@@ -1,0 +1,136 @@
+object Form_AskMapSize: TForm_AskMapSize
+  Left = 297
+  Height = 290
+  Top = 189
+  Width = 225
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Map size'
+  ClientHeight = 290
+  ClientWidth = 225
+  Color = 9551084
+  OnShow = FormShow
+  LCLVersion = '1.6.4.0'
+  object Label1: TLabel
+    Left = 16
+    Height = 15
+    Top = 16
+    Width = 83
+    Caption = 'Actual map size'
+    Font.Style = [fsItalic]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label2: TLabel
+    Left = 16
+    Height = 15
+    Top = 136
+    Width = 73
+    Caption = 'New map size'
+    Font.Style = [fsItalic]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 16
+    Height = 15
+    Top = 80
+    Width = 96
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Row : 9000 tiles'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label4: TLabel
+    AnchorSideLeft.Control = Shape1
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideBottom.Control = Shape1
+    Left = 118
+    Height = 15
+    Top = 43
+    Width = 79
+    Anchors = [akLeft, akBottom]
+    Caption = 'Column : 1 tile'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Shape1: TShape
+    AnchorSideLeft.Control = Label3
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Label3
+    AnchorSideTop.Side = asrCenter
+    Left = 115
+    Height = 58
+    Top = 58
+    Width = 84
+    BorderSpacing.Left = 3
+  end
+  object Label5: TLabel
+    Left = 64
+    Height = 15
+    Top = 172
+    Width = 48
+    Caption = 'Column :'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label6: TLabel
+    Left = 80
+    Height = 15
+    Top = 200
+    Width = 31
+    Caption = 'Row :'
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object SE1: TSpinEdit
+    Left = 128
+    Height = 23
+    Top = 164
+    Width = 71
+    Font.Style = [fsBold]
+    MaxValue = 2000
+    ParentFont = False
+    TabOrder = 0
+    Value = 8
+  end
+  object SE2: TSpinEdit
+    Left = 128
+    Height = 23
+    Top = 192
+    Width = 71
+    Font.Style = [fsBold]
+    MaxValue = 2000
+    ParentFont = False
+    TabOrder = 1
+    Value = 8
+  end
+  object BitBtn1: TBitBtn
+    Left = 19
+    Height = 23
+    Top = 256
+    Width = 80
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
+    OnClick = BitBtn1Click
+    TabOrder = 2
+  end
+  object BitBtn2: TBitBtn
+    Left = 128
+    Height = 23
+    Top = 256
+    Width = 78
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 3
+  end
+end

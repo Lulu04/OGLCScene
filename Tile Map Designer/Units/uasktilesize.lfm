@@ -1,0 +1,60 @@
+object Form_AskTileSize: TForm_AskTileSize
+  Left = 355
+  Height = 140
+  Top = 199
+  Width = 236
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = 'Form_AskTileSize'
+  ClientHeight = 140
+  ClientWidth = 236
+  Color = 9551084
+  Font.Height = -16
+  Position = poMainFormCenter
+  LCLVersion = '1.6.2.0'
+  object Label1: TLabel
+    Left = 37
+    Height = 21
+    Top = 16
+    Width = 74
+    Caption = 'Tile width :'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 32
+    Height = 21
+    Top = 64
+    Width = 79
+    Caption = 'Tile height :'
+    ParentColor = False
+  end
+  object E1: TEdit
+    Left = 128
+    Height = 29
+    Top = 8
+    Width = 54
+    Alignment = taRightJustify
+    NumbersOnly = True
+    TabOrder = 0
+  end
+  object E2: TEdit
+    Left = 128
+    Height = 29
+    Top = 56
+    Width = 54
+    Alignment = taRightJustify
+    NumbersOnly = True
+    TabOrder = 1
+  end
+  object Button1: TButton
+    Left = 80
+    Height = 24
+    Top = 104
+    Width = 78
+    Caption = 'ok'
+    Font.Height = -16
+    OnClick = Button1Click
+    ParentFont = False
+    TabOrder = 2
+  end
+end

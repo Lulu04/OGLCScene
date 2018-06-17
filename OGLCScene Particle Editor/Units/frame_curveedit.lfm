@@ -1,0 +1,24 @@
+object Frame1: TFrame1
+  Left = 0
+  Height = 240
+  Top = 0
+  Width = 320
+  ClientHeight = 240
+  ClientWidth = 320
+  Color = clNone
+  ParentColor = False
+  TabOrder = 0
+  DesignLeft = 534
+  DesignTop = 249
+  object PB: TPaintBox
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    OnMouseDown = PBMouseDown
+    OnMouseMove = PBMouseMove
+    OnMouseUp = PBMouseUp
+    OnPaint = PBPaint
+  end
+end

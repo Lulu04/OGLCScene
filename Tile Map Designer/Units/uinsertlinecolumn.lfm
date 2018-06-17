@@ -1,0 +1,65 @@
+object Form_InsertLineColumn: TForm_InsertLineColumn
+  Left = 414
+  Height = 80
+  Top = 250
+  Width = 294
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = 'Insert line(s)'
+  ClientHeight = 80
+  ClientWidth = 294
+  Color = 10019834
+  LCLVersion = '1.6.4.0'
+  object Shape1: TShape
+    Left = 0
+    Height = 80
+    Top = 0
+    Width = 294
+    Align = alClient
+    Brush.Color = 10019834
+    Pen.Color = 420998
+    Pen.Width = 3
+  end
+  object BitBtn1: TBitBtn
+    Left = 200
+    Height = 21
+    Top = 48
+    Width = 73
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 200
+    Height = 21
+    Top = 13
+    Width = 73
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 6
+    Height = 15
+    Top = 36
+    Width = 106
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Line to insert :'
+    ParentColor = False
+  end
+  object SE1: TSpinEdit
+    Left = 121
+    Height = 23
+    Top = 32
+    Width = 56
+    MaxValue = 10000
+    MinValue = 1
+    TabOrder = 2
+    Value = 1
+  end
+end

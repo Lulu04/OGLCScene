@@ -1,0 +1,41 @@
+E_Coor
+0 0
+E_Direction
+180
+E_Spread
+11
+E_Life
+0.003
+E_LoopMode
+TRUE
+E_Emission
+299
+E_Gravity
+0 0
+E_Type
+1 150
+P_ParticlesPositionsRelativeToEmitterPosition
+FALSE
+P_Texture
+Flame.png
+32 32
+P_Frame
+0 0
+P_Life
+0.899 0.598
+P_ColorMode
+0
+P_BlendMode
+1
+P_Color
+3 0.00000 255 255 255 31 0.16946 245 131 27 147 1.00000 255 0 0 1
+P_Velocity
+32 3 3 0.00000 -0.02703 0.48768 -0.02703 1.00000 0.02703
+P_AVelocity
+-1 0 2 0.00000 0.00000 1.00000 0.00000
+P_Size
+0.68750 0.59375 4 0.00000 0.73171 0.19507 1.43902 0.75764 0.68293 1.00000 1.46341
+P_StartAngle
+0 0
+P_Spin
+71 38 2 0.00000 0.99320 1.00000 -0.91156
