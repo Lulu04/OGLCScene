@@ -219,7 +219,7 @@ var
 
   TextureManager.BindTexture( FTexture );
 
-  for i:=1 to UTF8Length(aText) do begin
+  for i:=1 to UTF8Length(aString) do begin
    tc := GetTexturedChar( UTF8Copy(aText,i,1) );
    if tc <> NIL then begin
       DrawChar( tc, aLocation, aLayerPercentOpacity );
