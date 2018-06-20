@@ -297,7 +297,7 @@ end;
 function TTextureManager.GetMaxTextureWidth: integer;
 var v:GLInt;
 begin
- glGetIntegerv( GL_MAX_TEXTURE_SIZE, @v);
+ glGetIntegerv( GL_MAX_TEXTURE_SIZE, @v, 0);
  Result := v;
 end;
 

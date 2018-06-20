@@ -77,7 +77,6 @@ var
  begin
   TextureManager.Delete( FTexture );
   SetLength( FTexCharArray, 0 );
-  CharSpaceCoeff.Free;
   inherited Destroy;
  end;
 

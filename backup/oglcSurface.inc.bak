@@ -951,7 +951,7 @@ type
   PTextureCoordIndex = ^TTextureCoordIndex;
   TTextureCoordIndex = array[ 0..3 ] of integer;
 
-const                                                      // normal       // flip H       // flip V       // flip HV
+const                                                      // normal       // flip H       // flip V       // flip both
   FLIP_TEXCOORD : array[ 0..3 ] of TTextureCoordIndex = ( ( 0, 1, 2, 3 ), ( 1, 0, 3, 2 ), ( 3, 2, 1, 0 ), ( 2, 3, 0, 1 ) );
 
 procedure TSimpleSurfaceWithEffect.DrawSurface(aTexture: PTexture; AFrameIndex: integer; const aLayerPercentOpacity: single);
