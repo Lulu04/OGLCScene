@@ -2,19 +2,20 @@
 const
   OGLC_DEFAULT_CHAR_SET = ' '+
                           '0123456789'+
-                          '?!,.;:/*-+=()[]@'+
                           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'+
-                          'éèêëàâæçùûüïîôœÿß'+
-                          'ÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸ';
+                          '?!,.;:/*-+=()[]@'+
+                          'ÉéÈèÊêËëÁáÂâÀàÆæÇçÙùÛûÏïÎîÔôŒœŸÿ'+
+                          'ÄäÖöÜüß'+
+                          'Ññ';
 type
 
-// TO DO: rewrite all !
 // construct an image with each character in the charset.
 
 TTexturedChar = record
   Character: string;
-  CharSize : TSize;    // in pixel
-  TexCoor  : TTexCoor; // coordinates of the part of the texture for this character
+  DecoratedCharSize,          // size of the character with outline and shadow
+  OriginalCharSize: TSize;    // normal size of the character (as given by TBGRABitmap.TextSize())
+  TexCoor: TTexCoor;          // texture coordinates for this character
 end;
 PTexturedChar=^TTexturedChar;
 
@@ -32,10 +33,15 @@ TTexturedFont = class
   function GetTexturedChar( aChar: string ): PTexturedChar;
   procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single );
  public
+  CharSpaceCoeff: TBoundedFParam; // coeff affect the space between character
+                                  // [0..1[ the characters are close together
+                                  // 1  normal
+                                  // >1   the characters are farther apart from each other
   procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single );
   function GetCharWidth( const c: string ): integer;
   function GetCharHeight( const c: string ): integer;
   function GetCharSize( const c: string ): TSize;
+  property Texture: PTexture read FTexture;
 end;
 
 
@@ -63,6 +69,8 @@ var
  begin
   SetLength( FTexCharArray, 0 );
   BuildTexture( aFont, aCharSet );
+  CharSpaceCoeff:= CreateBoundedFParam(0, 1000000, FALSE );
+  CharSpaceCoeff.Value := 1.0;
  end;
 
  destructor TTexturedFont.Destroy;
@@ -87,11 +95,12 @@ var
 
  procedure TTexturedFont.BuildTexture(aFont: TGuiFont; const aCharSet: string);
  var i, j, xx, yy, maxCharHeight : integer;
-     ima, imaChar: TBGRABitmap;
+     ima, temp: TBGRABitmap;
      s1 : string;
      renderer: TBGRATextEffectFontRenderer;
  begin
   FFont := aFont;
+  if FFont.FontHeight>150 then FFont.FontHeight:=150; // max FontHeight is 150
 
   renderer:= TBGRATextEffectFontRenderer.Create;
   with FFont do begin
@@ -105,8 +114,9 @@ var
     renderer.OuterOutlineOnly := True;
     renderer.OutlineWidth := OutLineWidth;
 
-    ima:= TBGRABitmap.Create(TextureManager.GetMaxTextureWidth,
-                             TextureManager.GetMaxTextureWidth);  // default max texture size
+    //ima:= TBGRABitmap.Create(TextureManager.GetMaxTextureWidth,
+    //                         TextureManager.GetMaxTextureWidth);  // default max texture size
+    ima:= TBGRABitmap.Create(1024,1024, BGRAPixelTransparent );
     ima.FontRenderer := renderer;
     ima.FontQuality:= fqFineAntialiasing;
     ima.FontName := FontName;
@@ -119,46 +129,59 @@ var
   xx:=0;
   yy:=0;
   maxCharHeight:=0;
-  for i:=0 to UTF8Length(aCharSet)-1 do
+  for i:=0 to Length(FTexCharArray)-1 do
    begin
     s1 := UTF8Copy( aCharSet, i+1, 1 );
-    imaChar := TextToBitmap( s1, FFont );
+    temp := TextToBitmap( s1, FFont );
 
-    if xx+imaChar.Width>1024 then begin
+    if xx+temp.Width>ima.Width then begin
           // next line
           xx := 0;
           yy += maxCharHeight;
     end;
 
-    ima.PutImage(xx, yy, imaChar, dmDrawWithTransparency);
-    if maxCharHeight< imaChar.Height then maxCharHeight:=imaChar.Height;
-    xx += imachar.Width;
+    ima.PutImage(xx, yy, temp, dmDrawWithTransparency);
+    if maxCharHeight< temp.Height then maxCharHeight:=temp.Height;
 
     FTexCharArray[i].Character := s1;
-    FTexCharArray[i].CharSize := Size(imaChar.Width, imaChar.Height);
+    FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
+    FTexCharArray[i].OriginalCharSize := temp.TextSize(s1);
+    // coordinates of the character on the whole texture
     FTexCharArray[i].TexCoor[0].x := xx;
     FTexCharArray[i].TexCoor[0].y := yy;
-    FTexCharArray[i].TexCoor[1].x := xx+imaChar.Width;
+    FTexCharArray[i].TexCoor[1].x := xx+temp.Width;
     FTexCharArray[i].TexCoor[1].y := yy;
-    FTexCharArray[i].TexCoor[2].x := xx+imaChar.Width;
-    FTexCharArray[i].TexCoor[2].y := yy+imaChar.Height;
+    FTexCharArray[i].TexCoor[2].x := xx+temp.Width;
+    FTexCharArray[i].TexCoor[2].y := yy+temp.Height;
     FTexCharArray[i].TexCoor[3].x := xx;
-    FTexCharArray[i].TexCoor[3].y := yy+imaChar.Height;
+    FTexCharArray[i].TexCoor[3].y := yy+temp.Height;
+    xx += temp.Width;
+    temp.Free;
    end;
 
-  // TO DO: reduce the size of ima to remove the unused pixels
+  // reduce the size of the texture image to remove the unused pixels
+  if yy>0 then begin
+     // reduce only verticaly because all width is occupied
+     temp := TBGRABitmap.Create( ima.Width, yy+maxCharHeight );
+  end else begin
+     // reduce both horizontaly and verticaly
+     temp := TBGRABitmap.Create( xx, yy+maxCharHeight );
+  end;
 
-  // compute Texture coordinate for each character
+  temp.PutImage( 0, 0, ima, dmSet );
+  ima.Free;
+
+  // transform texture coordinate in their equivalent range [0..1]
   for i:=0 to Length(FTexCharArray)-1 do
     with FTexCharArray[i] do begin
      for j:=0 to 3 do begin
-       TexCoor[j].x := TexCoor[j].x/ima.Width;
-       TexCoor[j].y := TexCoor[j].y/ima.Height;
+       TexCoor[j].x := TexCoor[j].x/temp.Width;
+       TexCoor[j].y := (temp.Height-TexCoor[j].y)/temp.Height;
      end;
     end;
 
-  FTexture := TextureManager.Add( ima );
-  ima.Free;
+  FTexture := TextureManager.Add( temp );
+  temp.Free;
  end;
 
  function TTexturedFont.GetTexturedChar(aChar: string): PTexturedChar;
@@ -175,7 +198,6 @@ var
  var
    quad : TTexCoor;
    tci  : PTextureCoordIndex;
-   i: integer;
    procedure DrawVertex;
     begin
  {    glBegin( GL_TRIANGLES );
@@ -196,11 +218,12 @@ var
      glEnd;
     end;
  begin
-
+  if aChar^.Character=' ' then exit;
+ // aChar:=@FTexCharArray[20];
   quad[0] := aLoc;
-  quad[1] := aLoc+PointF(aChar^.CharSize.cx,0);
-  quad[2] := aLoc+PointF(aChar^.CharSize.cx,aChar^.CharSize.cy);
-  quad[3] := aLoc+PointF(0,aChar^.CharSize.cy);
+  quad[1] := aLoc+PointF(aChar^.DecoratedCharSize.cx,0);
+  quad[2] := aLoc+PointF(aChar^.DecoratedCharSize.cx,aChar^.DecoratedCharSize.cy);
+  quad[3] := aLoc+PointF(0,aChar^.DecoratedCharSize.cy);
 
   tci := @FLIP_TEXCOORD[ 0 ];
 
@@ -209,7 +232,7 @@ var
   DrawVertex;
  end;
 
-  procedure TTexturedFont.DrawText(aText: string; aLocation: TPointF;
+ procedure TTexturedFont.DrawText(aText: string; aLocation: TPointF;
    const aLayerPercentOpacity: single);
  var i: integer;
   tc: PTexturedChar;
@@ -219,11 +242,26 @@ var
 
   TextureManager.BindTexture( FTexture );
 
-  for i:=1 to UTF8Length(aString) do begin
-   tc := GetTexturedChar( UTF8Copy(aText,i,1) );
-   if tc <> NIL then begin
-      DrawChar( tc, aLocation, aLayerPercentOpacity );
-      aLocation.x+=tc^.CharSize.cx;
+  if FFont.ShadowOffsetX>=0 then begin // font shadow is on the right => put letter from left to right
+    for i:=1 to UTF8Length(aText) do begin
+     tc := GetTexturedChar( UTF8Copy(aText,i,1) );
+     if tc <> NIL then begin
+        DrawChar( tc, aLocation, aLayerPercentOpacity );
+        aLocation.x+=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
+     end;
+    end;
+  end else begin  // font shadow is on the left => put letter from right to left
+   for i:=1 to UTF8Length(aText) do begin
+    tc := GetTexturedChar( UTF8Copy(aText,i,1) );
+    if tc <> NIL then aLocation.x+=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
+    end;
+
+   for i:=UTF8Length(aText) downto 1 do begin
+    tc := GetTexturedChar( UTF8Copy(aText,i,1) );
+    if tc <> NIL then begin
+       aLocation.x-=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
+       DrawChar( tc, aLocation, aLayerPercentOpacity );
+    end;
    end;
   end;
  end;
@@ -234,7 +272,7 @@ var
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].CharSize.cx ;
+    else Result := FTexCharArray[i].DecoratedCharSize.cx ;
  end;
 
  function TTexturedFont.GetCharHeight(const c: string): integer;
@@ -243,7 +281,7 @@ var
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].CharSize.cy ;
+    else Result := FTexCharArray[i].DecoratedCharSize.cy ;
  end;
 
  function TTexturedFont.GetCharSize(const c: string): TSize;
@@ -252,7 +290,7 @@ var
   i := IndexOf( c );
   if i=-1
     then Result := Size(0,0)
-    else Result := FTexCharArray[i].CharSize ;
+    else Result := FTexCharArray[i].DecoratedCharSize ;
  end;
 
  constructor TFontManager.Create;

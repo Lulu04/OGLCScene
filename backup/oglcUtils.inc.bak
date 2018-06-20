@@ -128,8 +128,8 @@ begin
       // size of the rendered font. try to take into account shadow and outlines.
       ts := Result.TextSize(aCaption);
 
-      Result.SetSize( ts.cx + round(OutlineWidth)+abs( ShadowOffsetX ){%H-}+ShadowRadius*2,
-                      ts.cy + round(OutlineWidth)+abs( ShadowOffsetY ){%H-}+ShadowRadius*2 );
+      Result.SetSize( ts.cx + round(OutlineWidth)+abs( ShadowOffsetX )+ShadowRadius*2,
+                      ts.cy + round(OutlineWidth)+abs( ShadowOffsetY )+ShadowRadius*2 );
 
         xx := OutlineWidth*0.5+ShadowRadius;
         yy:= xx;
