@@ -116,9 +116,7 @@ var
     renderer.OuterOutlineOnly := True;
     renderer.OutlineWidth := OutLineWidth;
 
-    //ima:= TBGRABitmap.Create(TextureManager.GetMaxTextureWidth,
-    //                         TextureManager.GetMaxTextureWidth);  // default max texture size
-    ima:= TBGRABitmap.Create(1024,1024, BGRAWhite);//BGRAPixelTransparent );
+    ima:= TBGRABitmap.Create(1024, 1024, BGRAPixelTransparent );
     ima.FontRenderer := renderer;
     ima.FontQuality:= fqFineAntialiasing;
     ima.FontName := FontName;
@@ -220,8 +218,7 @@ var
      glEnd;
     end;
  begin
-  if aChar^.Character=' ' then exit;
- // aChar:=@FTexCharArray[20];
+//  if aChar^.Character=' ' then exit;
   quad[0] := aLoc;
   quad[1] := aLoc+PointF(aChar^.DecoratedCharSize.cx,0);
   quad[2] := aLoc+PointF(aChar^.DecoratedCharSize.cx,aChar^.DecoratedCharSize.cy);
