@@ -52,6 +52,7 @@ TFontManager = class
  Destructor Destroy; override;
 private
  FList: TList;
+ procedure Update( const aElapsedTime: single );
 public
  function AddFont( aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
  procedure DeleteFont( var aFont: TTexturedFont );
@@ -306,6 +307,13 @@ var
   Clear;
   FList.Free;
   inherited Destroy;
+ end;
+
+ procedure TFontManager.Update(const aElapsedTime: single);
+ var i: integer;
+ begin
+  for i:=0 to FList.Count-1 do
+    TTexturedFont(FList.Items[i]).CharSpaceCoeff.OnElapse( aElapsedTime );
  end;
 
   function TFontManager.AddFont(aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;

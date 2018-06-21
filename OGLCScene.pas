@@ -782,6 +782,7 @@ begin
  if FCurrentStage <> NIL then FCurrentStage.Update( DT );
 
  MouseManager.UpDate( DT );
+ FontManager.Update( DT );
 
  // Scene global fade
  FGlobalFadeColor.OnElapse( DT );
