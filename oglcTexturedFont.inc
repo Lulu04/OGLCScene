@@ -3,10 +3,10 @@ const
   OGLC_DEFAULT_CHAR_SET = ' '+
                           '0123456789'+
                           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'+
-                          '?!,.;:/*-+=()[]@'+
                           'ÉéÈèÊêËëÁáÂâÀàÆæÇçÙùÛûÏïÎîÔôŒœŸÿ'+
                           'ÄäÖöÜüß'+
-                          'Ññ';
+                          'Ññ'+
+                          '?!,.;:/*-+=()[]@';
 type
 
 // construct an image with each character in the charset.
@@ -118,7 +118,7 @@ var
 
     //ima:= TBGRABitmap.Create(TextureManager.GetMaxTextureWidth,
     //                         TextureManager.GetMaxTextureWidth);  // default max texture size
-    ima:= TBGRABitmap.Create(1024,1024, BGRAPixelTransparent );
+    ima:= TBGRABitmap.Create(1024,1024, BGRAWhite);//BGRAPixelTransparent );
     ima.FontRenderer := renderer;
     ima.FontQuality:= fqFineAntialiasing;
     ima.FontName := FontName;
