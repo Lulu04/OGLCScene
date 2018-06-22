@@ -104,15 +104,17 @@ function TextToBitmap(aCaption: string; const aFont: TGuiFont; aBackGround: TBGR
 var xx,yy,r:single;
     renderer: TBGRATextEffectFontRenderer;
     ts: TSize;
+    _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
+    _OutLineWidth: single;
 begin
  renderer:= TBGRATextEffectFontRenderer.Create;
  with aFont do begin
-    renderer.ShadowVisible := ShadowColor<>BGRAPixelTransparent;
+    renderer.ShadowVisible := ShadowColor.alpha<>0;
     renderer.ShadowColor := ShadowColor;
     renderer.ShadowOffset.x := ShadowOffsetX;
     renderer.ShadowOffset.y := ShadowOffsetY;
     renderer.ShadowRadius := ShadowRadius;
-    renderer.OutlineVisible := (OutLineColor<>BGRAPixelTransparent) and (OutLineWidth>0);
+    renderer.OutlineVisible := (OutLineColor.alpha>0) and (OutLineWidth>0);
     renderer.OutlineColor := OutLineColor;
     renderer.OuterOutlineOnly := True;
     renderer.OutlineWidth := OutLineWidth;
@@ -124,17 +126,32 @@ begin
     Result.FontHeight := FontHeight;
     Result.FontStyle := Style;
 
+    // force shadow param. to 0 if there is no shadow
+    if renderer.ShadowVisible then begin
+      _ShadowOffsetX:=ShadowOffsetX;
+      _ShadowOffsetY:=ShadowOffsetY;
+      _ShadowRadius:=ShadowRadius;
+    end else begin
+       _ShadowOffsetX:=0;
+       _ShadowOffsetY:=0;
+       _ShadowRadius:=0;
+    end;
+    // force outline param. to 0 if there is no outline
+    if renderer.OutlineVisible
+      then _OutLineWidth:=OutLineWidth
+      else _OutLineWidth:=0;
+
     if aBackGround = NIL then begin
-      // size of the rendered font. try to take into account shadow and outlines.
+      // size of the rendered font. try to take into account shadow and outline.
       ts := Result.TextSize(aCaption);
 
-      Result.SetSize( ts.cx + round(OutlineWidth)+abs( ShadowOffsetX ){%H-}+ShadowRadius*2,
-                      ts.cy + round(OutlineWidth)+abs( ShadowOffsetY ){%H-}+ShadowRadius*2 );
+      Result.SetSize( ts.cx + round(_OutlineWidth)+abs( _ShadowOffsetX ){%H-}+_ShadowRadius*2,
+                      ts.cy + round(_OutlineWidth)+abs( _ShadowOffsetY ){%H-}+_ShadowRadius*2 );
 
-        xx := OutlineWidth*0.5+ShadowRadius;
-        yy:= xx;
-        if ShadowOffsetX<0 then xx += Abs(ShadowOffsetX);
-        if ShadowOffsetY<0 then yy += Abs(ShadowOffsetY);
+      xx := _OutlineWidth*0.5+_ShadowRadius;
+      yy:= xx;
+      if _ShadowOffsetX<0 then xx += Abs(_ShadowOffsetX);
+      if _ShadowOffsetY<0 then yy += Abs(_ShadowOffsetY);
 
       Result.Fill( BGRAPixelTransparent );
       Result.TextOut( xx, yy, aCaption, FontColor );
@@ -144,8 +161,8 @@ begin
          then r := Result.Height * 0.3
          else r := Result.Width * 0.3;
        Result.RoundRectAntialias( 0, 0, Result.Width-1, Result.Height-1, r, r, nil, 0, aBackGround );
-       Result.RoundRectAntialias( 0, 0, Result.Width-1, Result.Height-1, r, r, OutLineColor, OutLineWidth );
-       Result.TextOut(Result.TextSize(' ').cx + OutLineWidth/2, OutLineWidth/2, aCaption, FontColor );
+       Result.RoundRectAntialias( 0, 0, Result.Width-1, Result.Height-1, r, r, OutLineColor, _OutLineWidth );
+       Result.TextOut(Result.TextSize(' ').cx + _OutLineWidth/2, _OutLineWidth/2, aCaption, FontColor );
     end;
  end;
 end;

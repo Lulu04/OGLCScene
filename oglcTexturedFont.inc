@@ -3,10 +3,10 @@ const
   OGLC_DEFAULT_CHAR_SET = ' '+
                           '0123456789'+
                           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'+
-                          '?!,.;:/*-+=()[]@'+
                           'ÉéÈèÊêËëÁáÂâÀàÆæÇçÙùÛûÏïÎîÔôŒœŸÿ'+
                           'ÄäÖöÜüß'+
-                          'Ññ';
+                          'Ññ'+
+                          '?!,.;:/*-+=()[]@';
 type
 
 // construct an image with each character in the charset.
@@ -52,6 +52,7 @@ TFontManager = class
  Destructor Destroy; override;
 private
  FList: TList;
+ procedure Update( const aElapsedTime: single );
 public
  function AddFont( aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
  procedure DeleteFont( var aFont: TTexturedFont );
@@ -115,9 +116,7 @@ var
     renderer.OuterOutlineOnly := True;
     renderer.OutlineWidth := OutLineWidth;
 
-    //ima:= TBGRABitmap.Create(TextureManager.GetMaxTextureWidth,
-    //                         TextureManager.GetMaxTextureWidth);  // default max texture size
-    ima:= TBGRABitmap.Create(1024,1024, BGRAPixelTransparent );
+    ima:= TBGRABitmap.Create(1024, 1024, BGRAPixelTransparent );
     ima.FontRenderer := renderer;
     ima.FontQuality:= fqFineAntialiasing;
     ima.FontName := FontName;
@@ -219,8 +218,7 @@ var
      glEnd;
     end;
  begin
-  if aChar^.Character=' ' then exit;
- // aChar:=@FTexCharArray[20];
+//  if aChar^.Character=' ' then exit;
   quad[0] := aLoc;
   quad[1] := aLoc+PointF(aChar^.DecoratedCharSize.cx,0);
   quad[2] := aLoc+PointF(aChar^.DecoratedCharSize.cx,aChar^.DecoratedCharSize.cy);
@@ -306,6 +304,13 @@ var
   Clear;
   FList.Free;
   inherited Destroy;
+ end;
+
+ procedure TFontManager.Update(const aElapsedTime: single);
+ var i: integer;
+ begin
+  for i:=0 to FList.Count-1 do
+    TTexturedFont(FList.Items[i]).CharSpaceCoeff.OnElapse( aElapsedTime );
  end;
 
   function TFontManager.AddFont(aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
