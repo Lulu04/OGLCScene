@@ -1,19 +1,19 @@
 {
-  ****************************************************************************
+  **************************************************************************
  *                                                                          *
- *  This file is part of OGLCScene library which is distributed             *
- *  under the modified LGPL.                                                *
+ *  This file is the main part of OGLCScene library.                        *
  *                                                                          *
- *  See the file COPYING.modifiedLGPL.txt, included in this distribution,   *
+ *  See the file LICENSE included in this distribution,                     *
  *  for details about the copyright.                                        *
  *                                                                          *
- *  This program is distributed in the hope that it will be useful,         *
+ *  This software is distributed in the hope of being useful                *
+ *  for learning purposes about OpenGL and Lazarus,                         *
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    *
  *                                                                          *
- ****************************************************************************
+  **************************************************************************
 
- written by Lulu - 2017
+ written by Lulu  2017 - 2018
 
 }
 unit OGLCScene;

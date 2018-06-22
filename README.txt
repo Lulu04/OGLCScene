@@ -1,7 +1,9 @@
 # OGLCScene
 2D game library written with Lazarus
 
-  This library use OpenGL through TOpenGLControl. I got inspired by ZENGL written by Andrey Kemka.
+  This Lazarus library was inspired by ZENGL written by Andrey Kemka.
+
+  You need LazOpenGlContext and BGRABitmap package to compile it.
   
   This is not modern OpenGL programming. It use "glBegin" / glEnd" batch to render graphics.
   It use also BGRABitmap to load and prepare some images like text with nice decorations.
@@ -9,7 +11,7 @@
   
 Support:
   - only 2D scene
-  - multi layers
+  - multi layers architecture
   - sprites and other kind of surface with automated effect like tint, opacity, moves...
   - all kind of surface that can be displayed have scenario support: they can execute scripts written in external files
     in order to perform certain actions on the surface.
