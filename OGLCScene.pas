@@ -497,7 +497,7 @@ begin
  while GetTickCount64 - FTickOrigin < 16 do
   begin
    sleep(1);
-   Application.ProcessMessages;
+   //Application.ProcessMessages;
   end;
  UpDate( ( t - FTickOrigin ) * 0.001 );
  FTickOrigin := t;
