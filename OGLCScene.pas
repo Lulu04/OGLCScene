@@ -517,8 +517,10 @@ begin
      ColorFadeIn( BGRABlack, 1.0 );
      ExecuteDuring( 1.0 );
    end;
-   if FCurrentStage <> NIL then FCurrentStage.FreeData;
-   if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+   if FCurrentStage <> NIL then begin
+     FCurrentStage.FreeData;
+     if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+   end;
    FCurrentStage := FStageRequested;
    FStageRequested := NIL;
    FCurrentStage.LoadData;
