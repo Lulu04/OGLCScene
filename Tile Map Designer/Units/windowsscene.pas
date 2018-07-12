@@ -646,12 +646,10 @@ begin
 end;
 
 procedure TWindow_Scene.ShowActionText(aX, aY: single; aTxt: string);
-var o : TGUILabel;
+var o : TGuiLabel;
   rx, ry, time: single;
 begin
-  o := TGUILabel.Create;
-  o.Font := FHintFont;
-  o.Caption := aTxt;
+  o := TGuiLabel.Create( aTxt, FHintFont );
   o.SetCenterCoordinate( aX, aY );
   FScene.Add( o, Layer_Info );
   time := 2.0;
@@ -672,9 +670,7 @@ var o: TGuiLabel;
     p: TPointF;
 begin
  if not Form_Principale.CheckBox2.Checked or ( Event = -1 ) then exit;
- o := TGuiLabel.Create;
- o.Font := FEventFont;
- o.Caption := GetStrEvent( Event );
+ o := TGuiLabel.Create( GetStrEvent( Event ), FEventFont );
  p := SceneTileCoor + PointF( FTileEngine.TileSize.cx*0.5, FTileEngine.TileSize.cy*0.5 );
  o.SetCenterCoordinate( p.x, p.y );
  FillBox( o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(0,0,0,190) );

@@ -35,7 +35,7 @@ FImageBackGround: TBGRABitmap;
 
 FTitleFont,
 FHintFont,
-FEventFont: TTexturedFont;
+FEventFont: TGuiFont;
 
 FLabelMapPosition: TGuiLabel;
 FLabelTileIndexes: TGuiLabel;
