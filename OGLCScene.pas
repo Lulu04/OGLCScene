@@ -28,7 +28,6 @@ uses
   lazutf8,
   BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath,
   VelocityCurve,
- // UTF8utils,
   math,
   strutils;
 
@@ -164,6 +163,7 @@ type
 
 // abstract class to manage one stage of your game application
 TStageSkeleton = class
+ FreeWhenLeave: boolean; // set to true to free automatically the stage when the application leave it
  procedure LoadData; virtual; abstract;  // override to load texture, create sprite, gui object, sound, initialization, etc...
  procedure FreeData; virtual; abstract;  // override to free all that need to be freed at the end of this stage
  procedure Update( AElapsedTime: single ); virtual; abstract; // override to update your stuff according time
@@ -197,7 +197,7 @@ TOGLCScene = class (TLayerList)
   FKeyMap : array[0..255] of boolean; // TRUE if Key is pressed
   FCurrentStage,
   FStageRequested: TStageSkeleton;
-  FIsChangingStage: boolean;
+  FIsChangingStage,
   FDoBlackScreenOnNewStage: boolean;
   procedure NewOnResize ( Sender:TObject );
   procedure NewOnClick ( Sender:TObject );
@@ -518,6 +518,7 @@ begin
      ExecuteDuring( 1.0 );
    end;
    if FCurrentStage <> NIL then FCurrentStage.FreeData;
+   if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
    FCurrentStage := FStageRequested;
    FStageRequested := NIL;
    FCurrentStage.LoadData;
@@ -545,7 +546,7 @@ begin
  FExecuteDuringLoop := FALSE;
 end;
 
-procedure TOGLCScene.LaunchStage(AStage: TStageSkeleton; DoBlackScreen: boolean=TRUE);
+procedure TOGLCScene.LaunchStage(AStage: TStageSkeleton; DoBlackScreen: boolean);
 begin
  if FIsChangingStage then exit;
  FStageRequested := AStage;
