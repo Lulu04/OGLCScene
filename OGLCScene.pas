@@ -215,6 +215,7 @@ TOGLCScene = class (TLayerList)
  private
   FGlobalFadeColor: TBGRAParam;
   FBackgroundColor : TBGRAPixel;
+  FFadeTimeForStageChange: single;
   function GetSceneHeight: integer; inline ;
   function GetSceneWidth: integer; inline ;
   procedure SetBackgroundColor ( aColor:TBGRAPixel );
@@ -247,6 +248,7 @@ TOGLCScene = class (TLayerList)
 
   procedure LaunchStage( AStage: TStageSkeleton; DoBlackScreen: boolean=TRUE );
   property CurrentStage: TStageSkeleton read FCurrentStage;
+  property FadeTimeForStageChange: single read FFadeTimeForStageChange write FFadeTimeForStageChange;
 
   // Surface
   procedure Add ( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
@@ -407,6 +409,8 @@ begin
 
  FGlobalFadeColor:= TBGRAParam.Create;
  FGlobalFadeColor.Value := BGRA(0,0,0,0);
+ FFadeTimeForStageChange:= 1.0;
+
 
  TextureManager := TTextureManager.Create;
 
@@ -432,7 +436,10 @@ end;
 
 destructor TOGLCScene.Destroy;
 begin
- if FCurrentStage <> NIL then FCurrentStage.FreeData;
+ if FCurrentStage <> NIL then begin
+   FCurrentStage.FreeData;
+   if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+ end;
  FCurrentStage := NIL;
 
  if FOnFreeCommonData <> NIL then FOnFreeCommonData;
@@ -514,8 +521,8 @@ begin
    FIsChangingStage := TRUE;
    if FDoBlackScreenOnNewStage then
    begin
-     ColorFadeIn( BGRABlack, 1.0 );
-     ExecuteDuring( 1.0 );
+     ColorFadeIn( BGRABlack, FFadeTimeForStageChange );
+     ExecuteDuring( FFadeTimeForStageChange );
    end;
    if FCurrentStage <> NIL then begin
      FCurrentStage.FreeData;
@@ -527,8 +534,8 @@ begin
    ClearKeysState;
    if FDoBlackScreenOnNewStage
      then begin
-       ColorFadeOut( 1.0 );
-       ExecuteDuring( 1.0 );
+       ColorFadeOut( FFadeTimeForStageChange );
+       ExecuteDuring( FFadeTimeForStageChange );
      end;
    FIsChangingStage := FALSE;
  end;
