@@ -116,6 +116,8 @@ const
      acSetCoor              = 'SetCoor'        ; // SetCoor X Y
      acSetCenterCoor        = 'SetCenterCoor'  ; // SetCenterCoor X Y  (single)
 
+     acCenterOnScene        = 'CenterOnScene'  ; // CenterOnScene
+
      acEnableGui            = 'EnableGui';  // EnableGui
      acDisableGui           = 'DisableGui'; // DisableGui
 

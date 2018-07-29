@@ -1385,6 +1385,8 @@ begin
   end;
   acSetCenterCoor : ParentSurface.SetCenterCoordinate( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ));
 
+  acCenterOnScene: ParentSurface.CenterOnScene;
+
   acSendEvent : if FScenarioEvent <> NIL then FScenarioEvent( ParentSurface, ID, strtoint( FTemp[1] ) );
 
   acLoop : CurrentLine := -1 ;
