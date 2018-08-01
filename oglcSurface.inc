@@ -224,10 +224,10 @@ TArrayOfPTexture = array of PTexture;
 
 TSprite = class ( TSimpleSurfaceWithEffect )
 private
-   FTexture: PTexture;
    FTextureOwner: boolean;
    procedure Init; virtual;
 protected
+   FTexture: PTexture;
    function GetWidth: integer; override;
    function GetHeight: integer; override;
 public
