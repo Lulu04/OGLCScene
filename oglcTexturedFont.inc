@@ -31,15 +31,19 @@ TTexturedFont = class
   function IndexOf( c: string ): integer;
   procedure BuildTexture( aFont: TGuiFont; const aCharSet: string );
   function GetTexturedChar( aChar: string ): PTexturedChar;
-  procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single );
+  procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single;
+                      aSetTextureParameters: boolean=TRUE);
  public
   CharSpaceCoeff: TBoundedFParam; // coeff affect the space between character
                                   // [0..1[ the characters are close together
                                   // 1  normal
                                   // >1   the characters are farther apart from each other
-  procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single );
+  procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single;
+                      aSetTextureParameters: boolean=TRUE );
   function GetCharWidth( const c: string ): integer;
   function GetCharHeight( const c: string ): integer;
+  function GetTextWidth( const t: string ): integer;
+  function GetTextHeight( const t: string ): integer;
   function GetCharSize( const c: string ): TSize;
   property Texture: PTexture read FTexture;
 end;
@@ -52,19 +56,99 @@ TFontManager = class
  Destructor Destroy; override;
 private
  FList: TList;
+ function GetCount: integer;
  procedure Update( const aElapsedTime: single );
 public
  function AddFont( aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
  procedure DeleteFont( var aFont: TTexturedFont );
  procedure Clear;
+ property Count: integer read GetCount;
 end;
 
 var
  FontManager : TFontManager ;
 
+
+type
+
+{ TFreeText }
+
+TFreeText = class(TSimpleSurfaceWithEffect)
+private
+  FCaption: string;
+  FTexturedFont: TTexturedFont;
+  function GetCaption: string;
+  procedure SetCaption(AValue: string);
+protected
+ function GetWidth: integer; override;
+ function GetHeight: integer; override;
+public
+  procedure Update( const aElapsedTime: single ); override;
+  procedure Draw( const aLayerPercentOpacity: single );  override;
+public
+  property Caption: string read GetCaption write SetCaption;
+  property TexturedFont: TTexturedFont read FTexturedFont write FTexturedFont;
+end;
+
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
- { TTexturedFont }
+ { TFreeText }
+
+ function TFreeText.GetCaption: string;
+ begin
+  Result := FCaption;
+ end;
+
+ procedure TFreeText.SetCaption(AValue: string);
+ begin
+  FCaption := AValue;
+ end;
+
+ function TFreeText.GetWidth: integer;
+ begin
+  Result := FTexturedFont.GetTextWidth( FCaption );
+ end;
+
+ function TFreeText.GetHeight: integer;
+ begin
+  Result := FTexturedFont.GetTextHeight( FCaption );
+ end;
+
+ procedure TFreeText.Update(const aElapsedTime: single);
+ begin
+  inherited Update(aElapsedTime);
+ end;
+
+ procedure TFreeText.Draw(const aLayerPercentOpacity: single);
+ var AlphaTint: byte;
+ begin
+  if FCaption='' then exit;
+  PushAndPrepareMatrix;
+  SetBlendMode( FBlendMode );
+  TextureManager.BindTexture( FTexturedFont.Texture );
+
+  if Tint.alpha.Value < 255
+    then begin
+          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+          glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
+          FTexturedFont.DrawText( FCaption, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity, FALSE );
+         end;
+
+  if Tint.alpha.Value <> 0
+    then begin  //Apply Tint
+          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
+          glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
+          glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
+          AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
+          glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
+          FTexturedFont.DrawText( FCaption, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity, FALSE );
+         end;
+
+  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
+  PopMatrix;
+ end;
+
+{ TTexturedFont }
 
   constructor TTexturedFont.Create(aFont: TGuiFont; const aCharSet: string);
  begin
@@ -132,7 +216,7 @@ var
   for i:=0 to Length(FTexCharArray)-1 do
    begin
     s1 := UTF8Copy( aCharSet, i+1, 1 );
-    temp := TextToBitmap( s1, FFont );
+    temp := TextToBitmap( s1, FFont, NIL );
 
     if xx+temp.Width>ima.Width then begin
           // next line
@@ -141,12 +225,12 @@ var
     end;
 
     ima.PutImage(xx, yy, temp, dmDrawWithTransparency);
-    if maxCharHeight< temp.Height then maxCharHeight:=temp.Height;
+    if maxCharHeight < temp.Height then maxCharHeight:=temp.Height;
 
     FTexCharArray[i].Character := s1;
     FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
     FTexCharArray[i].OriginalCharSize := temp.TextSize(s1);
-    // coordinates of the character on the whole texture
+    // coordinates of the character on the whole image
     FTexCharArray[i].TexCoor[0].x := xx;
     FTexCharArray[i].TexCoor[0].y := yy;
     FTexCharArray[i].TexCoor[1].x := xx+temp.Width;
@@ -159,7 +243,7 @@ var
     temp.Free;
    end;
 
-  // reduce the size of the texture image to remove the unused pixels
+  // reduce the size of the image to remove the unused pixels
   if yy>0 then begin
      // reduce only verticaly because all width is occupied
      temp := TBGRABitmap.Create( ima.Width, yy+maxCharHeight );
@@ -180,6 +264,7 @@ var
      end;
     end;
 
+  // create the texture from image
   FTexture := TextureManager.Add( temp );
   temp.Free;
  end;
@@ -194,22 +279,12 @@ var
  end;
 
  procedure TTexturedFont.DrawChar(aChar: PTexturedChar; const aLoc: TPointF;
-   const aLayerPercentOpacity: single);
+   const aLayerPercentOpacity: single; aSetTextureParameters: boolean);
  var
    quad : TTexCoor;
    tci  : PTextureCoordIndex;
    procedure DrawVertex;
     begin
- {    glBegin( GL_TRIANGLES );
-       glTexCoord2fv( @TexCoor[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-       glTexCoord2fv( @TexCoor[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-       glTexCoord2fv( @TexCoor[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-     glEnd;
-     glBegin( GL_TRIANGLES );
-       glTexCoord2fv( @TexCoor[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-       glTexCoord2fv( @TexCoor[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-       glTexCoord2fv( @TexCoor[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-     glEnd;  }
      glBegin( GL_QUADS );
        glTexCoord2fv( @aChar^.TexCoor[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
        glTexCoord2fv( @aChar^.TexCoor[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
@@ -226,20 +301,22 @@ var
 
   tci := @FLIP_TEXCOORD[ 0 ];
 
-  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-  glColor4ub(255,255,255,round(255 * aLayerPercentOpacity));
+  if aSetTextureParameters then begin
+    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+    glColor4ub(255,255,255,round(255 * aLayerPercentOpacity));
+  end;
   DrawVertex;
  end;
 
  procedure TTexturedFont.DrawText(aText: string; aLocation: TPointF;
-   const aLayerPercentOpacity: single);
+   const aLayerPercentOpacity: single; aSetTextureParameters: boolean);
  var i: integer;
   tc: PTexturedChar;
  begin
   if aText='' then exit;
   if Length(FTexCharArray)=0 then exit;
 
-  TextureManager.BindTexture( FTexture );
+  if aSetTextureParameters then TextureManager.BindTexture( FTexture );
 
   if FFont.ShadowOffsetX>=0 then begin // font shadow is on the right => put letter from left to right
     for i:=1 to UTF8Length(aText) do begin
@@ -283,6 +360,23 @@ var
     else Result := FTexCharArray[i].DecoratedCharSize.cy ;
  end;
 
+ function TTexturedFont.GetTextWidth(const t: string): integer;
+ var i: integer;
+ begin
+  Result := 0;
+  for i:=1 to UTF8Length(t) do Result += GetCharWidth( UTF8Copy( t, i, 1 ));
+ end;
+
+ function TTexturedFont.GetTextHeight(const t: string): integer;
+ var i, h: integer;
+ begin
+  Result := 0;
+  for i:=1 to UTF8Length(t) do begin
+   h := GetCharHeight( UTF8Copy( t, i, 1 ));
+   if Result<h then Result :=h;
+  end;
+ end;
+
  function TTexturedFont.GetCharSize(const c: string): TSize;
  var i: integer;
  begin
@@ -312,6 +406,11 @@ var
   for i:=0 to FList.Count-1 do
     TTexturedFont(FList.Items[i]).CharSpaceCoeff.OnElapse( aElapsedTime );
  end;
+
+function TFontManager.GetCount: integer;
+begin
+ Result := FList.Count;
+end;
 
   function TFontManager.AddFont(aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
  begin
