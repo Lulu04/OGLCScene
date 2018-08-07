@@ -30,26 +30,46 @@ var
    MouseManager : TMouseManager;
 
 type
+TFontGradient = record
+ c1,
+ c2: TBGRAPixel;
+ GradientType: TGradientType;
+ Origin, d1: TPointF;
+ gammaColorCorrection,
+ Sinus: boolean;
+end;
+
 { TGuiFont }
 
 TGuiFont = record
  FontName: string;
  FontHeight: integer;
  Style: TFontStyles;
- FontColor,
  OutLineColor: TBGRAPixel;
  OutLineWidth: single;
  ShadowColor: TBGRAPixel;
  ShadowOffsetX,
  ShadowOffsetY,
  ShadowRadius: integer;
+ UseGradient: boolean;
+ FontColor: TBGRAPixel;
+ Gradient: TFontGradient;
 end;
 PGuiFont = ^TGuiFont;
 
+// Give a filled TFontGradient record
+function FontGradient(c1, c2: TBGRAPixel; AGradientType: TGradientType; AOrigin, d1: TPointF;
+                      gammaColorCorrection: boolean = True; Sinus: Boolean=False): TFontGradient;
+// Give a TGuiFont record (color version)
 function GuiFont(aFontName:string; aFontHeight:integer; aStyle:TFontStyles;
                  aFontColor, aOutLineColor: TBGRAPixel; aOutLineWidth:single;
-                 aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer ): TGuiFont;
-
+                 aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer ): TGuiFont; overload;
+// Give a TGuiFont record (gradient version)
+function GuiFont(aFontName:string; aFontHeight:integer; aStyle:TFontStyles;
+                 aFontGradient: TFontGradient;
+                 aOutLineColor: TBGRAPixel; aOutLineWidth:single;
+                 aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer ): TGuiFont; overload;
+// Give a default font (arial, black)
 function DefaultFont: TGuiFont;
 
 type
@@ -193,6 +213,19 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
+function FontGradient(c1, c2: TBGRAPixel; AGradientType: TGradientType;
+  AOrigin, d1: TPointF; gammaColorCorrection: boolean; Sinus: Boolean
+  ): TFontGradient;
+begin
+ Result.c1:=c1;
+ Result.c2:=c2;
+ Result.GradientType:=AGradientType;
+ Result.Origin:=AOrigin;
+ Result.d1:=d1;
+ Result.gammaColorCorrection:=gammaColorCorrection;
+ Result.Sinus:=Sinus;
+end;
+
 function GuiFont(aFontName: string; aFontHeight: integer;
   aStyle: TFontStyles; aFontColor, aOutLineColor: TBGRAPixel;
   aOutLineWidth: single; aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY,
@@ -204,6 +237,29 @@ begin
     FontHeight:=aFontHeight;
     Style:= aStyle;
     FontColor:=aFontColor;
+    UseGradient:=FALSE;
+    OutLineColor:=aOutLineColor;
+    OutLineWidth:=aOutLineWidth;
+    ShadowColor:=aShadowColor;
+    ShadowOffsetX:=aShadowOffsetX;
+    ShadowOffsetY:=aShadowOffsetY;
+    ShadowRadius:=aShadowRadius;
+ end;
+end;
+
+function GuiFont(aFontName: string; aFontHeight: integer; aStyle: TFontStyles;
+  aFontGradient: TFontGradient; aOutLineColor: TBGRAPixel;
+  aOutLineWidth: single; aShadowColor: TBGRAPixel; aShadowOffsetX,
+  aShadowOffsetY, aShadowRadius: integer): TGuiFont;
+begin
+ if aFontName='' then aFontName:='Arial';
+ with Result do begin
+    FontName:=aFontName;
+    FontHeight:=aFontHeight;
+    Style:= aStyle;
+    FontColor:=BGRAPixelTransparent;
+    Gradient:=aFontGradient;
+    UseGradient:=TRUE;
     OutLineColor:=aOutLineColor;
     OutLineWidth:=aOutLineWidth;
     ShadowColor:=aShadowColor;
@@ -225,6 +281,7 @@ begin
  Result.ShadowOffsetX:=0;
  Result.ShadowOffsetY:=0;
  Result.ShadowRadius:=0;
+ Result.UseGradient:=FALSE;
 end;
 
 { TGuiRadio }

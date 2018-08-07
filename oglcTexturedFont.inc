@@ -184,6 +184,7 @@ end;
      ima, temp: TBGRABitmap;
      s1 : string;
      renderer: TBGRATextEffectFontRenderer;
+
  begin
   FFont := aFont;
   if FFont.FontHeight>150 then FFont.FontHeight:=150; // max FontHeight is 150

@@ -26,7 +26,7 @@ uses
   types,
   OpenGLContext, GLExt, GL,
   lazutf8,
-  BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath,
+  BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath, BGRAGradientScanner,
   VelocityCurve,
   math,
   strutils;

@@ -74,7 +74,6 @@ begin
  Result := inttoHex(aColor.red,2)+inttoHex(aColor.green,2)+inttoHex(aColor.blue,2)+inttoHex(aColor.alpha,2);
 end;
 
-
 function HexToBGRAPixel(const s: string): TBGRAPixel;
 var ss: string;
 begin
@@ -100,12 +99,20 @@ begin
  Result.alpha:=aColor.alpha;
 end;
 
+function GradientRecordToBGRAGradient( FG: TFontGradient ): TBGRAGradientScanner;
+begin
+ with FG do
+ Result:=TBGRAGradientScanner.Create(c1, c2, GradientType, Origin, d1, gammaColorCorrection, Sinus);
+end;
+
+
 function TextToBitmap(aCaption: string; const aFont: TGuiFont; aBackGround: TBGRABitmap): TBGRABitmap;
 var xx,yy,r:single;
     renderer: TBGRATextEffectFontRenderer;
     ts: TSize;
     _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
     _OutLineWidth: single;
+   grad: TBGRAGradientScanner;
 begin
  renderer:= TBGRATextEffectFontRenderer.Create;
  with aFont do begin
@@ -154,7 +161,12 @@ begin
       if _ShadowOffsetY<0 then yy += Abs(_ShadowOffsetY);
 
       Result.Fill( BGRAPixelTransparent );
-      Result.TextOut( xx, yy, aCaption, FontColor );
+      if UseGradient
+        then begin
+          grad:= GradientRecordToBGRAGradient( Gradient );//  TBGRAGradientScanner.Create();
+          Result.TextOut( xx, yy, aCaption, grad );
+          grad.Free;
+        end else Result.TextOut( xx, yy, aCaption, FontColor );
     end else begin
        Result.SetSize( Result.TextSize(aCaption+'  ').cx, Result.TextSize(aCaption+'  ').cy );
        if Result.Width > Result.Height
