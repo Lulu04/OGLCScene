@@ -177,13 +177,15 @@ TGuiProgressBar = class( TColorBackground )
   Destructor Destroy; override;
 private
   FMode: TGuiProgressBarMode;
-  FPercent: single;
+  FPercent,
+  FBorderWidth: single;
 public
  procedure Update( const aElapsedTime : single ) ; override;
   procedure Draw( const aLayerPercentOpacity: single ); override;
 public
   BackGroundColor,
   BorderColor: TBGRAParam;
+  property BorderWidth: single read FBorderWidth write FBorderWidth;
   property Mode: TGuiProgressBarMode read FMode write FMode;
   property Percent: single read FPercent write FPercent; // [0..1]
 end;
@@ -426,6 +428,7 @@ begin
 
  FMode := pbmHorizontal;
  FPercent := 0.0;
+ FBorderWidth := 1.5;
 end;
 
 destructor TGuiProgressBar.Destroy;
@@ -484,7 +487,7 @@ begin
                   TopLeftColor.Value, TopRightColor.Value, BottomRightColor.Value,
                   BottomLeftColor.Value, aLayerPercentOpacity );
          FillBox( xx, yy, ww, hh, BackGroundColor.Value, aLayerPercentOpacity ); // background
-         DrawBox( 0, 0, Width, Height, BorderColor.Value, aLayerPercentOpacity ); // border
+         DrawBox( 0, 0, Width, Height, BorderColor.Value, FBorderWidth, aLayerPercentOpacity ); // border
    end;
 
  if Tint.alpha.Value <> 0

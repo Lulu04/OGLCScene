@@ -31,7 +31,10 @@ public
 public
  X, Y: TFParam;
  function GetRectArea: TRect;
- function GetXY: TPointF; // return X.Value and Y.Value as TPointF (for convenience)
+ // return TopLeft coordinates of the surface
+ function GetXY: TPointF;
+ // return the center coordinates of the surface
+ function Center: TPointF;
  // kill the surface
  procedure Kill; // remove the surface from the scene and free it
  // Coordinates
@@ -1485,6 +1488,11 @@ end;
 function TSimpleSurface.GetXY: TPointF;
 begin
  Result := PointF( X.Value, Y.Value );
+end;
+
+function TSimpleSurface.Center: TPointF;
+begin
+  Result := PointF(CenterX, CenterY);
 end;
 
 procedure TSimpleSurface.Kill;
