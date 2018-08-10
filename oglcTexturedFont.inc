@@ -22,14 +22,14 @@ PTexturedChar=^TTexturedChar;
 { TTexturedFont }
 
 TTexturedFont = class
-  Constructor Create( aFont: TGuiFont; const aCharSet: string);
+  Constructor Create( aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
   Destructor Destroy; override;
  private
   FTexture: PTexture;
   FTexCharArray: array of TTexturedChar ;
   FFont: TGuiFont;
   function IndexOf( c: string ): integer;
-  procedure BuildTexture( aFont: TGuiFont; const aCharSet: string );
+  procedure BuildTexture( aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string );
   function GetTexturedChar( aChar: string ): PTexturedChar;
   procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single;
                       aSetTextureParameters: boolean=TRUE);
@@ -60,6 +60,7 @@ private
  procedure Update( const aElapsedTime: single );
 public
  function AddFont( aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
+ function AddFont( aGuiFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
  procedure DeleteFont( var aFont: TTexturedFont );
  procedure Clear;
  property Count: integer read GetCount;
@@ -151,10 +152,10 @@ end;
 
 { TTexturedFont }
 
-  constructor TTexturedFont.Create(aFont: TGuiFont; const aCharSet: string);
+  constructor TTexturedFont.Create(aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
  begin
   SetLength( FTexCharArray, 0 );
-  BuildTexture( aFont, aCharSet );
+  BuildTexture( aFont, aFillTexture, aCharSet );
   CharSpaceCoeff:= CreateBoundedFParam(0, 1000000, FALSE );
   CharSpaceCoeff.Value := 1.0;
  end;
@@ -180,7 +181,7 @@ end;
  end;
 
 
- procedure TTexturedFont.BuildTexture(aFont: TGuiFont; const aCharSet: string);
+ procedure TTexturedFont.BuildTexture(aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
  var i, j, xx, yy, maxCharHeight : integer;
      ima, temp: TBGRABitmap;
      s1 : string;
@@ -218,7 +219,7 @@ end;
   for i:=0 to Length(FTexCharArray)-1 do
    begin
     s1 := UTF8Copy( aCharSet, i+1, 1 );
-    temp := TextToBitmap( s1, FFont, NIL );
+    temp := TextToBitmap( s1, FFont, aFillTexture );
 
     if xx+temp.Width>ima.Width then begin
           // next line
@@ -416,9 +417,16 @@ end;
 
   function TFontManager.AddFont(aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
  begin
-  Result := TTexturedFont.Create( aGuiFont, aCharSet );
+  Result := TTexturedFont.Create( aGuiFont, NIL, aCharSet );
   FList.Add( Result );
  end;
+
+  function TFontManager.AddFont(aGuiFont: TGuiFont; aFillTexture: TBGRABitmap;
+    const aCharSet: string): TTexturedFont;
+  begin
+   Result := TTexturedFont.Create( aGuiFont, aFillTexture, aCharSet );
+   FList.Add( Result );
+  end;
 
  procedure TFontManager.DeleteFont(var aFont: TTexturedFont);
  var i: integer;

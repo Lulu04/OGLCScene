@@ -6,23 +6,25 @@ function PercentColor( const aColor : TBGRAPixel ;aPercent:single ) :TBGRAPixel;
 
 
 // return a TBGRABitmap from a text and font attributes
+// aFillTexture is a texture used to fill the letters
+// Fill prior use aFillTexture, then gradient, then font color
 function TextToBitmap( aCaption: string; const aFont: TGuiFont;
-                        aBackGround: TBGRABitmap=NIL): TBGRABitmap;
+                        aFillTexture: TBGRABitmap=NIL): TBGRABitmap;
 
 // return a PTexture from a text and font attributes
 function TextToTexture( aCaption: string; const aFont: TGuiFont;
-                        aBackGround: TBGRABitmap=NIL): PTexture;
+                        aFillTexture: TBGRABitmap=NIL): PTexture;
 
 // return a sprite from a text and font attributes
 function TextToSprite( aCaption: string; const aFont: TGuiFont;
-                        aBackGround: TBGRABitmap=NIL): TSprite;
+                        aFillTexture: TBGRABitmap=NIL): TSprite;
 
 
 // return an array of sprite. One sprite for one character.
 // UseChilds=TRUE  => Result[0] have all the others sprites as children. Children coordinate are initialized
 // UseChilds=FALSE => all sprites are independent of each other.
 function TextToLetterSprite( aCaption: string; aFont: TGuiFont;
-                             aBackGround: TBGRABitmap=NIL;
+                             aFillTexture: TBGRABitmap=NIL;
                              UseChilds: boolean=FALSE): TArrayOfSprite;
 
 
@@ -106,7 +108,7 @@ begin
 end;
 
 
-function TextToBitmap(aCaption: string; const aFont: TGuiFont; aBackGround: TBGRABitmap): TBGRABitmap;
+function TextToBitmap(aCaption: string; const aFont: TGuiFont; aFillTexture: TBGRABitmap): TBGRABitmap;
 var xx,yy,r:single;
     renderer: TBGRATextEffectFontRenderer;
     ts: TSize;
@@ -148,61 +150,53 @@ begin
       then _OutLineWidth:=OutLineWidth
       else _OutLineWidth:=0;
 
-    if aBackGround = NIL then begin
-      // size of the rendered font. try to take into account shadow and outline.
-      ts := Result.TextSize(aCaption);
+    // size of the rendered font. try to take into account shadow and outline.
+    ts := Result.TextSize(aCaption);
 
-      Result.SetSize( ts.cx + round(_OutlineWidth)+abs( _ShadowOffsetX ){%H-}+_ShadowRadius*2,
-                      ts.cy + round(_OutlineWidth)+abs( _ShadowOffsetY ){%H-}+_ShadowRadius*2 );
+    Result.SetSize( ts.cx + round(_OutlineWidth)+abs( _ShadowOffsetX ){%H-}+_ShadowRadius*2,
+                    ts.cy + round(_OutlineWidth)+abs( _ShadowOffsetY ){%H-}+_ShadowRadius*2 );
 
-      xx := _OutlineWidth*0.5+_ShadowRadius;
-      yy:= xx;
-      if _ShadowOffsetX<0 then xx += Abs(_ShadowOffsetX);
-      if _ShadowOffsetY<0 then yy += Abs(_ShadowOffsetY);
+    xx := _OutlineWidth*0.5+_ShadowRadius;
+    yy:= xx;
+    if _ShadowOffsetX<0 then xx += Abs(_ShadowOffsetX);
+    if _ShadowOffsetY<0 then yy += Abs(_ShadowOffsetY);
 
-      Result.Fill( BGRAPixelTransparent );
-      if UseGradient
-        then begin
-          grad:= GradientRecordToBGRAGradient( Gradient );//  TBGRAGradientScanner.Create();
-          Result.TextOut( xx, yy, aCaption, grad );
-          grad.Free;
-        end else Result.TextOut( xx, yy, aCaption, FontColor );
-    end else begin
-       Result.SetSize( Result.TextSize(aCaption+'  ').cx, Result.TextSize(aCaption+'  ').cy );
-       if Result.Width > Result.Height
-         then r := Result.Height * 0.3
-         else r := Result.Width * 0.3;
-       Result.RoundRectAntialias( 0, 0, Result.Width-1, Result.Height-1, r, r, nil, 0, aBackGround );
-       Result.RoundRectAntialias( 0, 0, Result.Width-1, Result.Height-1, r, r, OutLineColor, _OutLineWidth );
-       Result.TextOut(Result.TextSize(' ').cx + _OutLineWidth/2, _OutLineWidth/2, aCaption, FontColor );
-    end;
+    Result.Fill( BGRAPixelTransparent );
+    if aFillTexture<>NIL
+      then Result.TextOut( xx, yy, aCaption, aFillTexture)
+      else if UseGradient then begin
+             grad:= GradientRecordToBGRAGradient( Gradient );
+             Result.TextOut( xx, yy, aCaption, grad );
+             grad.Free;
+           end else Result.TextOut( xx, yy, aCaption, FontColor );
+
  end;
 end;
 
-function TextToTexture(aCaption: string; const aFont: TGuiFont;aBackGround: TBGRABitmap=NIL): PTexture;
+function TextToTexture(aCaption: string; const aFont: TGuiFont;aFillTexture: TBGRABitmap=NIL): PTexture;
 var ima: TBGRABitmap;
 begin
- ima := TextToBitmap( aCaption, aFont, aBackGround );
+ ima := TextToBitmap( aCaption, aFont, aFillTexture );
  Result := TextureManager.Add( ima );
  ima.Free;
 end;
 
 function TextToSprite(aCaption: string; const aFont: TGuiFont;
-  aBackGround: TBGRABitmap): TSprite;
+  aFillTexture: TBGRABitmap): TSprite;
 var t: PTexture;
 begin
- t := TextToTexture(aCaption, aFont, aBackGround );
+ t := TextToTexture(aCaption, aFont, aFillTexture );
  Result := TSprite.Create( t, TRUE );
 end;
 
 function TextToLetterSprite(aCaption: string; aFont: TGuiFont;
-  aBackGround: TBGRABitmap; UseChilds: boolean): TArrayOfSprite;
+  aFillTexture: TBGRABitmap; UseChilds: boolean): TArrayOfSprite;
 var i: integer;
 begin
  SetLength( Result, UTF8Length( aCaption ));
 
  for i:=0 to Length( Result )-1 do begin
-   Result[i] := TextToSprite( UTF8Copy(aCaption, i+1, 1 ), aFont, aBackGround );
+   Result[i] := TextToSprite( UTF8Copy(aCaption, i+1, 1 ), aFont, aFillTexture );
    if UseChilds and (i>0) then begin
      Result[i].SetCoordinate( Result[i-1].Width, 0 );
      Result[0].AddChild( Result[i] );
