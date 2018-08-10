@@ -501,6 +501,7 @@ begin
  end;
 
  TimerManager.ProcessTimer;
+ DelayManager.ProcessDelay;
 
  t := GetTickCount64;
  while GetTickCount64 - FTickOrigin < 16 do

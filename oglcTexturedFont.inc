@@ -123,6 +123,7 @@ end;
  var AlphaTint: byte;
  begin
   if FCaption='' then exit;
+  if FTexturedFont=NIL then exit;
   PushAndPrepareMatrix;
   SetBlendMode( FBlendMode );
   TextureManager.BindTexture( FTexturedFont.Texture );
