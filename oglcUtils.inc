@@ -109,7 +109,7 @@ end;
 
 
 function TextToBitmap(aCaption: string; const aFont: TGuiFont; aFillTexture: TBGRABitmap): TBGRABitmap;
-var xx,yy,r:single;
+var xx,yy:single;
     renderer: TBGRATextEffectFontRenderer;
     ts: TSize;
     _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;

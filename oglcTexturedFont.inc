@@ -91,6 +91,7 @@ public
   property TexturedFont: TTexturedFont read FTexturedFont write FTexturedFont;
 end;
 
+
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
  { TFreeText }

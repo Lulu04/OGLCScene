@@ -30,13 +30,14 @@ public
  procedure Update( const AElapsedTime: single ); virtual; abstract;
 public
  X, Y: TFParam;
+ // return rounded rectangle area of the surface
  function GetRectArea: TRect;
  // return TopLeft coordinates of the surface
  function GetXY: TPointF;
  // return the center coordinates of the surface
  function Center: TPointF;
- // kill the surface
- procedure Kill; // remove the surface from the scene and free it
+ // remove the surface from the scene and free it
+ procedure Kill;
  // Coordinates
  procedure SetCoordinate( aX, aY: single );overload;
  procedure SetCoordinate( aP: TPointF );overload;
@@ -80,7 +81,7 @@ protected
  procedure Execute ( const aElapsedTime : double ) ;
  procedure LoadFromFile ( const aFilename: string ) ;
  procedure SaveToFile ( const aFilename: string ) ;
- procedure DecodeAction;
+ procedure DecodeAction; virtual;
  procedure DecodeAdditionnalAction( {%H-}aAction: ArrayOfString ); virtual;
 public
  procedure AddLine( const aLine: string ) ;  // to construct the scenario manually

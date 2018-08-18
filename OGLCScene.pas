@@ -138,6 +138,7 @@ const
 type
 ArrayOfString = array of string;
 
+TOGLCCamera = class;
 
 {$define oglcINTERFACE}
 {$I oglcListType.inc }
@@ -148,6 +149,7 @@ ArrayOfString = array of string;
 {$I oglcRenderToTexture.inc }
 {$I oglcLayer.inc }
 {$I oglcSurface.inc }
+{$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
@@ -171,21 +173,6 @@ TStageSkeleton = class
  procedure Update( AElapsedTime: single ); virtual; abstract; // override to update your stuff according time
 end;
 
-{ TOGLCCamera }
-
-TOGLCCamera = class
- FParentScene: TOGLCScene;
- Constructor Create;
- Destructor Destroy; override;
- procedure Update( const AElapsedTime: single );
-public
-  LookAt: TPointFParam;
-  Scale: TPointFParam;
-  Angle: TFParam;
-  procedure Reset( const aSeconds: single ); // reset camera to initial value in specified time in seconds
-  procedure Use;
-  procedure Release;
-end;
 
 { TOGLCScene }
 TOGLCScene = class (TLayerList)
@@ -280,6 +267,7 @@ TOGLCScene = class (TLayerList)
   property Camera: TOGLCCamera read FCamera;
  public
   // convenience functions
+  function CreateCamera: TOGLCCamera;
   function Add_GuiLabel( const aCaption: string; aFont:TGuiFont; aBackGround: TBGRABitmap; aLayer: integer ): TGuiLabel;
 
   function Add_GuiTextArea( const aText: string;
@@ -306,57 +294,8 @@ POGLCScene = ^TOGLCScene ;
 
 implementation
 
-var
+var OpenGL_Version_2_0_Loaded: boolean = FALSE;
 
-OpenGL_Version_2_0_Loaded: boolean = FALSE;
-
-{ TOGLCCamera }
-
-constructor TOGLCCamera.Create;
-begin
-  LookAt := TPointFParam.Create;
-  Scale := TPointFParam.Create;
-  Scale.Value := PointF(1,1);
-  Angle := TFParam.Create;
-end;
-
-destructor TOGLCCamera.Destroy;
-begin
- FreeAndNil( LookAt );
- FreeAndNil( Scale );
- FreeAndNil( Angle );
- inherited Destroy;
-end;
-
-procedure TOGLCCamera.Update(const AElapsedTime: single);
-begin
- LookAt.OnElapse( AElapsedTime );
- Scale.OnElapse( AElapsedTime );
- Angle.OnElapse( AElapsedTime );
-end;
-
-procedure TOGLCCamera.Reset(const aSeconds: single);
-begin
- LookAt.ChangeTo( PointF(0,0), aSeconds );
- Scale.ChangeTo( PointF(1,1), aSeconds );
- Angle.ChangeTo( 0, aSeconds );
-end;
-
-procedure TOGLCCamera.Use;
-begin
- glPushMatrix;
- glTranslatef( FParentScene.Width * 0.5, FParentScene.Height * 0.5 , 0 );
- //glTranslatef( X.Value + Width * 0.5 * Scale.x.Value, Y.Value + Height * 0.5 * Scale.y.Value, 0 );
-
- glScalef( Scale.x.Value, Scale.y.Value, 0 );
- glRotatef( Angle.Value, 0, 0, 1 );
- glTranslatef( -FParentScene.Width * 0.5 + LookAt.x.Value, -FParentScene.Height * 0.5 + LookAt.y.Value, 0 );
-end;
-
-procedure TOGLCCamera.Release;
-begin
- glPopMatrix;
-end;
 
 {$define oglcIMPLEMENTATION}
 {$I oglcListType.inc }
@@ -367,6 +306,7 @@ end;
 {$I oglcRenderToTexture.inc }
 {$I oglcLayer.inc }
 {$I oglcSurface.inc }
+{$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
@@ -504,11 +444,11 @@ begin
  DelayManager.ProcessDelay;
 
  t := GetTickCount64;
- while GetTickCount64 - FTickOrigin < 16 do
-  begin
-   sleep(1);
+// while GetTickCount64 - FTickOrigin < 16 do
+//  begin
+//   sleep(1);
    //Application.ProcessMessages;
-  end;
+//  end;
  UpDate( ( t - FTickOrigin ) * 0.001 );
  FTickOrigin := t;
 
@@ -655,6 +595,12 @@ end;
 procedure TOGLCScene.ClearKeysState;
 begin
  FillChar( FKeyMap, sizeof(FKeyMap), FALSE ) ;
+end;
+
+function TOGLCScene.CreateCamera: TOGLCCamera;
+begin
+ Result := TOGLCCamera.Create;
+ Result.FParentScene := self;
 end;
 
 function TOGLCScene.Add_GuiLabel(const aCaption: string; aFont: TGuiFont;

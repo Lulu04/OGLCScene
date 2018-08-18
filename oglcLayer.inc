@@ -65,6 +65,7 @@ TLayer = class (TSurfaceList)
     // Tile engine
     FTileEngine : TTileEngine ;
     FTileEngineAutoFree : boolean ;
+    FCamera: TOGLCCamera;
    public
     Constructor Create;
     Destructor Destroy; override;
@@ -111,6 +112,7 @@ TLayer = class (TSurfaceList)
     // layer's property
     property Freeze : boolean read FFreeze write FFreeze ;    // Freeze all moves and variations of the layer and every surfaces of the layer
     property Visible : boolean read FVisible write FVisible;
+    property Camera: TOGLCCamera read FCamera write FCamera;
 end;
 
 
@@ -263,6 +265,7 @@ var i : integer;
     FOpacityPercent: single;
 begin
  if not FVisible then exit;
+ if FCamera<>NIL then FCamera.Use;
  if Angle.Value <> 0.0
    then begin
          glPushMatrix;
@@ -278,12 +281,14 @@ begin
   with TSimpleSurfaceWithEffect( FList.Items[i] ) do if Visible then Draw( FOpacityPercent );
 
  if Angle.Value <> 0.0 then glPopMatrix;
+ if FCamera<>NIL then FCamera.Release;
 end;
 
 procedure TLayer.Update(const aElapsedTime: single);
 var i: integer;
 begin
- if FFreeze then exit ;
+ if FFreeze then exit;
+ if FCamera<>NIL then FCamera.Update( aElapsedTime );
  // Do Blink
  with FBlink do
  if BlinkToGo <> 0
