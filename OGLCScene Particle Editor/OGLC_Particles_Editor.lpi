@@ -83,7 +83,7 @@
       <Unit0>
         <Filename Value="OGLC_Particles_Editor.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="7"/>
         <CursorPos X="39" Y="18"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1075,7 +1075,7 @@
       <Unit135>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="7"/>
+        <TopLine Value="20"/>
         <CursorPos X="32" Y="26"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1362,7 +1362,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="875"/>
         <CursorPos X="49" Y="888"/>
@@ -1857,9 +1856,10 @@
         <Filename Value="Units\screen_home.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="screen_Home"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="67"/>
-        <CursorPos X="19" Y="75"/>
+        <TopLine Value="4"/>
+        <CursorPos Y="19"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit236>
@@ -1909,27 +1909,24 @@
       </Unit242>
       <Unit243>
         <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="402"/>
         <CursorPos X="12" Y="415"/>
         <UsageCount Value="102"/>
-        <Loaded Value="True"/>
       </Unit243>
       <Unit244>
         <Filename Value="..\oglcListTypeDeclaration.inc"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="146"/>
         <CursorPos X="10" Y="155"/>
         <UsageCount Value="102"/>
-        <Loaded Value="True"/>
       </Unit244>
       <Unit245>
         <Filename Value="..\oglcSurfaceImplementation.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1281"/>
         <CursorPos X="37" Y="1305"/>
         <UsageCount Value="102"/>
-        <Loaded Value="True"/>
       </Unit245>
       <Unit246>
         <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\win32\system.pp"/>
@@ -1955,18 +1952,16 @@
       </Unit247>
       <Unit248>
         <Filename Value="..\oglcUtilsDeclaration.inc"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="11" Y="15"/>
         <UsageCount Value="71"/>
-        <Loaded Value="True"/>
       </Unit248>
       <Unit249>
         <Filename Value="..\oglcUtilsImplementation.inc"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="243"/>
         <CursorPos X="9" Y="299"/>
         <UsageCount Value="70"/>
-        <Loaded Value="True"/>
       </Unit249>
       <Unit250>
         <Filename Value="C:\lazarus\lcl\extctrls.pp"/>
@@ -2104,11 +2099,10 @@
       </Unit266>
       <Unit267>
         <Filename Value="..\oglcListTypeImplementation.inc"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="481"/>
         <CursorPos X="7" Y="499"/>
         <UsageCount Value="27"/>
-        <Loaded Value="True"/>
       </Unit267>
       <Unit268>
         <Filename Value="..\..\..\bgrabitmap-9.5\bgrabitmap\bgrabitmap.pas"/>
@@ -2132,19 +2126,17 @@
       </Unit270>
       <Unit271>
         <Filename Value="..\oglcLayerDeclaration.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="31"/>
         <CursorPos X="16" Y="46"/>
         <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit271>
       <Unit272>
         <Filename Value="..\oglcLayerImplementation.inc"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="42"/>
         <CursorPos X="15" Y="49"/>
         <UsageCount Value="21"/>
-        <Loaded Value="True"/>
       </Unit272>
       <Unit273>
         <Filename Value="..\..\..\bgrabitmap-9.6\bgrabitmap\bgrapath.pas"/>
@@ -2155,127 +2147,75 @@
         <UsageCount Value="10"/>
       </Unit273>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="17" HistoryIndex="16">
       <Position1>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="423" Column="41" TopLine="405"/>
+        <Caret Line="424" Column="41" TopLine="405"/>
       </Position1>
       <Position2>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="424" Column="41" TopLine="405"/>
+        <Caret Line="425" Column="41" TopLine="405"/>
       </Position2>
       <Position3>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="425" Column="41" TopLine="405"/>
+        <Caret Line="427" Column="26" TopLine="405"/>
       </Position3>
       <Position4>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="427" Column="26" TopLine="405"/>
+        <Caret Line="538" Column="38" TopLine="520"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="538" Column="38" TopLine="520"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="397" Column="15" TopLine="391"/>
-      </Position6>
-      <Position7>
         <Filename Value="Units\screen_home.pas"/>
         <Caret Line="75" Column="19" TopLine="67"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="325" Column="14" TopLine="308"/>
-      </Position8>
-      <Position9>
-        <Filename Value="..\oglcSurfaceImplementation.inc"/>
-        <Caret Line="1804" Column="19" TopLine="1787"/>
-      </Position9>
-      <Position10>
-        <Filename Value="..\oglcUtilsDeclaration.inc"/>
-        <Caret Line="15" Column="11"/>
-      </Position10>
-      <Position11>
-        <Filename Value="..\oglcSurfaceImplementation.inc"/>
-        <Caret Line="1795" Column="9" TopLine="1787"/>
-      </Position11>
-      <Position12>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="118" Column="14" TopLine="104"/>
-      </Position12>
-      <Position13>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="325" Column="14" TopLine="306"/>
-      </Position13>
-      <Position14>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="396" Column="14" TopLine="382"/>
-      </Position14>
-      <Position15>
-        <Filename Value="..\oglcSurfaceImplementation.inc"/>
-        <Caret Line="1028" Column="70" TopLine="1013"/>
-      </Position15>
-      <Position16>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="381" Column="49" TopLine="364"/>
-      </Position16>
-      <Position17>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="382" Column="48" TopLine="361"/>
-      </Position17>
-      <Position18>
+      </Position5>
+      <Position6>
         <Filename Value="Units\main.pas"/>
         <Caret Line="427" Column="42" TopLine="410"/>
-      </Position18>
-      <Position19>
+      </Position6>
+      <Position7>
         <Filename Value="Units\main.pas"/>
         <Caret Line="428" Column="42" TopLine="411"/>
-      </Position19>
-      <Position20>
+      </Position7>
+      <Position8>
         <Filename Value="Units\main.pas"/>
         <Caret Line="429" Column="42" TopLine="412"/>
-      </Position20>
-      <Position21>
+      </Position8>
+      <Position9>
         <Filename Value="Units\main.pas"/>
         <Caret Line="428" Column="42" TopLine="411"/>
-      </Position21>
-      <Position22>
+      </Position9>
+      <Position10>
         <Filename Value="Units\main.pas"/>
         <Caret Line="430" Column="42" TopLine="413"/>
-      </Position22>
-      <Position23>
+      </Position10>
+      <Position11>
         <Filename Value="Units\main.pas"/>
         <Caret Line="749" Column="25" TopLine="745"/>
-      </Position23>
-      <Position24>
+      </Position11>
+      <Position12>
         <Filename Value="Units\main.pas"/>
         <Caret Line="748" Column="43" TopLine="733"/>
-      </Position24>
-      <Position25>
+      </Position12>
+      <Position13>
         <Filename Value="Units\main.pas"/>
         <Caret Line="518" Column="50" TopLine="505"/>
-      </Position25>
-      <Position26>
+      </Position13>
+      <Position14>
         <Filename Value="Units\main.pas"/>
         <Caret Line="500" Column="6" TopLine="490"/>
-      </Position26>
-      <Position27>
+      </Position14>
+      <Position15>
         <Filename Value="Units\main.pas"/>
         <Caret Line="226" Column="15" TopLine="212"/>
-      </Position27>
-      <Position28>
+      </Position15>
+      <Position16>
         <Filename Value="Units\main.pas"/>
         <Caret Line="1000" Column="16" TopLine="976"/>
-      </Position28>
-      <Position29>
-        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
-        <Caret Line="415" Column="12" TopLine="402"/>
-      </Position29>
-      <Position30>
-        <Filename Value="..\oglcSurfaceImplementation.inc"/>
-        <Caret Line="1305" Column="37" TopLine="1281"/>
-      </Position30>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="888" Column="49" TopLine="875"/>
+      </Position17>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

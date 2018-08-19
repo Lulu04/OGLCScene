@@ -16,7 +16,6 @@ type
 
 THomeScreen = class( TStageSkeleton )
 private
-  FFont: TTexturedFont;
   procedure ProcessSceneBeforePaint;
 public
   procedure LoadData; override;
@@ -71,10 +70,8 @@ procedure THomeScreen.LoadData;
 var o: TGUILabel;
   cir: TCircle;
 begin
- FFont := FontManager.AddFont( 'Arial', 32, [], BGRA(255,0,200), BGRA(20,20,20), 3, BGRA(0,0,0,0), 0, 0, 0 );
- o := TGUILabel.Create;
- o.Font := FFont;
- o.Caption:='OGLC Particles Engine Editor V1.0';
+ o := TGUILabel.Create('OGLC Particles Engine Editor V1.0',
+                       GuiFont('Arial', 32, [], BGRA(255,0,200), BGRA(20,20,20), 3, BGRA(0,0,0,0), 0, 0, 0 ));
  FScene.Add( o, LAYER_PARTICLE );
  o.SetCoordinate(0,FScene.Height/2); //( FScene.Width/2, FScene.Height/2 );
  o.Opacity.ChangeTo(0, 5, 2 );
