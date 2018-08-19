@@ -16,7 +16,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="206"/>
+      <BuildNr Value="209"/>
       <Language Value="040C"/>
       <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.24"/>
     </VersionInfo>
@@ -1856,10 +1856,9 @@
         <Filename Value="Units\screen_home.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="screen_Home"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="4"/>
-        <CursorPos Y="19"/>
+        <CursorPos X="37" Y="21"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit236>
@@ -2008,9 +2007,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="frame_ShowColor"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="107"/>
-        <CursorPos X="33" Y="119"/>
+        <CursorPos X="67" Y="125"/>
         <UsageCount Value="114"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

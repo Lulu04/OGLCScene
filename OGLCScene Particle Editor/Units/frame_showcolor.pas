@@ -118,7 +118,8 @@ begin
    r := cprevious.red;
    g := cprevious.green;
    b := cprevious.blue;
-   a := cprevious.alpha;
+  // a := cprevious.alpha;
+   a:=255;
 
    for xx:=xbegin to xend do begin
    // FImage.DrawVertLine( xx, 0, FImage.Height, cprevious );
@@ -126,7 +127,7 @@ begin
     r+=dr;
     g+=dg;
     b+=db;
-    a+=da;
+   // a+=da;
    end;
 
    txt := BGRAPixelToHex(cprevious);
