@@ -204,9 +204,16 @@ end;
 
 destructor TSnow.Destroy;
 begin
- FreeAndNil( FlakeAmount );
- FreeAndNil( Gravity );
- FreeAndNil( HAmplitude );
+ FlakeAmount.Free;
+ FlakeSpeed.Free;
+ Gravity.Free;
+ HAmplitude.Free;
+
+ if Length(FTexture)=3 then begin
+  TextureManager.Delete(FTexture[0]);
+  TextureManager.Delete(FTexture[1]);
+  TextureManager.Delete(FTexture[2]);
+ end;
 
  inherited Destroy;
 end;
