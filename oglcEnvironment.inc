@@ -221,6 +221,7 @@ end;
 procedure TSnow.Update(const aElapsedTime: single);
 var i, j, z, fc: integer;
 begin
+ if FFreeze then exit;
  inherited Update(aElapsedTime);
 
  FlakeAmount.OnElapse( aElapsedTime );
@@ -274,6 +275,7 @@ procedure TSnow.Draw(const aLayerPercentOpacity: single);
 var i: integer;
     a: byte;
 begin
+ if not Visible then exit;
  PushAndPrepareMatrix;
  SetBlendMode( FBlendMode );
 
