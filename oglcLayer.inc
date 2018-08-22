@@ -288,7 +288,6 @@ procedure TLayer.Update(const aElapsedTime: single);
 var i: integer;
 begin
  if FFreeze then exit;
- if FCamera<>NIL then FCamera.Update( aElapsedTime );
  // Do Blink
  with FBlink do
  if BlinkToGo <> 0

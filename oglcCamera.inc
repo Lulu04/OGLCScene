@@ -51,6 +51,12 @@ public
   Scale: TPointFParam;
   Angle: TFParam;
   procedure Reset( const aSeconds: single ); // reset camera to initial value in specified time in seconds
+
+  // the camera will be used by the specified layer(s)
+  procedure AssignToLayer( aLayerIndex: integer ); overload;
+  procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
+  // The camera will no longer be used
+  procedure Unassign;
   {
   // Scenario
   function AddScenario( const aFilename: string; ACallBackEvent: TScenarioEvent=NIL ): TScenarioForCamera;overload; // return Scenario's ID
@@ -96,6 +102,28 @@ begin
  LookAt.ChangeTo( PointF(0,0), aSeconds );
  Scale.ChangeTo( PointF(1,1), aSeconds );
  Angle.ChangeTo( 0, aSeconds );
+end;
+
+procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
+begin
+ FParentScene.Layer[aLayerIndex].Camera := self;
+end;
+
+procedure TOGLCCamera.AssignToLayer(const aLayerIndexList: array of integer);
+var
+  i: Integer;
+begin
+ with FParentScene do
+  for i:=0 to Length(aLayerIndexList)-1 do
+    AssignToLayer( aLayerIndexList[i] );
+end;
+
+procedure TOGLCCamera.Unassign;
+var
+  i: Integer;
+begin
+ for i:=0 to FParentScene.LayerCount-1 do
+   with FParentScene.Layer[i] do if Camera=self then Camera := NIL;
 end;
 
 procedure TOGLCCamera.Use;

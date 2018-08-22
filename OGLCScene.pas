@@ -219,6 +219,7 @@ TOGLCScene = class (TLayerList)
   procedure SetLayerCount(AValue: integer ); override ;
  private
   FCamera: TOGLCCamera;
+  FCameraList: TList;
   function GetSceneCenter: TPointF;
  public
 
@@ -268,6 +269,10 @@ TOGLCScene = class (TLayerList)
  public
   // convenience functions
   function CreateCamera: TOGLCCamera;
+  // unassign the camera on all layers, then free it.
+  // After this method, aCamera is set to NIL.
+  procedure KillCamera( var aCamera: TOGLCCamera );
+
   function Add_GuiLabel( const aCaption: string; aFont:TGuiFont; aBackGround: TBGRABitmap; aLayer: integer ): TGuiLabel;
 
   function Add_GuiTextArea( const aText: string;
@@ -374,6 +379,8 @@ begin
 
  FCamera := TOGLCCamera.Create;
  FCamera.FParentScene := self;
+
+ FCameraList := TList.Create;
 end;
 
 destructor TOGLCScene.Destroy;
@@ -386,6 +393,8 @@ begin
 
  if FOnFreeCommonData <> NIL then FOnFreeCommonData;
  FCommonDataLoaded := FALSE;
+
+ FCameraList.Free;
 
  FreeAndNil( FGlobalFadeColor );
 
@@ -404,6 +413,8 @@ end;
 
 procedure TOGLCScene.DoLoop;
 var t: QWord;
+    sec: single;
+    i: Integer;
 begin
  if not FOGLC.MakeCurrent() then exit;
 
@@ -444,12 +455,18 @@ begin
  DelayManager.ProcessDelay;
 
  t := GetTickCount64;
+ sec := ( t - FTickOrigin ) * 0.001;
+
+ // update cameras
+ for i:=0 to FCameraList.Count-1 do
+   TOGLCCamera(FCameraList.Items[i]).Update( sec );
+
 // while GetTickCount64 - FTickOrigin < 16 do
 //  begin
 //   sleep(1);
    //Application.ProcessMessages;
 //  end;
- UpDate( ( t - FTickOrigin ) * 0.001 );
+ UpDate( sec );
  FTickOrigin := t;
 
  Draw;
@@ -458,7 +475,7 @@ begin
 
  FFlagMouseLeftClicked := FALSE ;
 
- // if needed, go to the next stage
+ // if needed, launch the next stage
  if (FStageRequested <> NIL) and not FExecuteDuringLoop and not FIsChangingStage then
  begin
    FIsChangingStage := TRUE;
@@ -601,6 +618,17 @@ function TOGLCScene.CreateCamera: TOGLCCamera;
 begin
  Result := TOGLCCamera.Create;
  Result.FParentScene := self;
+ FCameraList.Add( Result );
+end;
+
+procedure TOGLCScene.KillCamera(var aCamera: TOGLCCamera);
+var i: integer;
+begin
+ for i:=0 to LayerCount-1 do
+   if Layer[i].Camera = aCamera then Layer[i].Camera := NIL;
+ FCameraList.Remove( aCamera );
+ aCamera.Free;
+ aCamera := NIL;
 end;
 
 function TOGLCScene.Add_GuiLabel(const aCaption: string; aFont: TGuiFont;
