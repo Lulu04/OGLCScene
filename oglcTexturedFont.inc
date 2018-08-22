@@ -40,11 +40,20 @@ TTexturedFont = class
                                   // >1   the characters are farther apart from each other
   procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single;
                       aSetTextureParameters: boolean=TRUE );
+  procedure DrawCenteredChar( aChar: string; aCenterLocation: TPointF; const aLayerPercentOpacity: single;
+                      aSetTextureParameters: boolean=TRUE );
+  // original size (equal to TBGRABitmap.TextSize())
   function GetCharWidth( const c: string ): integer;
   function GetCharHeight( const c: string ): integer;
   function GetTextWidth( const t: string ): integer;
   function GetTextHeight( const t: string ): integer;
   function GetCharSize( const c: string ): TSize;
+  // size with outline and shadow
+  function GetDecoratedCharWidth( const c: string ): integer;
+  function GetDecoratedCharHeight( const c: string ): integer;
+  function GetDecoratedTextWidth( const t: string ): integer;
+  function GetDecoratedTextHeight( const t: string ): integer;
+  function GetDecoratedCharSize( const c: string ): TSize;
   property Texture: PTexture read FTexture;
 end;
 
@@ -346,13 +355,26 @@ end;
   end;
  end;
 
+ procedure TTexturedFont.DrawCenteredChar(aChar: string;
+   aCenterLocation: TPointF; const aLayerPercentOpacity: single;
+   aSetTextureParameters: boolean);
+ var tc: PTexturedChar;
+ begin
+  if aChar='' then exit;
+  if aSetTextureParameters then TextureManager.BindTexture( FTexture );
+
+  tc := GetTexturedChar( aChar );
+  if tc <> NIL then
+    DrawChar( tc, aCenterLocation-PointF(tc^.OriginalCharSize.cx*0.5,tc^.OriginalCharSize.cy*0.5 ), aLayerPercentOpacity );
+ end;
+
  function TTexturedFont.GetCharWidth(const c: string): integer;
  var i: integer;
  begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].DecoratedCharSize.cx ;
+    else Result := FTexCharArray[i].OriginalCharSize.cx ;
  end;
 
  function TTexturedFont.GetCharHeight(const c: string): integer;
@@ -361,7 +383,7 @@ end;
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].DecoratedCharSize.cy ;
+    else Result := FTexCharArray[i].OriginalCharSize.cy ;
  end;
 
  function TTexturedFont.GetTextWidth(const t: string): integer;
@@ -382,6 +404,50 @@ end;
  end;
 
  function TTexturedFont.GetCharSize(const c: string): TSize;
+ var i: integer;
+ begin
+  i := IndexOf( c );
+  if i=-1
+    then Result := Size(0,0)
+    else Result := FTexCharArray[i].OriginalCharSize;
+ end;
+
+ function TTexturedFont.GetDecoratedCharWidth(const c: string): integer;
+ var i: integer;
+ begin
+  i := IndexOf( c );
+  if i=-1
+    then Result := 0
+    else Result := FTexCharArray[i].DecoratedCharSize.cx ;
+ end;
+
+ function TTexturedFont.GetDecoratedCharHeight(const c: string): integer;
+ var i: integer;
+ begin
+  i := IndexOf( c );
+  if i=-1
+    then Result := 0
+    else Result := FTexCharArray[i].DecoratedCharSize.cy ;
+ end;
+
+ function TTexturedFont.GetDecoratedTextWidth(const t: string): integer;
+ var i: integer;
+ begin
+  Result := 0;
+  for i:=1 to UTF8Length(t) do Result += GetDecoratedCharWidth( UTF8Copy( t, i, 1 ));
+ end;
+
+ function TTexturedFont.GetDecoratedTextHeight(const t: string): integer;
+ var i, h: integer;
+ begin
+  Result := 0;
+  for i:=1 to UTF8Length(t) do begin
+   h := GetDecoratedCharHeight( UTF8Copy( t, i, 1 ));
+   if Result<h then Result :=h;
+  end;
+ end;
+
+ function TTexturedFont.GetDecoratedCharSize(const c: string): TSize;
  var i: integer;
  begin
   i := IndexOf( c );
