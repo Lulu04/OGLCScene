@@ -1,5 +1,8 @@
 {$ifdef oglcINTERFACE}
 type
+// Don't create a TCamera instance directly by TOGLCCamera.Create
+// Use instead TOGLCScene.CreateCamera
+
 {
 available action for camera scenario
 
