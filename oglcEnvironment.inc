@@ -87,15 +87,13 @@ public
 public
    procedure Update( const aElapsedTime: single ); override;
    procedure Draw( const aLayerPercentOpacity: single );  override;
-
-   procedure SetSize( aWidth, aHeight: integer );
-
 public
    FlakeAmount: TBoundedFParam;  // 0=no snow    1000=max
    FlakeSpeed: TPointFParam;     // speed on both axis in pixels per second
    HAmplitude: TFParam;          // horizontal amplitude in pixel
    Gravity: TPointFParam;
 
+   procedure SetSize( aWidth, aHeight: integer );
    procedure UseTexture( aTextureFile: string ); overload; // set the image flake
    procedure UseTexture( aImage: TBGRABitmap ); overload;
 end;
