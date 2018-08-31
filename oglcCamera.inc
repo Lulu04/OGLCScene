@@ -50,12 +50,13 @@ public
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
-  procedure Reset( const aSeconds: single ); // reset camera to initial value in specified time in seconds
+  // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
+  procedure Reset( const aSeconds: single );
 
   // the camera will be used by the specified layer(s)
   procedure AssignToLayer( aLayerIndex: integer ); overload;
   procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
-  // The camera will no longer be used
+  // The camera will no longer be used by any layer
   procedure Unassign;
   {
   // Scenario
