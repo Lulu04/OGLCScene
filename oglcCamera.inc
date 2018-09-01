@@ -50,6 +50,10 @@ public
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
+
+  // move the camera to the specified location
+  procedure MoveTo( aPt: TPointF ); overload;
+  procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( const aSeconds: single );
 
@@ -130,8 +134,8 @@ end;
 procedure TOGLCCamera.Use;
 begin
  glPushMatrix;
+
  glTranslatef( FParentScene.Width * 0.5, FParentScene.Height * 0.5 , 0 );
- //glTranslatef( X.Value + Width * 0.5 * Scale.x.Value, Y.Value + Height * 0.5 * Scale.y.Value, 0 );
 
  glScalef( Scale.x.Value, Scale.y.Value, 0 );
  glRotatef( Angle.Value, 0, 0, 1 );
@@ -141,6 +145,16 @@ end;
 procedure TOGLCCamera.Release;
 begin
  glPopMatrix;
+end;
+
+procedure TOGLCCamera.MoveTo(aPt: TPointF);
+begin
+ LookAt.Value := FParentScene.Center-aPt;
+end;
+
+procedure TOGLCCamera.MoveTo(aPt: TPointF; aDuration: single; aCurve: Word);
+begin
+ LookAt.ChangeTo( FParentScene.Center-aPt, aDuration, aCurve);
 end;
 
 { TScenarioForCamera }
