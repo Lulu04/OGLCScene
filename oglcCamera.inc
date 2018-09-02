@@ -55,7 +55,7 @@ public
   procedure MoveTo( aPt: TPointF ); overload;
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
-  procedure Reset( const aSeconds: single );
+  procedure Reset( aDuration: single; aCurve:Word= idcLinear);
 
   // the camera will be used by the specified layer(s)
   procedure AssignToLayer( aLayerIndex: integer ); overload;
@@ -102,11 +102,11 @@ begin
  Angle.OnElapse( AElapsedTime );
 end;
 
-procedure TOGLCCamera.Reset(const aSeconds: single);
+procedure TOGLCCamera.Reset(aDuration: single; aCurve:Word);
 begin
- LookAt.ChangeTo( PointF(0,0), aSeconds );
- Scale.ChangeTo( PointF(1,1), aSeconds );
- Angle.ChangeTo( 0, aSeconds );
+ LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
+ Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
+ Angle.ChangeTo( 0, aDuration, aCurve );
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
