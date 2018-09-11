@@ -146,7 +146,7 @@ public
    Scale   : TPointFParam;
    Skew    : TPointFParam;
    // post a message to the surface. the message will be processed later in the Update method
-   // the delay allows to send the message only after a lapse of time (in seconds)
+   // the delay allows to process the message only after a lapse of time (in seconds)
    procedure AddMessage( UserValue: word; aDelay: single=0 );
    // override to process the message received from another surface
    procedure ProcessMessage( {%H-}UserValue: word ); virtual;
