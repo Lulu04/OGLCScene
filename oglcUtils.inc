@@ -27,8 +27,10 @@ function TextToLetterSprite( aCaption: string; aFont: TGuiFont;
                              aFillTexture: TBGRABitmap=NIL;
                              UseChilds: boolean=FALSE): TArrayOfSprite;
 
-
+// splits each words separated by the specified separator.
 function SplitLineToStringArray( ALine: string; aCharSeparator: char ): ArrayOfString;
+// splits each words of a text. #10(line feed) is considered as a line break
+function SplitTextToWordArray( aText: string; aCharSeparator: char=' ' ): ArrayOfString;
 
 procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y, aAngle: single; aAlpha: byte; ATint: TBGRAPixel ); overload;
 procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y: single; Param: TSimpleSurfaceWithEffect; ALayerPercentOpacity: single=1.0 ); overload;
@@ -210,6 +212,7 @@ begin
  SetLength( Result, 0 );
  if Length( ALine ) = 0 then exit;
 
+ // prepare the string
  if ALine[1] <> aCharSeparator
    then ALine := aCharSeparator + ALine;
 
@@ -225,6 +228,41 @@ begin
     end;
   inc ( i );
  until i > Length( ALine );
+end;
+
+function SplitTextToWordArray(aText: string; aCharSeparator: char
+  ): ArrayOfString;
+var i, w: integer;
+   function IsLineFeed: boolean;
+   begin
+    Result := aText[i]=#10;
+   end;
+   procedure AddNewLine;
+   begin
+    inc(w);
+    SetLength(Result, w+1);
+    Result[w] := '';
+   end;
+begin
+ SetLength( Result, 0 );
+ if Length( aText ) = 0 then exit;
+
+ // prepare the string
+ if aText[1] <> aCharSeparator
+   then aText := aCharSeparator + aText;
+
+ i := 1;
+ w := -1;
+ repeat
+  if IsLineFeed then begin
+    if Result[w]<>'' then AddNewLine;
+    Result[w] := aText[i];
+    AddNewLine;
+  end else if aText[i] <> aCharSeparator
+             then Result[w] := Result[w] + aText[i]
+             else AddNewLine;
+  inc ( i );
+ until i>Length( aText );
 end;
 
 

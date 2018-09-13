@@ -90,21 +90,26 @@ private
   FTexturedFont: TTexturedFont;
   function GetCaption: string;
   procedure SetCaption(AValue: string); virtual;
+  procedure SetTexturedFont(AValue: TTexturedFont); virtual;
 protected
  function GetWidth: integer; override;
  function GetHeight: integer; override;
 public
-  procedure Update( const aElapsedTime: single ); override;
   procedure Draw( const aLayerPercentOpacity: single );  override;
 public
   property Caption: string read GetCaption write SetCaption;
-  property TexturedFont: TTexturedFont read FTexturedFont write FTexturedFont;
+  property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
 end;
 
 
-{ TAlignedFreeText }
+TOGLCAlignment=(taTopLeft, taTopCenter, taTopRight,
+                taCenterLeft, taCenterCenter, taCenterRight,
+                taBottomLeft, taBottomCenter, taBottomRight);
 
-TAlignedFreeText=class(TFreeText)
+{ TMultilineText }
+// Draws a text in a rectangular area with horizontal and vertical align.
+// The caption can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
+TMultilineText=class(TFreeText)
 private type
   TFreeTextWord=record
     Word: string;
@@ -116,38 +121,48 @@ private type
   ArrayOfFreeTextWord = array of TFreeTextWord;
 private
   FRect: TRect;
-  FAlign: TAlignment;
-  procedure CenterVertically;
-  procedure DoLeftAlign;
-  procedure DoCenterAlign;
-  procedure DoRightAlign;
+  FAlign: TOGLCAlignment;
+  procedure DoVTopAlign;
+  procedure DoVCenterAlign;
+  procedure DoVBottomAlign;
+  procedure DoHLeftAlign;
+  procedure DoHCenterAlign;
+  procedure DoHRightAlign;
   procedure DoAlign;
 private
   FWords : ArrayOfFreeTextWord;
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
-  procedure PositionTheWords;
-  procedure SetAlign(AValue: TAlignment);
   procedure SetCaption(AValue: string); override;
+  procedure SetTexturedFont(AValue: TTexturedFont); override;
+  procedure PositionTheWords;
+  procedure SetAlign(AValue: TOGLCAlignment);
   procedure GetWordIndex( aLineIndex: integer; var iBegin, iEnd: integer );
+protected
+ function GetWidth: integer; override;
+ function GetHeight: integer; override;
 public
  procedure Draw( const aLayerPercentOpacity: single ); override;
 public
   constructor Create( aFont: TTexturedFont; aRect: TRect );
-  property Align: TAlignment read FAlign write SetAlign;
+  property Align: TOGLCAlignment read FAlign write SetAlign;
 end;
 
-TMaximizedText = class( TAlignedFreeText )
-// to do
+// TMaximizedText do:
+//   1) calculates the largest font height to make the text as large as possible within a rectangular area.
+//   2) constructs the TTexturedFont according the max size font
+TMaximizedText = class( TMultilineText )
+public
+//  constructor Create( aRect: TRect );
 end;
 
 
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
- { TAlignedFreeText }
+ { TMultilineText }
 
- procedure TAlignedFreeText.PositionTheWords;
+ procedure TMultilineText.PositionTheWords;
  var W: ArrayOfString;
    i, SpaceWidth, xx, yy: Integer;
  begin
@@ -159,23 +174,25 @@ end;
      exit;
    end;
 
-   W := SplitLineToStringArray(FCaption, ' ');
+   W := SplitTextToWordArray(FCaption, ' ');
    SetLength(FWords, Length(W));
 
    SpaceWidth := FTexturedFont.GetCharWidth(' ');
 
    xx := 0;
    yy := 0;
-   FLineCount := 0;
+   FLineCount := 1;
    FDrawingHeight := FTexturedFont.Font.FontHeight;
    i := 0;
    repeat
     FWords[i].Word := W[i];
     FWords[i].Width := FTexturedFont.GetTextWidth(FWords[i].Word);
-    if xx+FWords[i].Width <= FRect.Width then begin
+
+    if (xx+FWords[i].Width <= FRect.Width) and
+       (FWords[i].Word<>#10) then begin
       // put the word on the same line
       FWords[i].Location:=PointF(xx,yy);
-      FWords[i].LineIndex:=FLineCount;
+      FWords[i].LineIndex:=FLineCount-1;
       xx+=FWords[i].Width;
       // add space if we are not at the end of the line
       if xx+SpaceWidth <= FRect.Width then xx+=SpaceWidth;
@@ -183,6 +200,7 @@ end;
       FWords[i].Visible := FWords[i].Location.y<FRect.Height;
       inc(i);
     end else begin
+      if FWords[i].Word=#10 then inc(i); // skip LineFeed
       // go to the next line
       yy+=FTexturedFont.Font.FontHeight;
       xx:=0;
@@ -194,23 +212,30 @@ end;
    until i=Length(FWords);
  end;
 
- procedure TAlignedFreeText.SetAlign(AValue: TAlignment);
+ procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
  begin
    if FAlign=AValue then Exit;
    FAlign:=AValue;
    DoAlign;
  end;
 
- procedure TAlignedFreeText.SetCaption(AValue: string);
+ procedure TMultilineText.SetCaption(AValue: string);
  begin
-   //AValue := Trim(AValue);
    if FCaption=AValue then exit;
    FCaption := AValue;
    PositionTheWords;
    DoAlign;
  end;
 
- procedure TAlignedFreeText.GetWordIndex(aLineIndex: integer; var iBegin,
+ procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
+ begin
+   if FTexturedFont=AValue then exit;
+   FTexturedFont := AValue;
+   PositionTheWords;
+   DoAlign;
+ end;
+
+ procedure TMultilineText.GetWordIndex(aLineIndex: integer; var iBegin,
    iEnd: integer);
  var i : integer;
  begin
@@ -225,55 +250,81 @@ end;
    end;
  end;
 
- procedure TAlignedFreeText.Draw(const aLayerPercentOpacity: single);
+ function TMultilineText.GetWidth: integer;
+begin
+  Result:=FRect.Width;
+end;
+
+ function TMultilineText.GetHeight: integer;
+begin
+  Result:=FRect.Height;
+end;
+
+ procedure TMultilineText.Draw(const aLayerPercentOpacity: single);
  var AlphaTint: byte;
   i: integer;
  begin
   if FCaption='' then exit;
   if FTexturedFont=NIL then exit;
+
   PushAndPrepareMatrix;
   SetBlendMode( FBlendMode );
+
+  TextureManager.DisableTextureUsage;
+  FillBox(0,0,Width, Height, BGRA(0,0,80));
+
   TextureManager.BindTexture( FTexturedFont.Texture );
+
   for i:=0 to Length(FWords)-1 do begin
-
     if FWords[i].Visible then begin
-      if Tint.alpha.Value < 255
-        then begin
-              glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-              glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-              FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
-             end;
+      if Tint.alpha.Value < 255 then begin
+        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+        glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
+        FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
+      end;
 
-      if Tint.alpha.Value <> 0
-        then begin  //Apply Tint
-              glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-              glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-              glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-              AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-              glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-              FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
-             end;
+      if Tint.alpha.Value <> 0 then begin  //Apply Tint
+        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
+        glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
+        glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
+        AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
+        glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
+        FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
+      end;
     end;
-
   end;
 
   DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
   PopMatrix;
  end;
 
- constructor TAlignedFreeText.Create(aFont: TTexturedFont; aRect: TRect);
+ constructor TMultilineText.Create(aFont: TTexturedFont; aRect: TRect);
  begin
   inherited Create;
   FTexturedFont := aFont;
   FRect := aRect;
+  FAlign := taCenterCenter;
  end;
 
- procedure TAlignedFreeText.CenterVertically;
+ procedure TMultilineText.DoVTopAlign;
+ var i, j, iBegin, iEnd: integer;
+  yy: single;
+ begin
+  yy := 0;
+  for i:=0 to FLineCount-1 do begin
+    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    for j:=iBegin to iEnd do FWords[j].Location.y := yy;
+    yy += FTexturedFont.Font.FontHeight;
+  end;
+ end;
+
+ procedure TMultilineText.DoVCenterAlign;
  var i, j, iBegin, iEnd, h: integer;
   yy: single;
  begin
-  h := 0;
-  for i:=0 to FLineCount-1 do h := h + FTexturedFont.Font.FontHeight;
+  h:=FLineCount*FTexturedFont.Font.FontHeight;
+ // h := FDrawingHeight;  //
+  if h=0 then exit;
   yy := ( FRect.Height - h )*0.5;
   for i:=0 to FLineCount-1 do begin
     GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
@@ -282,7 +333,19 @@ end;
   end;
  end;
 
- procedure TAlignedFreeText.DoLeftAlign;
+ procedure TMultilineText.DoVBottomAlign;
+ var i, j, iBegin, iEnd: integer;
+  yy: single;
+ begin
+  yy := FRect.Height-FTexturedFont.Font.FontHeight;
+  for i:=FLineCount-1 downto 0 do begin
+    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    for j:=iBegin to iEnd do FWords[j].Location.y := yy;
+    yy -= FTexturedFont.Font.FontHeight;
+  end;
+ end;
+
+ procedure TMultilineText.DoHLeftAlign;
  var i, j, w, iBegin, iEnd: integer;
  begin
   for i:=0 to FLineCount-1 do
@@ -297,7 +360,7 @@ end;
    end;
  end;
 
- procedure TAlignedFreeText.DoCenterAlign;
+ procedure TMultilineText.DoHCenterAlign;
  var i, j, iBegin, iEnd: integer;
   w: single;
  begin
@@ -313,28 +376,33 @@ end;
    end;
  end;
 
- procedure TAlignedFreeText.DoRightAlign;
+ procedure TMultilineText.DoHRightAlign;
  var i, j, w, iBegin, iEnd: integer;
  begin
   for i:=0 to FLineCount-1 do begin
     GetWordIndex ( i, iBegin{%H-}, iEnd{%H-} );
-    w := FRect.Width + FTexturedFont.GetCharWidth(' ');
+    w := FRect.Width; // + FTexturedFont.GetCharWidth(' ');
     for j:=iEnd downto iBegin do
      begin
-      w -= FWords[j].Width - FTexturedFont.GetCharWidth(' ');
+      w -= FWords[j].Width;
       FWords[j].Location.x := w;
+      w-=FTexturedFont.GetCharWidth(' ');
      end;
   end;
  end;
 
- procedure TAlignedFreeText.DoAlign;
+ procedure TMultilineText.DoAlign;
  begin
   case FAlign of
-   taLeftJustify: DoLeftAlign;
-   taRightJustify: DoRightAlign;
-   taCenter: DoCenterAlign;
+   taTopLeft, taCenterLeft, taBottomLeft: DoHLeftAlign;
+   taTopRight, taCenterRight, taBottomRight: DoHRightAlign;
+   taTopCenter, taCenterCenter, taBottomCenter: DoHCenterAlign;
   end;
-  CenterVertically;
+  case FAlign of
+   taTopLeft, taTopCenter, taTopRight: DoVTopAlign;
+   taCenterLeft, taCenterCenter, taCenterRight: DoVCenterAlign;
+   taBottomLeft, taBottomCenter, taBottomRight: DoVBottomAlign;
+  end;
  end;
 
 
@@ -350,6 +418,12 @@ end;
   FCaption := AValue;
  end;
 
+procedure TFreeText.SetTexturedFont(AValue: TTexturedFont);
+begin
+  if FTexturedFont=AValue then Exit;
+  FTexturedFont:=AValue;
+end;
+
  function TFreeText.GetWidth: integer;
  begin
   Result := FTexturedFont.GetTextWidth( FCaption );
@@ -358,11 +432,6 @@ end;
  function TFreeText.GetHeight: integer;
  begin
   Result := FTexturedFont.GetTextHeight( FCaption );
- end;
-
- procedure TFreeText.Update(const aElapsedTime: single);
- begin
-  inherited Update(aElapsedTime);
  end;
 
  procedure TFreeText.Draw(const aLayerPercentOpacity: single);
