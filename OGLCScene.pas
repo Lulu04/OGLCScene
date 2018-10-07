@@ -301,7 +301,6 @@ implementation
 
 var OpenGL_Version_2_0_Loaded: boolean = FALSE;
 
-
 {$define oglcIMPLEMENTATION}
 {$I oglcListType.inc }
 {$I oglcMessage.inc }

@@ -136,9 +136,9 @@ private
   FDrawingHeight: integer;
   procedure SetCaption(AValue: string); override;
   procedure SetTexturedFont(AValue: TTexturedFont); override;
-  procedure PositionTheWords;
-  procedure SetAlign(AValue: TOGLCAlignment);
-  procedure GetWordIndex( aLineIndex: integer; var iBegin, iEnd: integer );
+  procedure DistributeTheWordsOnTheSurface;
+  procedure SetAlign(AValue: TOGLCAlignment); virtual;
+  procedure GetWordsIndexes( aLineIndex: integer; var iBegin, iEnd: integer );
 protected
  function GetWidth: integer; override;
  function GetHeight: integer; override;
@@ -149,22 +149,168 @@ public
   property Align: TOGLCAlignment read FAlign write SetAlign;
 end;
 
-// TMaximizedText do:
-//   1) calculates the largest font height to make the text as large as possible within a rectangular area.
-//   2) constructs the TTexturedFont according the max size font
+// TMaximizedText is an area where the text is displayed as large as possible and aligned.
+// the font height is maximized and the corresponding textured font is then created
+// Usefull for screen title for example
+// TO DO: constructs the textured font only with the characters present in the caption
 TMaximizedText = class( TMultilineText )
+private
+ FGuiFont: TGuiFont;
+ FTemp: TBGRABitmap;
+ procedure MakeMaximizedFont;
+ function ComputeDrawingSize( aGuiFont: TGuiFont ): TSize;
+ procedure SetCaption(AValue: string); override;
+ procedure SetTexturedFont(AValue: TTexturedFont); override;
 public
-//  constructor Create( aRect: TRect );
+  // the font height field of 'aGuiFont' is maximized.
+  constructor Create( aRect: TRect; aGuiFont: TGuiFont );
+  destructor destroy; override;
 end;
 
 
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
+ { TMaximizedText }
+
+ procedure TMaximizedText.MakeMaximizedFont;
+ var s: TSize;
+ begin
+  FGuiFont.FontHeight:=50; // arbitrary font height
+  FTemp:= TBGRABitmap.Create(1,1);
+
+  s := ComputeDrawingSize( FGuiFont );
+  if ( s.cy < FRect.Height ) and ( s.cx < FRect.Width ) then begin
+    // the drawing is smallest than the surface => we try to increase it
+    repeat
+      FGuiFont.FontHeight := FGuiFont.FontHeight+1;
+      s := ComputeDrawingSize( FGuiFont );
+    until ( s.cy > FRect.Height ) or ( s.cx > FRect.Width ) ;
+    FGuiFont.FontHeight := FGuiFont.FontHeight-1;
+  end else if (s.cy>FRect.Height) and (s.cx> FRect.Width) then begin
+    // the drawing is larger than the surface => we decrease it
+    repeat
+      FGuiFont.FontHeight := FGuiFont.FontHeight-1;
+      s := ComputeDrawingSize( FGuiFont );
+    until ( s.cy <= FRect.Height ) and ( s.cx <= FRect.Width ) ;
+  end;
+  FTemp.Free;
+
+  if FTexturedFont<>NIL then FontManager.DeleteFont( FTexturedFont );
+  FTexturedFont := FontManager.AddFont( FGuiFont );
+ end;
+
+ function TMaximizedText.ComputeDrawingSize(aGuiFont: TGuiFont): TSize;
+ var W: ArrayOfString;
+     i, SpaceWidth, WordWidth, xx, yy: Integer;
+ procedure NextLine;
+ begin
+  yy+=FTemp.FontHeight;
+  xx:=0;
+  inc(FLineCount);
+  if i<>Length(W)-1 then Result.cy := Result.cy+FTemp.FontHeight;
+ end;
+ procedure PutWordOnCurrentLine;
+ begin
+  xx+=WordWidth+SpaceWidth;
+ end;
+ function CurrentLineIsEmpty: boolean;
+ begin
+  Result := xx=0;
+ end;
+ begin
+   FTemp.FontHeight:=aGuiFont.FontHeight;
+   FTemp.FontStyle:=aGuiFont.Style;
+   FTemp.FontName:=aGuiFont.FontName;
+
+   Result.cx := 0;
+   Result.cy := 0;
+   if FCaption ='' then exit;
+
+   W := SplitTextToWordArray(FCaption, ' ');
+
+   SpaceWidth := FTemp.TextSize(' ').cx;
+
+   xx := 0;
+   yy := 0;
+   Result.cy := FTemp.FontHeight;
+   i := 0;
+   repeat
+    WordWidth := FTemp.TextSize(W[i]).cx;
+
+    if W[i]=#10 then begin
+        NextLine;
+        inc(i);
+    end else if xx+WordWidth <= FRect.Width then begin
+      // the word fit
+      PutWordOnCurrentLine;
+      inc(i);
+    end else begin
+         // the word don't fit
+         if CurrentLineIsEmpty then begin
+           PutWordOnCurrentLine;
+           NextLine;
+           inc(i);
+         end else begin
+              NextLine;
+              PutWordOnCurrentLine;
+              inc(i);
+         end;
+    end;
+    if xx>Result.cx then Result.cx:=xx;
+   until i=Length(W);
+ end;
+
+ procedure TMaximizedText.SetCaption(AValue: string);
+ begin
+  if FCaption=AValue then exit;
+  FCaption := AValue;
+  MakeMaximizedFont;
+  DistributeTheWordsOnTheSurface;
+  DoAlign;
+end;
+
+ procedure TMaximizedText.SetTexturedFont(AValue: TTexturedFont);
+ begin
+ // does nothing because it's no sense to manually change the font height in TMaximizedtext...
+ end;
+
+ constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont);
+ begin
+  inherited Create( NIL, aRect );
+  FGuiFont := aGuiFont;
+ end;
+
+ destructor TMaximizedText.destroy;
+begin
+  if FTexturedFont<>NIl then FontManager.DeleteFont( FTexturedFont );
+  inherited destroy;
+end;
+
  { TMultilineText }
 
- procedure TMultilineText.PositionTheWords;
+ procedure TMultilineText.DistributeTheWordsOnTheSurface;
  var W: ArrayOfString;
    i, SpaceWidth, xx, yy: Integer;
+   procedure NextLine;
+   begin
+    yy+=FTexturedFont.Font.FontHeight;
+    xx:=0;
+    inc(FLineCount);
+    if i<>Length(FWords)-1 then FDrawingHeight += FTexturedFont.Font.FontHeight;
+   end;
+   procedure PutWordOnCurrentLine;
+   begin
+    FWords[i].Location:=PointF(xx,yy);
+    FWords[i].LineIndex:=FLineCount-1;
+    xx+=FWords[i].Width+SpaceWidth;
+    // the word is not visible if we are vertically out of bounds
+    FWords[i].Visible := FWords[i].Location.y<FRect.Height;
+   end;
+   function CurrentLineIsEmpty: boolean;
+   begin
+    Result := xx=0;
+   end;
+
  begin
    FLineCount := 0;
    FDrawingWidth := 0;
@@ -188,26 +334,25 @@ end;
     FWords[i].Word := W[i];
     FWords[i].Width := FTexturedFont.GetTextWidth(FWords[i].Word);
 
-    if (xx+FWords[i].Width <= FRect.Width) and
-       (FWords[i].Word<>#10) then begin
-      // put the word on the same line
-      FWords[i].Location:=PointF(xx,yy);
-      FWords[i].LineIndex:=FLineCount-1;
-      xx+=FWords[i].Width;
-      // add space if we are not at the end of the line
-      if xx+SpaceWidth <= FRect.Width then xx+=SpaceWidth;
-      // the word is not visible if we are vertically out of bounds
-      FWords[i].Visible := FWords[i].Location.y<FRect.Height;
+    if FWords[i].Word=#10 then begin
+        NextLine;
+        inc(i);
+    end else if xx+FWords[i].Width <= FRect.Width then begin
+      // the word fit
+      PutWordOnCurrentLine;
       inc(i);
     end else begin
-      if FWords[i].Word=#10 then inc(i); // skip LineFeed
-      // go to the next line
-      yy+=FTexturedFont.Font.FontHeight;
-      xx:=0;
-      FDrawingHeight+=FTexturedFont.Font.FontHeight;
-      inc(FLineCount);
+         // the word don't fit
+         if CurrentLineIsEmpty then begin
+           PutWordOnCurrentLine;
+           NextLine;
+           inc(i);
+         end else begin
+              NextLine;
+              PutWordOnCurrentLine;
+              inc(i);
+         end;
     end;
-
     if xx>FDrawingWidth then FDrawingWidth:=xx;
    until i=Length(FWords);
  end;
@@ -223,7 +368,7 @@ end;
  begin
    if FCaption=AValue then exit;
    FCaption := AValue;
-   PositionTheWords;
+   DistributeTheWordsOnTheSurface;
    DoAlign;
  end;
 
@@ -231,11 +376,11 @@ end;
  begin
    if FTexturedFont=AValue then exit;
    FTexturedFont := AValue;
-   PositionTheWords;
+   DistributeTheWordsOnTheSurface;
    DoAlign;
  end;
 
- procedure TMultilineText.GetWordIndex(aLineIndex: integer; var iBegin,
+ procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; var iBegin,
    iEnd: integer);
  var i : integer;
  begin
@@ -312,7 +457,7 @@ end;
  begin
   yy := 0;
   for i:=0 to FLineCount-1 do begin
-    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight;
   end;
@@ -327,7 +472,7 @@ end;
   if h=0 then exit;
   yy := ( FRect.Height - h )*0.5;
   for i:=0 to FLineCount-1 do begin
-    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight;
   end;
@@ -339,7 +484,7 @@ end;
  begin
   yy := FRect.Height-FTexturedFont.Font.FontHeight;
   for i:=FLineCount-1 downto 0 do begin
-    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy -= FTexturedFont.Font.FontHeight;
   end;
@@ -350,7 +495,7 @@ end;
  begin
   for i:=0 to FLineCount-1 do
    begin
-    GetWordIndex( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     w := 0;
     for j:=iBegin to iEnd do
      begin
@@ -366,7 +511,7 @@ end;
  begin
   for i:=0 to FLineCount-1 do
    begin
-    GetWordIndex ( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
     w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // largeur totale de la ligne
     w := ( FRect.Width - w )*0.5;
     for j:=iBegin to iEnd do begin
@@ -380,7 +525,7 @@ end;
  var i, j, w, iBegin, iEnd: integer;
  begin
   for i:=0 to FLineCount-1 do begin
-    GetWordIndex ( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
     w := FRect.Width; // + FTexturedFont.GetCharWidth(' ');
     for j:=iEnd downto iBegin do
      begin
