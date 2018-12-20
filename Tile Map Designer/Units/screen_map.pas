@@ -41,8 +41,16 @@ var o: TGUILabel;
   FImaGrid : TBGRABitmap;
 begin
  FTitleFont := GuiFont( 'Arial', 32, [], BGRA(0,255,100), BGRA(20,100,50), 1, BGRA(0,0,0,0), 0, 0, 0 );
- FHintFont := GuiFont( 'Arial', 12, [], BGRA(255,255,100), BGRA(0,0,0,200), 4, BGRA(0,0,0,0), 0, 0, 0 );
- FEventFont := GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0);//, fqSystemClearType );
+// FHintFont := GuiFont( 'Arial', 12, [], BGRA(255,255,100), BGRA(0,0,0,200), 4, BGRA(0,0,0,0), 0, 0, 0 );
+// FEventFont := GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0);//, fqSystemClearType );
+
+ FEventFont:= FontManager.AddFont(GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0));
+ FHintFont:= FontManager.AddFont(GuiFont( 'Arial', 12, [], BGRA(255,255,100), BGRA(0,0,0,200), 4, BGRA(0,0,0,0), 0, 0, 0 ));
+
+ FLabelMapPosition:=TFreeText.Create;
+ FLabelMapPosition.TexturedFont:=FHintFont;
+ FLabelMapPosition.Caption:='Map position:';
+ FScene.add( FLabelMapPosition, Layer_Info );
 
  o := TGUILabel.Create('T I L E    M A P    D E S I G N E R', FTitleFont );
  o.SetCenterCoordinate( FScene.Width/2, FScene.Height/2 );
@@ -51,28 +59,44 @@ begin
  o.Scale.ChangeTo( PointF(1.2,1.2), 6 );
  o.KillDefered( 5 );
 
- FLabelMapPosition := TGuiLabel.Create('Map position:', FHintFont);
- FLabelMapPosition.SetCoordinate( 0, 0 );
- FScene.Add( FLabelMapPosition, Layer_Info );
 
- FLabelTileIndexes := TGuiLabel.Create('Tile:', FHintFont);
+// FLabelTileIndexes := TGuiLabel.Create('Tile:', FHintFont);
+// FLabelTileIndexes.SetCoordinate( 0, FLabelMapPosition2.BottomY+5 );
+// FScene.Add( FLabelTileIndexes, Layer_Info );
+
+ FLabelTileIndexes := TFreeText.Create;
+ FLabelTileIndexes.TexturedFont:=FHintFont;
+ FLabelTileIndexes.Caption:='Tile:';
+ FScene.add( FLabelTileIndexes, Layer_Info );
  FLabelTileIndexes.SetCoordinate( 0, FLabelMapPosition.BottomY+5 );
- FScene.Add( FLabelTileIndexes, Layer_Info );
 
 
- FLabelSelectionInfo := TGuiLabel.Create('Sel:', FHintFont);
+// FLabelSelectionInfo := TGuiLabel.Create('Sel:', FHintFont);
+// FLabelSelectionInfo.SetCoordinate( 0, FLabelTileIndexes2.BottomY+5 );
+// FScene.Add( FLabelSelectionInfo, Layer_Info );
+
+ FLabelSelectionInfo := TFreeText.Create;
+ FLabelSelectionInfo.TexturedFont:=FHintFont;
+ FLabelSelectionInfo.Caption:='Sel:';
+ FScene.add( FLabelSelectionInfo, Layer_Info );
  FLabelSelectionInfo.SetCoordinate( 0, FLabelTileIndexes.BottomY+5 );
- FScene.Add( FLabelSelectionInfo, Layer_Info );
 
- FLabelGroundType := TGuiLabel.Create('Ground:', FHintFont);
+ FLabelGroundType := TFreeText.Create;
+ FLabelGroundType.TexturedFont:=FHintFont;
+ FLabelGroundType.Caption := 'Ground:';
  FLabelGroundType.SetCoordinate( 0, FLabelSelectionInfo.BottomY+5 );
  FScene.Add( FLabelGroundType, Layer_Info );
 
- FLabelEventName := TGuiLabel.Create('Event:', FHintFont);
+
+ FLabelEventName := TFreeText.Create;
+ FLabelEventName.TexturedFont:=FHintFont;
+ FLabelEventName.Caption := 'Event:';
  FLabelEventName.SetCoordinate( 0, FLabelGroundType.BottomY+5 );
  FScene.Add( FLabelEventName, Layer_Info );
 
- FLabelDebug := TGuiLabel.Create('Debug', FEventFont);
+ FLabelDebug := TFreeText.Create;
+ FLabelDebug.TexturedFont:=FEventFont;
+ FLabelDebug.Caption := 'Debug';
  FLabelDebug.SetCoordinate( 0, FScene.Height-FLabelDebug.Height );
  FScene.Add( FLabelDebug, Layer_Info );
 

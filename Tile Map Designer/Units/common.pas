@@ -33,16 +33,19 @@ FTileEngineGrid: TTileEngine;
 FImageBackGround: TBGRABitmap;
 
 
-FTitleFont,
-FHintFont,
-FEventFont: TGuiFont;
+FTitleFont: TGuiFont;
 
-FLabelMapPosition: TGuiLabel;
-FLabelTileIndexes: TGuiLabel;
-FLabelSelectionInfo: TGuiLabel;
+FEventFont,
+FHintFont: TTexturedFont;
+
+FLabelMapPosition,
+FLabelTileIndexes,
+FLabelSelectionInfo,
 FLabelGroundType,
-FLabelEventName: TGuiLabel;
-FLabelDebug: TGuiLabel;
+FLabelEventName,
+FLabelDebug: TFreeText;
+
+
 
 FReady: boolean =FALSE;
 

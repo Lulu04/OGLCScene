@@ -68,7 +68,6 @@ type
     CheckBox2: TCheckBox;
     CB12: TCheckBox;
     ColorButton1: TColorButton;
-    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -130,6 +129,8 @@ type
     PageControl1: TPageControl;
     Panel10: TPanel;
     Panel11: TPanel;
+    Panel12: TPanel;
+    Panel13: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -139,7 +140,6 @@ type
     Panel8: TPanel;
     Panel9: TPanel;
     PB2: TPaintBox;
-    Panel1: TPanel;
     PB1: TPaintBox;
     PopupMenu1: TPopupMenu;
     RB1: TRadioButton;
@@ -161,6 +161,7 @@ type
     Shape1: TShape;
     Shape2: TShape;
     SBHelp1: TSpeedButton;
+    TabSheet1: TTabSheet;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);

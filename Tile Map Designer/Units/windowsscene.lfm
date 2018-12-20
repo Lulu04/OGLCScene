@@ -151,5 +151,19 @@ object Window_Scene: TWindow_Scene
       Caption = 'Copy event types to CLIPBOARD'
       OnClick = MenuItem7Click
     end
+    object MenuItem8: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem10: TMenuItem
+      Caption = 'Set ground type...'
+      OnClick = MenuItem10Click
+    end
+    object MenuItem11: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem9: TMenuItem
+      Caption = 'Put all tileset'
+      OnClick = MenuItem9Click
+    end
   end
 end

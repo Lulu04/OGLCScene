@@ -25,10 +25,14 @@ type
   TWindow_Scene = class(TForm)
     MenuClear: TMenuItem;
     MenuItem1: TMenuItem;
+    MenuItem10: TMenuItem;
+    MenuItem11: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
     Menu_StartMap: TMenuItem;
     Menu_FillWithSelectedTile: TMenuItem;
     MenuItem2: TMenuItem;
@@ -47,9 +51,11 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormMouseEnter(Sender: TObject);
     procedure MenuClearClick(Sender: TObject);
+    procedure MenuItem10Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
+    procedure MenuItem9Click(Sender: TObject);
     procedure Menu_CutClick(Sender: TObject);
     procedure Menu_FillWithSelectedTileClick(Sender: TObject);
     procedure Menu_PasteClick(Sender: TObject);
@@ -224,6 +230,34 @@ begin
    end;
 end;
 
+// popup Set ground type...
+procedure TWindow_Scene.MenuItem10Click(Sender: TObject);
+var pt: PTile;
+  p1: TPoint;
+  s: TSize;
+  ro, co: integer;
+begin
+ if not XYCoorIsInMap( FMousePos.x, FMousePos.y ) then exit;
+ if Form_AskGroundType.ShowModal = mrCancel then exit;
+
+ if not SelectionAvailable then begin  // set ground type on tile under the mouse
+      p1 := ClientPosToTileIndex( FMousePos );
+      pt:=FTileEngine.GetPTile(p1.y, p1.x);
+      FTileEngine.SetGroundType( pt^.TextureIndex,pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
+      SetProjectModified;
+ end else begin                       // set ground type on the selected tiles
+      s := TileCountInSelection;
+      p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
+      for ro:=p1.y to p1.y+s.cy-1 do
+       for co:=p1.x to p1.x+s.cx-1 do begin
+         pt:=FTileEngine.GetPTile(ro, co);
+         FTileEngine.SetGroundType( pt^.TextureIndex, pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
+       end;
+      ShowActionText( FMousePos.x, FMousePos.y, 'set ground type' );
+      SetProjectModified;
+ end;
+end;
+
 // popup Set user event value
 procedure TWindow_Scene.MenuItem3Click(Sender: TObject);
 var ro, co: integer;
@@ -287,6 +321,28 @@ end;
 procedure TWindow_Scene.MenuItem7Click(Sender: TObject);
 begin
  Form_ExportEvent.ShowModal;
+end;
+
+// popup 'put all tiles in the current tileset'
+procedure TWindow_Scene.MenuItem9Click(Sender: TObject);
+var ro, co: integer;
+    s: TSize;
+    p1: TPoint;
+    Ftl: TTileSet;
+begin
+ if Form_Principale.CB1.ItemIndex=-1 then exit;
+
+ p1 := ClientPosToTileIndex( FMousePos );
+ Ftl := TileSetManager.TileSet[Form_Principale.CB1.ItemIndex];
+ for ro:=p1.y to p1.y+Ftl.YTileCount-1 do
+  for co:=p1.x to p1.x+Ftl.XTileCount-1 do
+   begin
+    FTileEngine.SetCell( ro, co, Form_Principale.CB1.ItemIndex, co-p1.x, ro-p1.y );
+    FTileEngine.SetUserEventValue( ro, co, -1 );
+   end;
+
+ ShowActionText( FMousePos.x, FMousePos.y, 'put whole tileset');
+ SetProjectModified;
 end;
 
 // popup Cut
@@ -646,10 +702,12 @@ begin
 end;
 
 procedure TWindow_Scene.ShowActionText(aX, aY: single; aTxt: string);
-var o : TGuiLabel;
+var o : TFreeText;
   rx, ry, time: single;
 begin
-  o := TGuiLabel.Create( aTxt, FHintFont );
+  o := TFreeText.Create;
+  o.TexturedFont:=FHintFont;
+  o.Caption:=aTxt;
   o.SetCenterCoordinate( aX, aY );
   FScene.Add( o, Layer_Info );
   time := 2.0;
@@ -666,14 +724,17 @@ end;
 
 procedure TWindow_Scene.ProcessTileEngineEvent(Sender: TTileEngine;
   const SceneTileCoor: TPointF; Event: integer);
-var o: TGuiLabel;
+var o: TFreeText;
     p: TPointF;
 begin
  if not Form_Principale.CheckBox2.Checked or ( Event = -1 ) then exit;
- o := TGuiLabel.Create( GetStrEvent( Event ), FEventFont );
+ o := TFreeText.Create;
+ o.TexturedFont:=FEventFont;
+ //o := TGuiLabel.Create( GetStrEvent( Event ), FEventFont );
  p := SceneTileCoor + PointF( FTileEngine.TileSize.cx*0.5, FTileEngine.TileSize.cy*0.5 );
  o.SetCenterCoordinate( p.x, p.y );
- FillBox( o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(0,0,0,190) );
+ TextureManager.DisableTextureUsage;
+ FillBox( o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(1,0,0) );
  o.Draw( 1.0 );
  o.Free;
 end;
