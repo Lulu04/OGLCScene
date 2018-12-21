@@ -730,7 +730,6 @@ begin
  if not Form_Principale.CheckBox2.Checked or ( Event = -1 ) then exit;
  o := TFreeText.Create;
  o.TexturedFont:=FEventFont;
- //o := TGuiLabel.Create( GetStrEvent( Event ), FEventFont );
  p := SceneTileCoor + PointF( FTileEngine.TileSize.cx*0.5, FTileEngine.TileSize.cy*0.5 );
  o.SetCenterCoordinate( p.x, p.y );
  TextureManager.DisableTextureUsage;

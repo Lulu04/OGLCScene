@@ -124,13 +124,12 @@ public
  procedure SetViewSize( AWidth, AHeight: integer );
 
  property MapSize: TSize read GetMapSize; // give total map size in pixel
-
  property TileSize: TSize read GetTileSize; // give tile size in pixel
  property MapTileCount: TSize read FMapTileCount; // cx = column count     cy = row count
- property HScrollEnable: boolean read FHScrollEnable write FHScrollEnable;
- property HLoopMode: boolean read FHLoopMode write FHLoopMode;
- property VScrollEnable: boolean read FVScrollEnable write FVScrollEnable;
- property VLoopMode: boolean read FVLoopMode write FVLoopMode;
+ property HScrollEnable: boolean read FHScrollEnable write FHScrollEnable; // TRUE to enable horizontal scrolling
+ property HLoopMode: boolean read FHLoopMode write FHLoopMode;    // set TRUE to repeat the map horizontally
+ property VScrollEnable: boolean read FVScrollEnable write FVScrollEnable; // TRUE to enable vertical scrolling
+ property VLoopMode: boolean read FVLoopMode write FVLoopMode;    // set TRUE to repeat the map vertically
 
  property OnTileEvent: TTileEvent read FOnTileEvent write FOnTileEvent;
 end;

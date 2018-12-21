@@ -16,7 +16,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1349"/>
+      <BuildNr Value="1351"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -86,7 +86,7 @@
       <Unit0>
         <Filename Value="Tile_Map_Designer.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="19"/>
+        <EditorIndex Value="17"/>
         <TopLine Value="4"/>
         <CursorPos X="28" Y="17"/>
         <UsageCount Value="200"/>
@@ -988,7 +988,7 @@
       <Unit122>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="25"/>
+        <TopLine Value="33"/>
         <CursorPos Y="39"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1134,8 +1134,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="WindowsScene"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="694"/>
-        <CursorPos X="36" Y="711"/>
+        <TopLine Value="697"/>
+        <CursorPos X="2" Y="699"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1280,8 +1280,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="704"/>
-        <CursorPos X="58" Y="708"/>
+        <TopLine Value="502"/>
+        <CursorPos X="27" Y="508"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1623,17 +1623,16 @@
       <Unit202>
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="11"/>
         <TopLine Value="79"/>
-        <CursorPos X="25" Y="93"/>
+        <CursorPos X="45" Y="90"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit202>
       <Unit203>
         <Filename Value="Units\tileset_manager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="46"/>
         <CursorPos X="19" Y="62"/>
         <UsageCount Value="206"/>
@@ -1741,9 +1740,9 @@
       </Unit215>
       <Unit216>
         <Filename Value="..\OGLCScene.pas"/>
-        <EditorIndex Value="17"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="142"/>
-        <CursorPos X="13" Y="162"/>
+        <CursorPos X="13" Y="151"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit216>
@@ -1824,7 +1823,7 @@
         <ComponentName Value="Form_InsertLineColumn"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="7"/>
         <CursorPos X="24" Y="28"/>
         <UsageCount Value="201"/>
@@ -1973,7 +1972,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="328"/>
         <CursorPos X="39" Y="312"/>
-        <UsageCount Value="126"/>
+        <UsageCount Value="129"/>
       </Unit242>
       <Unit243>
         <Filename Value="Units\uexporteventtype.pas"/>
@@ -1984,7 +1983,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="37"/>
         <CursorPos X="45" Y="42"/>
-        <UsageCount Value="94"/>
+        <UsageCount Value="97"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit243>
@@ -2042,46 +2041,46 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="9"/>
         <CursorPos X="65" Y="11"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="62"/>
         <Loaded Value="True"/>
       </Unit250>
       <Unit251>
         <Filename Value="..\..\VelocityCurve.pas"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="16"/>
         <CursorPos X="47" Y="33"/>
         <UsageCount Value="20"/>
-        <Loaded Value="True"/>
       </Unit251>
       <Unit252>
         <Filename Value="..\oglcSurface.inc"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="15" Y="91"/>
+        <EditorIndex Value="15"/>
+        <TopLine Value="606"/>
+        <CursorPos X="25" Y="786"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit252>
       <Unit253>
         <Filename Value="..\oglcGUI.inc"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="446"/>
         <CursorPos X="23" Y="459"/>
         <UsageCount Value="14"/>
-        <Loaded Value="True"/>
       </Unit253>
       <Unit254>
         <Filename Value="..\oglcTileMap.inc"/>
-        <EditorIndex Value="18"/>
-        <TopLine Value="14"/>
-        <CursorPos X="68" Y="76"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="16"/>
+        <TopLine Value="118"/>
+        <CursorPos Y="127"/>
         <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit254>
       <Unit255>
         <Filename Value="..\oglcTexturedFont.inc"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="58"/>
         <CursorPos X="13" Y="80"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit255>
     </Units>
     <OtherDefines Count="1">
@@ -2089,124 +2088,124 @@
     </OtherDefines>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="41" Column="69" TopLine="36"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="118" Column="11" TopLine="106"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="57" Column="53" TopLine="39"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="680" Column="23" TopLine="676"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="60" Column="19" TopLine="39"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="120" Column="11" TopLine="108"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="61" Column="19" TopLine="39"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="694" Column="11" TopLine="692"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="62" Column="31" TopLine="39"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="111" Column="16" TopLine="108"/>
       </Position5>
       <Position6>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="63" Column="19" TopLine="41"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="648" Column="2" TopLine="643"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="66" Column="56" TopLine="44"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="111" Column="11" TopLine="99"/>
       </Position7>
       <Position8>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="60" Column="19" TopLine="44"/>
+        <Filename Value="Units\windowsscene.pas"/>
+        <Caret Line="588" Column="11" TopLine="584"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="61" Column="19" TopLine="44"/>
+        <Filename Value="Units\windowsscene.pas"/>
+        <Caret Line="100" Column="14" TopLine="88"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="62" Column="31" TopLine="44"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="650" Column="20" TopLine="643"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="590" Column="20" TopLine="576"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="118" Column="11" TopLine="106"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="613" Column="21" TopLine="591"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="680" Column="19" TopLine="676"/>
       </Position12>
       <Position13>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="63" Column="59" TopLine="44"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="120" Column="11" TopLine="108"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="60" Column="16" TopLine="49"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="694" Column="2" TopLine="692"/>
       </Position14>
       <Position15>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="61" Column="21" TopLine="49"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="693" Column="28" TopLine="678"/>
       </Position15>
       <Position16>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="62" Column="21" TopLine="49"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="121" Column="23" TopLine="108"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="63" Column="33" TopLine="49"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="502" Column="111" TopLine="495"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="73" Column="58" TopLine="51"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="503" Column="111" TopLine="496"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="586" Column="31" TopLine="576"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="511" Column="2" TopLine="499"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="596" Column="21" TopLine="576"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="709" Column="26" TopLine="697"/>
       </Position20>
       <Position21>
-        <Filename Value="Units\common.pas"/>
-        <Caret Line="47" Column="18" TopLine="26"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="67" Column="14" TopLine="54"/>
       </Position21>
       <Position22>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="596" Column="20" TopLine="577"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="276" Column="10" TopLine="268"/>
       </Position22>
       <Position23>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="614" Column="20" TopLine="599"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="54" Column="12" TopLine="43"/>
       </Position23>
       <Position24>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="69" Column="19" TopLine="32"/>
+        <Filename Value="..\OGLCScene.pas"/>
+        <Caret Line="151" Column="13" TopLine="142"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\common.pas"/>
-        <Caret Line="48" TopLine="29"/>
+        <Filename Value="..\oglcSurface.inc"/>
+        <Caret Line="159" Column="18" TopLine="144"/>
       </Position25>
       <Position26>
-        <Filename Value="Units\common.pas"/>
-        <Caret Line="41" TopLine="25"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="311" Column="12" TopLine="294"/>
       </Position26>
       <Position27>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="708" Column="35" TopLine="695"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="71" Column="18" TopLine="55"/>
       </Position27>
       <Position28>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="48" Column="123" TopLine="36"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="635" Column="2" TopLine="633"/>
       </Position28>
       <Position29>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="736" Column="18" TopLine="715"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="73" Column="17" TopLine="58"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\windowsscene.pas"/>
-        <Caret Line="711" Column="36" TopLine="694"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="361" Column="22" TopLine="342"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

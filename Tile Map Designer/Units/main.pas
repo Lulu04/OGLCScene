@@ -53,6 +53,8 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
+    Button6: TButton;
     CB1: TComboBox;
     CB10: TCheckBox;
     CB11: TCheckBox;
@@ -106,6 +108,9 @@ type
     Label43: TLabel;
     Label44: TLabel;
     Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Label48: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
@@ -127,6 +132,7 @@ type
     OD1: TOpenDialog;
     OD2: TOpenDialog;
     PageControl1: TPageControl;
+    Panel1: TPanel;
     Panel10: TPanel;
     Panel11: TPanel;
     Panel12: TPanel;
@@ -158,6 +164,8 @@ type
     SE2: TSpinEdit;
     SE5: TSpinEdit;
     SE6: TSpinEdit;
+    SE7: TSpinEdit;
+    SE8: TSpinEdit;
     Shape1: TShape;
     Shape2: TShape;
     SBHelp1: TSpeedButton;
@@ -166,6 +174,8 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
     procedure CB1Change(Sender: TObject);
     procedure CB4Change(Sender: TObject);
     procedure CB5Change(Sender: TObject);
@@ -203,6 +213,7 @@ type
     procedure SE1Change(Sender: TObject);
     procedure SE3Change(Sender: TObject);
     procedure SE6Change(Sender: TObject);
+    procedure SE7Change(Sender: TObject);
   private
     procedure LoadTextureToProject( AFilename: string; AFrameWidth, AFrameHeight: integer );
   private
@@ -492,6 +503,20 @@ begin
  Label15.Caption := s;
 
  PB2SetSizeAndPos;
+end;
+
+// stop scroll on main map
+procedure TForm_Principale.Button5Click(Sender: TObject);
+begin
+ SE7.Value:=0;
+ SE8.Value:=0;
+ FTileEngine.ScrollSpeed.Value:=PointF(0,0);
+end;
+
+// go to top left on main map
+procedure TForm_Principale.Button6Click(Sender: TObject);
+begin
+ FTileEngine.PositionOnMap.Value:=PointF(0,0);
 end;
 
 // tileset choice
@@ -879,6 +904,12 @@ procedure TForm_Principale.SE6Change(Sender: TObject);
 begin
  FTileEngine.MapHoleColor.Alpha.Value := SE6.Value;
  SetProjectModified;
+end;
+
+// scrolling speed (main map)
+procedure TForm_Principale.SE7Change(Sender: TObject);
+begin
+ FTileEngine.ScrollSpeed.Value := PointF( SE7.Value, SE8.Value );
 end;
 
 
