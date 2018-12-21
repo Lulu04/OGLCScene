@@ -114,11 +114,11 @@ public
  function GetUserEventValue( aSceneCoor: TPointF ): integer; overload;
 
  // Return TRUE if aSceneCoor point is in map (can be out of view, but on map)
- // if MapPos is specified, at the end of the function, it contain Map position corresponding to aSceneCoor
- function SceneCoorIsInMap( aSceneCoor: TPointF;  MapPos: PPointF=NIL ): boolean;
+ // if specified, at the end of the function, aPSurfaceCoor contain surface coordinates translated from aSceneCoor
+ function SceneCoorIsInMap( aSceneCoor: TPointF;  aPSurfaceCoor: PPointF=NIL ): boolean;
 
- function SceneCoorToMapPosition( aSceneCoor: TPointF ): TPointF; inline;
- function MapPositionToSceneCoor( aMapPos: TPointF ): TPointF; inline;
+// function SceneCoorToMapPosition( aSceneCoor: TPointF ): TPointF; inline;
+// function MapPositionToSceneCoor( aMapPos: TPointF ): TPointF; inline;
 
  // set the size in pixels of the surface on which the map will be drawn in the scene. You can retrieve it with property Width and Height
  procedure SetViewSize( AWidth, AHeight: integer );
@@ -641,15 +641,15 @@ end;
 
 function TTileEngine.GetGroundType(aSceneCoor: TPointF): integer;
 var p: PTile;
-    mp: TPointF;
+    sc: TPointF;
     ro, co: integer;
 begin
  Result := 1;    // Neutral ground by default
  if ( TileSize.cx = 0 ) or ( TileSize.cy = 0 ) then exit;
- if not SceneCoorIsInMap( aSceneCoor, @mp ) then exit;
+ if not SceneCoorIsInMap( aSceneCoor, @sc ) then exit;
 
- co := round( mp.x ) div TileSize.cx + FColumnIndexFirstTile;
- ro := round( mp.y ) div TileSize.cy + FRowIndexFirstTile;
+ co := FColumnIndexFirstTile + trunc((sc.x-FXOffsetFirstTile)/FTileSize.cx);
+ ro := FRowIndexFirstTile + trunc((sc.y-FYOffsetFirstTile)/FTileSize.cy);
 
  p := GetPTile( ro, co );
  if p <> NIL
@@ -658,25 +658,25 @@ end;
 
 function TTileEngine.GetUserEventValue(aSceneCoor: TPointF): integer;
 var p: PTile;
-    mp: TPointF;
+    sc: TPointF;
     ro, co: integer;
 begin
  Result := VALUE_NO_EVENT;
  if ( TileSize.cx = 0 ) or ( TileSize.cy = 0 ) then exit;
- if not SceneCoorIsInMap( aSceneCoor, @mp ) then exit;
+ if not SceneCoorIsInMap( aSceneCoor, @sc ) then exit;
 
- co := round( mp.x ) div TileSize.cx + FColumnIndexFirstTile;
- ro := round( mp.y ) div TileSize.cy + FRowIndexFirstTile;
+ co := FColumnIndexFirstTile + trunc((sc.x-FXOffsetFirstTile)/FTileSize.cx);
+ ro := FRowIndexFirstTile + trunc((sc.y-FYOffsetFirstTile)/FTileSize.cy);
 
  p := GetPTile( ro, co );
  if p <> NIL then Result := p^.UserEvent;
 end;
 
-function TTileEngine.SceneCoorIsInMap(aSceneCoor: TPointF;  MapPos: PPointF): boolean;
+function TTileEngine.SceneCoorIsInMap(aSceneCoor: TPointF;  aPSurfaceCoor: PPointF): boolean;
 var f1, f2: boolean;
     P: TPointF;
 begin
- P := SceneCoorToMapPosition( aSceneCoor );
+ P := SceneToSurface( aSceneCoor );
  f1 := ( P.x >= 0 ) and ( P.x < FMapSize.cx );
  f1 := f1 OR FHLoopMode;
 
@@ -685,17 +685,7 @@ begin
 
  Result := f1 and f2 ;
 
- if MapPos <> NIL then MapPos^ := p;
-end;
-
-function TTileEngine.SceneCoorToMapPosition(aSceneCoor: TPointF): TPointF;
-begin
- Result := aSceneCoor - PointF(X.Value, Y.Value );
-end;
-
-function TTileEngine.MapPositionToSceneCoor(aMapPos: TPointF): TPointF;
-begin
- Result := aMapPos + PointF(X.Value, Y.Value );
+ if aPSurfaceCoor <> NIL then aPSurfaceCoor^ := p;
 end;
 
 function TTileEngine.GetTileSize: TSize;
