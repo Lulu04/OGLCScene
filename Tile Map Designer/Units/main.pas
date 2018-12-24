@@ -356,8 +356,8 @@ begin
   SE4.Value := FTileEngine.Height;
  end else
  begin
-  SE3.Value := FTileEngine.MapTileCount.cx;
-  SE4.Value := FTileEngine.MapTileCount.cy;
+  SE3.Value := FTileEngine.MapTileCount.cy;
+  SE4.Value := FTileEngine.MapTileCount.cx;
  end;
 
  // Scroll Loop Mode
