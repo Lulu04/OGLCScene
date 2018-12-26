@@ -39,7 +39,8 @@ begin
  FMapFile.Add('DRAW_SIZE');
  if Form_Principale.CB4.ItemIndex=0
    then FMapFile.Add( inttostr(Form_Principale.SE3.Value) + '|' + inttostr(Form_Principale.SE4.Value) )
-   else FMapFile.Add( inttostr(Form_Principale.SE4.Value * FTileEngine.TileSize.cx) + '|' + inttostr(Form_Principale.SE3.Value * FTileEngine.TileSize.cy) );
+   else FMapFile.Add( inttostr(Form_Principale.SE3.Value * FTileEngine.TileSize.cx) + '|' +
+                      inttostr(Form_Principale.SE4.Value * FTileEngine.TileSize.cy) );
 
  // tile size
  FMapFile.Add('TILE_SIZE');

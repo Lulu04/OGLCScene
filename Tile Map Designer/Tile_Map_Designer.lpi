@@ -16,7 +16,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1356"/>
+      <BuildNr Value="1360"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -88,7 +88,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="17"/>
         <TopLine Value="6"/>
-        <CursorPos X="34" Y="18"/>
+        <CursorPos Y="32"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -1279,10 +1279,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="341"/>
-        <CursorPos X="50" Y="353"/>
+        <TopLine Value="353"/>
+        <CursorPos X="33" Y="366"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2040,8 +2039,10 @@
         <ComponentName Value="Form_Save"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <CursorPos X="65" Y="11"/>
+        <TopLine Value="40"/>
+        <CursorPos X="49" Y="39"/>
         <UsageCount Value="62"/>
         <Loaded Value="True"/>
       </Unit250>
@@ -2070,8 +2071,8 @@
       <Unit254>
         <Filename Value="..\oglcTileMap.inc"/>
         <EditorIndex Value="16"/>
-        <TopLine Value="648"/>
-        <CursorPos X="33" Y="661"/>
+        <TopLine Value="121"/>
+        <CursorPos X="11" Y="114"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit254>
@@ -2088,124 +2089,124 @@
     </OtherDefines>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="503" Column="111" TopLine="496"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="88" Column="19" TopLine="73"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="511" Column="2" TopLine="499"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="589" Column="2" TopLine="587"/>
       </Position2>
       <Position3>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="709" Column="26" TopLine="697"/>
+        <Caret Line="111" Column="16" TopLine="97"/>
       </Position3>
       <Position4>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="67" Column="14" TopLine="54"/>
+        <Caret Line="649" Column="16" TopLine="642"/>
       </Position4>
       <Position5>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="276" Column="10" TopLine="268"/>
+        <Caret Line="118" Column="11" TopLine="106"/>
       </Position5>
       <Position6>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="54" Column="12" TopLine="43"/>
+        <Caret Line="679" Column="20" TopLine="675"/>
       </Position6>
       <Position7>
-        <Filename Value="..\OGLCScene.pas"/>
-        <Caret Line="151" Column="13" TopLine="142"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="120" Column="11" TopLine="108"/>
       </Position7>
       <Position8>
         <Filename Value="..\oglcSurface.inc"/>
-        <Caret Line="159" Column="18" TopLine="144"/>
+        <Caret Line="620" Column="28" TopLine="606"/>
       </Position8>
       <Position9>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="311" Column="12" TopLine="294"/>
+        <Filename Value="..\oglcSurface.inc"/>
+        <Caret Line="159" Column="20" TopLine="148"/>
       </Position9>
       <Position10>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="71" Column="18" TopLine="55"/>
+        <Caret Line="691" TopLine="688"/>
       </Position10>
       <Position11>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="635" Column="2" TopLine="633"/>
+        <Caret Line="121" Column="3" TopLine="105"/>
       </Position11>
       <Position12>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="73" Column="17" TopLine="58"/>
+        <Caret Line="683" Column="29" TopLine="669"/>
       </Position12>
       <Position13>
         <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="361" Column="22" TopLine="342"/>
+        <Caret Line="118" Column="20" TopLine="112"/>
       </Position13>
       <Position14>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="88" Column="19" TopLine="73"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="508" Column="27" TopLine="502"/>
       </Position14>
       <Position15>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="589" Column="2" TopLine="587"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="320" Column="20" TopLine="301"/>
       </Position15>
       <Position16>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="111" Column="16" TopLine="97"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="230" Column="15" TopLine="218"/>
       </Position16>
       <Position17>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="649" Column="16" TopLine="642"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="359" Column="45" TopLine="341"/>
       </Position17>
       <Position18>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="118" Column="11" TopLine="106"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="353" Column="50" TopLine="341"/>
       </Position18>
       <Position19>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="679" Column="20" TopLine="675"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="537" Column="29" TopLine="529"/>
       </Position19>
       <Position20>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="120" Column="11" TopLine="108"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="376" Column="5" TopLine="372"/>
       </Position20>
       <Position21>
-        <Filename Value="..\oglcSurface.inc"/>
-        <Caret Line="620" Column="28" TopLine="606"/>
+        <Filename Value="Units\usavemap.pas"/>
+        <Caret Line="12" Column="11"/>
       </Position21>
       <Position22>
-        <Filename Value="..\oglcSurface.inc"/>
-        <Caret Line="159" Column="20" TopLine="148"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="376" Column="5" TopLine="372"/>
       </Position22>
       <Position23>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="691" TopLine="688"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="320" Column="16" TopLine="304"/>
       </Position23>
       <Position24>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="121" Column="3" TopLine="105"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="230" Column="15" TopLine="218"/>
       </Position24>
       <Position25>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="683" Column="29" TopLine="669"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="359" Column="46" TopLine="338"/>
       </Position25>
       <Position26>
-        <Filename Value="..\oglcTileMap.inc"/>
-        <Caret Line="118" Column="20" TopLine="112"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="539" Column="40" TopLine="529"/>
       </Position26>
       <Position27>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="508" Column="27" TopLine="502"/>
+        <Caret Line="375" Column="2" TopLine="372"/>
       </Position27>
       <Position28>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="320" Column="20" TopLine="301"/>
+        <Caret Line="320" Column="14" TopLine="295"/>
       </Position28>
       <Position29>
         <Filename Value="Units\main.pas"/>
         <Caret Line="230" Column="15" TopLine="218"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="359" Column="45" TopLine="341"/>
+        <Filename Value="..\oglcTileMap.inc"/>
+        <Caret Line="661" Column="33" TopLine="648"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

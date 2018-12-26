@@ -356,13 +356,18 @@ begin
   SE4.Value := FTileEngine.Height;
  end else
  begin
-  SE3.Value := FTileEngine.MapTileCount.cy;
-  SE4.Value := FTileEngine.MapTileCount.cx;
+  SE3.Value := FTileEngine.MapTileCount.cx;
+  SE4.Value := FTileEngine.MapTileCount.cy;
  end;
 
  // Scroll Loop Mode
  CB2.Checked := FTileEngine.HLoopMode;
  CB3.Checked := FTileEngine.VLoopMode;
+
+ // Scrolling enabled
+ CB5.Checked:=FTileEngine.HScrollEnable;
+ CB6.Checked:=FTileEngine.VScrollEnable;
+
 
  // Start tile
  Label10.Caption := inttostr( trunc( FTileEngine.PositionOnMap.x.Value / FTileEngine.TileSize.cx ));
@@ -530,8 +535,8 @@ procedure TForm_Principale.CB4Change(Sender: TObject);
 begin
  if CB4.ItemIndex = 1 then
  begin
-   Label19.Caption := 'rows';
-   Label21.Caption := 'columns';
+   Label19.Caption := 'columns';
+   Label21.Caption := 'rows';
    SE3.Value := SE3.Value div FTileEngine.TileSize.cx;
    SE4.Value := SE4.Value div FTileEngine.TileSize.cy;
  end else
