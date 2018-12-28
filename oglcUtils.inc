@@ -51,6 +51,8 @@ procedure DrawEllipse( aCenter: TPointF; aRadius1, aRadius2: single; Color: TBGR
 function ScaleValueToFitScene( aTexture: PTexture; AScene: TOGLCScene ): TPointF;
 function ScaleValueToFitSurface( aTexture: PTexture; aSurface: TSimpleSurfaceWithEffect ): TPointF;
 
+function Distance(aPt1, aPt2: TPointF): single;
+
 type
 TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
 procedure SetBlendMode( ABlendMode: byte );
@@ -547,6 +549,10 @@ begin
  DrawLine( P1.x, P1.y, P2.x, P2.y, Color, w, aLayerPercentOpacity);
 end;
 
+function Distance(aPt1, aPt2: TPointF): single;
+begin
+ Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
+end;
 
 procedure SetBlendMode(ABlendMode: byte);
 var src : LongWord;
