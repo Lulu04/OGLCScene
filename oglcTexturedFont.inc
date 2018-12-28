@@ -134,6 +134,7 @@ private
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
+  function GetDrawingSize: TSize;
   procedure SetCaption(AValue: string); override;
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
@@ -147,6 +148,7 @@ public
 public
   constructor Create( aFont: TTexturedFont; aRect: TRect );
   property Align: TOGLCAlignment read FAlign write SetAlign;
+  property DrawingSize: TSize read GetDrawingSize; // real size of the text area
 end;
 
 // TMaximizedText is an area where the text is displayed as large as possible and aligned.
@@ -371,6 +373,12 @@ end;
    DistributeTheWordsOnTheSurface;
    DoAlign;
  end;
+
+function TMultilineText.GetDrawingSize: TSize;
+begin
+ Result.cx:=FDrawingWidth;
+ Result.cy:=FDrawingHeight;
+end;
 
  procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
  begin
