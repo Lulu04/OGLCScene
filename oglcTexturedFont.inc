@@ -6,7 +6,7 @@ const
                           'ÉéÈèÊêËëÁáÂâÀàÆæÇçÙùÛûÏïÎîÔôŒœŸÿ'+
                           'ÄäÖöÜüß'+
                           'Ññ'+
-                          '?!,.;:/*-+=()[]@';
+                          '''"?!,.;:/*-+=()[]@#&';
 type
 
 // construct an image with each character in the charset.
@@ -134,7 +134,7 @@ private
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
-  function GetDrawingSize: TSize;
+  function GetDrawingRect: TRect;
   procedure SetCaption(AValue: string); override;
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
@@ -148,7 +148,7 @@ public
 public
   constructor Create( aFont: TTexturedFont; aRect: TRect );
   property Align: TOGLCAlignment read FAlign write SetAlign;
-  property DrawingSize: TSize read GetDrawingSize; // real size of the text area
+  property DrawingRect: TRect read GetDrawingRect; // real size of the text area
 end;
 
 // TMaximizedText is an area where the text is displayed as large as possible and aligned.
@@ -374,10 +374,12 @@ end;
    DoAlign;
  end;
 
-function TMultilineText.GetDrawingSize: TSize;
+function TMultilineText.GetDrawingRect: TRect;
 begin
- Result.cx:=FDrawingWidth;
- Result.cy:=FDrawingHeight;
+ Result.Left:=round(FWords[0].Location.x);
+ Result.Top:=round(FWords[0].Location.y);
+ Result.Width:=FDrawingWidth;
+ Result.Height:=FDrawingHeight;
 end;
 
  procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
@@ -423,8 +425,8 @@ end;
   PushAndPrepareMatrix;
   SetBlendMode( FBlendMode );
 
-  TextureManager.DisableTextureUsage;
-  FillBox(0,0,Width, Height, BGRA(0,0,80));
+//  TextureManager.DisableTextureUsage;
+//  FillBox(0,0,Width, Height, BGRA(0,0,80));
 
   TextureManager.BindTexture( FTexturedFont.Texture );
 
