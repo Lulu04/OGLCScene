@@ -76,7 +76,6 @@ TLayer = class (TSurfaceList)
     // Tile engine
     procedure AssignTileEngine( aTileEngine: TTileEngine; AutoFree: boolean=TRUE );
    public
-    Angle: TFParam;
     Opacity: TBoundedFParam;
 
     procedure KillAll;
@@ -241,15 +240,12 @@ begin
  // Opacity variation
  Opacity:= CreateBoundedFParam(0, 255);
  Opacity.Value := 255;
- // Self rotation
- Angle:= TFParam.Create;
  // TileEngine
  FTileEngine := NIL;
 end;
 
 destructor TLayer.Destroy;
 begin
- FreeAndNil( Angle );
  FreeAndNil( Opacity );
 
  if ( FTileEngine <> NIL ) and FTileEngineAutoFree
@@ -266,13 +262,6 @@ var i : integer;
 begin
  if not FVisible then exit;
  if FCamera<>NIL then FCamera.Use;
- if Angle.Value <> 0.0
-   then begin
-         glPushMatrix;
-         glTranslatef(FParentScene.Width * 0.5, FParentScene.Height * 0.5, 0 );
-         glRotatef(Angle.Value, 0, 0, 1);
-         glTranslatef(-FParentScene.Width * 0.5, -FParentScene.Height * 0.5, 0 );
-        end;
  FOpacityPercent:= Opacity.Value/255;
 
  if FTileEngine <> NIL then FTileEngine.Draw( FOpacityPercent ) ;
@@ -280,7 +269,6 @@ begin
  for i:=0 to FList.Count-1 do
   with TSimpleSurfaceWithEffect( FList.Items[i] ) do if Visible then Draw( FOpacityPercent );
 
- if Angle.Value <> 0.0 then glPopMatrix;
  if FCamera<>NIL then FCamera.Release;
 end;
 
@@ -309,8 +297,6 @@ begin
                       end;
               end;
       end;
-
- Angle.OnElapse( aElapsedTime );
 
  Opacity.OnElapse( aElapsedTime );
 
