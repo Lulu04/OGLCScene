@@ -120,7 +120,8 @@ private type
   end;
   ArrayOfFreeTextWord = array of TFreeTextWord;
 private
-  FRect: TRect;
+  FRect,
+  FDrawingRect: TRect;
   FAlign: TOGLCAlignment;
   procedure DoVTopAlign;
   procedure DoVCenterAlign;
@@ -134,7 +135,6 @@ private
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
-  function GetDrawingRect: TRect;
   procedure SetCaption(AValue: string); override;
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
@@ -148,7 +148,7 @@ public
 public
   constructor Create( aFont: TTexturedFont; aRect: TRect );
   property Align: TOGLCAlignment read FAlign write SetAlign;
-  property DrawingRect: TRect read GetDrawingRect; // real size of the text area
+  property DrawingRect: TRect read FDrawingRect; // real size of the text area
 end;
 
 // TMaximizedText is an area where the text is displayed as large as possible and aligned.
@@ -162,7 +162,7 @@ private
  procedure MakeMaximizedFont;
  function ComputeDrawingSize( aGuiFont: TGuiFont ): TSize;
  procedure SetCaption(AValue: string); override;
- procedure SetTexturedFont(AValue: TTexturedFont); override;
+ procedure SetTexturedFont({%H-}AValue: TTexturedFont); override;
 public
   // the font height field of 'aGuiFont' is maximized.
   constructor Create( aRect: TRect; aGuiFont: TGuiFont );
@@ -317,6 +317,8 @@ end;
    FLineCount := 0;
    FDrawingWidth := 0;
    FDrawingHeight := 0;
+   FDrawingRect.Width:=0;
+   FDrawingRect.Height:=0;
    if (FCaption ='') or (FTexturedFont=NIL) then begin
      SetLength(FWords,0);
      exit;
@@ -374,14 +376,6 @@ end;
    DoAlign;
  end;
 
-function TMultilineText.GetDrawingRect: TRect;
-begin
- Result.Left:=round(FWords[0].Location.x);
- Result.Top:=round(FWords[0].Location.y);
- Result.Width:=FDrawingWidth;
- Result.Height:=FDrawingHeight;
-end;
-
  procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
  begin
    if FTexturedFont=AValue then exit;
@@ -426,7 +420,7 @@ end;
   SetBlendMode( FBlendMode );
 
 //  TextureManager.DisableTextureUsage;
-//  FillBox(0,0,Width, Height, BGRA(0,0,80));
+//  FillBox(0,0,Width, Height, BGRA(0,0,80,100));
 
   TextureManager.BindTexture( FTexturedFont.Texture );
 
@@ -465,6 +459,7 @@ end;
  var i, j, iBegin, iEnd: integer;
   yy: single;
  begin
+  FDrawingRect.Top:=0;
   yy := 0;
   for i:=0 to FLineCount-1 do begin
     GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
@@ -478,9 +473,9 @@ end;
   yy: single;
  begin
   h:=FLineCount*FTexturedFont.Font.FontHeight;
- // h := FDrawingHeight;  //
   if h=0 then exit;
   yy := ( FRect.Height - h )*0.5;
+  FDrawingRect.Top:=round(yy);
   for i:=0 to FLineCount-1 do begin
     GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
@@ -493,6 +488,7 @@ end;
   yy: single;
  begin
   yy := FRect.Height-FTexturedFont.Font.FontHeight;
+  FDrawingRect.Top:=FRect.Height-FDrawingHeight;
   for i:=FLineCount-1 downto 0 do begin
     GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
@@ -503,6 +499,7 @@ end;
  procedure TMultilineText.DoHLeftAlign;
  var i, j, w, iBegin, iEnd: integer;
  begin
+  FDrawingRect.Left:=0;
   for i:=0 to FLineCount-1 do
    begin
     GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
@@ -519,11 +516,15 @@ end;
  var i, j, iBegin, iEnd: integer;
   w: single;
  begin
+  FDrawingRect.Left:=FRect.Width;
   for i:=0 to FLineCount-1 do
    begin
     GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
-    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // largeur totale de la ligne
+    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
     w := ( FRect.Width - w )*0.5;
+
+    if FDrawingRect.Left>w then FDrawingRect.Left:=round(w);
+
     for j:=iBegin to iEnd do begin
       FWords[j].Location.x := w ;
       w := w + FWords[j].Width + FTexturedFont.GetCharWidth(' ');
@@ -534,16 +535,20 @@ end;
  procedure TMultilineText.DoHRightAlign;
  var i, j, w, iBegin, iEnd: integer;
  begin
+  FDrawingRect.Left:=FRect.Width;
+
   for i:=0 to FLineCount-1 do begin
     GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
-    w := FRect.Width; // + FTexturedFont.GetCharWidth(' ');
+    w := FRect.Width;
     for j:=iEnd downto iBegin do
      begin
       w -= FWords[j].Width;
       FWords[j].Location.x := w;
+      if FDrawingRect.Left>w then FDrawingRect.Left:=w;
       w-=FTexturedFont.GetCharWidth(' ');
      end;
   end;
+
  end;
 
  procedure TMultilineText.DoAlign;
@@ -558,6 +563,8 @@ end;
    taCenterLeft, taCenterCenter, taCenterRight: DoVCenterAlign;
    taBottomLeft, taBottomCenter, taBottomRight: DoVBottomAlign;
   end;
+  FDrawingRect.Bottom:=FDrawingRect.Top+FDrawingHeight;
+  FDrawingRect.Right:=FDrawingRect.Left+FDrawingWidth;
  end;
 
 
@@ -662,7 +669,7 @@ end;
 
   renderer:= TBGRATextEffectFontRenderer.Create;
   with FFont do begin
-    renderer.ShadowVisible := ShadowColor<>BGRAPixelTransparent;
+    renderer.ShadowVisible := (ShadowColor<>BGRAPixelTransparent) and (ShadowRadius>0);
     renderer.ShadowColor := ShadowColor;
     renderer.ShadowOffset.x := ShadowOffsetX;
     renderer.ShadowOffset.y := ShadowOffsetY;
