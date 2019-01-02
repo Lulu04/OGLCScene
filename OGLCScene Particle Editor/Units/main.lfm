@@ -818,8 +818,8 @@ object Form_Principale: TForm_Principale
     Height = 458
     Top = 0
     Width = 344
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet4
+    TabIndex = 1
     TabOrder = 2
     object TabSheet1: TTabSheet
       Caption = 'Emitter'

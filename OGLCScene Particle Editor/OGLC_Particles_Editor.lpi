@@ -16,7 +16,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="209"/>
+      <BuildNr Value="211"/>
       <Language Value="040C"/>
       <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.24"/>
     </VersionInfo>
@@ -1075,7 +1075,7 @@
       <Unit135>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="20"/>
+        <TopLine Value="11"/>
         <CursorPos X="32" Y="26"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1362,9 +1362,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="875"/>
-        <CursorPos X="49" Y="888"/>
+        <TopLine Value="334"/>
+        <CursorPos X="40" Y="343"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1901,8 +1902,8 @@
       <Unit242>
         <Filename Value="..\OGLCScene.pas"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="26"/>
-        <CursorPos X="10" Y="30"/>
+        <TopLine Value="329"/>
+        <CursorPos X="2" Y="331"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit242>
@@ -2007,7 +2008,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="frame_ShowColor"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="107"/>
         <CursorPos X="67" Y="125"/>
@@ -2147,7 +2147,7 @@
         <UsageCount Value="10"/>
       </Unit273>
     </Units>
-    <JumpHistory Count="17" HistoryIndex="16">
+    <JumpHistory Count="20" HistoryIndex="19">
       <Position1>
         <Filename Value="Units\main.pas"/>
         <Caret Line="424" Column="41" TopLine="405"/>
@@ -2216,6 +2216,18 @@
         <Filename Value="Units\main.pas"/>
         <Caret Line="888" Column="49" TopLine="875"/>
       </Position17>
+      <Position18>
+        <Filename Value="..\OGLCScene.pas"/>
+        <Caret Line="226" Column="18" TopLine="210"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="511" Column="2" TopLine="499"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="651" Column="2" TopLine="648"/>
+      </Position20>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

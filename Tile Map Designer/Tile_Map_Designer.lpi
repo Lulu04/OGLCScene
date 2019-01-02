@@ -16,7 +16,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1360"/>
+      <BuildNr Value="1362"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -2041,8 +2041,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="40"/>
-        <CursorPos X="49" Y="39"/>
+        <TopLine Value="93"/>
+        <CursorPos X="32" Y="45"/>
         <UsageCount Value="62"/>
         <Loaded Value="True"/>
       </Unit250>
