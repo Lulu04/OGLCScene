@@ -88,6 +88,10 @@ public
  function GetGroundType( ATextureIndex, ixFrame, iyFrame: integer ): integer; overload;
  procedure ClearCell( ARow, AColumn: integer );
 public
+ // set to TRUE if you use a camera to move on the map instead of using PositionOnMap property
+ // slowly because all the tiles are drawn even if they are not visible
+ ForceTheDrawingOfAllTheTiles: boolean;
+
  // this is virtual position of the top left corner of the view
  // why virtual ? Because when HLoopMode or VLoopMode is set to TRUE, the map repeats itself indefinitely
  // and position can be greater than view size, or even negative
@@ -274,7 +278,7 @@ begin
   p := PositionOnMap.Value;
   ComputeIndexes( p );
 
-  if not TileMapDesignerModeEnable then
+  if not (TileMapDesignerModeEnable or ForceTheDrawingOfAllTheTiles) then
   begin
    glScissor( round(x.Value), round(y.Value), Width, Height );
    glEnable( GL_SCISSOR_TEST );
@@ -291,7 +295,8 @@ begin
       xxx := xx + x.Value;
       yyy := yy + y.Value;
       if not( ( xxx > FParentScene.Width ) or ( xxx+TileSize.cx < 0 ) or
-              ( yyy > FParentScene.Height) or ( yyy+TileSize.cy < 0 ) )
+              ( yyy > FParentScene.Height) or ( yyy+TileSize.cy < 0 ) ) or
+         ForceTheDrawingOfAllTheTiles
        then begin  // draw only non clipped tile
              if ( ixtile < 0 ) or ( ixtile >= FMapTileCount.cx ) or
                 ( iytile < 0 ) or ( iytile >= FMapTileCount.cy )
