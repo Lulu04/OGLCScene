@@ -7,6 +7,7 @@ TTexCoor = array[0..3] of TPointF;
 PTexture = ^TTexture;
 TTexture = record
             ID            : GLuint   ;
+            Owner         : boolean  ;
             TextureWidth  : integer  ;
             TextureHeight : integer  ;
             ImageWidth    : integer  ;
@@ -27,7 +28,6 @@ TTextureManager = class( TOGLCGTextureManagerSpec )
 private
  FCurrentBindedTexture : PTexture;
  FGL_TEXTURE_2DEnabled : boolean;
- function ValueOfNextPowerOfTwo ( aValue:integer ):integer;
  function InitFromBGRABitmap( aIma: TBGRABitmap ): PTexture;
  procedure SetFrameSize( ATexture: PTexture; AFrameWidth, AFrameHeight: integer );
  procedure ComputeOpenGLFramesCoord(ATexture: PTexture; FramesX: Integer=1; FramesY: Integer=1);
@@ -42,6 +42,9 @@ public
  procedure Replace( ATexture: PTexture; aImage : TBGRABitmap ); overload;
 
  procedure Delete ( var aTexture: PTexture );
+
+ // return a part of a texture from an existing one
+ function GivePart( aTexture: PTexture; aRect: TRect ): PTexture;
 
  procedure BindTexture( ATexture: PTexture );  // call 'glEnable( GL_TEXTURE_2D )' and 'glBindTexture(...)' only if necessary
  procedure DisableTextureUsage;                // call 'glDisable( GL_TEXTURE_2D )' only if necessary
@@ -63,13 +66,6 @@ begin
  inherited Create;
  FCurrentBindedTexture := NIL;
  FGL_TEXTURE_2DEnabled := FALSE;
-end;
-
-function TTextureManager.ValueOfNextPowerOfTwo(aValue: integer): integer;
-begin
- Result:=1;
- while ( power(2,Result)<aValue ) do inc ( Result );
- Result := trunc(power(2,Result));
 end;
 
 function TTextureManager.InitFromBGRABitmap(aIma: TBGRABitmap ): PTexture;
@@ -97,6 +93,8 @@ begin
  Result^.FrameHeight := dup.Height;
 
  Result^.FrameCount := 1;
+
+ Result^.Owner:=TRUE;
 
  glGenTextures(1, @Result^.ID );
  BindTexture( Result );
@@ -216,6 +214,8 @@ begin
 
  Result^.FrameCount := 1;
 
+ Result^.Owner:=TRUE;
+
  glGenTextures(1, @Result^.ID );
  BindTexture( Result );
  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA{0x1908}, Result^.TextureWidth , Result^.TextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NIL );
@@ -266,10 +266,81 @@ end;
 
 procedure TTextureManager.Delete(var aTexture: PTexture);
 begin
- glDeleteTextures( 1, @aTexture^.ID );
+ if aTexture^.Owner then glDeleteTextures( 1, @aTexture^.ID );
  SetLength( aTexture^.FramesCoord, 0 );
  DoDelete( aTexture );
  aTexture := NIL;
+end;
+
+function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect
+  ): PTexture;
+var ux, uy, tw, th: single;
+ fw, fh, fx, fy: single;
+begin
+ Result := AddInstanceToList;
+ Result^.ImageWidth := aTexture^.ImageWidth;
+ Result^.ImageHeight := aTexture^.ImageHeight;
+
+ Result^.TextureWidth := aTexture^.TextureWidth;
+ Result^.TextureHeight := aTexture^.TextureHeight;
+
+ Result^.FrameWidth := aRect.Width;
+ Result^.FrameHeight := aRect.Height;
+
+ Result^.FrameCount := 1;
+
+ Result^.ID:=aTexture^.ID;
+ Result^.Owner:=FALSE;
+
+ with Result^ do begin
+//   U := ImageWidth/TextureWidth;
+//   V := ImageHeight/TextureHeight;
+   fw := aRect.Width/TextureWidth;
+   fh := aRect.Height/TextureHeight;
+   fy := 1-aRect.Top/TextureHeight;
+   fx := aRect.Left/TextureWidth;
+
+   SetLength( FramesCoord, FrameCount );
+
+   FramesCoord[ 0, 0 ].X := fx;
+   FramesCoord[ 0, 0 ].Y := fy;
+
+   FramesCoord[ 0, 1 ].X := fx + fw;
+   FramesCoord[ 0, 1 ].Y := fy;
+
+   FramesCoord[ 0, 2 ].X := fx + fw;
+   FramesCoord[ 0, 2 ].Y := fy - fh;
+
+   FramesCoord[ 0, 3 ].X := fx;
+   FramesCoord[ 0, 3 ].Y := fy - fh;
+ end;
+
+{
+    fU := U / FramesX;
+    fV := V / FramesY;
+
+    i := 1;
+    for iy := 1 to FramesY do
+     for ix := 1 to FramesX do
+      begin
+        ty := 1 - fV * ( iy - 1 );
+        tx := ( ix - 1 ) * fU;
+
+        FramesCoord[ i, 0 ].X := tx;
+        FramesCoord[ i, 0 ].Y := ty;
+
+        FramesCoord[ i, 1 ].X := tx + fU;
+        FramesCoord[ i, 1 ].Y := ty;
+
+        FramesCoord[ i, 2 ].X := tx + fU;
+        FramesCoord[ i, 2 ].Y := ty - fV;
+
+        FramesCoord[ i, 3 ].X := tx;
+        FramesCoord[ i, 3 ].Y := ty - fV;
+
+        inc( i );
+      end;  }
+
 end;
 
 procedure TTextureManager.BindTexture(ATexture: PTexture);
