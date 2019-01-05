@@ -35,6 +35,10 @@ function SplitTextToWordArray( aText: string; aCharSeparator: char=' ' ): ArrayO
 procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y, aAngle: single; aAlpha: byte; ATint: TBGRAPixel ); overload;
 procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y: single; Param: TSimpleSurfaceWithEffect; ALayerPercentOpacity: single=1.0 ); overload;
 
+procedure DrawTexturePart( aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
+                           aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
+                           aPercentOpacity: single);
+
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor, FillColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
 
@@ -472,6 +476,52 @@ begin
   end;
 end;
 
+procedure DrawTexturePart(aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
+  aFlipH, aFlipV: boolean; aTint: TBGRAPixel; aPercentOpacity: single);
+var
+  quad : array[ 0..3 ] of TPointF;
+  tci  : PTextureCoordIndex;
+  i: integer;
+  procedure DrawVertex ;
+   begin
+    glBegin( GL_QUADS );
+      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
+      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
+      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
+      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
+    glEnd;
+   end;
+begin
+ if aTexture = nil then exit;
+ TextureManager.BindTexture( aTexture );
+
+ quad[0] := aScreenCoor^[0];
+ quad[1] := aScreenCoor^[1];
+ quad[2] := aScreenCoor^[2];
+ quad[3] := aScreenCoor^[3];
+
+ // Flip
+ i:=0;
+ if aFlipH then inc( i );
+ if aFlipV then inc( i, 2 );
+ tci := @FLIP_TEXCOORD[ i ];
+
+ if aTint.alpha < 255
+   then begin
+         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+         glColor4ub(255,255,255,round(255*aPercentOpacity));
+         DrawVertex;
+        end;
+
+ if aTint.alpha <> 0
+   then begin  //Apply Tint
+         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
+         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
+         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
+         glColor4ub( aTint.red, aTint.Green, aTint.Blue, round(aTint.alpha*aPercentOpacity));
+         DrawVertex;
+        end;
+end;
 
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single; aLayerPercentOpacity: single);
 begin
