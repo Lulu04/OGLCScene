@@ -62,9 +62,6 @@ TLayer = class (TSurfaceList)
     FFreeze  : boolean ;
     // Blink
     FBlink : TBlink ;
-    // Tile engine
-    FTileEngine : TTileEngine ;
-    FTileEngineAutoFree : boolean ;
     FCamera: TOGLCCamera;
    public
     Constructor Create;
@@ -72,9 +69,6 @@ TLayer = class (TSurfaceList)
     procedure Draw;
     procedure Update( const aElapsedTime : single ) ;
     procedure Clear; override;
-   public
-    // Tile engine
-    procedure AssignTileEngine( aTileEngine: TTileEngine; AutoFree: boolean=TRUE );
    public
     Opacity: TBoundedFParam;
 
@@ -240,19 +234,11 @@ begin
  // Opacity variation
  Opacity:= CreateBoundedFParam(0, 255);
  Opacity.Value := 255;
- // TileEngine
- FTileEngine := NIL;
 end;
 
 destructor TLayer.Destroy;
 begin
  FreeAndNil( Opacity );
-
- if ( FTileEngine <> NIL ) and FTileEngineAutoFree
-   then begin
-         FTileEngine.Free ;
-         FTileEngine := NIL ;
-   end;
  inherited Destroy;
 end;
 
@@ -263,8 +249,6 @@ begin
  if not FVisible then exit;
  if FCamera<>NIL then FCamera.Use;
  FOpacityPercent:= Opacity.Value/255;
-
- if FTileEngine <> NIL then FTileEngine.Draw( FOpacityPercent ) ;
 
  for i:=0 to FList.Count-1 do
   with TSimpleSurfaceWithEffect( FList.Items[i] ) do if Visible then Draw( FOpacityPercent );
@@ -300,8 +284,6 @@ begin
 
  Opacity.OnElapse( aElapsedTime );
 
- if FTileEngine <> NIL then FTileEngine.Update( aElapsedTime ) ;
-
  for i:=0 to FList.Count-1 do
    TSimpleSurfaceWithEffect( FList.Items[i] ).Update( aElapsedTime );
 end;
@@ -309,28 +291,6 @@ end;
 procedure TLayer.Clear;
 begin
  inherited Clear;
-
- {
-  if ( FTileEngine <> NIL ) and FTileEngineAutoFree
-    then FTileEngine.Free;
-  FTileEngineAutoFree := FALSE;
-  FTileEngine := NIL;
- }
-end;
-
-procedure TLayer.AssignTileEngine(aTileEngine: TTileEngine; AutoFree: boolean);
-begin
- if ( FTileEngine <> NIL ) and FTileEngineAutoFree
-   then FreeAndNil( FTileEngine );
-
- FTileEngine := aTileEngine;
- if FTileEngine <> NIl
-   then begin
-         FTileEngine.FParentScene := FParentScene;
-         FTileEngine.FParentLayer := Self;
-   end;
-
- FTileEngineAutoFree := AutoFree;
 end;
 
 procedure TLayer.KillAll;
