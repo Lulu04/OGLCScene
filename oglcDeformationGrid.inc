@@ -4,7 +4,7 @@ type
 
   { TDeformationGrid }
 
-  TDeformationType = ( dtNone, dtWaveH, dtWaveV, dtTumultuousWater, dtFinFish,
+  TDeformationType = ( dtNone, dtWaveH, dtWaveV, dtTumultuousWater, dtTumultuousWater2, dtFinFish,
                        dtSnakeH, dtSnakeV,
                        dtFlagRight);
 
@@ -285,8 +285,8 @@ begin
  DeformationSpeed.OnElapse( aElapsedTime );
  Amplitude.OnElapse( aElapsedTime );
 
- if (FDeformationType=dtSnakeH) or
-    (FDeformationType=dtSnakeV) then begin
+ if FDeformationType in [dtSnakeH,dtSnakeV,dtTumultuousWater2]{(FDeformationType=dtSnakeH) or FDeformationType in [
+    (FDeformationType=dtSnakeV)} then begin
    ixbegin := 0;
    ixend := ColumnCount-1;
    iybegin := 0;
@@ -312,7 +312,7 @@ begin
 
     // FGrid.Grid[iy][ix].y := iy*FGrid.Height/FGrid.RowCount + sin(TimeCount*(iy*0.2))*2*(iy+1);
 
-    dtTumultuousWater: begin
+    dtTumultuousWater, dtTumultuousWater2: begin
       Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+ix+iy*0.5)*FWCell*0.5*Amplitude.x.Value;
       Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+iy+ix*0.5)*FHCell*0.5*Amplitude.y.Value;
     end;
@@ -443,7 +443,7 @@ end;
 
 procedure TDeformationGrid.ApplyDeformation(aType: TDeformationType);
 begin
- FTimeCount := 0;
+// FTimeCount := 0;
  FDeformationType := aType;
 end;
 
