@@ -266,16 +266,15 @@ end;
 
 procedure TTextureManager.Delete(var aTexture: PTexture);
 begin
+ if aTexture=NIL then raise Exception.Create('TextureManager: Try to delete a texture=NIL...');
  if aTexture^.Owner then glDeleteTextures( 1, @aTexture^.ID );
  SetLength( aTexture^.FramesCoord, 0 );
  DoDelete( aTexture );
  aTexture := NIL;
 end;
 
-function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect
-  ): PTexture;
-var ux, uy, tw, th: single;
- fw, fh, fx, fy: single;
+function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect): PTexture;
+var fw, fh, fx, fy: single;
 begin
  Result := AddInstanceToList;
  Result^.ImageWidth := aTexture^.ImageWidth;
@@ -293,8 +292,6 @@ begin
  Result^.Owner:=FALSE;
 
  with Result^ do begin
-//   U := ImageWidth/TextureWidth;
-//   V := ImageHeight/TextureHeight;
    fw := aRect.Width/TextureWidth;
    fh := aRect.Height/TextureHeight;
    fy := 1-aRect.Top/TextureHeight;
@@ -314,33 +311,6 @@ begin
    FramesCoord[ 0, 3 ].X := fx;
    FramesCoord[ 0, 3 ].Y := fy - fh;
  end;
-
-{
-    fU := U / FramesX;
-    fV := V / FramesY;
-
-    i := 1;
-    for iy := 1 to FramesY do
-     for ix := 1 to FramesX do
-      begin
-        ty := 1 - fV * ( iy - 1 );
-        tx := ( ix - 1 ) * fU;
-
-        FramesCoord[ i, 0 ].X := tx;
-        FramesCoord[ i, 0 ].Y := ty;
-
-        FramesCoord[ i, 1 ].X := tx + fU;
-        FramesCoord[ i, 1 ].Y := ty;
-
-        FramesCoord[ i, 2 ].X := tx + fU;
-        FramesCoord[ i, 2 ].Y := ty - fV;
-
-        FramesCoord[ i, 3 ].X := tx;
-        FramesCoord[ i, 3 ].Y := ty - fV;
-
-        inc( i );
-      end;  }
-
 end;
 
 procedure TTextureManager.BindTexture(ATexture: PTexture);
