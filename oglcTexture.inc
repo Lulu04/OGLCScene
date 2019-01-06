@@ -45,6 +45,8 @@ public
 
  // return a part of a texture from an existing one
  function GivePart( aTexture: PTexture; aRect: TRect ): PTexture;
+ // return a framed part of a texture
+ function GivePart( aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer ): PTexture;
 
  procedure BindTexture( ATexture: PTexture );  // call 'glEnable( GL_TEXTURE_2D )' and 'glBindTexture(...)' only if necessary
  procedure DisableTextureUsage;                // call 'glDisable( GL_TEXTURE_2D )' only if necessary
@@ -312,6 +314,108 @@ begin
    FramesCoord[ 0, 3 ].Y := fy - fh;
  end;
 end;
+
+function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture;
+var originX, originY, fw, fh, fx, fy: single;
+ fcx, fcy, i, ix, iy: integer;
+begin
+ if (aRect.Width mod AFrameWidth<>0) or
+    (aRect.Height mod AFrameHeight<>0)
+    then Raise Exception.Create('Texture Manager: aRect size don''t match with (AFrameWidth,AFrameHeight)...');
+
+ Result := GivePart( aTexture, aRect );
+
+ fcx := aRect.Width div AFrameWidth;
+ fcy := aRect.Height div AFrameHeight;
+ if fcx*fcy=1 then exit;
+
+ with Result^ do begin
+
+   FrameWidth := AFrameWidth;
+   FrameHeight := AFrameHeight;
+   FrameCount := fcx*fcy+1;
+
+   SetLength( FramesCoord, fcx*fcy+1);
+
+   fw := FrameWidth/TextureWidth;
+   fh := FrameHeight/TextureHeight;
+   originX := aRect.Left/TextureWidth;
+   originY := 1-aRect.Top/TextureHeight;
+
+   i := 1;
+   for iy := 0 to fcy-1 do
+    for ix := 0 to fcx-1 do
+     begin
+       fy := originY - fh * iy;
+       fx := originX + ix * fw;
+
+       FramesCoord[ i, 0 ].X := fx;
+       FramesCoord[ i, 0 ].Y := fy;
+
+       FramesCoord[ i, 1 ].X := fx + fw;
+       FramesCoord[ i, 1 ].Y := fy;
+
+       FramesCoord[ i, 2 ].X := fx + fw;
+       FramesCoord[ i, 2 ].Y := fy - fh;
+
+       FramesCoord[ i, 3 ].X := fx;
+       FramesCoord[ i, 3 ].Y := fy - fh;
+
+       inc( i );
+     end;
+ end;
+end;
+{
+with ATexture^ do
+begin
+  U := 1;
+  V := 1;
+
+  if FramesX < 1 then FramesX := 1;
+  if FramesY < 1 then FramesY := 1;
+  FrameCount := FramesX * FramesY;
+
+  if FrameCount > 1
+    then FrameCount := FrameCount + 1; // because frame[0] fit whole texture, frame index start at 1
+  SetLength( FramesCoord, FrameCount );
+
+  FramesCoord[ 0, 0 ].X := 0;
+  FramesCoord[ 0, 0 ].Y := 1;
+  FramesCoord[ 0, 1 ].X := 1;
+  FramesCoord[ 0, 1 ].Y := 1;
+  FramesCoord[ 0, 2 ].X := 1;
+  FramesCoord[ 0, 2 ].Y := 0;
+  FramesCoord[ 0, 3 ].X := 0;
+  FramesCoord[ 0, 3 ].Y := 0;
+
+  if FrameCount = 1 then exit;
+
+  fU := U / FramesX;
+  fV := V / FramesY;
+
+  i := 1;
+  for iy := 1 to FramesY do
+   for ix := 1 to FramesX do
+    begin
+      ty := 1 - fV * ( iy - 1 );
+      tx := ( ix - 1 ) * fU;
+
+      FramesCoord[ i, 0 ].X := tx;
+      FramesCoord[ i, 0 ].Y := ty;
+
+      FramesCoord[ i, 1 ].X := tx + fU;
+      FramesCoord[ i, 1 ].Y := ty;
+
+      FramesCoord[ i, 2 ].X := tx + fU;
+      FramesCoord[ i, 2 ].Y := ty - fV;
+
+      FramesCoord[ i, 3 ].X := tx;
+      FramesCoord[ i, 3 ].Y := ty - fV;
+
+      inc( i );
+    end;
+end;
+}
 
 procedure TTextureManager.BindTexture(ATexture: PTexture);
 begin
