@@ -298,7 +298,6 @@ end;
     yy+=FTexturedFont.Font.FontHeight;
     xx:=0;
     inc(FLineCount);
-    if i<>Length(FWords)-1 then FDrawingHeight += FTexturedFont.Font.FontHeight;
    end;
    procedure PutWordOnCurrentLine;
    begin
@@ -316,7 +315,6 @@ end;
  begin
    FLineCount := 0;
    FDrawingWidth := 0;
-   FDrawingHeight := 0;
    FDrawingRect.Width:=0;
    FDrawingRect.Height:=0;
    if (FCaption ='') or (FTexturedFont=NIL) then begin
@@ -332,7 +330,6 @@ end;
    xx := 0;
    yy := 0;
    FLineCount := 1;
-   FDrawingHeight := FTexturedFont.Font.FontHeight;
    i := 0;
    repeat
     FWords[i].Word := W[i];
@@ -359,6 +356,7 @@ end;
     end;
     if xx>FDrawingWidth then FDrawingWidth:=xx;
    until i=Length(FWords);
+   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
  end;
 
  procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
