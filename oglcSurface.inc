@@ -645,6 +645,10 @@ begin
  if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then
    begin
      loopLength := FFrameLoopEnd-FFrameLoopStart+1;
+
+     while trunc(FFrame)>FFrameLoopEnd do FFrame-=loopLength;
+     while trunc(FFrame)<FFrameLoopStart do FFrame+=loopLength;
+{
      if FFrame >= FFrameLoopEnd then
        begin
          if loopLength <= 1 then
@@ -667,6 +671,8 @@ begin
            if FFrame < FFrameLoopStart then FFrame := FFrameLoopEnd;
          end;
        end;
+}
+
    end;
 
  // Blink
@@ -1109,10 +1115,8 @@ begin
  FFrameLoopStart := AStartFrameIndex;
  FFrameLoopEnd := AEndFrameIndex;
 
- if FFrame < FFrameLoopStart
-   then FFrame := FFrameLoopStart
-   else if FFrame > FFrameLoopEnd
-          then FFrame := FFrameLoopEnd;
+ if not InRange(trunc(FFrame), AStartFrameIndex, AEndFrameIndex)
+   then FFrame:= AStartFrameIndex;
 end;
 
 procedure TSimpleSurfaceWithEffect.FrameAddPerSecond(
