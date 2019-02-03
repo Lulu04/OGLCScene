@@ -18,7 +18,7 @@ PMessageObject = ^TMessageObject;
 TMessageObject = record
                   Delay    : single;
                   UserValue: word;
-                  CallBack : TDelayCallBack;
+                  CallBack : TMessageCallBack;
                   Next     : PMessageObject;
                   Prev     : PMessageObject;
 end;
@@ -30,7 +30,7 @@ TMessageList = class( TOGLCGMessageListSpec )
 private
  procedure ProcessMessages( const aElapsedTime: single );
 public
- procedure Add( aUserValue: word; aCallBack: TDelayCallBack; aDelay: single=0 );
+ procedure Add( aUserValue: word; aCallBack: TMessageCallBack; aDelay: single=0 );
 end;
 
 
@@ -40,18 +40,20 @@ end;
 procedure TMessageList.ProcessMessages(const aElapsedTime: single);
 var p :PMessageObject;
 begin
+
  p := FInstance0;
  while p^.Next <> NIL do begin
    p^.Next^.Delay := p^.Next^.Delay - aElapsedTime;
    if p^.Next^.Delay <= 0
      then begin
            if p^.Next^.CallBack <> NIL then p^.Next^.CallBack ( p^.Next^.UserValue );
-           DoDelete( p^.Next );
-     end else p := p^.Next;
+           DoDelete(p^.Next);
+     end;
+   p := p^.Next;
  end;
 end;
 
-procedure TMessageList.Add(aUserValue: word; aCallBack: TDelayCallBack; aDelay: single);
+procedure TMessageList.Add(aUserValue: word; aCallBack: TMessageCallBack; aDelay: single);
 var m: PMessageObject;
 begin
  m := AddInstanceToList;
