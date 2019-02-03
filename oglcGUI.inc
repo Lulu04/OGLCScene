@@ -179,6 +179,7 @@ private
   FMode: TGuiProgressBarMode;
   FPercent,
   FBorderWidth: single;
+  procedure SetPercent(AValue: single);
 public
  procedure Update( const aElapsedTime : single ) ; override;
   procedure Draw( const aLayerPercentOpacity: single ); override;
@@ -187,7 +188,7 @@ public
   BorderColor: TBGRAParam;
   property BorderWidth: single read FBorderWidth write FBorderWidth;
   property Mode: TGuiProgressBarMode read FMode write FMode;
-  property Percent: single read FPercent write FPercent; // [0..1]
+  property Percent: single read FPercent write SetPercent; // [0..1]
 end;
 
 
@@ -436,6 +437,13 @@ begin
  FreeAndNil( BackGroundColor );
  FreeAndNil( BorderColor );
  inherited Destroy;
+end;
+
+procedure TGuiProgressBar.SetPercent(AValue: single);
+begin
+ if AValue>1.0 then AValue:=1.0;
+ if AValue<0 then AValue:=0;
+ FPercent:=AValue;
 end;
 
 procedure TGuiProgressBar.Update(const aElapsedTime: single);
