@@ -41,6 +41,7 @@ TOGLCScene = class;
 // Callback for OGLCScene.OnBeforePaint and OGLCScene.OnAfterPaint
 TOGLCEvent = procedure of object;
 TDelayCallBack = procedure( UserValue: word ) of object;
+TMessageCallBack = procedure( UserValue: word ) of object;
 
 { in the scene, each surface can play scenarios. A scenario is an external text file
   that contain the actions to execute.
