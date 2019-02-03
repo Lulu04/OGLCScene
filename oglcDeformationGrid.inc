@@ -357,9 +357,10 @@ begin
  TextureManager.BindTexture( FTexture );
 
  WholeTexCoor := FTexture^.FramesCoord[trunc(FFrame)];
+
  ty := WholeTexCoor[0].y;
- tw := WholeTexCoor[1].x - WholeTexCoor[0].x;
- th := WholeTexCoor[1].y - WholeTexCoor[2].y;
+ tw := (WholeTexCoor[1].x - WholeTexCoor[0].x)/(FColumnCount-1);
+ th := (WholeTexCoor[1].y - WholeTexCoor[2].y)/(FRowCount-1);
 
  for iy:=0 to FRowCount-2 do begin
   if FApplyShadows then yref := FHCell * ( iy + YpcRef );
@@ -382,11 +383,11 @@ begin
     PartTexCoor[0].x := tx;
     PartTexCoor[0].y := ty;
 
-    PartTexCoor[1].x := tx + tw/(FColumnCount-1);
+    PartTexCoor[1].x := tx + tw;
     PartTexCoor[1].y := ty;
 
     PartTexCoor[2].x := PartTexCoor[1].x;
-    PartTexCoor[2].y := ty - th/(FRowCount-1);
+    PartTexCoor[2].y := ty - th;
 
     PartTexCoor[3].x := tx;
     PartTexCoor[3].y := PartTexCoor[2].y;
@@ -397,7 +398,7 @@ begin
      then DrawTexturePartWithShadows( FTexture, @ScreenCellCoor, @PartTexCoor, {%H-}yref, aLayerPercentOpacity )
      else DrawTexturePart( FTexture, @ScreenCellCoor, @PartTexCoor, aLayerPercentOpacity );
    end;
-  ty := {%H-}PartTexCoor[2].y;
+  ty := PartTexCoor[2].y;
  end;
 
  if FShowGrid then begin

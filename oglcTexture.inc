@@ -279,8 +279,8 @@ function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect): PTexture;
 var fw, fh, fx, fy: single;
 begin
  Result := AddInstanceToList;
- Result^.ImageWidth := aTexture^.ImageWidth;
- Result^.ImageHeight := aTexture^.ImageHeight;
+ Result^.ImageWidth := aRect.Width; // aTexture^.ImageWidth;
+ Result^.ImageHeight := aRect.Height;// aTexture^.ImageHeight;
 
  Result^.TextureWidth := aTexture^.TextureWidth;
  Result^.TextureHeight := aTexture^.TextureHeight;
