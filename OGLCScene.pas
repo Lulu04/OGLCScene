@@ -152,6 +152,7 @@ TOGLCCamera = class;
 {$I oglcSurface.inc }
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
+{$I oglcSpriteEffect.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
 {$I oglcSlideShow.inc }
@@ -313,6 +314,7 @@ var OpenGL_Version_2_0_Loaded: boolean = FALSE;
 {$I oglcSurface.inc }
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
+{$I oglcSpriteEffect.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
 {$I oglcSlideShow.inc }
