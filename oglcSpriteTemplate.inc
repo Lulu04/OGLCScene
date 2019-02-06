@@ -28,6 +28,8 @@ public
   Polar: TPolarSystemParam;
 end;
 
+TArrayOfTPolarSprite= array of TPolarSprite;
+
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
