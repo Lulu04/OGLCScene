@@ -38,18 +38,19 @@ end;
 {$ifdef oglcIMPLEMENTATION}
 
 procedure TMessageList.ProcessMessages(const aElapsedTime: single);
-var p :PMessageObject;
+var p, p1 :PMessageObject;
 begin
-
  p := FInstance0;
- while p^.Next <> NIL do begin
-   p^.Next^.Delay := p^.Next^.Delay - aElapsedTime;
-   if p^.Next^.Delay <= 0
-     then begin
-           if p^.Next^.CallBack <> NIL then p^.Next^.CallBack ( p^.Next^.UserValue );
-           DoDelete(p^.Next);
-     end;
-   p := p^.Next;
+ while p^.Next<>NIL do p:=p^.Next;
+
+ while p<>NIL do begin
+   p^.Delay := p^.Delay - aElapsedTime;
+   if p^.Delay <= 0 then begin
+     if p^.CallBack <> NIL then p^.CallBack( p^.UserValue );
+     p1 := p;
+     p:=p^.Prev;
+     DoDelete( p1 );
+   end else p:=p^.Prev;
  end;
 end;
 
