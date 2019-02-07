@@ -267,7 +267,7 @@ procedure TPathToDraw.Clear;
 //var i: integer;
 begin
 // for i:=0 to GetCount-1 do FPtArray[i].Free; // clear all point of the path
- DeleteAllChids; // delete all points and particles emitters
+ DeleteAllChilds; // delete all points and particles emitters
 
  SetLength( FPtArray, 0 );
  SetLength(FPEArray, 0 );

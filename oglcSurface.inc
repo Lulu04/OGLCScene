@@ -154,7 +154,7 @@ public
    procedure AddChild( ASurface: TSimpleSurfaceWithEffect );overload;
    procedure DeleteChild( aIndex: integer ); overload;
    procedure DeleteChild( aSurface: TSimpleSurfaceWithEffect ); overload;
-   procedure DeleteAllChids;
+   procedure DeleteAllChilds;
    function SurfaceToScene( aPts: TPointF ): TPointF;
    function SceneToSurface( aPts: TPointF ): TPointF;
    function SurfaceToScreen( aPts: TPointF ): TPointF;
@@ -778,7 +778,7 @@ begin
  DeleteChild( FChilds.IndexOf( aSurface ));
 end;
 
-procedure TSimpleSurfaceWithEffect.DeleteAllChids;
+procedure TSimpleSurfaceWithEffect.DeleteAllChilds;
 begin
  while FChilds.Count>0 do DeleteChild(0);
 end;
