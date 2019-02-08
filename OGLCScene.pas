@@ -168,11 +168,26 @@ TOGLCCamera = class;
 type
 
 // abstract class to manage one stage of your game application
+
+{ TStageSkeleton }
+
 TStageSkeleton = class
+private
+ FMessageList: TMessageList;
+public
+ constructor Create;
+ destructor Destroy; override;
+public
  FreeWhenLeave: boolean; // set to true to free automatically the stage when the application leave it
+
+ // post a message to the stage. the message will be processed later in the Update method
+ // the delay allows to process the message only after a lapse of time (in seconds)
+ procedure AddMessage( UserValue: word; aDelay: single=0 );
+ procedure ProcessMessage( {%H-}UserValue: word ); virtual; // override to process the message received
+
  procedure LoadData; virtual; abstract;  // override to load texture, create sprite, gui object, sound, initialization, etc...
  procedure FreeData; virtual; abstract;  // override to free all that need to be freed at the end of this stage
- procedure Update( AElapsedTime: single ); virtual; abstract; // override to update your stuff according time
+ procedure Update( AElapsedTime: single ); virtual; // override to update your stuff according time. don't forget to call inherited.
 end;
 
 
@@ -302,6 +317,34 @@ POGLCScene = ^TOGLCScene ;
 implementation
 
 var OpenGL_Version_2_0_Loaded: boolean = FALSE;
+
+{ TStageSkeleton }
+
+constructor TStageSkeleton.Create;
+begin
+ FMessageList:= TMessageList.Create;
+end;
+
+destructor TStageSkeleton.Destroy;
+begin
+ FMessageList.Free;
+  inherited Destroy;
+end;
+
+procedure TStageSkeleton.AddMessage(UserValue: word; aDelay: single);
+begin
+ FMessageList.Add( UserValue, @ProcessMessage, aDelay );
+end;
+
+procedure TStageSkeleton.ProcessMessage(UserValue: word);
+begin
+ // override to process the received message
+end;
+
+procedure TStageSkeleton.Update(AElapsedTime: single);
+begin
+ FMessageList.ProcessMessages(AElapsedTime);
+end;
 
 {$define oglcIMPLEMENTATION}
 {$I oglcListType.inc }
