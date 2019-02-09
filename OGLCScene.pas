@@ -200,7 +200,8 @@ TOGLCScene = class (TLayerList)
   FOGLCOnClick : TNotifyEvent;
   FFlagMouseLeftClicked: boolean;
   FGLInitialized : boolean;
-  FKeyMap : array[0..255] of boolean; // TRUE if Key is pressed
+  FKeyMap : array[0..255] of boolean; // TRUE if Key is actualy pressed
+  FKeyPressed: array[0..255] of boolean; // TRUE if a key was pressed then released
   FCurrentStage,
   FStageRequested: TStageSkeleton;
   FIsChangingStage,
@@ -237,7 +238,9 @@ TOGLCScene = class (TLayerList)
  private
   FCamera: TOGLCCamera;
   FCameraList: TList;
+  function GetKeyPressed(index: byte): boolean;
   function GetSceneCenter: TPointF;
+  procedure SetKeyMap(index: byte; AValue: boolean);
  public
 
   Constructor Create ( aOGLContext: TOpenGLControl ) ;
@@ -280,7 +283,8 @@ TOGLCScene = class (TLayerList)
   property OnFreeCommonData: TOGLCEvent read FOnFreeCommonData write FOnFreeCommonData;
  public
   procedure ClearKeysState;
-  property Key[index:byte]: boolean read GetKeyMap ;
+  property Key[index:byte]: boolean read GetKeyMap write SetKeyMap;
+  property KeyPressed[index:byte]: boolean read GetKeyPressed;
 
   property Camera: TOGLCCamera read FCamera;
  public
@@ -585,11 +589,12 @@ begin
  if ssCtrl in Shift then FKeyMap[VK_LCONTROL] := TRUE
   else if ssShift in Shift then FKeyMap[VK_LSHIFT] := TRUE
    else if ssAlt in Shift then FKeyMap[VK_MENU] := TRUE
-    else} FKeyMap[byte(Key)] := TRUE ;
+    else} FKeyMap[byte(Key)] := TRUE;
 end;
 
 procedure TOGLCScene.ProcessKeyUp(Key: Word; Shift: TShiftState);
 begin
+ if FKeyMap[byte(Key)] then FKeyPressed[byte(Key)]:=TRUE;
 { shift := GetKeyShiftState;
  if ssCtrl in Shift then FKeyMap[VK_LCONTROL] := FALSE
   else if ssShift in Shift then FKeyMap[VK_LSHIFT] := FALSE
@@ -656,7 +661,8 @@ end;
 
 procedure TOGLCScene.ClearKeysState;
 begin
- FillChar( FKeyMap, sizeof(FKeyMap), FALSE ) ;
+ FillChar( FKeyMap, sizeof(FKeyMap), FALSE );
+ FillChar( FKeyPressed, sizeof(FKeyPressed), FALSE );
 end;
 
 function TOGLCScene.CreateCamera: TOGLCCamera;
@@ -847,6 +853,11 @@ begin
  Result := FKeyMap[index];
 end;
 
+procedure TOGLCScene.SetKeyMap(index: byte; AValue: boolean);
+begin
+  FKeyMap[index]:=AValue;
+end;
+
 function TOGLCScene.GetRectArea: TRect;
 begin
  Result.Create( Point(0,0), Width,  Height );
@@ -866,6 +877,13 @@ function TOGLCScene.GetSceneCenter: TPointF;
 begin
  Result := PointF( Width*0.5, Height*0.5 );
 end;
+
+function TOGLCScene.GetKeyPressed(index: byte): boolean;
+begin
+ Result := FKeyPressed[index];
+ FKeyPressed[index]:=FALSE;
+end;
+
 
 
 end.
