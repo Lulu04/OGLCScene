@@ -129,6 +129,9 @@ public
  procedure SetEmitterTypeOuterCircle( Radius: single );
  procedure SetEmitterTypeRing( SmallRadius, BigRadius: single );
 
+ // return TRUE if at least one particle collide the specified surface
+ function ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect ): boolean;
+
  property EmitterType: TEmitterType read FEmitterType;
  property ParticlesCount: integer read FParticleCount;
  property OnParticleDies: TOnParticleDies read FOnParticleDies write FOnParticleDies;
@@ -746,5 +749,17 @@ begin
   FBigRadius := SmallRadius;
  end;
 end;
+
+function TParticleEmitter.ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect): boolean;
+var i: Integer;
+begin
+ for i:=0 to length(FParticles)-1 do begin
+  Result:=aSurface.CollisionTestWith(FParticles[i].X, FParticles[i].Y,
+                                     FParticleParam.Texture^.FrameWidth*FParticles[i].CurrentSize,
+                                     FParticleParam.Texture^.FrameHeight*FParticles[i].CurrentSize);
+  if Result then exit;
+ end;
+end;
+
 {$endif oglcIMPLEMENTATION}
 
