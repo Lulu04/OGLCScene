@@ -68,7 +68,6 @@ end;
 
 procedure THomeScreen.LoadData;
 var o: TGUILabel;
-  cir: TCircle;
 begin
  o := TGUILabel.Create('OGLC Particles Engine Editor V1.0',
                        GuiFont('Arial', 32, [], BGRA(255,0,200), BGRA(20,20,20), 3, BGRA(0,0,0,0), 0, 0, 0 ));
@@ -87,15 +86,6 @@ begin
 
  FBackGroundRainbow := TColorBackground.Create(0,0, FScene.Width, FScene.Height);
  FScene.Add( FBackGroundRainbow, LAYER_BACKGROUND );
-
- cir := TCircle.Create( PointF(200,200), 100 );
- cir.Tint.Value:=BGRA(255,255,255);
- FScene.Add(cir, LAYER_PARTICLE);
- cir.Radius.ChangeTo(0, 5);
-
- cir := TCircle.Create( PointF(400,200), 100 );
- cir.Tint.Value:=BGRA(0,0,255);
- FScene.Add(cir, LAYER_PARTICLE);
 
  FScene.OnAfterPaint:=@ProcessSceneBeforePaint;
 end;

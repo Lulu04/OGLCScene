@@ -5,7 +5,7 @@ unit Main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, Graphics,
+  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, Graphics, LCLType,
   StdCtrls, ComCtrls, ExtCtrls, Menus, Spin, ExtDlgs,
   BGRABitmap, BGRABitmapTypes,
   OpenGLContext,
@@ -67,7 +67,11 @@ type
     Panel13: TPanel;
     Panel14: TPanel;
     Panel9: TPanel;
+    RB30: TRadioButton;
+    RB31: TRadioButton;
     RB3: TRadioButton;
+    RB32: TRadioButton;
+    RB33: TRadioButton;
     SizeCurve: TFrame1;
     Label41: TLabel;
     Label42: TLabel;
@@ -236,6 +240,8 @@ type
     procedure ProcessColorCurveAddPoint( PointIndex: integer; P: TPointF );
     procedure ProcessColorCurveDeletePoint( PointIndex: integer );
   public
+    function GetVelocityValue: integer;
+    procedure SetVelocityValue( aValue: integer );
   end;
 
 var
@@ -484,7 +490,9 @@ end;
 procedure TForm_Principale.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
- FScene.ProcessKeyUp( Key, Shift );
+ if Button4.Visible and (Key=VK_F1)
+   then FPEngine.Shoot
+   else FScene.ProcessKeyUp( Key, Shift );
 end;
 
 procedure TForm_Principale.MenuItem2Click(Sender: TObject);
@@ -582,7 +590,7 @@ begin
  s.Add( t );
 
  s.Add('P_Velocity');
- t := inttostr( TB10.Position )+' '+inttostr( TB11.Position );
+ t := inttostr( GetVelocityValue )+' '+inttostr( TB11.Position );
  with FPEngine.FParticleParam do begin
   t += ' '+inttostr(Length(ArrayVelocity));
   for i:=0 to Length(ArrayVelocity)-1 do
@@ -675,9 +683,9 @@ end;
 procedure TForm_Principale.TB10Change(Sender: TObject);
 var p: psingle;
 begin
- Label34.Caption:=inttostr(TB10.Position)+' px/sec';
+ Label34.Caption:=inttostr(GetVelocityValue)+' px/sec';
  p := @FPEngine.FParticleParam.Velocity;
- p^ := TB10.Position;
+ p^ := GetVelocityValue;
 
  Label36.Caption:=inttostr(TB11.Position)+' px/sec';
  p := @FPEngine.FParticleParam.VelocityVariation;
@@ -926,7 +934,8 @@ begin
 
   k := s.IndexOf('P_Velocity');
   SplittedText := SplitLineToStringArray( s.Strings[k+1], ' ' );
-  TB10.Position := strtoint(SplittedText[0]);
+  SetVelocityValue( strtoint(SplittedText[0]));
+//  TB10.Position := strtoint(SplittedText[0]);
   TB11.Position := strtoint(SplittedText[1]);
   VelocityCurve.Clear;
   k := strtoint(SplittedText[2]);  // point count
@@ -1139,6 +1148,31 @@ begin
   Frame2_1.UpdateColor( ArrayColor );
  end;
 
+end;
+
+function TForm_Principale.GetVelocityValue: integer;
+begin
+  Result := TB10.Position;
+  if RB31.Checked then Result:=Result*2;
+  if RB32.Checked then Result:=Result*5;
+  if RB33.Checked then Result:=Result*10;
+end;
+
+procedure TForm_Principale.SetVelocityValue(aValue: integer);
+begin
+ if AValue>1024*5 then begin
+  TB10.Position:=AValue div 10;
+  RB33.Checked:=TRUE;
+ end else if AValue>1024*2 then begin
+  TB10.Position:=AValue div 5;
+  RB32.Checked:=TRUE;
+ end else if AValue>1024 then begin
+  TB10.Position:=AValue div 2;
+  RB31.Checked:=TRUE;
+ end else begin
+  TB10.Position:=AValue;
+  RB30.Checked:=TRUE;
+ end;
 end;
 
 
