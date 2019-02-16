@@ -1187,11 +1187,12 @@ begin
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(const aX, aY, aWidth, aHeight: single ): boolean;
+var r, r1: TRect;
 begin
- Result := not (( aX > FSurfaceOrigin.x+Width ) or (aX+aWidth < FSurfaceOrigin.x) or
-              (aY > FSurfaceOrigin.y+Height) or ( aY+aHeight < FSurfaceOrigin.y));
-// Result := not (( aX > GetRightX ) or (aX+aWidth < x.Value) or
-//              (aY > GetBottomY) or ( aY+aHeight < y.Value));
+ r.Create(Point(round(aX), round(aY)), round aWith), round( aHeight));
+ CollisionTestWith( r );
+// Result := not (( aX > FSurfaceOrigin.x+Width ) or (aX+aWidth < FSurfaceOrigin.x) or
+//              (aY > FSurfaceOrigin.y+Height) or ( aY+aHeight < FSurfaceOrigin.y));
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aRect: TRect): boolean;
