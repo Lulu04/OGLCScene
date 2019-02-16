@@ -279,14 +279,14 @@ function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect): PTexture;
 var fw, fh, fx, fy: single;
 begin
  Result := AddInstanceToList;
- Result^.ImageWidth := aRect.Width; // aTexture^.ImageWidth;
- Result^.ImageHeight := aRect.Height;// aTexture^.ImageHeight;
+ Result^.ImageWidth := aRect.Width;
+ Result^.ImageHeight := aRect.Height;
 
  Result^.TextureWidth := aTexture^.TextureWidth;
  Result^.TextureHeight := aTexture^.TextureHeight;
 
- Result^.FrameWidth := aRect.Width;
- Result^.FrameHeight := aRect.Height;
+ Result^.FrameWidth := aRect.Width+1;
+ Result^.FrameHeight := aRect.Height+1;
 
  Result^.FrameCount := 1;
 
@@ -294,8 +294,8 @@ begin
  Result^.Owner:=FALSE;
 
  with Result^ do begin
-   fw := aRect.Width/TextureWidth;
-   fh := aRect.Height/TextureHeight;
+   fw := FrameWidth/TextureWidth;
+   fh := FrameHeight/TextureHeight;
    fy := 1-aRect.Top/TextureHeight;
    fx := aRect.Left/TextureWidth;
 
