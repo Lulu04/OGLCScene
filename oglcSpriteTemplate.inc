@@ -1,12 +1,13 @@
 {$ifdef oglcINTERFACE}
 type
 
-{ TSatelliteSprite }
-// Satellite sprite that turn like an electron in rectangular area
+{ TMouseSatelliteSprite }
+// Satellite sprite that turn like an electron in rectangular area around mouse cursor
 
-TSatelliteSprite = class( TSprite )
+TMouseSatelliteSprite = class( TSprite )
 protected
   Accumulator: TPointF;
+  procedure SetCoordinates; virtual;
 public
   Pulse: TPointFParam; // sprite's speed
   MovingRectangle: TPointFParam; // width and height of the rectangle area where the sprite move
@@ -14,6 +15,18 @@ public
   Constructor Create( ATexture: PTexture; Owner: boolean=FALSE );
   Destructor Destroy; override;
   procedure Update( const aElapsedTime: single ); override;
+end;
+
+
+{ TSatelliteSprite }
+
+TSatelliteSprite = class( TMouseSatelliteSprite )
+private
+  FSatCoor: TPointF;
+protected
+  procedure SetCoordinates; override;
+public
+  procedure Draw( const aLayerPercentOpacity: single );  override;
 end;
 
 
@@ -55,11 +68,38 @@ begin
  SetCenterCoordinate( Polar.CartesianValue );
 end;
 
-
-
 { TSatelliteSprite }
 
-constructor TSatelliteSprite.Create( ATexture: PTexture; Owner: boolean);
+procedure TSatelliteSprite.SetCoordinates;
+begin
+ FSatCoor.x := cos( Accumulator.x ) * MovingRectangle.x.Value*0.5 + X.Value;
+ FSatCoor.y := sin( Accumulator.y ) * MovingRectangle.y.Value*0.5 + Y.Value;
+end;
+
+procedure TSatelliteSprite.Draw(const aLayerPercentOpacity: single);
+var t: TPointF;
+begin
+ if FTexture=NIL then exit;
+
+ t:=GetXY;
+ CenterX := FSatCoor.x;
+ CenterY := FSatCoor.y;
+
+ DrawSurface( FTexture, trunc( FFrame ), aLayerPercentOpacity );
+
+ X.Value := t.x;
+ Y.Value:=t.y;
+end;
+
+{ TMouseSatelliteSprite }
+
+procedure TMouseSatelliteSprite.SetCoordinates;
+begin
+ CenterX := (cos( Accumulator.x )) * MovingRectangle.x.Value + MouseManager.MousePosition.x;
+ CenterY := (sin( Accumulator.y )) * MovingRectangle.y.Value + MouseManager.MousePosition.y;
+end;
+
+constructor TMouseSatelliteSprite.Create( ATexture: PTexture; Owner: boolean);
 begin
  inherited Create( ATexture, Owner );
  Pulse := TPointFParam.Create;
@@ -70,22 +110,21 @@ begin
  Angle.AddConstant( 360 );
 end;
 
-destructor TSatelliteSprite.Destroy;
+destructor TMouseSatelliteSprite.Destroy;
 begin
  Pulse.Free;
  MovingRectangle.Free;
  inherited Destroy;
 end;
 
-procedure TSatelliteSprite.Update(const aElapsedTime: single);
+procedure TMouseSatelliteSprite.Update(const aElapsedTime: single);
 begin
  if FFreeze then exit;
  inherited Update(aElapsedTime);
  Pulse.OnElapse( aElapsedTime );
  Accumulator.x += Pulse.x.Value * PulseFactor * AElapsedTime;
  Accumulator.y += Pulse.y.Value * PulseFactor * AElapsedTime;
- X.Value := (cos( Accumulator.x )) * MovingRectangle.x.Value + MouseManager.MousePosition.x;
- Y.Value := (sin( Accumulator.y )) * MovingRectangle.y.Value + MouseManager.MousePosition.y;
+ SetCoordinates;
 end;
 
 {$endif oglcIMPLEMENTATION}
