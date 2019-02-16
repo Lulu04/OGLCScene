@@ -307,6 +307,11 @@ begin
                             indexTex := FMap[iytile,ixtile].TextureIndex;
                             indexFrame := TileEngineIndexFrameToTextureIndexFrame( indexTex, FMap[iytile,ixtile].ixFrame, FMap[iytile,ixtile].iyFrame );
 
+                            TextureManager.BindTexture(FTextureList[indexTex].Texture);
+                            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);//GL_LINEAR);
+                            glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);//GL_LINEAR);
+
+
                             DrawTexture( FTextureList[indexTex].Texture, indexFrame, xxx, yyy, 0, round( Opacity.Value * aLayerPercentOpacity ), Tint.Value );
                            end
                       else DrawColoredSquare;
