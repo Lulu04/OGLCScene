@@ -40,17 +40,18 @@ TLayer = class;
 TSurfaceList = class
    Constructor Create ;
    Destructor Destroy ; override ;
-   protected
+protected
      FList : TList ;
      function GetSurfaceCount: integer; inline;
      function GetSurface(aIndex: integer): TSimpleSurfaceWithEffect ; inline;
      procedure Delete ( Index:integer );
-   public
+public
      procedure Clear; virtual;
      function Add ( aSurface : TSimpleSurfaceWithEffect ) : integer ; virtual ;
      procedure Insert ( aIndex : integer ; aSurface : TSimpleSurfaceWithEffect ) ; virtual ;
      property SurfaceCount : integer read GetSurfaceCount ;
      property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface ; default;
+
 end;
 
 { TLayer }
@@ -63,6 +64,8 @@ TLayer = class (TSurfaceList)
     // Blink
     FBlink : TBlink ;
     FCamera: TOGLCCamera;
+   private
+    FOnSortCompare: TListSortCompare;
    public
     Constructor Create;
     Destructor Destroy; override;
@@ -106,6 +109,7 @@ TLayer = class (TSurfaceList)
     property Freeze : boolean read FFreeze write FFreeze ;    // Freeze all moves and variations of the layer and every surfaces of the layer
     property Visible : boolean read FVisible write FVisible;
     property Camera: TOGLCCamera read FCamera write FCamera;
+    property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare; // specify a function to sort the surface on the layer
 end;
 
 
@@ -284,8 +288,12 @@ begin
 
  Opacity.OnElapse( aElapsedTime );
 
+
  for i:=0 to FList.Count-1 do
    TSimpleSurfaceWithEffect( FList.Items[i] ).Update( aElapsedTime );
+
+ // sort the surface
+ if FOnSortCompare<>NIL then FList.Sort( FOnSortCompare );
 end;
 
 procedure TLayer.Clear;
