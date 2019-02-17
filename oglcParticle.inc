@@ -659,6 +659,9 @@ begin
   glTexCoord2fv( @TexCoord[2] );  glVertex2fv( @quad[ 2 ] );
   glTexCoord2fv( @TexCoord[3] );  glVertex2fv( @quad[ 3 ] );
  glEnd;
+
+//   TextureManager.DisableTextureUsage;
+//   DrawPolygon( quad, BGRA(255,0,0), 1);
 end;
 
 procedure TParticleEmitter.Shoot;
@@ -753,8 +756,10 @@ end;
 function TParticleEmitter.ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect): boolean;
 var i: Integer;
 begin
+ Result := FALSE;
  for i:=0 to length(FParticles)-1 do begin
-  Result:=aSurface.CollisionTestWith(FParticles[i].X, FParticles[i].Y,
+  if FParticles[i].CurrentLife > 0
+   then Result:=aSurface.CollisionTestWith(FParticles[i].X, FParticles[i].Y,
                                      FParticleParam.Texture^.FrameWidth*FParticles[i].CurrentSize,
                                      FParticleParam.Texture^.FrameHeight*FParticles[i].CurrentSize);
   if Result then exit;
