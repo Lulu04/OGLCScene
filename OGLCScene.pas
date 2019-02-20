@@ -261,8 +261,9 @@ TOGLCScene = class (TLayerList)
   property FadeTimeForStageChange: single read FFadeTimeForStageChange write FFadeTimeForStageChange;
 
   // Surface
-  procedure Add ( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
-  procedure Insert ( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
+  procedure Add ( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0); // add a surface to a layer
+  procedure Insert ( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0); // insert a surface to a layer
+  procedure RemoveSurfaceFromLayer( aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer); // remove a surface from the layer (but don't free it)
   function GetSurfaceByIndex( aLayerIndex, aSurfaceIndex: integer): TSimpleSurface;
 
   // Global scene color fade in and out
@@ -638,6 +639,12 @@ begin
  InsertSurfaceToLayer( aSurfaceIndex, aSurface, aLayerIndex);
  aSurface.SetParentLayer( Layer[aLayerIndex] );
  aSurface.SetParentScene( Self );
+end;
+
+procedure TOGLCScene.RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect;
+  aLayerIndex: integer);
+begin
+ Layer[aLayerIndex].Remove(aSurface);
 end;
 
 function TOGLCScene.GetSurfaceByIndex(aLayerIndex, aSurfaceIndex: integer ): TSimpleSurface;

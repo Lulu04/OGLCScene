@@ -48,6 +48,7 @@ protected
 public
      procedure Clear; virtual;
      function Add ( aSurface : TSimpleSurfaceWithEffect ) : integer ; virtual ;
+     procedure Remove( aSurface: TSimpleSurfaceWithEffect );
      procedure Insert ( aIndex : integer ; aSurface : TSimpleSurfaceWithEffect ) ; virtual ;
      property SurfaceCount : integer read GetSurfaceCount ;
      property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface ; default;
@@ -189,6 +190,11 @@ function TSurfaceList.Add(aSurface: TSimpleSurfaceWithEffect): integer;
 begin
  Result := FList.Add ( aSurface ) ;
  aSurface.SceneIndex := Result ;
+end;
+
+procedure TSurfaceList.Remove(aSurface: TSimpleSurfaceWithEffect);
+begin
+ FList.Remove(aSurface);
 end;
 
 
