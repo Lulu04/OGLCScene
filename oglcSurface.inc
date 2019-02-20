@@ -56,8 +56,8 @@ public
  property Tag1 : integer read FTag1 write FTag1;
  property Tag2 : boolean read FTag2 write FTag2;
  property Group : integer read FGroup write FGroup;
- property ParentLayer: TLayer read FParentLayer;
- property ParentScene: TOGLCScene read FParentScene;
+ property ParentLayer: TLayer read FParentLayer write FParentLayer;
+ property ParentScene: TOGLCScene read FParentScene write FParentScene;
 end;
 
 TScenarioEvent = procedure ( aSurface: TSimpleSurfaceWithEffect;
