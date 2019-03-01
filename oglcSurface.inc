@@ -96,6 +96,7 @@ TSimpleSurfaceWithEffect = class( TSimpleSurface )
   Destructor Destroy; override;
 private
   FMessageList: TMessageList;
+  FEnableProcessMessage: boolean;
 private
   procedure Init;
   procedure SetFrame(AValue: single);
@@ -150,6 +151,11 @@ public
    procedure AddMessage( UserValue: word; aDelay: single=0 );
    // override to process the message received from another surface
    procedure ProcessMessage( {%H-}UserValue: word ); virtual;
+   // lock the call to process message
+   procedure LockProcessMessage;
+   // unlock the call to processmessage
+   procedure UnlockProcessMessage;
+
    // add a child to the surface
    procedure AddChild( ASurface: TSimpleSurfaceWithEffect );overload;
    procedure DeleteChild( aIndex: integer ); overload;
@@ -542,6 +548,7 @@ begin
  FGuiEnabled := TRUE;
 
  FMessageList := TMessageList.Create;
+ FEnableProcessMessage:=TRUE;
 end;
 
 procedure TSimpleSurfaceWithEffect.SetFrame(AValue: single);
@@ -627,7 +634,7 @@ begin
  FSurfaceOrigin := PointF(X.Value,Y.Value);
  if FParentSurface<>NIL then FSurfaceOrigin+= FParentSurface.FSurfaceOrigin;
 
- FMessageList.ProcessMessages( aElapsedTime );
+ if FEnableProcessMessage then FMessageList.ProcessMessages( aElapsedTime );
 
  if FFreeze then exit ;
 
@@ -758,6 +765,16 @@ end;
 procedure TSimpleSurfaceWithEffect.ProcessMessage(UserValue: word);
 begin
 // override to process the received message
+end;
+
+procedure TSimpleSurfaceWithEffect.LockProcessMessage;
+begin
+ FEnableProcessMessage:=FALSE;
+end;
+
+procedure TSimpleSurfaceWithEffect.UnlockProcessMessage;
+begin
+ FEnableProcessMessage:=TRUE;
 end;
 
 procedure TSimpleSurfaceWithEffect.AddChild(ASurface: TSimpleSurfaceWithEffect);
