@@ -136,6 +136,8 @@ public
  property VLoopMode: boolean read FVLoopMode write FVLoopMode;    // set TRUE to repeat the map vertically
 
  property OnTileEvent: TTileEvent read FOnTileEvent write FOnTileEvent;
+
+ property TextureList: TArrayOfTileTexInfo read FTextureList;
 end;
 {$endif oglcINTERFACE}
 
@@ -769,8 +771,10 @@ begin
          if Length( txtsplited ) <> 2
            then raise exception.Create('Tile engine - LoadMap error : can''t retrieve draw size');
          SetViewSize( strtoint( txtsplited[0]), strtoint( txtsplited[1] ));
-         x.Value := ( FParentScene.Width - FWidth ) / 2;    // center on scene by default
-         y.Value := ( FParentScene.Height - FHeight ) / 2;
+         if FParentScene<>NIL then begin // center on scene by default
+           x.Value := ( FParentScene.Width - FWidth ) / 2;
+           y.Value := ( FParentScene.Height - FHeight ) / 2;
+         end;
    end;
 
  // Tile Size
