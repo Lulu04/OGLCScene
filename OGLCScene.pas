@@ -338,7 +338,7 @@ end;
 
 procedure TStageSkeleton.AddMessage(UserValue: word; aDelay: single);
 begin
- FMessageList.Add( UserValue, @ProcessMessage, aDelay );
+ FMessageList.Add( UserValue, @Self.ProcessMessage, aDelay );
 end;
 
 procedure TStageSkeleton.ProcessMessage(UserValue: word);
