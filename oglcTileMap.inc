@@ -14,17 +14,18 @@ TTile = record
 end;
 PTile = ^TTile;
 
-// map is an array of array of TTile
+// 2D map is an array of array of TTile
 TArrayOfArrayOfTile = array of array of TTile;
 
 TArrayOfArrayOfInteger = array of array of integer;
 // each texture (or tileset) have an array value that allows to identify ground type for each tile
 TTileTexInfo = record
      Texture  : PTexture;
-     TileType : TArrayOfArrayOfInteger;  // each type by frame column and row  [x][y]
+     TileType : TArrayOfArrayOfInteger;  // each ground type by frame column and row  [x][y]
 end;
 PTileTexInfo = ^TTileTexInfo;
 TArrayOfTileTexInfo = array of TTileTexInfo;
+PArrayOfTileTexInfo=^TArrayOfTileTexInfo;
 
 
 TTileEvent = procedure ( Sender: TTileEngine; const TileTopLeftCoor: TPointF; EventValue: integer ) of object;
@@ -34,6 +35,8 @@ TTileEngine = class( TSimpleSurfaceWithEffect )
  Destructor Destroy ; override ;
 private
  FTextureList      : TArrayOfTileTexInfo;
+ FTextureListOwner : boolean;
+ FPTextureList     : PArrayOfTileTexInfo;
  FMap              : TArrayOfArrayOfTile; // [row,column]
  FMapSize          : TSize;     // total map size in pixel
  FMapTileCount     : TSize;
@@ -48,6 +51,7 @@ private
  FXOffsetFirstTile: single;
  FYOffsetFirstTile: single;
  FOnTileEvent : TTileEvent ; // callback for event
+ function GetTextureList: TArrayOfTileTexInfo;
  function GetTileSize: TSize;
  function GetMapSize: TSize;
  procedure EnsurePositionInMap( var APos: TPointF );
@@ -72,6 +76,7 @@ public
  function GetFirstTileRowIndex: integer;
  function AddTexture( AFilename: string; AFrameWidth, AFrameHeight: integer ): integer; // return index of created texture
  procedure DeleteTexture( AIndex: integer );
+ function GetPTextureList: PArrayOfTileTexInfo;
  function GetTexture( AIndex: integer ): PTexture;
  function GetTextureCount: integer;
  procedure SetMapTileCount( ARowCount, AColumnCount: integer );
@@ -109,7 +114,9 @@ public
  function GetBoundedPositionOnMap: TPointF;
 
  // load map previously created with 'Tile Map Designer' tool
- procedure LoadMapFile( const aFilename : string );
+ // aTextureList is a pointer to the texture list of another TileEngine. Use it if several maps have the same tileset
+ // eg: TileEngineTWO.LoadFromFile('filemap.map', @TileEngineONE.GetPTextureList);
+ procedure LoadMapFile( const aFilename : string; aTextureList: PArrayOfTileTexInfo=NIL );
 
  // Give the type of the tile pointed by specified position on the scene (and not on map). Can be out of the view, but still on map
  function GetGroundType( aSceneCoor: TPointF ): integer; overload;
@@ -137,7 +144,7 @@ public
 
  property OnTileEvent: TTileEvent read FOnTileEvent write FOnTileEvent;
 
- property TextureList: TArrayOfTileTexInfo read FTextureList;
+ property TextureList: TArrayOfTileTexInfo read GetTextureList;
 end;
 {$endif oglcINTERFACE}
 
@@ -257,6 +264,7 @@ var ixtile, iytile : integer;
     xx, yy, xxx, yyy: single;
     c: TBGRAPixel;
     p: TPointF;
+    t: PTexture;
 
     procedure DrawColoredSquare; inline;
     begin
@@ -309,12 +317,12 @@ begin
                             indexTex := FMap[iytile,ixtile].TextureIndex;
                             indexFrame := TileEngineIndexFrameToTextureIndexFrame( indexTex, FMap[iytile,ixtile].ixFrame, FMap[iytile,ixtile].iyFrame );
 
-                            TextureManager.BindTexture(FTextureList[indexTex].Texture);
+                            t:=GetTexture(indexTex);
+                            TextureManager.BindTexture(t);
                             glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);//GL_LINEAR);
                             glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);//GL_LINEAR);
 
-
-                            DrawTexture( FTextureList[indexTex].Texture, indexFrame, xxx, yyy, 0, round( Opacity.Value * aLayerPercentOpacity ), Tint.Value );
+                            DrawTexture( t, indexFrame, xxx, yyy, 0, round( Opacity.Value * aLayerPercentOpacity ), Tint.Value );
                            end
                       else DrawColoredSquare;
                      // callback event
@@ -393,16 +401,30 @@ begin
  SetLength( FTextureList, Length( FTextureList ) - 1 );
 end;
 
-function TTileEngine.GetTexture(AIndex: integer): PTexture;
+function TTileEngine.GetPTextureList: PArrayOfTileTexInfo;
 begin
- if (AIndex >= 0) and (AIndex<Length(FTextureList))
-   then Result := FTextureList[AIndex].Texture
-   else Result := NIL;
+ if FTextureListOwner
+   then Result := @FTextureList
+   else Result := FPTextureList;
 end;
 
+function TTileEngine.GetTexture(AIndex: integer): PTexture;
+begin
+ if FTextureListOwner then begin
+   if (AIndex >= 0) and (AIndex<Length(FTextureList))
+     then Result := FTextureList[AIndex].Texture
+     else Result := NIL;
+ end else begin
+   if (AIndex >= 0) and (AIndex<Length(FPTextureList^))
+     then Result := FPTextureList^[AIndex].Texture
+     else Result := NIL;
+ end;
+end;
 function TTileEngine.GetTextureCount: integer;
 begin
- Result := Length( FTextureList );
+ if FTextureListOwner
+   then Result := Length(FTextureList)
+   else Result := Length(FPTextureList^);
 end;
 
 procedure TTileEngine.SetMapTileCount(ARowCount, AColumnCount: integer);
@@ -514,7 +536,7 @@ end;
 
 function TTileEngine.IsValidTextureIndex(AITex: integer): boolean;
 begin
- Result := ( AITex >= 0 ) and ( AITex < Length( FTextureList ));
+ Result := ( AITex >= 0 ) and ( AITex < self.GetTextureCount);
 end;
 
 function TTileEngine.IsValidFrameIndex(ATextureIndex, ixFrame, iyFrame: integer ): boolean;
@@ -522,9 +544,9 @@ var fc: TSize;
 begin
  Result := IsValidTextureIndex( ATextureIndex );
  if Result then begin
-  fc := TextureManager.GetFrameCount( FTextureList[ATextureIndex].Texture );
-  Result := ( ixFrame > -1 ) and ( ixFrame < fc.cx ) and
-            ( iyFrame > -1 ) and ( iyFrame < fc.cy );
+   fc := TextureManager.GetFrameCount( GetTexture(ATextureIndex));
+   Result := ( ixFrame > -1 ) and ( ixFrame < fc.cx ) and
+             ( iyFrame > -1 ) and ( iyFrame < fc.cy );
  end;
 end;
 
@@ -550,7 +572,7 @@ begin
 
  if ATextureIndex = -1 then exit;
 
- fc:= TextureManager.GetFrameCount( FTextureList[ATextureIndex].Texture );
+ fc:= TextureManager.GetFrameCount( GetTexture(ATextureIndex));
  if p^.ixFrame >= fc.cx then  p^.ixFrame := fc.cx-1;
  if p^.ixFrame < 0 then  p^.ixFrame := 0;
 
@@ -587,20 +609,30 @@ begin
  p := GetPTile( ARow, AColumn );
  if p = NIL
    then Result := NIL
-   else Result := @FTextureList[p^.TextureIndex];
+   else begin
+     if FTextureListOwner
+       then Result := @FTextureList[p^.TextureIndex]
+       else Result := @FPTextureList^[p^.TextureIndex];
+   end;
 end;
 
 procedure TTileEngine.SetGroundType(ATextureIndex, ixFrame, iyFrame, AGroundType: integer);
 begin
  if not IsValidFrameIndex( ATextureIndex, ixFrame, iyFrame ) then exit;
- FTextureList[ATextureIndex].TileType[ixFrame][iyFrame] := AGroundType;
+ if FTextureListOwner
+   then FTextureList[ATextureIndex].TileType[ixFrame][iyFrame] := AGroundType
+   else FPTextureList^[ATextureIndex].TileType[ixFrame][iyFrame] := AGroundType;
 end;
 
 function TTileEngine.GetGroundType(ATextureIndex, ixFrame, iyFrame: integer ): integer;
 begin
  if not IsValidFrameIndex( ATextureIndex, ixFrame, iyFrame )
    then Result := 0    // value for ground 'hole'
-   else Result := FTextureList[ATextureIndex].TileType[ixFrame][iyFrame];
+   else begin
+    if FTextureListOwner
+      then Result := FTextureList[ATextureIndex].TileType[ixFrame][iyFrame]
+      else Result := FPTextureList^[ATextureIndex].TileType[ixFrame][iyFrame];
+   end;
 end;
 
 procedure TTileEngine.ClearCell(ARow, AColumn: integer);
@@ -622,9 +654,11 @@ var i : integer;
 begin
  SetLength( FMap, 0 );
 
- for i:=0 to Length( FTextureList )-1 do
-  TextureManager.Delete ( FTextureList[i].Texture );
- SetLength( FTextureList, 0 );
+ if FTextureListOwner then begin
+   for i:=0 to GetTextureCount-1 do
+    TextureManager.Delete ( FTextureList[i].Texture );
+   SetLength( FTextureList, 0 );
+ end;
 
  FMapSize.cx := 0;
  FMapSize.cy :=0;
@@ -705,12 +739,19 @@ begin
  Result := FTileSize;
 end;
 
+function TTileEngine.GetTextureList: TArrayOfTileTexInfo;
+begin
+ if FTextureListOwner
+    then Result := FTextureList
+    else Result := FPTextureList^;
+end;
+
 function TTileEngine.GetMapSize: TSize;
 begin
  Result := FMapSize;
 end;
 
-procedure TTileEngine.LoadMapFile(const aFilename: string);
+procedure TTileEngine.LoadMapFile(const aFilename: string; aTextureList: PArrayOfTileTexInfo);
 var FMapFile: TStringList;
     path: string;
     i, j, k, z, Count, ix, iy : integer;
@@ -723,19 +764,26 @@ begin
  path := ExtractFilePath( aFileName );
 
  // load map's textures
- k := FMapFile.IndexOf('TEXTURES');
- if k=-1 then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture list');
- inc(k);
- Count := strtoint( FMapFile.Strings[k] );
- inc(k);
- for i:=0 to Count-1 do
-  begin
-   txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
-   if Length( txtsplited ) <> 3
-     then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture name and frame size');
-   AddTexture( path + txtsplited[0], strtoint( txtsplited[1] ), strtoint( txtsplited[2] ));
-   inc(k);
-  end;
+ if aTextureList=NIL then begin
+  k := FMapFile.IndexOf('TEXTURES');
+  if k=-1 then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture list');
+  inc(k);
+  Count := strtoint( FMapFile.Strings[k] );
+  inc(k);
+  for i:=0 to Count-1 do
+   begin
+    txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+    if Length( txtsplited ) <> 3
+      then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture name and frame size');
+    AddTexture( path + txtsplited[0], strtoint( txtsplited[1] ), strtoint( txtsplited[2] ));
+    inc(k);
+   end;
+  FTextureListOwner:=TRUE;
+  FPTextureList:=NIL;
+ end else begin
+  FTextureListOwner:=FALSE;
+  FPTextureList:=aTextureList;
+ end;
 
  // load Frame Type
  //  FRAMES_TYPE
