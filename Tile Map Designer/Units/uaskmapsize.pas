@@ -7,8 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, Spin, Buttons,
-  OGLCScene,
-  common;
+  OGLCScene;
 
 type
 
@@ -38,6 +37,7 @@ var
   Form_AskMapSize: TForm_AskMapSize;
 
 implementation
+uses umaps;
 
 {$R *.lfm}
 
@@ -46,25 +46,21 @@ implementation
 procedure TForm_AskMapSize.FormShow(Sender: TObject);
 var s: string;
 begin
- s := inttostr( FTileEngine.MapTileCount.cx ) + ' column';
- if FTileEngine.MapTileCount.cx > 1 then s += 's';
+ s := inttostr( MapList.MainMap.TileEngine.MapTileCount.cx ) + ' column';
+ if MapList.MainMap.TileEngine.MapTileCount.cx > 1 then s += 's';
  Label4.Caption := s;
 
- s := inttostr( FTileEngine.MapTileCount.cy ) + ' row';
- if FTileEngine.MapTileCount.cx > 1 then s += 's';
+ s := inttostr( MapList.MainMap.TileEngine.MapTileCount.cy ) + ' row';
+ if MapList.MainMap.TileEngine.MapTileCount.cx > 1 then s += 's';
  Label3.Caption := s;
 
- SE1.Value := FTileEngine.MapTileCount.cx;
- SE2.Value := FTileEngine.MapTileCount.cy;
+ SE1.Value := MapList.MainMap.TileEngine.MapTileCount.cx;
+ SE2.Value := MapList.MainMap.TileEngine.MapTileCount.cy;
 end;
 
 procedure TForm_AskMapSize.BitBtn1Click(Sender: TObject);
 begin
- with FTileEngine do begin
-   SetMapTileCount( Form_AskMapSize.SE2.Value, Form_AskMapSize.SE1.Value );
-   SetViewSize( TileSize.cx * MapTileCount.cx, TileSize.cy * MapTileCount.cy ); // set view to whole map
- end;
- SetProjectModified;
+ MapList.SetSize( SE2.Value, SE1.Value );
 end;
 
 end.

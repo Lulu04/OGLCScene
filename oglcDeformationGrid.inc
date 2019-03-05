@@ -398,7 +398,7 @@ begin
      then DrawTexturePartWithShadows( FTexture, @ScreenCellCoor, @PartTexCoor, {%H-}yref, aLayerPercentOpacity )
      else DrawTexturePart( FTexture, @ScreenCellCoor, @PartTexCoor, aLayerPercentOpacity );
    end;
-  ty := PartTexCoor[2].y;
+  ty := {%H-}PartTexCoor[2].y;
  end;
 
  if FShowGrid then begin

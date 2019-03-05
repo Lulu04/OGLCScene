@@ -1,4 +1,25 @@
-unit WindowsScene;
+{
+  ****************************************************************************
+ *                                                                          *
+ *  This file is part of OGLCScene library which is distributed             *
+ *  under the modified LGPL.                                                *
+ *                                                                          *
+ *  See the file COPYING.modifiedLGPL.txt, included in this distribution,   *
+ *  for details about the copyright.                                        *
+ *                                                                          *
+ *  This program is distributed in the hope that it will be useful,         *
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of          *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                    *
+ *                                                                          *
+ ****************************************************************************
+
+ TILE MAP DESIGNER  written by Lulu - 2017
+ Using OGLCScene, this software allow to create map for game based on tile.
+ It is a simple version that does not pretend to compete with those already
+ existing.
+
+}
+unit u_main;
 
 {$mode objfpc}{$H+}
 
@@ -20,9 +41,9 @@ type
 
   TState = ( sNeutral, sMoveView, sSelecting, sSelectionDone );
 
-  { TWindow_Scene }
+  { TForm_Main }
 
-  TWindow_Scene = class(TForm)
+  TForm_Main = class(TForm)
     MenuClear: TMenuItem;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
@@ -46,10 +67,13 @@ type
     Panel1: TPanel;
     PopupMenu1: TPopupMenu;
     SBHelp3: TSpeedButton;
+    procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormMouseEnter(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure MenuClearClick(Sender: TObject);
     procedure MenuItem10Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
@@ -64,8 +88,8 @@ type
     procedure Menu_InsertColumnClick(Sender: TObject);
     procedure Menu_StartMapClick(Sender: TObject);
     procedure OpenGLControl1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure OpenGLControl1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure OpenGLControl1MouseMove(Sender: TObject; {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
     procedure SBHelp3Click(Sender: TObject);
   private
     FCoorBeginLeftClick,
@@ -103,19 +127,23 @@ type
 
     procedure ProcessTileEngineEvent( Sender: TTileEngine; const SceneTileCoor: TPointF; Event: integer );
 
+    procedure SetWindowsTitle( const s: string );
+
+
   end;
 
 var
-  Window_Scene: TWindow_Scene;
+  Form_Main: TForm_Main;
 
 implementation
-uses Main,
-     uAskGroundType;
+uses u_tool_window,
+     uAskGroundType,
+     umaps, u_tileset_edit;
 {$R *.lfm}
 
-{ TWindow_Scene }
+{ TForm_Main }
 
-procedure TWindow_Scene.FormCreate(Sender: TObject);
+procedure TForm_Main.FormCreate(Sender: TObject);
 begin
  FScene := TOGLCScene.Create ( OpenGLControl1 ) ;
  FScene.LayerCount := LAYER_COUNT;
@@ -129,35 +157,37 @@ begin
 
 end;
 
-procedure TWindow_Scene.FormDestroy(Sender: TObject);
+procedure TForm_Main.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+var mr: TModalResult;
+begin
+ CanClose := FALSE;
+ if FProjectIsModified then begin
+  mr := MessageDlg('', 'Before quit, do you want to save the current(s) map(s) ?', mtWarning, [mbYes, mbNo, mbCancel],0);
+  if mr = mrCancel then exit;
+  if mr = mrYes then MapList.SaveSession;
+  FProjectIsModified := FALSE;
+ end;
+ CanClose:=TRUE;
+end;
+
+procedure TForm_Main.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+ FScene.ColorFadeIn(BGRABlack,0.5);
+ FScene.ExecuteDuring(0.5);
+end;
+
+procedure TForm_Main.FormDestroy(Sender: TObject);
 begin
  FScene.Free;
  FScene := NIL;
 end;
 
-procedure TWindow_Scene.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-var i: integer;
+procedure TForm_Main.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
- // shortcut key for tileset manipulation
- case Key of
-  VK_PRIOR: begin
-    i := Form_Principale.CB1.ItemIndex - 1;
-    if i > 0 then Form_Principale.CB1.ItemIndex := i;
-    Key := VK_UNKNOWN;
-  end;
-  VK_NEXT: begin
-    i := Form_Principale.CB1.ItemIndex + 1;
-    if i < Form_Principale.CB1.Items.Count then Form_Principale.CB1.ItemIndex := i;
-    Key := VK_UNKNOWN;
-  end;
-  VK_UP: Form_Principale.SetRelativeSelectedTile( 0, -1 );
-  VK_DOWN: Form_Principale.SetRelativeSelectedTile( 0, 1 );
-  VK_RIGHT: Form_Principale.SetRelativeSelectedTile( 1, 0 );
-  VK_LEFT: Form_Principale.SetRelativeSelectedTile( -1, 0 );
- end;
+ EvalKey( Key );
 
  FMousePos := OpenGlControl1.ScreenToClient( Mouse.CursorPos );
- // shortcut key
+ // shortcut key to copy, paste, cut, erase
  case Key of
   VK_SPACE: begin
     Menu_FillWithSelectedTileClick(self);
@@ -181,35 +211,42 @@ begin
  end;//case
 end;
 
-procedure TWindow_Scene.FormMouseEnter(Sender: TObject);
+procedure TForm_Main.FormMouseEnter(Sender: TObject);
 begin
  SetFocus;
 end;
 
-function TWindow_Scene.ClientPosToTileIndex( APos: TPoint ): TPoint;
+procedure TForm_Main.FormShow(Sender: TObject);
+begin
+ Form_Tools.Show;
+end;
+
+function TForm_Main.ClientPosToTileIndex( APos: TPoint ): TPoint;
 begin
  Result.x := XCoorToColumnIndex( APos.x );
  Result.y := YCoorToRowIndex( APos.y );
 end;
 
-function TWindow_Scene.ScreenPosToTileIndex(APos: TPoint): TPoint;
+function TForm_Main.ScreenPosToTileIndex(APos: TPoint): TPoint;
 begin
  Result := ClientPosToTileIndex( OpenGlControl1.ScreenToClient( APos ) );
 end;
 
 // popup Clear tile
-procedure TWindow_Scene.MenuClearClick(Sender: TObject);
+procedure TForm_Main.MenuClearClick(Sender: TObject);
 var ro, co: integer;
      s: TSize;
     p1: TPoint;
     t: string;
 begin
+ if TilesetEdit.IsActive then exit;
+
  if not SelectionAvailable then
    begin // erase tile under mouse
     if XYCoorIsInMap( FMousePos.x, FMousePos.y ) then begin
       p1 := ClientPosToTileIndex( FMousePos );
-      FTileEngine.SetCell( p1.y, p1.x, -1, 0, 0 );
-      FTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
+      FWorkingTileEngine.SetCell( p1.y, p1.x, -1, 0, 0 );
+      FWorkingTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
       ShowActionText( FMousePos.x, FMousePos.y, 'erase 1 tile');
       SetProjectModified;
     end;
@@ -220,8 +257,8 @@ begin
      for ro:=p1.y to p1.y+s.cy-1 do
        for co:=p1.x to p1.x+s.cx-1 do
          begin
-          FTileEngine.SetCell( ro, co, -1, 0, 0 );
-          FTileEngine.SetUserEventValue( ro, co, -1 );
+          FWorkingTileEngine.SetCell( ro, co, -1, 0, 0 );
+          FWorkingTileEngine.SetUserEventValue( ro, co, -1 );
          end;
      t := 'erase ' + inttostr( s.cx * s.cy ) + ' tile';
      if s.cx * s.cy > 1 then t+='s';
@@ -231,7 +268,7 @@ begin
 end;
 
 // popup Set ground type...
-procedure TWindow_Scene.MenuItem10Click(Sender: TObject);
+procedure TForm_Main.MenuItem10Click(Sender: TObject);
 var pt: PTile;
   p1: TPoint;
   s: TSize;
@@ -242,16 +279,16 @@ begin
 
  if not SelectionAvailable then begin  // set ground type on tile under the mouse
       p1 := ClientPosToTileIndex( FMousePos );
-      pt:=FTileEngine.GetPTile(p1.y, p1.x);
-      FTileEngine.SetGroundType( pt^.TextureIndex,pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
+      pt:=FWorkingTileEngine.GetPTile(p1.y, p1.x);
+      FWorkingTileEngine.SetGroundType( pt^.TextureIndex,pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
       SetProjectModified;
  end else begin                       // set ground type on the selected tiles
       s := TileCountInSelection;
       p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
       for ro:=p1.y to p1.y+s.cy-1 do
        for co:=p1.x to p1.x+s.cx-1 do begin
-         pt:=FTileEngine.GetPTile(ro, co);
-         FTileEngine.SetGroundType( pt^.TextureIndex, pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
+         pt:=FWorkingTileEngine.GetPTile(ro, co);
+         FWorkingTileEngine.SetGroundType( pt^.TextureIndex, pt^.ixFrame, pt^.iyFrame, Form_AskGroundType.LB.ItemIndex);
        end;
       ShowActionText( FMousePos.x, FMousePos.y, 'set ground type' );
       SetProjectModified;
@@ -259,7 +296,7 @@ begin
 end;
 
 // popup Set user event value
-procedure TWindow_Scene.MenuItem3Click(Sender: TObject);
+procedure TForm_Main.MenuItem3Click(Sender: TObject);
 var ro, co: integer;
     s: TSize;
     p1: TPoint;
@@ -271,7 +308,7 @@ begin
    begin // set event on tile under mouse
     if XYCoorIsInMap( FMousePos.x, FMousePos.y ) then begin
       p1 := ClientPosToTileIndex( FMousePos );
-      FTileEngine.SetUserEventValue( p1.y, p1.x, Form_AskEvent.LB.ItemIndex );
+      FWorkingTileEngine.SetUserEventValue( p1.y, p1.x, Form_AskEvent.LB.ItemIndex );
       ShowActionText( FMousePos.x, FMousePos.y, 'set 1 event');
       SetProjectModified;
     end;
@@ -280,7 +317,7 @@ begin
      p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
      for ro:=p1.y to p1.y+s.cy-1 do
       for co:=p1.x to p1.x+s.cx-1 do
-        FTileEngine.SetUserEventValue( ro, co, Form_AskEvent.LB.ItemIndex );
+        FWorkingTileEngine.SetUserEventValue( ro, co, Form_AskEvent.LB.ItemIndex );
 
      t := 'set '+inttostr(s.cx * s.cy)+' event';
      if s.cx * s.cy > 1 then t+='s';
@@ -290,7 +327,7 @@ begin
 end;
 
 // popup Delete event
-procedure TWindow_Scene.MenuItem5Click(Sender: TObject);
+procedure TForm_Main.MenuItem5Click(Sender: TObject);
 var ro, co: integer;
     s: TSize;
     p1: TPoint;
@@ -300,7 +337,7 @@ begin
    begin // delete event on tile under mouse
     if XYCoorIsInMap( FMousePos.x, FMousePos.y ) then begin
       p1 := ClientPosToTileIndex( FMousePos );
-      FTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
+      FWorkingTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
       ShowActionText( FMousePos.x, FMousePos.y, 'delete 1 event');
       SetProjectModified;
     end;
@@ -309,7 +346,7 @@ begin
      p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
      for ro:=p1.y to p1.y+s.cy-1 do
       for co:=p1.x to p1.x+s.cx-1 do
-        FTileEngine.SetUserEventValue( ro, co, -1 );
+        FWorkingTileEngine.SetUserEventValue( ro, co, -1 );
 
      t := 'delete '+inttostr(s.cx * s.cy)+' event';
      if s.cx * s.cy > 1 then t+='s';
@@ -318,27 +355,26 @@ begin
    end;
 end;
 
-procedure TWindow_Scene.MenuItem7Click(Sender: TObject);
+procedure TForm_Main.MenuItem7Click(Sender: TObject);
 begin
  Form_ExportEvent.ShowModal;
 end;
 
 // popup 'put all tiles in the current tileset'
-procedure TWindow_Scene.MenuItem9Click(Sender: TObject);
+procedure TForm_Main.MenuItem9Click(Sender: TObject);
 var ro, co: integer;
-    s: TSize;
     p1: TPoint;
     Ftl: TTileSet;
 begin
- if Form_Principale.CB1.ItemIndex=-1 then exit;
+ if Form_Tools.CB1.ItemIndex=-1 then exit;
 
  p1 := ClientPosToTileIndex( FMousePos );
- Ftl := TileSetManager.TileSet[Form_Principale.CB1.ItemIndex];
+ Ftl := TileSetManager.TileSet[Form_Tools.CB1.ItemIndex];
  for ro:=p1.y to p1.y+Ftl.YTileCount-1 do
   for co:=p1.x to p1.x+Ftl.XTileCount-1 do
    begin
-    FTileEngine.SetCell( ro, co, Form_Principale.CB1.ItemIndex, co-p1.x, ro-p1.y );
-    FTileEngine.SetUserEventValue( ro, co, -1 );
+    FWorkingTileEngine.SetCell( ro, co, Form_Tools.CB1.ItemIndex, co-p1.x, ro-p1.y );
+    FWorkingTileEngine.SetUserEventValue( ro, co, -1 );
    end;
 
  ShowActionText( FMousePos.x, FMousePos.y, 'put whole tileset');
@@ -346,19 +382,21 @@ begin
 end;
 
 // popup Cut
-procedure TWindow_Scene.Menu_CutClick(Sender: TObject);
+procedure TForm_Main.Menu_CutClick(Sender: TObject);
 var ro, co: integer;
     s: TSize;
     p1: TPoint;
     t: string;
 begin
+ if TilesetEdit.IsActive then exit;
+
  if not SelectionAvailable then
    begin // cut tile under mouse
     if XYCoorIsInMap( FMousePos.x, FMousePos.y ) then begin
       Menu_CopyClick( Sender );
       p1 := ClientPosToTileIndex( FMousePos );
-      FTileEngine.SetCell( p1.y, p1.x, -1, -1, -1 );
-      FTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
+      FWorkingTileEngine.SetCell( p1.y, p1.x, -1, -1, -1 );
+      FWorkingTileEngine.SetUserEventValue( p1.y, p1.x, -1 );
       ShowActionText( FMousePos.x, FMousePos.y, 'cut 1 tile');
       SetProjectModified;
     end;
@@ -371,8 +409,8 @@ begin
      for ro:=p1.y to p1.y+s.cy-1 do
       for co:=p1.x to p1.x+s.cx-1 do
        begin
-        FTileEngine.SetCell( ro, co, -1, -1, -1 );
-        FTileEngine.SetUserEventValue( ro, co, -1 );
+        FWorkingTileEngine.SetCell( ro, co, -1, -1, -1 );
+        FWorkingTileEngine.SetUserEventValue( ro, co, -1 );
        end;
 
      t := 'cut ' + inttostr( s.cx * s.cy ) + ' tile';
@@ -383,18 +421,20 @@ begin
 end;
 
 // popup fill with selected tile
-procedure TWindow_Scene.Menu_FillWithSelectedTileClick(Sender: TObject);
+procedure TForm_Main.Menu_FillWithSelectedTileClick(Sender: TObject);
 var ro, co, t, ixfr, iyfr : integer;
     s: TSize;
     p1: TPoint;
     tt: string;
 begin
- Form_Principale.GetTextureAndFrameindex( t, ixfr, iyfr );
+ if TilesetEdit.IsActive then exit;
+
+ Form_Tools.GetTextureAndFrameindex( t, ixfr, iyfr );
  if not SelectionAvailable then
    begin // fill tile under mouse
     if XYCoorIsInMap( FMousePos.x, FMousePos.y ) then begin
       p1 := ClientPosToTileIndex( FMousePos );
-      FTileEngine.SetCell( p1.y, p1.x, t, ixfr, iyfr );
+      FWorkingTileEngine.SetCell( p1.y, p1.x, t, ixfr, iyfr );
 
       ShowActionText( FMousePos.x, FMousePos.y, 'fill 1 tile');
       SetProjectModified;
@@ -404,7 +444,7 @@ begin
      p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
      for ro:=p1.y to p1.y+s.cy-1 do
        for co:=p1.x to p1.x+s.cx-1 do
-        FTileEngine.SetCell( ro, co, t, ixfr, iyfr );
+        FWorkingTileEngine.SetCell( ro, co, t, ixfr, iyfr );
 
      tt := 'fill ' + inttostr( s.cx * s.cy ) + ' tile';
      if s.cx * s.cy > 1 then tt+='s';
@@ -416,7 +456,7 @@ end;
 // popup Copy
 // if there is no selection, copy only tile over mouse
 // if there is selection, copy it
-procedure TWindow_Scene.Menu_CopyClick(Sender: TObject);
+procedure TForm_Main.Menu_CopyClick(Sender: TObject);
 var ro, co: integer;
     s: TSize;
     p1: TPoint;
@@ -429,7 +469,7 @@ begin
       SetLength( FTileArrayToPaste, 1, 1 );
       p1 := ClientPosToTileIndex( FMousePos );
 
-      p := FTileEngine.GetPTile( p1.y, p1.x);
+      p := FWorkingTileEngine.GetPTile( p1.y, p1.x);
 
       FTileArrayToPaste[0][0].TextureIndex := p^.TextureIndex;
       FTileArrayToPaste[0][0].ixFrame := p^.ixFrame;
@@ -446,7 +486,7 @@ begin
      for ro:=p1.y to p1.y+s.cy-1 do
        for co:=p1.x to p1.x+s.cx-1 do
         begin
-         p := FTileEngine.GetPTile( ro, co );
+         p := FWorkingTileEngine.GetPTile( ro, co );
          FTileArrayToPaste[ro-p1.y][co-p1.x].TextureIndex := p^.TextureIndex;
          FTileArrayToPaste[ro-p1.y][co-p1.x].ixFrame := p^.ixFrame;
          FTileArrayToPaste[ro-p1.y][co-p1.x].iyFrame := p^.iyFrame;
@@ -460,12 +500,14 @@ begin
 end;
 
 // popup Paste
-procedure TWindow_Scene.Menu_PasteClick(Sender: TObject);
+procedure TForm_Main.Menu_PasteClick(Sender: TObject);
 var p1: TPoint;
     p3: PTile;
     ro, co, i: integer;
     t: string;
 begin
+ if TilesetEdit.IsActive then exit;
+
  if Length( FTileArrayToPaste ) = 0 then exit;
  if not XYCoorIsInMap( FMousePos.x, FMousePos.y ) then exit;
  // copy tiles in buffer to map
@@ -485,8 +527,8 @@ begin
        end;
     }
     p3 := @FTileArrayToPaste[ro-p1.y][co-p1.x];
-    FTileEngine.SetCell( ro, co, p3^.TextureIndex, p3^.ixFrame, p3^.iyFrame );
-    FTileEngine.SetUserEventValue( ro, co, p3^.UserEvent );
+    FWorkingTileEngine.SetCell( ro, co, p3^.TextureIndex, p3^.ixFrame, p3^.iyFrame );
+    FWorkingTileEngine.SetUserEventValue( ro, co, p3^.UserEvent );
    end;
 
  i := Length( FTileArrayToPaste ) * Length( FTileArrayToPaste[0] );
@@ -498,41 +540,39 @@ end;
 
 
 // popup insert row
-procedure TWindow_Scene.Menu_InsertRowClick(Sender: TObject);
+procedure TForm_Main.Menu_InsertRowClick(Sender: TObject);
 var it: TPoint;
     t: string;
 begin
+ if TilesetEdit.IsActive then exit;
+
  it := ClientPosToTileIndex( FMousePos );
  Form_InsertLineColumn.Label1.Caption := 'Row to insert :';
  if Form_InsertLineColumn.ShowModal = mrCancel then exit;
- FTileEngine.InsertRow( it.y, Form_InsertLineColumn.SE1.Value );
- // set tileengine view to see whole map
- FTileEngine.SetViewSize( FTileEngine.MapSize.cx, FTileEngine.MapSize.cy );
- // update mini map size
- Form_Principale.PB2SetSizeAndPos;
+
+ MapList.InsertRow( it.y, Form_InsertLineColumn.SE1.Value );
 
  t := 'insert ' + inttostr( Form_InsertLineColumn.SE1.Value ) + ' row';
  if Form_InsertLineColumn.SE1.Value > 1 then t+='s';
  ShowActionText( FMousePos.x, FMousePos.y, t);
 
- Form_Principale.UpdateMapParameterOnScreen;
+ Form_Tools.UpdateMapParameterOnScreen;
 
  SetProjectModified;
 end;
 
 // popup insert columns
-procedure TWindow_Scene.Menu_InsertColumnClick(Sender: TObject);
+procedure TForm_Main.Menu_InsertColumnClick(Sender: TObject);
 var it: TPoint;
   t: string;
 begin
+ if TilesetEdit.IsActive then exit;
+
  it := ClientPosToTileIndex( FMousePos );
  Form_InsertLineColumn.Label1.Caption := 'Column to insert :';
  if Form_InsertLineColumn.ShowModal = mrCancel then exit;
- FTileEngine.InsertColumn( it.x, Form_InsertLineColumn.SE1.Value );
- // set tileengine view to see whole map
- FTileEngine.SetViewSize( FTileEngine.MapSize.cx, FTileEngine.MapSize.cy );
- // update mini map size
- Form_Principale.PB2SetSizeAndPos;
+
+ MapList.InsertColumn( it.x, Form_InsertLineColumn.SE1.Value );
 
  t := 'insert ' + inttostr( Form_InsertLineColumn.SE1.Value ) + ' column';
  if Form_InsertLineColumn.SE1.Value > 1 then t+='s';
@@ -541,18 +581,18 @@ begin
 end;
 
 // menu Start map on this tile
-procedure TWindow_Scene.Menu_StartMapClick(Sender: TObject);
+procedure TForm_Main.Menu_StartMapClick(Sender: TObject);
 var it: TPoint;
 begin
  it := ClientPosToTileIndex( FMousePos );
 
- Form_Principale.Label10.Caption := inttostr( it.x );
- Form_Principale.Label11.Caption := inttostr( it.y );
+ Form_Tools.Label10.Caption := inttostr( it.x );
+ Form_Tools.Label11.Caption := inttostr( it.y );
  ShowActionText( FMousePos.x, FMousePos.y, 'Define start map at this tile');
  SetProjectModified;
 end;
 
-procedure TWindow_Scene.OpenGLControl1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TForm_Main.OpenGLControl1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
  if Button = mbLeft then begin
    FState := sNeutral;
@@ -568,8 +608,8 @@ begin
 
  if ( Button = mbLeft ) and not ( ssShift in Shift ) then begin
    FState := sMoveView;
-   FOriginTileEngine.x := round(FTileEngine.X.Value);
-   FOriginTileEngine.y := round(FTileEngine.Y.Value);
+   FOriginTileEngine.x := round(FWorkingTileEngine.X.Value);
+   FOriginTileEngine.y := round(FWorkingTileEngine.Y.Value);
  end;
 
  if ( Button = mbLeft ) and ( ssCtrl in Shift ) then begin
@@ -577,27 +617,32 @@ begin
  end;
 end;
 
-procedure TWindow_Scene.OpenGLControl1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+procedure TForm_Main.OpenGLControl1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var it: TPoint;
     tc: TSize;
     i: integer;
     p:PTile;
+    s: string;
 begin
  if not FReady then exit;
  // update info on screen
  if XYCoorIsInMap( X, Y ) then begin
 
-  FLabelMapPosition.Caption := 'Map position:  (' + inttostr(round(X-FTileEngine.X.Value)) +
-                               ',' + inttostr(round(Y-FTileEngine.Y.Value)) + ')';
+  FLabelMapPosition.Caption := 'Map position:  (' + inttostr(round(X-FWorkingTileEngine.X.Value)) +
+                               ',' + inttostr(round(Y-FWorkingTileEngine.Y.Value)) + ')';
 
- // it := ClientCoorToColumnRowIndex( Point(X,Y) );
   it := ClientPosToTileIndex( Point(X,Y) );
-p := FTileEngine.GetPTile( it.y, it.x);
-  FLabelTileIndexes.Caption := 'Tile Column: ' + inttostr(it.x+1)+'/'+inttostr(FTileEngine.MapTileCount.cx)+
-                                  '  Row: '+inttostr(it.y+1)+'/'+inttostr(FTileEngine.MapTileCount.cy);
-  i := FTileEngine.GetGroundType( PointF(X,Y) );
+  s := 'Tile Column: ' + inttostr(it.x+1)+'/'+inttostr(FWorkingTileEngine.MapTileCount.cx)+
+       '  Row: '+inttostr(it.y+1)+'/'+inttostr(FWorkingTileEngine.MapTileCount.cy);
+  if TilesetEdit.IsActive
+     then s+='  Tileset: '+inttostr(TilesetEdit.CurrentTilesetIndex)
+     else s+='  Layer: '+MapList.SelectedLayerName;
+  FLabelTileIndexes.Caption := s;
+
+  p := FWorkingTileEngine.GetPTile( it.y, it.x);
+  i := FWorkingTileEngine.GetGroundType( PointF(X,Y) );
   FLabelGroundType.Caption := 'Ground: ' + GroundTypeToString( i )+' ('+inttostr(i)+')';
-  FLabelEventName.Caption:='Event: ' + GetStrEvent( FTileEngine.GetUserEventValue( PointF(X,Y) ))+
+  FLabelEventName.Caption:='Event: ' + GetStrEvent( FWorkingTileEngine.GetUserEventValue( PointF(X,Y) ))+
                            '  ->  '+ inttostr(p^.UserEvent);
 {
  ti := FTileEngine.GetPTileTexInfo( it.y, it.x );
@@ -616,6 +661,8 @@ p := FTileEngine.GetPTile( it.y, it.x);
   FLabelEventName.Caption:='Event:';
  end;
 
+ FLabelEventName.Visible := not TileSetEdit.IsActive;
+
  case FState of
      sSelecting: begin
            if XYCoorIsInMap( X, Y ) then begin
@@ -627,7 +674,10 @@ p := FTileEngine.GetPTile( it.y, it.x);
            end;
      end;
      sMoveView: begin
-          FTileEngine.SetCoordinate( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
+        if TilesetEdit.IsActive
+           then TilesetEdit.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y )
+           else MapList.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
+         // FWorkingTileEngine.SetCoordinate( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
      end;
      sNeutral: begin
           if XYCoorIsInMap( X, Y) then begin
@@ -641,7 +691,7 @@ p := FTileEngine.GetPTile( it.y, it.x);
  end;
 end;
 
-procedure TWindow_Scene.OpenGLControl1MouseUp(Sender: TObject;
+procedure TForm_Main.OpenGLControl1MouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var p: TPoint;
 begin
@@ -669,7 +719,7 @@ end;
 
 
 // click on help button
-procedure TWindow_Scene.SBHelp3Click(Sender: TObject);
+procedure TForm_Main.SBHelp3Click(Sender: TObject);
 begin
  Showmessage('This is the RENDER WINDOW.'+lineending+
              lineending+
@@ -684,6 +734,10 @@ begin
              '             CTRL C -> Copy tile under mouse or in selected area.'+lineending+
              '             CTRL V -> Paste tile(s) copied at mouse position.'+lineending+
              lineending+
+             '        F1 -> Previous layer.'+lineending+
+             '        F2 -> Next layer.'+lineending+
+             '        F6 -> Show/Hide main window.'+lineending+
+             lineending+
              'RIGHT CLIC -> Tile contextual menu'+lineending+
              '  - START GAME ON THIS TILE: when you will load the map in your game application,'+lineending+
              '    the position will be set automatically to draw this tile on top/left view.'+lineending+
@@ -694,14 +748,14 @@ begin
 end;
 
 
-function TWindow_Scene.XYCoorIsInMap(AX, AY: integer): boolean;
+function TForm_Main.XYCoorIsInMap(AX, AY: integer): boolean;
 begin
- with FTileEngine do
+ with FWorkingTileEngine do
  Result := ( AX >= X.Value ) and ( AX < X.Value + Width ) and
            ( AY >= Y.Value ) and ( AY < Y.Value + Height );
 end;
 
-procedure TWindow_Scene.ShowActionText(aX, aY: single; aTxt: string);
+procedure TForm_Main.ShowActionText(aX, aY: single; aTxt: string);
 var o : TFreeText;
   rx, ry, time: single;
 begin
@@ -709,7 +763,7 @@ begin
   o.TexturedFont:=FHintFont;
   o.Caption:=aTxt;
   o.SetCenterCoordinate( aX, aY );
-  FScene.Add( o, Layer_Info );
+  FScene.Add( o, Layer_InfoMap );
   time := 2.0;
   o.Opacity.ChangeTo( 0, time, idcStartSlowEndFast );
   if aX > FScene.Width/2
@@ -722,15 +776,15 @@ begin
   o.KillDefered( time );
 end;
 
-procedure TWindow_Scene.ProcessTileEngineEvent(Sender: TTileEngine;
+procedure TForm_Main.ProcessTileEngineEvent(Sender: TTileEngine;
   const SceneTileCoor: TPointF; Event: integer);
 var o: TFreeText;
     p: TPointF;
 begin
- if not Form_Principale.CheckBox2.Checked or ( Event = -1 ) then exit;
+ if not Form_Tools.CheckBox2.Checked or ( Event = -1 ) then exit;
  o := TFreeText.Create;
  o.TexturedFont:=FEventFont;
- p := SceneTileCoor + PointF( FTileEngine.TileSize.cx*0.5, FTileEngine.TileSize.cy*0.5 );
+ p := SceneTileCoor + PointF( FWorkingTileEngine.TileSize.cx*0.5, FWorkingTileEngine.TileSize.cy*0.5 );
  o.SetCenterCoordinate( p.x, p.y );
  TextureManager.DisableTextureUsage;
  FillBox( o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(1,0,0) );
@@ -738,71 +792,76 @@ begin
  o.Free;
 end;
 
-
-function TWindow_Scene.XCoorToColumnIndex(AX: integer): integer;
+procedure TForm_Main.SetWindowsTitle(const s: string);
 begin
- Result := round(AX-FTileEngine.X.Value) div FTileEngine.TileSize.cx + FTileEngine.GetFirstTileColumnIndex;
+ Caption := 'TILE MAP DESIGNER - ' + s;
+end;
+
+
+function TForm_Main.XCoorToColumnIndex(AX: integer): integer;
+begin
+ Result := round(AX-FWorkingTileEngine.X.Value) div FWorkingTileEngine.TileSize.cx + FWorkingTileEngine.GetFirstTileColumnIndex;
  if Result < 0 then Result := 0;
- if Result > FTileEngine.MapTileCount.cx-1 then Result := FTileEngine.MapTileCount.cx-1;
+ if Result > FWorkingTileEngine.MapTileCount.cx-1 then Result := FWorkingTileEngine.MapTileCount.cx-1;
 end;
 
-function TWindow_Scene.YCoorToRowIndex(AY: integer): integer;
+function TForm_Main.YCoorToRowIndex(AY: integer): integer;
 begin
- Result := round(AY-FTileEngine.Y.Value) div FTileEngine.TileSize.cy + FTileEngine.GetFirstTileRowIndex;
+ Result := round(AY-FWorkingTileEngine.Y.Value) div FWorkingTileEngine.TileSize.cy + FWorkingTileEngine.GetFirstTileRowIndex;
  if Result < 0 then Result := 0;
- if Result > FTileEngine.MapTileCount.cy-1 then Result := FTileEngine.MapTileCount.cy-1;
+ if Result > FWorkingTileEngine.MapTileCount.cy-1 then Result := FWorkingTileEngine.MapTileCount.cy-1;
 end;
 
-function TWindow_Scene.ColumnIndexToXCoord( aColumn: integer ): integer;
+function TForm_Main.ColumnIndexToXCoord( aColumn: integer ): integer;
 begin
- Result := ( aColumn - FTileEngine.GetFirstTileColumnIndex ) * FTileEngine.TileSize.cx + round( FTileEngine.Y.Value );
+ Result := ( aColumn - FWorkingTileEngine.GetFirstTileColumnIndex ) * FWorkingTileEngine.TileSize.cx {%H-}+ round( FWorkingTileEngine.Y.Value );
 end;
 
-function TWindow_Scene.RowIndexToYCoord( aRow: integer ): integer;
+function TForm_Main.RowIndexToYCoord( aRow: integer ): integer;
 begin
- Result := ( aRow - FTileEngine.GetFirstTileRowIndex ) * FTileEngine.TileSize.cy + round( FTileEngine.Y.Value );
+ Result := ( aRow - FWorkingTileEngine.GetFirstTileRowIndex ) * FWorkingTileEngine.TileSize.cy {%H-}+ round( FWorkingTileEngine.Y.Value );
 end;
 
-function TWindow_Scene.ClientCoorToColumnRowIndex(aPoint: TPoint): TPoint;
+function TForm_Main.ClientCoorToColumnRowIndex(aPoint: TPoint): TPoint;
 begin
- Result.x := round( aPoint.x - FTileEngine.X.Value ) div FTileEngine.TileSize.cx + FTileEngine.GetFirstTileColumnIndex;
+ Result.x := round( aPoint.x - FWorkingTileEngine.X.Value ) div FWorkingTileEngine.TileSize.cx + FWorkingTileEngine.GetFirstTileColumnIndex;
  if Result.x < 0 then Result.x := 0;
- if Result.x > FTileEngine.MapTileCount.cx-1 then Result.x := FTileEngine.MapTileCount.cx-1;
+ if Result.x > FWorkingTileEngine.MapTileCount.cx-1 then Result.x := FWorkingTileEngine.MapTileCount.cx-1;
 
- Result.y := round( aPoint.y - FTileEngine.Y.Value ) div FTileEngine.TileSize.cy + FTileEngine.GetFirstTileRowIndex;
+ Result.y := round( aPoint.y - FWorkingTileEngine.Y.Value ) div FWorkingTileEngine.TileSize.cy + FWorkingTileEngine.GetFirstTileRowIndex;
  if Result.y < 0 then Result.y := 0;
- if Result.y > FTileEngine.MapTileCount.cy-1 then Result.y := FTileEngine.MapTileCount.cy-1;
+ if Result.y > FWorkingTileEngine.MapTileCount.cy-1 then Result.y := FWorkingTileEngine.MapTileCount.cy-1;
 end;
 
-function TWindow_Scene.ColumnRowIndexToClientCoor(aTile: TPoint): TPoint;
+function TForm_Main.ColumnRowIndexToClientCoor(aTile: TPoint): TPoint;
 begin
- Result.x := ( aTile.x - FTileEngine.GetFirstTileColumnIndex ) * FTileEngine.TileSize.cx + round( FTileEngine.Y.Value );
- Result.y := ( aTile.y - FTileEngine.GetFirstTileRowIndex ) * FTileEngine.TileSize.cy + round( FTileEngine.Y.Value );
+ Result.x := ( aTile.x - FWorkingTileEngine.GetFirstTileColumnIndex ) * FWorkingTileEngine.TileSize.cx {%H-}+ round( FWorkingTileEngine.Y.Value );
+ Result.y := ( aTile.y - FWorkingTileEngine.GetFirstTileRowIndex ) * FWorkingTileEngine.TileSize.cy {%H-}+ round( FWorkingTileEngine.Y.Value );
 end;
 
-function TWindow_Scene.ClientCoorToTileTopLeftCoor(aP: TPoint): TPoint;
+function TForm_Main.ClientCoorToTileTopLeftCoor(aP: TPoint): TPoint;
 var xx, yy: integer;
 begin
- if ( FTileEngine.TileSize.cx = 0 ) or ( FTileEngine.TileSize.cy = 0 )
+ if ( FWorkingTileEngine.TileSize.cx = 0 ) or ( FWorkingTileEngine.TileSize.cy = 0 )
    then begin
      Result.x := 0;
      Result.y := 0;
    end
    else begin
-     xx := round(FTileEngine.X.Value) mod FTileEngine.TileSize.cx;
-     yy := round(FTileEngine.Y.Value) mod FTileEngine.TileSize.cy;
+     xx := round(FWorkingTileEngine.X.Value) mod FWorkingTileEngine.TileSize.cx;
+     yy := round(FWorkingTileEngine.Y.Value) mod FWorkingTileEngine.TileSize.cy;
 
-     Result.x := (aP.x - xx) div FTileEngine.TileSize.cx * FTileEngine.TileSize.cx + xx;
-     Result.y := (aP.y - yy) div FTileEngine.TileSize.cy * FTileEngine.TileSize.cy + yy;
+     Result.x := (aP.x - xx) div FWorkingTileEngine.TileSize.cx * FWorkingTileEngine.TileSize.cx + xx;
+     Result.y := (aP.y - yy) div FWorkingTileEngine.TileSize.cy * FWorkingTileEngine.TileSize.cy + yy;
    end;
 end;
 
-function TWindow_Scene.SelectionAvailable: boolean;
+function TForm_Main.SelectionAvailable: boolean;
 begin
  Result := FState = sSelectionDone;
 end;
 
-function TWindow_Scene.TileCountInSelection: TSize;
+function TForm_Main.TileCountInSelection: TSize;
 var p1, p2: TPoint;
 begin
  p1 := ClientCoorToColumnRowIndex( FCoorBeginLeftClick );
@@ -812,59 +871,47 @@ begin
  Result.cy := p2.y - p1.y + 1;
 end;
 
-procedure TWindow_Scene.DoPaintMap;
+procedure TForm_Main.DoPaintMap;
 var p1, p2: TPoint;
 begin
- if FTileEngine = NIL then exit;
- if ( FTileEngine.TileSize.cx = 0 ) or ( FTileEngine.TileSize.cy = 0 ) then exit;
+ if MapList.Count = 0 then exit;
+ if ( FWorkingTileEngine.TileSize.cx = 0 ) or ( FWorkingTileEngine.TileSize.cy = 0 ) then exit;
 
  TextureManager.DisableTextureUsage;
  SetBlendMode( FX_BLEND_NORMAL );
 
  if ( FState = sSelecting ) or ( FState = sSelectionDone )
-   then begin
+   then begin  // rectangular selection area
      p1 := ClientCoorToTileTopLeftCoor( FCoorBeginLeftClick );
      p2 := ClientCoorToTileTopLeftCoor( FCoorEndLeftClick );
-     p2.x := p2.x + FTileEngine.TileSize.cx - p1.x;
-     p2.y := p2.y + FTileEngine.TileSize.cy - p1.y;
+     p2.x := p2.x + FWorkingTileEngine.TileSize.cx - p1.x;
+     p2.y := p2.y + FWorkingTileEngine.TileSize.cy - p1.y;
 
-     DrawBox( p1.x, p1.y, p2.x, p2.y, BGRA(255,255,255,190) );
+     DrawBox( p1.x, p1.y, p2.x, p2.y, BGRA(255,255,255,190), 1.5 );
  end
- else begin
-      p1 := Window_Scene.ScreenToClient( Mouse.CursorPos );
+ else begin  // tile under the mouse
+      p1 := Form_Main.ScreenToClient( Mouse.CursorPos );
       if XYCoorIsInMap( p1.x, p1.y )
         then begin
           p1 := ClientCoorToTileTopLeftCoor( p1 );
-          DrawBox( p1.x, p1.y, FTileEngine.TileSize.cx, FTileEngine.TileSize.cy, BGRA(255,0,0) );
+          DrawBox( p1.x, p1.y, FWorkingTileEngine.TileSize.cx, FWorkingTileEngine.TileSize.cy, BGRA(255,0,0), 1.5 );
         end;
  end;
+
+ // draw a box around the map boundary
+ DrawBox( FWorkingTileEngine.X.Value, FWorkingTileEngine.Y.Value,
+          FWorkingTileEngine.Width, FWorkingTileEngine.Height,
+          BGRA(50,50,50), 1);
 end;
 
-procedure TWindow_Scene.LoadCommonRessource;
+procedure TForm_Main.LoadCommonRessource;
 var ima: TBGRABitmap;
 begin
+
  ScreenMap := TScreenMap.Create;
  FScene.LaunchStage( ScreenMap );
 
  TileSetManager := TTilesetManager.Create;
-
- // tile engine for map creation by user
- FTileEngine := TTileEngine.Create;
- FScene.Layer[Layer_WorkMap].AssignTileEngine( FTileEngine, FALSE );
- FTileEngine.TileMapDesignerModeEnable := TRUE;
- FTileEngine.OnTileEvent :=@Window_Scene.ProcessTileEngineEvent;
- FTileEngine.MapHoleColor.Value := ColorToBGRA( Form_Principale.ColorButton1.ButtonColor,
-                                                Form_Principale.SE6.Value );
-
- // tile engine for draw secondary map on top
- FTopOverlayTileEngine := TTileEngine.Create;
- FScene.Layer[Layer_SecondMapTop].AssignTileEngine( FTopOverlayTileEngine, TRUE );
- FTopOverlayTileEngine.TileMapDesignerModeEnable := TRUE;
-
- // tile engine for draw secondary map on background
- FBelowOverlayTileEngine := TTileEngine.Create;
- FScene.Layer[Layer_SecondMapBelow].AssignTileEngine( FBelowOverlayTileEngine, TRUE );
- FBelowOverlayTileEngine.TileMapDesignerModeEnable := TRUE;
 
  // white/gray image for grid
  ima := TBGRABitmap.Create( 8, 8, BGRA(220,220,220));
@@ -873,24 +920,21 @@ begin
  FImageBackGround.PutImage( 0, 8, ima, dmSet, 255 );
  ima.Free;
 
- FTileEngineGrid:= TTileEngine.Create;
- FScene.Layer[Layer_Grid].AssignTileEngine( FTileEngine, FALSE );
 end;
 
-procedure TWindow_Scene.FreeCommonRessource;
+procedure TForm_Main.FreeCommonRessource;
 begin
+ FImageBackGround.Free;
+ MapList.Free;
+ TileSetEdit.Free;
  TileSetManager.Free;
 
- FTileEngine.Free;
-
  ScreenMap.Free;
-
- FImageBackGround.Free;
 
  Application.OnIdle := NIL;
 end;
 
-procedure TWindow_Scene.ProcessApplicationIdle(Sender: TObject;
+procedure TForm_Main.ProcessApplicationIdle(Sender: TObject;
   var Done: Boolean);
 begin
  if FScene <> NIL then FScene.DoLoop;

@@ -1,31 +1,30 @@
-object Form_Principale: TForm_Principale
-  Left = 259
+object Form_Tools: TForm_Tools
+  Left = 347
   Height = 668
-  Top = 50
+  Top = 108
   Width = 377
-  BorderIcons = [biSystemMenu]
-  Caption = 'TILE MAP DESIGNER - '
+  BorderIcons = []
+  BorderStyle = bsToolWindow
+  Caption = 'Tools'
   ClientHeight = 648
   ClientWidth = 377
   Color = 3685953
   DefaultMonitor = dmPrimary
   Font.Color = 8895729
+  FormStyle = fsStayOnTop
   KeyPreview = True
   Menu = MainMenu1
-  OnClose = FormClose
-  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
-  OnMouseLeave = FormMouseLeave
-  OnShow = FormShow
   LCLVersion = '1.8.0.6'
   object PageControl1: TPageControl
     Left = 0
     Height = 648
     Top = 0
     Width = 377
-    ActivePage = pageSetting
+    ActivePage = pageLayer
     Align = alClient
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Tilesets'
@@ -157,28 +156,6 @@ object Form_Principale: TForm_Principale
             ParentColor = False
             ParentFont = False
           end
-          object CheckBox2: TCheckBox
-            Left = 104
-            Height = 19
-            Top = 32
-            Width = 20
-            Checked = True
-            State = cbChecked
-            TabOrder = 4
-          end
-          object Label7: TLabel
-            AnchorSideLeft.Control = CheckBox2
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = CheckBox2
-            Left = 124
-            Height = 15
-            Top = 32
-            Width = 61
-            Caption = 'Show event'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
           object Label4: TLabel
             Left = 224
             Height = 15
@@ -249,11 +226,57 @@ object Form_Principale: TForm_Principale
         end
       end
     end
-    object pageSetting: TTabSheet
-      Caption = 'Setting'
+    object pageMiniMap: TTabSheet
+      Caption = 'Mini Map'
       ClientHeight = 620
       ClientWidth = 369
-      object Panel3: TPanel
+      object Panel2: TPanel
+        Left = 0
+        Height = 202
+        Top = 0
+        Width = 304
+        BevelOuter = bvNone
+        ClientHeight = 202
+        ClientWidth = 304
+        Color = 3289658
+        ParentColor = False
+        TabOrder = 0
+        object PB2: TPaintBox
+          Left = 4
+          Height = 194
+          Top = 4
+          Width = 298
+          OnMouseDown = PB2MouseDown
+          OnMouseMove = PB2MouseMove
+          OnMouseUp = PB2MouseUp
+          OnPaint = PB2Paint
+        end
+      end
+      object SBH: TScrollBar
+        Left = 0
+        Height = 16
+        Top = 204
+        Width = 300
+        PageSize = 0
+        TabOrder = 1
+        OnScroll = SBVScroll
+      end
+      object SBV: TScrollBar
+        Left = 304
+        Height = 213
+        Top = 0
+        Width = 18
+        Kind = sbVertical
+        PageSize = 0
+        TabOrder = 2
+        OnScroll = SBVScroll
+      end
+    end
+    object pageLayer: TTabSheet
+      Caption = 'Layer'
+      ClientHeight = 620
+      ClientWidth = 369
+      object Panel14: TPanel
         Left = 0
         Height = 620
         Top = 0
@@ -262,20 +285,236 @@ object Form_Principale: TForm_Principale
         BevelOuter = bvNone
         ClientHeight = 620
         ClientWidth = 369
-        Color = 5133914
+        Color = 4937317
         ParentColor = False
         TabOrder = 0
+        object Button7: TButton
+          Left = 8
+          Height = 19
+          Hint = 'create a new layer'
+          Top = 200
+          Width = 65
+          Caption = 'Add Layer'
+          OnClick = Button7Click
+          TabOrder = 0
+        end
+        object CLBLayer: TCheckListBox
+          Left = 8
+          Height = 184
+          Hint = 'Visible = Checked'#13#10'Right clic to Lock/Unlock the layer'
+          Top = 8
+          Width = 224
+          Color = 5133914
+          ExtendedSelect = False
+          Font.Color = 8895729
+          Font.Height = -17
+          Font.Style = [fsBold]
+          ItemHeight = 0
+          OnClickCheck = CLBLayerClickCheck
+          OnSelectionChange = CLBLayerSelectionChange
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+        end
+        object Button8: TButton
+          Left = 192
+          Height = 19
+          Hint = 'Delete the selected layer'
+          Top = 200
+          Width = 40
+          Caption = 'Delete'
+          OnClick = Button8Click
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 2
+        end
+        object Arrow1: TArrow
+          Left = 239
+          Height = 27
+          Top = 125
+          Width = 24
+          ArrowColor = 2414956
+          ArrowType = atUp
+          Constraints.MinHeight = 8
+          Constraints.MinWidth = 8
+          OnClick = Arrow1Click
+          ShadowType = stNone
+        end
+        object Arrow2: TArrow
+          Left = 239
+          Height = 27
+          Top = 165
+          Width = 24
+          ArrowColor = 2414956
+          ArrowType = atDown
+          Constraints.MinHeight = 8
+          Constraints.MinWidth = 8
+          OnClick = Arrow2Click
+          ShadowType = stNone
+        end
+        object Button9: TButton
+          Left = 239
+          Height = 32
+          Top = 16
+          Width = 88
+          Caption = 'Load session'
+          OnClick = Button9Click
+          TabOrder = 3
+        end
+        object Button10: TButton
+          Left = 239
+          Height = 32
+          Top = 56
+          Width = 88
+          Caption = 'Save session'
+          OnClick = Button10Click
+          TabOrder = 4
+        end
+        object Panel7: TPanel
+          Left = 8
+          Height = 60
+          Top = 232
+          Width = 243
+          BevelOuter = bvNone
+          ClientHeight = 60
+          ClientWidth = 243
+          Color = 9210954
+          ParentColor = False
+          TabOrder = 5
+          object Shape1: TShape
+            AnchorSideLeft.Control = Label15
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideTop.Control = Label15
+            AnchorSideTop.Side = asrCenter
+            AnchorSideBottom.Control = Label15
+            AnchorSideBottom.Side = asrBottom
+            Left = 94
+            Height = 37
+            Top = 18
+            Width = 84
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 3
+            Brush.Color = 9408399
+            Brush.Style = bsCross
+            Pen.Color = 9408399
+          end
+          object Label15: TLabel
+            Left = 0
+            Height = 15
+            Top = 40
+            Width = 91
+            Alignment = taRightJustify
+            AutoSize = False
+            Caption = 'Row : 0 tiles'
+            Font.Color = clWhite
+            ParentColor = False
+            ParentFont = False
+          end
+          object Label5: TLabel
+            AnchorSideLeft.Control = Shape1
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideBottom.Control = Shape1
+            Left = 84
+            Height = 15
+            Top = 3
+            Width = 105
+            Alignment = taCenter
+            Anchors = [akLeft, akBottom]
+            AutoSize = False
+            Caption = 'Column : 0 tiles'
+            Font.Color = clWhite
+            ParentColor = False
+            ParentFont = False
+          end
+          object Button4: TButton
+            Left = 184
+            Height = 20
+            Top = 35
+            Width = 48
+            Caption = 'Set size'
+            OnClick = Button4Click
+            TabOrder = 0
+          end
+          object Label40: TLabel
+            Left = 8
+            Height = 15
+            Top = 1
+            Width = 46
+            Caption = 'Map size'
+            Font.Color = 10671092
+            Font.Style = [fsItalic]
+            ParentColor = False
+            ParentFont = False
+          end
+        end
+        object Panel8: TPanel
+          Left = 256
+          Height = 116
+          Top = 232
+          Width = 64
+          BevelOuter = bvNone
+          ClientHeight = 116
+          ClientWidth = 64
+          Color = 7290425
+          ParentColor = False
+          TabOrder = 6
+          object Label41: TLabel
+            Left = 7
+            Height = 15
+            Top = 4
+            Width = 52
+            Caption = 'Hole color'
+            Font.Color = 10671092
+            Font.Style = [fsItalic]
+            ParentColor = False
+            ParentFont = False
+          end
+          object ColorButton1: TColorButton
+            Left = 7
+            Height = 27
+            Top = 21
+            Width = 53
+            BorderWidth = 2
+            ButtonColorSize = 16
+            ButtonColor = 3231082
+            OnColorChanged = ColorButton1ColorChanged
+          end
+          object Label42: TLabel
+            Left = 14
+            Height = 15
+            Top = 53
+            Width = 39
+            Caption = 'opacity'
+            Font.Color = 10671092
+            Font.Style = [fsItalic]
+            ParentColor = False
+            ParentFont = False
+          end
+          object SE6: TSpinEdit
+            Left = 9
+            Height = 23
+            Top = 69
+            Width = 48
+            Font.Style = [fsBold]
+            MaxValue = 255
+            OnChange = SE6Change
+            ParentFont = False
+            TabOrder = 0
+            Value = 255
+          end
+        end
         object Panel6: TPanel
           Left = 8
           Height = 53
-          Top = 72
-          Width = 239
+          Top = 296
+          Width = 243
           BevelOuter = bvNone
           ClientHeight = 53
-          ClientWidth = 239
+          ClientWidth = 243
           Color = 3829058
           ParentColor = False
-          TabOrder = 0
+          TabOrder = 7
           object CB4: TComboBox
             AnchorSideLeft.Control = SE4
             AnchorSideLeft.Side = asrBottom
@@ -395,150 +634,17 @@ object Form_Principale: TForm_Principale
             ParentFont = False
           end
         end
-        object Panel7: TPanel
-          Left = 8
-          Height = 60
-          Top = 8
-          Width = 239
-          BevelOuter = bvNone
-          ClientHeight = 60
-          ClientWidth = 239
-          Color = 9210954
-          ParentColor = False
-          TabOrder = 1
-          object Shape1: TShape
-            AnchorSideLeft.Control = Label15
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = Label15
-            AnchorSideTop.Side = asrCenter
-            AnchorSideBottom.Control = Label15
-            AnchorSideBottom.Side = asrBottom
-            Left = 94
-            Height = 37
-            Top = 18
-            Width = 84
-            Anchors = [akLeft, akBottom]
-            BorderSpacing.Left = 3
-            Brush.Color = 9408399
-            Brush.Style = bsCross
-            Pen.Color = 9408399
-          end
-          object Label15: TLabel
-            Left = 0
-            Height = 15
-            Top = 40
-            Width = 91
-            Alignment = taRightJustify
-            AutoSize = False
-            Caption = 'Row : 0 tiles'
-            Font.Color = clWhite
-            ParentColor = False
-            ParentFont = False
-          end
-          object Label5: TLabel
-            AnchorSideLeft.Control = Shape1
-            AnchorSideLeft.Side = asrCenter
-            AnchorSideBottom.Control = Shape1
-            Left = 84
-            Height = 15
-            Top = 3
-            Width = 105
-            Alignment = taCenter
-            Anchors = [akLeft, akBottom]
-            AutoSize = False
-            Caption = 'Column : 0 tiles'
-            Font.Color = clWhite
-            ParentColor = False
-            ParentFont = False
-          end
-          object Button4: TButton
-            Left = 184
-            Height = 20
-            Top = 35
-            Width = 48
-            Caption = 'Set size'
-            OnClick = Button4Click
-            TabOrder = 0
-          end
-          object Label40: TLabel
-            Left = 8
-            Height = 15
-            Top = 1
-            Width = 46
-            Caption = 'Map size'
-            Font.Color = 10671092
-            Font.Style = [fsItalic]
-            ParentColor = False
-            ParentFont = False
-          end
-        end
-        object Panel8: TPanel
-          Left = 256
-          Height = 99
-          Top = 26
-          Width = 64
-          BevelOuter = bvNone
-          ClientHeight = 99
-          ClientWidth = 64
-          Color = 7290425
-          ParentColor = False
-          TabOrder = 2
-          object Label41: TLabel
-            Left = 7
-            Height = 15
-            Top = 4
-            Width = 52
-            Caption = 'Hole color'
-            Font.Color = 10671092
-            Font.Style = [fsItalic]
-            ParentColor = False
-            ParentFont = False
-          end
-          object ColorButton1: TColorButton
-            Left = 7
-            Height = 27
-            Top = 21
-            Width = 53
-            BorderWidth = 2
-            ButtonColorSize = 16
-            ButtonColor = 3231082
-            OnColorChanged = ColorButton1ColorChanged
-          end
-          object Label42: TLabel
-            Left = 14
-            Height = 15
-            Top = 53
-            Width = 39
-            Caption = 'opacity'
-            Font.Color = 10671092
-            Font.Style = [fsItalic]
-            ParentColor = False
-            ParentFont = False
-          end
-          object SE6: TSpinEdit
-            Left = 9
-            Height = 23
-            Top = 69
-            Width = 48
-            Font.Style = [fsBold]
-            MaxValue = 255
-            OnChange = SE6Change
-            ParentFont = False
-            TabOrder = 0
-            Value = 255
-          end
-        end
         object Panel10: TPanel
           Left = 8
           Height = 40
-          Top = 130
+          Top = 352
           Width = 312
           BevelOuter = bvNone
           ClientHeight = 40
           ClientWidth = 312
           Color = 6440540
           ParentColor = False
-          TabOrder = 3
+          TabOrder = 8
           object Label11: TLabel
             AnchorSideLeft.Control = Label10
             AnchorSideLeft.Side = asrBottom
@@ -622,14 +728,14 @@ object Form_Principale: TForm_Principale
         object Panel11: TPanel
           Left = 8
           Height = 41
-          Top = 174
+          Top = 408
           Width = 312
           BevelOuter = bvNone
           ClientHeight = 41
           ClientWidth = 312
           Color = 4154217
           ParentColor = False
-          TabOrder = 4
+          TabOrder = 9
           object Label17: TLabel
             AnchorSideLeft.Control = CB3
             AnchorSideTop.Control = CB3
@@ -770,67 +876,31 @@ object Form_Principale: TForm_Principale
             ParentFont = False
           end
         end
-        object SBHelp1: TSpeedButton
-          Cursor = crHandPoint
-          Left = 304
+        object CheckBox3: TCheckBox
+          Left = 274
           Height = 19
-          Hint = 'Help'
-          Top = 0
-          Width = 19
-          Color = 4091197
-          Flat = True
-          Glyph.Data = {
-            36040000424D3604000000000000360000002800000010000000100000000100
-            2000000000000004000064000000640000000000000000000000FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00AD744423AC72417DAA703FDBA86D3CF3A76B3AF3A569
-            37DBA468357DA3663323FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00B57E5153B37C4EE6D7BBA3FFE9DACAFFECE0D1FFECE0D1FFE8D8
-            C8FFD3B59CFFA76C3AE6A66A3853FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00BD895F53BB875BF4E7D5C4FFE5D2BFFFC9A685FFB88E67FFB68A65FFC5A1
-            80FFE0CCBAFFE3D0BEFFAB7040F4A96E3D53FFFFFF00FFFFFF00FFFFFF00C695
-            6D22C3926AE5EAD8C9FFE3CDBAFFC0946BFFBA8C62FFCFB094FFCFB094FFB789
-            5FFFB28761FFDAC0AAFFE4D1C0FFAE7546E5AD734322FFFFFF00FFFFFF00CC9E
-            787EE4CCB9FFEAD6C5FFC79971FFBF9066FFBF9066FFF7F1ECFFF6F0EAFFB789
-            5FFFB7895FFFB58963FFE2CEBBFFD9BDA6FFB27B4D7EFFFFFF00FFFFFF00D3A7
-            84DBEFE1D3FFD9B595FFC7986CFFC39569FFC19367FFBF9066FFBF9066FFBB8B
-            63FFB98A63FFB88A62FFCBA786FFEADCCCFFB88357DBFFFFFF00FFFFFF00D9B0
-            8FF6F2E4D9FFD1A57AFFC5996BFFC4976AFFC49669FFFAF6F2FFF3EAE1FFC295
-            6DFFBE8F65FFBE8F64FFC0956DFFEFE3D5FFBF8C61F6FFFFFF00FFFFFF00E0B9
-            99F6F2E5DAFFD1A67EFFCC9D71FFC79A6CFFC5986BFFE2CCB6FFF8F3EEFFF6EE
-            E8FFD9BDA1FFC29468FFC59B71FFF0E2D6FFC5956CF6FFFFFF00FFFFFF00E6C1
-            A3DBF3E5D9FFDFBB9EFFCFA075FFCD9E72FFF5EBE3FFE4CBB4FFE7D3BFFFFBF8
-            F6FFE5D3BFFFC4986BFFD6B491FFEEE0D2FFCC9E78DBFFFFFF00FFFFFF00EBC9
-            AD7EF4E3D4FFEFDCCDFFD5A87EFFD0A077FFFBF8F5FFFCF8F5FFFCF8F5FFFBF8
-            F5FFD1A881FFCFA47BFFEAD5C3FFEAD4C2FFD2A7837EFFFFFF00FFFFFF00F1D0
-            B522EFCEB3E5F6E9DDFFECD8C6FFD7AC81FFDCBB9AFFF6ECE3FFF5ECE2FFE4C8
-            AEFFD2A77BFFE6CEBAFFF1E2D5FFDBB391E5D9B08E22FFFFFF00FFFFFF00FFFF
-            FF00F4D4BB53F2D2B8F4F7EADFFFEEDED0FFE3C1A7FFD8AE89FFD7AC86FFDDBB
-            9CFFEBD6C7FFF3E6D9FFE3BE9FF4E1BB9C53FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00F6D8BF53F5D6BDE6F9E9DCFFF6E8DDFFF3E5DAFFF3E5DAFFF5E7
-            DCFFF5E4D6FFEBC8ACE6E9C6A953FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00F9DBC423F8DAC27DF7D8C0DBF6D7BEF3F4D5BCF3F3D3
-            B9DBF1D1B77DF0CFB423FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-            FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
-          }
-          Layout = blGlyphRight
-          OnClick = SBHelp1Click
-          ShowHint = True
-          ParentShowHint = False
+          Top = 104
+          Width = 80
+          Caption = 'Align maps'
+          Checked = True
+          Color = 11581892
+          Font.Color = clBlack
+          ParentColor = False
+          ParentFont = False
+          State = cbChecked
+          TabOrder = 10
         end
         object Panel1: TPanel
           Left = 18
           Height = 130
-          Top = 263
+          Top = 480
           Width = 322
           BevelOuter = bvNone
           ClientHeight = 130
           ClientWidth = 322
           Color = 3299433
           ParentColor = False
-          TabOrder = 5
+          TabOrder = 11
           object Label46: TLabel
             Left = 16
             Height = 15
@@ -916,484 +986,24 @@ object Form_Principale: TForm_Principale
             TabOrder = 3
           end
         end
-      end
-    end
-    object pageMiniMap: TTabSheet
-      Caption = 'Mini Map'
-      ClientHeight = 620
-      ClientWidth = 369
-      object Panel2: TPanel
-        Left = 0
-        Height = 202
-        Top = 0
-        Width = 304
-        BevelOuter = bvNone
-        ClientHeight = 202
-        ClientWidth = 304
-        Color = 3289658
-        ParentColor = False
-        TabOrder = 0
-        object PB2: TPaintBox
-          Left = 4
-          Height = 194
-          Top = 4
-          Width = 298
-          OnMouseDown = PB2MouseDown
-          OnMouseMove = PB2MouseMove
-          OnMouseUp = PB2MouseUp
-          OnPaint = PB2Paint
-        end
-      end
-      object SBH: TScrollBar
-        Left = 0
-        Height = 16
-        Top = 204
-        Width = 300
-        PageSize = 0
-        TabOrder = 1
-        OnScroll = SBVScroll
-      end
-      object SBV: TScrollBar
-        Left = 304
-        Height = 213
-        Top = 0
-        Width = 18
-        Kind = sbVertical
-        PageSize = 0
-        TabOrder = 2
-        OnScroll = SBVScroll
-      end
-    end
-    object pageOverlaying: TTabSheet
-      Caption = 'Second map'
-      ClientHeight = 620
-      ClientWidth = 369
-      object Panel4: TPanel
-        Left = 0
-        Height = 620
-        Top = 0
-        Width = 369
-        Align = alClient
-        BevelOuter = bvNone
-        ClientHeight = 620
-        ClientWidth = 369
-        Color = 4937317
-        ParentColor = False
-        TabOrder = 0
-        object CB7: TCheckBox
-          Left = 24
+        object Button11: TButton
+          Left = 104
           Height = 19
-          Top = 8
-          Width = 20
-          OnChange = CB7Change
-          TabOrder = 0
+          Hint = 'Delete the selected layer'
+          Top = 200
+          Width = 56
+          Caption = 'Rename'
+          OnClick = Button11Click
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 12
         end
-        object Label26: TLabel
-          AnchorSideLeft.Control = CB7
-          AnchorSideTop.Control = CB7
-          Left = 45
-          Height = 15
-          Top = 10
-          Width = 134
-          BorderSpacing.Left = 21
-          BorderSpacing.Top = 2
-          Caption = 'Enable second tile engine'
-          Font.Color = 8895729
-          ParentColor = False
-          ParentFont = False
-        end
-        object Panel5: TPanel
-          Left = 8
-          Height = 184
-          Top = 32
-          Width = 312
-          ClientHeight = 184
-          ClientWidth = 312
-          Color = 3164233
-          Enabled = False
-          ParentColor = False
-          TabOrder = 1
-          object SE1: TSpinEdit
-            AnchorSideLeft.Control = Label29
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = Label29
-            AnchorSideBottom.Control = Label29
-            AnchorSideBottom.Side = asrBottom
-            Left = 186
-            Height = 23
-            Top = 144
-            Width = 62
-            Anchors = [akLeft, akBottom]
-            BorderSpacing.Left = 9
-            Font.Color = clBlack
-            MaxValue = 255
-            OnChange = SE1Change
-            ParentFont = False
-            TabOrder = 0
-            Value = 255
-          end
-          object Label29: TLabel
-            Left = 136
-            Height = 15
-            Top = 152
-            Width = 41
-            Caption = 'Opacity'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object Label28: TLabel
-            AnchorSideLeft.Control = RB2
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = RB2
-            Left = 241
-            Height = 15
-            Top = 24
-            Width = 63
-            Caption = 'Put on back'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object RB2: TRadioButton
-            Left = 221
-            Height = 19
-            Top = 24
-            Width = 20
-            TabOrder = 1
-          end
-          object Label27: TLabel
-            AnchorSideLeft.Control = RB1
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = RB1
-            Left = 241
-            Height = 15
-            Top = 4
-            Width = 56
-            Caption = 'Put on top'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object RB1: TRadioButton
-            Left = 221
-            Height = 19
-            Top = 4
-            Width = 20
-            Checked = True
-            OnChange = RB1Change
-            TabOrder = 2
-            TabStop = True
-          end
-          object Label30: TLabel
-            Left = 8
-            Height = 15
-            Top = 120
-            Width = 80
-            Caption = 'Scrolling speed'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object SE2: TSpinEdit
-            AnchorSideLeft.Control = Label32
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideBottom.Control = Label32
-            AnchorSideBottom.Side = asrBottom
-            Left = 27
-            Height = 23
-            Top = 136
-            Width = 64
-            Anchors = [akLeft, akBottom]
-            BorderSpacing.Left = 9
-            Font.Color = clBlack
-            MaxValue = 10000
-            MinValue = -10000
-            OnChange = SE1Change
-            ParentFont = False
-            TabOrder = 3
-          end
-          object Label31: TLabel
-            Left = 8
-            Height = 15
-            Top = 168
-            Width = 10
-            Caption = 'Y:'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object SE5: TSpinEdit
-            AnchorSideLeft.Control = Label31
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideBottom.Control = Label31
-            AnchorSideBottom.Side = asrBottom
-            Left = 27
-            Height = 23
-            Top = 160
-            Width = 64
-            Anchors = [akLeft, akBottom]
-            BorderSpacing.Left = 9
-            Font.Color = clBlack
-            MaxValue = 10000
-            MinValue = -10000
-            OnChange = SE1Change
-            ParentFont = False
-            TabOrder = 4
-          end
-          object Label32: TLabel
-            Left = 8
-            Height = 15
-            Top = 144
-            Width = 10
-            Caption = 'X:'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object Label33: TLabel
-            Left = 167
-            Height = 15
-            Top = 56
-            Width = 116
-            Caption = 'Horizontal scrolling ↔'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object Label34: TLabel
-            Left = 176
-            Height = 15
-            Top = 96
-            Width = 95
-            Caption = 'Vertical scrolling ↕'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object CB8: TCheckBox
-            AnchorSideLeft.Control = Label33
-            AnchorSideTop.Control = Label33
-            AnchorSideTop.Side = asrBottom
-            Left = 167
-            Height = 19
-            Top = 71
-            Width = 20
-            Checked = True
-            OnChange = SE1Change
-            State = cbChecked
-            TabOrder = 5
-          end
-          object Label35: TLabel
-            AnchorSideLeft.Control = CB8
-            AnchorSideTop.Control = CB8
-            Left = 188
-            Height = 15
-            Top = 73
-            Width = 35
-            BorderSpacing.Left = 21
-            BorderSpacing.Top = 2
-            Caption = 'Enable'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object CB9: TCheckBox
-            AnchorSideTop.Control = Label34
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Label34
-            AnchorSideRight.Side = asrBottom
-            Left = 167
-            Height = 19
-            Top = 111
-            Width = 20
-            Anchors = [akTop, akRight]
-            BorderSpacing.Right = 84
-            Checked = True
-            OnChange = SE1Change
-            State = cbChecked
-            TabOrder = 6
-          end
-          object Label36: TLabel
-            AnchorSideLeft.Control = CB9
-            AnchorSideTop.Control = CB9
-            Left = 188
-            Height = 15
-            Top = 113
-            Width = 35
-            BorderSpacing.Left = 21
-            BorderSpacing.Top = 2
-            Caption = 'Enable'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object CB10: TCheckBox
-            AnchorSideLeft.Control = Label35
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = Label33
-            AnchorSideTop.Side = asrBottom
-            Left = 236
-            Height = 19
-            Top = 71
-            Width = 20
-            BorderSpacing.Left = 13
-            Checked = True
-            OnChange = SE1Change
-            State = cbChecked
-            TabOrder = 7
-          end
-          object Label37: TLabel
-            AnchorSideLeft.Control = CB10
-            AnchorSideTop.Control = CB10
-            Left = 257
-            Height = 15
-            Top = 73
-            Width = 27
-            BorderSpacing.Left = 21
-            BorderSpacing.Top = 2
-            Caption = 'Loop'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object CB11: TCheckBox
-            AnchorSideLeft.Control = Label36
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = Label34
-            AnchorSideTop.Side = asrBottom
-            Left = 234
-            Height = 19
-            Top = 111
-            Width = 20
-            BorderSpacing.Left = 11
-            Checked = True
-            OnChange = SE1Change
-            State = cbChecked
-            TabOrder = 8
-          end
-          object Label38: TLabel
-            AnchorSideLeft.Control = CB11
-            AnchorSideTop.Control = CB11
-            Left = 255
-            Height = 15
-            Top = 113
-            Width = 27
-            BorderSpacing.Left = 21
-            BorderSpacing.Top = 2
-            Caption = 'Loop'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object CB12: TCheckBox
-            Left = 20
-            Height = 19
-            Top = 12
-            Width = 20
-            Checked = True
-            State = cbChecked
-            TabOrder = 9
-          end
-          object Label39: TLabel
-            AnchorSideLeft.Control = CB12
-            AnchorSideLeft.Side = asrBottom
-            AnchorSideTop.Control = CB12
-            Left = 40
-            Height = 15
-            Top = 12
-            Width = 149
-            Caption = 'Align on working tile engine'
-            Font.Color = 8895729
-            ParentColor = False
-            ParentFont = False
-          end
-          object Panel9: TPanel
-            Left = 8
-            Height = 60
-            Top = 40
-            Width = 144
-            BevelOuter = bvNone
-            ClientHeight = 60
-            ClientWidth = 144
-            Color = 6513477
-            ParentColor = False
-            TabOrder = 10
-            object Shape2: TShape
-              AnchorSideLeft.Control = Label43
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label43
-              AnchorSideTop.Side = asrCenter
-              AnchorSideBottom.Control = Label43
-              AnchorSideBottom.Side = asrBottom
-              Left = 70
-              Height = 37
-              Top = 18
-              Width = 50
-              Anchors = [akLeft, akBottom]
-              BorderSpacing.Left = 3
-              Brush.Color = 9408399
-              Brush.Style = bsCross
-              Pen.Color = 9408399
-            end
-            object Label43: TLabel
-              Left = 0
-              Height = 15
-              Top = 40
-              Width = 67
-              Alignment = taRightJustify
-              AutoSize = False
-              Caption = 'Row : 0 tiles'
-              Font.Color = clWhite
-              Font.Height = 12
-              ParentColor = False
-              ParentFont = False
-            end
-            object Label44: TLabel
-              AnchorSideLeft.Control = Shape2
-              AnchorSideLeft.Side = asrCenter
-              AnchorSideBottom.Control = Shape2
-              Left = 53
-              Height = 15
-              Top = 3
-              Width = 85
-              Alignment = taCenter
-              Anchors = [akLeft, akBottom]
-              AutoSize = False
-              Caption = 'Column : 0 tiles'
-              Font.Color = clWhite
-              Font.Height = 12
-              ParentColor = False
-              ParentFont = False
-            end
-            object Label45: TLabel
-              Left = 3
-              Height = 15
-              Top = 1
-              Width = 46
-              Caption = 'Map size'
-              Font.Color = 10671092
-              Font.Style = [fsItalic]
-              ParentColor = False
-              ParentFont = False
-            end
-          end
-        end
-        object Button3: TButton
-          Left = 192
-          Height = 19
-          Top = 8
-          Width = 88
-          Caption = 'load map'
-          OnClick = Button3Click
-          TabOrder = 2
-        end
-        object SBHelp3: TSpeedButton
+        object SBHelp1: TSpeedButton
           Cursor = crHandPoint
-          Left = 302
+          Left = 344
           Height = 19
           Hint = 'Help'
-          Top = 4
+          Top = 0
           Width = 19
           Color = 4091197
           Flat = True
@@ -1434,9 +1044,23 @@ object Form_Principale: TForm_Principale
             FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00
           }
           Layout = blGlyphRight
-          OnClick = SBHelp3Click
+          OnClick = SBHelp1Click
           ShowHint = True
           ParentShowHint = False
+        end
+        object CheckBox2: TCheckBox
+          Left = 274
+          Height = 19
+          Top = 192
+          Width = 86
+          Caption = 'Show Events'
+          Checked = True
+          Color = 11581892
+          Font.Color = clBlack
+          ParentColor = False
+          ParentFont = False
+          State = cbChecked
+          TabOrder = 13
         end
       end
     end
@@ -1444,26 +1068,8 @@ object Form_Principale: TForm_Principale
   object MainMenu1: TMainMenu
     left = 40
     top = 488
-    object MenuItem1: TMenuItem
-      Caption = 'File'
-      object MenuItem3: TMenuItem
-        Caption = 'Open'
-        OnClick = MenuItem3Click
-      end
-      object MenuItem4: TMenuItem
-        Caption = 'Save'
-        OnClick = MenuItem4Click
-      end
-      object MenuItem6: TMenuItem
-        Caption = '-'
-      end
-      object MenuItem7: TMenuItem
-        Caption = 'Quit'
-        OnClick = MenuItem7Click
-      end
-    end
     object MenuItem10: TMenuItem
-      Caption = 'Setting'
+      Caption = 'Tools'
       object Menu_ClearAllMap: TMenuItem
         Caption = 'Clear all'
         OnClick = Menu_ClearAllMapClick
@@ -1510,5 +1116,20 @@ object Form_Principale: TForm_Principale
       Caption = 'Copy ground types to CLIPBOARD'
       OnClick = Menu_ExportGroundTypeClick
     end
+  end
+  object OD3: TOpenDialog
+    Title = 'Open Session file'
+    Filter = 'Map session files|*.mapsession|All files|*.*'
+    FilterIndex = 0
+    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    left = 328
+    top = 504
+  end
+  object SD2: TSaveDialog
+    Title = 'Save map'
+    Filter = 'Map session files|*.mapsession|All files|*.*'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    left = 328
+    top = 568
   end
 end

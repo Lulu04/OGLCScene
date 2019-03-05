@@ -1,19 +1,22 @@
-object Window_Scene: TWindow_Scene
-  Left = 711
+object Form_Main: TForm_Main
+  Left = 433
   Height = 680
-  Top = 25
+  Top = 65
   Width = 670
-  BorderIcons = []
-  BorderStyle = bsNone
-  Caption = 'Scene windows'
+  Caption = 'Tile Map Designer'
   ClientHeight = 680
   ClientWidth = 670
   Color = clBlack
+  KeyPreview = True
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnMouseEnter = FormMouseEnter
+  OnShow = FormShow
   LCLVersion = '1.8.0.6'
+  WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 0
     Height = 680

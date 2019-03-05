@@ -1,0 +1,52 @@
+object Form_RenameMap: TForm_RenameMap
+  Left = 322
+  Height = 152
+  Top = 160
+  Width = 320
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'Rename the current map'
+  ClientHeight = 152
+  ClientWidth = 320
+  Color = 5804495
+  Position = poMainFormCenter
+  LCLVersion = '1.8.0.6'
+  object BitBtn1: TBitBtn
+    Left = 64
+    Height = 23
+    Top = 112
+    Width = 80
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 173
+    Height = 23
+    Top = 112
+    Width = 78
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 32
+    Height = 15
+    Top = 34
+    Width = 108
+    Caption = 'Enter the new name:'
+    ParentColor = False
+  end
+  object Edit1: TEdit
+    Left = 32
+    Height = 23
+    Top = 60
+    Width = 258
+    TabOrder = 2
+    Text = 'Edit1'
+  end
+end

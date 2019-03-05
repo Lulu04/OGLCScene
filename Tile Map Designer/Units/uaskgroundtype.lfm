@@ -9,7 +9,7 @@ object Form_AskGroundType: TForm_AskGroundType
   ClientHeight = 232
   ClientWidth = 458
   Color = 5804495
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.0.6'
   object Button1: TButton
     Left = 216
     Height = 25

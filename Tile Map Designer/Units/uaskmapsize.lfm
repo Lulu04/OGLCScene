@@ -10,7 +10,7 @@ object Form_AskMapSize: TForm_AskMapSize
   ClientWidth = 225
   Color = 9551084
   OnShow = FormShow
-  LCLVersion = '1.6.4.0'
+  LCLVersion = '1.8.0.6'
   object Label1: TLabel
     Left = 16
     Height = 15

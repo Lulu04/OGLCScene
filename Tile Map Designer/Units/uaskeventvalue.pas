@@ -34,7 +34,7 @@ type
     procedure Button4Click(Sender: TObject);
     procedure SBHelp1Click(Sender: TObject);
   private
-    function NameAlreadyExist( aName: string ): boolean;
+    function NameAlreadyExist: boolean;
   public
     { public declarations }
   end;
@@ -45,7 +45,8 @@ var
   Form_AskEvent: TForm_AskEvent;
 
 implementation
-uses common;
+uses common,
+  umaps;
 
 function GetStrEvent(AIndex: integer): string;
 begin
@@ -66,13 +67,13 @@ begin
  if LB.GetSelectedText='None' then exit; // avoid to delete first event (none)
 
  // delete this selected event on the map
- for ro:=0 to FTileEngine.MapTileCount.cy-1 do
-   for co:=0 to FTileEngine.MapTileCount.cx-1 do begin
-     eve := FTileEngine.GetPTile( ro, co )^.UserEvent ;
+ for ro:=0 to MapList.MainMap.TileEngine.MapTileCount.cy-1 do
+   for co:=0 to MapList.MainMap.TileEngine.MapTileCount.cx-1 do begin
+     eve := MapList.MainMap.TileEngine.GetPTile( ro, co )^.UserEvent ;
      if eve = LB.ItemIndex
-       then FTileEngine.GetPTile( ro, co )^.UserEvent := -1
+       then MapList.MainMap.TileEngine.GetPTile( ro, co )^.UserEvent := -1
        else if eve > LB.ItemIndex
-              then FTileEngine.GetPTile( ro, co )^.UserEvent := FTileEngine.GetPTile( ro, co )^.UserEvent-1;
+              then MapList.MainMap.TileEngine.GetPTile( ro, co )^.UserEvent := MapList.MainMap.TileEngine.GetPTile( ro, co )^.UserEvent-1;
    end;
 
  LB.Items.Delete( LB.ItemIndex );
@@ -111,7 +112,7 @@ begin
  E1.Text := DelSpace( E1.Text );
  if E1.Text = '' then exit;
 
- if NameAlreadyExist( E1.Text ) then exit;
+ if NameAlreadyExist then exit;
  LB.Items.Strings[LB.ItemIndex] := E1.Text;
 
  SetProjectModified;
@@ -138,7 +139,7 @@ begin
              'or in the whole selected area on render window.' );
 end;
 
-function TForm_AskEvent.NameAlreadyExist( aName: string ): boolean;
+function TForm_AskEvent.NameAlreadyExist: boolean;
 var i: integer;
 begin
  Result := FALSE;
@@ -159,7 +160,7 @@ begin
  E1.Text := DelSpace( E1.Text );
  if E1.Text = '' then exit;
 
- if NameAlreadyExist( E1.Text ) then exit;
+ if NameAlreadyExist then exit;
 
  LB.Items.Add( E1.Text );
  LB.ItemIndex := LB.Count -1;

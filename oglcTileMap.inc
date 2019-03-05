@@ -56,7 +56,6 @@ private
  function GetMapSize: TSize;
  procedure EnsurePositionInMap( var APos: TPointF );
  procedure ComputeIndexes( APosition: TPointF );
- procedure SetTileSize( AHSize, AVSize: integer );
  function IsValidRow( ARow: integer ): boolean; inline;
  function IsValidColumn( AColumn: integer ): boolean; inline;
  function IsValidTextureIndex( AITex: integer ): boolean;
@@ -72,11 +71,13 @@ public
 public
  // methods to construct map. Used by 'Tile Map Designer' utility
  TileMapDesignerModeEnable: boolean;
+ procedure SetTileSize( AHSize, AVSize: integer );
  function GetFirstTileColumnIndex: integer;
  function GetFirstTileRowIndex: integer;
  function AddTexture( AFilename: string; AFrameWidth, AFrameHeight: integer ): integer; // return index of created texture
  procedure DeleteTexture( AIndex: integer );
  function GetPTextureList: PArrayOfTileTexInfo;
+ procedure SetTextureListFromAnotherTileEngine( aTileEngine: TTileEngine);
  function GetTexture( AIndex: integer ): PTexture;
  function GetTextureCount: integer;
  procedure SetMapTileCount( ARowCount, AColumnCount: integer );
@@ -114,9 +115,12 @@ public
  function GetBoundedPositionOnMap: TPointF;
 
  // load map previously created with 'Tile Map Designer' tool
- // aTextureList is a pointer to the texture list of another TileEngine. Use it if several maps have the same tileset
- // eg: TileEngineTWO.LoadFromFile('filemap.map', @TileEngineONE.GetPTextureList);
- procedure LoadMapFile( const aFilename : string; aTextureList: PArrayOfTileTexInfo=NIL );
+ // aTileEngineToCopy is an existing TileEngine wich have already all the tilesets loading in.
+ // Use it if several maps have the same tileset than another
+ // example:
+ //     TileEngineONE.LoadFromFile('filemapONE.map');
+ //     TileEngineTWO.LoadFromFile('filemapTWO.map', TileEngineONE);
+ procedure LoadMapFile( const aFilename: string; aTileEngineToCopy: TTileEngine=NIL );
 
  // Give the type of the tile pointed by specified position on the scene (and not on map). Can be out of the view, but still on map
  function GetGroundType( aSceneCoor: TPointF ): integer; overload;
@@ -145,6 +149,7 @@ public
  property OnTileEvent: TTileEvent read FOnTileEvent write FOnTileEvent;
 
  property TextureList: TArrayOfTileTexInfo read GetTextureList;
+ property TexturesOwner: boolean read FTextureListOwner write FTextureListOwner; // don't use please
 end;
 {$endif oglcINTERFACE}
 
@@ -406,6 +411,12 @@ begin
  if FTextureListOwner
    then Result := @FTextureList
    else Result := FPTextureList;
+end;
+
+procedure TTileEngine.SetTextureListFromAnotherTileEngine( aTileEngine: TTileEngine);
+begin
+ FTextureListOwner:=FALSE;
+ FPTextureList:=aTileEngine.GetPTextureList;
 end;
 
 function TTileEngine.GetTexture(AIndex: integer): PTexture;
@@ -751,7 +762,7 @@ begin
  Result := FMapSize;
 end;
 
-procedure TTileEngine.LoadMapFile(const aFilename: string; aTextureList: PArrayOfTileTexInfo);
+procedure TTileEngine.LoadMapFile(const aFilename: string; aTileEngineToCopy: TTileEngine);
 var FMapFile: TStringList;
     path: string;
     i, j, k, z, Count, ix, iy : integer;
@@ -763,8 +774,8 @@ begin
  FMapFile.LoadFromFile( aFilename );
  path := ExtractFilePath( aFileName );
 
- // load map's textures
- if aTextureList=NIL then begin
+ if aTileEngineToCopy=NIL then begin
+  // load map's textures
   k := FMapFile.IndexOf('TEXTURES');
   if k=-1 then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture list');
   inc(k);
@@ -782,7 +793,7 @@ begin
   FPTextureList:=NIL;
  end else begin
   FTextureListOwner:=FALSE;
-  FPTextureList:=aTextureList;
+  FPTextureList:= aTileEngineToCopy.GetPTextureList;
  end;
 
  // load Frame Type
@@ -791,26 +802,29 @@ begin
  //  ixCount|iyCount|values_first_line|values_second_line|...        <- texture 1
  //  ixCount|iyCount|values_first_line|values_second_line|...        <- texture 2
  //  ....
- k := FMapFile.IndexOf('FRAMES_TYPE');
- if k <> -1 then begin
-  inc (k);
-  Count := strtoint( FMapFile.Strings[k] );  // texture count
-  inc(k);
-  for i:=0 to Count-1 do
-   begin
-    z := 0;
-    txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
-    for iy:=0 to strtoint(txtsplited[1])-1 do
-     for ix:=0 to strtoint(txtsplited[0])-1 do
-      begin
-       SetGroundType( i, ix, iy, strtoint( txtsplited[2+z{ix}] ));
-       inc(z);
-      end;
-    inc (k);
-   end;
+ if aTileEngineToCopy=NIL then begin
+  k := FMapFile.IndexOf('FRAMES_TYPE');
+  if k <> -1 then begin
+   inc (k);
+   Count := strtoint( FMapFile.Strings[k] );  // texture count
+   inc(k);
+   for i:=0 to Count-1 do
+    begin
+     z := 0;
+     txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+     for iy:=0 to strtoint(txtsplited[1])-1 do
+      for ix:=0 to strtoint(txtsplited[0])-1 do
+       begin
+        SetGroundType( i, ix, iy, strtoint( txtsplited[2+z{ix}] ));
+        inc(z);
+       end;
+     inc (k);
+    end;
+  end;
  end;
 
  // Draw Size
+
  k := FMapFile.IndexOf('DRAW_SIZE');
  if k <> -1
    then begin
@@ -826,24 +840,28 @@ begin
    end;
 
  // Tile Size
- k := FMapFile.IndexOf('TILE_SIZE');
- if k = -1
-   then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
- inc(k);
- txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
- if Length( txtsplited ) <> 2
-   then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
- SetTileSize( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
+ if aTileEngineToCopy=NIL then begin
+  k := FMapFile.IndexOf('TILE_SIZE');
+  if k = -1
+    then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
+  inc(k);
+  txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+  if Length( txtsplited ) <> 2
+    then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
+  SetTileSize( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
+ end else SetTileSize(aTileEngineToCopy.TileSize.cx,aTileEngineToCopy.TileSize.cy);
 
  // Map tile count
- k := FMapFile.IndexOf('MAP_SIZE');
- if k = -1
-   then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map tile count');
- inc(k);
- txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
- if Length( txtsplited ) <> 2
-   then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map size');
- SetMapTileCount( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
+ if aTileEngineToCopy=NIL then begin
+  k := FMapFile.IndexOf('MAP_SIZE');
+  if k = -1
+    then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map tile count');
+  inc(k);
+  txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+  if Length( txtsplited ) <> 2
+    then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map size');
+  SetMapTileCount( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
+ end else SetMapTileCount( aTileEngineToCopy.MapTileCount.cy, aTileEngineToCopy.MapTileCount.cx);
 
  // Scroll enable
  FHScrollEnable := FALSE;
@@ -876,9 +894,11 @@ begin
  end;
 
  // hole color
- MapHoleColor.Value := BGRA(0,0,0,255);
- k := FMapFile.IndexOf('HOLE_COLOR');
- if k <> -1 then MapHoleColor.Value := HexToBGRAPixel( FMapFile.Strings[k+1] );
+ if aTileEngineToCopy=NIL then begin
+  MapHoleColor.Value := BGRA(0,0,0,255);
+  k := FMapFile.IndexOf('HOLE_COLOR');
+  if k <> -1 then MapHoleColor.Value := HexToBGRAPixel( FMapFile.Strings[k+1] );
+ end else MapHoleColor.Value := aTileEngineToCopy.MapHoleColor.Value;
 
  // Build map from Data
  k := FMapFile.IndexOf('DATA');
