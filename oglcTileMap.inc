@@ -10,7 +10,7 @@ TTile = record
          TextureIndex  : integer; // index of texture in TTilemap.FTextureList
          ixFrame       : integer; // frame x index on texture
          iyFrame       : integer; // frame y index
-         UserEvent     : integer;
+         UserEvent     : integer; // when the tile is drawn, TTileEngine.OnTileEvent is called with this parameter
 end;
 PTile = ^TTile;
 
