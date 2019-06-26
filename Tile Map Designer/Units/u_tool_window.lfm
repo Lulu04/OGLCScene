@@ -3,9 +3,9 @@ object Form_Tools: TForm_Tools
   Height = 668
   Top = 108
   Width = 377
-  BorderIcons = []
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
-  Caption = 'Tools'
+  Caption = 'Tool Layers'
   ClientHeight = 648
   ClientWidth = 377
   Color = 3685953
@@ -24,7 +24,7 @@ object Form_Tools: TForm_Tools
     Width = 377
     ActivePage = pageLayer
     Align = alClient
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Tilesets'
@@ -224,52 +224,6 @@ object Form_Tools: TForm_Tools
           OnMouseDown = PB1MouseDown
           OnPaint = PB1Paint
         end
-      end
-    end
-    object pageMiniMap: TTabSheet
-      Caption = 'Mini Map'
-      ClientHeight = 620
-      ClientWidth = 369
-      object Panel2: TPanel
-        Left = 0
-        Height = 202
-        Top = 0
-        Width = 304
-        BevelOuter = bvNone
-        ClientHeight = 202
-        ClientWidth = 304
-        Color = 3289658
-        ParentColor = False
-        TabOrder = 0
-        object PB2: TPaintBox
-          Left = 4
-          Height = 194
-          Top = 4
-          Width = 298
-          OnMouseDown = PB2MouseDown
-          OnMouseMove = PB2MouseMove
-          OnMouseUp = PB2MouseUp
-          OnPaint = PB2Paint
-        end
-      end
-      object SBH: TScrollBar
-        Left = 0
-        Height = 16
-        Top = 204
-        Width = 300
-        PageSize = 0
-        TabOrder = 1
-        OnScroll = SBVScroll
-      end
-      object SBV: TScrollBar
-        Left = 304
-        Height = 213
-        Top = 0
-        Width = 18
-        Kind = sbVertical
-        PageSize = 0
-        TabOrder = 2
-        OnScroll = SBVScroll
       end
     end
     object pageLayer: TTabSheet
@@ -876,20 +830,6 @@ object Form_Tools: TForm_Tools
             ParentFont = False
           end
         end
-        object CheckBox3: TCheckBox
-          Left = 274
-          Height = 19
-          Top = 104
-          Width = 80
-          Caption = 'Align maps'
-          Checked = True
-          Color = 11581892
-          Font.Color = clBlack
-          ParentColor = False
-          ParentFont = False
-          State = cbChecked
-          TabOrder = 10
-        end
         object Panel1: TPanel
           Left = 18
           Height = 130
@@ -900,7 +840,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 322
           Color = 3299433
           ParentColor = False
-          TabOrder = 11
+          TabOrder = 10
           object Label46: TLabel
             Left = 16
             Height = 15
@@ -996,7 +936,7 @@ object Form_Tools: TForm_Tools
           OnClick = Button11Click
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 12
+          TabOrder = 11
         end
         object SBHelp1: TSpeedButton
           Cursor = crHandPoint
@@ -1048,26 +988,20 @@ object Form_Tools: TForm_Tools
           ShowHint = True
           ParentShowHint = False
         end
-        object CheckBox2: TCheckBox
-          Left = 274
-          Height = 19
-          Top = 192
-          Width = 86
-          Caption = 'Show Events'
-          Checked = True
-          Color = 11581892
-          Font.Color = clBlack
-          ParentColor = False
-          ParentFont = False
-          State = cbChecked
-          TabOrder = 13
+        object ListBox1: TListBox
+          Left = 297
+          Height = 45
+          Top = 138
+          Width = 57
+          ItemHeight = 0
+          TabOrder = 12
         end
       end
     end
   end
   object MainMenu1: TMainMenu
-    left = 40
-    top = 488
+    left = 128
+    top = 600
     object MenuItem10: TMenuItem
       Caption = 'Tools'
       object Menu_ClearAllMap: TMenuItem
@@ -1106,8 +1040,8 @@ object Form_Tools: TForm_Tools
     top = 472
   end
   object PopupMenu1: TPopupMenu
-    left = 152
-    top = 544
+    left = 264
+    top = 576
     object MenuItem5: TMenuItem
       Caption = 'Ground type...'
       OnClick = MenuItem5Click

@@ -46,8 +46,6 @@ type
     CB5: TCheckBox;
     CB6: TCheckBox;
     CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    CheckBox3: TCheckBox;
     CLBLayer: TCheckListBox;
     ColorButton1: TColorButton;
     Label10: TLabel;
@@ -79,6 +77,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LBJeux: TListBox;
+    ListBox1: TListBox;
     MainMenu1: TMainMenu;
     MenuItem10: TMenuItem;
     Menu_ExportGroundType: TMenuItem;
@@ -96,18 +95,13 @@ type
     Panel12: TPanel;
     Panel13: TPanel;
     Panel14: TPanel;
-    Panel2: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
     Panel8: TPanel;
-    PB2: TPaintBox;
     PB1: TPaintBox;
     PopupMenu1: TPopupMenu;
     SBHelp2: TSpeedButton;
-    SBV: TScrollBar;
-    SBH: TScrollBar;
     SD1: TSaveDialog;
-    pageMiniMap: TTabSheet;
     SD2: TSaveDialog;
     SE3: TSpinEdit;
     SE4: TSpinEdit;
@@ -147,16 +141,8 @@ type
     procedure PB1MouseDown(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
     procedure PB1Paint(Sender: TObject);
-    procedure PB2MouseDown(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
-    procedure PB2MouseMove(Sender: TObject; {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure PB2MouseUp(Sender: TObject; Button: TMouseButton;
-      {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
-    procedure PB2Paint(Sender: TObject);
     procedure SBHelp1Click(Sender: TObject);
     procedure SBHelp2Click(Sender: TObject);
-    procedure SBVScroll(Sender: TObject; {%H-}ScrollCode: TScrollCode;
-      var ScrollPos: Integer);
     procedure SE3Change(Sender: TObject);
     procedure SE6Change(Sender: TObject);
     procedure SE7Change(Sender: TObject);
@@ -164,10 +150,8 @@ type
     procedure LoadTextureToProject( AFilename: string; AFrameWidth, AFrameHeight: integer );
   private
     FSelectedCell: TPoint;
-    FMiniMapTarget: TPoint;
   public
     procedure PB1SetSizeAndPos;
-    procedure PB2SetSizeAndPos;
 
     procedure GetTextureAndFrameindex( out t, ixfr, iyfr: integer );
     procedure SetRelativeSelectedTile( aDeltaX, aDeltay: integer );
@@ -181,7 +165,8 @@ var
 
 implementation
 {$R *.lfm}
-uses u_tileset_edit;
+uses u_tileset_edit,
+  u_main;
 
 { TForm_Tools }
 
@@ -260,45 +245,6 @@ begin
  PB1.SetBounds( ll, tt, ww, hh );
 end;
 
-procedure TForm_Tools.PB2SetSizeAndPos;
-var factor: single;
-  ll, tt, ww, hh: integer;
-begin
- if MapList.Count=0 then exit;
- if MapList.MainMap.TileEngine.TileSize.cx = 0 then exit;
- if MapList.MainMap.TileEngine.MapSize.cy = 0 then exit;
- if MapList.MainMap.TileEngine.MapSize.cx = 0 then exit;
-
- factor := MapList.MainMap.TileEngine.MapSize.cx / MapList.MainMap.TileEngine.MapSize.cy;
- if MapList.MainMap.TileEngine.MapSize.cx > MapList.MainMap.TileEngine.MapSize.cy
-   then begin // map width > map height
-     ll := 0;
-     ww := Panel2.Width;
-     hh := round( ww/factor );
-     tt := round( (Panel2.Height-hh )/2 );
-   end
-   else begin
-    tt := 0;
-    hh := Panel2.Height;
-    ww := round( hh*factor );
-    ll := round( (Panel2.Width-ww)/2 );
-   end;
- PB2.SetBounds( ll, tt, ww, hh );
- PB2.Invalidate;
-
- SBV.Max := MapList.MainMap.TileEngine.MapTileCount.cy;
- SBV.PageSize := round( FScene.Height / MapList.MainMap.TileEngine.TileSize.cy );
- SBV.LargeChange := SBV.PageSize;
-
- SBH.Max := MapList.MainMap.TileEngine.MapTileCount.cx;
- SBH.PageSize := round( FScene.Width / MapList.MainMap.TileEngine.TileSize.cx );
- SBH.LargeChange := SBH.PageSize;
-
-end;
-
-
-
-
 // delete Tileset
 procedure TForm_Tools.Button2Click(Sender: TObject);
 var i: integer;
@@ -331,7 +277,7 @@ begin
  if MapList.MainMap.TileEngine.MapTileCount.cx > 1 then s+='s';
  Label15.Caption := s;
 
- PB2SetSizeAndPos;
+// PB2SetSizeAndPos;
 end;
 
 // stop scroll on main map
@@ -433,7 +379,8 @@ end;
 procedure TForm_Tools.CLBLayerSelectionChange(Sender: TObject;
   User: boolean);
 begin
- FWorkingTileEngine := MapList.TileEngine[CLBLayer.ItemIndex];
+ MapList.SetWorkingTileEngine;
+ Form_Main.Label3.Caption:=MapList.SelectedLayerName;
 
  CB5.Checked:=FWorkingTileEngine.HScrollEnable;
  CB2.Checked:=FWorkingTileEngine.HLoopMode;
@@ -453,6 +400,7 @@ procedure TForm_Tools.FormCreate(Sender: TObject);
 begin
  MapList:= TMapList.Create;
  TileSetEdit:= TTilesetEdit.Create;
+ PatternList:= TPatternList.Create;
 end;
 
 
@@ -625,63 +573,6 @@ begin
  PB1.Invalidate;
 end;
 
-// mouse down on mini map
-procedure TForm_Tools.PB2MouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
- if Button = mbLeft then PB2.Tag:=1;
-end;
-
-// mouse move on mini map
-procedure TForm_Tools.PB2MouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
-var xx, yy: single;
-begin
- if PB2.Tag = 0 then exit;
- if X > PB2.Width then X := PB2.Width;
- if X < 0 then X := 0;
- if Y > PB2.Height then Y := PB2.Height;
- if Y < 0 then Y := 0;
-
- xx := MapList.MainMap.TileEngine.MapSize.cx * X / PB2.Width;
- yy := MapList.MainMap.TileEngine.MapSize.cy * Y / PB2.Height;
-
- SBV.Position := round( yy*SBV.Max/MapList.MainMap.TileEngine.MapSize.cy);
- SBH.Position := round( xx/SBH.Max/MapList.MainMap.TileEngine.MapSize.cx);
-
- if MapList.MainMap.TileEngine.MapSize.cx <= FScene.Width
-   then xx := -( FScene.Width - MapList.MainMap.TileEngine.MapSize.cx )/2;
- if MapList.MainMap.TileEngine.MapSize.cy <= FScene.Height
-   then yy := -( FScene.Height - MapList.MainMap.TileEngine.MapSize.cy )/2;
-
- MapList.MoveTileEngineTo(-xx, -yy);
-
- FMiniMapTarget := Point( X, Y );
- PB2.Invalidate;
-end;
-
-// mouse up on mini map
-procedure TForm_Tools.PB2MouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
- if Button = mbLeft then PB2.Tag:=0;
-end;
-
-// draw mini map
-procedure TForm_Tools.PB2Paint(Sender: TObject);
-const TARGET_RADIUS=5;
-var ima: TBGRABitmap;
-begin
- ima := TBGRABitmap.Create( PB2.Width, PB2.Height, BGRA(0,0,0));
- ima.Rectangle(0, 0, ima.Width, ima.Height, BGRA(180,180,180), dmSet );
-
- with FMiniMapTarget do
-  ima.FillEllipseLinearColorAntialias( x, y, TARGET_RADIUS, TARGET_RADIUS, BGRA(200,180,50), BGRA(200,180,80));
-
- ima.Draw( PB2.Canvas, 0, 0 );
- ima.Free;
-end;
-
 // Help button click page 'Setting'
 procedure TForm_Tools.SBHelp1Click(Sender: TObject);
 begin
@@ -731,14 +622,6 @@ begin
              '  - COPY GROUND TYPE TO CLIPBOARD -> Copy the ground types list in clipboard, so you can'+lineending+
              '    paste them under Lazarus, in your Pascal game application.' );
 
-end;
-
-procedure TForm_Tools.SBVScroll(Sender: TObject; ScrollCode: TScrollCode; var ScrollPos: Integer);
-begin
- if Sender = SBV
-   then MapList.MainMap.TileEngine.Y.ChangeTo( -ScrollPos/SBV.Max*MapList.MainMap.TileEngine.MapSize.cy, 0.2, idcSinusoid );
- if Sender = SBH
-   then MapList.MainMap.TileEngine.X.ChangeTo( -ScrollPos/SBH.Max*MapList.MainMap.TileEngine.MapSize.cx, 0.2, idcSinusoid );
 end;
 
 // change map view size in game

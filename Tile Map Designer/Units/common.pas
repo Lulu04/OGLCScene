@@ -13,11 +13,12 @@ uses
 const
 
 // LAYER
-LAYER_COUNT = 4;
+LAYER_COUNT = 5;
   Layer_InfoMap         = 0;
-  Layer_WorkTileSet     = 1;
-  Layer_WorkMap         = 2;
-  Layer_Grid            = 3;
+  Layer_Pattern         = 1;   // to show the pattern's list
+  Layer_WorkTileSet     = 2;   // to show/edit the tileset or
+  Layer_WorkMap         = 3;   // to edit the layer's map
+  Layer_Grid            = 4;   // to show the checkerboard
 
 
 var
@@ -51,10 +52,14 @@ procedure SetProjectModified;
 
 procedure EvalKey( Key: Word );
 
+procedure OnlyThisLayerVisible( aL: integer );
+
 implementation
 uses u_main, LCLType,
   u_tool_window,
-  u_tileset_edit;
+  u_tileset_edit,
+  u_tool_minimap,
+  u_tool_layer;
 
 procedure SetProjectModified;
 begin
@@ -102,14 +107,30 @@ begin
    end;
   end;
 
-  VK_W: with TileSetEdit do if IsActive          // W -> toogle tileset view
-     then ExitModeEditTileset
-     else EnterModeEditTileset;
+  VK_W: if TileSetEdit.IsActive          // W -> toogle tileset view
+     then SetViewOnLayer
+     else SetViewOnTileSetEdit;
 
-  VK_M: if not TileSetEdit.IsActive then begin   // M -> go to the MiniMap tool
-   with Form_Tools do PageControl1.ActivePage:=pageMiniMap;
+  VK_P: if PatternList.IsActive          // P -> toogle pattern list view
+     then SetViewOnLayer
+     else SetViewOnPatternList;
+
+  VK_M: if not TileSetEdit.IsActive then begin   // M -> show tool MiniMap
+   Form_Minimap.Show;
+  end;
+
+  VK_L: if not TileSetEdit.IsActive and not PatternList.IsActive then begin  // L -> show tool Layers
+   Form_ToolLayer.Show;
   end;
  end;//case
+end;
+
+procedure OnlyThisLayerVisible(aL: integer);
+var i: integer;
+begin
+ for i:=1 to LAYER_COUNT-2 do FScene.Layer[i].Visible:=i=aL;
+ FScene.Layer[Layer_InfoMap].Visible:=TRUE;
+ FScene.Layer[Layer_Grid].Visible:=TRUE;
 end;
 
 end.

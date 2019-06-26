@@ -37,15 +37,14 @@ var o: TGUILabel;
   FImaGrid : TBGRABitmap;
 begin
  FTitleFont := GuiFont( 'Arial', 32, [], BGRA(0,255,100), BGRA(20,100,50), 1, BGRA(0,0,0,0), 0, 0, 0 );
-// FHintFont := GuiFont( 'Arial', 12, [], BGRA(255,255,100), BGRA(0,0,0,200), 4, BGRA(0,0,0,0), 0, 0, 0 );
-// FEventFont := GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0);//, fqSystemClearType );
 
  FEventFont:= FontManager.AddFont(GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0));
- FHintFont:= FontManager.AddFont(GuiFont( 'Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5 ));
+ FHintFont:= FontManager.AddFont(GuiFont( 'Tahoma', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5 ));
 
  FLabelMapPosition:=TFreeText.Create;
  FLabelMapPosition.TexturedFont:=FHintFont;
  FLabelMapPosition.Caption:='Map position:';
+ FLabelMapPosition.SetCoordinate(0,30);
  FScene.add( FLabelMapPosition, Layer_InfoMap );
 
  o := TGUILabel.Create('T I L E    M A P    D E S I G N E R', FTitleFont );
@@ -55,21 +54,11 @@ begin
  o.Scale.ChangeTo( PointF(1.2,1.2), 6 );
  o.KillDefered( 5 );
 
-
-// FLabelTileIndexes := TGuiLabel.Create('Tile:', FHintFont);
-// FLabelTileIndexes.SetCoordinate( 0, FLabelMapPosition2.BottomY+5 );
-// FScene.Add( FLabelTileIndexes, Layer_InfoMap );
-
  FLabelTileIndexes := TFreeText.Create;
  FLabelTileIndexes.TexturedFont:=FHintFont;
  FLabelTileIndexes.Caption:='Tile:';
  FScene.add( FLabelTileIndexes, Layer_InfoMap );
  FLabelTileIndexes.SetCoordinate( 0, FLabelMapPosition.BottomY+5 );
-
-
-// FLabelSelectionInfo := TGuiLabel.Create('Sel:', FHintFont);
-// FLabelSelectionInfo.SetCoordinate( 0, FLabelTileIndexes2.BottomY+5 );
-// FScene.Add( FLabelSelectionInfo, Layer_InfoMap );
 
  FLabelSelectionInfo := TFreeText.Create;
  FLabelSelectionInfo.TexturedFont:=FHintFont;
@@ -82,7 +71,6 @@ begin
  FLabelGroundType.Caption := 'Ground:';
  FLabelGroundType.SetCoordinate( 0, FLabelSelectionInfo.BottomY+5 );
  FScene.Add( FLabelGroundType, Layer_InfoMap );
-
 
  FLabelEventName := TFreeText.Create;
  FLabelEventName.TexturedFont:=FHintFont;

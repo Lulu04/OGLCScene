@@ -5,7 +5,7 @@ unit umaps;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, Controls,
+  Classes, SysUtils, Forms, Dialogs, Controls, StdCtrls,
   BGRABitmap, BGRABitmapTypes,
   OGLCScene, VelocityCurve,
   common;
@@ -18,6 +18,7 @@ TMapInfo=class
   LayerName: string;
   TileEngine: TTileEngine;
   IsMainMap: boolean;
+  IsDeletable: boolean;
   constructor Create;
   destructor Destroy; override;
 end;
@@ -39,6 +40,8 @@ private
   procedure RemoveTileEngineFromSceneLayer;
   procedure PutTileEngineToSceneLayer;
   procedure ClearList;
+  procedure SetAsMainMap( aMapInfo: TMapInfo );
+  procedure SetAsNormalMap( aMapInfo: TMapInfo );
 public
   constructor Create;
   destructor Destroy; override;
@@ -61,6 +64,7 @@ public
 
   procedure ShiftMapUp;
   procedure ShiftMapDown;
+  procedure SetWorkingTileEngine;
 
   property MainMap: TMapInfo read GetMainMap;
   property Count: integer read GetCount;
@@ -77,7 +81,8 @@ uses u_tool_window,
   uasknewlayermapinfo,
   u_main,
   tileset_manager,
-  usavemap, uaskrenamemap;
+  usavemap, uaskrenamemap,
+  u_tileset_edit;
 
 { TMapInfo }
 
@@ -167,6 +172,21 @@ begin
  TileSetManager.Clear;
 end;
 
+procedure TMapList.SetAsMainMap(aMapInfo: TMapInfo);
+begin
+ aMapInfo.IsDeletable:=FALSE;
+ aMapInfo.IsMainMap:=TRUE;
+ aMapInfo.TileEngine.TexturesOwner:=TRUE;
+ FMainMap := aMapInfo;
+end;
+
+procedure TMapList.SetAsNormalMap(aMapInfo: TMapInfo);
+begin
+ aMapInfo.IsMainMap:=FALSE;
+ aMapInfo.IsDeletable:=TRUE;
+ aMapInfo.TileEngine.TexturesOwner:=FALSE;
+end;
+
 constructor TMapList.Create;
 begin
  FMapList:=TList.Create;
@@ -174,9 +194,8 @@ begin
  // create main map by default
  FMainMap:= TMapInfo.Create;
  FMainMap.LayerName:='Main_Map';
- FMainMap.IsMainMap:=TRUE;
- FMainMap.TileEngine.TexturesOwner:=TRUE;
  FMapList.Add( FMainMap );
+ SetAsMainMap( FMainMap );
  PutTileEngineToSceneLayer;
  FWorkingTileEngine:=FMainMap.TileEngine;
 
@@ -218,6 +237,8 @@ begin
  temp.Add('[ACTIVE_MAP]');
  temp.Add(inttostr(Form_Tools.CLBLayer.ItemIndex));
 
+ PatternList.SaveTo( temp );
+
  temp.SaveToFile( Form_Tools.SD2.FileName );
 
  temp.Free;
@@ -258,8 +279,9 @@ begin
   m:=TMapInfo.Create;
   m.LayerName:=splittedText[0];
 
-  m.IsMainMap := splittedText[1]='MAIN';
-  if m.IsMainMap then FMainMap:=m;
+  if splittedText[1]='MAIN'
+    then SetAsMainMap( m )
+    else SetAsNormalMap( m );
 
   FMapList.Add( m );
 
@@ -273,7 +295,10 @@ begin
  if k<>-1 then begin
    inc(k);
    Form_Tools.CLBLayer.ItemIndex:=strtoint(temp.Strings[k]);
+   Form_Main.Label3.Caption:=SelectedLayerName;
  end;
+ PatternList.LoadFrom( temp );
+
  temp.Free;
 
 
@@ -300,7 +325,6 @@ begin
     end;
 
  Form_Tools.PB1SetSizeAndPos;
- Form_Tools.PB2SetSizeAndPos;
  Form_Tools.UpdateMapParameterOnScreen;
 
  PutTileEngineToSceneLayer;
@@ -317,10 +341,10 @@ begin
    o:= TMapInfo.Create;
    o.LayerName:=Form_AskNewLayerMapInfo.Edit1.Text;
 
-   if FMapList.Count=0 then begin
-     FMainMap:=o;
-     o.IsMainMap:=TRUE;
-   end else begin
+   if FMapList.Count=0
+     then SetAsMainMap( o )
+     else begin
+     SetAsNormalMap( o );
 
      o.TileEngine.SetTextureListFromAnotherTileEngine( FMainMap.TileEngine ); // link the texture list to the main map
      o.TileEngine.SetViewSize(FMainMap.TileEngine.Width, FMainMap.TileEngine.Height);
@@ -450,8 +474,6 @@ begin
    // set tileengine view to see whole map
    t.SetViewSize( t.MapSize.cx, t.MapSize.cy );
  end;
- // update mini map size
- Form_Tools.PB2SetSizeAndPos;
 end;
 
 procedure TMapList.InsertColumn(aColumnIndex, aCount: integer);
@@ -464,8 +486,6 @@ begin
    // set tileengine view to see whole map
    t.SetViewSize( t.MapSize.cx, t.MapSize.cy );
  end;
- // update mini map size
- Form_Tools.PB2SetSizeAndPos;
 end;
 
 procedure TMapList.ShiftMapUp;
@@ -497,6 +517,12 @@ begin
  PutTileEngineToSceneLayer;
 
  SetProjectModified;
+end;
+
+procedure TMapList.SetWorkingTileEngine;
+begin
+ if Form_Tools.CLBLayer.ItemIndex=-1 then exit;
+ FWorkingTileEngine := TileEngine[Form_Tools.CLBLayer.ItemIndex];
 end;
 
 end.

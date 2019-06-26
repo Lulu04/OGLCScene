@@ -27,14 +27,9 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, OpenGLContext, Forms, Controls, Graphics,
-  Dialogs, LCLIntf, ExtCtrls, LCLType, Menus, Buttons, Types,
-  BGRABitmap, BGRABitmapTypes,
-  common, OGLCScene,
-  VelocityCurve,
-  uinsertlinecolumn,
-  uAskEventValue,
-  uexporteventtype,
-  screen_map,
+  Dialogs, LCLIntf, ExtCtrls, LCLType, Menus, Buttons, ComCtrls, StdCtrls,
+  Types, BGRABitmap, BGRABitmapTypes, common, OGLCScene, VelocityCurve,
+  uinsertlinecolumn, uAskEventValue, uexporteventtype, screen_map,
   tileset_manager;
 
 type
@@ -44,10 +39,19 @@ type
   { TForm_Main }
 
   TForm_Main = class(TForm)
+    ApplicationProperties1: TApplicationProperties;
+    ComboBox1: TComboBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
     MenuClear: TMenuItem;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
+    MenuItem12: TMenuItem;
+    MenuItem13: TMenuItem;
+    MenuItem14: TMenuItem;
+    MenuItem15: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
@@ -65,17 +69,30 @@ type
     Menu_InsertColumn: TMenuItem;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     PopupMenu1: TPopupMenu;
     SBHelp3: TSpeedButton;
+    Shape1: TShape;
+    Shape2: TShape;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton5: TSpeedButton;
+    ToggleBox1: TToggleBox;
+    procedure ComboBox1Change(Sender: TObject);
     procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure FormMouseEnter(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MenuClearClick(Sender: TObject);
     procedure MenuItem10Click(Sender: TObject);
+    procedure MenuItem12Click(Sender: TObject);
+    procedure MenuItem14Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -91,6 +108,9 @@ type
     procedure OpenGLControl1MouseMove(Sender: TObject; {%H-}Shift: TShiftState; X, Y: Integer);
     procedure OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
     procedure SBHelp3Click(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButton5Click(Sender: TObject);
   private
     FCoorBeginLeftClick,
     FCoorEndLeftClick,
@@ -99,7 +119,6 @@ type
     procedure DoPaintMap;
     function ClientCoorToColumnRowIndex( aPoint: TPoint ): TPoint; // return column and row indexes of tile pointed by aPoint (client window coordinates)
     function ColumnRowIndexToClientCoor( aTile: TPoint ): TPoint;  // return coordinate from tile's (column,row) indexes
-    function ClientCoorToTileTopLeftCoor( aP: TPoint ): TPoint;
 
   private
     // selection
@@ -114,16 +133,17 @@ type
     FMousePos: TPoint;
     function XCoorToColumnIndex( AX: integer ): integer;
     function YCoorToRowIndex( AY: integer ): integer;
-    function ColumnIndexToXCoord( aColumn: integer ): integer;
-    function RowIndexToYCoord( aRow: integer ): integer;
+//    function ColumnIndexToXCoord( aColumn: integer ): integer;
+//    function RowIndexToYCoord( aRow: integer ): integer;
 
 
-    function ClientPosToTileIndex( APos: TPoint ): TPoint;
     function ScreenPosToTileIndex( APos: TPoint ): TPoint;
 
-    function XYCoorIsInMap( AX, AY: integer ): boolean;
     procedure ShowActionText( aX, aY: single; aTxt: string );
   public
+    function XYCoorIsInMap( AX, AY: integer ): boolean;
+    function ClientPosToTileIndex( APos: TPoint ): TPoint;
+    function ClientCoorToTileTopLeftCoor( aP: TPoint ): TPoint;
 
     procedure ProcessTileEngineEvent( Sender: TTileEngine; const SceneTileCoor: TPointF; Event: integer );
 
@@ -138,7 +158,10 @@ var
 implementation
 uses u_tool_window,
      uAskGroundType,
-     umaps, u_tileset_edit;
+     umaps, u_tileset_edit,
+     u_tool_minimap,
+     u_tool_layer,
+     Clipbrd;
 {$R *.lfm}
 
 { TForm_Main }
@@ -176,6 +199,16 @@ begin
  FScene.ExecuteDuring(0.5);
 end;
 
+// user change the view
+procedure TForm_Main.ComboBox1Change(Sender: TObject);
+begin
+ case ComboBox1.ItemIndex of
+  0: SetViewOnLayer;
+  1: SetViewOnTileSetEdit;
+  2: SetViewOnPatternList;
+ end;
+end;
+
 procedure TForm_Main.FormDestroy(Sender: TObject);
 begin
  FScene.Free;
@@ -211,13 +244,12 @@ begin
  end;//case
 end;
 
-procedure TForm_Main.FormMouseEnter(Sender: TObject);
-begin
- SetFocus;
-end;
-
 procedure TForm_Main.FormShow(Sender: TObject);
 begin
+ // force Panel 2 to have the same larger than the window
+ // we don't use Panel2.Align:=alTop because the clientRect is modified by LCL...
+ Panel2.SetBounds(0,0,ClientWidth,Panel2.Height);
+
  Form_Tools.Show;
 end;
 
@@ -293,6 +325,26 @@ begin
       ShowActionText( FMousePos.x, FMousePos.y, 'set ground type' );
       SetProjectModified;
  end;
+end;
+
+// popup Keep as pattern
+procedure TForm_Main.MenuItem12Click(Sender: TObject);
+begin
+ showmessage('Keep...');
+ if WorkingPattern.TileCount>0 then begin
+   PatternList.AddWorkingPattern;
+   ShowActionText( FMousePos.x, FMousePos.y, '1 pattern added' );
+   SetProjectModified;
+ end;
+end;
+
+// popup Copy map position to ClipBoard
+procedure TForm_Main.MenuItem14Click(Sender: TObject);
+var p: TPoint;
+begin
+ p:=OpenGLControl1.ScreenToClient( Mouse.CursorPos );
+ Clipboard.AsText := inttostr(round(p.x-FWorkingTileEngine.X.Value)) + ',' + inttostr(round(p.y-FWorkingTileEngine.Y.Value));
+ ShowActionText( p.x, p.y, 'Map position copied to clipboard');
 end;
 
 // popup Set user event value
@@ -594,26 +646,30 @@ end;
 
 procedure TForm_Main.OpenGLControl1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
- if Button = mbLeft then begin
+ if Button = mbLeft then begin    // left clic all version
    FState := sNeutral;
    FCoorBeginLeftClick.x := X;
    FCoorBeginLeftClick.y := Y;
  end;
 
- if ( Button = mbLeft ) and ( ssShift in Shift )
+ if ( Button = mbLeft ) and not   // left clic alone = start moving view and unselect previous selection
+    (( ssShift in Shift )or( ssCtrl in Shift )or( ssAlt in Shift )) then begin
+   FState := sMoveView;
+   FOriginTileEngine.x := round(FWorkingTileEngine.X.Value);
+   FOriginTileEngine.y := round(FWorkingTileEngine.Y.Value);
+   WorkingPattern.Clear;
+ end;
+
+ if ( Button = mbLeft ) and ( ssShift in Shift )   // left clic + SHIFT = start a rectangular selection without clear the previous selection
     and not( ssCtrl in Shift ) and XYCoorIsInMap( X, Y ) then begin
    FState := sSelecting;
    FCoorEndLeftClick := FCoorBeginLeftClick;
  end;
 
- if ( Button = mbLeft ) and not ( ssShift in Shift ) then begin
-   FState := sMoveView;
-   FOriginTileEngine.x := round(FWorkingTileEngine.X.Value);
-   FOriginTileEngine.y := round(FWorkingTileEngine.Y.Value);
- end;
-
- if ( Button = mbLeft ) and ( ssCtrl in Shift ) then begin
-   //select tile under mouse (if any)
+ if ( Button = mbLeft ) and ( ssCtrl in Shift ) then begin  // left clic + CTRL = add a single tile to selection
+   if XYCoorIsInMap( X, Y ) then begin
+     WorkingPattern.AddOrRemoveTileUnderMouse;
+   end;
  end;
 end;
 
@@ -625,6 +681,7 @@ var it: TPoint;
     s: string;
 begin
  if not FReady then exit;
+
  // update info on screen
  if XYCoorIsInMap( X, Y ) then begin
 
@@ -675,8 +732,10 @@ begin
      end;
      sMoveView: begin
         if TilesetEdit.IsActive
-           then TilesetEdit.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y )
-           else MapList.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
+          then TilesetEdit.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y )
+        else if PatternList.IsActive
+          then PatternList.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y )
+        else MapList.SetTileEngineCoordinates( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
          // FWorkingTileEngine.SetCoordinate( FOriginTileEngine.x + X - FCoorBeginLeftClick.x, FOriginTileEngine.y + Y - FCoorBeginLeftClick.y );
      end;
      sNeutral: begin
@@ -747,6 +806,32 @@ begin
              '    paste them under Lazarus, in your game application.' );
 end;
 
+// load session
+procedure TForm_Main.SpeedButton1Click(Sender: TObject);
+var mr: TModalResult;
+begin
+ if FProjectIsModified then begin
+  mr := MessageDlg('', 'Before load, do you want to save the current(s) map(s) ?', mtWarning, [mbYes, mbNo, mbCancel],0);
+  if mr = mrCancel then exit;
+  if mr = mrYes then MapList.SaveSession;
+  FProjectIsModified := FALSE;
+ end;
+
+ MapList.LoadSession;
+end;
+
+// save session
+procedure TForm_Main.SpeedButton2Click(Sender: TObject);
+begin
+ MapList.SaveSession;
+end;
+
+//
+procedure TForm_Main.SpeedButton5Click(Sender: TObject);
+begin
+ Form_ToolLayer.Show;
+end;
+
 
 function TForm_Main.XYCoorIsInMap(AX, AY: integer): boolean;
 begin
@@ -781,7 +866,7 @@ procedure TForm_Main.ProcessTileEngineEvent(Sender: TTileEngine;
 var o: TFreeText;
     p: TPointF;
 begin
- if not Form_Tools.CheckBox2.Checked or ( Event = -1 ) then exit;
+ if not ToggleBox1.Checked or ( Event = -1 ) then exit;
  o := TFreeText.Create;
  o.TexturedFont:=FEventFont;
  p := SceneTileCoor + PointF( FWorkingTileEngine.TileSize.cx*0.5, FWorkingTileEngine.TileSize.cy*0.5 );
@@ -812,7 +897,7 @@ begin
  if Result > FWorkingTileEngine.MapTileCount.cy-1 then Result := FWorkingTileEngine.MapTileCount.cy-1;
 end;
 
-function TForm_Main.ColumnIndexToXCoord( aColumn: integer ): integer;
+{function TForm_Main.ColumnIndexToXCoord( aColumn: integer ): integer;
 begin
  Result := ( aColumn - FWorkingTileEngine.GetFirstTileColumnIndex ) * FWorkingTileEngine.TileSize.cx {%H-}+ round( FWorkingTileEngine.Y.Value );
 end;
@@ -820,7 +905,7 @@ end;
 function TForm_Main.RowIndexToYCoord( aRow: integer ): integer;
 begin
  Result := ( aRow - FWorkingTileEngine.GetFirstTileRowIndex ) * FWorkingTileEngine.TileSize.cy {%H-}+ round( FWorkingTileEngine.Y.Value );
-end;
+end; }
 
 function TForm_Main.ClientCoorToColumnRowIndex(aPoint: TPoint): TPoint;
 begin
@@ -902,6 +987,9 @@ begin
  DrawBox( FWorkingTileEngine.X.Value, FWorkingTileEngine.Y.Value,
           FWorkingTileEngine.Width, FWorkingTileEngine.Height,
           BGRA(50,50,50), 1);
+
+ // draw a box around selection in WorkingPattern
+ WorkingPattern.DrawBoxAroundTiles;
 end;
 
 procedure TForm_Main.LoadCommonRessource;
@@ -928,6 +1016,7 @@ begin
  MapList.Free;
  TileSetEdit.Free;
  TileSetManager.Free;
+ PatternList.Free;
 
  ScreenMap.Free;
 

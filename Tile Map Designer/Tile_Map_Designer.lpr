@@ -10,7 +10,8 @@ uses
   Forms, lazopenglcontext, OGLCScene, common, u_main, u_tool_window, screen_map,
   tileset_manager, uAskTileSize, uabout, uAskGroundType, uinsertlinecolumn,
   uAskMapSize, uexportgroundtype, VelocityCurve, uaskeventvalue, usavemap,
-  uexporteventtype, umaps, uasknewlayermapinfo, uaskrenamemap, u_tileset_edit;
+  uexporteventtype, umaps, uasknewlayermapinfo, uaskrenamemap, u_tileset_edit,
+  u_tool_minimap, u_tool_layer;
 
 {$R *.res}
 
@@ -28,6 +29,8 @@ begin
   Application.CreateForm(TForm_ExportEvent, Form_ExportEvent);
   Application.CreateForm(TForm_AskNewLayerMapInfo, Form_AskNewLayerMapInfo);
   Application.CreateForm(TForm_RenameMap, Form_RenameMap);
+  Application.CreateForm(TForm_Minimap, Form_Minimap);
+  Application.CreateForm(TForm_ToolLayer, Form_ToolLayer);
   Application.Run;
 
 end.
