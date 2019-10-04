@@ -94,7 +94,11 @@ public
    Gravity: TPointFParam;
 
    procedure SetSize( aWidth, aHeight: integer );
-   procedure UseTexture( aTextureFile: string ); overload; // set the image flake
+   // set the image flake from a file
+   // if aSizeCoeff<1 reduce the image
+   // aSizeCoeff=1 use the same size
+   // aSizeCoeff>1 enlarge the image
+   procedure UseTexture( aTextureFile: string; aSizeCoeff: single=1.0 ); overload;
    procedure UseTexture( aImage: TBGRABitmap ); overload;
 end;
 
@@ -299,16 +303,18 @@ begin
  FHeight := aHeight;
 end;
 
-procedure TSnow.UseTexture(aTextureFile: string);
-var ima: TBGRABitmap;
+procedure TSnow.UseTexture(aTextureFile: string; aSizeCoeff: single=1.0);
+var ima,ima1: TBGRABitmap;
     i: integer;
 begin
  if FTexture[0] <> NIL
    then for i:=0 to 2 do TextureManager.Delete( FTexture[i] );
 
  ima := TBGRABitmap.Create( aTextureFile );
- UseTexture( ima );
+ ima1:=ima.Resample(round(ima.Width*aSizeCoeff), round(ima.Height*aSizeCoeff)) as TBGRABitmap;
+ UseTexture( ima1 );
  ima.Free;
+ ima1.Free;
 end;
 
 procedure TSnow.UseTexture(aImage: TBGRABitmap);
