@@ -33,6 +33,7 @@ type
     FLoop: boolean;
     FSlideState: TSlideState;
     function GetCount: integer;
+    function GetCurrentIndex: integer;
     function GetSlideStep( aIndex: integer ): TSlideStep;
     procedure SetCurrentStep;
     procedure UnsetCurrentStep( ATransition: TSlideTransition; ATransitionTime: single );
@@ -59,6 +60,7 @@ type
 
     property Loop: boolean read FLoop write FLoop; // TRUE= loop to first image
     property Count: integer read GetCount;
+    property CurrentIndex: integer read GetCurrentIndex;
     property State: TSlideState read FSlideState;
   end;
 {$endif oglcINTERFACE}
@@ -75,13 +77,18 @@ begin
  Result := FList.Count;
 end;
 
+function TSlideShow.GetCurrentIndex: integer;
+begin
+ Result := FCurrentIndex;
+end;
+
 procedure TSlideShow.GotoNextStep;
 var i: integer;
     s: TSlideStep;
 begin
  if FSlideState = stEmpty then exit;
 
- if ( FCurrentIndex = GetCount-1 ) and not FLoop then exit;
+// if ( FCurrentIndex = GetCount-1 ) and not FLoop then exit;
 
  // take next step index
  i := FCurrentIndex;
@@ -90,6 +97,7 @@ begin
    if FLoop then i := 0
             else begin
               i := GetCount-1;
+              FSlideState := stStopped;
               exit;
             end;
  end;
