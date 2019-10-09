@@ -154,19 +154,22 @@ end;
 // TMaximizedText is an area where the text is displayed as large as possible and aligned.
 // the font height is maximized and the corresponding textured font is then created
 // Usefull for screen title for example
-// TO DO: constructs the textured font only with the characters present in the caption
 TMaximizedText = class( TMultilineText )
 private
  FGuiFont: TGuiFont;
  FTemp: TBGRABitmap;
+ FCharSet: string;
  procedure MakeMaximizedFont;
  function ComputeDrawingSize( aGuiFont: TGuiFont ): TSize;
  procedure SetCaption(AValue: string); override;
  procedure SetTexturedFont({%H-}AValue: TTexturedFont); override;
 public
   // the font height field of 'aGuiFont' is maximized.
-  constructor Create( aRect: TRect; aGuiFont: TGuiFont );
+  constructor Create( aRect: TRect; aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET );
   destructor destroy; override;
+
+  function GetComputedGuiFont: TGuiFont;
+  function GetComputedTexturedFont: TTexturedFont;
 end;
 
 
@@ -188,7 +191,7 @@ end;
       s := ComputeDrawingSize( FGuiFont );
     until ( s.cy > FRect.Height ) or ( s.cx > FRect.Width ) ;
     FGuiFont.FontHeight := FGuiFont.FontHeight-1;
-  end else if (s.cy>FRect.Height) and (s.cx> FRect.Width) then begin
+  end else if (s.cy>FRect.Height) or (s.cx> FRect.Width) then begin
     // the drawing is larger than the surface => we decrease it
     repeat
       FGuiFont.FontHeight := FGuiFont.FontHeight-1;
@@ -198,7 +201,7 @@ end;
   FTemp.Free;
 
   if FTexturedFont<>NIL then FontManager.DeleteFont( FTexturedFont );
-  FTexturedFont := FontManager.AddFont( FGuiFont );
+  FTexturedFont := FontManager.AddFont( FGuiFont, FCharSet );
  end;
 
  function TMaximizedText.ComputeDrawingSize(aGuiFont: TGuiFont): TSize;
@@ -276,10 +279,11 @@ end;
  // does nothing because it's no sense to manually change the font height in TMaximizedtext...
  end;
 
- constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont);
+ constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont; const aCharSet: string);
  begin
   inherited Create( NIL, aRect );
   FGuiFont := aGuiFont;
+  FCharSet:=aCharSet;
  end;
 
  destructor TMaximizedText.destroy;
@@ -287,6 +291,16 @@ begin
   if FTexturedFont<>NIl then FontManager.DeleteFont( FTexturedFont );
   inherited destroy;
 end;
+
+ function TMaximizedText.GetComputedGuiFont: TGuiFont;
+ begin
+  Result :=FGuiFont;
+ end;
+
+ function TMaximizedText.GetComputedTexturedFont: TTexturedFont;
+ begin
+  Result:=FTexturedFont;
+ end;
 
  { TMultilineText }
 
