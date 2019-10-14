@@ -44,6 +44,7 @@ begin
  while p^.Next<>NIL do p:=p^.Next;
 
  while p<>NIL do begin
+   if p=FInstance0 then exit;
    p^.Delay := p^.Delay - aElapsedTime;
    if p^.Delay <= 0 then begin
      if p^.CallBack <> NIL then p^.CallBack( p^.UserValue );
