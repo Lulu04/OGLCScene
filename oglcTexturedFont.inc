@@ -161,11 +161,12 @@ private
  FCharSet: string;
  procedure MakeMaximizedFont;
  function ComputeDrawingSize( aGuiFont: TGuiFont ): TSize;
+ procedure UpdateCharsetFromCaption;
  procedure SetCaption(AValue: string); override;
  procedure SetTexturedFont({%H-}AValue: TTexturedFont); override;
 public
-  // the font height field of 'aGuiFont' is maximized.
-  constructor Create( aRect: TRect; aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET );
+  // the font height field of 'aGuiFont' will be maximized.
+  constructor Create( aRect: TRect; aGuiFont: TGuiFont );
   destructor destroy; override;
 
   function GetComputedGuiFont: TGuiFont;
@@ -180,6 +181,8 @@ end;
  procedure TMaximizedText.MakeMaximizedFont;
  var s: TSize;
  begin
+
+
   FGuiFont.FontHeight:=50; // arbitrary font height
   FTemp:= TBGRABitmap.Create(1,1);
 
@@ -201,6 +204,7 @@ end;
   FTemp.Free;
 
   if FTexturedFont<>NIL then FontManager.DeleteFont( FTexturedFont );
+  UpdateCharsetFromCaption;
   FTexturedFont := FontManager.AddFont( FGuiFont, FCharSet );
  end;
 
@@ -265,6 +269,19 @@ end;
    until i=Length(W);
  end;
 
+ procedure TMaximizedText.UpdateCharsetFromCaption;
+ var t, ch: string;
+   i: Integer;
+ begin
+  if FCaption='' then exit;
+  t:='';
+  for i:=1 to UTF8Length(FCaption) do begin
+   ch:=UTF8Copy(FCaption,i,1);
+   if UTF8Pos(ch, t)=0 then t+=ch;
+  end;
+  if FCharSet<>t then FCharSet:=t;
+ end;
+
  procedure TMaximizedText.SetCaption(AValue: string);
  begin
   if FCaption=AValue then exit;
@@ -279,11 +296,12 @@ end;
  // does nothing because it's no sense to manually change the font height in TMaximizedtext...
  end;
 
- constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont; const aCharSet: string);
+ constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont);
  begin
   inherited Create( NIL, aRect );
   FGuiFont := aGuiFont;
-  FCharSet:=aCharSet;
+  FCharSet:='';
+  Caption:='';
  end;
 
  destructor TMaximizedText.destroy;
