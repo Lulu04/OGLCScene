@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <PathDelim Value="\"/>
     <General>
       <MainUnit Value="0"/>
@@ -42,7 +42,7 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <UseHeaptrc Value="True"/>
+              <GenerateDebugInfo Value="False"/>
             </Debugging>
             <LinkSmart Value="True"/>
             <Options>
@@ -56,13 +56,12 @@
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
-      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
-      <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="4">
       <Item1>
@@ -1942,9 +1941,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="Frame_CurveEdit"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="265"/>
-        <CursorPos X="54" Y="281"/>
+        <TopLine Value="209"/>
+        <CursorPos X="32" Y="218"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1981,9 +1981,9 @@
         <Filename Value="C:\lazarus\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2154"/>
-        <CursorPos X="3" Y="1929"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="2324"/>
+        <CursorPos X="40" Y="2336"/>
+        <UsageCount Value="10"/>
       </Unit252>
       <Unit253>
         <Filename Value="C:\lazarus\lcl\include\graphiccontrol.inc"/>
@@ -2008,8 +2008,8 @@
         <ResourceBaseClass Value="Frame"/>
         <UnitName Value="frame_ShowColor"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="107"/>
-        <CursorPos X="67" Y="125"/>
+        <TopLine Value="16"/>
+        <CursorPos Y="25"/>
         <UsageCount Value="116"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2156,7 +2156,6 @@
       </Unit274>
       <Unit275>
         <Filename Value="..\oglcParticle.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
         <TopLine Value="737"/>
         <CursorPos X="5" Y="754"/>
@@ -2167,123 +2166,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="932" Column="2" TopLine="913"/>
+        <Caret Line="1152" Column="17" TopLine="1133"/>
       </Position1>
       <Position2>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="935" Column="9" TopLine="913"/>
+        <Caret Line="243" Column="39" TopLine="230"/>
       </Position2>
       <Position3>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="1152" Column="17" TopLine="1133"/>
+        <Caret Line="1151" Column="52" TopLine="1134"/>
       </Position3>
       <Position4>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="243" Column="39" TopLine="230"/>
+        <Caret Line="244" Column="22" TopLine="230"/>
       </Position4>
       <Position5>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="1151" Column="52" TopLine="1134"/>
+        <Caret Line="1161" Column="37" TopLine="1150"/>
       </Position5>
       <Position6>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="244" Column="22" TopLine="230"/>
+        <Caret Line="691" Column="29" TopLine="680"/>
       </Position6>
       <Position7>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="1161" Column="37" TopLine="1150"/>
+        <Caret Line="493" Column="2" TopLine="490"/>
       </Position7>
       <Position8>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="691" Column="29" TopLine="680"/>
+        <Caret Line="363" Column="2" TopLine="360"/>
       </Position8>
       <Position9>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="493" Column="2" TopLine="490"/>
+        <Caret Line="493" Column="32" TopLine="490"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="363" Column="2" TopLine="360"/>
-      </Position10>
-      <Position11>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="493" Column="32" TopLine="490"/>
-      </Position11>
-      <Position12>
         <Filename Value="..\OGLCScene.pas"/>
         <Caret Line="369" Column="13" TopLine="350"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\oglcParticle.inc"/>
+        <Caret Line="106" Column="15" TopLine="86"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\oglcParticle.inc"/>
+        <Caret Line="316" Column="32" TopLine="300"/>
       </Position12>
       <Position13>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="106" Column="15" TopLine="86"/>
+        <Caret Line="133" Column="18" TopLine="116"/>
       </Position13>
       <Position14>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="316" Column="32" TopLine="300"/>
+        <Caret Line="755" Column="2" TopLine="732"/>
       </Position14>
       <Position15>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="133" Column="18" TopLine="116"/>
+        <Caret Line="133" Column="17" TopLine="115"/>
       </Position15>
       <Position16>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="755" Column="2" TopLine="732"/>
+        <Caret Line="757" Column="14" TopLine="732"/>
       </Position16>
       <Position17>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="133" Column="17" TopLine="115"/>
+        <Caret Line="133" Column="21" TopLine="121"/>
       </Position17>
       <Position18>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="757" Column="14" TopLine="732"/>
+        <Caret Line="759" Column="92" TopLine="735"/>
       </Position18>
       <Position19>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="133" Column="21" TopLine="121"/>
+        <Caret Line="106" Column="15" TopLine="83"/>
       </Position19>
       <Position20>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="759" Column="92" TopLine="735"/>
+        <Caret Line="231" Column="17" TopLine="211"/>
       </Position20>
       <Position21>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="106" Column="15" TopLine="83"/>
+        <Caret Line="101" Column="21" TopLine="92"/>
       </Position21>
       <Position22>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="231" Column="17" TopLine="211"/>
+        <Caret Line="107" Column="14" TopLine="100"/>
       </Position22>
       <Position23>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="101" Column="21" TopLine="92"/>
+        <Caret Line="414" Column="23" TopLine="397"/>
       </Position23>
       <Position24>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="618" Column="3" TopLine="622"/>
+        <Caret Line="101" Column="12" TopLine="90"/>
       </Position24>
       <Position25>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="107" Column="14" TopLine="100"/>
+        <Caret Line="632" Column="39" TopLine="614"/>
       </Position25>
       <Position26>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="414" Column="23" TopLine="397"/>
+        <Caret Line="133" Column="21" TopLine="123"/>
       </Position26>
       <Position27>
         <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="101" Column="12" TopLine="90"/>
+        <Caret Line="755" TopLine="737"/>
       </Position27>
       <Position28>
-        <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="632" Column="39" TopLine="614"/>
+        <Filename Value="Units\frame_showcolor.pas"/>
+        <Caret Line="23" Column="19" TopLine="6"/>
       </Position28>
       <Position29>
-        <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="133" Column="21" TopLine="123"/>
+        <Filename Value="Units\frame_showcolor.pas"/>
+        <Caret Line="24" Column="26" TopLine="6"/>
       </Position29>
       <Position30>
-        <Filename Value="..\oglcParticle.inc"/>
-        <Caret Line="755" TopLine="737"/>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="58" Column="14" TopLine="50"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

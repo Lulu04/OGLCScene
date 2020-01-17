@@ -21,6 +21,7 @@ type
     FBackground: TBGRABitmap;
     procedure DrawBackGroundImage;
   public
+    procedure EraseBackground(DC: HDC); override;
     procedure FreeData;
     procedure UpdateColor( P: array of TPColor );
   end;
@@ -69,6 +70,10 @@ begin
   ima1.Free;
   FBackground.Fill( ima );
   ima.Free;
+end;
+
+procedure TFrame2.EraseBackground(DC: HDC);
+begin
 end;
 
 procedure TFrame2.FreeData;

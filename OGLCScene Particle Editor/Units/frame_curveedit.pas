@@ -55,6 +55,7 @@ type
     FLegendMin: string;
     FHorizAxisArray: array of single;
   public
+   procedure EraseBackground(DC: HDC); override;
    procedure FreeData; // call before exit program to free memory used by TFrame1
    procedure Clear; // remove all points
    // aTimePercent [0..1] is a percentage of particle life
@@ -204,6 +205,10 @@ begin
  FPCurrentPts := NIL;
  FPPreviousPts := NIL;
  FPNextPts := NIL;
+end;
+
+procedure TFrame1.EraseBackground(DC: HDC);
+begin
 end;
 
 procedure TFrame1.PBPaint(Sender: TObject);
