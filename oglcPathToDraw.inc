@@ -14,8 +14,6 @@ ArrayOfDrawingPoint = array of TDrawingPoint;
 ArrayofParticleEmitter = array of TParticleEmitter;
 
 { TPathToDraw }
-// to do: make all points and particle emitter be a childs of the TPathToDraw surface
-// to allow transformation matrix on the drawing
 TPathToDraw = class( TSimpleSurfaceWithEffect )
   Constructor Create( aSquareSize: integer );
   Destructor Destroy; override;
@@ -97,7 +95,6 @@ destructor TPathToDraw.Destroy;
 begin
  LineColor.Free;
  ParticleOpacity.Free;
-// Clear;
  inherited Destroy;
 end;
 
@@ -138,8 +135,8 @@ end;
 
 procedure TPathToDraw.SetShakerAmplitude(AValue: integer);
 begin
-  if FShakerAmplitude=AValue then Exit;
   EnsureRange( AValue, 0, 100 );
+  if FShakerAmplitude=AValue then Exit;
   FShakerAmplitude:=AValue;
 end;
 
@@ -264,9 +261,7 @@ begin
 end;
 
 procedure TPathToDraw.Clear;
-//var i: integer;
 begin
-// for i:=0 to GetCount-1 do FPtArray[i].Free; // clear all point of the path
  DeleteAllChilds; // delete all points and particles emitters
 
  SetLength( FPtArray, 0 );
@@ -322,7 +317,6 @@ begin
     ip := Length( FPEArray );
     SetLength( FPEArray, ip+1 );
     FPEArray[ip] := TParticleEmitter.Create;
-   // FParentScene.Add( FPEArray[ip], 0);//FLayerIndexForParticles );
    AddChild( FPEArray[ip] );
     FPEArray[ip].LoadFromFile( aParticleFilename );
     FPEArray[ip].SetCoordinate( p1 );
