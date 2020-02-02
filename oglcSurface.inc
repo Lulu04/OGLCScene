@@ -64,6 +64,7 @@ TScenarioEvent = procedure ( aSurface: TSimpleSurfaceWithEffect;
                              aScenarioID: TIDScenario;
                              aUserEvent: integer ) of object; // CallBack for scenario event
 
+TScenarioDecode = procedure(aAction: ArrayOfString) of object;
 { TScenario }
 
 TScenario = class
@@ -78,16 +79,18 @@ protected
  FIsRunning   : boolean     ;
  FTemp        : ArrayOfString ;
  FScenarioEvent : TScenarioEvent ;
+ FScenarioDecodeProc: TScenarioDecode;
  procedure Execute ( const aElapsedTime : double ) ;
  procedure LoadFromFile ( const aFilename: string ) ;
  procedure SaveToFile ( const aFilename: string ) ;
  procedure DecodeAction; virtual;
- procedure DecodeAdditionnalAction( {%H-}aAction: ArrayOfString ); virtual;
+// procedure DecodeAdditionnalAction( {%H-}aAction: ArrayOfString ); virtual;
 public
  procedure AddLine( const aLine: string ) ;  // to construct the scenario manually
  property OnEvent: TScenarioEvent read FScenarioEvent write FScenarioEvent ; // Scenario event callback
+ // this callback is only called when an action has not been recognized
+ property OnDecode: TScenarioDecode read FScenarioDecodeProc write FScenarioDecodeProc;
 end;
-
 
 { TSimpleSurfaceWithEffect }
 
@@ -129,6 +132,7 @@ protected
    FBindToSprite  : TBindToSprite ;
 protected
    FListScenario : array of TScenario ;    // surface can execute several scenario at the same time
+   FScenarioAdditionnalDecode: TScenarioDecode;
    function GetScenario( AIDScenario: TIDScenario ): TScenario;
 protected
    procedure PushAndPrepareMatrix; inline;
@@ -204,6 +208,8 @@ public
    procedure StopScenario( AIDScenario: TIDScenario );
    procedure StopAllScenario;
    function ScenarioIsPlaying( AIDScenario: TIDScenario ): boolean;
+   // set a callbak proc to decode custom additionnal actions
+   procedure SetScenarioAdditionnalDecode( aCallbackDecode: TScenarioDecode );
    // Frame anime
    procedure SetFrameLoopBounds( AStartFrameIndex, AEndFrameIndex: integer );
    procedure FrameAddPerSecond( ADeltaFramePerSecond: single );
@@ -284,21 +290,24 @@ public
    procedure SetBottomColors( AColor: TBGRAPixel );
 end;
 
-{ TCircle }
+{ TEllipse }
 
-TCircle = class( TSimpleSurfaceWithEffect )
-  Constructor Create( aCenter: TPointF; aRadius: single );
+TEllipse = class( TSimpleSurfaceWithEffect )
+  Constructor Create( aCenter: TPointF; aRx, aRy: single );
   Destructor Destroy; override;
 protected
   FPath: ArrayOfTPointF;
-  FOldRadius: single;
+  FOldRx,
+  FOldRy: single;
   function GetWidth: integer; override;
   function GetHeight: integer; override;
 public
   procedure Update( const aElapsedTime: single ); override;
   procedure Draw( const aLayerPercentOpacity: single ); override;
 public
-  Radius: TFParam;
+  RadiusX,
+  RadiusY: TFParam;
+  // Tint property is the color of the ellipse
 end;
 
 {$endif oglcINTERFACE}
@@ -306,46 +315,55 @@ end;
 
 
 {$ifdef oglcIMPLEMENTATION}
-{TCircle }
-constructor TCircle.Create( aCenter: TPointF; aRadius: single );
+{TEllipse }
+constructor TEllipse.Create( aCenter: TPointF; aRx, aRy: single );
 begin
  inherited Create;
  X.Value := aCenter.x;
  Y.Value := aCenter.y;
- FPath := ComputeEllipse( 0, 0, aRadius, aRadius );
- FOldRadius := aRadius;
- Radius := TFParam.Create;
- Radius.Value := aRadius;
+ FPath := ComputeEllipse( 0, 0, aRx, aRy );
+ FOldRx := aRx;
+ FOldRy := aRy;
+ RadiusX := TFParam.Create;
+ RadiusX.Value := aRx;
+ RadiusY := TFParam.Create;
+ RadiusY.Value := aRy;
 end;
 
-destructor TCircle.Destroy;
+destructor TEllipse.Destroy;
 begin
- Radius.Free;
+ RadiusX.Free;
+ RadiusY.Free;
  inherited Destroy;
 end;
 
-function TCircle.GetWidth: integer;
+function TEllipse.GetWidth: integer;
 begin
- Result := round( Radius.Value*2);
+ Result := round( RadiusX.Value*2);
 end;
 
-function TCircle.GetHeight: integer;
+function TEllipse.GetHeight: integer;
 begin
- Result := round( Radius.Value*2);
+ Result := round( RadiusY.Value*2);
 end;
 
-procedure TCircle.Update(const aElapsedTime: single);
+procedure TEllipse.Update(const aElapsedTime: single);
 begin
  inherited Update(aElapsedTime);
  if FFreeze then exit;
- Radius.OnElapse( aElapsedTime );
- if Radius.Value <> FOldRadius then begin
-  FOldRadius := Radius.Value;
-  FPath := ComputeEllipse( 0, 0, Radius.Value, Radius.Value );
+
+ RadiusX.OnElapse( aElapsedTime );
+ RadiusY.OnElapse( aElapsedTime );
+
+ if (RadiusX.Value <> FOldRx) or
+    (RadiusY.Value <> FOldRy) then begin
+  FOldRx := RadiusX.Value;
+  FOldRy := RadiusY.Value;
+  FPath := ComputeEllipse( 0, 0, RadiusX.Value, RadiusY.Value );
  end;
 end;
 
-procedure TCircle.Draw(const aLayerPercentOpacity: single);
+procedure TEllipse.Draw(const aLayerPercentOpacity: single);
 var i: integer;
 begin
  if not Visible or
@@ -1230,11 +1248,13 @@ begin
  o.LoadFromFile( aFilename );
  o.CurrentLine := 0;
  o.OnEvent := ACallBackEvent;
+ o.OnDecode:=FScenarioAdditionnalDecode;
  Result := AddScenario( o );
 end;
 
 function TSimpleSurfaceWithEffect.AddScenario(aScenario: TScenario ): TIDScenario;
 begin
+ aScenario.OnDecode:=FScenarioAdditionnalDecode;
  Result := Length( FListScenario );
  SetLength( FListScenario, Result + 1 );
  FListScenario[Result] := aScenario;
@@ -1292,6 +1312,12 @@ begin
  if s = NIL
    then Result := FALSE
    else Result := S.FIsRunning;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScenarioAdditionnalDecode(
+  aCallbackDecode: TScenarioDecode);
+begin
+ FScenarioAdditionnalDecode := aCallbackDecode;
 end;
 
 
@@ -1454,18 +1480,13 @@ begin
   acEnableGui: ParentSurface.EnableGui;
   acDisableGui: ParentSurface.DisableGui
 
-  else DecodeAdditionnalAction( FTemp );
+  else if FScenarioDecodeProc<>NIL then FScenarioDecodeProc(FTemp); //DecodeAdditionnalAction( FTemp );
  end;//case
 end;
 
 procedure TScenario.AddLine(const aLine: string);
 begin
  Actions.Add( aLine );
-end;
-
-procedure TScenario.DecodeAdditionnalAction(aAction:ArrayOfString);
-begin
-// nothing here
 end;
 
 

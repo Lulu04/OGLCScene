@@ -200,7 +200,7 @@ begin
    if i <> -1 then CurrentLine := i - 1;
   end;
 
-  else DecodeAdditionnalAction( FTemp );
+  else if FScenarioDecodeProc<>NIL then FScenarioDecodeProc(FTemp); //DecodeAdditionnalAction( FTemp );
  end;//case
 end;
 

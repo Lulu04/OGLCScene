@@ -136,12 +136,179 @@ end;
  end;
 }
 
+{
+TOGLCStormLightningNode=record
+  Pt: TPointF;
+  Po: TPolarCoor;
+  Alpha: single;
+end;
+POGLCStormLightningNode=^TOGLCStormLightningNode;
+ArrayOfStormLightningNode = array of TOGLCStormLightningNode;
+
+TOGLCStormLightningSecondaryPath=record
+  FirstNode: POGLCStormLightningNode;
+  Nodes: ArrayOfStormLightningNode;
+  IsMain: boolean;
+end;
+
+
+{ ToglcStormLightning }
+
+ToglcStormLightning = class(TSimpleSurfaceWithEffect)
+private
+  FWidth, FHeight: integer;
+  FMainColor, FSecondaryColor: TBGRAPixel;
+  FNodeAngleAperture,
+  FMaxLineWidth: single;
+  FMainTexture,
+  FSecondaryTexture: PTexture;
+  FMainNodes: ArrayOfStormLightningNode;
+  FSecondaryNodes: array of ArrayOfOGLCStormLightningNode;
+  procedure CreateTextures;
+  procedure ComputeDrawing;
+protected
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+public
+  procedure Update( const aElapsedTime: single ); override;
+  procedure Draw( const aLayerPercentOpacity: single );  override;
+public
+  Constructor Create( aStartPt, // scene coordinates from where the lightning start
+                      aTargetPt: TPointF; // scene coordinates where the lightning ends
+                      aMainNodeCount,                // must be >2
+                      aSecondaryNodeCount: integer;  // must be >=0
+                      aMainColor, // color of the main lightning
+                      aSecondaryColor: TBGRAPixel; // color of the secondary lightning
+                      aNodeAngleAperture, // >=0
+                      aMaxLineWidth: single); // must be >0
+  Destructor Destroy; override;
+
+end;
+}
 {$endif oglcINTERFACE}
 
 
 
 {$ifdef oglcIMPLEMENTATION}
 
+{ ToglcStormLightning }
+{
+procedure ToglcStormLightning.CreateTextures;
+var ima: TBGRABitmap;
+    procedure DoGradient(aColor: TBGRAPixel);
+    var
+      xL, xR: integer;
+      opacityStep, accualpha: single;
+      c: TBGRAPixel;
+    begin
+     ima.Fill(aColor);
+     if ima.Width<2 then exit;
+
+     xL:= round(ima.Width/2);
+     xR:=xL;
+     opacityDeltaStep:=aColor.alpha/(ima.Width-xR);
+     c:=aColor;
+
+     xR:= ima.Width-1;
+     accualpha:= opacityDeltaStep;
+     for xL:=0 to round(ima.Width/2)-1 do begin
+      c.alpha := round(accualpha);
+      ima.Pixels[xL,0]:=c;
+      ima.Pixels[xR,0]:=c;
+      accualpha+=opacityDeltaStep;
+      dec(xR);
+     end;
+    end;
+
+begin
+ w:=round(FMaxLineWidth*10);
+ if w>200 then w:=200;
+ if w<1 then w:=1;
+
+ ima:=TBGRABitmap.Create(w, 1,);
+ DoGradient( FMainColor );
+ FMainTexture:=TextureManager.Add(ima);
+
+ DoGradient( FSecondaryColor );
+ FSecondaryTexture:=TextureManager.Add(ima);
+ ima.Free;
+end;
+
+procedure ToglcStormLightning.ComputeDrawing;
+begin
+
+end;
+
+function ToglcStormLightning.GetWidth: integer;
+begin
+ Result:=FWidth;
+end;
+
+function ToglcStormLightning.GetHeight: integer;
+begin
+ Result:=FHeight;
+end;
+
+procedure ToglcStormLightning.Update(const aElapsedTime: single);
+begin
+ inherited Update(aElapsedTime);
+end;
+
+procedure ToglcStormLightning.Draw(const aLayerPercentOpacity: single);
+begin
+ if not FVisible then exit;
+ if Opacity.Value=0 then exit;
+
+ SetBlendMode( FBlendMode );
+ PushAndPrepareMatrix;
+ TextureManager.DisableTextureUsage;
+ glLineWidth( 3.5 );    // 3.5
+
+ c := FMainColor;
+ c.alpha := round( c.alpha*aLayerPercentOpacity*Opacity.pcValue );
+
+ p1 := PointF( FPtArray[0].CenterX, FPtArray[0].CenterY );
+ if FShakerEnable then p1 := p1.Add(PointF(random(FShakerAmplitude),random(FShakerAmplitude)));
+ i := 1;
+ repeat
+   p2 := PointF( FPtArray[i].CenterX, FPtArray[i].CenterY );
+   if FShakerEnable then p2 := p2.Add(PointF(random(FShakerAmplitude),random(FShakerAmplitude)));
+   if not FPtArray[i].IsJump then begin
+     if (Mode = pdmAll) or
+        ((Mode = pdmOnlyPositionned) and FPtArray[i].IsGoodPositionned)
+       then DrawLine( p1, p2, c, FLineWidth, aLayerPercentOpacity);
+   end;
+   p1 := p2;
+   inc( i );
+ until i=Count;
+
+ DrawChildSurfaces( aLayerPercentOpacity * Opacity.pcValue );
+ PopMatrix;
+end;
+
+constructor ToglcStormLightning.Create(aStartPt, aTargetPt: TPointF;
+  aMainNodeCount, aSecondaryNodeCount: integer; aMainColor,
+  aSecondaryColor: TBGRAPixel; aNodeAngleAperture, aMaxLineWidth: single);
+begin
+ FMainColor := MainColor;
+ FSecondaryColor:=aSecondaryColor;
+ FNodeAngleAperture:=aNodeAngleAperture;
+
+ if aMaxLineWidth<1 then aMaxLineWidth:=1;
+ if aMaxLineWidth>80 then aMaxLineWidth:=80;
+ FMaxLineWidth:=aMaxLineWidth;
+
+ if aMainNodeCount<2 then aMainNodeCount:=2;
+ if aSecondaryNodeCount<0 then aSecondaryNodeCount:=0;
+
+ CreateTextures;
+end;
+
+destructor ToglcStormLightning.Destroy;
+begin
+ inherited Destroy;
+end;
+}
 { TSnow }
 
 function TSnow.GetOneTypeFlakeCount: integer;
