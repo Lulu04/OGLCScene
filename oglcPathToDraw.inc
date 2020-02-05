@@ -61,7 +61,7 @@ public
   property PointVisible: boolean read FPointVisible write SetPointVisible;
 
   property EnableShaker: boolean read FShakerEnable write FShakerEnable;
-  property ShakerAmplitude: integer read FShakerAmplitude write SetShakerAmplitude;
+  property ShakerAmplitude: integer read FShakerAmplitude write SetShakerAmplitude; // [0..100]
 end;
 
 
