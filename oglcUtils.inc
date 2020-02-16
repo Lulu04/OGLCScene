@@ -39,6 +39,11 @@ procedure DrawTexturePart( aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
                            aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
                            aPercentOpacity: single);
 
+procedure DrawStretchedTexture( aTexture: PTexture; AFrameIndex: integer;
+                                TopLeft, TopRight, BottomRight, BottomLeft: TPointF;
+                                aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
+                                aPercentOpacity: single);
+
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor, FillColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
 
@@ -56,6 +61,8 @@ function ScaleValueToFitScene( aTexture: PTexture; AScene: TOGLCScene ): TPointF
 function ScaleValueToFitSurface( aTexture: PTexture; aSurface: TSimpleSurfaceWithEffect ): TPointF;
 
 function Distance(aPt1, aPt2: TPointF): single;
+
+function PointFToRectF( p1, p2: TPointF ): TRectF;
 
 type
 TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
@@ -523,6 +530,57 @@ begin
         end;
 end;
 
+procedure DrawStretchedTexture(aTexture: PTexture; AFrameIndex: integer;
+                          TopLeft, TopRight, BottomRight, BottomLeft: TPointF;
+                          aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
+                          aPercentOpacity: single);
+var
+  quad : array[ 0..3 ] of TPointF;
+  tci  : PTextureCoordIndex;
+  i: integer;
+  TexCoord : TTexCoor;
+  procedure DrawVertex;
+   begin
+    glBegin( GL_QUADS );
+      glTexCoord2fv( @TexCoord[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
+      glTexCoord2fv( @TexCoord[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
+      glTexCoord2fv( @TexCoord[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
+      glTexCoord2fv( @TexCoord[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
+    glEnd;
+   end;
+begin
+ if aTexture = nil then exit;
+ TextureManager.BindTexture( aTexture );
+ TexCoord := aTexture^.FramesCoord[AFrameIndex];
+
+ quad[0] := TopLeft;
+ quad[1] := TopRight;
+ quad[2] := BottomRight;
+ quad[3] := BottomLeft;
+
+ // Flip
+ i:=0;
+ if aFlipH then inc( i );
+ if aFlipV then inc( i, 2 );
+ tci := @FLIP_TEXCOORD[ i ];
+
+ if aTint.alpha < 255
+   then begin
+         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+         glColor4ub(255,255,255,round(255*aPercentOpacity));
+         DrawVertex;
+        end;
+
+ if aTint.alpha <> 0
+   then begin  //Apply Tint
+         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
+         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
+         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
+         glColor4ub( aTint.red, aTint.Green, aTint.Blue, round(aTint.alpha*aPercentOpacity));
+         DrawVertex;
+        end;
+end;
+
 procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single; aLayerPercentOpacity: single);
 begin
  X += 0.5;
@@ -602,6 +660,19 @@ end;
 function Distance(aPt1, aPt2: TPointF): single;
 begin
  Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
+end;
+
+function PointFToRectF(p1, p2: TPointF): TRectF;
+var topleft, bottomright: TPointF;
+begin
+ if p1.x<p2.x then topleft.x:=p1.x else topleft.x:=p2.x;
+ if p1.y<p2.y then topleft.y:=p1.y else topleft.y:=p2.y;
+
+ if p1.x<p2.x then bottomright.x:=p2.x else bottomright.x:=p1.x;
+ if p1.y<p2.y then bottomright.y:=p2.y else bottomright.y:=p1.y;
+
+ Result.TopLeft:=topleft;
+ Result.BottomRight:=bottomright;
 end;
 
 procedure SetBlendMode(ABlendMode: byte);
@@ -686,6 +757,7 @@ begin
  if rl < rh then r := rl else r := rh;
  Result := PointF(r, r);
 end;
+
 
 {$endif oglcIMPLEMENTATION}
 
