@@ -377,6 +377,7 @@ begin
  for i:=1 to Length( FPath )-1 do
   DrawLine( FPath[i-1], FPath[i], Tint.Value, aLayerPercentOpacity );
 
+ DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
  PopMatrix;
 end;
 
