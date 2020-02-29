@@ -227,7 +227,7 @@ begin
 
  // prepare the string
  if ALine[1] <> aCharSeparator
-   then ALine := aCharSeparator + ALine;
+   then ALine := aCharSeparator {%H-}+ ALine;
 
  i := 1;
  w := -1;
@@ -262,7 +262,7 @@ begin
 
  // prepare the string
  if aText[1] <> aCharSeparator
-   then aText := aCharSeparator + aText;
+   then aText := aCharSeparator {%H-}+ aText;
 
  i := 1;
  w := -1;
