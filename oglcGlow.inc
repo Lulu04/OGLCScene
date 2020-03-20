@@ -1,8 +1,8 @@
 {$ifdef oglcINTERFACE}
 type
-  { TGlow }
+  { TOGLCGlow }
 
-  TGlow = class( TSimpleSurfaceWithEffect )
+  TOGLCGlow = class( TSimpleSurfaceWithEffect )
    private
     class var FShaderGlow: TShaderID;
     class var FLocGlowCenter: GLint;
@@ -39,19 +39,19 @@ GLOW_FRAGMENT_SHADER_PRG = '#version 120'#10+
                           'gl_FragColor = color;'#10+
                           '}' ;
 
-{ TGlow }
+{ TOGLCGlow }
 
-function TGlow.GetWidth: integer;
+function TOGLCGlow.GetWidth: integer;
 begin
  Result := round( Radius.Value * 2 );
 end;
 
-function TGlow.GetHeight: integer;
+function TOGLCGlow.GetHeight: integer;
 begin
  Result := round( Radius.Value * 2 );
 end;
 
-procedure TGlow.Update(const aElapsedTime: single);
+procedure TOGLCGlow.Update(const aElapsedTime: single);
 begin
  inherited Update(aElapsedTime);
  if Freeze then exit;
@@ -59,7 +59,7 @@ begin
  Attenuation.OnElapse( aElapsedTime );
 end;
 
-procedure TGlow.Draw(const aLayerPercentOpacity: single);
+procedure TOGLCGlow.Draw(const aLayerPercentOpacity: single);
 var r: single;
     p: TPointF;
 begin
@@ -96,7 +96,7 @@ begin
 
 end;
 
-constructor TGlow.Create(aX, aY, aRadius: single; aColor: TBGRAPixel;
+constructor TOGLCGlow.Create(aX, aY, aRadius: single; aColor: TBGRAPixel;
   aBlendMode: byte);
 begin
  inherited Create;
@@ -119,7 +119,7 @@ begin
  end;
 end;
 
-destructor TGlow.Destroy;
+destructor TOGLCGlow.Destroy;
 begin
  Radius.Free;
  Attenuation.Free;
