@@ -171,6 +171,7 @@ public
    function ScreenToSurface( aPts: TPointF ): TPointF;
    function SurfaceToParent( aPts: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
    function ParentToSurface( aPts: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
+   function IsParentOf( aSurface: TSimpleSurfaceWithEffect): boolean;
 
    function GetScaledArea: TRect;
 
@@ -849,15 +850,31 @@ end;
 function TSimpleSurfaceWithEffect.SurfaceToParent(aPts: TPointF;
   aParent: TSimpleSurfaceWithEffect): TPointF;
 begin
- if not Assigned(aParent) then aParent := FParentSurface;
- Result := aParent.SceneToSurface( SurfaceToScene( aPts ) );
+  if aParent=NIL then aParent := FParentSurface;
+  if aParent=NIL
+    then Result := SurfaceToScene( aPts )
+    else Result := aParent.SceneToSurface( SurfaceToScene( aPts ) );
 end;
 
 function TSimpleSurfaceWithEffect.ParentToSurface(aPts: TPointF;
   aParent: TSimpleSurfaceWithEffect): TPointF;
 begin
  if not Assigned(aParent) then aParent := FParentSurface;
- Result := SceneToSurface( aParent.SurfaceToScene( aPts ) );
+ if aParent=NIL
+   then Result := SceneToSurface( aPts )
+   else Result := SceneToSurface( aParent.SurfaceToScene( aPts ) );
+end;
+
+function TSimpleSurfaceWithEffect.IsParentOf(aSurface: TSimpleSurfaceWithEffect ): boolean;
+var
+  i: Integer;
+begin
+ Result:=FALSE;
+ for i:=0 to ChildCount-1 do
+  if Child[i]=aSurface then begin
+    Result:=TRUE;
+    exit;
+  end;
 end;
 
 function TSimpleSurfaceWithEffect.GetScaledArea: TRect;
@@ -986,6 +1003,14 @@ end;
 
 procedure TSimpleSurfaceWithEffect.PushAndPrepareMatrix;
 begin
+  glPushMatrix;
+  glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5, 0 );
+  glScalef( Scale.x.Value, Scale.y.Value, 0 );
+  glRotatef( Angle.Value, 0, 0, 1 );
+  glTranslatef( -Width * 0.5, -Height * 0.5, 0 );
+
+ {
+
  glPushMatrix;
  if FParentSurface = NIL then glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5 , 0 )
                          else glTranslatef( X.Value + Width * 0.5 * Scale.x.Value, Y.Value + Height * 0.5 * Scale.y.Value, 0 );
@@ -993,6 +1018,8 @@ begin
  glScalef( Scale.x.Value, Scale.y.Value, 0 );
  glRotatef( Angle.Value, 0, 0, 1 );
  glTranslatef( -Width * 0.5, -Height * 0.5, 0 );
+ }
+
 end;
 
 procedure TSimpleSurfaceWithEffect.PopMatrix;
@@ -1061,9 +1088,7 @@ begin
  if FFlipV then inc( i, 2 );
  tci := @FLIP_TEXCOORD[ i ];
 
-// glEnable(GL_BLEND);
  SetBlendMode( FBlendMode );
-
  TextureManager.BindTexture( aTexture );
 
  if Tint.alpha.Value < 255
@@ -1083,8 +1108,8 @@ begin
          DrawVertex;
         end;
 
- TextureManager.DisableTextureUsage;
  {$IFDEF DEBUG_MODE_ON}
+   TextureManager.DisableTextureUsage;
    DrawBox(X.Value, Y.Value, aTexture^.TextureWidth, aTexture^.TextureHeight, BGRA(255,0,0));
  {$ENDIF}
 
