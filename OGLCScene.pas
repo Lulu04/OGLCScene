@@ -150,6 +150,7 @@ TOGLCCamera = class;
 {$I oglcRenderToTexture.inc }
 {$I oglcLayer.inc }
 {$I oglcSurface.inc }
+{$I oglcPath.inc }
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcSpriteEffect.inc }
@@ -291,7 +292,7 @@ TOGLCScene = class (TLayerList)
  public
   // convenience functions
   function CreateCamera: TOGLCCamera;
-  // unassign the camera on all layers, then free it.
+  // unassign the camera on all layers, and free it.
   // After this method, aCamera is set to NIL.
   procedure KillCamera( var aCamera: TOGLCCamera );
 
@@ -360,6 +361,7 @@ end;
 {$I oglcRenderToTexture.inc }
 {$I oglcLayer.inc }
 {$I oglcSurface.inc }
+{$I oglcPath.inc }
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcSpriteEffect.inc }

@@ -34,10 +34,11 @@ TTexturedFont = class
   procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single;
                       aSetTextureParameters: boolean=TRUE);
  public
-  CharSpaceCoeff: TBoundedFParam; // coeff affect the space between character
-                                  // [0..1[ the characters are close together
-                                  // 1  normal
-                                  // >1   the characters are farther apart from each other
+  // coeff affect the space between character
+  // [0..1[ the characters are close together
+  // 1  normal
+  // >1   the characters are farther apart from each other
+  CharSpaceCoeff: TBoundedFParam;
   procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single;
                       aSetTextureParameters: boolean=TRUE );
   procedure DrawCenteredChar( aChar: string; aCenterLocation: TPointF; const aLayerPercentOpacity: single;
@@ -100,6 +101,34 @@ public
   property Caption: string read GetCaption write SetCaption;
   property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
 end;
+
+
+{ TFreeTextOnPath }
+
+TFreeTextOnPath = class(TFreeText)
+private
+  FPath: TOGLCPath;
+  FPathOwner: boolean;
+  procedure SetCaption(AValue: string); override;
+public
+  procedure Update( const aElapsedTime: single ); override;
+  procedure Draw( const aLayerPercentOpacity: single );  override;
+public
+  // Distance traveled on the path
+  DistanceTraveled: TFParam;
+  // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
+  AutoRotate: boolean;
+  // set this value to ajust the right orientation of the sprite along the path. Default is '0'.
+  AngleAdjust: single;
+
+  constructor Create;
+  destructor Destroy; override;
+  // use this method to assign a path to the sprite.
+  // if Owner is TRUE, the path is automatically destroyed when the sprite is killed
+  procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
+  property Path: TOGLCPath read FPath;
+end;
+
 
 
 TOGLCAlignment=(taTopLeft, taTopCenter, taTopRight,
@@ -654,6 +683,95 @@ end;
 
   DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
   PopMatrix;
+ end;
+
+ { TFreeTextOnPath }
+
+ procedure TFreeTextOnPath.SetCaption(AValue: string);
+ begin
+  inherited SetCaption(AValue);
+ end;
+
+ procedure TFreeTextOnPath.Update(const aElapsedTime: single);
+ begin
+   inherited Update(aElapsedTime);
+   if FFreeze then exit;
+   DistanceTraveled.OnElapse( aElapsedTime );
+ end;
+
+ procedure TFreeTextOnPath.Draw(const aLayerPercentOpacity: single);
+ var AlphaTint: byte;
+  P: TPointF;
+  A, dist: single;
+  ch: string;
+  i: Integer;
+ begin
+  if FCaption='' then exit;
+  if FTexturedFont=NIL then exit;
+  if FPath=NIL then exit;
+
+  SetBlendMode( FBlendMode );
+  TextureManager.BindTexture( FTexturedFont.Texture );
+
+  dist:=DistanceTraveled.Value;
+
+  for i:=1 to UTF8Length(FCaption) do begin
+   ch := UTF8Copy(FCaption,i,1);
+   if FPath.IsOnThePath( dist ) then begin
+     FPath.GetPosAndAngle( dist, P, A);
+     SetCoordinate( P );
+     if AutoRotate then Angle.Value:=A;
+     PushAndPrepareMatrix;
+     if Tint.alpha.Value < 255
+       then begin
+             glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+             glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
+             FTexturedFont.DrawCenteredChar(ch, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity );
+            end;
+
+     if Tint.alpha.Value <> 0
+       then begin  //Apply Tint
+             glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
+             glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
+             glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
+             AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
+             glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
+             FTexturedFont.DrawCenteredChar(ch, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity );
+            end;
+
+     PopMatrix;
+   end;
+   dist+=FTexturedFont.GetDecoratedCharWidth( ch );
+  end;
+
+{  FPath.GetPosAndAngle( DistanceTraveled.Value, P, A);
+  SetCoordinate( P );
+  if AutoRotate then Angle.Value:=A;
+  PushAndPrepareMatrix;
+  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
+  PopMatrix;}
+ end;
+
+ constructor TFreeTextOnPath.Create;
+ begin
+  inherited Create;
+  DistanceTraveled:= TFParam.Create;
+  AutoRotate:=TRUE;
+ end;
+
+ destructor TFreeTextOnPath.Destroy;
+ begin
+  DistanceTraveled.Free;
+  if (FPath<>NIL) and FPathOwner then FPath.Free;
+  inherited Destroy;
+ end;
+
+ procedure TFreeTextOnPath.AssignPath(aPath: TOGLCPath; Owner: boolean);
+ begin
+  if (FPath<>NIL) and FPathOwner then FPath.Free;
+
+  FPathOwner:= Owner;
+  FPath:=aPath;
  end;
 
 { TTexturedFont }
