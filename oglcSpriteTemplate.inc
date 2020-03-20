@@ -38,6 +38,7 @@ public
   Destructor Destroy; override;
   procedure Update( const aElapsedTime: single ); override;
 public
+  // changing the distance and/or angle automatically moves the sprite accordingly
   Polar: TPolarSystemParam;
 end;
 
