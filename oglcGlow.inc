@@ -4,6 +4,7 @@ type
 
   TGlow = class( TSimpleSurfaceWithEffect )
    private
+    class var FShaderGlow: TShaderID;
     class var FLocGlowCenter: GLint;
     class var FLocGlowColor: GLint;
     class var FLocGlowRadius: GLint;
@@ -20,9 +21,24 @@ type
    Attenuation: TFParam;
    Constructor Create( aX, aY, aRadius: single; aColor: TBGRAPixel; aBlendMode: byte=FX_BLEND_ADD ) ;
    Destructor Destroy; override;
+   // use Tint property to set the color
   end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
+const
+
+GLOW_FRAGMENT_SHADER_PRG = '#version 120'#10+
+                          'uniform vec2 lightCenter;'#10+
+                          'uniform vec4 lightColor;'#10+
+                          'uniform float lightRadius;'#10+
+                          'uniform float powerAttenuation;'#10+
+                          'void main() {'#10+
+                          'float d = distance( lightCenter, gl_FragCoord.xy ) / lightRadius;'#10+
+                          'float attenuation = 1 - d;'#10+
+                          'vec4 color = vec4(attenuation, attenuation, attenuation, pow(attenuation, powerAttenuation)) * lightColor;'#10+
+                          'gl_FragColor = color;'#10+
+                          '}' ;
+
 { TGlow }
 
 function TGlow.GetWidth: integer;
@@ -38,28 +54,26 @@ end;
 procedure TGlow.Update(const aElapsedTime: single);
 begin
  inherited Update(aElapsedTime);
+ if Freeze then exit;
  Radius.OnElapse( aElapsedTime );
  Attenuation.OnElapse( aElapsedTime );
 end;
 
 procedure TGlow.Draw(const aLayerPercentOpacity: single);
-var OldBlendMode : byte ;
-  r: single;
+var r: single;
+    p: TPointF;
 begin
  if not FVisible then exit;
  if not OpenGL_Version_2_0_Loaded then exit; // no shader available
 
- OldBlendMode := _FglCurrentBlendMode;
  SetBlendMode( FBlendMode );
 
  r := Radius.Value * Scale.x.Value;
-
-// glPushMatrix;
-// glTranslatef( X, Y, 0);
+ p:= SurfaceToScene(PointF(0,0));
 
  with ShaderManager do begin
-  Use( FParentScene.FShaderGlow );
-  SetUniform2f( FLocGlowCenter, x.Value, FParentScene.Height - y.Value);
+  Use( FShaderGlow );
+  SetUniform2f( FLocGlowCenter, p.x, FParentScene.Height - p.y);
   SetUniform4f( FLocGlowColor, Tint.Red.Value/255, Tint.Green.Value/255, Tint.Blue.Value/255, Tint.Alpha.Value/255*aLayerPercentOpacity );
   SetUniform1f( FLocGlowRadius, r );
   SetUniform1f( FLocGlowAttenuation, Attenuation.Value );
@@ -71,8 +85,6 @@ begin
   glVertex2f( x.Value+r, y.Value+r );
   glVertex2f( x.Value-r, y.Value+r );
  glEnd ;
-
- SetBlendMode( OldBlendMode );
 
  ShaderManager.UseNone;
 
@@ -97,14 +109,14 @@ begin
  Tint.Value:=aColor;
  FBlendMode := aBlendMode;
 
- if not FLocInitDone
-   then begin
+ if not FLocInitDone then begin
     FLocInitDone := TRUE;
+    FShaderGlow := ShaderManager.CreateShader( '', GLOW_FRAGMENT_SHADER_PRG );
     FLocGlowCenter := ShaderManager.GetUniform( 0, 'lightCenter' ) ;
     FLocGlowColor := ShaderManager.GetUniform( 0, 'lightColor' ) ;
     FLocGlowRadius := ShaderManager.GetUniform( 0, 'lightRadius' ) ;
     FLocGlowAttenuation := ShaderManager.GetUniform( 0, 'powerAttenuation' ) ;
-end;
+ end;
 end;
 
 destructor TGlow.Destroy;

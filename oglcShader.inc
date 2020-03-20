@@ -46,25 +46,6 @@ var
  ShaderManager : TShaderManager=NIL;
 
 const
-
-  GLOW_VERTEX_SHADER_PRG = '#version 120'#10+
-                           'void main() {'#10+
-                           'gl_Position = ftransform();'#10+  //gl_Vertex;'+
-                           '}';
-
- GLOW_FRAGMENT_SHADER_PRG = '#version 120'#10+
-                            'uniform vec2 lightCenter;'#10+
-                            'uniform vec4 lightColor;'#10+
-                            'uniform float lightRadius;'#10+
-                            'uniform float powerAttenuation;'#10+
-                            'void main() {'#10+
-                            'float d = distance( lightCenter, gl_FragCoord.xy ) / lightRadius;'#10+
-                            'float attenuation = 1 - d;'#10+
-                            'vec4 color = vec4(attenuation, attenuation, attenuation, pow(attenuation, powerAttenuation)) * lightColor;'#10+
-                            'gl_FragColor = color;'#10+
-                            '}' ;
-
-
  TEST_VERTEX_SHADER_PRG = '#version 130'#10+
                           'varying vec2 UV;'#10+
                           'void main() {'#10+

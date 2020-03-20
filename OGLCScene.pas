@@ -211,8 +211,6 @@ TOGLCScene = class (TLayerList)
   procedure NewOnClick ( Sender:TObject );
   procedure Draw;
   procedure UpDate ( const DT:single );
- protected
-  FShaderGlow: TShaderID;
  private
   FTickOrigin : QWord;
   // FPS
@@ -490,10 +488,7 @@ begin
     then Showmessage('Cannot load OpenGL 2.0, shader not available...');
 
    if ShaderManager = NIL
-     then begin
-           ShaderManager := TShaderManager.Create;
-           FShaderGlow := ShaderManager.CreateShader( '', GLOW_FRAGMENT_SHADER_PRG );
-     end;
+     then ShaderManager := TShaderManager.Create;
 
    FTickOrigin := GetTickCount64;
  end;
