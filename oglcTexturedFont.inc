@@ -705,6 +705,7 @@ end;
   A, dist: single;
   ch: string;
   i: Integer;
+  chSize: TSize;
  begin
   if FCaption='' then exit;
   if FTexturedFont=NIL then exit;
@@ -717,11 +718,17 @@ end;
 
   for i:=1 to UTF8Length(FCaption) do begin
    ch := UTF8Copy(FCaption,i,1);
+   chSize := FTexturedFont.GetCharSize(ch);
    if FPath.IsOnThePath( dist ) then begin
      FPath.GetPosAndAngle( dist, P, A);
-     SetCoordinate( P );
      if AutoRotate then Angle.Value:=A;
-     PushAndPrepareMatrix;
+
+     glPushMatrix;
+     glTranslatef( P.x + chSize.cx * 0.5, P.y + chSize.cy * 0.5, 0 );
+     glScalef( Scale.x.Value, Scale.y.Value, 0 );
+     glRotatef( Angle.Value, 0, 0, 1 );
+     glTranslatef( -chSize.cx * 0.5, -chSize.cy * 0.5, 0 );
+
      if Tint.alpha.Value < 255
        then begin
              glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
@@ -743,13 +750,6 @@ end;
    end;
    dist+=FTexturedFont.GetDecoratedCharWidth( ch );
   end;
-
-{  FPath.GetPosAndAngle( DistanceTraveled.Value, P, A);
-  SetCoordinate( P );
-  if AutoRotate then Angle.Value:=A;
-  PushAndPrepareMatrix;
-  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
-  PopMatrix;}
  end;
 
  constructor TFreeTextOnPath.Create;
