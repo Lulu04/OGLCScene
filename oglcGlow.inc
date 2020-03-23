@@ -9,7 +9,7 @@ type
     class var FLocGlowColor: GLint;
     class var FLocGlowRadius: GLint;
     class var FLocGlowAttenuation: GLint;
-    class var FLocInitDone: boolean;
+    class var FShaderInitDone: boolean;
   protected
    function GetWidth: integer; override;
    function GetHeight: integer; override;
@@ -109,8 +109,8 @@ begin
  Tint.Value:=aColor;
  FBlendMode := aBlendMode;
 
- if not FLocInitDone then begin
-    FLocInitDone := TRUE;
+ if not FShaderInitDone then begin
+    FShaderInitDone := TRUE;
     FShaderGlow := ShaderManager.CreateShader( '', GLOW_FRAGMENT_SHADER_PRG );
     FLocGlowCenter := ShaderManager.GetUniform( 0, 'lightCenter' ) ;
     FLocGlowColor := ShaderManager.GetUniform( 0, 'lightColor' ) ;
