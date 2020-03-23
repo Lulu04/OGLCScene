@@ -1,6 +1,9 @@
 {$ifdef oglcINTERFACE}
 type
 
+// code to manage water effect in TWaterSurface has been written by Circular, the maintainer of BGRABitmap library
+// Thanks !
+
   TValue = NativeInt;
 const
   watersizex = 640;
