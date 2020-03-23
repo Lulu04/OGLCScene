@@ -43,6 +43,9 @@ private
 protected
  function GetWidth: integer; override;
  function GetHeight: integer; override;
+ procedure ReleaseCurrentPath;
+ procedure DoDraw( const pt1, pt2: TPointF; aLayerPercentOpacity: single); virtual;
+ function GetPoint( aIndex: integer ): TPointF; virtual;
 public
    procedure Update( const aElapsedTime: single ); override;
    procedure Draw( const aLayerPercentOpacity: single );  override;
@@ -86,6 +89,7 @@ public
  procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
  property Path: TOGLCPath read FPath;
 end;
+
 
 
 {$endif oglcINTERFACE}
@@ -188,17 +192,27 @@ end;
 function TOGLCPathDrawing.GetWidth: integer;
 begin
  Result:= round(FPath.RectArea.Width);
-// if FTexture<>NIL
-//   then Result:=FTexture^.FrameWidth
-//   else Result:=round(FLineWidth);
 end;
 
 function TOGLCPathDrawing.GetHeight: integer;
 begin
  Result:= round(FPath.RectArea.Height);
-// if FTexture<>NIL
-//   then Result:=FTexture^.FrameHeight
-//   else Result:=1;
+end;
+
+procedure TOGLCPathDrawing.ReleaseCurrentPath;
+begin
+ if (FPath<>NIL) and FPathOwner then FPath.Free;
+ FPath:=NIL;
+end;
+
+procedure TOGLCPathDrawing.DoDraw(const pt1, pt2: TPointF; aLayerPercentOpacity: single);
+begin
+ DrawLine( pt1, pt2, LineColor.Value, FLineWidth, aLayerPercentOpacity);
+end;
+
+function TOGLCPathDrawing.GetPoint(aIndex: integer): TPointF;
+begin
+ Result := FPath.Pts[aIndex];
 end;
 
 procedure TOGLCPathDrawing.Update(const aElapsedTime: single);
@@ -215,14 +229,9 @@ var i: integer;
   p1,p2: TPointF;
   d, d1: single;
   po: TPolarCoor;
-  iDL: integer;
+  iDL, lp: integer;
   DLRemainingDistance: single;
-  DLFlag: boolean;
-
-  procedure DoDraw( const pt1, pt2: TPointF);
-  begin
-   DrawLine( pt1, pt2, LineColor.Value, FLineWidth, aLayerPercentOpacity)
-  end;
+  DLFlag, Notdotted: boolean;
 
   procedure NextIndex;
   begin
@@ -238,12 +247,12 @@ var i: integer;
   var p3: TPointF;
   begin
    if DLRemainingDistance>=po.Distance then begin
-     if DLFlag then DoDraw( p1, PolarToCartesian(p1, po) );
+     if DLFlag then DoDraw( p1, PolarToCartesian(p1, po), aLayerPercentOpacity );
      DLRemainingDistance-=po.Distance;
      if DLRemainingDistance=0 then NextIndex;
    end else begin
        p3:= PolarToCartesian(p1, PolarCoor(DLRemainingDistance, po.Angle));
-       if DLFlag then DoDraw( p1, p3 );
+       if DLFlag then DoDraw( p1, p3, aLayerPercentOpacity );
        p1:=p3;
        po.Distance:=po.Distance-DLRemainingDistance;
        NextIndex;
@@ -256,7 +265,8 @@ begin
  if Opacity.Value=0 then exit;
 
  if FPath=NIL then exit;
- if Length(FPath.Pts)<2 then exit;
+ lp:=Length(FPath.Pts);
+ if lp<2 then exit;
  if DistanceTraveled.Value<0 then exit;
 
  SetBlendMode( FBlendMode );
@@ -265,22 +275,23 @@ begin
  glLineWidth( FLineWidth );
 
  d:=0;
- p1 := FPath.Pts[0];
+ p1 := GetPoint(0);
  i := 1;
 
- if Length(FDottedLine)>0 then begin
+ Notdotted:=Length(FDottedLine)=0;
+ if not Notdotted then begin //Length(FDottedLine)>0 then begin
    iDL:=0;
    DLRemainingDistance:=FDottedLine[0];
    DLFlag:=TRUE;
  end;
 
  repeat
-   p2 := FPath.Pts[i];
+   p2 := GetPoint(i);
    d1:=d;
    d+=FPath.DistanceAndAngle[i].x;
    if DistanceTraveled.Value>=d then begin // draw whole line segment
-     if Length(FDottedLine)=0
-       then DoDraw( p1, p2 )
+     if Notdotted
+       then DoDraw( p1, p2, aLayerPercentOpacity )
        else begin
          po:=CartesianToPolar( p1, p2 );
          DrawDottedLine;
@@ -288,15 +299,17 @@ begin
    end else begin // draw only part of line segment
        po:=CartesianToPolar( p1, p2 );
        po.Distance:=DistanceTraveled.Value-d1;
-       if Length(FDottedLine)=0
-       then DoDraw( p1, PolarToCartesian(p1, po) )
-       else DrawDottedLine;
+       if Notdotted
+         then DoDraw( p1, PolarToCartesian(p1, po), aLayerPercentOpacity )
+         else DrawDottedLine;
    end;
    if d>DistanceTraveled.Value then break;
 
    p1 := p2;
    inc( i );
- until i=Length(FPath.Pts);
+ until i=lp;
+
+ DrawBox(FPath.RectArea.Left, FPath.RectArea.Top, FPath.RectArea.Width, FPath.RectArea.Height, BGRA(255,0,0),2);
 
  DrawChildSurfaces( aLayerPercentOpacity * Opacity.pcValue );
  PopMatrix;
@@ -314,14 +327,14 @@ end;
 destructor TOGLCPathDrawing.Destroy;
 begin
  DistanceTraveled.Free;
- if (FPath<>NIL) and FPathOwner then FPath.Free;
+ ReleaseCurrentPath;
  LineColor.Free;
  inherited Destroy;
 end;
 
 procedure TOGLCPathDrawing.AssignPath(aPath: TOGLCPath; Owner: boolean);
 begin
- if (FPath<>NIL) and FPathOwner then FPath.Free;
+ ReleaseCurrentPath;
 
  FPathOwner:= Owner;
  FPath:=aPath;
