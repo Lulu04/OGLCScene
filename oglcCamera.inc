@@ -56,6 +56,10 @@ public
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
+  // gives the distance between a point and the camera lookAt value
+  function DistanceToPoint( aPt: TPointF ): single;
+  // converts a world point coordinate to screen coordinate relative to camera view
+  function WorldToScreen( aPt: TPointF ): TPointF;
 
   // the camera will be used by the specified layer(s)
   procedure AssignToLayer( aLayerIndex: integer ); overload;
@@ -107,6 +111,16 @@ begin
  LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
  Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
  Angle.ChangeTo( 0, aDuration, aCurve );
+end;
+
+function TOGLCCamera.DistanceToPoint(aPt: TPointF): single;
+begin
+ Result := Distance( aPt, LookAt.Value );
+end;
+
+function TOGLCCamera.WorldToScreen(aPt: TPointF): TPointF;
+begin
+ Result := aPt + LookAt.Value;
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
