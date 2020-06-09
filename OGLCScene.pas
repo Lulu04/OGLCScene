@@ -27,6 +27,7 @@ uses
   OpenGLContext, GLExt, GL,
   lazutf8,
   BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath, BGRAGradientScanner,
+  BGRASVG,
   VelocityCurve,
   math,
   strutils;
@@ -35,7 +36,6 @@ uses
 //{$DEFINE DEBUG_MODE_ON}
 
 type
-
 TOGLCScene = class;
 
 // Callback for OGLCScene.OnBeforePaint and OGLCScene.OnAfterPaint
@@ -141,7 +141,13 @@ ArrayOfString = array of string;
 
 TOGLCCamera = class;
 
+TOGLCAlignment=(taTopLeft, taTopCenter, taTopRight,
+                taCenterLeft, taCenterCenter, taCenterRight,
+                taBottomLeft, taBottomCenter, taBottomRight);
+
+
 {$define oglcINTERFACE}
+{$I gl_core_matrix.inc }
 {$I oglcListType.inc }
 {$I oglcMessage.inc }
 {$I oglcTexture.inc }
@@ -154,6 +160,7 @@ TOGLCCamera = class;
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcSpriteEffect.inc }
+{$I oglcElectricalFX.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
 {$I oglcSlideShow.inc }
@@ -184,11 +191,15 @@ public
  // post a message to the stage. the message will be processed later in the Update method
  // the delay allows to process the message only after a lapse of time (in seconds)
  procedure AddMessage( UserValue: word; aDelay: single=0 );
- procedure ProcessMessage( {%H-}UserValue: word ); virtual; // override to process the message received
+ // override to process the messages received
+ procedure ProcessMessage( {%H-}UserValue: word ); virtual;
 
- procedure LoadData; virtual; abstract;  // override to load texture, create sprite, gui object, sound, initialization, etc...
- procedure FreeData; virtual; abstract;  // override to free all that need to be freed at the end of this stage
- procedure Update( AElapsedTime: single ); virtual; // override to update your stuff according time. don't forget to call inherited.
+ // override to load texture, create sprite, gui object, sound, initialization, etc...
+ procedure LoadData; virtual; abstract;
+ // override to free all that need to be freed at the end of this stage
+ procedure FreeData; virtual; abstract;
+ // override to update your stuff according time. don't forget to call inherited.
+ procedure Update( AElapsedTime: single ); virtual;
 end;
 
 
@@ -220,7 +231,7 @@ TOGLCScene = class (TLayerList)
   procedure CallBackTimerFPS ;
  private
   FGlobalFadeColor: TBGRAParam;
-  FBackgroundColor : TBGRAPixel;
+  FBackgroundColorF: TColorF;
   FFadeTimeForStageChange: single;
   function GetSceneHeight: integer; inline ;
   function GetSceneWidth: integer; inline ;
@@ -237,9 +248,13 @@ TOGLCScene = class (TLayerList)
  private
   FCamera: TOGLCCamera;
   FCameraList: TList;
+  function GetBackgroundColor: TBGRAPixel;
   function GetKeyPressed(index: byte): boolean;
   function GetSceneCenter: TPointF;
   procedure SetKeyMap(index: byte; AValue: boolean);
+{ public
+  FRendererForPostProcessing: TOGLCRenderToTexture;
+  FPostProcessingShader: TOGLCPostProcessingFX;   }
  public
 
   Constructor Create ( aOGLContext: TOpenGLControl ) ;
@@ -273,7 +288,7 @@ TOGLCScene = class (TLayerList)
   property Height: integer read GetSceneHeight;
   property Center: TPointF read GetSceneCenter;
   property FPS: integer read FFPS;
-  property BackgroundColor: TBGRAPixel read FBackgroundColor write SetBackgroundColor ;
+  property BackgroundColor: TBGRAPixel read GetBackgroundColor write SetBackgroundColor ;
   // Callback
   property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
   property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
@@ -316,11 +331,7 @@ TOGLCScene = class (TLayerList)
 end;
 POGLCScene = ^TOGLCScene ;
 
-
-
 implementation
-
-var OpenGL_Version_2_0_Loaded: boolean = FALSE;
 
 { TStageSkeleton }
 
@@ -351,6 +362,7 @@ begin
 end;
 
 {$define oglcIMPLEMENTATION}
+{$I gl_core_matrix.inc }
 {$I oglcListType.inc }
 {$I oglcMessage.inc }
 {$I oglcTexture.inc }
@@ -363,6 +375,7 @@ end;
 {$I oglcCamera.inc }
 {$I oglcSpriteTemplate.inc }
 {$I oglcSpriteEffect.inc }
+{$I oglcElectricalFX.inc }
 {$I oglcGlow.inc }
 {$I oglcDeformationGrid.inc }
 {$I oglcSlideShow.inc }
@@ -396,7 +409,10 @@ begin
 
  ClearKeysState;
 
- FBackgroundColor := BGRABlack;
+ FBackgroundColorF[1]:= 0;
+ FBackgroundColorF[2]:= 0;
+ FBackgroundColorF[3]:= 0;
+ FBackgroundColorF[4]:= 1;
 
  FOnBeforePaint := NIL;
  FOnAfterPaint := NIL;
@@ -427,13 +443,13 @@ begin
  FCurrentStage := NIL;
  FStageRequested := NIL;
 
- FCamera := TOGLCCamera.Create;
- FCamera.FParentScene := self;
-
  FCameraList := TList.Create;
+ FCamera := CreateCamera;
 end;
 
 destructor TOGLCScene.Destroy;
+var
+  i: Integer;
 begin
  if FCurrentStage <> NIL then begin
    FCurrentStage.FreeData;
@@ -444,6 +460,11 @@ begin
  if FOnFreeCommonData <> NIL then FOnFreeCommonData;
  FCommonDataLoaded := FALSE;
 
+{ if FRendererForPostProcessing<>NIL then FRendererForPostProcessing.Free;
+ FPostProcessingShader.Free;  }
+
+ for i:=0 to FCameraList.Count-1 do
+  TOGLCCamera(FCameraList.Items[0]).Free;
  FCameraList.Free;
 
  FreeAndNil( FGlobalFadeColor );
@@ -454,9 +475,6 @@ begin
  DelayManager.Free;
  MouseManager.Free;
  TextureManager.Free;
- if ShaderManager <> NIL then FreeAndNil( ShaderManager );
-
- FreeAndNil( FCamera );
 
  inherited Destroy;
 end;
@@ -469,26 +487,34 @@ begin
  if not FOGLC.MakeCurrent() then exit;
 
  if not FGLInitialized then begin
+   if not Load_GL_version_3_0
+     then raise Exception.Create('Cannot load OpenGL 3.0...');
 
    SetBlendMode( FX_BLEND_NORMAL ) ;
    glEnable(GL_POLYGON_SMOOTH or GL_LINE_SMOOTH);
 
+   // matrix emulator for OpenGL core
+   gnGL.mat[nGL_PROJECTION] := IdentityHmgMatrix;
+   gnGL.mat[nGL_MODELVIEW] := IdentityHmgMatrix;
+   nglMatrixMode(nGL_PROJECTION);
+   nglOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
+   nglMatrixMode(nGL_MODELVIEW);
+
+   // Matrix for legacy OpenGL
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
    glOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
-
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+
    glViewport(0, 0, GetSceneWidth, GetSceneHeight );
    FGLInitialized := TRUE;
-   SetBackgroundColor( FBackgroundColor );
 
-   OpenGL_Version_2_0_Loaded := Load_GL_version_2_0;
-   if not OpenGL_Version_2_0_Loaded
-    then Showmessage('Cannot load OpenGL 2.0, shader not available...');
-
-   if ShaderManager = NIL
-     then ShaderManager := TShaderManager.Create;
+{   FRendererForPostProcessing:= TOGLCRenderToTexture.Create(Self, GetSceneWidth, GetSceneHeight, 0);
+   if not FRendererForPostProcessing.Ready
+     then Showmessage('FBO for scene post processing not ready !...');
+   FPostProcessingShader:= TOGLCPostProcessingFX.Create;
+   FPostProcessingShader.SetParam(FRendererForPostProcessing.RenderedTexture, 0);  }
 
    FTickOrigin := GetTickCount64;
  end;
@@ -504,7 +530,7 @@ begin
  t := GetTickCount64;
  sec := ( t - FTickOrigin ) * 0.001;
 
- // update cameras
+ // update camera objects
  for i:=0 to FCameraList.Count-1 do
    TOGLCCamera(FCameraList.Items[i]).Update( sec );
 
@@ -515,19 +541,45 @@ begin
 //  end;
  UpDate( sec );
  FTickOrigin := t;
-
  Draw;
+
+ glFlush;
  FOGLC.SwapBuffers;
  inc( FFPSCounter );
 
  FFlagMouseLeftClicked := FALSE ;
 
  // if needed, launch the next stage
- if (FStageRequested <> NIL) and not FExecuteDuringLoop and not FIsChangingStage then
- begin
+ if FStageRequested <> NIL then begin
+
    FIsChangingStage := TRUE;
-   if FDoBlackScreenOnNewStage then
-   begin
+   if FDoBlackScreenOnNewStage and
+     (FGlobalFadeColor.State=psNO_CHANGE) and
+     (FGlobalFadeColor.Value<>BGRABlack)
+     then ColorFadeIn( BGRABlack, FFadeTimeForStageChange );
+
+   if {FDoBlackScreenOnNewStage and }
+     (FGlobalFadeColor.State=psNO_CHANGE) {and
+     (FGlobalFadeColor.Value=BGRABlack)} then begin
+       if FCurrentStage <> NIL then begin
+         FCurrentStage.FreeData;
+         if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+       end;
+       FCurrentStage := FStageRequested;
+       FStageRequested := NIL;
+       FCurrentStage.LoadData;
+       ClearKeysState;
+       if FDoBlackScreenOnNewStage then
+         ColorFadeOut( FFadeTimeForStageChange );
+       FIsChangingStage := FALSE;
+   end;
+ end;
+
+
+{
+ if (FStageRequested <> NIL) and not FExecuteDuringLoop and not FIsChangingStage then begin
+   FIsChangingStage := TRUE;
+   if FDoBlackScreenOnNewStage then begin
      ColorFadeIn( BGRABlack, FFadeTimeForStageChange );
      ExecuteDuring( FFadeTimeForStageChange );
    end;
@@ -546,7 +598,7 @@ begin
      end;
    FIsChangingStage := FALSE;
  end;
-
+}
 end;
 
 procedure TOGLCScene.ExecuteDuring(aTimeInSecond: single);
@@ -759,10 +811,14 @@ procedure TOGLCScene.Draw;
 var L, i: integer;
     o: TSimpleSurfaceWithEffect;
 begin
+{ if FPostProcessingShader.FFX<>[]
+   then FRendererForPostProcessing.Bind;  }
+
+ glClearColor(FBackgroundColorF[1], FBackgroundColorF[2], FBackgroundColorF[3], FBackgroundColorF[4]);
+ glClear( GL_COLOR_BUFFER_BIT );
+
  // set camera view
  FCamera.Use;
-
- glClear( GL_COLOR_BUFFER_BIT );
 
  // delete all surface with FKill=true
  for L:=0 to LayerCount-1 do
@@ -793,9 +849,92 @@ begin
  // Render mouse cursor
  MouseManager.Draw;
 
-// glDisable( GL_BLEND );
-
  FCamera.Release;
+
+{ if FPostProcessingShader.FFX<>[] then begin
+   // draw post-processing frame buffer on screen
+  FRendererForPostProcessing.Unbind;
+
+   SetBlendMode(FX_BLEND_NORMAL);
+   //DrawTexture( FRendererForPostProcessing.RenderedTexture, 0, 0, 0, 0, 255, BGRA(0,0,0,0));
+  FPostProcessingShader.SetParam(FRendererForPostProcessing.RenderedTexture, 0);
+  FPostProcessingShader.Use;
+  glActiveTexture(GL_TEXTURE0);
+  TextureManager.BindTexture( FRendererForPostProcessing.RenderedTexture );
+
+  glBegin( GL_TRIANGLE_STRIP );
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
+    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
+    glVertex2f( 0,0 );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
+    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
+    glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+  glEnd;
+
+
+
+{
+  glBegin( GL_TRIANGLES );
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
+   glVertex2f( 0,0 );
+
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
+   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
+
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
+   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
+   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
+   glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+
+   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
+   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
+   glVertex2f( 0,0 );
+
+  glEnd;
+}
+
+
+{
+  glBegin( GL_QUADS );
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
+    glVertex2f( 0,0 );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
+    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
+    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+
+    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
+    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
+    glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
+  glEnd;
+}
+
+  FPostProcessingShader.Release;
+//  glActiveTexture(GL_TEXTURE0);
+ end;   }
 end;
 
 procedure TOGLCScene.UpDate(const DT: single);
@@ -848,8 +987,7 @@ end;
 
 procedure TOGLCScene.SetBackgroundColor(aColor: TBGRAPixel);
 begin
- FBackgroundColor := aColor;
- glClearColor(FBackgroundColor.red/255, FBackgroundColor.green/255, FBackgroundColor.blue/255, FBackgroundColor.alpha/255);
+ FBackgroundColorF := ColorF( aColor.red/255, aColor.green/255, aColor.blue/255, aColor.alpha/255);
 end;
 
 function TOGLCScene.GetKeyMap(index: byte): boolean;
@@ -888,7 +1026,13 @@ begin
  FKeyPressed[index]:=FALSE;
 end;
 
-
+function TOGLCScene.GetBackgroundColor: TBGRAPixel;
+begin
+ Result := BGRA( round(FBackgroundColorF[1]*255),
+                 round(FBackgroundColorF[2]*255),
+                 round(FBackgroundColorF[3]*255),
+                 round(FBackgroundColorF[4]*255));
+end;
 
 end.
 
