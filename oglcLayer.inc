@@ -67,6 +67,8 @@ TLayer = class (TSurfaceList)
     FCamera: TOGLCCamera;
    private
     FOnSortCompare: TListSortCompare;
+    FOnBeforePaint,
+    FOnAfterPaint: TOGLCEvent;
    public
     Constructor Create;
     Destructor Destroy; override;
@@ -106,17 +108,28 @@ TLayer = class (TSurfaceList)
     function CollisionTest( aX, aY, aWidth, aHeight: single) : TSimpleSurfaceWithEffect; overload;
     function CollisionTest( aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
 
-    // layer's property
-    property Freeze : boolean read FFreeze write FFreeze ;    // Freeze all moves and variations of the layer and every surfaces of the layer
+    // Freeze the layer and its surfaces
+    property Freeze : boolean read FFreeze write FFreeze;
+    // Set the layer visible or not
     property Visible : boolean read FVisible write FVisible;
+    // don't use this method directly. Use instead TOGLCCamera.AssignToLayer method to assign
+    // a camera view to the layer
     property Camera: TOGLCCamera read FCamera write FCamera;
-    property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare; // specify a function to sort the surface on the layer
+    // specify a function to sort the surface on the layer
+    property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare;
+
+    // Assign this callback if you want to do some initializations before surfaces are rendered on the layer.
+    // For example, you can bind a TOGLCRenderToTexture to render the layer in a target texture
+    property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
+    // Assign this callback if you want to do some finalizations after the layer is rendered.
+    // For example, you can unbind a TOGLCRenderToTexture and render its texture with a specific shader
+    property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
 end;
 
 
 TSurfaceChangeLayer= record
-                 Surface: TSimpleSurfaceWithEffect;
-                 NewLayerIndex: integer;
+  Surface: TSimpleSurfaceWithEffect;
+  NewLayerIndex: integer;
 end;
 TArrayOfSurfaceChangeLayer = array of TSurfaceChangeLayer;
 
@@ -253,17 +266,25 @@ begin
 end;
 
 procedure TLayer.Draw;
-var i : integer;
+var i: integer;
     FOpacityPercent: single;
 begin
  if not FVisible then exit;
+
+ // Before paint CallBack
+ if Assigned (FOnBeforePaint) then FOnBeforePaint;
+
  if FCamera<>NIL then FCamera.Use;
  FOpacityPercent:= Opacity.Value/255;
 
  for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i] ) do if Visible then Draw( FOpacityPercent );
+  with TSimpleSurfaceWithEffect( FList.Items[i] ) do
+   if Visible then Draw( FOpacityPercent );
 
  if FCamera<>NIL then FCamera.Release;
+
+ // After paint CallBack
+ if Assigned (FOnAfterPaint) then FOnAfterPaint;
 end;
 
 procedure TLayer.Update(const aElapsedTime: single);
