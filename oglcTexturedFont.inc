@@ -129,11 +129,33 @@ public
   property Path: TOGLCPath read FPath;
 end;
 
+{ TFreeTextClockLabel }
 
+TFreeTextClockLabel = class(TFreeText)
+private
+  FTime: single;
+  FPaused,
+  FCountdown,
+  FShowFractionalPart: boolean;
+  procedure SetTime(AValue: single);
+  procedure UpdateCaption;
+public
+  // the TexturedFont used by the inherited TFreeText must have [0 1 2 3 4 5 6 7 8 9 : .] characters included
+  // aPaused to TRUE to pause the count/countdown at the begining
+  constructor Create( aPaused: boolean );
+  procedure Update(const aElapsedTime: single ); override;
+  // pause the clock
+  procedure Pause;
+  // run the clock
+  procedure Run;
+  // gives/sets the current value to count in seconds
+  property Time: single read FTime write SetTime;
+  // set to TRUE if you want to time countdown. Default is FALSE (counting time)
+  property Countdown: boolean read FCountdown write FCountdown;
+  // set to TRUE force the tenths and hundredths of seconds to be drawned. default is TRUE
+  property ShowFractionalPart: boolean read FShowFractionalPart write FShowFractionalPart;
+end;
 
-TOGLCAlignment=(taTopLeft, taTopCenter, taTopRight,
-                taCenterLeft, taCenterCenter, taCenterRight,
-                taBottomLeft, taBottomCenter, taBottomRight);
 
 { TMultilineText }
 // Draws a text in a rectangular area with horizontal and vertical align.
@@ -658,6 +680,7 @@ end;
  procedure TFreeText.Draw(const aLayerPercentOpacity: single);
  var AlphaTint: byte;
  begin
+  if not FVisible then exit;
   if FCaption='' then exit;
   if FTexturedFont=NIL then exit;
   PushAndPrepareMatrix;
@@ -772,6 +795,66 @@ end;
 
   FPathOwner:= Owner;
   FPath:=aPath;
+ end;
+
+ { TFreeTextClockLabel }
+
+ procedure TFreeTextClockLabel.SetTime(AValue: single);
+ begin
+  if FTime=AValue then Exit;
+  FTime:=AValue;
+  UpdateCaption;
+ end;
+
+ procedure TFreeTextClockLabel.UpdateCaption;
+ var t,h,m,s: integer;
+  c: string;
+ begin
+  t := trunc(FTime);
+  h := t div 3600;
+  t:=t-h*3600;
+  m := t div 60;
+  s:=t-m*60;
+  t := round(Frac(FTime)*100);
+  c:='';
+  if h>0 then c:=h.ToString+':';
+
+  if m>10
+    then c+=m.ToString+':'
+    else c+='0'+m.ToString+':';
+
+  if s<10 then c+='0';
+  c+=s.ToString;
+  if FShowFractionalPart then c+='.'+t.ToString;
+  Caption := c;
+ end;
+
+ constructor TFreeTextClockLabel.Create(aPaused: boolean);
+ begin
+  inherited Create;
+  FPaused:=aPaused;
+  FShowFractionalPart :=TRUE;
+ end;
+
+ procedure TFreeTextClockLabel.Update(const aElapsedTime: single);
+ begin
+  inherited Update(aElapsedTime);
+  if FFreeze or FPaused then exit;
+  if FCountdown then begin
+    FTime -=aElapsedTime;
+    if FTime<0 then FTime:=0;
+  end else FTime +=aElapsedTime;
+  UpdateCaption;
+ end;
+
+ procedure TFreeTextClockLabel.Pause;
+ begin
+  FPaused := TRUE;
+ end;
+
+ procedure TFreeTextClockLabel.Run;
+ begin
+  FPaused := FALSE;
  end;
 
 { TTexturedFont }
