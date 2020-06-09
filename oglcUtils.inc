@@ -64,6 +64,15 @@ function Distance(aPt1, aPt2: TPointF): single;
 
 function PointFToRectF( p1, p2: TPointF ): TRectF;
 
+// return the appropriate GL_COLOR_ATTACHMENTx
+// ie: aIndex=0  returns GL_COLOR_ATTACHMENT0
+//     aIndex=8  returns GL_COLOR_ATTACHMENT8
+// aIndex [0..15]
+function IndexToColorAttachment( aIndex: integer ): GLenum;
+// return the total color attachment available on your system
+// the max value will be the returned value minus 1.
+function ColorAttachmentCount: GLint;
+
 type
 TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
 procedure SetBlendMode( ABlendMode: byte );
@@ -76,7 +85,6 @@ var
 const
   deg2rad = 0.017453292;
   rad2deg = 57.29578049;
-
 
 {$endif oglcINTERFACE}
 
@@ -549,8 +557,11 @@ var
     glEnd;
    end;
 begin
- if aTexture = nil then exit;
+// if aTexture = nil then exit;
+// if aPercentOpacity=0 then exit;
  TextureManager.BindTexture( aTexture );
+
+ AFrameIndex := EnsureRange( AFrameIndex, 0, aTexture^.FrameCount-1);
  TexCoord := aTexture^.FramesCoord[AFrameIndex];
 
  quad[0] := TopLeft;
@@ -673,6 +684,36 @@ begin
 
  Result.TopLeft:=topleft;
  Result.BottomRight:=bottomright;
+end;
+
+function IndexToColorAttachment(aIndex: integer): GLenum;
+begin
+{ case aIndex of
+   1: Result:=GL_COLOR_ATTACHMENT1;
+   2: Result:=GL_COLOR_ATTACHMENT2;
+   3: Result:=GL_COLOR_ATTACHMENT3;
+   4: Result:=GL_COLOR_ATTACHMENT4;
+   5: Result:=GL_COLOR_ATTACHMENT5;
+   6: Result:=GL_COLOR_ATTACHMENT6;
+   7: Result:=GL_COLOR_ATTACHMENT7;
+   8: Result:=GL_COLOR_ATTACHMENT8;
+   9: Result:=GL_COLOR_ATTACHMENT9;
+   10: Result:=GL_COLOR_ATTACHMENT10;
+   11: Result:=GL_COLOR_ATTACHMENT11;
+   12: Result:=GL_COLOR_ATTACHMENT12;
+   13: Result:=GL_COLOR_ATTACHMENT13;
+   14: Result:=GL_COLOR_ATTACHMENT14;
+   15: Result:=GL_COLOR_ATTACHMENT15;
+   else Result:= GL_COLOR_ATTACHMENT0;
+ end;   }
+ Result:= GL_COLOR_ATTACHMENT0+aIndex;
+end;
+
+function ColorAttachmentCount: GLint;
+var c: GLint;
+begin
+ glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, @c);
+ Result:=c;
 end;
 
 procedure SetBlendMode(ABlendMode: byte);
