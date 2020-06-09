@@ -101,12 +101,13 @@ private
   FMessageList: TMessageList;
   FEnableProcessMessage: boolean;
 private
-  procedure Init;
   procedure SetFrame(AValue: single);
 protected
  FChilds: TList;
  FParentSurface: TSimpleSurfaceWithEffect;
  FSurfaceOrigin: TPointF;
+ FAngleOrigin: single;
+ FScaleOrigin: TPointF;
  FGuiEnabled: boolean;
  function GetChild( aIndex: integer ): TSimpleSurfaceWithEffect;
  procedure SetParentSurface( aSurface: TSimpleSurfaceWithEffect );
@@ -114,12 +115,12 @@ protected
  procedure SetParentLayer( aLayer: TLayer );
 protected
    FBlendMode: byte;
-   FFreeze       : boolean ;
+   FFreeze: boolean;
    FTimeBeforeKill: single;
    // Blink
-   FBlink : TBlink;
+   FBlink: TBlink;
    // Rotation around axis
-   FRotationAroundPt     : TRotationAroundPoint ;
+   FRotationAroundPt: TRotationAroundPoint;
    // Flip
    FFlipH:boolean;
    FFlipV:boolean;
@@ -129,9 +130,9 @@ protected
    FFrameLoopStart,
    FFrameLoopEnd: integer;
    // Bind Surface
-   FBindToSprite  : TBindToSprite ;
+   FBindToSprite: TBindToSprite;
 protected
-   FListScenario : array of TScenario ;    // surface can execute several scenario at the same time
+   FListScenario: array of TScenario;    // surface can execute several scenario at the same time
    FScenarioAdditionnalDecode: TScenarioDecode;
    function GetScenario( AIDScenario: TIDScenario ): TScenario;
 protected
@@ -150,14 +151,16 @@ public
    Tint    : TBGRAParam;
    Scale   : TPointFParam;
    Skew    : TPointFParam;
-   // post a message to the surface. the message will be processed later in the Update method
-   // the delay allows to process the message only after a lapse of time (in seconds)
+   // Add a message to the surface.
+   // 'ProcessMessage' method will be called with UserValue as parameter.
+   // if aDelay=0 the call is done in the next frame.
+   // If delay is >0, the call is done only after this lapse of time (in seconds)
    procedure AddMessage( UserValue: word; aDelay: single=0 );
    // override to process the message received from another surface
    procedure ProcessMessage( {%H-}UserValue: word ); virtual;
-   // lock the call to process message
+   // pause to process messages. Messages can be added.
    procedure LockProcessMessage;
-   // unlock the call to processmessage
+   // resume to process messages
    procedure UnlockProcessMessage;
 
    // add a child to the surface
@@ -191,13 +194,14 @@ public
    procedure MoveXRelative( aDeltaX, aDuration: single; aCurve: Word= idcLinear );
    procedure MoveYRelative( aDeltaY, aDuration: single; aCurve: Word= idcLinear );
    // Blink
-   procedure Blink ( aNumberOfBlink : integer ; aVisibleTime , aInvisibleTime : single ) ; // aNumberOfBlink=-1 for infinite blink
+   // aNumberOfBlink=-1 for infinite blink
+   procedure Blink( aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single );
    procedure StopBlink;
    // Rotate around point
    procedure RotationAroundPoint( aXPt, aYPt: single; aAnglePerSecond: single; aSelfRotate: boolean=TRUE ) ; overload;
    procedure RotationAroundPoint( aPt: TPointF; aAnglePerSecond: single; aSelfRotate: boolean=TRUE ) ; overload;
    // Bind this surface to another
-   procedure BindToSprite ( aParentSurface:TSimpleSurface; aOffsetX, aOffsetY: single );
+   procedure BindToSprite( aParentSurface:TSimpleSurface; aOffsetX, aOffsetY: single );
    procedure BindCenterToSprite( aParentSurface:TSimpleSurface );
    procedure UnBind;
    // Scenario
@@ -216,8 +220,8 @@ public
    procedure FrameAddPerSecond( ADeltaFramePerSecond: single );
    property Frame: single read FFrame write SetFrame;
    // Flip H and V
-   property FlipH : boolean read FFlipH write FFlipH ;
-   property FlipV : boolean read FFlipV write FFlipV ;
+   property FlipH: boolean read FFlipH write FFlipH;
+   property FlipV: boolean read FFlipV write FFlipV;
    // utils
    procedure CenterOnScene;
    procedure CenterOnSurface( ASurface: TSimpleSurface );
@@ -228,18 +232,19 @@ public
    function CollisionTestWith( const aX, aY, aWidth, aHeight: single): boolean; overload;
    function CollisionTestWith( aRect: TRect ): boolean; overload;
 
-   property Freeze : boolean read FFreeze write FFreeze ;  // set to TRUE to stop all variations on surface ( move, opacity change, scale change, etc...)
+   property Freeze: boolean read FFreeze write FFreeze ;  // set to TRUE to stop all variations on surface ( move, opacity change, scale change, etc...)
    property BlendMode: byte read FBlendMode write FBlendMode;
 public
    function ChildCount: integer;
    property Child[index:integer]: TSimpleSurfaceWithEffect read GetChild;
    property ParentSurface: TSimpleSurfaceWithEffect read FParentSurface;
 
-   procedure EnableGui;  // enable mouse effect on gui surfaces
-   procedure DisableGui; // disable mouse effect on gui surfaces
+   // enable mouse effect on the surface
+   procedure EnableGui;
+   // disable mouse effect on the surface
+   procedure DisableGui;
 end;
 
-TArrayOfPTexture = array of PTexture;
 
 { TSprite }
 
@@ -264,6 +269,25 @@ end;
 
 TArrayOfSprite = array of TSprite ;
 PArrayOfSprite = ^TArrayOfSprite ;
+
+
+{ TStrechedSprite }
+// to do: ajouter la possibilité d'ancrer le sprite sur l'un de ses coté ou en son centre
+// utiliser TOGLCAlignment
+
+TStrechedSprite=class( TSprite )
+private
+   FWidth, FHeight: integer;
+protected
+   function GetWidth: integer; override;
+   function GetHeight: integer; override;
+public
+   procedure Draw( const aLayerPercentOpacity: single ); override;
+public
+   // set the size of the surface. the texture will be streched to fit the rectangle
+   // default size is the size of the texture (or, if any, one frame of the texture)
+   procedure SetSize( aWidth, aHeight: integer );
+end;
 
 
 { TColorBackground }
@@ -311,6 +335,28 @@ public
   // Tint property is the color of the ellipse
 end;
 
+
+{
+TVAOSprite=class( TSimpleSurfaceWithEffect )
+private
+  FVAO, FVBO: GLuint;
+  FTextureOwner: boolean;
+  procedure Init; virtual;
+protected
+  FTexture: PTexture;
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+public
+  procedure Draw( const aLayerPercentOpacity: single ); override;
+public
+  // create a sprite from a texture.
+  // if Owner is set to TRUE, the texture will be freed when the sprite will be killed
+  Constructor Create( ATexture: PTexture; Owner: boolean=FALSE );
+  Destructor Destroy; override;
+
+  property Texture: PTexture read FTexture;
+end;
+}
 {$endif oglcINTERFACE}
 
 
@@ -366,17 +412,21 @@ end;
 
 procedure TEllipse.Draw(const aLayerPercentOpacity: single);
 var i: integer;
+    c: TBGRAPixel;
 begin
- if not Visible or
-    (Tint.Alpha.Value = 0) or
-    (Length(FPath)=0) then exit;
+ if not Visible then exit;
+ if Length(FPath)=0 then exit;
+ c := Tint.Value;
+ c.alpha := round(c.alpha*Opacity.pcValue);
+ if c.alpha=0 then exit;
+ if aLayerPercentOpacity=0 then exit;
 
  PushAndPrepareMatrix;
  SetBlendMode( FBlendMode );
  TextureManager.DisableTextureUsage;
 
  for i:=1 to Length( FPath )-1 do
-  DrawLine( FPath[i-1], FPath[i], Tint.Value, aLayerPercentOpacity );
+  DrawLine( FPath[i-1], FPath[i], c, aLayerPercentOpacity );
 
  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
  PopMatrix;
@@ -475,6 +525,63 @@ begin
 end;
 
 
+{ TStrechedSprite }
+
+function TStrechedSprite.GetWidth: integer;
+begin
+ Result:=FWidth;
+end;
+
+function TStrechedSprite.GetHeight: integer;
+begin
+ Result:=FHeight;
+end;
+
+procedure TStrechedSprite.Draw(const aLayerPercentOpacity: single);
+var a: single;
+    quad: array[ 0..3 ] of TPointF;
+begin
+ if FTexture = nil then exit;
+ if not FVisible then exit;
+ a := Opacity.pcValue * aLayerPercentOpacity;
+ if a=0 then exit;
+
+ PushAndPrepareMatrix;
+
+ quad[ 0 ].X := 0;  quad[ 0 ].Y := 0;
+ quad[ 1 ].X := Width; quad[ 1 ].Y := 0;
+ quad[ 2 ].X := Width; quad[ 2 ].Y := Height;
+ quad[ 3 ].X := 0;  quad[ 3 ].Y := Height;
+
+ // Skew
+ quad[0].X += Skew.x.Value * Scale.x.Value;
+ quad[0].Y += Skew.y.Value * Scale.y.Value;
+ quad[1].X += Skew.x.Value * Scale.x.Value;
+ quad[1].Y += Skew.y.Value * Scale.y.Value;
+
+ SetBlendMode( FBlendMode );
+ DrawStretchedTexture( FTexture, trunc( FFrame ),
+                       quad[0], quad[1], quad[2], quad[3],
+                       FFlipH, FFlipV,
+                       Tint.Value,
+                       a);
+
+ {$IFDEF DEBUG_MODE_ON}
+   TextureManager.DisableTextureUsage;
+   DrawBox(X.Value, Y.Value, aTexture^.TextureWidth, aTexture^.TextureHeight, BGRA(255,0,0));
+ {$ENDIF}
+
+ DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
+ PopMatrix;
+end;
+
+procedure TStrechedSprite.SetSize(aWidth, aHeight: integer);
+begin
+ FWidth := aWidth;
+ FHeight := aHeight;
+end;
+
+
 { TSprite }
 
 constructor TSprite.Create(ATexture: PTexture; Owner: boolean);
@@ -494,7 +601,7 @@ end;
 procedure TSprite.Draw(const aLayerPercentOpacity : single);
 begin
  if FTexture=NIL then exit;
- DrawSurface( FTexture, trunc( FFrame ), aLayerPercentOpacity );
+ DrawSurface( FTexture, trunc( FFrame ), aLayerPercentOpacity*Opacity.pcValue );
 end;
 
 procedure TSprite.Init;
@@ -520,12 +627,7 @@ end;
 
 constructor TSimpleSurfaceWithEffect.Create;
 begin
- inherited Create ;
- Init;
-end;
-
-procedure TSimpleSurfaceWithEffect.Init;
-begin
+ inherited Create;
  FBlendMode := FX_BLEND_NORMAL;
  FFreeze := FALSE ;
  FTimeBeforeKill := 0.0;
@@ -651,8 +753,15 @@ procedure TSimpleSurfaceWithEffect.Update(const aElapsedTime: single);
 var Xr,Yr,s,c: single ;
     i, loopLength: integer;
 begin
- FSurfaceOrigin := PointF(X.Value,Y.Value);
- if FParentSurface<>NIL then FSurfaceOrigin+= FParentSurface.FSurfaceOrigin;
+ FSurfaceOrigin.x := X.Value;
+ FSurfaceOrigin.y := Y.Value;
+ FAngleOrigin := Angle.Value;
+ FScaleOrigin := Scale.Value;
+ if FParentSurface<>NIL then begin
+   FSurfaceOrigin+= FParentSurface.FSurfaceOrigin;
+   FAngleOrigin+= FParentSurface.FAngleOrigin;
+   FScaleOrigin+= FParentSurface.FScaleOrigin;
+ end;
 
  if FEnableProcessMessage then FMessageList.ProcessMessages( aElapsedTime );
 
@@ -667,78 +776,48 @@ begin
     then Y.OnElapse( aElapsedTime )
     else Y.Value := Y.Value + Speed.y.Value * aElapsedTime;
 
-  if FTimeBeforeKill <> 0
-   then begin
-         FTimeBeforeKill -= aElapsedTime;
-         if FTimeBeforeKill <= 0 then FKill := TRUE;
-   end;
+  if FTimeBeforeKill <> 0 then begin
+    FTimeBeforeKill -= aElapsedTime;
+    if FTimeBeforeKill <= 0 then FKill := TRUE;
+  end;
 
  FFrame += aElapsedTime * FFrameDeltaPerSecond;
- if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then
-   begin
-     loopLength := FFrameLoopEnd-FFrameLoopStart+1;
+ if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then  begin
+   loopLength := FFrameLoopEnd-FFrameLoopStart+1;
 
-     while trunc(FFrame)>FFrameLoopEnd do FFrame-=loopLength;
-     while trunc(FFrame)<FFrameLoopStart do FFrame+=loopLength;
-{
-     if FFrame >= FFrameLoopEnd then
-       begin
-         if loopLength <= 1 then
-           FFrame := FFrameLoopEnd
-         else
-         begin
-           FFrame := FFrame - Trunc((FFrame-(FFrameLoopStart))/loopLength)*loopLength;
-           if FFrame > FFrameLoopEnd then FFrame := FFrameLoopStart;
-           if FFrame < FFrameLoopStart then FFrame := FFrameLoopStart;
-         end;
-       end else
-     if FFrame < FFrameLoopStart then
-       begin
-         if loopLength <= 1 then
-           FFrame := FFrameLoopStart
-         else
-         begin
-           FFrame += Trunc((FFrameLoopEnd-FFrame)/loopLength)*loopLength;
-           if FFrame > FFrameLoopEnd then FFrame := FFrameLoopEnd;
-           if FFrame < FFrameLoopStart then FFrame := FFrameLoopEnd;
-         end;
-       end;
-}
-
-   end;
+   while trunc(FFrame)>FFrameLoopEnd do FFrame-=loopLength;
+   while trunc(FFrame)<FFrameLoopStart do FFrame+=loopLength;
+ end;
 
  // Blink
  with FBlink do
- if BlinkToGo <> 0
- then begin
-       if CountInvisible > 0
-         then begin // surface is invisible
-               FVisible := FALSE ;
-               CountInvisible -= aElapsedTime ;
-               CountVisible := VisibleTime ;
-              end
-         else begin // surface is visible
-               FVisible := TRUE ;
-               CountVisible -= aElapsedTime ;
-               if CountVisible <= 0
-                 then begin
-                       CountInvisible := InvisibleTime ;
-                       if BlinkToGo > 0 then dec ( BlinkToGo ) ;
-                       if BlinkToGo = 0 then FVisible := TRUE ;
-                      end;
-              end;
-      end;
+ if BlinkToGo <> 0 then begin
+       if CountInvisible > 0 then begin
+         // surface is invisible
+         FVisible := FALSE ;
+         CountInvisible -= aElapsedTime ;
+         CountVisible := VisibleTime ;
+       end else begin
+         // surface is visible
+         FVisible := TRUE ;
+         CountVisible -= aElapsedTime ;
+         if CountVisible <= 0 then begin
+           CountInvisible := InvisibleTime ;
+           if BlinkToGo > 0 then dec ( BlinkToGo ) ;
+           if BlinkToGo = 0 then FVisible := TRUE ;
+         end;
+       end;
+ end;
  // Angle
  Angle.OnElapse( aElapsedTime );
  // Do Rotation around an axis
  with FRotationAroundPt do
-  if InProgress
-    then begin
-           Xr := GetCenterX - XPt ;
-           Yr := GetCenterY - YPt ;
-           sincos( AnglePerSecond * aElapsedTime * deg2rad, s, c );
-           SetCenterCoordinate( XPt + Xr * c + Yr * s, YPt - Xr * s  + c * Yr );
-   end;
+  if InProgress then begin
+    Xr := GetCenterX - XPt ;
+    Yr := GetCenterY - YPt ;
+    sincos( AnglePerSecond * aElapsedTime * deg2rad, s, c );
+    SetCenterCoordinate( XPt + Xr * c + Yr * s, YPt - Xr * s  + c * Yr );
+  end;
  // Do Opacity Variation
  Opacity.OnElapse( aElapsedTime );
  // Do Tint Variation
@@ -748,11 +827,10 @@ begin
  // Do Skew Variation
  Skew.OnElapse( aElapsedTime );
  // Do Bind to another sprite
- if (FBindToSprite.InProgress) and ( FBindToSprite.ParentSurface<>NIL )
-   then begin
-         X.Value := FBindToSprite.ParentSurface.X.Value + FBindToSprite.OffsetX ;
-         Y.Value := FBindToSprite.ParentSurface.Y.Value + FBindToSprite.OffsetY ;
-   end;
+ if (FBindToSprite.InProgress) and ( FBindToSprite.ParentSurface<>NIL ) then begin
+   X.Value := FBindToSprite.ParentSurface.X.Value + FBindToSprite.OffsetX ;
+   Y.Value := FBindToSprite.ParentSurface.Y.Value + FBindToSprite.OffsetY ;
+ end;
  // Scenario
  for i:=0 to Length( FListScenario )-1 do
   if FListScenario[i].FIsRunning
@@ -764,11 +842,10 @@ begin
 
  // delete all childs with FKill=TRUE
  for i:=FChilds.Count-1 downto 0 do
-  if TSimpleSurfaceWithEffect( FChilds.Items[i] ).FKill
-    then begin
-          TSimpleSurfaceWithEffect( FChilds.Items[i] ).Free;
-          FChilds.Delete( i );
-    end;
+  if TSimpleSurfaceWithEffect( FChilds.Items[i] ).FKill then begin
+    TSimpleSurfaceWithEffect( FChilds.Items[i] ).Free;
+    FChilds.Delete( i );
+  end;
 end;
 
 procedure TSimpleSurfaceWithEffect.Draw(const aLayerPercentOpacity : single);
@@ -784,7 +861,7 @@ end;
 
 procedure TSimpleSurfaceWithEffect.ProcessMessage(UserValue: word);
 begin
-// override to process the received message
+// override to process the received messages
 end;
 
 procedure TSimpleSurfaceWithEffect.LockProcessMessage;
@@ -1003,23 +1080,11 @@ end;
 
 procedure TSimpleSurfaceWithEffect.PushAndPrepareMatrix;
 begin
-  glPushMatrix;
-  glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5, 0 );
-  glScalef( Scale.x.Value, Scale.y.Value, 0 );
-  glRotatef( Angle.Value, 0, 0, 1 );
-  glTranslatef( -Width * 0.5, -Height * 0.5, 0 );
-
- {
-
  glPushMatrix;
- if FParentSurface = NIL then glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5 , 0 )
-                         else glTranslatef( X.Value + Width * 0.5 * Scale.x.Value, Y.Value + Height * 0.5 * Scale.y.Value, 0 );
-
+ glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5, 0 );
  glScalef( Scale.x.Value, Scale.y.Value, 0 );
  glRotatef( Angle.Value, 0, 0, 1 );
  glTranslatef( -Width * 0.5, -Height * 0.5, 0 );
- }
-
 end;
 
 procedure TSimpleSurfaceWithEffect.PopMatrix;
