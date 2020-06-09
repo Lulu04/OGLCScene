@@ -5,7 +5,7 @@ VALUE_NO_EVENT = -1;
 
 type
 // on map, tiles have a reference on a texture, indexes (ix,iy) for each tile on this texture (frame)
-// and an user value for trigger an event
+// and an user value for trigger an event when it is drawn
 TTile = record
          TextureIndex  : integer; // index of texture in TTilemap.FTextureList
          ixFrame       : integer; // frame x index on texture
@@ -18,7 +18,8 @@ PTile = ^TTile;
 TArrayOfArrayOfTile = array of array of TTile;
 
 TArrayOfArrayOfInteger = array of array of integer;
-// each texture (or tileset) have an array value that allows to identify ground type for each tile
+// each texture (or tileset) have an array value that allows to identify the type for each tile
+// ground, water, wall,...
 TTileTexInfo = record
      Texture  : PTexture;
      TileType : TArrayOfArrayOfInteger;  // each ground type by frame column and row  [x][y]
@@ -101,7 +102,7 @@ public
  // this is virtual position of the top left corner of the view
  // why virtual ? Because when HLoopMode or VLoopMode is set to TRUE, the map repeats itself indefinitely
  // and position can be greater than view size, or even negative
- // for example, your map is 100x100 pixels sized and you set HLoopMode to TRUE, virtual position (15000,80) is valid
+ // for example, your map size is 100x100 pixels and you set HLoopMode to TRUE, virtual position (15000,80) is valid
  // because map repeat itself on horizontal axis
  PositionOnMap : TPointFParam;
 
@@ -111,7 +112,7 @@ public
  // color for the 'holes' in the map
  MapHoleColor  : TBGRAParam;
 
- // give real position on map pointed by 'VirtualPositionOnMap'
+ // give real position on map pointed by 'PositionOnMap'
  function GetBoundedPositionOnMap: TPointF;
 
  // load map previously created with 'Tile Map Designer' tool
