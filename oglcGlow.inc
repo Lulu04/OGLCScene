@@ -4,12 +4,12 @@ type
 
   TOGLCGlow = class( TSimpleSurfaceWithEffect )
    private
-    class var FShaderGlow: TShaderID;
+    class var FShaderGlow: TOGLCShader;
     class var FLocGlowCenter: GLint;
     class var FLocGlowColor: GLint;
     class var FLocGlowRadius: GLint;
     class var FLocGlowAttenuation: GLint;
-    class var FShaderInitDone: boolean;
+    class var FGlowCount: integer;
   protected
    function GetWidth: integer; override;
    function GetHeight: integer; override;
@@ -64,15 +64,15 @@ var r: single;
     p: TPointF;
 begin
  if not FVisible then exit;
- if not OpenGL_Version_2_0_Loaded then exit; // no shader available
+// if not OpenGL_Version_3_0_Loaded then exit; // no shader available
 
  SetBlendMode( FBlendMode );
 
  r := Radius.Value * Scale.x.Value;
  p:= SurfaceToScene(PointF(0,0));
 
- with ShaderManager do begin
-  Use( FShaderGlow );
+ with FShaderGlow do begin
+  Use;
   SetUniform2f( FLocGlowCenter, p.x, FParentScene.Height - p.y);
   SetUniform4f( FLocGlowColor, Tint.Red.Value/255, Tint.Green.Value/255, Tint.Blue.Value/255, Tint.Alpha.Value/255*aLayerPercentOpacity );
   SetUniform1f( FLocGlowRadius, r );
@@ -86,7 +86,7 @@ begin
   glVertex2f( x.Value-r, y.Value+r );
  glEnd ;
 
- ShaderManager.UseNone;
+ FShaderGlow.Release;
 
 
  {$IFDEF DEBUG_MODE_ON}
@@ -109,18 +109,27 @@ begin
  Tint.Value:=aColor;
  FBlendMode := aBlendMode;
 
- if not FShaderInitDone then begin
-    FShaderInitDone := TRUE;
-    FShaderGlow := ShaderManager.CreateShader( '', GLOW_FRAGMENT_SHADER_PRG );
-    FLocGlowCenter := ShaderManager.GetUniform( 0, 'lightCenter' ) ;
-    FLocGlowColor := ShaderManager.GetUniform( 0, 'lightColor' ) ;
-    FLocGlowRadius := ShaderManager.GetUniform( 0, 'lightRadius' ) ;
-    FLocGlowAttenuation := ShaderManager.GetUniform( 0, 'powerAttenuation' ) ;
+ if FGlowCount=0 then begin
+    inc(FGlowCount);
+    FShaderGlow := TOGLCShader.Create( '', GLOW_FRAGMENT_SHADER_PRG );
+    with FShaderGlow do begin
+     Use;
+     FLocGlowCenter := GetUniform( 'lightCenter' );
+     FLocGlowColor := GetUniform( 'lightColor' );
+     FLocGlowRadius := GetUniform( 'lightRadius' );
+     FLocGlowAttenuation := GetUniform( 'powerAttenuation' );
+     Release;
+    end;
  end;
 end;
 
 destructor TOGLCGlow.Destroy;
 begin
+ dec(FGlowCount);
+ if FGlowCount=0 then begin
+   FShaderGlow.Free;
+   FShaderGlow:=NIL;
+ end;
  Radius.Free;
  Attenuation.Free;
  inherited Destroy;
