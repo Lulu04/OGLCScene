@@ -117,14 +117,19 @@ public
  LoopMode       : boolean;
  ParticlesPositionsRelativeToEmitterPosition: boolean; // FALSE by default
  procedure LoadFromFile( const aFilename: string );
- procedure Shoot ;
- procedure Clear ;
+ procedure Shoot;
+ procedure Clear;
 
- procedure SetEmitterTypePoint; // (X,Y) is the position of the point
- procedure SetEmitterTypeLine( P2: TPointF ); // (X,Y) is the first point of the line
- procedure SetEmitterTypeLine( aDirection, aSize: single ); // (X,Y) is the first point of the line
- procedure SetEmitterTypeRectangle( aWidth, aHeight: integer ); // (X,Y) is the top left corner of the rectangle
- procedure SetEmitterTypeCircle( Radius: single ); // (X,Y) is the center of the circle
+ // (X,Y) is the position of the point
+ procedure SetEmitterTypePoint;
+ // (X,Y) is the first point of the line
+ procedure SetEmitterTypeLine( P2: TPointF );
+ // (X,Y) is the first point of the line
+ procedure SetEmitterTypeLine( aDirection, aSize: single );
+ // (X,Y) is the top left corner of the rectangle
+ procedure SetEmitterTypeRectangle( aWidth, aHeight: integer );
+ // (X,Y) is the center of the circle
+ procedure SetEmitterTypeCircle( Radius: single );
  procedure SetEmitterTypeInnerCircle( Radius: single );
  procedure SetEmitterTypeOuterCircle( Radius: single );
  procedure SetEmitterTypeRing( SmallRadius, BigRadius: single );
