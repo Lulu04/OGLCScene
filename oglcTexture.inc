@@ -20,6 +20,9 @@ TTexture = record
             Prev          : PTexture ;
            end;
 
+TArrayOfPTexture = array of PTexture;
+
+
 { TTextureManager }
 TOGLCGTextureManagerSpec = specialize TOGLCGList<TTexture>;
 
@@ -37,6 +40,11 @@ public
  function Add( aImage: TBGRABitmap ): PTexture; overload;
  function Add( aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer ): PTexture; overload;
  function AddEmpty( aWidth, aHeight: integer ): PTexture;
+ // create a texture from an svg file.
+ // if you give an width and set aHeight=-1, TextureManager will compute the right height to conserve aspect ratio
+ // same thing if you gives an height and set aWidth=-1
+ // aWidth and aHeight can not be both equal to -1
+ function AddFromSVG( const aSVGFilename: string; aWidth, aHeight: integer ): PTexture; overload;
 
  procedure Replace( ATexture: PTexture; const aFilename : string ); overload;
  procedure Replace( ATexture: PTexture; aImage : TBGRABitmap ); overload;
@@ -48,7 +56,8 @@ public
  // return a framed part of a texture
  function GivePart( aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer ): PTexture;
 
- procedure BindTexture( ATexture: PTexture );  // call 'glEnable( GL_TEXTURE_2D )' and 'glBindTexture(...)' only if necessary
+ // select the OpenGL Texture unit and bind the texture to it
+ procedure BindTexture( ATexture: PTexture; aTextureUnitIndex: integer=0 );  // call 'glEnable( GL_TEXTURE_2D )' and 'glBindTexture(...)' only if necessary
  procedure DisableTextureUsage;                // call 'glDisable( GL_TEXTURE_2D )' only if necessary
 
  function GetMaxTextureWidth: integer;
@@ -229,6 +238,31 @@ begin
  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
  SetFrameSize( Result, Result^.ImageWidth, Result^.ImageHeight );
+end;
+
+function TTextureManager.AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture;
+var svg: TBGRASVG;
+  FWHFactor, cw, ch: single;
+  ima: TBGRABitmap;
+begin
+ try
+   svg:= TBGRASVG.Create( aSVGFileName );
+
+   cw:=svg.WidthAsPixel;
+   ch:=svg.HeightAsPixel;
+
+   FWHFactor := cw/ch;
+   if (aWidth = -1) and (aHeight = -1)
+     then Exception.Create('SVGDraw: parameters aImageWidth and aImageHeight are both equal to -1...');
+   if aWidth = -1 then aWidth := round(aHeight*FWHFactor);
+   if aHeight = -1 then aHeight := round(aWidth/FWHFactor);
+   ima := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent );
+   svg.StretchDraw(ima.Canvas2D, 0, 0, aWidth, aHeight, FALSE);
+   Result := Add( ima );
+   ima.Free;
+ finally
+   svg.Free;
+ end;
 end;
 
 procedure TTextureManager.Replace(ATexture: PTexture; const aFilename: string);
@@ -417,7 +451,7 @@ begin
 end;
 }
 
-procedure TTextureManager.BindTexture(ATexture: PTexture);
+procedure TTextureManager.BindTexture(ATexture: PTexture; aTextureUnitIndex: integer);
 begin
  if ATexture = NIL then exit;
  if not FGL_TEXTURE_2DEnabled
@@ -427,6 +461,7 @@ begin
    end;
  if FCurrentBindedTexture <> aTexture
   then begin
+        glActiveTexture(GL_TEXTURE0+aTextureUnitIndex);
         glBindTexture( GL_TEXTURE_2D, aTexture^.ID );
         FCurrentBindedTexture := aTexture;
   end;
