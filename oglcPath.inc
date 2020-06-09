@@ -309,7 +309,7 @@ begin
    inc( i );
  until i=lp;
 
- DrawBox(FPath.RectArea.Left, FPath.RectArea.Top, FPath.RectArea.Width, FPath.RectArea.Height, BGRA(255,0,0),2);
+// DrawBox(FPath.RectArea.Left, FPath.RectArea.Top, FPath.RectArea.Width, FPath.RectArea.Height, BGRA(255,0,0),2);
 
  DrawChildSurfaces( aLayerPercentOpacity * Opacity.pcValue );
  PopMatrix;
