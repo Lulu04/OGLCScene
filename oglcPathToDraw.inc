@@ -25,6 +25,7 @@ private
   FPtArray: ArrayOfDrawingPoint;
   FPointTexture: PTexture;
   FLineWidth: single;
+  FDrawingName: string;
   function GetCount: integer;
 private
   FPEArray: ArrayofParticleEmitter;
@@ -62,6 +63,8 @@ public
 
   property EnableShaker: boolean read FShakerEnable write FShakerEnable;
   property ShakerAmplitude: integer read FShakerAmplitude write SetShakerAmplitude; // [0..100]
+  // give the name of the drawing from the previous loaded filename
+  property DrawingName: string read FDrawingName;
 end;
 
 
@@ -224,11 +227,12 @@ begin
    s := TStringList.Create;
    s.LoadFromFile( aFilename );
 
-   if s.IndexOf('[DRAWING_PATH]')=-1
+   k := s.IndexOf('[DRAWING_PATH]');
+   if k=-1
      then Exception.Create('File '+ExtractFileName(aFilename)+' bad format...'+LINEENDING+
                            'This is not a drawing file')
      else begin
-
+      FDrawingName := s.Strings[k+1];
       k := s.IndexOf('PointCount');
       if k=-1
         then Exception.Create('File '+ExtractFileName(aFilename)+' Point count not found...')
