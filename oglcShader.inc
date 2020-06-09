@@ -1,244 +1,417 @@
 {$ifdef oglcINTERFACE}
 type
 
-PShader = ^TShader;
-TShader = record
-             ProgramID,
-             FragmentID,
-             VertexID: GLUInt;
-end;
+{ TOGLCShader }
 
-const INVALID_SHADER_ID = -1;
-type
-TShaderID = integer;
-
-{ TShaderManager }
-
-TShaderManager = class
+TOGLCShader = class
  private
-  FList : TList;
-  procedure NotifyFragmentCompilationError;
-  procedure NotifyVertexCompilationError;
+  FProgramID,
+  FFragmentID,
+  FVertexID: GLUInt;
+  procedure NotifyFragmentCompilationError( const aF: string );
+  procedure NotifyVertexCompilationError( const aF: string );
   procedure NotifyLinkError;
-  function getShader( aIndex: integer ): PShader;
-  procedure Clear;
+  procedure NotifyGetUniformError( const s: string);
  public
-  constructor Create;
-  Destructor Destroy; override;
-  function ShaderAvailable: boolean;
+  constructor Create(const AVertexCodeSource, AFragmentCodeSource: string);
+  destructor Destroy; override;
 
-  function CreateShader( const AVertexCodeSource, AFragmentCodeSource: string ): TShaderID; // return created shader ID
-  procedure DeleteShader( AShader: TShaderID );
+  procedure Use; virtual;
+  procedure Release;
 
-  procedure Use( AShader: TShaderID );
-  procedure UseNone;
-
-  function GetUniform( AShader: TShaderID; const AName ): GLint;
+  function GetUniform( const AName: string ): GLint;
   procedure SetUniform1f( AUniform: GLint; AValue: single );
   procedure SetUniform2f( AUniform: GLint; AValue1, AValue2: single );
   procedure SetUniform3f( AUniform: GLint; AValue1, AValue2, AValue3: single );
   procedure SetUniform4f( AUniform: GLint; AValue1, AValue2, AValue3, AValue4: single );
-
   procedure SetUniform1i( AUniform: GLint; AValue: GLint );
+  procedure SetUniformMatrix4( AUniform: GLint; AValue: PGLfloat);
 end;
 
-var
- ShaderManager : TShaderManager=NIL;
 
-const
- TEST_VERTEX_SHADER_PRG = '#version 130'#10+
-                          'varying vec2 UV;'#10+
-                          'void main() {'#10+
-                          'gl_Position = gl_ProjectionMatrix * gl_Vertex;'#10 +
-                          'UV = vec2(gl_MultiTexCoord0);'#10 +
-                          '}';
+TOGLCPostFXEnum=( pfColorInversion, pfGrayscale, pfSepia, pfSharpen, pfBlur );
+TOGLCPostFX= set of TOGLCPostFXEnum;
 
- TEST_FRAGMENT_SHADER_PRG = '#version 130'#10+
-                            'varying vec2 UV;'#10+
-                            'uniform sampler2D Image;'#10+
-                            'out vec4 FragmentColor;'#10+
-                            'void main() {'#10+
-                            'float TintFactor=0.1;'#10+
-                            'vec4 ImageColor = texture2D( Image, UV );'#10+
-                            'vec4 TintColor = vec4(1,0,0,1);'#10+
-                            'gl_FragData[0] = ImageColor * (1-TintFactor) + TintColor * TintFactor;'#10+
-                            '}' ;
+{ TOGLCPostProcessingFX }
 
- // sin
- SIN_VERTEX_SHADER_PRG = 'void main() {'+
-                         'gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;'+
-                         'gl_Position = ftransform();'+
-                         'gl_FrontColor = gl_Color;'+
-                         '}';
- SIN_FRAGMENT_SHADER_PRG = 'uniform sampler2D tex;'+
-                           'void main() {'+
-                           'vec4 pixel = texture2D(tex, gl_TexCoord[0].xy);'+
-                           'gl_FragColor = vec4(0.0,1.0,0.0,1.0);'+//* pixel;'+ // gl_Color * pixel;
-                           '}' ;
+TOGLCPostProcessingFX=class
+private const
+  // FX bit mask
+  fxbmColorInversion=$01;
+  fxbmGrayscale=$02;
+  fxbmSepia=$04;
+  fxbmSharpen=$08;
+  fxbmBlur=$10;
+  procedure ComputeFXBitMask;
+private
+  FFX: TOGLCPostFX;
+  FFXBitMask: GLuint;
+  FTint: TBGRAPixel;
+  FTexture: PTexture;
+  FColorAttachmentIndex: GLint;
+  class var FShader: TOGLCShader;
+  class var FLocFXFlag: GLint;
+  class var FLocTint: GLint;
+  class var FLocTexSlot: GLint;
+  class var FLocTexWidth: GLint;
+  class var FLocTexHeight: GLint;
+  class var FCount: integer;
+public
+  constructor Create;
+  destructor Destroy; override;
+
+  procedure Use;
+  procedure Release;
+
+  procedure EnableFX( aFXs: TOGLCPostFX );
+  procedure DisableFX( aFXs: TOGLCPostFX );
+  procedure DisableAllFX;
+
+  procedure SetParam( aTexture: PTexture; aColorAttachment: integer);
+  property Tint: TBGRAPixel read FTint write FTint;
+end;
+
+
+
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
-{ TShaderManager }
+const
+kVert ='varying vec4 vClr;'
++#10'void main() {'
++#10'    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;'
++#10'    vClr = gl_MultiTexCoord0;' //gl_Color;'
++#10'}';
 
-procedure TShaderManager.NotifyFragmentCompilationError;
+kFrag = 'varying vec4 vClr;'
++#10'uniform sampler2D TexSlot;'
++#10'uniform int FXFlag;'
++#10'uniform vec4 TintColor;'
++#10'uniform int TexWidth, TexHeight;'
+//+#10'uniform int TexHeight;'
++#10'void main() {'
++#10'  vec4 Col = texture(TexSlot, vClr.xy);'
+// blur
++#10' if (FXFlag >= 16){'
++#10'   FXFlag = FXFlag-16;'
++#10'	float dx = 1.0f/TexWidth;//step on x'
++#10'	float dy = 1.0f/TexHeight;//step on y'
++#10'	vec3 sum = vec3(0,0,0);'
++#10'	for(int i = -3; i< 3; i++)'
++#10'	   for(int j = -3;j < 3; j++)'   //9
++#10'		sum += texture2D(TexSlot, vClr.xy + vec2(i * dx, j * dy)).rgb;'
++#10'	Col = vec4(vec3(sum/30), Col.a);'  //360
++#10' }'
+// sharpen
++#10' if (FXFlag >= 8){'
++#10'   FXFlag = FXFlag-8;'
++#10'   float kernel[9] = float[]('
++#10'   -1, -1, -1,'
++#10'    -1,  9, -1,'
++#10'   -1, -1, -1'
++#10'   );'
++#10'	float dx = 1.0f/TexWidth;//step on x'
++#10'	float dy = 1.0f/TexHeight;//step on y'
++#10'   vec2 offsets[9] = vec2[]('
++#10'   vec2(-dx,  dy),' // top-left
++#10'   vec2( 0.0f,    dy),' // top-center
++#10'   vec2( dx,  dy),' // top-right
++#10'   vec2(-dx,  0.0f),'   // center-left
++#10'   vec2( 0.0f,    0.0f),'   // center-center
++#10'   vec2( dx,  0.0f),'   // center-right
++#10'   vec2(-dx, -dy),' // bottom-left
++#10'   vec2( 0.0f,   -dy),' // bottom-center
++#10'   vec2( dx, -dy)'  // bottom-right
++#10'   );'
++#10'   vec3 sampleTex[9];'
++#10'   for(int i = 0; i < 9; i++)'
++#10'      sampleTex[i] = vec3(texture2D(TexSlot, vClr.xy + offsets[i]));'
++#10'   sampleTex[4] = Col.rgb;'
++#10'   vec3 c = vec3(0.0);'
++#10'   for(int i = 0; i < 9; i++)'
++#10'      c += sampleTex[i] * kernel[i];'
++#10'   Col = vec4(c, Col.a);'
++#10' }'
+// sepia
++#10' if (FXFlag >= 4){'
++#10'   FXFlag = FXFlag-4;'
++#10'   Col = vec4(0.393*Col.r + 0.769*Col.g + 0.189*Col.b,'
++#10'              0.349*Col.r + 0.686*Col.g + 0.168*Col.b,'
++#10'              0.272*Col.r + 0.534*Col.g + 0.131*Col.b, Col.a);'
++#10' }'
+// grayscale
++#10' if (FXFlag >= 2){'
++#10'   FXFlag = FXFlag-2;'
++#10'   float average = 0.2126 * Col.r + 0.7152 * Col.g + 0.0722 * Col.b;'
++#10'   Col = vec4(average, average, average, Col.a);'
++#10' }'
+// color inversion
++#10' if (FXFlag == 1){'
++#10'   Col = vec4(vec3(1.0 - Col), Col.a);'
++#10' }'
+// Tint
++#10' Col = Col * (1-TintColor.a) + vec4( vec3(TintColor*TintColor.a), Col.a);'
+
++#10'  gl_FragColor = Col;'
++#10'}';
+
+SCENE_POST_PROCESSING_VER_PRG =
+                         '#version 330 core'#10+
+                         'layout (location = 0) in vec2 aPos;'#10+
+                         'layout (location = 1) in vec2 aTexCoords;'#10+
+                         'out vec2 TexCoords;'#10+
+
+                         'void main()'#10+
+                         '{'#10+
+                         '  gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);'#10+
+                         '  TexCoords = aTexCoords;'#10+
+                         '}';
+
+// bit 0 = color inversion
+// bit 1 = Grayscale
+// bit 2 = Sharpen
+// bit 3 = Blur effect
+// always Apply Tint if Tint.alpha>0
+SCENE_POST_PROCESSING_FRAG_PRG =
+                          '#version 330 core'#10+
+                          'out vec4 FragColor;'#10+
+                          'in vec2 TexCoords;'#10+
+                          'uniform sampler2D TexSlot;'#10+
+                          'uniform vec4 TintColor;'#10+
+                          'uniform int FXFlag;'#10+
+
+                          'void main() {'#10+
+                          'vec4 WorkC = texture(TexSlot, TexCoords);'#10+
+
+                         // 'if ( FXFlag & 4 = 4 )'#10+
+                         // ' {'#10+
+                          // color inversion
+                     //     '   WorkC = vec4(vec3(1.0 - WorkC), 1.0);'#10+
+                         // ' }'#10+
+
+                          'FragColor = WorkC;'#10+
+                          '}' ;
+
+{ TOGLCPostProcessingFX }
+
+constructor TOGLCPostProcessingFX.Create;
 begin
- raise Exception.Create('Fragment Shader not compiled...');
+ if FCount=0 then begin
+//   FShader := TOGLCShader.Create(SCENE_POST_PROCESSING_VER_PRG, SCENE_POST_PROCESSING_FRAG_PRG);
+   FShader := TOGLCShader.Create(kVert, kFrag);
+   with FShader do begin
+     FLocTexSlot := GetUniform('TexSlot');
+     FLocTint := GetUniform('TintColor');
+     FLocFXFlag := GetUniform('FXFlag');
+     FLocTexWidth := GetUniform('TexWidth');
+     FLocTexHeight := GetUniform('TexHeight');
+   end;
+ end;
+ inc(FCount);
+ FFX:=[];
+ ComputeFXBitMask;
+ FTint:=BGRA(0,0,0,0);
 end;
 
-procedure TShaderManager.NotifyVertexCompilationError;
+destructor TOGLCPostProcessingFX.Destroy;
 begin
- raise Exception.Create('Vertex Shader not compiled...');
+ dec(FCount);
+ if FCount=0 then begin
+   FShader.Free;
+   FShader:=NIL;
+ end;
+ inherited Destroy;
 end;
 
-procedure TShaderManager.NotifyLinkError;
+procedure TOGLCPostProcessingFX.Use;
+begin
+ glActiveTexture( GL_TEXTURE0+FColorAttachmentIndex );
+ FShader.Use;
+
+ FShader.SetUniform1i( FLocTexSlot, FColorAttachmentIndex);
+ FShader.SetUniform1i( FLocFXFlag, FFXBitMask);
+ FShader.SetUniform4f( FLocTint, FTint.red/255, FTint.green/255, FTint.blue/255, FTint.alpha/255);
+ FShader.SetUniform1i( FLocTexWidth, FTexture^.TextureWidth);
+ FShader.SetUniform1i( FLocTexHeight, FTexture^.TextureHeight);
+end;
+
+procedure TOGLCPostProcessingFX.Release;
+begin
+ FShader.Release;
+end;
+
+procedure TOGLCPostProcessingFX.ComputeFXBitMask;
+begin
+ FFXBitMask:=0;
+ if pfColorInversion in FFX then FFXBitMask := FFXBitMask or fxbmColorInversion;
+ if pfGrayscale in FFX then FFXBitMask := FFXBitMask or fxbmGrayscale;
+ if pfSepia in FFX then FFXBitMask := FFXBitMask or fxbmSepia;
+ if pfSharpen in FFX then FFXBitMask := FFXBitMask or fxbmSharpen;
+ if pfBlur in FFX then FFXBitMask := FFXBitMask or fxbmBlur;
+end;
+
+procedure TOGLCPostProcessingFX.EnableFX(aFXs: TOGLCPostFX);
+begin
+ if pfColorInversion in aFXs then Include( FFX, pfColorInversion );
+ if pfGrayscale in aFXs then Include( FFX, pfGrayscale);
+ if pfSepia in aFXs then Include( FFX, pfSepia);
+ if pfSharpen in aFXs then Include( FFX, pfSharpen);
+ if pfBlur in aFXs then Include( FFX, pfBlur);
+ ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingFX.DisableFX(aFXs: TOGLCPostFX);
+begin
+ if pfColorInversion in aFXs then Exclude( FFX, pfColorInversion );
+ if pfGrayscale  in aFXs then Exclude( FFX, pfGrayscale);
+ if pfSepia  in aFXs then Exclude( FFX, pfSepia);
+ if pfSharpen  in aFXs then Exclude( FFX, pfSharpen);
+ if pfBlur  in aFXs then Exclude( FFX, pfBlur);
+ ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingFX.DisableAllFX;
+begin
+ FFX:=[];
+ ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingFX.SetParam(aTexture: PTexture; aColorAttachment: integer);
+begin
+ FTexture:=aTexture;
+ FColorAttachmentIndex:=aColorAttachment;
+end;
+
+
+
+{ TOGLCShader }
+
+procedure TOGLCShader.NotifyFragmentCompilationError( const aF: string );
+var s: string;
+begin
+ if Length(aF)>100
+   then s := copy(aF,1,100)
+   else s := aF;
+ raise Exception.Create('FRAGMENT SHADER NOT COMPILED...'+LINEENDING+s);
+end;
+
+procedure TOGLCShader.NotifyVertexCompilationError( const aF: string );
+var s: string;
+begin
+ if Length(aF)>100
+   then s := copy(aF,1,100)
+   else s := aF;
+ raise Exception.Create('Vertex Shader not compiled...'+LINEENDING+s);
+end;
+
+procedure TOGLCShader.NotifyLinkError;
 begin
  raise Exception.Create('Shader Program not linked...');
 end;
 
-function TShaderManager.getShader(aIndex: integer): PShader;
+procedure TOGLCShader.NotifyGetUniformError(const s: string);
 begin
- if (aIndex < 0) or (aIndex >= FList.Count)
-   then Result := NIL
-   else Result := PShader( FList.Items[aIndex] );
+ raise Exception.Create('SHADER ERROR on GetUniform with '+s);
 end;
 
-procedure TShaderManager.Clear;
-begin
- while FList.Count > 0 do DeleteShader( 0 );
-end;
-
-constructor TShaderManager.Create ;
-begin
- FList := TList.Create;
-end;
-
-destructor TShaderManager.Destroy;
-begin
- Clear;
- FreeAndNil( FList );
- inherited Destroy;
-end;
-
-function TShaderManager.ShaderAvailable: boolean;
-begin
- Result := OpenGL_Version_2_0_Loaded;
-end;
-
-function TShaderManager.CreateShader(const AVertexCodeSource, AFragmentCodeSource: string): TShaderID;
+constructor TOGLCShader.Create(const AVertexCodeSource, AFragmentCodeSource: string);
 var R : GLint ;
     code:string;
-    o: PShader;
 begin
- Result := INVALID_SHADER_ID;
- if not ShaderAvailable then exit;
-
- o := new(PShader);
-
- o^.ProgramID := 0;
- o^.VertexID := 0;
- o^.FragmentID := 0;
+ FProgramID := 0;
+ FVertexID := 0;
+ FFragmentID := 0;
  if ( Length (AVertexCodeSource ) = 0 ) and
     ( Length (AFragmentCodeSource ) = 0 )
     then exit;
 
- o^.ProgramID := glCreateProgram();
+ FProgramID := glCreateProgram();
 
- if Length (AVertexCodeSource ) > 0
-  then begin
-        o^.VertexID := glCreateShader( GL_VERTEX_SHADER ) ;
+ if Length (AVertexCodeSource ) > 0 then begin
+        FVertexID := glCreateShader( GL_VERTEX_SHADER );
         code := AVertexCodeSource;
-        glShaderSource( o^.VertexID, 1, @code, NIL ) ;
-        glCompileShader( o^.VertexID ) ;
-        glGetShaderiv( o^.VertexID, GL_COMPILE_STATUS, @R ) ;
-        if R = GL_FALSE then NotifyVertexCompilationError;
+        glShaderSource( FVertexID, 1, @code, NIL );
+        glCompileShader( FVertexID );
+        glGetShaderiv( FVertexID, GL_COMPILE_STATUS, @R );
+        if R=GL_FALSE
+          then NotifyVertexCompilationError( AVertexCodeSource );
+        glAttachShader( FProgramID, FVertexID );
+ end;
 
-        glAttachShader( o^.ProgramID, o^.VertexID ) ;
-  end;
-
- if Length (AFragmentCodeSource ) > 0
-   then begin
-         o^.FragmentID := glCreateShader( GL_FRAGMENT_SHADER );
+ if Length (AFragmentCodeSource ) > 0 then begin
+         FFragmentID := glCreateShader( GL_FRAGMENT_SHADER );
          code := AFragmentCodeSource;
-         glShaderSource( o^.FragmentID, 1, @code, NIL );
-         glCompileShader( o^.FragmentID );
-         glGetShaderiv( o^.FragmentID, GL_COMPILE_STATUS, @R );
-         if R = GL_FALSE then NotifyFragmentCompilationError;
+         glShaderSource( FFragmentID, 1, @code, NIL );
+         glCompileShader( FFragmentID );
+         glGetShaderiv( FFragmentID, GL_COMPILE_STATUS, @R );
+         if R=GL_FALSE
+           then NotifyFragmentCompilationError( AFragmentCodeSource );
+         glAttachShader( FProgramID, FFragmentID );
+ end;
 
-         glAttachShader( o^.ProgramID, o^.FragmentID );
-   end;
+ glLinkProgram( FProgramID );
+ glGetProgramiv(FProgramID, GL_LINK_STATUS, @R);
+ if R=GL_FALSE
+   then NotifyLinkError;
 
- glLinkProgram ( o^.ProgramID );
- glGetProgramiv(o^.ProgramID, GL_LINK_STATUS, @R);
- if R = GL_FALSE then NotifyLinkError;
+ glValidateProgram( FProgramID );
+ if FFragmentID<>0 then glDeleteShader( FFragmentID );
+ if FVertexID<>0 then glDeleteShader( FVertexID );
 
- glValidateProgram ( o^.ProgramID );
-
- Result := TShaderID( FList.Add( o ) );
 end;
 
-procedure TShaderManager.DeleteShader(AShader: TShaderID);
-var o: PShader;
+destructor TOGLCShader.Destroy;
 begin
- if not ShaderAvailable then exit;
- o := GetShader( AShader );
- if o = NIL then exit;
- with o^ do
-  begin
-   glDeleteShader( FragmentID );
-   glDeleteShader( VertexID );
-   glDeleteProgram( ProgramID )
-  end;
- Dispose( o );
- FList.Delete( AShader );
+ if FFragmentID<>0 then glDeleteShader( FFragmentID );
+ if FVertexID<>0 then glDeleteShader( FVertexID );
+ if FProgramID<>0 then glDeleteProgram( FProgramID );
+ inherited Destroy;
 end;
 
-procedure TShaderManager.Use(AShader: TShaderID);
-var o: PShader;
+procedure TOGLCShader.Use;
 begin
- if not ShaderAvailable then exit;
- o := getShader(AShader);
- if o = NIL
-   then glUseProgram( 0 )
-   else glUseProgram( o^.ProgramID );
+ glUseProgram( FProgramID );
 end;
 
-procedure TShaderManager.UseNone;
+procedure TOGLCShader.Release;
 begin
- if ShaderAvailable then glUseProgram( 0 );
+ glUseProgram( 0 );
 end;
 
-function TShaderManager.GetUniform(AShader: TShaderID; const AName): GLint;
-var o: PShader;
+function TOGLCShader.GetUniform(const AName: string): GLint;
 begin
- Result := 0;
- if not ShaderAvailable then exit;
- o := getShader( AShader);
- if o <> NIL
-   then Result := glGetUniformLocation( o^.ProgramID, @AName );
+ Result := glGetUniformLocation( FProgramID, PChar(AName) );
+ if Result=-1 then NotifyGetUniformError(AName);
 end;
 
-procedure TShaderManager.SetUniform1f(AUniform: GLint; AValue: single);
+procedure TOGLCShader.SetUniform1f(AUniform: GLint; AValue: single);
 begin
- if ShaderAvailable then glUniform1f( AUniform, AValue );
+ glUniform1f( AUniform, AValue );
 end;
 
-procedure TShaderManager.SetUniform2f(AUniform: GLint; AValue1, AValue2: single);
+procedure TOGLCShader.SetUniform2f(AUniform: GLint; AValue1, AValue2: single);
 begin
- if ShaderAvailable then glUniform2f( AUniform, AValue1, AValue2 );
+ glUniform2f( AUniform, AValue1, AValue2 );
 end;
 
-procedure TShaderManager.SetUniform3f(AUniform: GLint; AValue1, AValue2, AValue3: single);
+procedure TOGLCShader.SetUniform3f(AUniform: GLint; AValue1, AValue2, AValue3: single);
 begin
- if ShaderAvailable then glUniform3f( AUniform, AValue1, AValue2, AValue3 );
+ glUniform3f( AUniform, AValue1, AValue2, AValue3 );
 end;
 
-procedure TShaderManager.SetUniform4f(AUniform: GLint; AValue1, AValue2, AValue3, AValue4: single);
+procedure TOGLCShader.SetUniform4f(AUniform: GLint; AValue1, AValue2, AValue3, AValue4: single);
 begin
- if ShaderAvailable then glUniform4f( AUniform, AValue1, AValue2, AValue3, AValue4 );
+ glUniform4f( AUniform, AValue1, AValue2, AValue3, AValue4 );
 end;
 
-procedure TShaderManager.SetUniform1i(AUniform: GLint; AValue: GLint);
+procedure TOGLCShader.SetUniform1i(AUniform: GLint; AValue: GLint);
 begin
- if ShaderAvailable then glUniform1i( AUniform, AValue );
+ glUniform1i( AUniform, AValue );
 end;
+
+procedure TOGLCShader.SetUniformMatrix4(AUniform: GLint; AValue: PGLfloat);
+begin
+ glUniformMatrix4fv(AUniform, 1, GL_FALSE, AValue);
+end;
+
 {$endif oglcIMPLEMENTATION}
 
