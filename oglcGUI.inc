@@ -192,6 +192,26 @@ public
 end;
 
 
+{ TGuiRadialProgressBar }
+
+TGuiRadialProgressBar=class(TOGLCPathDrawing)
+private
+ FCircularPath: TOGLCPath;
+ FMax: single;
+ FPosition: single;
+ procedure SetPosition(AValue: single);
+ procedure UpdateDrawing;
+public
+ constructor Create( aCenter: TPointF; aRadius: single );
+ destructor Destroy; override;
+ // return TRUE if Position >= Max
+ function Completed: boolean;
+ property Max: single read FMax write FMax;
+ property Position: single read FPosition write SetPosition;
+end;
+
+
+
 
 { TGuiTextArea }
 
@@ -510,6 +530,45 @@ begin
  DrawChildSurfaces( aLayerPercentOpacity );
  PopMatrix;
 end;
+
+
+{ TGuiRadialProgressBar }
+
+procedure TGuiRadialProgressBar.SetPosition(AValue: single);
+begin
+ if FPosition=AValue then Exit;
+ FPosition:=AValue;
+ UpdateDrawing;
+end;
+
+procedure TGuiRadialProgressBar.UpdateDrawing;
+var f: single;
+begin
+ if FMax=0
+   then f:=0
+   else f := FPosition/FMax;
+ DistanceTraveled.Value := Path.PathLength*f;
+end;
+
+constructor TGuiRadialProgressBar.Create(aCenter: TPointF; aRadius: single);
+begin
+ inherited Create;
+ FCircularPath := TOGLCPath.Create;
+ FCircularPath.Pts := ComputeEllipse(aCenter.x, aCenter.y, aRadius, aRadius );
+ AssignPath( FCircularPath );
+end;
+
+destructor TGuiRadialProgressBar.Destroy;
+begin
+ FCircularPath.Free;
+ inherited Destroy;
+end;
+
+function TGuiRadialProgressBar.Completed: boolean;
+begin
+ result:= FPosition>=Max;
+end;
+
 
 { TGuiLabel }
 
