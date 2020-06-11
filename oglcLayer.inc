@@ -250,10 +250,11 @@ end;
 constructor TLayer.Create;
 begin
  inherited Create;
- FVisible := TRUE ;
- FFreeze := FALSE ;
+ FVisible := TRUE;
+ FFreeze := FALSE;
+ FCamera:= NIL;
  // Blink
- FBlink.BlinkToGo := 0 ;
+ FBlink.BlinkToGo := 0;
  // Opacity variation
  Opacity:= CreateBoundedFParam(0, 255);
  Opacity.Value := 255;
@@ -293,25 +294,22 @@ begin
  if FFreeze then exit;
  // Do Blink
  with FBlink do
- if BlinkToGo <> 0
- then begin
-       if CountVisible > 0
-         then begin // Layer is visible
-               FVisible := TRUE ;
-               CountVisible -= aElapsedTime ;
-               CountInvisible := InvisibleTime ;
-              end
-         else begin // Layer is invisible
-               FVisible := FALSE ;
-               CountInvisible -= aElapsedTime ;
-               if CountInvisible <= 0
-                 then begin
-                       CountVisible := VisibleTime ;
-                       if BlinkToGo > 0 then dec ( BlinkToGo ) ;
-                       if BlinkToGo = 0 then FVisible := TRUE ;
-                      end;
-              end;
-      end;
+ if BlinkToGo <> 0 then begin
+       if CountVisible>0 then begin
+             // Layer is visible
+             FVisible := TRUE;
+             CountVisible -= aElapsedTime;
+             CountInvisible := InvisibleTime;
+       end else begin // Layer is invisible
+             FVisible := FALSE;
+             CountInvisible -= aElapsedTime;
+             if CountInvisible <= 0 then begin
+               CountVisible := VisibleTime ;
+               if BlinkToGo > 0 then dec ( BlinkToGo );
+               if BlinkToGo = 0 then FVisible := TRUE;
+             end;
+       end;
+ end;
 
  Opacity.OnElapse( aElapsedTime );
 
@@ -338,11 +336,11 @@ procedure TLayer.Blink(aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: si
 begin
  with FBlink do
   begin
-   BlinkToGo := aNumberOfBlink ;
-   VisibleTime := aVisibleTime ;
-   InvisibleTime := aInvisibleTime ;
-   CountVisible := aVisibleTime ;
-   CountInvisible := aInvisibleTime ;
+   BlinkToGo := aNumberOfBlink;
+   VisibleTime := aVisibleTime;
+   InvisibleTime := aInvisibleTime;
+   CountVisible := aVisibleTime;
+   CountInvisible := aInvisibleTime;
   end;
 end;
 
@@ -369,7 +367,7 @@ var i:integer ;
 begin
  for i:=0 to FList.Count-1 do
   with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Freeze:=aValue ;
+    if ( aGroup = -1 ) or ( Group = aGroup) then Freeze:=aValue;
 end;
 
 procedure TLayer.GroupTint(aGroup: integer; aTint: TBGRAPixel);
@@ -564,17 +562,14 @@ procedure TLayerList.SetLayerCount(AValue: integer );
 var i:integer;
 begin
  if AValue = FList.Count then exit;
- if AValue > FList.Count
-   then begin
-         for i:=1 to AValue-FList.Count do
-          FList.Add( TLayer.Create );
-   end
- else begin
-       while AValue < FList.Count do
-        begin
+ if AValue > FList.Count then begin
+       for i:=1 to AValue-FList.Count do
+         FList.Add( TLayer.Create );
+  end else begin
+       while AValue < FList.Count do begin
          Layer[FList.Count-1].Free;
          FList.Delete(FList.Count-1);
-        end;
+       end;
  end;
 end;
 
