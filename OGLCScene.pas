@@ -454,8 +454,8 @@ begin
  if FCurrentStage <> NIL then begin
    FCurrentStage.FreeData;
    if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+   FCurrentStage := NIL;
  end;
- FCurrentStage := NIL;
 
  if FOnFreeCommonData <> NIL then FOnFreeCommonData;
  FCommonDataLoaded := FALSE;
