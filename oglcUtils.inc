@@ -73,6 +73,9 @@ function IndexToColorAttachment( aIndex: integer ): GLenum;
 // the max value will be the returned value minus 1.
 function ColorAttachmentCount: GLint;
 
+// Activate/Deactivate the screen vertical blank synchonization
+procedure SetVSync( AValue: boolean );
+
 type
 TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
 procedure SetBlendMode( ABlendMode: byte );
@@ -714,6 +717,30 @@ var c: GLint;
 begin
  glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, @c);
  Result:=c;
+end;
+
+function dlopen ( lpLibFileName : PAnsiChar) : HMODULE; stdcall; external 'kernel32.dll' name 'LoadLibraryA';
+function dlclose( hLibModule : HMODULE ) : Boolean; stdcall; external 'kernel32.dll' name 'FreeLibrary';
+//function dlsym  ( hModule : HMODULE; lpProcName : PAnsiChar) : Pointer; stdcall; external 'kernel32.dll' name 'GetProcAddress';
+function wglGetProcAddress(proc: PAnsiChar): Pointer; stdcall; external 'opengl32.dll';
+procedure SetVSync( AValue: boolean );
+type
+  TSwapIntervalFunc = function( interval: GLInt ): LongBool ; stdcall;
+var oglLibrary: HMODULE=0;
+    wglSwapInterval: function(interval: GLint): LongBool; stdcall;
+  function gl_GetProc( const Proc : UTF8String ) : Pointer;
+  begin
+    Result := wglGetProcAddress( PAnsiChar( Proc ) );
+    if Result = nil Then
+      Result := wglGetProcAddress( PAnsiChar( Proc + 'ARB' ) );
+    if Result = nil Then
+      Result := wglGetProcAddress( PAnsiChar( Proc + 'EXT' ) );
+  end;
+begin
+ oglLibrary := dlopen( 'opengl32.dll' {$IFDEF UNIX}, $001 {$ENDIF} );
+ wglSwapInterval := TSwapIntervalFunc( gl_GetProc( 'wglSwapInterval' ));
+ if wglSwapInterval<>NIL then wglSwapInterval( Integer( AValue ));
+ dlclose( oglLibrary );
 end;
 
 procedure SetBlendMode(ABlendMode: byte);
