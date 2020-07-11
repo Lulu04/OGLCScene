@@ -93,8 +93,10 @@ private
   procedure SetCaption(AValue: string);
   procedure SetFont( AValue: TGuiFont );
 protected
-  procedure DoFontChange; virtual; // called when font change. Override to update the widget
-  procedure DoCaptionChange; virtual; // called when caption change. Override to update the widget
+  // called when font change. Override to update the widget
+  procedure DoFontChange; virtual;
+  // called when caption change. Override to update the widget
+  procedure DoCaptionChange; virtual;
 public
   procedure Update( const aElapsedTime : single ); override;
 public
@@ -110,6 +112,8 @@ public
  property Caption: string read FCaption write SetCaption;
 end;
 
+
+{ TGuiPanel }
 TGuiPanel = class( TColorBackground );
 
 { TGuiButton }
@@ -707,26 +711,21 @@ begin
  if (MouseManager.FMousePos.x>=FSurfaceOrigin.x) and (MouseManager.FMousePos.x<=FSurfaceOrigin.x+Width) and
     (MouseManager.FMousePos.y>=FSurfaceOrigin.y) and (MouseManager.FMousePos.y<=FSurfaceOrigin.y+Height)
    then begin
-         if not FMouseEntered
-           then begin
-                 FMouseEntered := TRUE;
-                 DoOnMouseEnter;
-                end
-           else begin
-                 if FParentScene.FFlagMouseLeftClicked
-                   then begin
-                         FParentScene.FFlagMouseLeftClicked := FALSE;
-                         DoOnMouseClick;
-                        end;
-                end;
-        end
-   else begin
-         if FMouseEntered
-           then begin
-                 FMouseEntered := FALSE;
-                 DoOnMouseLeave;
+         if not FMouseEntered then begin
+           FMouseEntered := TRUE;
+           DoOnMouseEnter;
+         end else begin
+           if FParentScene.FFlagMouseLeftClicked then begin
+             FParentScene.FFlagMouseLeftClicked := FALSE;
+             DoOnMouseClick;
            end;
-        end;
+         end;
+ end else begin
+         if FMouseEntered then begin
+           FMouseEntered := FALSE;
+           DoOnMouseLeave;
+         end;
+ end;
 end;
 
 procedure TGuiClickableObject.Anim_OnMouseEnter;
