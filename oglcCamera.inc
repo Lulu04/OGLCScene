@@ -47,12 +47,14 @@ protected
   procedure Use;
   procedure Release;
 public
+  // by default, LookAt is initialized with the center coodinates of its parent scene
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
 
   // move the camera to the specified location
   procedure MoveTo( aPt: TPointF ); overload;
+  // move the camera to the specified location
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
@@ -60,9 +62,13 @@ public
   function DistanceToPoint( aPt: TPointF ): single;
   // converts a world point coordinate to screen coordinate relative to camera view
   function WorldToScreen( aPt: TPointF ): TPointF;
+  // converts a screen coordinates to world coordinates relative to camera view
+  function ScreenToWorld( aPt: TPointF ): TPointF;
 
-  // the camera will be used by the specified layer(s)
+  // the camera will be used by the specified layer, given by its index
+  // if another camera was assigned on this layer, the new one replace it
   procedure AssignToLayer( aLayerIndex: integer ); overload;
+  // the camera will be used to several layers, given by their indexes
   procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
   // The camera will no longer be used by any layer
   procedure Unassign;
@@ -121,6 +127,11 @@ end;
 function TOGLCCamera.WorldToScreen(aPt: TPointF): TPointF;
 begin
  Result := aPt + LookAt.Value;
+end;
+
+function TOGLCCamera.ScreenToWorld(aPt: TPointF): TPointF;
+begin
+ Result := aPt - LookAt.Value;
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
