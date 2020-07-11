@@ -19,7 +19,6 @@ public
   function AdjustDistanceTraveled( aDis: single ): single;
   // return the current scene position and angle(direction in degree) from a distance traveled
   procedure GetPosAndAngle( aDistanceTraveled: single; out Pos: TPointF; out Angle: single );
-
   // use this property to set the path nodes (in scene coordinates)
   property Pts: ArrayOfTPointF read FPts write SetPts;
   // for each node: x=distance to the next node, y=angle(direction) to the next node
@@ -50,6 +49,8 @@ public
    procedure Update( const aElapsedTime: single ); override;
    procedure Draw( const aLayerPercentOpacity: single );  override;
 public
+ // the virtual distance traveled on the path.
+ // virtual because it can be higher than path length when path is looped
   DistanceTraveled: TFParam;
   LineColor: TBGRAParam;
   Constructor Create;
@@ -57,6 +58,10 @@ public
   // assign a path to draw
   // if Owner is TRUE, the path is automatically destroyed when the sprite is killed
   procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
+  // because DistanceTraveled can be higher than path length (in case where the path is looped)
+  // this function return the real position on the path
+  function RealDistanceTraveled: single;
+
   // Use this method to define how to draw lines on the path:
   // [n1, n2, n3, n4,...]   n1,n3... are the length of the drawn part  n2,n4,... the length of holes
   // use [] for solid line (default)
@@ -338,6 +343,11 @@ begin
 
  FPathOwner:= Owner;
  FPath:=aPath;
+end;
+
+function TOGLCPathDrawing.RealDistanceTraveled: single;
+begin
+ Result := Path.AdjustDistanceTraveled(DistanceTraveled.Value);
 end;
 
 
