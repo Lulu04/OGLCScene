@@ -150,8 +150,13 @@ TLayerList = class
    private
      FListSurfaceChangeLayer: TArrayOfSurfaceChangeLayer;
    public
-    procedure ClearAllLayer; // delete all surfaces in all layer
-    procedure ClearLayer( aLayerIndex:integer ); // delete all surfaces in specified layer
+    // delete(kill) all surfaces in all layers
+    procedure ClearAllLayer;
+    // delete all surfaces in specified layer
+    procedure ClearLayer( aLayerIndex:integer );
+
+    // gives the index of the specified layer (-1 if not found)
+    function LayerIndexOf( aLayer: TLayer ): integer;
 
     // move a surface on another layer
     procedure SurfaceChangeLayer( aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer );
@@ -539,6 +544,17 @@ end;
 procedure TLayerList.ClearLayer(aLayerIndex: integer);
 begin
  TLayer( FList.Items[aLayerIndex] ).Clear;
+end;
+
+function TLayerList.LayerIndexOf(aLayer: TLayer): integer;
+var i: Integer;
+begin
+ Result:=-1;
+ for i:=0 to GetLayerCount-1 do
+  if Layer[i]=aLayer then begin
+   Result:=i;
+   break;
+  end;
 end;
 
 function TLayerList.GetLayerCount: integer;
