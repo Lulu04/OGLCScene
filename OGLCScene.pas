@@ -145,7 +145,6 @@ TOGLCAlignment=(taTopLeft, taTopCenter, taTopRight,
                 taCenterLeft, taCenterCenter, taCenterRight,
                 taBottomLeft, taBottomCenter, taBottomRight);
 
-
 {$define oglcINTERFACE}
 {$I gl_core_matrix.inc }
 {$I oglcListType.inc }
@@ -211,15 +210,17 @@ TOGLCScene = class (TLayerList)
   FOGLCOnResize : TNotifyEvent;
   FOGLCOnClick : TNotifyEvent;
   FFlagMouseLeftClicked: boolean;
-  FGLInitialized : boolean;
+  FGLInitialized,
+  FNeedToResizeViewPort: boolean;
   FKeyMap : array[0..255] of boolean; // TRUE if Key is actualy pressed
   FKeyPressed: array[0..255] of boolean; // TRUE if a key was pressed then released
   FCurrentStage,
   FStageRequested: TStageSkeleton;
   FIsChangingStage,
   FDoBlackScreenOnNewStage: boolean;
-  procedure NewOnResize ( Sender:TObject );
-  procedure NewOnClick ( Sender:TObject );
+  procedure NewOnResize( Sender:TObject );
+  procedure NewOnClick( Sender:TObject );
+  procedure UpdateViewPortSize;
   procedure Draw;
   procedure UpDate ( const DT:single );
  private
@@ -227,8 +228,9 @@ TOGLCScene = class (TLayerList)
   // FPS
   FFPSCounter : integer;
   FFPS        : integer;
+  FMonitorRefreshRate: integer;
   FExecuteDuringLoop: boolean;
-  procedure CallBackTimerFPS ;
+  procedure CallBackTimerFPS;
  private
   FGlobalFadeColor: TBGRAParam;
   FBackgroundColorF: TColorF;
@@ -257,7 +259,7 @@ TOGLCScene = class (TLayerList)
   FPostProcessingShader: TOGLCPostProcessingFX;   }
  public
 
-  Constructor Create ( aOGLContext: TOpenGLControl ) ;
+  Constructor Create( aOGLContext: TOpenGLControl );
   Destructor Destroy; override;
   function GetRectArea: TRect;
   // called from main windows
@@ -274,8 +276,8 @@ TOGLCScene = class (TLayerList)
   property CurrentStage: TStageSkeleton read FCurrentStage;
   property FadeTimeForStageChange: single read FFadeTimeForStageChange write FFadeTimeForStageChange;
 
-  // Surface
-  procedure Add ( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0); // add a surface to a layer
+  // Add a surface to a layer
+  procedure Add( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
   procedure Insert ( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0); // insert a surface to a layer
   procedure RemoveSurfaceFromLayer( aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer); // remove a surface from the layer (but don't free it)
   function GetSurfaceByIndex( aLayerIndex, aSurfaceIndex: integer): TSimpleSurface;
@@ -288,6 +290,11 @@ TOGLCScene = class (TLayerList)
   property Height: integer read GetSceneHeight;
   property Center: TPointF read GetSceneCenter;
   property FPS: integer read FFPS;
+  // set the monitor refresh rate
+  // default value is 60Hz
+  // set to 0 to force real time between swap buffer
+  // set a value different from 0 to force fixed time. example 60Hz force time to 1/60=0.01666 sec
+  property MonitorRefreshRate: integer read FMonitorRefreshRate write FMonitorRefreshRate;
   property BackgroundColor: TBGRAPixel read GetBackgroundColor write SetBackgroundColor ;
   // Callback
   property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
@@ -428,7 +435,7 @@ begin
  TextureManager := TTextureManager.Create;
 
  TimerManager := TTimerManager.Create;
- TimerManager.Add ( @CallBackTimerFPS, 1000 );
+ TimerManager.Add( @CallBackTimerFPS, 1000 );
 
  DelayManager := TDelayManager.Create;
 
@@ -445,11 +452,12 @@ begin
 
  FCameraList := TList.Create;
  FCamera := CreateCamera;
+
+ FMonitorRefreshRate := 60;
 end;
 
 destructor TOGLCScene.Destroy;
-var
-  i: Integer;
+var i: Integer;
 begin
  if FCurrentStage <> NIL then begin
    FCurrentStage.FreeData;
@@ -493,21 +501,8 @@ begin
    SetBlendMode( FX_BLEND_NORMAL ) ;
    glEnable(GL_POLYGON_SMOOTH or GL_LINE_SMOOTH);
 
-   // matrix emulator for OpenGL core
-   gnGL.mat[nGL_PROJECTION] := IdentityHmgMatrix;
-   gnGL.mat[nGL_MODELVIEW] := IdentityHmgMatrix;
-   nglMatrixMode(nGL_PROJECTION);
-   nglOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
-   nglMatrixMode(nGL_MODELVIEW);
+   UpdateViewPortSize;
 
-   // Matrix for legacy OpenGL
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-
-   glViewport(0, 0, GetSceneWidth, GetSceneHeight );
    FGLInitialized := TRUE;
 
 {   FRendererForPostProcessing:= TOGLCRenderToTexture.Create(Self, GetSceneWidth, GetSceneHeight, 0);
@@ -519,6 +514,11 @@ begin
    FTickOrigin := GetTickCount64;
  end;
 
+ if FNeedToResizeViewPort then begin
+   UpdateViewPortSize;
+   FNeedToResizeViewPort:=FALSE;
+ end;
+
  if not FCommonDataLoaded and ( OnLoadCommonData <> NIL ) then begin
    FOnLoadCommonData;
    FCommonDataLoaded := TRUE;
@@ -528,26 +528,24 @@ begin
  DelayManager.ProcessDelay;
 
  t := GetTickCount64;
- sec := ( t - FTickOrigin ) * 0.001;
+ if FMonitorRefreshRate<1
+   then sec := ( t - FTickOrigin ) * 0.001
+   else sec := 1/FMonitorRefreshRate;
+ FTickOrigin := t;
 
  // update camera objects
  for i:=0 to FCameraList.Count-1 do
    TOGLCCamera(FCameraList.Items[i]).Update( sec );
 
-// while GetTickCount64 - FTickOrigin < 16 do
-//  begin
-//   sleep(1);
-   //Application.ProcessMessages;
-//  end;
  UpDate( sec );
- FTickOrigin := t;
- Draw;
 
+ Draw;
  glFlush;
  FOGLC.SwapBuffers;
+ glFinish;
  inc( FFPSCounter );
 
- FFlagMouseLeftClicked := FALSE ;
+ FFlagMouseLeftClicked := FALSE;
 
  // if needed, launch the next stage
  if FStageRequested <> NIL then begin
@@ -558,12 +556,11 @@ begin
      (FGlobalFadeColor.Value<>BGRABlack)
      then ColorFadeIn( BGRABlack, FFadeTimeForStageChange );
 
-   if {FDoBlackScreenOnNewStage and }
-     (FGlobalFadeColor.State=psNO_CHANGE) {and
-     (FGlobalFadeColor.Value=BGRABlack)} then begin
+   if FGlobalFadeColor.State=psNO_CHANGE then begin
        if FCurrentStage <> NIL then begin
          FCurrentStage.FreeData;
-         if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
+         if FCurrentStage.FreeWhenLeave
+           then FCurrentStage.Free;
        end;
        FCurrentStage := FStageRequested;
        FStageRequested := NIL;
@@ -574,31 +571,6 @@ begin
        FIsChangingStage := FALSE;
    end;
  end;
-
-
-{
- if (FStageRequested <> NIL) and not FExecuteDuringLoop and not FIsChangingStage then begin
-   FIsChangingStage := TRUE;
-   if FDoBlackScreenOnNewStage then begin
-     ColorFadeIn( BGRABlack, FFadeTimeForStageChange );
-     ExecuteDuring( FFadeTimeForStageChange );
-   end;
-   if FCurrentStage <> NIL then begin
-     FCurrentStage.FreeData;
-     if FCurrentStage.FreeWhenLeave then FCurrentStage.Free;
-   end;
-   FCurrentStage := FStageRequested;
-   FStageRequested := NIL;
-   FCurrentStage.LoadData;
-   ClearKeysState;
-   if FDoBlackScreenOnNewStage
-     then begin
-       ColorFadeOut( FFadeTimeForStageChange );
-       ExecuteDuring( FFadeTimeForStageChange );
-     end;
-   FIsChangingStage := FALSE;
- end;
-}
 end;
 
 procedure TOGLCScene.ExecuteDuring(aTimeInSecond: single);
@@ -621,9 +593,9 @@ begin
  FDoBlackScreenOnNewStage := DoBlackScreen;
 end;
 
-
 procedure TOGLCScene.NewOnResize(Sender: TObject);
 begin
+ FNeedToResizeViewPort := TRUE;
  if FOGLCOnResize <> NIL then FOGLCOnResize( Sender );
 end;
 
@@ -631,6 +603,25 @@ procedure TOGLCScene.NewOnClick(Sender: TObject);
 begin
  FFlagMouseLeftClicked := TRUE;
  if FOGLCOnClick <> NIL then FOGLCOnClick( Sender );
+end;
+
+procedure TOGLCScene.UpdateViewPortSize;
+begin
+ // matrix emulator for OpenGL core
+ gnGL.mat[nGL_PROJECTION] := IdentityHmgMatrix;
+ gnGL.mat[nGL_MODELVIEW] := IdentityHmgMatrix;
+ nglMatrixMode(nGL_PROJECTION);
+ nglOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
+ nglMatrixMode(nGL_MODELVIEW);
+
+ // Matrix for legacy OpenGL
+ glMatrixMode(GL_PROJECTION);
+ glLoadIdentity();
+ glOrtho( FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
+ glMatrixMode(GL_MODELVIEW);
+ glLoadIdentity();
+
+ glViewport(0, 0, GetSceneWidth, GetSceneHeight );
 end;
 
 procedure TOGLCScene.ProcessKeyDown(Key: Word; Shift: TShiftState);
@@ -676,14 +667,14 @@ begin
  MouseManager.FMousePos.y:=Y;
 end;
 
-procedure TOGLCScene.Add( aSurface : TSimpleSurfaceWithEffect; aLayerIndex:integer);
+procedure TOGLCScene.Add( aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer);
 begin
  AddSurfaceToLayer(aSurface, aLayerIndex );
  aSurface.SetParentLayer( Layer[aLayerIndex] );
  aSurface.SetParentScene( Self );
 end;
 
-procedure TOGLCScene.Insert( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer) ;
+procedure TOGLCScene.Insert( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer);
 begin
  InsertSurfaceToLayer( aSurfaceIndex, aSurface, aLayerIndex);
  aSurface.SetParentLayer( Layer[aLayerIndex] );
@@ -943,10 +934,6 @@ begin
  // camera update
  FCamera.Update( DT );
 
- // Mouse update
-// if FMouseManager.FSprite <> NIL
-//   then FMouseManager.FSprite.Update( DT );
-
  // Do 'Surface change layer' request
  for i:=0 to length(FListSurfaceChangeLayer)-1 do
   with FListSurfaceChangeLayer[i] do
@@ -982,7 +969,7 @@ end;
 
 function TOGLCScene.GetSceneWidth: integer;
 begin
- Result := FOGLC.Width ;
+ Result := FOGLC.Width;
 end;
 
 procedure TOGLCScene.SetBackgroundColor(aColor: TBGRAPixel);
