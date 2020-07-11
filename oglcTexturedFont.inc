@@ -137,6 +137,7 @@ private
   FPaused,
   FCountdown,
   FShowFractionalPart: boolean;
+  procedure SetShowFractionalPart(AValue: boolean);
   procedure SetTime(AValue: single);
   procedure UpdateCaption;
 public
@@ -153,7 +154,7 @@ public
   // set to TRUE if you want to time countdown. Default is FALSE (counting time)
   property Countdown: boolean read FCountdown write FCountdown;
   // set to TRUE force the tenths and hundredths of seconds to be drawned. default is TRUE
-  property ShowFractionalPart: boolean read FShowFractionalPart write FShowFractionalPart;
+  property ShowFractionalPart: boolean read FShowFractionalPart write SetShowFractionalPart;
 end;
 
 
@@ -806,6 +807,13 @@ end;
   UpdateCaption;
  end;
 
+procedure TFreeTextClockLabel.SetShowFractionalPart(AValue: boolean);
+begin
+  if FShowFractionalPart=AValue then Exit;
+  FShowFractionalPart:=AValue;
+  UpdateCaption;
+end;
+
  procedure TFreeTextClockLabel.UpdateCaption;
  var t,h,m,s: integer;
   c: string;
@@ -815,7 +823,7 @@ end;
   t:=t-h*3600;
   m := t div 60;
   s:=t-m*60;
-  t := round(Frac(FTime)*100);
+  t := trunc(Frac(FTime)*100);
   c:='';
   if h>0 then c:=h.ToString+':';
 
@@ -825,7 +833,12 @@ end;
 
   if s<10 then c+='0';
   c+=s.ToString;
-  if FShowFractionalPart then c+='.'+t.ToString;
+
+  if FShowFractionalPart
+    then if t<10
+      then c+='.0'+t.ToString
+      else c+='.'+t.ToString;
+
   Caption := c;
  end;
 
