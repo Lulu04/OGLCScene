@@ -295,6 +295,7 @@ TOGLCScene = class (TLayerList)
   // set to 0 to force real time between swap buffer
   // set a value different from 0 to force fixed time. example 60Hz force time to 1/60=0.01666 sec
   property MonitorRefreshRate: integer read FMonitorRefreshRate write FMonitorRefreshRate;
+
   property BackgroundColor: TBGRAPixel read GetBackgroundColor write SetBackgroundColor ;
   // Callback
   property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
