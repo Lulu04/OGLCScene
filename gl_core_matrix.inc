@@ -34,7 +34,7 @@ type
   procedure ComputeMatrix( aTarget: PnMat44; aTranslate, aScale: PPointF; aAngle: single); overload;
   procedure ComputeMatrix( aTarget: PnMat44; aTranslate, aScale: PPointF; aAngle: single; aWidth, aHeight: integer); overload;
   function ApplyMatrix( aPMatrix: PnMat44; aPt: TPointF ): TPointF;
-  procedure SetToIdentity( aPMatrix: PnMat44 );
+  procedure SetToIdentity( aPMatrix: PnMat44 ); inline;
 
 {$endif oglcINTERFACE}
 
@@ -55,7 +55,16 @@ procedure ComputeMatrix(aTarget: PnMat44; aTranslate, aScale: PPointF;
   aAngle: single);
 begin
  SetToIdentity( aTarget );
+{
+ aTarget[3,0] := aTranslate^.x;
+ aTarget[3,1] := aTranslate^.y;
 
+
+
+ glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5, 0 );
+ glScalef( Scale.x.Value, Scale.y.Value, 0 );
+ glRotatef( Angle.Value, 0, 0, 1 );
+ glTranslatef( -Width * 0.5, -Height * 0.5, 0 );     }
 end;
 
 procedure ComputeMatrix(aTarget: PnMat44; aTranslate, aScale: PPointF;
