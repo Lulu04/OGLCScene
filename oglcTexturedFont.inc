@@ -133,6 +133,7 @@ end;
 
 TFreeTextClockLabel = class(TFreeText)
 private
+  FOnCountdownDone: TNotifyEvent;
   FTime: single;
   FPaused,
   FCountdown,
@@ -155,6 +156,8 @@ public
   property Countdown: boolean read FCountdown write FCountdown;
   // set to TRUE force the tenths and hundredths of seconds to be drawned. default is TRUE
   property ShowFractionalPart: boolean read FShowFractionalPart write SetShowFractionalPart;
+  // event callback for countdown mode. Fired when timer reach 0.
+  property OnCountdownDone: TNotifyEvent read FOnCountdownDone write FOnCountdownDone;
 end;
 
 
@@ -825,19 +828,20 @@ end;
   s:=t-m*60;
   t := trunc(Frac(FTime)*100);
   c:='';
-  if h>0 then c:=h.ToString+':';
+  if h>0 then c:=inttostr(h)+':';
 
-  if m>10
-    then c+=m.ToString+':'
-    else c+='0'+m.ToString+':';
+  if m>0 then
+   if m>10
+    then c+=inttostr(m)+':'
+    else c+='0'+inttostr(m)+':';
 
   if s<10 then c+='0';
-  c+=s.ToString;
+  c+=inttostr(s);
 
   if FShowFractionalPart
     then if t<10
-      then c+='.0'+t.ToString
-      else c+='.'+t.ToString;
+      then c+='.0'+inttostr(t)
+      else c+='.'+inttostr(t);
 
   Caption := c;
  end;
@@ -855,7 +859,11 @@ end;
   if FFreeze or FPaused then exit;
   if FCountdown then begin
     FTime -=aElapsedTime;
-    if FTime<0 then FTime:=0;
+    if FTime<0 then begin
+      FTime:=0;
+      if FOnCountdownDone<>NIL
+        then FOnCountdownDone( self );
+    end;
   end else FTime +=aElapsedTime;
   UpdateCaption;
  end;
