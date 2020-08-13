@@ -41,9 +41,9 @@ public
  function Add( aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer ): PTexture; overload;
  function AddEmpty( aWidth, aHeight: integer ): PTexture;
  // create a texture from an svg file.
- // if you give an width and set aHeight=-1, TextureManager will compute the right height to conserve aspect ratio
- // same thing if you gives an height and set aWidth=-1
- // aWidth and aHeight can not be both equal to -1
+ // You can set aHeight=-1 to force TextureManager to calculate the right height to conserve aspect ratio.
+ // Or you can set aWidth=-1 to force TextureManager to calculates the right width to conserve aspect ratio.
+ // Both aWidth and aHeight can not be equal to -1.
  function AddFromSVG( const aSVGFilename: string; aWidth, aHeight: integer ): PTexture; overload;
 
  procedure Replace( ATexture: PTexture; const aFilename : string ); overload;
