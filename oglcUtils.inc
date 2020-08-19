@@ -4,6 +4,10 @@ function BGRAPixelToHex(aColor: TBGRAPixel): string;
 function HexToBGRAPixel(const s: string): TBGRAPixel;
 function PercentColor( const aColor : TBGRAPixel ;aPercent:single ) :TBGRAPixel;
 
+// returns a time formated string HH:MM:SS.xx
+// if aShowFractionalPart is set to FALSE the .xx part is removed
+function SecondsToString( aTime: single; aShowFractionalPart: boolean ): string;
+
 
 // return a TBGRABitmap from a text and font attributes
 // aFillTexture is a texture used to fill the letters
@@ -125,6 +129,32 @@ begin
  Result.green:=g;
  Result.red:=r;
  Result.alpha:=aColor.alpha;
+end;
+
+function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
+var t,h,m,s: integer;
+begin
+ t := trunc(aTime);
+ h := t div 3600;
+ t:=t-h*3600;
+ m := t div 60;
+ s:=t-m*60;
+ t := trunc(Frac(aTime)*100);
+ Result:='';
+ if h>0 then Result:=inttostr(h)+':';
+
+ if m>0 then
+  if m>10
+   then Result+=inttostr(m)+':'
+   else Result+='0'+inttostr(m)+':';
+
+ if s<10 then Result+='0';
+ Result+=inttostr(s);
+
+ if aShowFractionalPart
+   then if t<10
+     then Result+='.0'+inttostr(t)
+     else Result+='.'+inttostr(t);
 end;
 
 function GradientRecordToBGRAGradient( FG: TFontGradient ): TBGRAGradientScanner;
