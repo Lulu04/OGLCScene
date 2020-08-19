@@ -49,7 +49,7 @@ public
  procedure Replace( ATexture: PTexture; const aFilename : string ); overload;
  procedure Replace( ATexture: PTexture; aImage : TBGRABitmap ); overload;
 
- procedure Delete ( var aTexture: PTexture );
+ procedure Delete( var aTexture: PTexture );
 
  // return a part of a texture from an existing one
  function GivePart( aTexture: PTexture; aRect: TRect ): PTexture;
