@@ -818,32 +818,8 @@ begin
 end;
 
  procedure TFreeTextClockLabel.UpdateCaption;
- var t,h,m,s: integer;
-  c: string;
  begin
-  t := trunc(FTime);
-  h := t div 3600;
-  t:=t-h*3600;
-  m := t div 60;
-  s:=t-m*60;
-  t := trunc(Frac(FTime)*100);
-  c:='';
-  if h>0 then c:=inttostr(h)+':';
-
-  if m>0 then
-   if m>10
-    then c+=inttostr(m)+':'
-    else c+='0'+inttostr(m)+':';
-
-  if s<10 then c+='0';
-  c+=inttostr(s);
-
-  if FShowFractionalPart
-    then if t<10
-      then c+='.0'+inttostr(t)
-      else c+='.'+inttostr(t);
-
-  Caption := c;
+  Caption := SecondsToString( FTime, FShowFractionalPart );
  end;
 
  constructor TFreeTextClockLabel.Create(aPaused: boolean);
