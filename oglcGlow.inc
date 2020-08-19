@@ -9,7 +9,6 @@ type
     class var FLocGlowColor: GLint;
     class var FLocGlowRadius: GLint;
     class var FLocGlowAttenuation: GLint;
-    class var FGlowCount: integer;
   protected
    function GetWidth: integer; override;
    function GetHeight: integer; override;
@@ -109,8 +108,7 @@ begin
  Tint.Value:=aColor;
  FBlendMode := aBlendMode;
 
- if FGlowCount=0 then begin
-    inc(FGlowCount);
+ if FShaderGlow=NIL then begin
     FShaderGlow := TOGLCShader.Create( '', GLOW_FRAGMENT_SHADER_PRG );
     with FShaderGlow do begin
      Use;
@@ -125,11 +123,6 @@ end;
 
 destructor TOGLCGlow.Destroy;
 begin
- dec(FGlowCount);
- if FGlowCount=0 then begin
-   FShaderGlow.Free;
-   FShaderGlow:=NIL;
- end;
  Radius.Free;
  Attenuation.Free;
  inherited Destroy;
