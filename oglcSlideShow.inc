@@ -45,7 +45,9 @@ type
     Destructor Destroy; override;
     procedure Update( const aElapsedTime: single ); override;
   public
-    StretchStayTime: TFParam; // 0.0= time stopped   0.5= half time     1.0= normal time  2.0= accelerate double time  etc...
+    // use to stretch the time between each image
+    // 0.0= time stopped   0.5= half time     1.0= normal time  2.0= accelerate double time  etc...
+    StretchStayTime: TFParam;
     procedure SetSize( aW, aH: integer );
     procedure AddImage( AFilename: string; AEffect: TSlideFX;
                         AStayTime: single;
