@@ -403,7 +403,7 @@ begin
  inherited Create;
 
  // fix decimal separator to dot to avoid exception when converting floating point values from scenario's files
- SysUtils.FormatSettings.DecimalSeparator := '.';
+ SysUtils.DefaultFormatSettings.DecimalSeparator := '.';
 
  FGLInitialized := FALSE;
  FOGLC := aOGLContext;
@@ -520,7 +520,7 @@ begin
    FNeedToResizeViewPort:=FALSE;
  end;
 
- if not FCommonDataLoaded and ( OnLoadCommonData <> NIL ) then begin
+ if not FCommonDataLoaded and ( FOnLoadCommonData <> NIL ) then begin
    FOnLoadCommonData;
    FCommonDataLoaded := TRUE;
  end;
