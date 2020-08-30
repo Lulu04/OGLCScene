@@ -625,6 +625,10 @@ begin
  aW := aTexture^.FrameWidth;
  aH := aTexture^.FrameHeight;
 
+ if AFrameIndex>=aTexture^.FrameCount
+   then AFrameIndex := aTexture^.FrameCount-1
+   else if AFrameIndex<0
+          then AFrameIndex :=0;
  TexCoord := aTexture^.FramesCoord[AFrameIndex];
 
  // Zoom
