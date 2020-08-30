@@ -194,7 +194,7 @@ private
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
   procedure SetAlign(AValue: TOGLCAlignment); virtual;
-  procedure GetWordsIndexes( aLineIndex: integer; var iBegin, iEnd: integer );
+  procedure GetWordsIndexes( aLineIndex: integer; out iBegin, iEnd: integer );
 protected
  function GetWidth: integer; override;
  function GetHeight: integer; override;
@@ -469,7 +469,7 @@ end;
    DoAlign;
  end;
 
- procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; var iBegin,
+ procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin,
    iEnd: integer);
  var i : integer;
  begin
@@ -547,7 +547,7 @@ end;
   FDrawingRect.Top:=0;
   yy := 0;
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight;
   end;
@@ -562,7 +562,7 @@ end;
   yy := ( FRect.Height - h )*0.5;
   FDrawingRect.Top:=round(yy);
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight;
   end;
@@ -575,7 +575,7 @@ end;
   yy := FRect.Height-FTexturedFont.Font.FontHeight;
   FDrawingRect.Top:=FRect.Height-FDrawingHeight;
   for i:=FLineCount-1 downto 0 do begin
-    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy -= FTexturedFont.Font.FontHeight;
   end;
@@ -587,7 +587,7 @@ end;
   FDrawingRect.Left:=0;
   for i:=0 to FLineCount-1 do
    begin
-    GetWordsIndexes( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes( i, iBegin, iEnd );
     w := 0;
     for j:=iBegin to iEnd do
      begin
@@ -604,7 +604,7 @@ end;
   FDrawingRect.Left:=FRect.Width;
   for i:=0 to FLineCount-1 do
    begin
-    GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes ( i, iBegin, iEnd );
     w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
     w := ( FRect.Width - w )*0.5;
 
@@ -623,7 +623,7 @@ end;
   FDrawingRect.Left:=FRect.Width;
 
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes ( i, iBegin{%H-}, iEnd{%H-} );
+    GetWordsIndexes ( i, iBegin, iEnd );
     w := FRect.Width;
     for j:=iEnd downto iBegin do
      begin
