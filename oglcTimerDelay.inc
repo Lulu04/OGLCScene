@@ -29,7 +29,7 @@ type
 
 PTimerObject = ^TTimerObject;
 TTimerObject = record
-                Interval : integer;
+                Interval : QWord;
                 Time     : QWord; //TTimeStamp;
                 CallBack : TOGLCEvent;
                 Kill     : boolean;
@@ -60,7 +60,7 @@ function TTimerManager.Add(aCallBack: TOGLCEvent; aIntervalMSec: integer ): PTim
 begin
  Result := AddInstanceToList;
  Result^.CallBack := aCallBack ;
- Result^.Interval := aIntervalMSec ;
+ Result^.Interval := QWord(aIntervalMSec) ;
  Result^.Kill:=FALSE;
  Result^.Time := GetTickCount64; // DateTimeToTimeStamp ( Now ) ;
 end;
@@ -72,8 +72,8 @@ end;
 
 procedure TTimerManager.ProcessTimer;
 var p: PTimerObject;
-    tactual: QWord; //TTimeStamp ;
-    delta: integer;
+    tactual, timetop: QWord; //TTimeStamp ;
+    //delta: QWord;
 begin
  // delete all killed timer
  p := FInstance0;
@@ -91,12 +91,19 @@ begin
  tactual := GetTickCount64; //DateTimeToTimeStamp ( Now ) ;
  while p <> NIL do
   begin
-   delta := tactual - p^.Time; //tactual.Time - p^.Time.Time ;
+   timetop := p^.Time + p^.Interval;
+   if timetop <= tactual then begin
+     p^.Time := timetop;
+     if p^.CallBack <> NIL then p^.CallBack();
+   end;
+
+{   delta := tactual - p^.Time; //tactual.Time - p^.Time.Time ;
    if delta >= p^.Interval
      then begin
-           p^.Time := tactual + QWord(delta - p^.Interval);//p^.Time.Time := tactual.Time + delta - p^.Interval;
+           p^.Time := p^.Time + p^.Interval;
+          // p^.Time := tactual + delta - p^.Interval;//p^.Time.Time := tactual.Time + delta - p^.Interval;
            if p^.CallBack <> NIL then p^.CallBack();
-          end;
+   end; }
    p := p^.Next;
   end;
 end;
@@ -112,7 +119,7 @@ end;
 
 procedure TDelayManager.ProcessDelay;
 var p :PDelayObject ;
-    delta : integer ;
+    delta : QWord;
 begin
  p := FInstance0;
  Factual := GetTickCount64;
