@@ -48,6 +48,7 @@ protected
   procedure Release;
 public
   // by default, LookAt is initialized with the center coodinates of its parent scene
+  // use instead MoveTo to easyly translate the camera to the target position
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
@@ -58,12 +59,25 @@ public
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
+
   // gives the distance between a point and the camera lookAt value
   function DistanceToPoint( aPt: TPointF ): single;
+
   // converts a world point coordinate to screen coordinate relative to camera view
   function WorldToScreen( aPt: TPointF ): TPointF;
   // converts a screen coordinates to world coordinates relative to camera view
   function ScreenToWorld( aPt: TPointF ): TPointF;
+
+  // converts a screen coordinates [0..ScreenWidth],[0..ScreenHeight] to scene coordinate
+  // taking in account the camera offset and scaling value. (not its rotate value)
+  function ScreenToScene( aPt: TPointF ): TPointF;
+
+  // translate the camera to the center of the target surface
+//  procedure CenterAndZoomOn( aTargetSurface: TSimpleSurfaceWithEffect );
+
+  // return the bounds of the view currently centered by the camera
+  // the coordinates are relative to the scene
+  function GetViewRect: TRectF;
 
   // the camera will be used by the specified layer, given by its index
   // if another camera was assigned on this layer, the new one replace it
@@ -132,6 +146,29 @@ end;
 function TOGLCCamera.ScreenToWorld(aPt: TPointF): TPointF;
 begin
  Result := aPt - LookAt.Value;
+end;
+
+function TOGLCCamera.ScreenToScene(aPt: TPointF): TPointF;
+var coefx, coefy: single;
+  vr: TRectF;
+begin
+ coefx := aPt.x/FParentScene.Width;
+ coefy := aPt.y/FParentScene.Height;
+ vr := GetViewRect;
+ Result.x := vr.Left+vr.Width*coefx;
+ Result.y := vr.Top+vr.Height*coefy;
+end;
+
+function TOGLCCamera.GetViewRect: TRectF;
+var vieww, viewh: single;
+begin
+ vieww := FParentScene.Width/Scale.x.Value;
+ viewh := FParentScene.Height/Scale.y.Value;
+
+ Result.Left := LookAt.x.Value+FParentScene.Width*0.5-vieww*0.5;
+ Result.Top := LookAt.y.Value+FParentScene.Height*0.5-viewh*0.5;
+ Result.Width := vieww;
+ Result.Height:= viewh;
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
