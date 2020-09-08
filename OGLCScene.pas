@@ -270,7 +270,7 @@ TOGLCScene = class (TLayerList)
 
   // call DoLoop on Application idle process. It update and draw the scene
   procedure DoLoop;
-  procedure ExecuteDuring( aTimeInSecond:single );
+  procedure ExecuteDuring( aTimeInSecond:single ); Deprecated;
 
   procedure LaunchStage( AStage: TStageSkeleton; DoBlackScreen: boolean=TRUE );
   property CurrentStage: TStageSkeleton read FCurrentStage;
@@ -831,8 +831,6 @@ begin
  // Render all Layers
  for L:=LayerCount-1 downto 0 do Layer[L].Draw;
 
- // After paint CallBack
- if Assigned (FOnAfterPaint) then FOnAfterPaint;
 
  // Scene global fade
  if FGlobalFadeColor.Alpha.Value > 0
@@ -842,6 +840,8 @@ begin
  MouseManager.Draw;
 
  FCamera.Release;
+ // After paint CallBack
+ if Assigned (FOnAfterPaint) then FOnAfterPaint;
 
 { if FPostProcessingShader.FFX<>[] then begin
    // draw post-processing frame buffer on screen
