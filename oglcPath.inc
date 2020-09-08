@@ -53,6 +53,8 @@ public
  // virtual because it can be higher than path length when path is looped
   DistanceTraveled: TFParam;
   LineColor: TBGRAParam;
+  DottedLineOffset: TFParam;
+
   Constructor Create;
   Destructor Destroy; override;
   // assign a path to draw
@@ -212,7 +214,7 @@ end;
 
 procedure TOGLCPathDrawing.DoDraw(const pt1, pt2: TPointF; aLayerPercentOpacity: single);
 begin
- DrawLine( pt1, pt2, LineColor.Value, FLineWidth, aLayerPercentOpacity);
+ DrawLine( pt1, pt2, LineColor.Value, FLineWidth, aLayerPercentOpacity*Opacity.pcValue);
 end;
 
 function TOGLCPathDrawing.GetPoint(aIndex: integer): TPointF;
