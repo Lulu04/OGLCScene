@@ -549,7 +549,7 @@ end;
   for i:=0 to FLineCount-1 do begin
     GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
-    yy += FTexturedFont.Font.FontHeight;
+    yy += FTexturedFont.Font.FontHeight; //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
  end;
 
@@ -557,14 +557,14 @@ end;
  var i, j, iBegin, iEnd, h: integer;
   yy: single;
  begin
-  h:=FLineCount*FTexturedFont.Font.FontHeight;
+  h:=FLineCount*FTexturedFont.Font.FontHeight; //FLineCount*FTexturedFont.Font.FontHeight*Scale.y.Value
   if h=0 then exit;
   yy := ( FRect.Height - h )*0.5;
   FDrawingRect.Top:=round(yy);
   for i:=0 to FLineCount-1 do begin
     GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
-    yy += FTexturedFont.Font.FontHeight;
+    yy += FTexturedFont.Font.FontHeight; //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
  end;
 
@@ -572,12 +572,12 @@ end;
  var i, j, iBegin, iEnd: integer;
   yy: single;
  begin
-  yy := FRect.Height-FTexturedFont.Font.FontHeight;
+  yy := FRect.Height-FTexturedFont.Font.FontHeight; //FRect.Height-FTexturedFont.Font.FontHeight*Scale.y.Value
   FDrawingRect.Top:=FRect.Height-FDrawingHeight;
   for i:=FLineCount-1 downto 0 do begin
     GetWordsIndexes( i, iBegin, iEnd );
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
-    yy -= FTexturedFont.Font.FontHeight;
+    yy -= FTexturedFont.Font.FontHeight;  //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
  end;
 
@@ -592,7 +592,7 @@ end;
     for j:=iBegin to iEnd do
      begin
       FWords[j].Location.x := w;
-      w += FWords[j].Width + FTexturedFont.GetCharWidth(' ');
+      w += FWords[j].Width + FTexturedFont.GetCharWidth(' '); //*Scale.x.Value
      end;
    end;
  end;
@@ -605,14 +605,20 @@ end;
   for i:=0 to FLineCount-1 do
    begin
     GetWordsIndexes ( i, iBegin, iEnd );
-    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
+    w := 0;
+    for j:=iBegin to iEnd do begin
+     w+= FWords[j].Width;
+     if i<>iEnd then w+=FTexturedFont.GetCharWidth(' ');
+    end;
+
+//    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
     w := ( FRect.Width - w )*0.5;
 
     if FDrawingRect.Left>w then FDrawingRect.Left:=round(w);
 
     for j:=iBegin to iEnd do begin
       FWords[j].Location.x := w ;
-      w := w + FWords[j].Width + FTexturedFont.GetCharWidth(' ');
+      w += {(}FWords[j].Width + FTexturedFont.GetCharWidth(' '){)*Scale.x.Value};
     end;
    end;
  end;
