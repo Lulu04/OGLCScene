@@ -62,7 +62,8 @@ procedure DrawPolygon( aPath:ArrayOfTPointF; Color: TBGRAPixel; w: single );
 procedure DrawEllipse( aCenter: TPointF; aRadius1, aRadius2: single; Color: TBGRAPixel; w: single );
 
 function ScaleValueToFitScene( aTexture: PTexture; AScene: TOGLCScene ): TPointF;
-function ScaleValueToFitSurface( aTexture: PTexture; aSurface: TSimpleSurfaceWithEffect ): TPointF;
+function ScaleValueToFitSurface( aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect ): TPointF;
+function ScaleValueToFitRect( aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect ): TPointF;
 
 function Distance(aPt1, aPt2: TPointF): single;
 
@@ -847,11 +848,21 @@ begin
 end;
 
 function ScaleValueToFitSurface(aTexture: PTexture;
-  aSurface: TSimpleSurfaceWithEffect): TPointF;
+  aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 var rl,rh,r: single;
 begin
- rl := aSurface.Width / aTexture^.ImageWidth;
- rh := aSurface.Height / aTexture^.ImageHeight;
+ rl := aTargetSurface.Width / aTexture^.ImageWidth;
+ rh := aTargetSurface.Height / aTexture^.ImageHeight;
+ if rl < rh then r := rl else r := rh;
+ Result := PointF(r, r);
+end;
+
+function ScaleValueToFitRect(aRect: TRectF;
+  aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+var rl,rh,r: single;
+begin
+ rl := aTargetSurface.Width / aRect.Width;
+ rh := aTargetSurface.Height / aRect.Height;
  if rl < rh then r := rl else r := rh;
  Result := PointF(r, r);
 end;
