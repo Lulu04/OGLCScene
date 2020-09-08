@@ -101,7 +101,21 @@ private
   FMessageList: TMessageList;
   FEnableProcessMessage: boolean;
 private
+  function GetScaledAreaF: TRectF;
+  function GetScaledBottomY: single;
+  function GetScaledHeight: single;
+  function GetScaledRightX: single;
+  function GetScaledWidth: single;
+  function GetScaledX: single;
+  function GetScaledY: single;
   procedure SetFrame(AValue: single);
+  procedure SetScaledAreaF(AValue: TRectF);
+  procedure SetScaledBottomY(AValue: single);
+  procedure SetScaledHeight(AValue: single);
+  procedure SetScaledRightX(AValue: single);
+  procedure SetScaledWidth(AValue: single);
+  procedure SetScaledX(AValue: single);
+  procedure SetScaledY(AValue: single);
 protected
  FChilds: TList;
  FParentSurface: TSimpleSurfaceWithEffect;
@@ -176,8 +190,16 @@ public
    function ParentToSurface( aPts: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
    function IsParentOf( aSurface: TSimpleSurfaceWithEffect): boolean;
 
+public  // utils for scaled surface
    function GetScaledArea: TRect;
-
+   property ScaledAreaF: TRectF read GetScaledAreaF write SetScaledAreaF;
+   property ScaledWidth: single read GetScaledWidth write SetScaledWidth;
+   property ScaledHeight: single read GetScaledHeight write SetScaledHeight;
+   property ScaledX: single read GetScaledX write SetScaledX;
+   property ScaledY: single read GetScaledY write SetScaledY;
+   property ScaledRightX: single read GetScaledRightX write SetScaledRightX;
+   property ScaledBottomY: single read GetScaledBottomY write SetScaledBottomY;
+public
    // Kill defered
    procedure KillDefered( ASec: single );
    // Move
@@ -336,6 +358,31 @@ public
 end;
 
 
+{ TOGLCRectangle }
+
+TOGLCRectangle = class( TSimpleSurfaceWithEffect )
+private
+  FWidth, FHeight,
+  FLineWidth: single;
+protected
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+public
+  procedure Update( const aElapsedTime: single ); override;
+  procedure Draw( const aLayerPercentOpacity: single ); override;
+public
+  Constructor Create( aX, aY, aWidth, aHeight: single );
+  Destructor Destroy; override;
+public
+  // The border color.
+  // Use Tint property to set the fill color.
+  BorderColor: TBGRAParam;
+  procedure SetSize( aW, aH: single );
+  // the width of the border of the rectangle
+  property LineWidth: single read FLineWidth write FLineWidth;
+end;
+
+
 {
 TVAOSprite=class( TSimpleSurfaceWithEffect )
 private
@@ -362,6 +409,75 @@ end;
 
 
 {$ifdef oglcIMPLEMENTATION}
+{ TOGLCRectangle }
+
+function TOGLCRectangle.GetWidth: integer;
+begin
+ Result := round(FWidth);
+end;
+
+function TOGLCRectangle.GetHeight: integer;
+begin
+ Result := round(FHeight);
+end;
+
+procedure TOGLCRectangle.Update(const aElapsedTime: single);
+begin
+ inherited Update(aElapsedTime);
+ if not Freeze then BorderColor.OnElapse(aElapsedTime);
+end;
+
+procedure TOGLCRectangle.Draw(const aLayerPercentOpacity: single);
+var a: Single;
+begin
+ if not FVisible then exit;
+ if (FWidth=0) or (FHeight=0) then exit;
+
+ a := aLayerPercentOpacity * Opacity.pcValue;
+ if a=0 then exit;
+
+ PushAndPrepareMatrix;
+
+ // Skew is ignored
+ // Flip property is ignored
+ SetBlendMode( FBlendMode );
+ TextureManager.DisableTextureUsage;
+
+ DrawBox(X.Value, Y.Value, FWidth-1, FHeight-1, BorderColor.Value, Tint.Value, FLineWidth, a);
+
+ DrawChildSurfaces( a );
+ PopMatrix;
+end;
+
+constructor TOGLCRectangle.Create(aX, aY, aWidth, aHeight: single);
+begin
+ inherited Create;
+ if aWidth<0 then aWidth:=0;
+ if aHeight<0 then aHeight:=0;
+ FWidth := aWidth;
+ FHeight := aHeight;
+ X.Value := aX;
+ Y.Value := aY;
+ BorderColor:= TBGRAParam.Create;
+ BorderColor.Value:=BGRA(255,255,255);
+ Tint.Value:=BGRA(100,100,100);
+ FLineWidth := 1.0;
+end;
+
+destructor TOGLCRectangle.Destroy;
+begin
+ BorderColor.Free;
+ inherited Destroy;
+end;
+
+procedure TOGLCRectangle.SetSize(aW, aH: single);
+begin
+ if aW<0 then aW:=0;
+ if aH<0 then aH:=0;
+ FWidth :=aW;
+ FHeight:=aH;
+end;
+
 {TEllipse }
 constructor TEllipse.Create( aCenter: TPointF; aRx, aRy: single );
 begin
@@ -678,6 +794,54 @@ begin
  FFrame:=AValue;
 end;
 
+procedure TSimpleSurfaceWithEffect.SetScaledAreaF(AValue: TRectF);
+begin
+ ScaledWidth:= AValue.Width;
+ ScaledHeight := AValue.Height;
+ ScaledX := AValue.Left;
+ ScaledY := AValue.Top;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledBottomY(AValue: single);
+begin
+ CenterY := AValue-GetScaledHeight*0.5;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledHeight(AValue: single);
+begin
+ if Height<>0 then Scale.y.Value := AValue/Height;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledRightX(AValue: single);
+begin
+ CenterX := AValue-GetScaledWidth*0.5;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledWidth(AValue: single);
+begin
+ if Width<>0 then Scale.x.Value := AValue/Width;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledX(AValue: single);
+begin
+ CenterX := AValue+GetScaledWidth*0.5;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetScaledY(AValue: single);
+begin
+ CenterY := AValue+GetScaledHeight*0.5;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledAreaF: TRectF;
+var xx,yy,ww,hh: single;
+begin
+ ww := Width*Scale.x.Value;
+ hh := Height*Scale.y.Value;
+ xx := FSurfaceOrigin.x-ww*0.5;
+ yy := FSurfaceOrigin.y-hh*0.5;
+ Result := RectF(xx,yy,xx+ww,yy+hh);
+end;
+
 procedure TSimpleSurfaceWithEffect.EnableGui;
 var i: integer;
 begin
@@ -748,6 +912,36 @@ begin
  inherited Destroy;
 end;
 
+function TSimpleSurfaceWithEffect.GetScaledBottomY: single;
+begin
+ Result := CenterY+GetScaledHeight*0.5;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledHeight: single;
+begin
+ Result := Height*Scale.y.Value;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledRightX: single;
+begin
+ Result := CenterX+GetScaledWidth*0.5;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledWidth: single;
+begin
+ Result := Width*Scale.x.Value;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledX: single;
+begin
+ Result := CenterX-GetScaledWidth*0.5;
+end;
+
+function TSimpleSurfaceWithEffect.GetScaledY: single;
+begin
+ Result := CenterY-GetScaledHeight*0.5;
+end;
+
 
 procedure TSimpleSurfaceWithEffect.Update(const aElapsedTime: single);
 var Xr,Yr,s,c: single ;
@@ -760,7 +954,8 @@ begin
  if FParentSurface<>NIL then begin
    FSurfaceOrigin+= FParentSurface.FSurfaceOrigin;
    FAngleOrigin+= FParentSurface.FAngleOrigin;
-   FScaleOrigin+= FParentSurface.FScaleOrigin;
+   FScaleOrigin.x := FScaleOrigin.x*FParentSurface.FScaleOrigin.x;
+   FScaleOrigin.y := FScaleOrigin.y*FParentSurface.FScaleOrigin.y;
  end;
 
  if FEnableProcessMessage then FMessageList.ProcessMessages( aElapsedTime );
