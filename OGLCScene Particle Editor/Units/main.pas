@@ -272,7 +272,7 @@ end;
 procedure TForm_Principale.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
  FScene.ColorFadeIn(BGRABlack, 0.5 );
- FScene.ExecuteDuring(0.5);
+ //FScene.ExecuteDuring(0.5);
 end;
 
 procedure TForm_Principale.FormCloseQuery(Sender: TObject; var CanClose: boolean );
