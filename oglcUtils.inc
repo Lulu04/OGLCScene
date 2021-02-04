@@ -262,27 +262,41 @@ begin
 end;
 
 function SplitLineToStringArray(ALine: string; aCharSeparator: char): ArrayOfString;
-var i, w: integer;
+var k, i: integer;
+  function EndOfString: boolean;
+  begin
+   Result := k>Length(ALine);
+  end;
+  procedure SkipSeparator;
+  begin
+   repeat
+    if EndOfString
+      then exit
+      else if ALine[k]=aCharSeparator
+            then inc(k)
+            else exit;
+   until false;
+  end;
+  procedure GetWord;
+  begin
+   inc(i);
+   SetLength( Result, i+1 );
+   Result[i] := '';
+   repeat
+    Result[i] := Result[i]+ALine[k];
+    inc(k);
+    if EndOfString then exit;
+   until ALine[k]=aCharSeparator;
+  end;
 begin
- SetLength( Result, 0 );
+ SetLength( Result{%H-}, 0 );
  if Length( ALine ) = 0 then exit;
-
- // prepare the string
- if ALine[1] <> aCharSeparator
-   then ALine := aCharSeparator {%H-}+ ALine;
-
- i := 1;
- w := -1;
+ i := -1;
+ k := 1;
  repeat
-  if ALine[i] <> aCharSeparator
-    then Result[w] := Result[w] + ALine[i]
-    else begin
-          inc ( w );
-          SetLength( Result, w + 1 );
-          Result[w] := '';
-    end;
-  inc ( i );
- until i > Length( ALine );
+  SkipSeparator;
+  if not EndOfString then GetWord;
+ until EndOfString;
 end;
 
 function SplitTextToWordArray(aText: string; aCharSeparator: char
@@ -750,6 +764,46 @@ begin
  Result:=c;
 end;
 
+
+procedure SetVSync( AValue: boolean );
+const
+{$IFDEF Windows}
+opengllib = 'opengl32.dll';
+{$ELSE}
+{$IFDEF OS2}
+opengllib = 'opengl.dll';
+{$ELSE OS2}
+{$ifdef darwin}
+opengllib = '/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib';
+{$ELSE}
+{$ifdef haiku}
+opengllib = 'libGL.so';
+{$else}
+opengllib = 'libGL.so.1';
+{$endif}
+{$endif}
+{$ENDIF OS2}
+{$ENDIF}
+
+{$MACRO ON}
+{$IFDEF Windows}
+{$DEFINE extdecl := stdcall}
+{$ELSE}
+{$DEFINE extdecl := cdecl}
+{$ENDIF}
+var
+  HLib: TLibHandle;
+  wglSwapInterval: function(interval: GLint): LongBool; extdecl;
+begin
+ HLib := DynLibs.LoadLibrary( opengllib );
+ if HLib <> DynLibs.NilHandle then begin
+  Pointer(wglSwapInterval) := DynLibs.GetProcedureAddress( HLib, PChar('wglSwapInterval'));
+  if wglSwapInterval<>NIL then wglSwapInterval( Integer( AValue ));
+  DynLibs.UnloadLibrary(HLib);
+ end;
+end;
+
+{
 function dlopen ( lpLibFileName : PAnsiChar) : HMODULE; stdcall; external 'kernel32.dll' name 'LoadLibraryA';
 function dlclose( hLibModule : HMODULE ) : Boolean; stdcall; external 'kernel32.dll' name 'FreeLibrary';
 //function dlsym  ( hModule : HMODULE; lpProcName : PAnsiChar) : Pointer; stdcall; external 'kernel32.dll' name 'GetProcAddress';
@@ -773,6 +827,7 @@ begin
  if wglSwapInterval<>NIL then wglSwapInterval( Integer( AValue ));
  dlclose( oglLibrary );
 end;
+}
 
 procedure SetBlendMode(ABlendMode: byte);
 var src : LongWord;
