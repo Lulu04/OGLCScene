@@ -57,8 +57,8 @@ private
  function GetMapSize: TSize;
  procedure EnsurePositionInMap( var APos: TPointF );
  procedure ComputeIndexes( APosition: TPointF );
- function IsValidRow( ARow: integer ): boolean; inline;
- function IsValidColumn( AColumn: integer ): boolean; inline;
+ function IsValidRow( ARow: integer ): boolean;
+ function IsValidColumn( AColumn: integer ): boolean;
  function IsValidTextureIndex( AITex: integer ): boolean;
  function IsValidFrameIndex( ATextureIndex, ixFrame, iyFrame: integer ): boolean;
  function TileEngineIndexFrameToTextureIndexFrame( iTexture, ixFrame, iyFrame: integer): integer;

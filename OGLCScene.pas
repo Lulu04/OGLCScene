@@ -25,6 +25,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Graphics, Dialogs, Controls,
   types,
   OpenGLContext, GLExt, GL,
+  DynLibs,
   lazutf8,
   BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath, BGRAGradientScanner,
   BGRASVG,
@@ -235,8 +236,8 @@ TOGLCScene = class (TLayerList)
   FGlobalFadeColor: TBGRAParam;
   FBackgroundColorF: TColorF;
   FFadeTimeForStageChange: single;
-  function GetSceneHeight: integer; inline ;
-  function GetSceneWidth: integer; inline ;
+  function GetSceneHeight: integer;
+  function GetSceneWidth: integer;
   procedure SetBackgroundColor ( aColor:TBGRAPixel );
  private
   // CallBack

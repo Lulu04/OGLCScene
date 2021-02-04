@@ -150,8 +150,8 @@ protected
    FScenarioAdditionnalDecode: TScenarioDecode;
    function GetScenario( AIDScenario: TIDScenario ): TScenario;
 protected
-   procedure PushAndPrepareMatrix; inline;
-   procedure PopMatrix; inline;
+   procedure PushAndPrepareMatrix;
+   procedure PopMatrix;
    procedure DrawChildSurfaces( const aLayerPercentOpacity: single );
    procedure DrawSurface( aTexture: PTexture; AFrameIndex: integer; const aLayerPercentOpacity : single ); overload;
    procedure DrawSurface( const aTopLeftColor, aTopRightColor, aBottomRightColor, aBottomLeftColor: TBGRAPixel; const aLayerPercentOpacity : single ); overload;
@@ -1680,7 +1680,7 @@ begin
 
  FTemp := SplitLineToStringArray( Actions.Strings[CurrentLine], ' ' );
 
- case FTemp.[0] of
+ case FTemp[0] of
   acWait : WaitTime := StrToFloat( FTemp[1] );
   acKill : ParentSurface.Kill;
   acFreeze : ParentSurface.Freeze := FTemp[1] = acTRUE ;
