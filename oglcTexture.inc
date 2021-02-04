@@ -88,7 +88,7 @@ begin
  if TBGRAPixel_RGBAOrder then
    {%H-}glFormat := GL_RGBA
  else
-   glFormat := GL_BGRA;
+   {%H-}glFormat := GL_BGRA;
 
  if dup.LineOrder = riloTopToBottom then
    dup.VerticalFlip;
