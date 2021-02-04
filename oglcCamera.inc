@@ -227,7 +227,7 @@ begin
  if Length(Actions.Strings[CurrentLine]) = 0 then exit;
  FTemp := SplitLineToStringArray( Actions.Strings[CurrentLine], ' ' );
 
- case FTemp.[0] of
+ case FTemp[0] of
   acWait : WaitTime := StrToFloat( FTemp[1] );
 
   acAngle : FParentCamera.Angle.Value := StrToFloat( FTemp[1] ) ;
