@@ -284,8 +284,8 @@ TOGLCScene = class (TLayerList)
   function GetSurfaceByIndex( aLayerIndex, aSurfaceIndex: integer): TSimpleSurface;
 
   // Global scene color fade in and out
-  procedure ColorFadeIn ( const aColor : TBGRAPixel ; const aDurationInSecond : single );
-  procedure ColorFadeOut ( const aDurationInSecond : single );
+  procedure ColorFadeIn( const aColor: TBGRAPixel; const aDurationInSecond: single );
+  procedure ColorFadeOut( const aDurationInSecond: single );
 
   property Width: integer read GetSceneWidth;
   property Height: integer read GetSceneHeight;
