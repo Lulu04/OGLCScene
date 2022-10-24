@@ -1,5 +1,7 @@
 {$ifdef oglcINTERFACE}
 
+function StringToSingle(const aStr: string): single;
+
 function BGRAPixelToHex(aColor: TBGRAPixel): string;
 function HexToBGRAPixel(const s: string): TBGRAPixel;
 function PercentColor( const aColor : TBGRAPixel ;aPercent:single ) :TBGRAPixel;
@@ -101,6 +103,28 @@ const
 {$ifdef oglcIMPLEMENTATION}
 
 
+function StringToSingle(const aStr: string): single;
+var i, k, integerPart, decimalPart: integer;
+  divisor: double;
+begin
+  k := Pos('.', aStr);
+  if k = 0 then
+    k := Pos(',', aStr);
+
+  if k = 0 then
+    Result := Single(aStr.ToInteger)
+  else
+  begin
+    integerPart := Copy(aStr, 1, k-1).ToInteger;
+    decimalPart := Copy(aStr, k+1, Length(aStr)-k).ToInteger;
+
+    divisor := 1;
+    for i:=1 to Length(aStr)-k do
+      divisor := divisor*10;
+
+    Result := Single(integerPart+decimalPart/divisor);
+  end;
+end;
 
 function BGRAPixelToHex(aColor: TBGRAPixel): string;
 begin

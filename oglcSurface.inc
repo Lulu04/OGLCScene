@@ -1681,44 +1681,44 @@ begin
  FTemp := SplitLineToStringArray( Actions.Strings[CurrentLine], ' ' );
 
  case FTemp[0] of
-  acWait : WaitTime := StrToFloat( FTemp[1] );
+  acWait : WaitTime := StringToSingle( FTemp[1] );
   acKill : ParentSurface.Kill;
   acFreeze : ParentSurface.Freeze := FTemp[1] = acTRUE ;
   acVisible : ParentSurface.Visible := FTemp[1] = acTRUE ;
 
   acOpacity : ParentSurface.Opacity.Value := strtoint( FTemp[1] );
-  acOpacityChange : ParentSurface.Opacity.ChangeTo( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] ) );
+  acOpacityChange : ParentSurface.Opacity.ChangeTo( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] ) );
 
   acTint : ParentSurface.Tint.Value := BGRA( strtoint( FTemp[1] ), strtoint( FTemp[2] ), strtoint( FTemp[3] ), strtoint( FTemp[4] ) );
   acTintChange : ParentSurface.Tint.ChangeTo( BGRA( strtoint( FTemp[1] ),
                                                     strtoint( FTemp[2] ),
                                                     strtoint( FTemp[3] ),
                                                     strtoint( FTemp[4] )),
-                                                    StrToFloat( FTemp[5] ),
+                                                    StringToSingle( FTemp[5] ),
                                                     StringToCurveID( FTemp[6] ));
-  acTintRedChange: ParentSurface.Tint.Red.ChangeTo( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] ));
-  acTintGreenChange: ParentSurface.Tint.Green.ChangeTo( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] ));
-  acTintBlueChange: ParentSurface.Tint.Blue.ChangeTo( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] ));
-  acTintAlphaChange : ParentSurface.Tint.Alpha.ChangeTo( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] ));
+  acTintRedChange: ParentSurface.Tint.Red.ChangeTo( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] ));
+  acTintGreenChange: ParentSurface.Tint.Green.ChangeTo( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] ));
+  acTintBlueChange: ParentSurface.Tint.Blue.ChangeTo( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] ));
+  acTintAlphaChange : ParentSurface.Tint.Alpha.ChangeTo( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] ));
 
-  acAngle : ParentSurface.Angle.Value := StrToFloat( FTemp[1] ) ;
-  acRotate : ParentSurface.Angle.AddConstant( StrToFloat( FTemp[1] ) );
-  acRotateTo : ParentSurface.Angle.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
-  acRotationAroundAxis : ParentSurface.RotationAroundPoint( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StrToFloat( FTemp[3] ), FTemp[4] = acTRUE );
+  acAngle : ParentSurface.Angle.Value := StringToSingle( FTemp[1] ) ;
+  acRotate : ParentSurface.Angle.AddConstant( StringToSingle( FTemp[1] ) );
+  acRotateTo : ParentSurface.Angle.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
+  acRotationAroundAxis : ParentSurface.RotationAroundPoint( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToSingle( FTemp[3] ), FTemp[4] = acTRUE );
 
-  acSkew : ParentSurface.Skew.ChangeTo( PointF( strtoint( FTemp[1] ), strtoint( FTemp[2] ) ), StrToFloat( FTemp[3] ),  StringToCurveID( FTemp[4]  ) );
+  acSkew : ParentSurface.Skew.ChangeTo( PointF( strtoint( FTemp[1] ), strtoint( FTemp[2] ) ), StringToSingle( FTemp[3] ),  StringToCurveID( FTemp[4]  ) );
 
-  acScale : ParentSurface.Scale.Value := PointF( StrToFloat( FTemp[1] ), StrToFloat( FTemp[1] ) );
+  acScale : ParentSurface.Scale.Value := PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[1] ) );
   acScaleChange : begin
-   ParentSurface.Scale.x.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-   ParentSurface.Scale.y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   ParentSurface.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   ParentSurface.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
   end;
-  acScaleH : ParentSurface.Scale.x.Value := StrToFloat( FTemp[1] );
-  acScaleHChange : ParentSurface.Scale.x.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acScaleV : ParentSurface.Scale.y.Value := StrToFloat( FTemp[1] );
-  acScaleVChange : ParentSurface.Scale.y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acScaleH : ParentSurface.Scale.x.Value := StringToSingle( FTemp[1] );
+  acScaleHChange : ParentSurface.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acScaleV : ParentSurface.Scale.y.Value := StringToSingle( FTemp[1] );
+  acScaleVChange : ParentSurface.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
-  acBlink: ParentSurface.Blink( strtoint( FTemp[1] ), StrToFloat( FTemp[2] ), StrToFloat( FTemp[3] ) );
+  acBlink: ParentSurface.Blink( strtoint( FTemp[1] ), StringToSingle( FTemp[2] ), StringToSingle( FTemp[3] ) );
   acStopBlink: ParentSurface.StopBlink;
 
   acFlipH: ParentSurface.FlipH := FTemp[1] = acTRUE ;
@@ -1728,30 +1728,30 @@ begin
 
   acAnimate: begin
               ParentSurface.SetFrameLoopBounds( strtoint( FTemp[1] ), strtoint( FTemp[2] ) );
-              ParentSurface.FrameAddPerSecond( StrToFloat( FTemp[3] ));
+              ParentSurface.FrameAddPerSecond( StringToSingle( FTemp[3] ));
   end;
   acIncFrame : ParentSurface.Frame := ParentSurface.Frame + 1;
   acDecFrame : ParentSurface.Frame := ParentSurface.Frame - 1;
   acSetFrame : ParentSurface.Frame := strtoint( FTemp[1] );
 
 
-  acMoveTo  : ParentSurface.MoveTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StrToFloat( FTemp[3] ), StringToCurveID( FTemp[4] ));
-  acMoveXTo : ParentSurface.X.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acMoveYTo : ParentSurface.Y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveTo  : ParentSurface.MoveTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ));
+  acMoveXTo : ParentSurface.X.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveYTo : ParentSurface.Y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
-  acMoveCenterTo  : ParentSurface.MoveCenterTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StrToFloat( FTemp[3] ), StringToCurveID( FTemp[4] ) );
-  acMoveXCenterTo : ParentSurface.MoveXCenterTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ) );
-  acMoveYCenterTo : ParentSurface.MoveYCenterTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ) );
+  acMoveCenterTo  : ParentSurface.MoveCenterTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ) );
+  acMoveXCenterTo : ParentSurface.MoveXCenterTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ) );
+  acMoveYCenterTo : ParentSurface.MoveYCenterTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ) );
 
-  acMoveRelative   : ParentSurface.MoveRelative( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StrToFloat( FTemp[3] ), StringToCurveID( FTemp[4] ));
-  acMoveXRelative  : ParentSurface.MoveXRelative( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acMoveYRelative  : ParentSurface.MoveYRelative( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveRelative   : ParentSurface.MoveRelative( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ));
+  acMoveXRelative  : ParentSurface.MoveXRelative( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveYRelative  : ParentSurface.MoveYRelative( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
   acSetCoor : begin
-    ParentSurface.X.Value := StrToFloat( FTemp[1] );
-    ParentSurface.Y.Value := StrToFloat( FTemp[2] );
+    ParentSurface.X.Value := StringToSingle( FTemp[1] );
+    ParentSurface.Y.Value := StringToSingle( FTemp[2] );
   end;
-  acSetCenterCoor : ParentSurface.SetCenterCoordinate( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ));
+  acSetCenterCoor : ParentSurface.SetCenterCoordinate( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ));
 
   acCenterOnScene: ParentSurface.CenterOnScene;
 

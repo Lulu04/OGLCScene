@@ -435,12 +435,12 @@ begin
 
  case ComboBox1.ItemIndex of
   0: FPEngine.SetEmitterTypePoint;
-  1: FPEngine.SetEmitterTypeLine( TB2.Position, strtofloat(Edit5.Text));
+  1: FPEngine.SetEmitterTypeLine( TB2.Position, StringToSingle(Edit5.Text));
   2: FPEngine.SetEmitterTypeRectangle( strtoint(Edit3.Text), strtoint(Edit4.Text) );
-  3: FPEngine.SetEmitterTypeCircle( strtofloat(Edit7.Text) );
-  4: FPEngine.SetEmitterTypeRing( strtofloat(Edit9.Text), strtofloat(Edit8.Text) );
-  5: FPEngine.SetEmitterTypeInnerCircle( strtofloat(Edit7.Text) );
-  6: FPEngine.SetEmitterTypeOuterCircle( strtofloat(Edit7.Text) );
+  3: FPEngine.SetEmitterTypeCircle( StringToSingle(Edit7.Text) );
+  4: FPEngine.SetEmitterTypeRing( StringToSingle(Edit9.Text), StringToSingle(Edit8.Text) );
+  5: FPEngine.SetEmitterTypeInnerCircle( StringToSingle(Edit7.Text) );
+  6: FPEngine.SetEmitterTypeOuterCircle( StringToSingle(Edit7.Text) );
  end;
 end;
 
@@ -465,19 +465,19 @@ end;
 // Line length
 procedure TForm_Principale.Edit5EditingDone(Sender: TObject);
 begin
- FPEngine.SetEmitterTypeLine( TB2.Position, strtofloat(Edit5.Text));
+ FPEngine.SetEmitterTypeLine( TB2.Position, StringToSingle(Edit5.Text));
 end;
 
 // circle radius
 procedure TForm_Principale.Edit7EditingDone(Sender: TObject);
 begin
- FPEngine.SetEmitterTypeCircle( strtofloat(Edit7.Text));
+ FPEngine.SetEmitterTypeCircle( StringToSingle(Edit7.Text));
 end;
 
 // ring small radius/big radius
 procedure TForm_Principale.Edit9EditingDone(Sender: TObject);
 begin
- FPEngine.SetEmitterTypeRing( strtofloat(Edit9.Text), strtofloat(Edit8.Text));
+ FPEngine.SetEmitterTypeRing( StringToSingle(Edit9.Text), StringToSingle(Edit8.Text));
 end;
 
 
@@ -879,7 +879,7 @@ begin
   CheckBox1.Checked := s.Strings[k+1]='TRUE';
 
   k := s.IndexOf('E_Life');
-  TB1.Position := round(strtoFloat( s.Strings[k+1] )*1000);
+  TB1.Position := round(StringToSingle( s.Strings[k+1] )*1000);
 
   k := s.IndexOf('E_Direction');
   TB2.Position := strtoint( s.Strings[k+1] );
@@ -929,8 +929,8 @@ begin
 
   k := s.IndexOf('P_Life');
   SplittedText := SplitLineToStringArray( s.Strings[k+1], ' ' );
-  TB5.Position := round(strtofloat( SplittedText[0] )*1000);
-  TB6.Position := round(strtofloat( SplittedText[1] )*1000);
+  TB5.Position := round(StringToSingle( SplittedText[0] )*1000);
+  TB6.Position := round(StringToSingle( SplittedText[1] )*1000);
 
   k := s.IndexOf('P_Velocity');
   SplittedText := SplitLineToStringArray( s.Strings[k+1], ' ' );
@@ -941,7 +941,7 @@ begin
   k := strtoint(SplittedText[2]);  // point count
   i := 3;
   while k>0 do begin
-   VelocityCurve.AddPoint(StrToFloat(SplittedText[i]), (StrToFloat(SplittedText[i+1])+2)/4, FALSE);
+   VelocityCurve.AddPoint(StringToSingle(SplittedText[i]), (StringToSingle(SplittedText[i+1])+2)/4, FALSE);
    inc(i,2);
    dec(k);
   end;
@@ -954,33 +954,33 @@ begin
   k := strtoint(SplittedText[2]);  // point count
   i := 3;
   while k>0 do begin
-   SpinCurve.AddPoint(StrToFloat(SplittedText[i]), (StrToFloat(SplittedText[i+1])+2)/4, FALSE);
+   SpinCurve.AddPoint(StringToSingle(SplittedText[i]), (StringToSingle(SplittedText[i+1])+2)/4, FALSE);
    inc(i,2);
    dec(k);
   end;
 
   k := s.IndexOf('P_Size');
   SplittedText := SplitLineToStringArray( s.Strings[k+1], ' ' );
-  TB14.Position := round(StrToFloat(SplittedText[0])*100);
-  TB15.Position := round(StrToFloat(SplittedText[1])*100);
+  TB14.Position := round(StringToSingle(SplittedText[0])*100);
+  TB15.Position := round(StringToSingle(SplittedText[1])*100);
   SizeCurve.Clear;
   k := strtoint(SplittedText[2]);  // point count
   i := 3;
   while k>0 do begin
-   SizeCurve.AddPoint(StrToFloat(SplittedText[i]), StrToFloat(SplittedText[i+1])/4, FALSE);
+   SizeCurve.AddPoint(StringToSingle(SplittedText[i]), StringToSingle(SplittedText[i+1])/4, FALSE);
    inc(i,2);
    dec(k);
   end;
 
   k := s.IndexOf('P_AVelocity');
   SplittedText := SplitLineToStringArray( s.Strings[k+1], ' ' );
-  TB16.Position := round(StrToFloat(SplittedText[0]));
-  TB17.Position := round(StrToFloat(SplittedText[1]));
+  TB16.Position := round(StringToSingle(SplittedText[0]));
+  TB17.Position := round(StringToSingle(SplittedText[1]));
   AngularVelocityCurve.Clear;
   k := strtoint(SplittedText[2]);  // point count
   i := 3;
   while k>0 do begin
-   AngularVelocityCurve.AddPoint(StrToFloat(SplittedText[i]), (StrToFloat(SplittedText[i+1])+2)/4, FALSE);
+   AngularVelocityCurve.AddPoint(StringToSingle(SplittedText[i]), (StringToSingle(SplittedText[i+1])+2)/4, FALSE);
    inc(i,2);
    dec(k);
   end;
@@ -997,7 +997,7 @@ begin
   ColorCurve.Clear;
   i := 1;
   while k>0 do begin
-   ColorCurve.AddPoint(StrToFloat(SplittedText[i]), StrToFloat(SplittedText[i+4])/255, FALSE);
+   ColorCurve.AddPoint(StringToSingle(SplittedText[i]), StringToSingle(SplittedText[i+4])/255, FALSE);
    inc(i,5);
    dec(k);
   end;

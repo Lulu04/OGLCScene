@@ -447,17 +447,17 @@ begin
 
    k := F.IndexOf('E_Coor');
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   x.Value := StrToFloat( SplittedText[0] );
-   y.Value := StrToFloat( SplittedText[1] );
+   x.Value := StringToSingle( SplittedText[0] );
+   y.Value := StringToSingle( SplittedText[1] );
 
    k := F.IndexOf('E_Direction');
-   Direction.Value := StrToFloat( F.Strings[k+1] );
+   Direction.Value := StringToSingle( F.Strings[k+1] );
 
    k := F.IndexOf('E_Spread');
-   Spread.Value := StrToFloat( F.Strings[k+1] );
+   Spread.Value := StringToSingle( F.Strings[k+1] );
 
    k := F.IndexOf('E_Life');
-   EmitterLife := StrToFloat( F.Strings[k+1] );
+   EmitterLife := StringToSingle( F.Strings[k+1] );
 
    k := F.IndexOf('E_LoopMode');
    LoopMode := (F.Strings[k+1] = 'TRUE') or (F.Strings[k+1] = 'True') or (F.Strings[k+1] = 'true');
@@ -469,24 +469,24 @@ begin
 
    k := F.IndexOf('E_Gravity');
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   Gravity.x.Value := StrToFloat( SplittedText[0] );
-   Gravity.y.Value := StrToFloat( SplittedText[1] );
+   Gravity.x.Value := StringToSingle( SplittedText[0] );
+   Gravity.y.Value := StringToSingle( SplittedText[1] );
 
    k := F.IndexOf('E_GlobalOpacity');
    if k<>-1
-     then Opacity.Value := StrToFloat( F.Strings[k+1] )
+     then Opacity.Value := StringToSingle( F.Strings[k+1] )
      else Opacity.Value := 255;
 
   k := F.IndexOf('E_Type');
   if k<>-1 then begin
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
    case strtoint( SplittedText[0] ) of
-    1: SetEmitterTypeLine( Direction.Value, StrToFloat(SplittedText[1]) );
+    1: SetEmitterTypeLine( Direction.Value, StringToSingle(SplittedText[1]) );
     2: SetEmitterTypeRectangle( strtoint(SplittedText[1]), strtoint(SplittedText[2]) );
-    3: SetEmitterTypeCircle( StrToFloat(SplittedText[1]) );
-    4: SetEmitterTypeRing( StrToFloat(SplittedText[1]), StrToFloat(SplittedText[1]) );
-    5: SetEmitterTypeInnerCircle( StrToFloat(SplittedText[1]) );
-    6: SetEmitterTypeOuterCircle( StrToFloat(SplittedText[1]) )
+    3: SetEmitterTypeCircle( StringToSingle(SplittedText[1]) );
+    4: SetEmitterTypeRing( StringToSingle(SplittedText[1]), StringToSingle(SplittedText[1]) );
+    5: SetEmitterTypeInnerCircle( StringToSingle(SplittedText[1]) );
+    6: SetEmitterTypeOuterCircle( StringToSingle(SplittedText[1]) )
     else SetEmitterTypePoint;
    end;//case
   end else SetEmitterTypePoint;
@@ -510,8 +510,8 @@ begin
 
    k := F.IndexOf('P_Life');  // Life  LifeVariation
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.Life := StrToFloat( SplittedText[0] );
-   FParticleParam.LifeVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.Life := StringToSingle( SplittedText[0] );
+   FParticleParam.LifeVariation := StringToSingle( SplittedText[1] );
 
    k := F.IndexOf('P_ColorMode');
    FParticleParam.ColorMode := StrToint( F.Strings[k+1] );
@@ -526,7 +526,7 @@ begin
    k := 1 ;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayColor[i].Life := StrToFloat( SplittedText[k] ) ;
+     FParticleParam.ArrayColor[i].Life := StringToSingle( SplittedText[k] ) ;
      FParticleParam.ArrayColor[i].C.red := StrToInt( SplittedText[k+1] ) ;
      FParticleParam.ArrayColor[i].C.green := StrToInt( SplittedText[k+2] ) ;
      FParticleParam.ArrayColor[i].C.blue := StrToInt( SplittedText[k+3] ) ;
@@ -536,62 +536,62 @@ begin
 
    k := F.IndexOf('P_Velocity');  // velocity velocityVariation count   lifepos value   lifepos value...
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.Velocity := StrToFloat( SplittedText[0] );
-   FParticleParam.VelocityVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.Velocity := StringToSingle( SplittedText[0] );
+   FParticleParam.VelocityVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
    SetLength( FParticleParam.ArrayVelocity, count );
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayVelocity[i].Life := StrToFloat( SplittedText[k] );
-     FParticleParam.ArrayVelocity[i].Value := StrToFloat( SplittedText[k+1] );
+     FParticleParam.ArrayVelocity[i].Life := StringToSingle( SplittedText[k] );
+     FParticleParam.ArrayVelocity[i].Value := StringToSingle( SplittedText[k+1] );
      inc(k,2);
     end;
 
    k := F.IndexOf('P_AVelocity');     // AngleVelocity AngleVelocityVariation Count   lifepos value   lifepos value...
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.AVelocity := StrToFloat( SplittedText[0] );
-   FParticleParam.AVelocityVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.AVelocity := StringToSingle( SplittedText[0] );
+   FParticleParam.AVelocityVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
    SetLength( FParticleParam.ArrayAVelocity, count );
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayAVelocity[i].Life := StrToFloat( SplittedText[k] );
-     FParticleParam.ArrayAVelocity[i].Value := StrToFloat( SplittedText[k+1] );
+     FParticleParam.ArrayAVelocity[i].Life := StringToSingle( SplittedText[k] );
+     FParticleParam.ArrayAVelocity[i].Value := StringToSingle( SplittedText[k+1] );
      inc(k,2);
     end;
 
    k := F.IndexOf('P_Size');   // Size SizeVariation Count   lifepos value   lifepos value...
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.Size := StrToFloat( SplittedText[0] );
-   FParticleParam.SizeVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.Size := StringToSingle( SplittedText[0] );
+   FParticleParam.SizeVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
    SetLength( FParticleParam.ArraySize, count );
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArraySize[i].Life := StrToFloat( SplittedText[k] );
-     FParticleParam.ArraySize[i].Value := StrToFloat( SplittedText[k+1] );
+     FParticleParam.ArraySize[i].Life := StringToSingle( SplittedText[k] );
+     FParticleParam.ArraySize[i].Value := StringToSingle( SplittedText[k+1] );
      inc(k,2);
     end;
 
    k := F.IndexOf('P_StartAngle');  // StartAngle StartAngleVariation
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.StartAngle := StrToFloat( SplittedText[0] );
-   FParticleParam.StartAngleVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.StartAngle := StringToSingle( SplittedText[0] );
+   FParticleParam.StartAngleVariation := StringToSingle( SplittedText[1] );
 
    k := F.IndexOf('P_Spin');    // Spin SpinVariation Count   lifepos value   lifepos value...
    SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
-   FParticleParam.Spin := StrToFloat( SplittedText[0] );
-   FParticleParam.SpinVariation := StrToFloat( SplittedText[1] );
+   FParticleParam.Spin := StringToSingle( SplittedText[0] );
+   FParticleParam.SpinVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
    SetLength( FParticleParam.ArraySpin, count );
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArraySpin[i].Life := StrToFloat( SplittedText[k] );
-     FParticleParam.ArraySpin[i].Value := StrToFloat( SplittedText[k+1] );
+     FParticleParam.ArraySpin[i].Life := StringToSingle( SplittedText[k] );
+     FParticleParam.ArraySpin[i].Value := StringToSingle( SplittedText[k+1] );
      inc(k,2);
     end;
  finally

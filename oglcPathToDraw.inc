@@ -248,9 +248,9 @@ begin
             SplittedTxt := SplitLineToStringArray( s.Strings[k], ' ' );
 
             if Length( SplittedTxt )=2
-              then AddPointToPath( ScalePoint( PointF(StrToFloat(SplittedTxt[0]), StrToFloat(SplittedTxt[1]))), FALSE )
+              then AddPointToPath( ScalePoint( PointF(StringToSingle(SplittedTxt[0]), StringToSingle(SplittedTxt[1]))), FALSE )
               else if Length( SplittedTxt )=3
-                then AddPointToPath( ScalePoint( PointF(StrToFloat(SplittedTxt[1]), StrToFloat(SplittedTxt[2]))), TRUE )
+                then AddPointToPath( ScalePoint( PointF(StringToSingle(SplittedTxt[1]), StringToSingle(SplittedTxt[2]))), TRUE )
                 else begin
                  Exception.Create('File '+ExtractFileName(aFilename)+LINEENDING+' Bad point in list...');
                  c:=0;

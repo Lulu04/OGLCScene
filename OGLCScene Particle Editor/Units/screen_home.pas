@@ -48,18 +48,18 @@ begin
      end;
      etLine: begin
        polar.Angle:=FPEngine.Direction.Value;
-       polar.Distance:=strtofloat(Form_Principale.Edit5.Text);
+       polar.Distance:=StringToSingle(Form_Principale.Edit5.Text);
        DrawLine( p, PolarToCartesian(p, polar), c, 1, 1);
      end;
      etRectangle: DrawBox( FPEngine.X.Value, FPEngine.Y.Value, FPEngine.Width, FPEngine.Height,BGRA(255,0,0),1);
      etCircle, etInnerCircle, etOuterCircle: begin
-       r := strtofloat(Form_Principale.Edit7.Text);
+       r := StringToSingle(Form_Principale.Edit7.Text);
        DrawEllipse( p, r, r, c, 1);
      end;
      etRing: begin
-       r := strtofloat(Form_Principale.Edit8.Text);
+       r := StringToSingle(Form_Principale.Edit8.Text);
        DrawEllipse( p, r, r, c, 1);
-       r := strtofloat(Form_Principale.Edit9.Text);
+       r := StringToSingle(Form_Principale.Edit9.Text);
        DrawEllipse( p, r, r, c, 1);
      end;
    end;

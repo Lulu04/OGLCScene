@@ -228,29 +228,29 @@ begin
  FTemp := SplitLineToStringArray( Actions.Strings[CurrentLine], ' ' );
 
  case FTemp[0] of
-  acWait : WaitTime := StrToFloat( FTemp[1] );
+  acWait : WaitTime := StringToSingle( FTemp[1] );
 
-  acAngle : FParentCamera.Angle.Value := StrToFloat( FTemp[1] ) ;
-  acRotate : FParentCamera.Angle.AddConstant( StrToFloat( FTemp[1] ) );
-  acRotateTo : FParentCamera.Angle.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
+  acAngle : FParentCamera.Angle.Value := StringToSingle( FTemp[1] ) ;
+  acRotate : FParentCamera.Angle.AddConstant( StringToSingle( FTemp[1] ) );
+  acRotateTo : FParentCamera.Angle.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
 
-  acScale : FParentCamera.Scale.Value := PointF( StrToFloat( FTemp[1] ), StrToFloat( FTemp[1] ) );
+  acScale : FParentCamera.Scale.Value := PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[1] ) );
   acScaleChange : begin
-   FParentCamera.Scale.x.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-   FParentCamera.Scale.y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
   end;
-  acScaleH : FParentCamera.Scale.x.Value := StrToFloat( FTemp[1] );
-  acScaleHChange : FParentCamera.Scale.x.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acScaleV : FParentCamera.Scale.y.Value := StrToFloat( FTemp[1] );
-  acScaleVChange : FParentCamera.Scale.y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acScaleH : FParentCamera.Scale.x.Value := StringToSingle( FTemp[1] );
+  acScaleHChange : FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acScaleV : FParentCamera.Scale.y.Value := StringToSingle( FTemp[1] );
+  acScaleVChange : FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
 
-  acMoveTo  : FParentCamera.LookAt.ChangeTo(PointF( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] )), StrToFloat( FTemp[3] ), StringToCurveID( FTemp[4] ));
-  acMoveXTo : FParentCamera.LookAt.x.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acMoveYTo : FParentCamera.LookAt.y.ChangeTo( StrToFloat( FTemp[1] ), StrToFloat( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveTo  : FParentCamera.LookAt.ChangeTo(PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] )), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ));
+  acMoveXTo : FParentCamera.LookAt.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+  acMoveYTo : FParentCamera.LookAt.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
   acCenterOnScene: FParentCamera.LookAt.ChangeTo( FParentCamera.FParentScene.Center,
-                                                  StrToFloat( FTemp[1] ),
+                                                  StringToSingle( FTemp[1] ),
                                                   StringToCurveID( FTemp[2] ));
 
   acSendEvent : if FScenarioEvent <> NIL then FScenarioEvent( NIL, ID, strtoint( FTemp[1] ) );
