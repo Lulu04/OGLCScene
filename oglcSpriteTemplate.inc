@@ -77,24 +77,26 @@ end;
 
 { TOGLCSprite }
 
-TOGLCSprite=class(TSprite)
+{TOGLCSprite=class(TSprite)
 private
+  FModelMatrix: TnMat44;
   FShader: TOGLCPostProcessingFX;
   FVBO, FVAO: TGLint;
   procedure CreateBufferData;
 public
+  procedure Update( const aElapsedTime: single ); override;
   procedure Draw( const aLayerPercentOpacity: single );  override;
 public
   Constructor Create( ATexture: PTexture; Owner: boolean=FALSE );
   Destructor Destroy; override;
-end;
+end;   }
 
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 { TOGLCSprite }
 
-procedure TOGLCSprite.CreateBufferData;
+{procedure TOGLCSprite.CreateBufferData;
 const
     kATTRIB_POINT = 0; //XY position on screen
     kATTRIB_UV = 1; //UV coordinates of texture
@@ -133,7 +135,7 @@ begin
  glDeleteVertexArrays(1, @FVAO);
  FShader.Free;
  inherited Destroy;
-end;
+end;  }
 
 { TDrawPoints }
 
