@@ -245,7 +245,7 @@ begin
           Clear;
           repeat
             inc(k);
-            SplittedTxt := SplitLineToStringArray( s.Strings[k], ' ' );
+            SplittedTxt := s.Strings[k].Split([' ']);
 
             if Length( SplittedTxt )=2
               then AddPointToPath( ScalePoint( PointF(StringToSingle(SplittedTxt[0]), StringToSingle(SplittedTxt[1]))), FALSE )

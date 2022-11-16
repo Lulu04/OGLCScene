@@ -784,7 +784,7 @@ begin
   inc(k);
   for i:=0 to Count-1 do
    begin
-    txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+    txtsplited := FMapFile.Strings[k].Split(['|']);
     if Length( txtsplited ) <> 3
       then raise exception.Create('Tile engine - LoadMap error : can''t retrieve texture name and frame size');
     AddTexture( path + txtsplited[0], strtoint( txtsplited[1] ), strtoint( txtsplited[2] ));
@@ -812,7 +812,7 @@ begin
    for i:=0 to Count-1 do
     begin
      z := 0;
-     txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+     txtsplited := FMapFile.Strings[k].Split(['|']);
      for iy:=0 to strtoint(txtsplited[1])-1 do
       for ix:=0 to strtoint(txtsplited[0])-1 do
        begin
@@ -830,7 +830,7 @@ begin
  if k <> -1
    then begin
          inc(k);
-         txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+         txtsplited := FMapFile.Strings[k].Split(['|']);
          if Length( txtsplited ) <> 2
            then raise exception.Create('Tile engine - LoadMap error : can''t retrieve draw size');
          SetViewSize( strtoint( txtsplited[0]), strtoint( txtsplited[1] ));
@@ -846,7 +846,7 @@ begin
   if k = -1
     then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
   inc(k);
-  txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+  txtsplited := FMapFile.Strings[k].Split(['|']);
   if Length( txtsplited ) <> 2
     then raise exception.Create('Tile engine - LoadMap error : can''t retrieve tile size');
   SetTileSize( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
@@ -858,7 +858,7 @@ begin
   if k = -1
     then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map tile count');
   inc(k);
-  txtsplited := SplitLineToStringArray( FMapFile.Strings[k], '|' );
+  txtsplited := FMapFile.Strings[k].Split(['|']);
   if Length( txtsplited ) <> 2
     then raise exception.Create('Tile engine - LoadMap error : can''t retrieve map size');
   SetMapTileCount( strtoint( txtsplited[0] ), strtoint( txtsplited[1] ) );
@@ -887,7 +887,7 @@ begin
  PositionOnMap.Value := PointF( 0, 0);
  k := FMapFile.IndexOf('START_TILE');
  if k <> -1 then begin
-   txtsplited := SplitLineToStringArray( FMapFile.Strings[k+1], '|' );
+   txtsplited := FMapFile.Strings[k+1].Split(['|']);
    if Length( txtsplited ) = 2 then begin
      PositionOnMap.x.Value := strtoint( txtsplited[0] ) * FTileSize.cx;
      PositionOnMap.y.Value := strtoint( txtsplited[1] ) * FTileSize.cy;
@@ -909,10 +909,10 @@ begin
  for i:=0 to FMapTileCount.cy-1 do
   begin
    j := 0;
-   temp := SplitLineToStringArray( FMapFile.Strings[k], ' ' );
+   temp := FMapFile.Strings[k].Split([' ']);
    for z:=0 to Length( temp )-1 do
     begin
-     txtsplited := SplitLineToStringArray( temp[z], ',' );
+     txtsplited := temp[z].Split([',']);
 
      case txtsplited[0][1] of
       'T' : begin

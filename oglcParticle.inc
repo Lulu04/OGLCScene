@@ -446,7 +446,7 @@ begin
    F.LoadFromFile( aFilename );
 
    k := F.IndexOf('E_Coor');
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    x.Value := StringToSingle( SplittedText[0] );
    y.Value := StringToSingle( SplittedText[1] );
 
@@ -468,7 +468,7 @@ begin
    FParticleRateCount := 0;
 
    k := F.IndexOf('E_Gravity');
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    Gravity.x.Value := StringToSingle( SplittedText[0] );
    Gravity.y.Value := StringToSingle( SplittedText[1] );
 
@@ -479,7 +479,7 @@ begin
 
   k := F.IndexOf('E_Type');
   if k<>-1 then begin
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    case strtoint( SplittedText[0] ) of
     1: SetEmitterTypeLine( Direction.Value, StringToSingle(SplittedText[1]) );
     2: SetEmitterTypeRectangle( strtoint(SplittedText[1]), strtoint(SplittedText[2]) );
@@ -497,19 +497,19 @@ begin
   else ParticlesPositionsRelativeToEmitterPosition:=FALSE;
 
    k := F.IndexOf('P_Texture');
-   SplittedText := SplitLineToStringArray( F.Strings[k+2], ' ' );
+   SplittedText := F.Strings[k+2].Split([' ']);
    if FParticleParam.Texture <> NIL
      then TextureManager.Delete( FParticleParam.Texture );
    FParticleParam.Texture := TextureManager.Add( ExtractFilePath( aFilename ) + F.Strings[k+1],
                                                  strtoint( SplittedText[0] ), strtoint( SplittedText[1] ));
 
    k := F.IndexOf('P_Frame');   // StartFrameIndex EndFrameIndex
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.StartFrame := StrToInt( SplittedText[0] );
    FParticleParam.EndFrame := StrToInt( SplittedText[1] );
 
    k := F.IndexOf('P_Life');  // Life  LifeVariation
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.Life := StringToSingle( SplittedText[0] );
    FParticleParam.LifeVariation := StringToSingle( SplittedText[1] );
 
@@ -520,7 +520,7 @@ begin
    FParticleParam.BlendMode := StrToint( F.Strings[k+1] );
 
    k := F.IndexOf('P_Color');    // count   lifepos red green blue alpha    life red green...
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    count := StrToInt( SplittedText[0] );
    SetLength( FParticleParam.ArrayColor, count );
    k := 1 ;
@@ -535,7 +535,7 @@ begin
     end;
 
    k := F.IndexOf('P_Velocity');  // velocity velocityVariation count   lifepos value   lifepos value...
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.Velocity := StringToSingle( SplittedText[0] );
    FParticleParam.VelocityVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
@@ -549,7 +549,7 @@ begin
     end;
 
    k := F.IndexOf('P_AVelocity');     // AngleVelocity AngleVelocityVariation Count   lifepos value   lifepos value...
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.AVelocity := StringToSingle( SplittedText[0] );
    FParticleParam.AVelocityVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
@@ -563,7 +563,7 @@ begin
     end;
 
    k := F.IndexOf('P_Size');   // Size SizeVariation Count   lifepos value   lifepos value...
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.Size := StringToSingle( SplittedText[0] );
    FParticleParam.SizeVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );
@@ -577,12 +577,12 @@ begin
     end;
 
    k := F.IndexOf('P_StartAngle');  // StartAngle StartAngleVariation
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.StartAngle := StringToSingle( SplittedText[0] );
    FParticleParam.StartAngleVariation := StringToSingle( SplittedText[1] );
 
    k := F.IndexOf('P_Spin');    // Spin SpinVariation Count   lifepos value   lifepos value...
-   SplittedText := SplitLineToStringArray( F.Strings[k+1], ' ' );
+   SplittedText := F.Strings[k+1].Split([' ']);
    FParticleParam.Spin := StringToSingle( SplittedText[0] );
    FParticleParam.SpinVariation := StringToSingle( SplittedText[1] );
    count := StrToInt( SplittedText[2] );

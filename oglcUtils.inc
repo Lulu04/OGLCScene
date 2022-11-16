@@ -33,8 +33,6 @@ function TextToLetterSprite( aCaption: string; aFont: TGuiFont;
                              aFillTexture: TBGRABitmap=NIL;
                              UseChilds: boolean=FALSE): TArrayOfSprite;
 
-// splits each words separated by the specified separator.
-function SplitLineToStringArray( ALine: string; aCharSeparator: char ): ArrayOfString;
 // splits each words of a text. #10(line feed) is considered as a line break
 function SplitTextToWordArray( aText: string; aCharSeparator: char=' ' ): ArrayOfString;
 
@@ -274,6 +272,7 @@ function TextToLetterSprite(aCaption: string; aFont: TGuiFont;
   aFillTexture: TBGRABitmap; UseChilds: boolean): TArrayOfSprite;
 var i: integer;
 begin
+ Result := NIL;
  SetLength( Result, UTF8Length( aCaption ));
 
  for i:=0 to Length( Result )-1 do begin
@@ -285,46 +284,7 @@ begin
  end;
 end;
 
-function SplitLineToStringArray(ALine: string; aCharSeparator: char): ArrayOfString;
-var k, i: integer;
-  function EndOfString: boolean;
-  begin
-   Result := k>Length(ALine);
-  end;
-  procedure SkipSeparator;
-  begin
-   repeat
-    if EndOfString
-      then exit
-      else if ALine[k]=aCharSeparator
-            then inc(k)
-            else exit;
-   until false;
-  end;
-  procedure GetWord;
-  begin
-   inc(i);
-   SetLength( Result, i+1 );
-   Result[i] := '';
-   repeat
-    Result[i] := Result[i]+ALine[k];
-    inc(k);
-    if EndOfString then exit;
-   until ALine[k]=aCharSeparator;
-  end;
-begin
- SetLength( Result{%H-}, 0 );
- if Length( ALine ) = 0 then exit;
- i := -1;
- k := 1;
- repeat
-  SkipSeparator;
-  if not EndOfString then GetWord;
- until EndOfString;
-end;
-
-function SplitTextToWordArray(aText: string; aCharSeparator: char
-  ): ArrayOfString;
+function SplitTextToWordArray(aText: string; aCharSeparator: char): ArrayOfString;
 var i, w: integer;
    function IsLineFeed: boolean;
    begin

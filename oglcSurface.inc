@@ -1678,7 +1678,7 @@ var i: integer;
 begin
  if Length(Actions.Strings[CurrentLine]) = 0 then exit;
 
- FTemp := SplitLineToStringArray( Actions.Strings[CurrentLine], ' ' );
+ FTemp := Actions.Strings[CurrentLine].Split([' ']);
 
  case FTemp[0] of
   acWait : WaitTime := StringToSingle( FTemp[1] );
