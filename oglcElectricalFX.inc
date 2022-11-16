@@ -293,6 +293,7 @@ begin
 
  SegmentLength:=polar.Distance/(nodeCount+1);
 
+ nodes := NIL;
  SetLength(nodes,2+nodeCount);
  // set extremities
  nodes[0]:=aPtOrigin;

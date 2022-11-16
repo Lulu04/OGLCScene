@@ -43,6 +43,7 @@ begin
  if aColumCount<2 then aColumCount:=2;
  if aRowCount<2 then aRowCount:=2;
 
+ s := NIL;
  SetLength( s, aRowCount, aColumCount );
 
  cellw:=aTexture^.ImageWidth/aColumCount;
