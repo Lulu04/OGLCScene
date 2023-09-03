@@ -70,8 +70,8 @@ private
  function GetCount: integer;
  procedure Update( const aElapsedTime: single );
 public
- function AddFont( aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
- function AddFont( aGuiFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
+ function AddFont(const aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
+ function AddFont(const aGuiFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
  procedure DeleteFont( var aFont: TTexturedFont );
  procedure Clear;
  property Count: integer read GetCount;
@@ -1182,13 +1182,13 @@ begin
  Result := FList.Count;
 end;
 
-  function TFontManager.AddFont(aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
+  function TFontManager.AddFont(const aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
  begin
   Result := TTexturedFont.Create( aGuiFont, NIL, aCharSet );
   FList.Add( Result );
  end;
 
-  function TFontManager.AddFont(aGuiFont: TGuiFont; aFillTexture: TBGRABitmap;
+  function TFontManager.AddFont(const aGuiFont: TGuiFont; aFillTexture: TBGRABitmap;
     const aCharSet: string): TTexturedFont;
   begin
    Result := TTexturedFont.Create( aGuiFont, aFillTexture, aCharSet );
