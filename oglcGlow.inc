@@ -4,6 +4,7 @@ type
 
   TOGLCGlow = class( TSimpleSurfaceWithEffect )
    private
+    class var FShaderGlowRefCount: cardinal;
     class var FShaderGlow: TOGLCShader;
     class var FLocGlowCenter: GLint;
     class var FLocGlowColor: GLint;
@@ -108,7 +109,7 @@ begin
  Tint.Value:=aColor;
  FBlendMode := aBlendMode;
 
- if FShaderGlow=NIL then begin
+ if FShaderGlowRefCount=0 then begin
     FShaderGlow := TOGLCShader.Create( '', GLOW_FRAGMENT_SHADER_PRG );
     with FShaderGlow do begin
      Use;
@@ -119,12 +120,16 @@ begin
      Release;
     end;
  end;
+ inc(FShaderGlowRefCount);
 end;
 
 destructor TOGLCGlow.Destroy;
 begin
  Radius.Free;
  Attenuation.Free;
+ dec(FShaderGlowRefCount);
+ if FShaderGlowRefCount = 0 then
+   FShaderGlow.Free;
  inherited Destroy;
 end;
 
