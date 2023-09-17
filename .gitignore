@@ -1,2 +1,6 @@
-
 *.bak
+*.exe
+*.dbg
+lib/
+backup/
+.DS_Store
