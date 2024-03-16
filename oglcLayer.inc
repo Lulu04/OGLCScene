@@ -7,127 +7,123 @@ TSimpleSurfaceWithEffect = class;
 TSprite = class;
 TTileEngine = class;
 
-//TCallBackNotification = procedure ( Sender : TSimpleSurfaceWithEffect ) of object;
-
 TBlink = record
-          BlinkToGo                    : integer ;
-          VisibleTime                  : single  ;
-          InvisibleTime                : single  ;
-          CountVisible                 : single  ;
-          CountInvisible               : single  ;
-         end;
+  BlinkToGo: integer;
+  VisibleTime,
+  InvisibleTime,
+  CountVisible,
+  CountInvisible: single;
+end;
 
 TRotationAroundPoint = record
-                       InProgress       : boolean ;
-                       XPt              : single ;
-                       YPt              : single ;
-                       AnglePerSecond   : single ;
-                       ActualAngleRad   : single ;
-                       Radius           : single ;
-                      end;
+  InProgress: boolean;
+  XPt,
+  YPt,
+  AnglePerSecond,
+  ActualAngleRad,
+  Radius: single;
+end;
 
 TBindToSprite = record
-                 InProgress       : boolean       ;
-                 ParentSurface    : TSimpleSurface ;
-                 OffsetX          : single        ;
-                 OffsetY          : single        ;
-                end;
+  InProgress: boolean;
+  TargetSurface : TSimpleSurface;
+  OffsetX: single;
+  OffsetY: single;
+end;
 
 TLayer = class;
 
 { TSurfaceList }
 
 TSurfaceList = class
-   Constructor Create ;
-   Destructor Destroy ; override ;
+  Constructor Create;
+  Destructor Destroy; override;
 protected
-     FList : TList ;
-     function GetSurfaceCount: integer; inline;
-     function GetSurface(aIndex: integer): TSimpleSurfaceWithEffect ; inline;
-     procedure Delete ( Index:integer );
+  FList: TList;
+  function GetSurfaceCount: integer; inline;
+  function GetSurface(aIndex: integer): TSimpleSurfaceWithEffect; inline;
+  procedure Delete(Index:integer);
 public
-     procedure Clear; virtual;
-     function Add ( aSurface : TSimpleSurfaceWithEffect ) : integer ; virtual ;
-     procedure Remove( aSurface: TSimpleSurfaceWithEffect );
-     procedure Insert ( aIndex : integer ; aSurface : TSimpleSurfaceWithEffect ) ; virtual ;
-     property SurfaceCount : integer read GetSurfaceCount ;
-     property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface ; default;
-
+  procedure Clear; virtual;
+  function Add(aSurface: TSimpleSurfaceWithEffect): integer; virtual;
+  procedure Remove(aSurface: TSimpleSurfaceWithEffect);
+  procedure Insert(aIndex: integer ; aSurface : TSimpleSurfaceWithEffect); virtual;
+  function Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
+  property SurfaceCount : integer read GetSurfaceCount ;
+  property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface; default;
 end;
 
 { TLayer }
 
-TLayer = class (TSurfaceList)
-   private
-    FParentScene : TOGLCScene ;
-    FVisible : boolean ;
-    FFreeze  : boolean ;
-    // Blink
-    FBlink : TBlink ;
-    FCamera: TOGLCCamera;
-   private
-    FOnSortCompare: TListSortCompare;
-    FOnBeforePaint,
-    FOnAfterPaint: TOGLCEvent;
-   public
-    Constructor Create;
-    Destructor Destroy; override;
-    procedure Draw;
-    procedure Update( const aElapsedTime : single ) ;
-    procedure Clear; override;
-   public
-    Opacity: TBoundedFParam;
-
-    procedure KillAll;
-
-    // Blink
-    procedure Blink ( aNumberOfBlink : integer ; aVisibleTime , aInvisibleTime : single ) ; // aNumberOfBlink=-1 for infinite blink
+TLayer = class(TSurfaceList)
+private
+  FParentScene: TOGLCScene;
+  FVisible: boolean;
+  FFreeze: boolean;
+  // Blink
+  FBlink: TBlink;
+  FCamera: TOGLCCamera;
+private
+  FOnSortCompare: TListSortCompare;
+  FOnBeforePaint,
+  FOnAfterPaint: TOGLCEvent;
+public
+  Constructor Create;
+  Destructor Destroy; override;
+  procedure Draw;
+  procedure Update(const aElapsedTime: single);
+  procedure Clear; override;
+public
+  Opacity: TBoundedFParam;
+  procedure KillAll;
+  // Blink  aNumberOfBlink=-1 for infinite blink
+  procedure Blink(aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single);
 
 // Methods below affect the surfaces of the layer
 //    if  aGroup = -1  methods affect all surfaces of the layer.
 //    if  aGroup > -1  methods affect only the surfaces with specified group number
 // Note: every created surface have group property set to zero by default.
-    procedure GroupKill ( aGroup: integer) ;
-    procedure GroupVisible ( aGroup: integer; aValue:boolean ) ;
-    procedure GroupFreeze (aGroup: integer ; aValue:boolean ) ;
-    procedure GroupOpacity ( aGroup: integer; aNewOpacity:byte );
-    procedure GroupOpacityVariation ( aGroup: integer; aNewOpacity: byte; aDuration: single; aCurve: Word=idcLinear ) ;
-    procedure GroupTint ( aGroup : integer; aTint : TBGRAPixel );
-    procedure GroupTintOpacityVariation( aGroup : integer; aNewOpacity : byte ; aDuration: single; aCurve: Word=idcLinear);
-    procedure GroupMoveTo ( aGroup : integer; aX , aY : single ; aDuration : single ; aCurve:Word = idcLinear ) ;
-    procedure GroupMoveRelative ( aGroup : integer; aDeltaX , aDeltaY : single ; aDuration : single ; aCurve:Word = idcLinear ) ;
-    procedure GroupBlink ( aGroup : integer; aNumberOfBlink : integer ; aVisibleTime , aInvisibleTime : single ) ; // aNumberOfBlink=-1 for infinite blink
-    procedure GroupScale( aGroup : integer; aHScale, aVScale : single ; aDuration : single ; aHScaleCurve:Word=idcLinear; aVScaleCurve : Word=idcLinear ) ; // aHScale, aVScale = -1 for no change
-    procedure GroupRotate ( aGroup : integer; aAnglePerSecond: single) ;
-    procedure GroupFlipH ( aGroup : integer; aValue:boolean );
-    procedure GroupFlipV ( aGroup : integer; aValue:boolean );
+  procedure GroupKill(aGroup: integer);
+  procedure GroupVisible(aGroup: integer; aValue:boolean);
+  procedure GroupFreeze(aGroup: integer; aValue:boolean);
+  procedure GroupOpacity(aGroup: integer; aNewOpacity:byte);
+  procedure GroupOpacityVariation(aGroup: integer; aNewOpacity: byte; aDuration: single; aCurve: Word=idcLinear);
+  procedure GroupTint(aGroup: integer; const aTint: TBGRAPixel);
+  procedure GroupTintOpacityVariation(aGroup: integer; aNewOpacity: byte; aDuration: single; aCurve: Word=idcLinear);
+  procedure GroupMoveTo(aGroup: integer; aX, aY: single; aDuration: single; aCurve:Word=idcLinear);
+  procedure GroupMoveRelative(aGroup: integer; aDeltaX, aDeltaY: single; aDuration: single; aCurve: Word=idcLinear);
+  procedure GroupBlink(aGroup: integer; aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single); // aNumberOfBlink=-1 for infinite blink
+  procedure GroupScale(aGroup: integer; aHScale, aVScale: single; aDuration: single; aHScaleCurve: Word=idcLinear; aVScaleCurve: Word=idcLinear); // aHScale, aVScale = -1 for no change
+  procedure GroupRotate(aGroup: integer; aAnglePerSecond: single);
+  procedure GroupFlipH(aGroup: integer; aValue:boolean);
+  procedure GroupFlipV(aGroup: integer; aValue:boolean);
 
-    // Collision test: return surface collided, NIL if no collision
-    function CollisionTest( aSurface: TSimpleSurfaceWithEffect ) : TSimpleSurfaceWithEffect; overload;
-    function CollisionTest( aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: single ): TSimpleSurfaceWithEffect; overload;
-    function CollisionTest( aX, aY, aWidth, aHeight: single) : TSimpleSurfaceWithEffect; overload;
-    function CollisionTest( aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
+  // Collision test: return surface collided, NIL if no collision
+  function CollisionTest(aSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
+  function CollisionTest(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: single): TSimpleSurfaceWithEffect; overload;
+  function CollisionTest(aX, aY, aWidth, aHeight: single) : TSimpleSurfaceWithEffect; overload;
+  function CollisionTest(aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
 
-    // Freeze the layer and its surfaces
-    property Freeze : boolean read FFreeze write FFreeze;
-    // Set the layer visible or not
-    property Visible : boolean read FVisible write FVisible;
-    // don't use this method directly. Use instead TOGLCCamera.AssignToLayer method to assign
-    // a camera view to the layer
-    property Camera: TOGLCCamera read FCamera write FCamera;
-    // specify a function to sort the surface on the layer
-    property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare;
+  // Freeze the layer and its surfaces
+  property Freeze : boolean read FFreeze write FFreeze;
+  // Set the layer visible or not
+  property Visible : boolean read FVisible write FVisible;
+  // don't use this method directly. Use instead TOGLCCamera.AssignToLayer method to assign
+  // a camera view to the layer
+  property Camera: TOGLCCamera read FCamera write FCamera;
+  // specify a function to sort the surface on the layer
+  property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare;
 
-    // Assign this callback if you want to do some initializations before surfaces are rendered on the layer.
-    // For example, you can bind a TOGLCRenderToTexture to render the layer in a target texture
-    property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
-    // Assign this callback if you want to do some finalizations after the layer is rendered.
-    // For example, you can unbind a TOGLCRenderToTexture and render its texture with a specific shader
-    property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
+  // Assign this callback if you want to do some initializations before surfaces are rendered on the layer.
+  // For example, you can bind a TOGLCRenderToTexture to render the layer in a target texture
+  property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
+  // Assign this callback if you want to do some finalizations after the layer is rendered.
+  // For example, you can unbind a TOGLCRenderToTexture and render its texture with a specific shader
+  property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
 end;
 
 
-TSurfaceChangeLayer= record
+TSurfaceChangeLayer = record
   Surface: TSimpleSurfaceWithEffect;
   NewLayerIndex: integer;
 end;
@@ -136,116 +132,107 @@ TArrayOfSurfaceChangeLayer = array of TSurfaceChangeLayer;
 { TLayerList }
 
 TLayerList = class
-   Constructor Create;
-   Destructor Destroy; override;
-   private
-     FList : TList;
-     function GetLayerCount: integer;
-     function GetLayer(Index: integer): TLayer;
-     function GetSurfaceCount: integer;
-     procedure SetLayerCount(AValue: integer ); virtual ;
-     procedure AddSurfaceToLayer ( aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer=0 );
+private
+  FList: TList;
+  function GetLayerCount: integer;
+  function GetLayer(Index: integer): TLayer;
+  function GetSurfaceCount: integer;
+  procedure SetLayerCount(AValue: integer); virtual;
+  procedure AddSurfaceToLayer(aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer=0);
 
-     procedure InsertSurfaceToLayer ( aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer=0 );
-   private
-     FListSurfaceChangeLayer: TArrayOfSurfaceChangeLayer;
-   public
-    // delete(kill) all surfaces in all layers
-    procedure ClearAllLayer;
-    // delete all surfaces in specified layer
-    procedure ClearLayer( aLayerIndex:integer );
+  procedure InsertSurfaceToLayer(aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer=0);
+private
+  FListSurfaceChangeLayer: TArrayOfSurfaceChangeLayer;
+public
+  Constructor Create;
+  Destructor Destroy; override;
+  // delete(kill) all surfaces in all layers
+  procedure ClearAllLayer;
+  // delete all surfaces in specified layer
+  procedure ClearLayer(aLayerIndex:integer);
 
-    // gives the index of the specified layer (-1 if not found)
-    function LayerIndexOf( aLayer: TLayer ): integer;
+  // gives the index of the specified layer (-1 if not found)
+  function LayerIndexOf(aLayer: TLayer): integer;
 
-    // move a surface on another layer
-    procedure SurfaceChangeLayer( aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer );
+  // move a surface on another layer
+  procedure SurfaceChangeLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
 
-    procedure AllLayerVisible;
-    procedure OnlyThisLayerVisible ( tab:array of integer );
+  procedure AllLayerVisible;
+  procedure OnlyThisLayerVisible(const tab: array of integer);
 
-    property LayerCount:integer read GetLayerCount write SetLayerCount;
-    property Layer[Index:integer]:TLayer read GetLayer;
-    property SurfaceCount:integer read GetSurfaceCount;
+  property LayerCount:integer read GetLayerCount write SetLayerCount;
+  property Layer[Index:integer]:TLayer read GetLayer;
+  property SurfaceCount:integer read GetSurfaceCount;
 end;
 
-TProcedureWrapper = procedure of object;
-TProcedureDrawWrapper = procedure ( const aLayerPercentOpacity:single ) of object ;
-TProcedureUpdateWrapper = procedure ( const DT:single ) of object ;
-TProcedureDestroyWrapper = procedure of object;
-
 {$endif oglcINTERFACE}
-
-
-
 {$ifdef oglcIMPLEMENTATION}
+
 { TSurfaceList }
 
 constructor TSurfaceList.Create;
 begin
- FList := TList.Create ;
+  FList := TList.Create;
 end;
 
 destructor TSurfaceList.Destroy;
 begin
- Clear ;
- FList.Free ;
- inherited Destroy;
+  Clear;
+  FList.Free;
+  inherited Destroy;
 end;
 
 function TSurfaceList.GetSurfaceCount: integer;
 begin
- Result := FList.Count ;
+  Result := FList.Count;
 end;
 
 function TSurfaceList.GetSurface(aIndex: integer): TSimpleSurfaceWithEffect;
 begin
- Result := TSimpleSurfaceWithEffect ( FList.Items[aIndex] ) ;
+  Result := TSimpleSurfaceWithEffect(FList.Items[aIndex]);
 end;
 
 
 function TSurfaceList.Add(aSurface: TSimpleSurfaceWithEffect): integer;
 begin
- Result := FList.Add ( aSurface ) ;
- aSurface.SceneIndex := Result ;
+  Result := FList.Add(aSurface);
 end;
 
 procedure TSurfaceList.Remove(aSurface: TSimpleSurfaceWithEffect);
 begin
- FList.Remove(aSurface);
+  FList.Extract(aSurface);//Remove(aSurface);
 end;
 
 
 procedure TSurfaceList.Insert(aIndex: integer;aSurface: TSimpleSurfaceWithEffect);
 begin
- if aIndex < 0 then aIndex := 0;
- if aIndex < FList.Count
-   then begin
-         aSurface.SceneIndex := aIndex ;
-         FList.Insert ( aIndex , aSurface ) ;
-   end else begin
-    FList.Add( aSurface );
-    aSurface.SceneIndex := FList.Count-1;
-   end;
+  if aIndex < 0 then aIndex := 0;
+
+  if aIndex < FList.Count then FList.Insert(aIndex, aSurface)
+    else FList.Add(aSurface);
 end;
 
-procedure TSurfaceList.Delete( Index:integer ) ;
-var i :integer;
+function TSurfaceList.Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
+var i: integer;
 begin
- for i:=Index+1 to FList.Count-1 do
-  TSimpleSurface( FList.Items[i]).SceneIndex := TSimpleSurface( FList.Items[i]).SceneIndex - 1 ;
- FList.Delete ( Index );
-// FList.Pack;
+  for i:=0 to FList.Count-1 do
+    if TSimpleSurfaceWithEffect(FList[i]) = aSurface then exit(True);
+  Result := False;
+end;
+
+procedure TSurfaceList.Delete(Index:integer);
+begin
+  FList.Delete(Index);
 end;
 
 procedure TSurfaceList.Clear;
-var  o : TSimpleSurface ;
+var o: TSimpleSurface;
 begin
   while FList.Count > 0 do
    begin
-    o := TSimpleSurface( FList.Items[0] );
-    FList.Delete ( 0 );
+    o := TSimpleSurface(FList.Items[0]);
     o.Free;
+    FList.Delete(0);
    end;
 end;
 
@@ -254,387 +241,364 @@ end;
 
 constructor TLayer.Create;
 begin
- inherited Create;
- FVisible := TRUE;
- FFreeze := FALSE;
- FCamera:= NIL;
- // Blink
- FBlink.BlinkToGo := 0;
- // Opacity variation
- Opacity:= CreateBoundedFParam(0, 255);
- Opacity.Value := 255;
+  inherited Create;
+  FVisible := TRUE;
+  Opacity := CreateBoundedFParam(0, 255);
+  Opacity.Value := 255;
 end;
 
 destructor TLayer.Destroy;
 begin
- FreeAndNil( Opacity );
- inherited Destroy;
+  FreeAndNil(Opacity);
+  inherited Destroy;
 end;
 
 procedure TLayer.Draw;
 var i: integer;
-    FOpacityPercent: single;
+    computedOpacity: single;
 begin
- if not FVisible then exit;
+  if not FVisible then exit;
 
- // Before paint CallBack
- if Assigned (FOnBeforePaint) then FOnBeforePaint;
+  // Before paint CallBack
+  if Assigned(FOnBeforePaint) then FOnBeforePaint;
 
- if FCamera<>NIL then FCamera.Use;
- FOpacityPercent:= Opacity.Value/255;
+  if FCamera <> NIL then FCamera.Use;
 
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i] ) do
-   if Visible then Draw( FOpacityPercent );
+  computedOpacity := Opacity.Value*OneDiv255;
+  if computedOpacity > 0 then
+    for i:=0 to FList.Count-1 do
+     with TSimpleSurfaceWithEffect(FList.Items[i]) do
+      if Visible then Draw(computedOpacity);
 
- if FCamera<>NIL then FCamera.Release;
+  if FCamera <> NIL then FCamera.Release;
 
- // After paint CallBack
- if Assigned (FOnAfterPaint) then FOnAfterPaint;
+  // After paint CallBack
+  if Assigned(FOnAfterPaint) then FOnAfterPaint;
 end;
 
 procedure TLayer.Update(const aElapsedTime: single);
 var i: integer;
 begin
- if FFreeze then exit;
- // Do Blink
- with FBlink do
- if BlinkToGo <> 0 then begin
-       if CountVisible>0 then begin
-             // Layer is visible
-             FVisible := TRUE;
-             CountVisible -= aElapsedTime;
-             CountInvisible := InvisibleTime;
-       end else begin // Layer is invisible
-             FVisible := FALSE;
-             CountInvisible -= aElapsedTime;
-             if CountInvisible <= 0 then begin
-               CountVisible := VisibleTime ;
-               if BlinkToGo > 0 then dec ( BlinkToGo );
-               if BlinkToGo = 0 then FVisible := TRUE;
-             end;
-       end;
- end;
+  if FFreeze then exit;
+  // Do Blink
+  with FBlink do
+  if BlinkToGo <> 0 then begin
+    if CountVisible>0 then begin
+      // Layer is visible
+      FVisible := TRUE;
+      CountVisible -= aElapsedTime;
+      CountInvisible := InvisibleTime;
+    end else begin // Layer is invisible
+      FVisible := FALSE;
+      CountInvisible -= aElapsedTime;
+      if CountInvisible <= 0 then begin
+        CountVisible := VisibleTime;
+        if BlinkToGo > 0 then dec(BlinkToGo);
+        if BlinkToGo = 0 then FVisible := TRUE;
+      end;
+    end;
+  end;
 
- Opacity.OnElapse( aElapsedTime );
+  Opacity.OnElapse(aElapsedTime);
 
+  //for i:=0 to FList.Count-1 do
+  for i:=FList.Count-1 downto 0 do
+    TSimpleSurfaceWithEffect(FList.Items[i]).Update(aElapsedTime);
 
- for i:=0 to FList.Count-1 do
-   TSimpleSurfaceWithEffect( FList.Items[i] ).Update( aElapsedTime );
-
- // sort the surface
- if FOnSortCompare<>NIL then FList.Sort( FOnSortCompare );
+  // sort the surface
+  if FOnSortCompare <> NIL then FList.Sort(FOnSortCompare);
 end;
 
 procedure TLayer.Clear;
 begin
- inherited Clear;
+  inherited Clear;
 end;
 
 procedure TLayer.KillAll;
 var i: integer;
 begin
- for i:=0 to SurfaceCount-1 do Surface[i].Kill;
+  for i:=0 to SurfaceCount-1 do Surface[i].Kill;
 end;
 
 procedure TLayer.Blink(aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single);
 begin
- with FBlink do
-  begin
-   BlinkToGo := aNumberOfBlink;
-   VisibleTime := aVisibleTime;
-   InvisibleTime := aInvisibleTime;
-   CountVisible := aVisibleTime;
-   CountInvisible := aInvisibleTime;
+  with FBlink do begin
+    BlinkToGo := aNumberOfBlink;
+    VisibleTime := aVisibleTime;
+    InvisibleTime := aInvisibleTime;
+    CountVisible := aVisibleTime;
+    CountInvisible := aInvisibleTime;
   end;
 end;
 
-
-procedure TLayer.GroupKill ( aGroup : integer ) ; // kill all surface with group=aGroup
-var i:integer ;
+procedure TLayer.GroupKill(aGroup: integer);
+var i: integer;
 begin
- if aGroup = -1 then
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Kill;
+  if aGroup = -1 then
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Kill;
 end;
 
-procedure TLayer.GroupVisible ( aGroup : integer; aValue:boolean ) ;
-var i:integer ;
+procedure TLayer.GroupVisible (aGroup : integer; aValue:boolean);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Visible := aValue;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Visible := aValue;
 end;
 
-procedure TLayer.GroupFreeze(aGroup: integer; aValue:boolean );
-var i:integer ;
+procedure TLayer.GroupFreeze(aGroup: integer; aValue:boolean);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Freeze:=aValue;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Freeze := aValue;
 end;
 
-procedure TLayer.GroupTint(aGroup: integer; aTint: TBGRAPixel);
-var i:integer ;
+procedure TLayer.GroupTint(aGroup: integer; const aTint: TBGRAPixel);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Tint.Value := aTint ;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Tint.Value := aTint;
 end;
 
 procedure TLayer.GroupMoveTo( aGroup: integer; aX, aY: single; aDuration: single; aCurve:Word);
-var i:integer ;
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then MoveTo(aX,aY,aDuration,aCurve);
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then MoveTo(aX, aY, aDuration, aCurve);
 end;
 
-procedure TLayer.GroupMoveRelative(aGroup: integer; aDeltaX, aDeltaY: single;
-  aDuration: single; aCurve: Word);
-var i:integer ;
+procedure TLayer.GroupMoveRelative(aGroup: integer; aDeltaX, aDeltaY: single; aDuration: single; aCurve: Word);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-   if ( aGroup = -1 ) or ( Group = aGroup) then MoveRelative(aDeltaX,aDeltaY,aDuration,aCurve);
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+    if (aGroup = -1) or (Group = aGroup) then MoveRelative(aDeltaX, aDeltaY, aDuration, aCurve);
 end;
 
-procedure TLayer.GroupBlink(aGroup: integer; aNumberOfBlink: integer;
-  aVisibleTime, aInvisibleTime: single);
-var i:integer ;
+procedure TLayer.GroupBlink(aGroup: integer; aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Blink(aNumberOfBlink,aVisibleTime,aInvisibleTime);
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Blink(aNumberOfBlink, aVisibleTime, aInvisibleTime);
 end;
 
-procedure TLayer.GroupScale(aGroup: integer; aHScale, aVScale: single;
-  aDuration: single; aHScaleCurve:Word; aVScaleCurve: Word);
-var i:integer ;
+procedure TLayer.GroupScale(aGroup: integer; aHScale, aVScale: single; aDuration: single; aHScaleCurve:Word; aVScaleCurve: Word);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup)
-      then begin
-            Scale.x.ChangeTo( aHScale, aDuration, aHScaleCurve);
-            Scale.y.ChangeTo( aVScale, aDuration, aVScaleCurve);
-      end;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then begin
+       Scale.x.ChangeTo(aHScale, aDuration, aHScaleCurve);
+       Scale.y.ChangeTo(aVScale, aDuration, aVScaleCurve);
+     end;
 end;
 
 procedure TLayer.GroupRotate(aGroup: integer; aAnglePerSecond: single);
-var i:integer ;
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Angle.AddConstant( aAnglePerSecond );
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Angle.AddConstant(aAnglePerSecond);
 end;
 
-procedure TLayer.GroupOpacityVariation(aGroup: integer;
-  aNewOpacity: byte; aDuration: single; aCurve: Word);
-var i:integer ;
+procedure TLayer.GroupOpacityVariation(aGroup: integer; aNewOpacity: byte; aDuration: single; aCurve: Word);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Opacity.ChangeTo(aNewOpacity,aDuration,aCurve);
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect( FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Opacity.ChangeTo(aNewOpacity,aDuration,aCurve);
 end;
 
-procedure TLayer.GroupTintOpacityVariation(aGroup: integer;
-  aNewOpacity: byte; aDuration: single; aCurve: Word);
-var i:integer ;
+procedure TLayer.GroupTintOpacityVariation(aGroup: integer; aNewOpacity: byte; aDuration: single; aCurve: Word);
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Tint.ChangeTo(aNewOpacity,aDuration,aCurve);
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Tint.ChangeTo(aNewOpacity,aDuration,aCurve);
 end;
 
 procedure TLayer.GroupOpacity(aGroup: integer; aNewOpacity: byte);
-var i:integer ;
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then Opacity.Value := aNewOpacity;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then Opacity.Value := aNewOpacity;
 end;
 
 procedure TLayer.GroupFlipH(aGroup: integer; aValue: boolean);
-var i:integer ;
+var i: integer ;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then FlipH:=aValue;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect(FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then FlipH := aValue;
 end;
 
 procedure TLayer.GroupFlipV(aGroup: integer; aValue: boolean);
-var i:integer ;
+var i: integer;
 begin
- for i:=0 to FList.Count-1 do
-  with TSimpleSurfaceWithEffect( FList.Items[i]) do
-    if ( aGroup = -1 ) or ( Group = aGroup) then FlipV:=aValue;
+  for i:=0 to FList.Count-1 do
+   with TSimpleSurfaceWithEffect( FList.Items[i]) do
+     if (aGroup = -1) or (Group = aGroup) then FlipV := aValue;
 end;
 
 function TLayer.CollisionTest(aSurface : TSimpleSurfaceWithEffect): TSimpleSurfaceWithEffect;
 begin
- Result := CollisionTest( aSurface.X.Value, aSurface.Y.Value, aSurface.Width, aSurface.Height ) ;
+  Result := CollisionTest(aSurface.X.Value, aSurface.Y.Value, aSurface.Width, aSurface.Height);
 end;
 
-function TLayer.CollisionTest(aSurface: TSimpleSurfaceWithEffect; HTolerance,
-  VTolerance: single): TSimpleSurfaceWithEffect;
+function TLayer.CollisionTest(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: single): TSimpleSurfaceWithEffect;
 begin
- with aSurface do
-   Result := CollisionTest( X.Value+HTolerance, Y.Value+VTolerance,
-                            Width-HTolerance, Height-VTolerance, aSurface );
+  with aSurface do
+    Result := CollisionTest(X.Value+HTolerance, Y.Value+VTolerance,
+                            Width-HTolerance, Height-VTolerance, aSurface);
 end;
 
 function TLayer.CollisionTest(aX, aY, aWidth, aHeight: single): TSimpleSurfaceWithEffect;
 var i: integer;
 begin
- Result := NIL;
- for i:=0 to FList.Count-1 do
-  begin
-   with Surface[i] do
-    if not ( ( aX > GetRightX ) or ( aX+aWidth < x.Value ) or
-             ( aY > GetBottomY) or ( aY+aHeight < y.Value ) )
-       then begin
-        Result := Surface[i];
-        exit;
-       end;
-  end;
+  for i:=0 to FList.Count-1 do
+    with Surface[i] do
+     if not ((aX > GetRightX) or (aX+aWidth < X.Value) or
+              (aY > GetBottomY) or (aY+aHeight < Y.Value)) then begin
+         Result := Surface[i];
+         exit;
+     end;
+  Result := NIL;
 end;
 
-function TLayer.CollisionTest(aX, aY, aWidth, aHeight: single;
-  DontTestSurface: TSimpleSurfaceWithEffect): TSimpleSurfaceWithEffect;
+function TLayer.CollisionTest(aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect): TSimpleSurfaceWithEffect;
 var i: integer;
     o: TSimpleSurfaceWithEffect;
 begin
- Result := NIL;
- for i:=0 to FList.Count-1 do
-  begin
-   o := Surface[i];
-    if not ( ( aX > o.GetRightX ) or ( aX+aWidth < o.X.Value ) or
-             ( aY > o.GetBottomY) or ( aY+aHeight < o.Y.Value ) ) and
-      ( o <> DontTestSurface )
-       then begin
-        Result := o;
-        exit;
-       end;
+  for i:=0 to FList.Count-1 do begin
+    o := Surface[i];
+    if not ((aX > o.GetRightX) or (aX+aWidth < o.X.Value) or
+            (aY > o.GetBottomY) or (aY+aHeight < o.Y.Value)) and
+       (o <> DontTestSurface) then begin
+      Result := o;
+      exit;
+    end;
   end;
+  Result := NIL;
 end;
-
 
 { TLayerList }
 
 constructor TLayerList.Create;
 begin
- FList := TList.Create;
- SetLayerCount(1);
+  FList := TList.Create;
+  SetLayerCount(1);
 end;
 
 destructor TLayerList.Destroy;
 begin
- FList.Free;
- inherited Destroy;
+  FreeAndNil(FList);
+  inherited Destroy;
 end;
 
 procedure TLayerList.ClearAllLayer;
 var i:integer;
 begin
- for i:=0 to GetLayerCount-1 do Layer[i].Clear;
+  for i:=0 to GetLayerCount-1 do Layer[i].Clear;
 end;
 
 procedure TLayerList.ClearLayer(aLayerIndex: integer);
 begin
- TLayer( FList.Items[aLayerIndex] ).Clear;
+  TLayer(FList.Items[aLayerIndex]).Clear;
 end;
 
 function TLayerList.LayerIndexOf(aLayer: TLayer): integer;
 var i: Integer;
 begin
- Result:=-1;
- for i:=0 to GetLayerCount-1 do
-  if Layer[i]=aLayer then begin
-   Result:=i;
-   break;
-  end;
+  Result := -1;
+  for i:=0 to GetLayerCount-1 do
+   if Layer[i] = aLayer then begin
+    Result := i;
+    break;
+   end;
 end;
 
 function TLayerList.GetLayerCount: integer;
 begin
- Result := FList.Count;
+  Result := FList.Count;
 end;
 
 function TLayerList.GetLayer(Index: integer): TLayer;
 begin
- Result := TLayer(FList.Items[Index]);
+  Result := TLayer(FList.Items[Index]);
 end;
 
 function TLayerList.GetSurfaceCount: integer;
-var i:integer;
+var i: integer;
 begin
- Result:=0;
- for i:=0 to FList.Count-1 do Result += TLayer(FList.Items[i]).GetSurfaceCount;
+  Result := 0;
+  for i:=0 to FList.Count-1 do Result += TLayer(FList.Items[i]).GetSurfaceCount;
 end;
 
-procedure TLayerList.SetLayerCount(AValue: integer );
+procedure TLayerList.SetLayerCount(AValue: integer);
 var i:integer;
 begin
- if AValue = FList.Count then exit;
- if AValue > FList.Count then begin
-       for i:=1 to AValue-FList.Count do
-         FList.Add( TLayer.Create );
+  if AValue = FList.Count then exit;
+  if AValue > FList.Count then begin
+    for i:=1 to AValue-FList.Count do
+      FList.Add( TLayer.Create );
   end else begin
-       while AValue < FList.Count do begin
-         Layer[FList.Count-1].Free;
-         FList.Delete(FList.Count-1);
-       end;
- end;
+     while AValue < FList.Count do begin
+       Layer[FList.Count-1].Free;
+       FList.Delete(FList.Count-1);
+     end;
+  end;
 end;
 
-procedure TLayerList.AddSurfaceToLayer( aSurface : TSimpleSurfaceWithEffect; aLayerIndex:integer);
+procedure TLayerList.AddSurfaceToLayer(aSurface : TSimpleSurfaceWithEffect; aLayerIndex:integer);
 begin
- if aLayerIndex >= FList.Count
-   then aLayerIndex:=FList.Count-1
-   else if aLayerIndex < 0 then aLayerIndex := 0;
- Layer[aLayerIndex].Add(aSurface);
+  if aLayerIndex >= FList.Count then aLayerIndex:=FList.Count-1
+    else if aLayerIndex < 0 then aLayerIndex := 0;
+  Layer[aLayerIndex].Add(aSurface);
 end;
 
 procedure TLayerList.InsertSurfaceToLayer(aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer);
 begin
- if aLayerIndex >= FList.Count
-   then aLayerIndex:=FList.Count-1
-   else if aLayerIndex < 0 then aLayerIndex := 0;
- Layer[aLayerIndex].Insert(aSurfaceIndex, aSurface );
+  if aLayerIndex >= FList.Count then aLayerIndex := FList.Count-1
+    else if aLayerIndex < 0 then aLayerIndex := 0;
+  Layer[aLayerIndex].Insert(aSurfaceIndex, aSurface);
 end;
 
 procedure TLayerList.SurfaceChangeLayer(aSurface: TSimpleSurfaceWithEffect;
   aNewLayerIndex: integer);
 var i: integer;
 begin
- if ( aNewLayerIndex < 0 ) or ( aNewLayerIndex >= LayerCount ) then exit;
- if aSurface = NIL then exit;
- if aSurface.FParentLayer = NIL then exit;
- if aSurface.FParentLayer = Layer[aNewLayerIndex] then exit;
+  if (aNewLayerIndex < 0) or (aNewLayerIndex >= LayerCount) then exit;
+  if aSurface = NIL then exit;
+  if aSurface.FParentLayer = NIL then exit;
+  if aSurface.FParentLayer = Layer[aNewLayerIndex] then exit;
 
- // push the 'ChangeLayer' request in list. it will be processed at the right place in the scene loop
- i := Length( FListSurfaceChangeLayer );
- SetLength( FListSurfaceChangeLayer, i+1 );
- FListSurfaceChangeLayer[i].Surface := aSurface;
- FListSurfaceChangeLayer[i].NewLayerIndex := aNewLayerIndex;
-
+  // push the 'ChangeLayer' request in list. it will be processed in the next scene update
+  i := Length(FListSurfaceChangeLayer);
+  SetLength(FListSurfaceChangeLayer, i+1);
+  FListSurfaceChangeLayer[i].Surface := aSurface;
+  FListSurfaceChangeLayer[i].NewLayerIndex := aNewLayerIndex;
 end;
 
 procedure TLayerList.AllLayerVisible;
 var i:integer;
 begin
- for i:=0 to FList.Count-1 do TLayer(FList.Items[i]).Visible:=TRUE;
+  for i:=0 to FList.Count-1 do TLayer(FList.Items[i]).Visible := TRUE;
 end;
 
-procedure TLayerList.OnlyThisLayerVisible(tab: array of integer);
+procedure TLayerList.OnlyThisLayerVisible(const tab: array of integer);
 var i:integer;
 begin
- for i:=0 to FList.Count-1 do TLayer(FList.Items[i]).Visible:=FALSE;
- for i:=low(tab) to high(tab) do
-   if ( tab[i] < FList.Count ) and ( tab[i] >= 0 )
-     then TLayer(FList.Items[tab[i]]).Visible := TRUE;
+  for i:=0 to FList.Count-1 do TLayer(FList.Items[i]).Visible := FALSE;
+  for i:=low(tab) to high(tab) do
+    if (tab[i] < FList.Count) and (tab[i] >= 0) then
+      TLayer(FList.Items[tab[i]]).Visible := TRUE;
 end;
 {$endif oglcIMPLEMENTATION}
 

@@ -1,322 +1,487 @@
 {$ifdef oglcINTERFACE}
 type
 
+{ TOGLCElectricalBeamRenderer }
+
+TOGLCElectricalBeamRenderer = class(specialize TOGLCGenericPrimitiveRenderer<Txydistance>)
+private const
+  VERTEX_SHADER =
+   '#version 330 core'#10+
+   '  layout(location = 0) in vec4 aVertexCoor_Distance;'#10+
+   '  uniform mat4 uMVP;'#10+
+   '  out vec4 VertexColor;'#10+
+   '  out float Distance;'#10+
+   'void main()'#10+
+   '{'#10+
+   '  gl_Position = uMVP*vec4(aVertexCoor_Distance.xy, 0.0, 1.0);'#10+
+   '  Distance = aVertexCoor_Distance.z;'#10+
+   '}';
+
+  FRAGMENT_SHADER =
+   '#version 330 core'#10+
+   '  out vec4 FragColor;'#10+
+   '  uniform vec4 uBeamColor;'#10+
+   '  uniform vec4 uHaloColor;'#10+
+   '  uniform vec4 uTintColor;'#10+
+   '  uniform float uThreshold;'#10+
+   '  uniform float uHaloAttenuation;'#10+
+   '  uniform float uOpacity;'#10+
+   '  in float Distance;'#10+
+   'void main()'#10+
+   '{'#10+
+   '  vec4 col;'#10+
+   '  if (Distance < uThreshold) {'#10+
+   '     col = vec4(uBeamColor.rgb, uBeamColor.a*uOpacity);'#10+
+   '  } else {'#10+
+   '     col = vec4(uHaloColor.rgb, uHaloColor.a*pow((1-(Distance-uThreshold)), uHaloAttenuation)*uOpacity);'#10+
+   '  }'#10+
+   '  if (col.a == 0) discard;'#10+
+   // Tint
+   '  float a = col.a;'#10+
+   '  float tintAlphaX2 = uTintColor.a*2;'#10+
+   '  if (uTintColor.a > 0.5)'#10+
+   '   {'#10+
+   '     tintAlphaX2 = tintAlphaX2-1;'#10+
+   '     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace mode
+   '   }'#10+
+   '  else if (uTintColor.a > 0)'#10+
+   '     col = col + uTintColor*tintAlphaX2;'#10+     // mix mode
+   '  col.a = a;'#10+
+   '  FragColor = col;'#10+
+   '}';
+private
+  FLocMVP,
+  FLocTintColor,
+  FLocOpacity,
+  FLocBeamColor,
+  FLocHaloColor,
+  FLocThreshold,
+  FLocHaloAttenuation: GLint;
+  FMVP: TOGLCMatrix;
+  FBeamColorF, FHaloColorF,
+  FTintF: TColorF;
+  FThreshold, FHaloAttenuation, FOpacity: single;
+  procedure InitShaderCodeAndCallBack; override;
+  procedure DefineVertexAttribPointer;
+  procedure GetUniformLocation;
+  procedure SetUniformValuesAndTexture;
+public
+  procedure Prepare(const aBeamColor, aHaloColor: TBGRAPixel;
+                    const aThreshold, aHaloAttenuation, aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+
+end;
+
 { TOGLCElectricalBeam }
 
-TOGLCElectricalBeam=class(TOGLCPathDrawing)
+TOGLCElectricalBeam = class(TSimpleSurfaceWithEffect)
 private
-  class var FShader: TOGLCShader;
-  class var FLocBeamWidth: GLint;
-  class var FLocBeamColor: GLint;
-  class var FLocHaloColor: GLint;
-  class var FLocHaloRadius: GLint;
-  class var FLocHaloAttenuation: GLint;
-  class var FInstanceCount: integer;
-private
-  FSavedp1, FSavedp2: TPointF;
-private
-  FPtOrigin,
+  FBeamWidth, FHaloWidth, FThreshold: single;
   FPtTarget: TPointF;
   FRecomputePathTime,
   FRecomputePathTimeAccu: single;
-  FShakerOffset: arrayOfTPointF;
-  FShakerAmplitude: integer;
-  FShakerTime,
-  FShakerTimeAccu: single;
-  FSegmentLength,
   FAperture: single;
-  procedure SetShakerAmplitude(AValue: integer);
-  procedure ComputeShakerOffsets;
+  FPath: TOGLCPath;
+  FVertices: TArrayOfxydistance;
+  FIndices: TArrayOfVertexIndex;
+  FTargetInitialized: boolean;
+  procedure SetBeamAperture(AValue: single);
+  procedure SetHaloWidth(AValue: single);
+  procedure RecomputePath;
+  procedure DoComputeBeam;
 protected
-  procedure DoDraw( const pt1, pt2: TPointF; aLayerPercentOpacity: single); override;
-  function GetPoint( aIndex: integer ): TPointF; override;
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
 public
-   procedure Update( const aElapsedTime: single ); override;
-   procedure Draw( const aLayerPercentOpacity: single );  override;
+   procedure Update(const aElapsedTime: single); override;
+//   procedure Draw(const aLayerPercentOpacity: single); override;
+   procedure DoDraw; override;
 public
-   // the beam color
-   // use Tint property to set the color of the halo around the beam
+  // the beam color
   BeamColor: TBGRAParam;
-  // the radius of the halo around the beam
-  Radius     : single;
+  // the color of the halo around the beam.
+  HaloColor: TBGRAParam;
   // factor attenuation for the halo (default: 2)
-  Attenuation: single;
-  // uses Tint property to set the beam color
-  Constructor Create;
+  HaloAttenuation: single;
+
+  Constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
 
-  // constructs randomly the beam between the two points
-  // aSegmentLength is the distance between two nodes in pixels
-  // aAperture is the max value for the angle between two nodes
-  procedure ComputeBeam( aPtOrigin, aPtTarget: TPointF; aSegmentLength:single=40; aAperture: single=35 );
+procedure debugVertices;
 
-  property LineWidth: single read FLineWidth write FLineWidth;
-  property Path: TOGLCPath read FPath;
-  // amplitude max for the shaker effect in pixel
-  // if >0 each node of the beam moves randomly by max this value or less
-  // 0= no shaker effect
-  property ShakerAmplitude: integer read FShakerAmplitude write SetShakerAmplitude;
-  property ShakerTime: single read FShakerTime write FShakerTime;
+  // Sets the beam target point expressed in scene coordinates.
+  // The origin of the beam is the surface coordinates.
+  procedure SetTargetPoint(aPtTarget: TPointF);
 
-  // For each slice of time (in seconds) the beam will be recomputed
-  // this period is computed as with this formula: PathRecomputeTime+random*PathRecomputeTime*0.5
+  procedure ComputeBeam;
+  property BeamWidth: single read FBeamWidth write FBeamWidth;
+  // Aperture is the max value in degree for the angle between two nodes, range is 0 to 45.
+  property Aperture: single read FAperture write SetBeamAperture;
+
+  // The width of the halo around the beam. The halo is applyed on each side the beam.
+  property HaloWidth: single read FHaloWidth write SetHaloWidth;
+
+  // For each slice of time (in seconds) the beam is recomputed.
+  // This period is computed with this formula: PathRecomputeTime+random*PathRecomputeTime*0.5
   // If you don't want to re-compute periodically the beam, set it to negative value (default).
-  // default value is -1
+  // default value is -1.
   property PathRecomputeTime: single read FRecomputePathTime write FRecomputePathTime;
 end;
 
 {$endif oglcINTERFACE}
-
-
-
 {$ifdef oglcIMPLEMENTATION}
-const
 
-ELECTRICAL_BEAM_VERTEX_SHADER_PRG =
-'varying float vRadiusInterpolation;'
-+#10'void main() {'
-+#10'    gl_Position = gl_Vertex;' //  mvp * gl_Vertex;'    // gl_ModelViewProjectionMatrix * gl_Vertex;'
-+#10'    vRadiusInterpolation = gl_Color.rg;'  // distance between vertex and quad center
-+#10'}';
+{ TOGLCElectricalBeamRenderer }
 
-ELECTRICAL_BEAM_FRAGMENT_SHADER_PRG = '#version 120'#10+
-                          'varying float vRadiusInterpolation;'#10+
-                          'uniform float beamWidth;'#10+
-                          'uniform vec4 beamColor;'#10+
-                          'uniform vec4 haloColor;'#10+
-                          'uniform float haloRadius;'#10+
-                          'uniform float haloAttenuation;'#10+
-                          'vec4 color;'#10+
-                          'void main() {'#10+
+procedure TOGLCElectricalBeamRenderer.InitShaderCodeAndCallBack;
+begin
+DEBUG_USE_INDEX_ARRAY:=TRUE;
+  FVertexShaderCode := PChar(VERTEX_SHADER);
+  FFragmentShaderCode := PChar(FRAGMENT_SHADER);
+  FDefineVertexAttribPointer := @DefineVertexAttribPointer;
+  FGetUniformLocation := @GetUniformLocation;
+  FSetUniformValuesAndTexture := @SetUniformValuesAndTexture;
+end;
 
-                          ' if (vRadiusInterpolation ==-9999) {'#10+
-                          '   color = vec4(0,0,0,1);'#10+
-                          ' } else {'#10+
+procedure TOGLCElectricalBeamRenderer.DefineVertexAttribPointer;
+begin
+ glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Txydistance), NIL); // x y distance
+ glEnableVertexAttribArray(0);
+end;
 
-                          ' float d = abs(vRadiusInterpolation);'#10+
-                          ' if (d < beamWidth) {'#10+
-                          '    color = beamColor;'#10+
-                          ' } else {'#10+
-                          '    float attenuation = 1 - (d / haloRadius);'#10+
-                          '    color = vec4(haloColor.rgb, pow(attenuation, haloAttenuation));'#10+
-                          ' }'#10+
-                          ' }'#10+
-                          ' gl_FragColor = color;'#10+
-                          '}' ;
+procedure TOGLCElectricalBeamRenderer.GetUniformLocation;
+begin
+  with FShader do begin
+    FLocMVP := GetUniform('uMVP');
+    FLocTintColor := GetUniform('uTintColor');
+    FLocOpacity := GetUniform('uOpacity');
+    FLocBeamColor := GetUniform('uBeamColor');
+    FLocHaloColor := GetUniform('uHaloColor');
+    FLocThreshold := GetUniform('uThreshold');
+    FLocHaloAttenuation := GetUniform('uHaloAttenuation');
+  end;
+end;
+
+procedure TOGLCElectricalBeamRenderer.SetUniformValuesAndTexture;
+begin
+  glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
+  //glUniform4fv(FLocTintColor, 4, @FTintF);  // don't work... ?
+  glUniform4f(FLocTintColor, FTintF.r, FTintF.g, FTintF.b, FTintF.a);
+  glUniform1f(FLocOpacity, FOpacity);
+  glUniform4f(FLocBeamColor, FBeamColorF.r, FBeamColorF.g, FBeamColorF.b, FBeamColorF.a);
+  glUniform4f(FLocHaloColor, FHaloColorF.r, FHaloColorF.g, FHaloColorF.b, FHaloColorF.a);
+  glUniform1f(FLocThreshold, FThreshold);
+  glUniform1f(FLocHaloAttenuation, FHaloAttenuation);
+  FParentScene.TexMan.UnbindTexture;
+end;
+
+procedure TOGLCElectricalBeamRenderer.Prepare(const aBeamColor, aHaloColor: TBGRAPixel;
+  const aThreshold, aHaloAttenuation, aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+var forceFlush: boolean;
+  cfB, cfH: TColorF;
+begin
+  cfB.InitFromBGRA(aBeamColor);
+  cfH.InitFromBGRA(aHaloColor);
+  forceFlush := not FMVP.EqualTo(FParentScene.MVPMatrix) or
+                not FTintF.EqualTo(aComputedTint) or
+                (FOpacity <> aOpacity) or
+                not FBeamColorF.EqualTo(cfB) or
+                not FHaloColorF.EqualTo(cfH) or
+                (FThreshold <> aThreshold) or
+                (FHaloAttenuation <> aHaloAttenuation);
+  Batch_CheckIfNeedFlush(Self, ptTriangleStrip, NIL, 0, aBlendMode, forceFlush);
+  FMVP.CopyFrom(FParentScene.MVPMatrix);
+  FTintF.CopyFrom(aComputedTint);
+  FOpacity := aOpacity;
+  FBeamColorF.CopyFrom(cfB);
+  FHaloColorF.CopyFrom(cfH);
+  FThreshold := aThreshold;
+  FHaloAttenuation := aHaloAttenuation;
+end;
 
 
 { TOGLCElectricalBeam }
 
-procedure TOGLCElectricalBeam.SetShakerAmplitude(AValue: integer);
+procedure TOGLCElectricalBeam.SetHaloWidth(AValue: single);
 begin
-  if FShakerAmplitude=AValue then Exit;
-  FShakerAmplitude:=AValue;
+  FHaloWidth := Max(0, AValue);
 end;
 
-procedure TOGLCElectricalBeam.ComputeShakerOffsets;
-var
-  i, v: Integer;
+procedure TOGLCElectricalBeam.SetBeamAperture(AValue: single);
 begin
- v:=ShakerAmplitude*100;
- for i:=1 to High(FShakerOffset)-1 do begin
-   if ShakerAmplitude=0
-   then FShakerOffset[i]:=PointF(0,0)
-   else FShakerOffset[i]:=PointF(random(v)*0.01, random(v)*0.01);
- end;
+  FAperture := EnsureRange(AValue, 40, 80);
 end;
 
-procedure TOGLCElectricalBeam.DoDraw(const pt1, pt2: TPointF; aLayerPercentOpacity: single);
-var p2, p: TPointF;
-  pol:TPolarCoor;
-  A: single;
-  mvp, oldmv: TnMat44;
+procedure TOGLCElectricalBeam.RecomputePath;
+var ptOrigin, ptTarget: TPointF;
+   i, segmentCount: integer;
+   segmentLength: single;
+   polar, polar1: TPolarCoor;
+   pt: TPointF;
 begin
- pol:=CartesianToPolar(pt1, pt2);
- A:=pol.Angle;
+  ptOrigin := PointF(0,0);
+  ptTarget := SceneToSurface(FPtTarget);
+  polar := CartesianToPolar(ptOrigin, ptTarget);
+  if polar.Distance < 2 then begin
+    FPath := NIL;
+    exit;
+  end;
 
- with FShader do begin
-  Use;
-  SetUniform1f( FLocBeamWidth, FLineWidth);
-  SetUniform4f( FLocHaloColor, Tint.Red.Value/255, Tint.Green.Value/255, Tint.Blue.Value/255, Tint.Alpha.Value/255*aLayerPercentOpacity );
-  SetUniform4f( FLocBeamColor, BeamColor.Red.Value/255, BeamColor.Green.Value/255, BeamColor.Blue.Value/255, BeamColor.Alpha.Value/255*aLayerPercentOpacity );
-  SetUniform1f( FLocHaloRadius, Radius );
-  SetUniform1f( FLocHaloAttenuation, Attenuation );
- end;
+  if polar.Distance > 100 then segmentLength := 20
+  else if polar.Distance > 40 then segmentLength := 10
+  else if polar.Distance > 10 then segmentLength := 5
+  else segmentLength := polar.Distance;
+  segmentCount := Max(1, Round(polar.Distance/segmentLength));
 
- oldmv := ngl_ModelViewMatrix;
- nglTranslatef( pt1.x+FSurfaceOrigin.x, pt1.y+FSurfaceOrigin.y, 0 );
-// nglTranslatef( pt1.x, pt1.y, 0 );
- nglRotatef( A-90, 0, 0, 1 );               // opengl is counter clockwise
- mvp := ngl_ModelViewProjectionMatrix;
-// FShader.SetUniformMatrix4( FLocMVP, @mvp[0,0]);
+  // construct the path
+  SetLength(FPath, segmentCount+1);
+  FPath[0] := ptOrigin;
+  FPath[High(FPath)] := ptTarget;
+  if segmentCount = 1 then exit;
 
- p2 := PointF(0,pol.Distance);
- glBegin( GL_QUADS );
-  if FSavedp1.x=-100000
-   then p:=ApplyMatrix( @mvp, PointF(-Radius,0))
-   else p:=FSavedp1;
-  glColor4f(-Radius,0,0,0);
-  glVertex2f( p.x, p.y );    //p1
+  polar.Distance := 0;
+pt := ptOrigin; //
+  for i:=1 to High(FPath)-1 do begin
+    polar.Distance := i * segmentLength;
+//    pt := PolarToCartesian(ptOrigin, polar);    //
+    polar1.Angle := polar.Angle + random(Round(FAperture)*10)*0.1 - FAperture*0.5;
+    polar1.Distance := segmentLength;
+    FPath[i] := PolarToCartesian(pt, polar1);
+pt := FPath[i];  //
+  end;
 
-  if FSavedp1.x=-100000
-     then p:=ApplyMatrix( @mvp, PointF(Radius,0))
-     else p:=FSavedp2;
-  glColor4f(Radius,0,0,0);
-  glVertex2f( p.x, p.y );  //p1
 
-  p := ApplyMatrix( @mvp, p2+PointF(Radius,0));
-  FSavedp2:=p;
-  glColor4f(Radius,0,0,0);
-  glVertex2f( p.x, p.y );  //p2
-
-  p := ApplyMatrix( @mvp, p2-PointF(Radius,0));
-  FSavedp1:=p;
-  glColor4f(-Radius,0,0,0);
-  glVertex2f( p.x, p.y );  //p2
- glEnd;
- FShader.Release;
-{ DrawLine(p2.x-Radius, p2.y, p2.x+Radius, p2.y, BGRA(255,255,255,100),1);
- DrawLine(p2.x+Radius, p2.y, p1.x+Radius, p1.y, BGRA(255,255,255,100),1);
- DrawLine(p1.x+Radius, p1.y, p1.x-Radius, p1.y, BGRA(255,255,255,100),1);
- DrawLine(p1.x-Radius, p1.y, p2.x-Radius, p2.y, BGRA(255,255,255,100),1);  }
-
- // glPopMatrix;
-// nglLoadIdentity;
- gnGL.mat[nGL_MODELVIEW]:=oldmv;
+{  ang := polar.Angle;
+  pt := ptOrigin;
+  for i:=1 to High(FPath)-1 do begin
+    polar.Distance := segmentLength;
+    polar.Angle := ang + random(Round(FAperture)*10)*0.1 - FAperture*0.5;
+    FPath[i] := PolarToCartesian(pt, polar);
+    pt := FPath[i];
+  end;    }
 
 end;
 
-function TOGLCElectricalBeam.GetPoint(aIndex: integer): TPointF;
+procedure TOGLCElectricalBeam.DoComputeBeam;
+const VERTEX_COUNT_FOR_FIRST_QUAD = 6;
+      VERTEX_COUNT_FOR_OTHER_QUAD = 3;
+      INDICE_PER_QUAD = 6;
+var p: Pxydistance;
+  pIndice: PVertexIndex;
+  currentIndice: TVertexIndex;
+  i, quadCount, primitiveRestartCount: Integer;
+  quad1, quad2: TQuadF;
+  width1: single;
+  iterationCount: integer;
+   { TODO : essayer avec ptTriangles }
+   procedure InitVerticesAndIndicesForQuad1;
+   begin
+     if iterationCount = 0 then begin
+       // path point pt1 and pt2
+       p^.x := FPath[i].x; p^.y := FPath[i].y; p^.distance := 0;  inc(p);
+       p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 0;  inc(p);
+       // quad1 topleft, topright, bottomright, bottomleft
+       p^.x := quad1[0].x; p^.y := quad1[0].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[3].x; p^.y := quad1[3].y; p^.distance := 1;  inc(p);
+
+       // indices for triangle strip
+       pIndice[0] := currentIndice+2;
+       pIndice[1] := currentIndice+3;
+       pIndice[2] := currentIndice+0;
+       pIndice[3] := currentIndice+1;
+       pIndice[4] := currentIndice+5;
+       pIndice[5] := currentIndice+4;
+       inc(currentIndice, VERTEX_COUNT_FOR_FIRST_QUAD);
+     end else begin
+       // OPTIMIZATION: here we don't repeat the 3 left vertices that are already defined in the previous quad (the 3 at right)
+       // path point pt2
+       p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 0;  inc(p);
+       // quad1 topright, bottomright
+       p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1;  inc(p);
+
+       if iterationCount = 1 then begin
+         // indices for triangle strip
+         pIndice[0] := currentIndice-5;
+         pIndice[1] := currentIndice;
+         pIndice[2] := currentIndice-3;
+         pIndice[3] := currentIndice+1;
+         pIndice[4] := currentIndice+2;
+         pIndice[5] := currentIndice-2;
+       end else begin
+         pIndice[0] := currentIndice-3;
+         pIndice[1] := currentIndice;
+         pIndice[2] := currentIndice-2;
+         pIndice[3] := currentIndice+1;
+         pIndice[4] := currentIndice+2;
+         pIndice[5] := currentIndice-1;
+       end;
+       inc(currentIndice, VERTEX_COUNT_FOR_OTHER_QUAD);
+     end;
+
+     inc(pIndice, INDICE_PER_QUAD);
+//     inc(iterationCount);
+   end;
+   procedure PushPrimitiveRestart;
+   begin
+     pIndice^ := PRIMITIVE_INDEX_RESTART_VALUE;
+     inc(pIndice);
+   end;
+
 begin
- Result := FPath.Pts[aIndex]+FShakerOffset[aIndex];
+  FVertices := NIL;
+  FIndices := NIL;
+  if (FBeamWidth <= 0) or (Length(FPath) < 2) then exit;
+
+  width1 := FBeamWidth*0.5+FHaloWidth;
+  FThreshold :=  (FBeamWidth*0.5)/width1;
+
+  currentIndice := 0;
+  iterationCount := 0;
+  if Length(FPath) = 2 then begin
+    // there are only 2 points
+    SetLength(FVertices, VERTEX_COUNT_FOR_FIRST_QUAD);
+    p := @FVertices[0];
+    SetLength(FIndices, INDICE_PER_QUAD);
+    pIndice := @FIndices[0];
+    quad1 := LineSegmentToQuadF_PosMiddle(FPath[0], FPath[1], width1, width1);
+    i := 0;
+    InitVerticesAndIndicesForQuad1;
+    exit;
+  end;
+
+  quadCount := Length(FPath)-1;
+  primitiveRestartCount := quadCount - 1;
+  SetLength(FVertices, VERTEX_COUNT_FOR_FIRST_QUAD * quadcount);
+//  SetLength(FVertices, VERTEX_COUNT_FOR_FIRST_QUAD + (quadCount-1)*VERTEX_COUNT_FOR_OTHER_QUAD);
+  SetLength(FIndices, quadCount*INDICE_PER_QUAD + primitiveRestartCount);
+
+  // compute the previousTopLeft and previousBottomLeft
+  quad1 := LineSegmentToQuadF_PosMiddle(FPath[0], FPath[1], width1, width1);
+
+  p := @FVertices[0];
+  pIndice := @FIndices[0];
+
+  for i:=0 to High(FPath)-2 do begin
+    quad2 := LineSegmentToQuadF_PosMiddle(FPath[i+1], FPath[i+2], width1, width1);
+    AdjustCornerOnConsecutiveQuadF(quad1, quad2);
+    InitVerticesAndIndicesForQuad1;
+    PushPrimitiveRestart;
+    Move(quad2, quad1, SizeOf(TQuadF));
+  end;
+  inc(i);
+  InitVerticesAndIndicesForQuad1; // quad1 is equal to quad2
+
+  dec(p);
+  if p <> @FVertices[High(FVertices)] then
+    raise exception.create('vertex buffer overload or underload');
+
+  dec(pIndice);
+  if pIndice <>@FIndices[High(FIndices)] then
+    raise exception.create('index buffer overload or underload');
+end;
+
+function TOGLCElectricalBeam.GetWidth: integer;
+begin
+  Result := 1;
+end;
+
+function TOGLCElectricalBeam.GetHeight: integer;
+begin
+  Result := 1;
 end;
 
 procedure TOGLCElectricalBeam.Update(const aElapsedTime: single);
 begin
- inherited Update(aElapsedTime);
- if Freeze then exit;
+  inherited Update(aElapsedTime);
+  if Freeze then exit;
 
- if FRecomputePathTime>=0 then begin
-   FRecomputePathTimeAccu-=aElapsedTime;
-   if FRecomputePathTimeAccu<=FRecomputePathTime then begin
-     ComputeBeam( FPtOrigin, FPtTarget, FSegmentLength, FAperture);
-     FRecomputePathTimeAccu:=FRecomputePathTime+random*FRecomputePathTime*0.5;//0;
-   end;
- end;
+  BeamColor.OnElapse(aElapsedTime);
 
- FShakerTimeAccu+=aElapsedTime;
- if FShakerTimeAccu>=FShakerTime then begin
-   ComputeShakerOffsets;
-   FShakerTimeAccu:=0;
- end;
-
- BeamColor.OnElapse( aElapsedTime );
-end;
-
-procedure TOGLCElectricalBeam.Draw(const aLayerPercentOpacity: single);
-begin
- FSavedp1.x:=-100000;
- inherited Draw(aLayerPercentOpacity);
-end;
-
-
-constructor TOGLCElectricalBeam.Create;
-begin
- inherited Create;
- Tint.Value:=BGRA(255,255,255);
- BeamColor:= TBGRAParam.Create;
- BeamColor.Value:=BGRAWhite;
- Attenuation:= 2.0;
- Radius:=20;
- FRecomputePathTime:=-1;
-
- if FInstanceCount=0 then begin
-    FShader := TOGLCShader.Create( ELECTRICAL_BEAM_VERTEX_SHADER_PRG, ELECTRICAL_BEAM_FRAGMENT_SHADER_PRG );
-    with FShader do begin
-//     FLocMVP := GetUniform( 'mvp' );
-     FLocBeamWidth := GetUniform( 'beamWidth' );
-     FLocBeamColor := GetUniform( 'beamColor' );
-     FLocHaloColor := GetUniform( 'haloColor' );
-     FLocHaloRadius := GetUniform( 'haloRadius' );
-     FLocHaloAttenuation := GetUniform( 'haloAttenuation' );
+  if (FRecomputePathTime > 0) and FTargetInitialized then begin
+    FRecomputePathTimeAccu := FRecomputePathTimeAccu - aElapsedTime;
+    if FRecomputePathTimeAccu <= 0 then begin
+      RecomputePath;
+      DoComputeBeam;
+      FRecomputePathTimeAccu := FRecomputePathTime + random*FRecomputePathTime*0.5;
     end;
- end;
- inc(FInstanceCount);
+  end;
+end;
+
+procedure TOGLCElectricalBeam.DoDraw;
+var p: Pxydistance;
+//fborder: TOGLCBorder;
+begin
+  if (Length(FVertices) = 0) or (Length(FIndices) = 0) then exit;
+
+  FParentScene.FElectricalBeamRenderer.Prepare(BeamColor.Value, HaloColor.Value, FThreshold,
+                  HaloAttenuation, FComputedOpacity, FComputedTint, FBlendmode);
+  FParentScene.FElectricalBeamRenderer.PushIndices(FIndices);
+  p := FParentScene.FElectricalBeamRenderer.QueryVertex(Length(FVertices));
+  Move(FVertices[0], p^, SizeOf(Txydistance)*Length(FVertices));
+
+{  fborder.InitDefault;
+  fborder.LinePosition:=lpMiddle;
+  fborder.Color:=bgra(50,50,50,50);
+  FParentScene.ModelViewMatrix.Translate(0, 50);
+  fborder.InitFromPath(FPath, 15);
+  FParentScene.SmoothLineRenderer.DrawBorder(fborder, FComputedOpacity, FComputedTint);   }
+end;
+
+
+constructor TOGLCElectricalBeam.Create(aParentScene: TOGLCScene);
+begin
+  inherited Create;
+  FParentScene := aParentScene;
+  BeamColor := TBGRAParam.Create;
+  BeamColor.Value := BGRA(100,0,255);
+  FBeamWidth := 2.0;
+  HaloColor := TBGRAParam.Create;
+  HaloColor.Value := BGRA(255,0,255);
+  HaloAttenuation := 2.0;
+  HaloWidth := 3.0;
+  FRecomputePathTime := -1;
+  FAperture := 35;
+
+  if aParentScene.FElectricalBeamRenderer = NIL then
+    aParentScene.FElectricalBeamRenderer := TOGLCElectricalBeamRenderer.Create(aParentScene);
 end;
 
 destructor TOGLCElectricalBeam.Destroy;
 begin
- dec(FInstanceCount);
- if FInstanceCount=0 then begin
-   FShader.Free;
-   FShader:=NIL;
- end;
- BeamColor.Free;
- inherited Destroy;
+  FreeAndNil(BeamColor);
+  FreeAndNil(HaloColor);
+  inherited Destroy;
 end;
 
-procedure TOGLCElectricalBeam.ComputeBeam(aPtOrigin, aPtTarget: TPointF; aSegmentLength: single; aAperture: single);
-var nodes: ArrayOfTPointF;
-  polar: TPolarCoor;
-  p: TPointF;
-  A, SegmentLength: single;
-  nodeCount, i: Integer;
+procedure TOGLCElectricalBeam.debugVertices;
+var i: integer;
+  s: string;
 begin
- ReleaseCurrentPath;
- FPath:=TOGLCPath.Create;
- FPathOwner:=TRUE;
+  with FParentScene do begin
+    LogMess('Vertices count: '+IntToStr(Length(FVertices)));
+    for i:=0 to High(FVertices) do
+     LogMess('('+FormatFloat('0.000',FVertices[i].x)+'  '+FormatFloat('0.000',FVertices[i].y)+')'+
+             '  distance '+FormatFloat('0.000',FVertices[i].distance), 2);
+    LogMess('Indices count: '+IntToStr(Length(FIndices)));
+    s := '(';
+    for i:=0 to High(FIndices) do s := s + ' '+FIndices[i].ToString;
+    LogMess(s+' )', 2);
+  end;
+end;
 
- FPtOrigin:=aPtOrigin;
- FPtTarget:=aPtTarget;
- FRecomputePathTimeAccu:=0;
+procedure TOGLCElectricalBeam.SetTargetPoint(aPtTarget: TPointF);
+begin
+  FPtTarget := aPtTarget;
+  FTargetInitialized := True;
+end;
 
- if aPtOrigin=aPtTarget then begin
-   SetLength( FShakerOffset, 0);
-   exit;
- end;
-
- if aAperture<0
-    then aAperture:=0
-    else if aAperture>45
-           then aAperture:=45;
- FAperture:=aAperture;
-
- polar:=CartesianToPolar(aPtOrigin, aPtTarget);
-
- if aSegmentLength<=0 then aSegmentLength:=40;
- nodeCount:= round(polar.Distance/aSegmentLength);//nombre de point de controle
- if nodeCount=0 then begin
-   nodeCount:=1;
-   aSegmentLength:=polar.Distance/2;
- end;
- FSegmentLength:=aSegmentLength;
-
- SegmentLength:=polar.Distance/(nodeCount+1);
-
- nodes := NIL;
- SetLength(nodes,2+nodeCount);
- // set extremities
- nodes[0]:=aPtOrigin;
- nodes[nodeCount+1]:=aPtTarget;
-
- if nodeCount>0 then begin
-   A:=polar.Angle;
-   p:=aPtOrigin;
-   for i:=1 to nodeCount do begin
-    polar.Distance:=SegmentLength;//*i;
-    polar.Angle:=A+(random(round(aAperture)*10)*0.1-aAperture*0.5);
-
-    nodes[i]:=PolarToCartesian(p, polar);
-    p:=nodes[i];
-   end;
- end;
-
- FPath.Pts := nodes;
-
- // force offset for shaker to 0
- SetLength( FShakerOffset, Length(FPath.Pts));
- for i:=0 to High(FShakerOffset) do
-   FShakerOffset[i]:=PointF(0,0);
+procedure TOGLCElectricalBeam.ComputeBeam;
+begin
+  if not FTargetInitialized then exit;
+  RecomputePath;
+  DoComputeBeam;
 end;
 
 

@@ -1,10 +1,98 @@
 {$ifdef oglcINTERFACE}
 type
+
+{
+case Mode of
+  FX_COLOR_MIX:
+    begin
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    end;
+  FX_COLOR_SET:
+    begin
+      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+      glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB,  GL_REPLACE);
+      glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB,  GL_PRIMARY_COLOR_ARB);
+    end;
+end;
+
+}
+
+{ TOGLCParticleRenderer }
+
+TOGLCParticleRenderer = class(specialize TOGLCGenericPrimitiveRenderer<Txyuvtintopacitymatrix>)
+private const
+  VERTEX_SHADER =
+   '#version 330 core'#10+
+   '  layout(location = 0) in vec4 aVertexAndTextureCoor;'#10+
+   '  layout(location = 1) in vec4 aVertexTint;'#10+
+   '  layout(location = 2) in float aOpacity;'#10+
+   '  layout(location = 3) in mat4 aModelViewMatrix;'#10+
+   '  uniform mat4 uProjectionMatrix;'#10+
+   '  out vec2 TexCoords;'#10+
+   '  flat out vec4 Tint;'#10+
+   '  flat out float Opacity;'#10+
+   'void main()'#10+
+   '{'#10+
+   '  gl_Position = uProjectionMatrix*aModelViewMatrix*vec4(aVertexAndTextureCoor.xy, 0.0, 1.0);'#10+
+   '  TexCoords = aVertexAndTextureCoor.zw;'#10+
+   '  Tint = aVertexTint;'#10+
+   '  Opacity = aOpacity;'#10+
+   '}';
+
+  FRAGMENT_SHADER =
+   '#version 330 core'#10+
+   '  out vec4 FragColor;'#10+
+   '  in vec2 TexCoords;'#10+
+   '  flat in vec4 Tint;'#10+
+   '  flat in float Opacity;'#10+
+   '  uniform sampler2D uTexUnit;'#10+
+   'void main()'#10+
+   '{'#10+
+   '  vec4 col = texture(uTexUnit, TexCoords);'#10+
+'  float a = col.a*Opacity;'#10+
+   '  if (a == 0.0) discard;'#10+
+   // Tint and opacity
+//   '  float a = col.a*Opacity;'#10+
+   '  float tintAlphaX2 = Tint.a*2;'#10+
+   '  if (Tint.a > 0.5)'#10+
+   '   {'#10+
+   '     tintAlphaX2 = tintAlphaX2-1;'#10+
+   '     col = col * (1-tintAlphaX2) + Tint * tintAlphaX2;'#10+  // replace color
+   '   }'#10+
+   '  else if (Tint.a > 0)'#10+
+   '   {'#10+
+   '     col = col + Tint*tintAlphaX2;'#10+     // mix color
+   '   }'#10+
+
+//   '  col = col * (1-Tint.a) + Tint * Tint.a;'#10+
+   '  col.a = a;'#10+
+   '  FragColor = col;'#10+
+   '}' ;
+private
+  FLocProjectionMatrix,
+  FLocTextureUnit: GLint;
+  FTexture: PTexture;
+  FProjectionMatrix: TOGLCMatrix;
+  procedure InitShaderCodeAndCallBack; override;
+  procedure DefineVertexAttribPointer;
+  procedure GetUniformLocation;
+  procedure SetUniformValuesAndTexture;
+public
+  procedure Prepare(aTexture: PTexture; aTextureUnit: integer; aBlendMode: byte);
+
+  procedure PushQuad(const aFrameIndex, aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44;
+                     const aOpacity: single; const aComputedTint: TColorF);
+end;
+
+var
+  ParticleRenderer: TOGLCParticleRenderer;
+
+type
 { TParticleEmitter }
-TEmitterType = (etPoint, etLine, etRectangle, etCircle, etRing, etInnerCircle, etOuterCircle );
+TEmitterType = (etPoint, etLine, etRectangle, etCircle, etRing, etInnerCircle, etOuterCircle);
 
 const
-MAX_PARTICLES = 1024;
+  MAX_PARTICLES = 1024;
 
 type
 
@@ -37,565 +125,801 @@ TParticle = record
 
               InitialSpin: single;
               FSpinIndex: integer;
-              CurrentAngle: single ;
+              CurrentAngle: single;
              end;
 
-// called when a particle reachs the end of its trajectory (life)
-TOnParticleDies= procedure ( aPar: PParticle; aParIndex: integer ) of object;
+// called when a particle is at the end of its life
+TOnParticleDies= procedure(aPar: PParticle; aParIndex: integer) of object;
 
-PPColor = ^TPColor ;
+PPColor = ^TPColor;
 TPColor = packed record
-            C: TBGRAPixel;
-            Life: single;
+  C: TBGRAPixel;
+  Life: single;
 end;
 PPsingle = ^TPSingle;
 TPSingle = packed record
-             Value: single;
-             Life: single;
+  Value: single;
+  Life: single;
 end;
 
 TParticleParameter = record
-                      Texture: PTexture;
-                      StartFrame: integer;
-                      EndFrame: integer;
-                      ColorMode: byte;
-                      BlendMode: byte;
-                      Life: single;
-                      LifeVariation: single;
-                      ArrayColor: array of TPColor;
-                      Velocity: single ;
-                      VelocityVariation: single;
-                      ArrayVelocity: array of TPSingle;
-                      AVelocity: single;
-                      AVelocityVariation: single;
-                      ArrayAVelocity: array of TPSingle;
-                      Size: single;
-                      SizeVariation: single;
-                      ArraySize: array of TPSingle;
-                      Spin: single;
-                      SpinVariation: single;
-                      ArraySpin: array of TPSingle;
-                      StartAngle: single;
-                      StartAngleVariation: single;
+  Texture: PTexture;
+  TextureOwner: boolean;
+  StartFrame: integer;
+  EndFrame: integer;
+  Life: single;
+  LifeVariation: single;
+  ArrayColor: array of TPColor;
+  Velocity: single;
+  VelocityVariation: single;
+  ArrayVelocity: array of TPSingle;
+  AVelocity: single;
+  AVelocityVariation: single;
+  ArrayAVelocity: array of TPSingle;
+  Size: single;
+  SizeVariation: single;
+  ArraySize: array of TPSingle;
+  Spin: single;
+  SpinVariation: single;
+  ArraySpin: array of TPSingle;
+  StartAngle: single;
+  StartAngleVariation: single;
 end;
 
+TEmitterParameter = record
+  EmitterType: TEmitterType;
+  LineSize: single;
+  SmallRadius, BigRadius: single;
+end;
 
-
-TParticleEmitter = class( TSimpleSurfaceWithEffect )
- Constructor Create;
- Destructor Destroy ; override;
-protected
- FParticles : array [0..MAX_PARTICLES-1] of TParticle;
- FCurrentLife : single;
- FParticleRate : single;
- FParticleRateCount : single;
- FParticleCount : integer;
- FEmitterType: TEmitterType;
- FWidth, FHeight: integer;
- FLineP2: TPointF;
- FLineDirection, FLineSize: single;
- FSmallRadius, FBigRadius: single;
- procedure SetSize( AWidth, AHeight: integer );
- function GetWidth: integer; override;
- function GetHeight: integer; override;
- procedure DrawParticleTexture( aTexture: PTexture; AFrameIndex: integer; aTint: TBGRAPixel; aX, aY, aAngle, aZoom: single );
+TParticleEmitter = class(TSimpleSurfaceWithEffect)
 private
- // callback
- FOnParticleDies: TOnParticleDies;
+  FOnParticleDies: TOnParticleDies;
+protected
+  FCurrentLife: single;
+  FParticleRate: single;
+  FParticleRateCount: single;
+  FParticleCount: integer;
+  FEmitterType: TEmitterType;
+  FWidth, FHeight: integer;
+  FLineSize: single;
+  FSmallRadius, FBigRadius: single;
+  procedure SetSize(AWidth, AHeight: integer);
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+  property LineSize: single read FLineSize;
+  property SmallRadius: single read FSmallRadius;
+  property BigRadius: single read FBigRadius;
 public
- procedure Update ( const aElapsedTime : single ) ; override;
- procedure Draw( const aLayerPercentOpacity : single ) ; override;
+  procedure Update(const aElapsedTime: single); override;
+  procedure Draw(const aLayerPercentOpacity: single); override;
+  procedure DoDraw; override;
 public
- // acces to particle parameters
- FParticleParam : TParticleParameter;
+  // acces to particle parameters
+  FParticles: array [0..MAX_PARTICLES-1] of TParticle;
+  FParticleParam: TParticleParameter;
+  EmitterParam: TEmitterParameter;
 public
- ParticlesToEmit: TBoundedFParam;      // max particles count to emit at the same time [0..1024]
- Gravity        : TPointFParam;        // gravity in pixels per second
- Direction      : TBoundedFParam;      // [0..360] degree
- Spread         : TBoundedFParam;      // [0..360] degree
- EmitterLife    : single;              // duration in seconds of one shoot if emitter is not in loop mode
- LoopMode       : boolean;
- ParticlesPositionsRelativeToEmitterPosition: boolean; // FALSE by default
- procedure LoadFromFile( const aFilename: string );
- procedure Shoot;
- procedure Clear;
+  ParticlesToEmit: TBoundedFParam; // max particles count to emit at the same time [0..1024]
+  Gravity: TPointFParam;           // gravity in pixels per second
+  Direction: TBoundedFParam;       // [0..360] degree
+  Spread: TBoundedFParam;          // [0..360] degree
+  EmitterLife: single;             // duration in seconds of one shoot if emitter is not in loop mode
+  LoopMode: boolean;
+  ParticlesPositionsRelativeToEmitterPosition: boolean; // FALSE by default
+  Constructor Create(aParentScene: TOGLCScene);
+  Destructor Destroy; override;
+  // load the parameters from a file.
+  // You can specify an atlas where the used texture can be found.
+  // If you don't use an atlas, set aAtlas parameter to NIL. In that case, the texture
+  // will be created (the texture image must be in the same directory than aFilename).
+  procedure LoadFromFile(const aFilename: string; aAtlas: TOGLCTextureAtlas);
+  procedure Shoot;
+  procedure Clear;
 
- // (X,Y) is the position of the point
- procedure SetEmitterTypePoint;
- // (X,Y) is the first point of the line
- procedure SetEmitterTypeLine( P2: TPointF );
- // (X,Y) is the first point of the line
- procedure SetEmitterTypeLine( aDirection, aSize: single );
- // (X,Y) is the top left corner of the rectangle
- procedure SetEmitterTypeRectangle( aWidth, aHeight: integer );
- // (X,Y) is the center of the circle
- procedure SetEmitterTypeCircle( Radius: single );
- procedure SetEmitterTypeInnerCircle( Radius: single );
- procedure SetEmitterTypeOuterCircle( Radius: single );
- procedure SetEmitterTypeRing( SmallRadius, BigRadius: single );
+  // (X,Y) is the position of the point
+  procedure SetEmitterTypePoint;
+  // (X,Y) is the first point of the line
+  procedure SetEmitterTypeLine(P2: TPointF);
+  // (X,Y) is the first point of the line
+  procedure SetEmitterTypeLine(aDirection, aSize: single);
+  // (X,Y) is the top left corner of the rectangle
+  procedure SetEmitterTypeRectangle(aWidth, aHeight: integer);
+  // (X,Y) is the center of the circle
+  procedure SetEmitterTypeCircle(Radius: single);
+  procedure SetEmitterTypeInnerCircle(Radius: single);
+  procedure SetEmitterTypeOuterCircle(Radius: single);
+  procedure SetEmitterTypeRing(aSmallRadius, aBigRadius: single);
 
- // return TRUE if at least one particle collide the specified surface
- function ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect ): boolean;
+  // return TRUE if at least one particle collide the specified surface
+  function ParticlesCollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean;
 
- property EmitterType: TEmitterType read FEmitterType;
- property ParticlesCount: integer read FParticleCount;
- property OnParticleDies: TOnParticleDies read FOnParticleDies write FOnParticleDies;
+  property EmitterType: TEmitterType read FEmitterType;
+  property ParticlesCount: integer read FParticleCount;
+  property OnParticleDies: TOnParticleDies read FOnParticleDies write FOnParticleDies;
 end;
-{$endif oglcINTERFACE}
 
+ArrayofParticleEmitter = array of TParticleEmitter;
+
+{$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
+
+{ TOGLCParticleRenderer }
+
+procedure TOGLCParticleRenderer.InitShaderCodeAndCallBack;
+begin
+DEBUG_USE_INDEX_ARRAY:=TRUE;
+  FVertexShaderCode := PChar(VERTEX_SHADER);
+  FFragmentShaderCode := PChar(FRAGMENT_SHADER);
+  FDefineVertexAttribPointer := @DefineVertexAttribPointer;
+  FGetUniformLocation := @GetUniformLocation;
+  FSetUniformValuesAndTexture := @SetUniformValuesAndTexture;
+end;
+
+procedure TOGLCParticleRenderer.DefineVertexAttribPointer;
+begin
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), NIL); // xyuv
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*4));  // color
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*8));  // opacity
+  glEnableVertexAttribArray(2);
+
+  glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*9));  // model view matrix
+  glEnableVertexAttribArray(3);
+  glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*13));
+  glEnableVertexAttribArray(4);
+  glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*17));
+  glEnableVertexAttribArray(5);
+  glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvtintopacitymatrix), PChar(SizeOf(single)*21));
+  glEnableVertexAttribArray(6);
+end;
+
+procedure TOGLCParticleRenderer.GetUniformLocation;
+begin
+  with FShader do
+  begin
+    Use;
+    FLocProjectionMatrix := GetUniform('uProjectionMatrix');
+    FLocTextureUnit := GetUniform('uTexUnit');
+    Release;
+  end;
+end;
+
+procedure TOGLCParticleRenderer.SetUniformValuesAndTexture;
+begin
+  glUniform1i(FLocTextureUnit, GL_TEXTURE0+FTextureUnit);
+  glUniformMatrix4fv(FLocProjectionMatrix, 1, GL_FALSE, @FProjectionMatrix.Matrix[0,0]);
+  FParentScene.TexMan.Bind(FTexture, FTextureUnit);
+end;
+
+procedure TOGLCParticleRenderer.Prepare(aTexture: PTexture; aTextureUnit: integer; aBlendMode: byte);
+var forceFlush: Boolean;
+begin
+  forceFlush := not FProjectionMatrix.EqualTo(FParentScene.ProjectionMatrix);
+  Batch_CheckIfNeedFlush(Self, ptTriangles, aTexture, aTextureUnit, aBlendMode, forceFlush);
+  FTexture := aTexture;
+  FTextureUnit := aTextureUnit;
+  if forceFlush then FProjectionMatrix.CopyFrom(FParentScene.ProjectionMatrix);
+end;
+
+procedure TOGLCParticleRenderer.PushQuad(const aFrameIndex,
+  aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
+var w, h: single;
+    tci: PQuadCornerIndexes;
+    texCoord: PQuadCoor;
+    p: Pxyuvtintopacitymatrix;
+    fi: Integer;
+    pIndex: PVertexIndex;
+    currentIndex: TVertexIndex;
+begin
+ // if aModelViewMatrix = NIL then aModelViewMatrix := @FParentScene.ModelViewMatrix.Matrix;
+
+  fi := EnsureRange(aFrameIndex, 0, FTexture^.FrameCount-1);
+  texCoord := @FTexture^.FramesCoord[fi];
+  tci := @FLIP_INDEXES[aFlipIndex];
+  w := FTexture^.FrameWidth;
+  h := FTexture^.FrameHeight;
+
+  // push the 6 indices
+  currentIndex := FIndexInAttribsArray;
+  pIndex := QueryIndex(6);      // B   BD
+  pIndex[0] := currentIndex;    // AC  C
+  pIndex[1] := currentIndex+1;
+  pIndex[2] := currentIndex+2;
+  pIndex[3] := currentIndex+2;
+  pIndex[4] := currentIndex+1;
+  pIndex[5] := currentIndex+3;
+
+  // push the 4 vertex        // vertex coord      24
+  p := QueryVertex(4);        //                   13
+  with p[0] do begin
+    tint.CopyFrom(aComputedTint);
+    mv.CopyFrom(aModelViewMatrix);
+    u := texCoord^[ tci^[0] ].x;
+    v := texCoord^[ tci^[0] ].y;
+    x := 0;
+    y := h;
+    opacity := aOpacity;
+  end;
+  with p[1] do begin
+    tint.CopyFrom(aComputedTint);
+    mv.CopyFrom(aModelViewMatrix);
+    u := texCoord^[ tci^[1] ].x;
+    v := texCoord^[ tci^[1] ].y;
+    x := 0;
+    y := 0;
+    opacity := aOpacity;
+  end;
+  with p[2] do begin
+    tint.CopyFrom(aComputedTint);
+    mv.CopyFrom(aModelViewMatrix);
+    u := texCoord^[ tci^[2] ].x;
+    v := texCoord^[ tci^[2] ].y;
+    x := w;
+    y := h;
+    opacity := aOpacity;
+  end;
+  with p[3] do begin
+    tint.CopyFrom(aComputedTint);
+    mv.CopyFrom(aModelViewMatrix);
+    u := texCoord^[ tci^[3] ].x;
+    v := texCoord^[ tci^[3] ].y;
+    x := w;
+    y := 0;
+    opacity := aOpacity;
+  end;
+
+exit;
+
+  case FCurrentPrimitiveType of
+    ptTriangleStrip: begin
+      p := QueryVertex(4);
+      with p[0] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[0] ].x;
+        v := texCoord^[ tci^[0] ].y;
+        x := 0;
+        y := h;
+        opacity := aOpacity;
+      end;
+      with p[1] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[1] ].x;
+        v := texCoord^[ tci^[1] ].y;
+        x := 0;
+        y := 0;
+        opacity := aOpacity;
+      end;
+      with p[2] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[2] ].x;
+        v := texCoord^[ tci^[2] ].y;
+        x := w;
+        y := h;
+        opacity := aOpacity;
+      end;
+      with p[3] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[3] ].x;
+        v := texCoord^[ tci^[3] ].y;
+        x := w;
+        y := 0;
+        opacity := aOpacity;
+      end;
+    end;
+
+    ptTriangles: begin
+      p := QueryVertex(6);
+      with p[0] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[0] ].x;
+        v := texCoord^[ tci^[0] ].y;
+        x := 0;
+        y := h;
+        opacity := aOpacity;
+      end;
+      with p[1] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[1] ].x;
+        v := texCoord^[ tci^[1] ].y;
+        x := 0;
+        y := 0;
+        opacity := aOpacity;
+      end;
+      with p[2] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[2] ].x;
+        v := texCoord^[ tci^[2] ].y;
+        x := w;
+        y := h;
+        opacity := aOpacity;
+      end;
+      Move(p[2], p[3], SizeOf(Txyuvtintopacitymatrix)); // C
+      Move(p[1], p[4], SizeOf(Txyuvtintopacitymatrix)); // B
+      with p[5] do begin
+        tint.CopyFrom(aComputedTint);
+        mv.CopyFrom(aModelViewMatrix);
+        u := texCoord^[ tci^[3] ].x;
+        v := texCoord^[ tci^[3] ].y;
+        x := w;
+        y := 0;
+        opacity := aOpacity;
+      end;
+    end;
+  end;
+end;
+
 { TParticleEmitter }
 
-constructor TParticleEmitter.Create ;
+constructor TParticleEmitter.Create(aParentScene: TOGLCScene);
 var i:integer ;
 begin
- inherited Create;
- for i:=0 to MAX_PARTICLES-1 do
-  begin
-   FParticles[i].VX := 0;
-   FParticles[i].VY := 0;
-   FParticles[i].InitialLife := 0;
-   FParticles[i].CurrentLife := 0;
-  end;
- FEmitterType := etPoint;
- LoopMode := TRUE;
- EmitterLife := 3;
- FCurrentLife := 0;
- FParticleCount := 0;
- ParticlesToEmit := CreateBoundedFParam( 0, 1024 );
- Gravity := TPointFParam.Create;
- Spread := CreateBoundedFParam( 0, 360, TRUE );
- Direction := CreateBoundedFParam( 0, 360, TRUE );
- ParticlesPositionsRelativeToEmitterPosition := FALSE;
- SetSize(1,1);
+  inherited Create;
+  FParentScene := aParentScene;
+  for i:=0 to MAX_PARTICLES-1 do
+   begin
+    FParticles[i].VX := 0;
+    FParticles[i].VY := 0;
+    FParticles[i].InitialLife := 0;
+    FParticles[i].CurrentLife := 0;
+   end;
+  FEmitterType := etPoint;
+  LoopMode := TRUE;
+  EmitterLife := 3;
+  FCurrentLife := 0;
+  FParticleCount := 0;
+  ParticlesToEmit := CreateBoundedFParam(0, 1024);
+  Gravity := TPointFParam.Create;
+  Spread := CreateBoundedFParam(0, 360, TRUE);
+  Direction := CreateBoundedFParam(0, 360, TRUE);
+  ParticlesPositionsRelativeToEmitterPosition := FALSE;
+  SetSize(1, 1);
+
+  if ParticleRenderer = NIL then
+    ParticleRenderer := TOGLCParticleRenderer.Create(aParentScene);
 end;
 
 destructor TParticleEmitter.Destroy;
 begin
- SetLength( FParticleParam.ArrayColor, 0 ) ;
- SetLength( FParticleParam.ArraySpin, 0 ) ;
- SetLength( FParticleParam.ArraySize, 0 ) ;
- SetLength( FParticleParam.ArrayVelocity, 0 ) ;
- SetLength( FParticleParam.ArrayAVelocity, 0 ) ;
- TextureManager.Delete( FParticleParam.Texture );
- ParticlesToEmit.Free;
- Gravity.Free;
- Spread.Free;
- Direction.Free;
- inherited Destroy;
+  if FParticleParam.TextureOwner then FParentScene.TexMan.Delete(FParticleParam.Texture);
+  ParticlesToEmit.Free;
+  Gravity.Free;
+  Spread.Free;
+  Direction.Free;
+  inherited Destroy;
 end;
 
 procedure TParticleEmitter.Update(const aElapsedTime: single);
-var i, PToCreate, _Spread : integer ;
-    iLife, coeff, ang, siz{, Dir, Vel} : single ;
-    pc, nc : PPColor ;
-    ps, ns : PPSingle ;
+var i, PToCreate, _Spread: integer;
+    iLife, coeff, ang, siz: single;
+    pc, nc: PPColor;
+    ps, ns: PPSingle;
     offsetX, offsetY: single;
+j:integer;
 begin
- inherited Update( aElapsedTime );
- if FFreeze then exit;
- // update parameters
- Gravity.OnElapse( aElapsedTime );
- ParticlesToEmit.OnElapse( aElapsedTime );
- Spread.OnElapse( aElapsedTime );
- Direction.OnElapse( aElapsedTime );
- _Spread := round( Spread.Value );
- // update particles
- for i:=0 to MAX_PARTICLES-1 do
- with FParticles[i], FParticleParam do
-  begin
-   if CurrentLife > 0
-     then begin
-           CurrentLife -= aElapsedTime ;
-           if CurrentLife <= 0
-             then begin
-                   dec(FParticleCount);
-                   if FOnParticleDies<>NIL then FOnParticleDies( @FParticles[i], i );
-                  end
-             else begin
-                   iLife := (InitialLife - CurrentLife) / InitialLife;
-                   // frame index
-                   FrameIndex := FrameIndex + FrameCoeff * aElapsedTime;
-                   // color
-                   while ArrayColor[FColorIndex].Life < iLife do
-                    inc(FColorIndex) ;
-                   pc := @ArrayColor[FColorIndex-1] ;
-                   nc := @ArrayColor[FColorIndex] ;
-                   coeff := (iLife - pc^.Life) / (nc^.Life - pc^.Life) ;
-                   CurrentColor.red := pc^.C.red + round( ( nc^.C.red - pc^.C.red ) * coeff ) ;
-                   CurrentColor.green := pc^.C.green + round( ( nc^.C.green - pc^.C.green ) * coeff ) ;
-                   CurrentColor.blue := pc^.C.blue + round( ( nc^.C.blue - pc^.C.blue ) * coeff ) ;
-                   CurrentColor.alpha := pc^.C.alpha + round( ( nc^.C.alpha - pc^.C.alpha ) * coeff ) ;
-                   // size
-                   while ArraySize[FSizeIndex].Life < iLife do inc(FSizeIndex) ;
-                   ps := @ArraySize[FSizeIndex-1] ;
-                   ns := @ArraySize[FSizeIndex] ;
-                   CurrentSize := InitialSize * ( ps^.Value + ( ns^.Value - ps^.Value ) * ( iLife - ps^.Life ) / ( ns^.Life - ps^.Life ) );
-                   // Spin
-                   while ArraySpin[FSpinIndex].Life < iLife do inc(FSpinIndex) ;
-                   ps := @ArraySpin[FSpinIndex-1] ;
-                   ns := @ArraySpin[FSpinIndex] ;
-                   CurrentAngle := CurrentAngle + InitialSpin * ( ps^.Value + ( ns^.Value - ps^.Value ) * ( iLife - ps^.Life ) / ( ns^.Life - ps^.Life ) ) * aElapsedTime ;
-                   // Velocity
-                   while ArrayVelocity[FVelocityIndex].Life < iLife do inc(FVelocityIndex) ;
-                   ps := @ArrayVelocity[FVelocityIndex-1] ;
-                   ns := @ArrayVelocity[FVelocityIndex] ;
-                   CurrentVelocity := InitialVelocity + InitialVelocity * ( ps^.Value + ( ns^.Value - ps^.Value ) * ( iLife - ps^.Life ) / ( ns^.Life - ps^.Life ) ) ;
-                   // Angular Velocity
-                   while ArrayAVelocity[ FAVelocityIndex ].Life < iLife do INC( FAVelocityIndex );
-                   ps     := @ArrayAVelocity[ FAVelocityIndex-1 ];
-                   ns     := @ArrayAVelocity[ FAVelocityIndex ];
-                   CurrentAVelocity := InitialAVelocity + InitialAVelocity * ( ps^.Value + ( ns^.Value - ps^.Value ) * ( iLife - ps^.Life ) / ( ns^.Life - ps^.Life ) );
-                   CurrentDirection += CurrentAVelocity * aElapsedTime ;
+  inherited Update(aElapsedTime);
+  if FFreeze then exit;
 
-                   VX := cos( CurrentDirection * deg2rad ) * CurrentVelocity ;
-                   VY := sin( CurrentDirection * deg2rad ) * CurrentVelocity ;
-                   // Gravity
-                   X += ( VX + Gravity.x.Value ) * aElapsedTime ;
-                   Y += ( VY + Gravity.y.Value ) * aElapsedTime ;
-                  end;
-          end;
+  // update parameters
+  Gravity.OnElapse(aElapsedTime);
+  ParticlesToEmit.OnElapse(aElapsedTime);
+  Spread.OnElapse(aElapsedTime);
+  Direction.OnElapse(aElapsedTime);
+  _Spread := Round(Spread.Value);
+
+  // update particles
+  for i:=0 to MAX_PARTICLES-1 do
+   with FParticles[i], FParticleParam do begin
+     if CurrentLife > 0 then begin
+       CurrentLife -= aElapsedTime;
+       if CurrentLife <= 0 then begin
+         dec(FParticleCount);
+         if FOnParticleDies <> NIL then FOnParticleDies(@FParticles[i], i);
+       end
+       else begin
+         iLife := (InitialLife - CurrentLife) / InitialLife;
+         // frame index
+         FrameIndex := FrameIndex + FrameCoeff * aElapsedTime;
+         // color
+         while ArrayColor[FColorIndex].Life < iLife do inc(FColorIndex);
+         pc := @ArrayColor[FColorIndex-1];
+         nc := @ArrayColor[FColorIndex];
+         coeff := (iLife - pc^.Life) / (nc^.Life - pc^.Life);
+         if coeff < 0 then coeff := 0; // necessary for tool Particles Editor
+         CurrentColor.red := pc^.C.red + round((nc^.C.red - pc^.C.red) * coeff);
+         CurrentColor.green := pc^.C.green + round(( nc^.C.green - pc^.C.green ) * coeff);
+         CurrentColor.blue := pc^.C.blue + round((nc^.C.blue - pc^.C.blue) * coeff );
+         CurrentColor.alpha := pc^.C.alpha + round((nc^.C.alpha - pc^.C.alpha) * coeff);
+         // size
+         while ArraySize[FSizeIndex].Life < iLife do inc(FSizeIndex);
+         ps := @ArraySize[FSizeIndex-1];
+         ns := @ArraySize[FSizeIndex];
+         CurrentSize := InitialSize * (ps^.Value + (ns^.Value - ps^.Value) * (iLife - ps^.Life) / (ns^.Life - ps^.Life));
+         // Spin
+         while ArraySpin[FSpinIndex].Life < iLife do inc(FSpinIndex);
+         ps := @ArraySpin[FSpinIndex-1] ;
+         ns := @ArraySpin[FSpinIndex] ;
+         CurrentAngle := CurrentAngle + InitialSpin * (ps^.Value + (ns^.Value - ps^.Value) * (iLife - ps^.Life) / (ns^.Life - ps^.Life)){ * aElapsedTime};
+         // Velocity
+         while ArrayVelocity[FVelocityIndex].Life < iLife do inc(FVelocityIndex);
+         ps := @ArrayVelocity[FVelocityIndex-1] ;
+         ns := @ArrayVelocity[FVelocityIndex] ;
+         CurrentVelocity := InitialVelocity + InitialVelocity * (ps^.Value + (ns^.Value - ps^.Value) * (iLife - ps^.Life) / (ns^.Life - ps^.Life));
+         // Angular Velocity
+         while ArrayAVelocity[FAVelocityIndex].Life < iLife do inc(FAVelocityIndex);
+         ps := @ArrayAVelocity[ FAVelocityIndex-1 ];
+         ns := @ArrayAVelocity[ FAVelocityIndex ];
+         CurrentAVelocity := InitialAVelocity + InitialAVelocity * (ps^.Value + (ns^.Value - ps^.Value) * (iLife - ps^.Life) / (ns^.Life - ps^.Life));
+         CurrentDirection += CurrentAVelocity * aElapsedTime;
+
+         VX := cos(CurrentDirection * deg2rad) * CurrentVelocity;
+         VY := sin(CurrentDirection * deg2rad) * CurrentVelocity;
+         // Gravity
+         X += (VX + Gravity.x.Value) * aElapsedTime;
+         Y += (VY + Gravity.y.Value) * aElapsedTime;
+       end;
+     end;
+   end;
+
+  // Emitter life
+  FCurrentLife -= aElapsedTime;
+  if not LoopMode and (FCurrentLife <= 0) then begin
+    FCurrentLife := 0;
+    exit;
   end;
- // Emitter life
- FCurrentLife -= aElapsedTime ;
- if ( FCurrentLife <= 0 ) and not LoopMode
-   then begin
-         FCurrentLife := 0 ;
-         exit ;
+
+  // create new particles
+  if ParticlesToEmit.Value = 0.0 then exit;
+  FParticleRate := 1/ParticlesToEmit.Value;
+  FParticleRateCount += aElapsedTime;
+  PToCreate := 0;
+  while FParticleRateCount > FParticleRate do begin
+    FParticleRateCount -= FParticleRate;
+    inc(PToCreate);
+  end;
+  if FParticleCount + PToCreate > MAX_PARTICLES then PToCreate := MAX_PARTICLES - FParticleCount;
+  if PToCreate > 0 then begin
+    FParticleCount += PToCreate;
+    i := 0;
+    repeat
+      while FParticles[i].CurrentLife > 0 do inc(i);
+      FParticles[i].InitialLife := FParticleParam.Life + random(round(FParticleParam.LifeVariation*1000))*0.001-FParticleParam.LifeVariation*0.5;
+      FParticles[i].CurrentLife := FParticles[i].InitialLife;
+
+      FParticles[i].FrameIndex := FParticleParam.StartFrame;
+      FParticles[i].FrameCoeff := (FParticleParam.EndFrame - FParticleParam.StartFrame) / FParticles[i].InitialLife;
+
+      FParticles[i].CurrentColor := FParticleParam.ArrayColor[0].C;
+      FParticles[i].FColorIndex := 1;
+
+      FParticles[i].CurrentAngle := FParticleParam.StartAngle + random*FParticleParam.StartAngleVariation-FParticleParam.StartAngleVariation*0.5; // random(round(FParticleParam.StartAngleVariation*1000))*0.001;
+
+      FParticles[i].InitialSpin := FParticleParam.Spin + random*FParticleParam.SpinVariation-FParticleParam.SpinVariation*0.5; // random(round(FParticleParam.SpinVariation*1000))*0.001;
+      FParticles[i].FSpinIndex := 1;
+
+      FParticles[i].InitialSize := FParticleParam.Size + random*FParticleParam.SizeVariation-FParticleParam.SizeVariation*0.5; //+ random(round(FParticleParam.SizeVariation*1000))*0.001;
+      FParticles[i].InitialSize := FParticles[i].InitialSize * FParticleParam.ArraySize[0].Value;
+      FParticles[i].CurrentSize := FParticles[i].InitialSize;
+      FParticles[i].FSizeIndex := 1;
+
+      offsetX := -FParticleParam.Texture^.FrameWidth*0.5;
+      offsetY := -FParticleParam.Texture^.FrameHeight*0.5;
+      if not ParticlesPositionsRelativeToEmitterPosition then begin
+        offsetX += Self.X.Value;
+        offsetY += Self.Y.Value;
+      end;
+      FParticles[i].CurrentDirection := Direction.value + random(_Spread) - _Spread * 0.5 - 90;
+      case FEmitterType of
+        etPoint: begin
+          FParticles[i].X := offsetX;
+          FParticles[i].Y := offsetY;
         end;
- // create new particles
- if ParticlesToEmit.Value = 0.0 then exit;
- FParticleRate := 1/ParticlesToEmit.Value;
- FParticleRateCount += aElapsedTime ;
- PToCreate := 0 ;
- while FParticleRateCount > FParticleRate do
-  begin
-   FParticleRateCount -= FParticleRate;
-   inc(PToCreate) ;
+        etLine: begin
+          siz := random(round(FLineSize*1000))*0.001;
+          ang := Direction.Value * deg2rad;
+          FParticles[i].X := cos(ang) * siz + offsetX;
+          FParticles[i].Y := sin(ang) * siz + offsetY;
+        end;
+        etRectangle: begin
+          FParticles[i].X := random(Width) + offsetX;
+          FParticles[i].Y := random(Height) + offsetY;
+        end;
+        etCircle: begin
+          ang := random(360) * deg2rad;
+          siz := random(round(FSmallRadius*1000))*0.001;
+          FParticles[i].X := cos(ang) * siz + offsetX;
+          FParticles[i].Y := sin(ang) * siz + offsetY;
+        end;
+        etInnerCircle: begin
+          ang := random(360) * deg2rad;
+          FParticles[i].X := cos(ang) * FSmallRadius + offsetX;
+          FParticles[i].Y := sin(ang) * FSmallRadius + offsetY;
+          FParticles[i].CurrentDirection := CartesianToPolar(PointF(FParticles[i].X,FParticles[i].Y), GetXY ).Angle;
+        end;
+        etOuterCircle: begin
+          ang := random(360) * deg2rad;
+          FParticles[i].X := cos(ang) * FSmallRadius + offsetX;
+          FParticles[i].Y := sin(ang) * FSmallRadius + offsetY;
+          FParticles[i].CurrentDirection := CartesianToPolar( GetXY, PointF(FParticles[i].X,FParticles[i].Y) ).Angle;
+        end;
+        etRing: begin
+          ang := random(360) * deg2rad;
+          siz := random(round((FBigRadius-FSmallRadius)*1000))*0.001+FSmallRadius;
+          FParticles[i].X := cos(ang) * siz + offsetX;
+          FParticles[i].Y := sin(ang) * siz + offsetY;
+        end;
+      end;//case
+
+      FParticles[i].InitialVelocity := FParticleParam.Velocity + random*FParticleParam.VelocityVariation - FParticleParam.VelocityVariation * 0.5; //+ random(round(FParticleParam.VelocityVariation)) - FParticleParam.VelocityVariation * 0.5;
+      FParticles[i].CurrentVelocity := FParticles[i].InitialVelocity + FParticles[i].InitialVelocity * FParticleParam.ArrayVelocity[0].Value;
+      FParticles[i].FVelocityIndex := 1;
+
+      FParticles[i].InitialAVelocity := FParticleParam.AVelocity + random*FParticleParam.AVelocityVariation - FParticleParam.AVelocityVariation * 0.5; //+ random( round( FParticleParam.AVelocityVariation)) - FParticleParam.AVelocityVariation * 0.5;
+      FParticles[i].CurrentAVelocity := FParticles[i].InitialAVelocity + FParticles[i].InitialAVelocity * FParticleParam.ArrayAVelocity[0].Value;
+      FParticles[i].FAVelocityIndex := 1;
+
+      inc(i);
+      dec(PToCreate);
+    until PToCreate = 0;
   end;
-  if FParticleCount + PToCreate > MAX_PARTICLES then PToCreate := MAX_PARTICLES - FParticleCount ;
-  if PToCreate > 0
-    then begin
-          FParticleCount += PToCreate ;
-          i := 0 ;
-          repeat
-           while FParticles[i].CurrentLife > 0 do inc( i ) ;
-           FParticles[i].InitialLife := FParticleParam.Life + random(round(FParticleParam.LifeVariation*1000))*0.001;
-           FParticles[i].CurrentLife := FParticles[i].InitialLife ;
-
-           FParticles[i].FrameIndex := FParticleParam.StartFrame;
-           FParticles[i].FrameCoeff := (FParticleParam.EndFrame - FParticleParam.StartFrame) / FParticles[i].InitialLife;
-
-           FParticles[i].CurrentColor := FParticleParam.ArrayColor[0].C ;
-           FParticles[i].FColorIndex := 1 ;
-
-           FParticles[i].CurrentAngle := FParticleParam.StartAngle + random( round(FParticleParam.StartAngleVariation*1000) )*0.001 ;
-
-           FParticles[i].InitialSpin := FParticleParam.Spin + random( round(FParticleParam.SpinVariation*1000) )*0.001 ;
-           FParticles[i].FSpinIndex := 1 ;
-
-           FParticles[i].InitialSize := FParticleParam.Size + random( round(FParticleParam.SizeVariation*1000) )*0.001 ;
-           FParticles[i].InitialSize := FParticles[i].InitialSize * FParticleParam.ArraySize[0].Value ;
-           FParticles[i].CurrentSize := FParticles[i].InitialSize ;
-           FParticles[i].FSizeIndex := 1 ;
-
-           offsetX := -FParticleParam.Texture^.FrameWidth*0.5;
-           offsetY := -FParticleParam.Texture^.FrameHeight*0.5;
-           if not ParticlesPositionsRelativeToEmitterPosition then begin
-            offsetX += Self.X.Value;
-            offsetY += Self.Y.Value;
-           end;
-           FParticles[i].CurrentDirection := ( Direction.value + random( _Spread ) - _Spread * 0.5 );
-           case FEmitterType of
-            etPoint: begin
-              FParticles[i].X := offsetX;
-              FParticles[i].Y := offsetY;
-            end;
-            etLine: begin
-             siz := random(round(FLineSize*1000))*0.001;
-             ang := Direction.Value * deg2rad;
-             FParticles[i].X := cos( ang ) * siz + offsetX;
-             FParticles[i].Y := sin( ang ) * siz + offsetY;
-             FParticles[i].CurrentDirection := FParticles[i].CurrentDirection + 90;
-            end;
-            etRectangle: begin
-             FParticles[i].X := random( Width ) + offsetX;
-             FParticles[i].Y := random( Height ) + offsetY;
-            end;
-            etCircle: begin
-             ang := random(360) * deg2rad;
-             siz := random(round(FSmallRadius*1000))*0.001;
-             FParticles[i].X := cos( ang ) * siz + offsetX;
-             FParticles[i].Y := sin( ang ) * siz + offsetY;
-            end;
-            etInnerCircle: begin
-             ang := random(360) * deg2rad;
-             FParticles[i].X := cos( ang ) * FSmallRadius + offsetX;
-             FParticles[i].Y := sin( ang ) * FSmallRadius + offsetY;
-             FParticles[i].CurrentDirection := CartesianToPolar( PointF(FParticles[i].X,FParticles[i].Y), GetXY ).Angle;
-            end;
-            etOuterCircle: begin
-             ang := random(360) * deg2rad;
-             FParticles[i].X := cos( ang ) * FSmallRadius + offsetX;
-             FParticles[i].Y := sin( ang ) * FSmallRadius + offsetY;
-             FParticles[i].CurrentDirection := CartesianToPolar( GetXY, PointF(FParticles[i].X,FParticles[i].Y) ).Angle;
-            end;
-            etRing: begin
-             ang := random(360) * deg2rad;
-             siz := random(round((FBigRadius-FSmallRadius)*1000))*0.001+FSmallRadius;
-             FParticles[i].X := cos( ang ) * siz + offsetX;
-             FParticles[i].Y := sin( ang ) * siz + offsetY;
-            end;
-           end;//case
-
-           FParticles[i].InitialVelocity := FParticleParam.Velocity + random( round( FParticleParam.VelocityVariation ) ) - FParticleParam.VelocityVariation * 0.5 ;
-           FParticles[i].CurrentVelocity := FParticles[i].InitialVelocity + FParticles[i].InitialVelocity * FParticleParam.ArrayVelocity[0].Value ;
-           FParticles[i].FVelocityIndex := 1 ;
-
-           FParticles[i].InitialAVelocity := FParticleParam.AVelocity + random( round( FParticleParam.AVelocityVariation ) ) - FParticleParam.AVelocityVariation * 0.5 ;
-           FParticles[i].CurrentAVelocity := FParticles[i].InitialAVelocity + FParticles[i].InitialAVelocity * FParticleParam.ArrayAVelocity[0].Value ;
-           FParticles[i].FAVelocityIndex := 1 ;
-
-           inc( i ) ;
-           dec( PToCreate ) ;
-          until PToCreate = 0 ;
-         end;
 end;
 
 procedure TParticleEmitter.Draw(const aLayerPercentOpacity: single);
 var i: integer ;
-    a : byte ;
-    aa: single;
     {$IFDEF DEBUG_MODE_ON}
       xL,xR,yT,yB: single;
     {$ENDIF}
+    computedTint: TColorF;
+    computedOpacity: single;
+    pivotX, pivotY: single;
+    mv: TOGLCMatrix;
 begin
- if FParticleCount = 0
-   then begin
-         {$IFDEF DEBUG_MODE_ON}
-           DrawBox(X.Value, Y.Value, Width, Height, BGRA(255,0,0));
-         {$ENDIF}
-         exit ;
-   end;
- if FParticleParam.Texture = NIL then exit ;
- SetBlendMode( FParticleParam.BlendMode );
+  if FParticleParam.Texture = NIL then exit;
+  if FParticleCount = 0 then begin
+    {$IFDEF DEBUG_MODE_ON}
+    DrawBox(FParentScene, X.Value, Y.Value, Width, Height, BGRA(255,0,0));
+    {$ENDIF}
+    exit;
+  end;
+  {$IFDEF DEBUG_MODE_ON}
+    xL := X.Value;
+    xR := RightX;
+    yT := Y.Value;
+    yB := BottomY;
+  {$ENDIF}
 
- TextureManager.BindTexture( FParticleParam.Texture );
+  FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
+  if ParticlesPositionsRelativeToEmitterPosition then begin
+   PushAndPrepareSceneMV;
+  end;
 
- if FParticleParam.ColorMode = FX_COLOR_SET
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB );
-         glTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB,  GL_PRIMARY_COLOR_ARB );
-        end
-   else glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+//  FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FParticleParam.Texture, 0, FBlendMode);
 
- aa := Opacity.Value/255;
+  ParticleRenderer.Prepare(FParticleParam.Texture, 0, FBlendMode);
 
- {$IFDEF DEBUG_MODE_ON}
-   xL := X.Value;
-   xR := RightX;
-   yT := Y.Value;
-   yB := BottomY;
- {$ENDIF}
+  pivotX := FParticleParam.Texture^.FrameWidth*0.5;
+  pivotY := FParticleParam.Texture^.FrameHeight*0.5;
+  for i:=0 to MAX_PARTICLES-1 do
+   with FParticles[i] do
+    if CurrentLife > 0 then begin
+      mv.CopyFrom(FParentScene.ModelViewMatrix);
+      mv.AddTransform(X, Y, CurrentSize, CurrentSize, CurrentAngle, pivotX, pivotY);
+      computedTint.InitFromBGRA(CurrentColor);
+      computedTint.a := 1.0;
+      computedOpacity := FComputedOpacity*CurrentColor.alpha*OneDiv255;
+      ParticleRenderer.PushQuad(Trunc(FrameIndex), 0, @mv.Matrix, computedOpacity, computedTint);
+      {$IFDEF DEBUG_MODE_ON}
+       if xL > X then xL := X;
+       if xR < X then xR := X;
+       if yT > Y then yT := Y;
+       if yB < Y then yB := Y;
+      {$ENDIF}
+    end;
+//  ParticleRenderer.Batch_Flush;
 
+  if ParticlesPositionsRelativeToEmitterPosition then PopSceneMV;
 
- if ParticlesPositionsRelativeToEmitterPosition then begin
-// PushAndPrepareMatrix;
-   glPushMatrix;
-   if FParentSurface = NIL then glTranslatef( X.Value + Width * 0.5, Y.Value + Height * 0.5 , 0 )
-                           else glTranslatef( X.Value + Width * 0.5 * Scale.x.Value, Y.Value + Height * 0.5 * Scale.y.Value, 0 );
-   glScalef( Scale.x.Value, Scale.y.Value, 0 );
-   glRotatef( Angle.Value, 0, 0, 1 );
-   glTranslatef( -Width * 0.5, -Height * 0.5, 0 );
- end;
-
- for i:=0 to MAX_PARTICLES-1 do
-  with FParticles[i] do
-   if CurrentLife > 0
-     then begin
-           a := CurrentColor.alpha;
-           CurrentColor.alpha := round ( CurrentColor.alpha * aLayerPercentOpacity * aa );
-           DrawParticleTexture( FParticleParam.Texture, round( FrameIndex ), CurrentColor, X, Y, CurrentAngle, CurrentSize );
-           CurrentColor.alpha := a;
-           {$IFDEF DEBUG_MODE_ON}
-             if xL > X then xL := X;
-             if xR < X then xR := X;
-             if yT > Y then yT := Y;
-             if yB < Y then yB := Y;
-           {$ENDIF}
-     end;
-
- if ParticlesPositionsRelativeToEmitterPosition then PopMatrix;
-
- {$IFDEF DEBUG_MODE_ON}
-   SetBlendMode(FX_BLEND_NORMAL);
-   TextureManager.DisableTextureUsage;
-   DrawBox( xL, yT, xR-xL, yB-yT, BGRA(255,255,0));
- {$ENDIF}
+  {$IFDEF DEBUG_MODE_ON}
+    SetBlendMode(FX_BLEND_NORMAL);
+    DrawBox(FParentScene, xL, yT, xR-xL, yB-yT, BGRA(255,0,0));
+  {$ENDIF}
 end;
 
-procedure TParticleEmitter.LoadFromFile(const aFilename: string);
+procedure TParticleEmitter.DoDraw;
+begin
+end;
+
+procedure TParticleEmitter.LoadFromFile(const aFilename: string; aAtlas: TOGLCTextureAtlas);
 var F: TStringList;
     i, k, count :integer;
-    SplittedText: ArrayOfString;
+    SplittedText: TStringArray;
 begin
- Clear;
- F := TStringList.Create;
- try
-   F.LoadFromFile( aFilename );
+  Clear;
+  F := TStringList.Create;
+  try
+    F.LoadFromFile(aFilename);
 
-   k := F.IndexOf('E_Coor');
-   SplittedText := F.Strings[k+1].Split([' ']);
-   x.Value := StringToSingle( SplittedText[0] );
-   y.Value := StringToSingle( SplittedText[1] );
+    k := F.IndexOf('E_Coor');
+    SplittedText := F.Strings[k+1].Split([' ']);
+    x.Value := StringToSingle(SplittedText[0]);
+    y.Value := StringToSingle(SplittedText[1]);
 
-   k := F.IndexOf('E_Direction');
-   Direction.Value := StringToSingle( F.Strings[k+1] );
+    k := F.IndexOf('E_Direction');
+    Direction.Value := StringToSingle(F.Strings[k+1]);
 
    k := F.IndexOf('E_Spread');
-   Spread.Value := StringToSingle( F.Strings[k+1] );
+   Spread.Value := StringToSingle(F.Strings[k+1]);
 
    k := F.IndexOf('E_Life');
-   EmitterLife := StringToSingle( F.Strings[k+1] );
+   EmitterLife := StringToSingle(F.Strings[k+1]);
 
    k := F.IndexOf('E_LoopMode');
    LoopMode := (F.Strings[k+1] = 'TRUE') or (F.Strings[k+1] = 'True') or (F.Strings[k+1] = 'true');
 
    k := F.IndexOf('E_Emission');
-   ParticlesToEmit.Value := StrToInt( F.Strings[k+1] );
+   ParticlesToEmit.Value := F.Strings[k+1].ToInteger;
    FParticleRate := 1/ParticlesToEmit.Value;
    FParticleRateCount := 0;
 
    k := F.IndexOf('E_Gravity');
    SplittedText := F.Strings[k+1].Split([' ']);
-   Gravity.x.Value := StringToSingle( SplittedText[0] );
-   Gravity.y.Value := StringToSingle( SplittedText[1] );
+   Gravity.x.Value := StringToSingle(SplittedText[0]);
+   Gravity.y.Value := StringToSingle(SplittedText[1]);
 
    k := F.IndexOf('E_GlobalOpacity');
    if k<>-1
-     then Opacity.Value := StringToSingle( F.Strings[k+1] )
+     then Opacity.Value := StringToSingle(F.Strings[k+1])
      else Opacity.Value := 255;
 
   k := F.IndexOf('E_Type');
-  if k<>-1 then begin
-   SplittedText := F.Strings[k+1].Split([' ']);
-   case strtoint( SplittedText[0] ) of
-    1: SetEmitterTypeLine( Direction.Value, StringToSingle(SplittedText[1]) );
-    2: SetEmitterTypeRectangle( strtoint(SplittedText[1]), strtoint(SplittedText[2]) );
-    3: SetEmitterTypeCircle( StringToSingle(SplittedText[1]) );
-    4: SetEmitterTypeRing( StringToSingle(SplittedText[1]), StringToSingle(SplittedText[1]) );
-    5: SetEmitterTypeInnerCircle( StringToSingle(SplittedText[1]) );
-    6: SetEmitterTypeOuterCircle( StringToSingle(SplittedText[1]) )
-    else SetEmitterTypePoint;
-   end;//case
+  if k<>-1 then
+  begin
+    SplittedText := F.Strings[k+1].Split([' ']);
+    case SplittedText[0].ToInteger of
+     1: SetEmitterTypeLine(Direction.Value, StringToSingle(SplittedText[1]));
+     2: SetEmitterTypeRectangle(SplittedText[1].ToInteger, SplittedText[2].ToInteger);
+     3: SetEmitterTypeCircle(StringToSingle(SplittedText[1]));
+     4: SetEmitterTypeRing(StringToSingle(SplittedText[1]), StringToSingle(SplittedText[1]));
+     5: SetEmitterTypeInnerCircle(StringToSingle(SplittedText[1]));
+     6: SetEmitterTypeOuterCircle(StringToSingle(SplittedText[1]))
+     else SetEmitterTypePoint;
+    end;//case
   end else SetEmitterTypePoint;
 
   k := F.IndexOf('P_ParticlesPositionsRelativeToEmitterPosition');
   if k<>-1 then
-    ParticlesPositionsRelativeToEmitterPosition := (F.Strings[k+1] = 'TRUE') or (F.Strings[k+1] = 'True') or (F.Strings[k+1] = 'true')
-  else ParticlesPositionsRelativeToEmitterPosition:=FALSE;
+    ParticlesPositionsRelativeToEmitterPosition := LowerCase(F.Strings[k+1]) = 'true'
+  else ParticlesPositionsRelativeToEmitterPosition := FALSE;
 
    k := F.IndexOf('P_Texture');
    SplittedText := F.Strings[k+2].Split([' ']);
-   if FParticleParam.Texture <> NIL
-     then TextureManager.Delete( FParticleParam.Texture );
-   FParticleParam.Texture := TextureManager.Add( ExtractFilePath( aFilename ) + F.Strings[k+1],
-                                                 strtoint( SplittedText[0] ), strtoint( SplittedText[1] ));
+   if (FParticleParam.Texture <> NIL) and FParticleParam.TextureOwner then
+     FParentScene.TexMan.Delete(FParticleParam.Texture);
+   if aAtlas = NIL then begin
+     FParticleParam.Texture := FParentScene.TexMan.Add(ExtractFilePath(aFilename) + F.Strings[k+1],
+                                                SplittedText[0].ToInteger, SplittedText[1].ToInteger);
+     FParticleParam.TextureOwner := True;
+   end else begin
+     FParticleParam.Texture := aAtlas.RetrieveTextureByFileName(F.Strings[k+1]);
+     FParticleParam.TextureOwner := False;
+     if FParticleParam.Texture = NIL then begin
+       FParentScene.LogWarning('TParticleEmitter.LoadFromFile: texture not found in atlas');
+       FParentScene.LogMess('particle file: '+aFilename, 1);
+       FParentScene.LogMess('texture filename: '+F.Strings[k+1], 1);
+     end;
+   end;
 
    k := F.IndexOf('P_Frame');   // StartFrameIndex EndFrameIndex
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.StartFrame := StrToInt( SplittedText[0] );
-   FParticleParam.EndFrame := StrToInt( SplittedText[1] );
+   FParticleParam.StartFrame := SplittedText[0].ToInteger;
+   FParticleParam.EndFrame := SplittedText[1].ToInteger;
 
    k := F.IndexOf('P_Life');  // Life  LifeVariation
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.Life := StringToSingle( SplittedText[0] );
-   FParticleParam.LifeVariation := StringToSingle( SplittedText[1] );
+   FParticleParam.Life := StringToSingle(SplittedText[0]);
+   FParticleParam.LifeVariation := StringToSingle(SplittedText[1]);
 
    k := F.IndexOf('P_ColorMode');
-   FParticleParam.ColorMode := StrToint( F.Strings[k+1] );
+   TintMode := TTintMode(F.Strings[k+1].ToInteger);
 
    k := F.IndexOf('P_BlendMode');
-   FParticleParam.BlendMode := StrToint( F.Strings[k+1] );
+   FBlendMode := F.Strings[k+1].ToInteger;
 
    k := F.IndexOf('P_Color');    // count   lifepos red green blue alpha    life red green...
    SplittedText := F.Strings[k+1].Split([' ']);
-   count := StrToInt( SplittedText[0] );
-   SetLength( FParticleParam.ArrayColor, count );
+   count := SplittedText[0].ToInteger;
+   SetLength(FParticleParam.ArrayColor, count);
    k := 1 ;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayColor[i].Life := StringToSingle( SplittedText[k] ) ;
-     FParticleParam.ArrayColor[i].C.red := StrToInt( SplittedText[k+1] ) ;
-     FParticleParam.ArrayColor[i].C.green := StrToInt( SplittedText[k+2] ) ;
-     FParticleParam.ArrayColor[i].C.blue := StrToInt( SplittedText[k+3] ) ;
-     FParticleParam.ArrayColor[i].C.alpha := StrToInt( SplittedText[k+4] ) ;
-     inc(k,5);
+     if i = 0 then FParticleParam.ArrayColor[i].Life := 0.0
+       else if i = count-1 then FParticleParam.ArrayColor[i].Life := 1.0
+         else FParticleParam.ArrayColor[i].Life := StringToSingle(SplittedText[k]);
+     FParticleParam.ArrayColor[i].C.red := SplittedText[k+1].ToInteger;
+     FParticleParam.ArrayColor[i].C.green := SplittedText[k+2].ToInteger;
+     FParticleParam.ArrayColor[i].C.blue := SplittedText[k+3].ToInteger;
+     FParticleParam.ArrayColor[i].C.alpha := SplittedText[k+4].ToInteger;
+     inc(k, 5);
     end;
 
    k := F.IndexOf('P_Velocity');  // velocity velocityVariation count   lifepos value   lifepos value...
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.Velocity := StringToSingle( SplittedText[0] );
-   FParticleParam.VelocityVariation := StringToSingle( SplittedText[1] );
-   count := StrToInt( SplittedText[2] );
-   SetLength( FParticleParam.ArrayVelocity, count );
+   FParticleParam.Velocity := StringToSingle(SplittedText[0]);
+   FParticleParam.VelocityVariation := StringToSingle(SplittedText[1]);
+   count := SplittedText[2].ToInteger;
+   SetLength(FParticleParam.ArrayVelocity, count);
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayVelocity[i].Life := StringToSingle( SplittedText[k] );
-     FParticleParam.ArrayVelocity[i].Value := StringToSingle( SplittedText[k+1] );
-     inc(k,2);
+     if i = 0 then FParticleParam.ArrayVelocity[i].Life := 0.0
+       else if i = count-1 then FParticleParam.ArrayVelocity[i].Life := 1.0
+         else FParticleParam.ArrayVelocity[i].Life := StringToSingle(SplittedText[k]);
+     FParticleParam.ArrayVelocity[i].Value := StringToSingle(SplittedText[k+1]);
+     inc(k, 2);
     end;
 
    k := F.IndexOf('P_AVelocity');     // AngleVelocity AngleVelocityVariation Count   lifepos value   lifepos value...
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.AVelocity := StringToSingle( SplittedText[0] );
-   FParticleParam.AVelocityVariation := StringToSingle( SplittedText[1] );
-   count := StrToInt( SplittedText[2] );
-   SetLength( FParticleParam.ArrayAVelocity, count );
+   FParticleParam.AVelocity := StringToSingle(SplittedText[0]);
+   FParticleParam.AVelocityVariation := StringToSingle(SplittedText[1]);
+   count := SplittedText[2].ToInteger;
+   SetLength(FParticleParam.ArrayAVelocity, count);
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArrayAVelocity[i].Life := StringToSingle( SplittedText[k] );
-     FParticleParam.ArrayAVelocity[i].Value := StringToSingle( SplittedText[k+1] );
-     inc(k,2);
+     if i = 0 then FParticleParam.ArrayAVelocity[i].Life := 0.0
+       else if i = count-1 then FParticleParam.ArrayAVelocity[i].Life := 1.0
+         else FParticleParam.ArrayAVelocity[i].Life := StringToSingle(SplittedText[k]);
+     FParticleParam.ArrayAVelocity[i].Value := StringToSingle(SplittedText[k+1]);
+     inc(k, 2);
     end;
 
    k := F.IndexOf('P_Size');   // Size SizeVariation Count   lifepos value   lifepos value...
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.Size := StringToSingle( SplittedText[0] );
-   FParticleParam.SizeVariation := StringToSingle( SplittedText[1] );
-   count := StrToInt( SplittedText[2] );
-   SetLength( FParticleParam.ArraySize, count );
+   FParticleParam.Size := StringToSingle(SplittedText[0]);
+   FParticleParam.SizeVariation := StringToSingle(SplittedText[1]);
+   count := SplittedText[2].ToInteger;
+   SetLength(FParticleParam.ArraySize, count);
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArraySize[i].Life := StringToSingle( SplittedText[k] );
-     FParticleParam.ArraySize[i].Value := StringToSingle( SplittedText[k+1] );
-     inc(k,2);
+     if i = 0 then FParticleParam.ArraySize[i].Life := 0.0
+       else if i = count-1 then FParticleParam.ArraySize[i].Life := 1.0
+         else FParticleParam.ArraySize[i].Life := StringToSingle(SplittedText[k]);
+     FParticleParam.ArraySize[i].Value := StringToSingle(SplittedText[k+1]);
+     inc(k, 2);
     end;
 
    k := F.IndexOf('P_StartAngle');  // StartAngle StartAngleVariation
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.StartAngle := StringToSingle( SplittedText[0] );
-   FParticleParam.StartAngleVariation := StringToSingle( SplittedText[1] );
+   FParticleParam.StartAngle := StringToSingle(SplittedText[0]);
+   FParticleParam.StartAngleVariation := StringToSingle(SplittedText[1]);
 
    k := F.IndexOf('P_Spin');    // Spin SpinVariation Count   lifepos value   lifepos value...
    SplittedText := F.Strings[k+1].Split([' ']);
-   FParticleParam.Spin := StringToSingle( SplittedText[0] );
-   FParticleParam.SpinVariation := StringToSingle( SplittedText[1] );
-   count := StrToInt( SplittedText[2] );
-   SetLength( FParticleParam.ArraySpin, count );
+   FParticleParam.Spin := StringToSingle(SplittedText[0]);
+   FParticleParam.SpinVariation := StringToSingle(SplittedText[1]);
+   count := SplittedText[2].ToInteger;
+   SetLength(FParticleParam.ArraySpin, count);
    k := 3;
    for i:=0 to count-1 do
     begin
-     FParticleParam.ArraySpin[i].Life := StringToSingle( SplittedText[k] );
-     FParticleParam.ArraySpin[i].Value := StringToSingle( SplittedText[k+1] );
-     inc(k,2);
+     if i = 0 then FParticleParam.ArraySpin[i].Life := 0.0
+       else if i = count-1 then FParticleParam.ArraySpin[i].Life := 1.0
+         else FParticleParam.ArraySpin[i].Life := StringToSingle(SplittedText[k]);
+     FParticleParam.ArraySpin[i].Value := StringToSingle(SplittedText[k+1]);
+     inc(k, 2);
     end;
  finally
-  F.Free ;
+  F.Free;
  end;
 end;
 
@@ -609,157 +933,91 @@ begin
  Result := FHeight;
 end;
 
-procedure TParticleEmitter.DrawParticleTexture(aTexture: PTexture;
-  AFrameIndex: integer; aTint: TBGRAPixel; aX, aY, aAngle, aZoom: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  TexCoord : TTexCoor;
-  aW, aH : Single ;
-  x1, x2 : Single;
-  y1, y2 : Single;
-  cX, cY : Single;
-  c, s   : Single;
-begin
-
- if aTexture = nil then exit;
- aW := aTexture^.FrameWidth;
- aH := aTexture^.FrameHeight;
-
- if AFrameIndex>=aTexture^.FrameCount
-   then AFrameIndex := aTexture^.FrameCount-1
-   else if AFrameIndex<0
-          then AFrameIndex :=0;
- TexCoord := aTexture^.FramesCoord[AFrameIndex];
-
- // Zoom
- if aZoom <> 1 Then
-   begin
-     aX := aX + ( aW - aW * aZoom ) / 2 ;
-     aY := aY + ( aH - aH * aZoom ) / 2 ;
-     aW := aW * aZoom ;
-     aH := aH * aZoom ;
-   end;
- // Angle
- if aAngle <> 0
-   then begin
-         x1 := -aW / 2;
-         y1 := -aH / 2;
-         x2 := -x1;
-         y2 := -y1;
-         cX :=  aX + x2;
-         cY :=  aY + y2;
-         sincos( aAngle * deg2rad, s, c );
-         quad[ 0 ].X := x1 * c - y1 * s + cX; quad[ 0 ].Y := x1 * s + y1 * c + cY;
-         quad[ 1 ].X := x2 * c - y1 * s + cX; quad[ 1 ].Y := x2 * s + y1 * c + cY;
-         quad[ 2 ].X := x2 * c - y2 * s + cX; quad[ 2 ].Y := x2 * s + y2 * c + cY;
-         quad[ 3 ].X := x1 * c - y2 * s + cX; quad[ 3 ].Y := x1 * s + y2 * c + cY;
-        end
-   else begin
-         quad[ 0 ].X := aX; quad[ 0 ].Y := aY;
-         quad[ 1 ].X := aX + aW; quad[ 1 ].Y := aY;
-         quad[ 2 ].X := aX + aW; quad[ 2 ].Y := aY + aH;
-         quad[ 3 ].X := aX; quad[ 3 ].Y := aY + aH;
-        end;
-
- glColor4ub( aTint.red, aTint.green, aTint.blue, aTint.alpha );
- glBegin( GL_QUADS );
-  glTexCoord2fv( @TexCoord[0] );  glVertex2fv( @quad[ 0 ] );
-  glTexCoord2fv( @TexCoord[1] );  glVertex2fv( @quad[ 1 ] );
-  glTexCoord2fv( @TexCoord[2] );  glVertex2fv( @quad[ 2 ] );
-  glTexCoord2fv( @TexCoord[3] );  glVertex2fv( @quad[ 3 ] );
- glEnd;
-
-//   TextureManager.DisableTextureUsage;
-//   DrawPolygon( quad, BGRA(255,0,0), 1);
-end;
-
 procedure TParticleEmitter.Shoot;
 begin
- FCurrentLife := EmitterLife;
- FParticleRateCount := 0;
+  FCurrentLife := EmitterLife;
+  FParticleRateCount := 0;
 end;
 
 procedure TParticleEmitter.Clear;
-var i: integer ;
+var i: integer;
 begin
- for i:=0 to MAX_PARTICLES-1 do
+  for i:=0 to MAX_PARTICLES-1 do
   begin
-   FParticles[i].CurrentLife := 0 ;
-   FParticles[i].InitialLife := 0 ;
+    FParticles[i].CurrentLife := 0;
+    FParticles[i].InitialLife := 0;
   end;
- FParticleCount := 0 ;
+  FParticleCount := 0 ;
 end;
 
 procedure TParticleEmitter.SetSize(AWidth, AHeight: integer);
 begin
- FWidth := AWidth;
- FHeight := AHeight;
+  FWidth := AWidth;
+  FHeight := AHeight;
 end;
 
 procedure TParticleEmitter.SetEmitterTypePoint;
 begin
- FEmitterType := etPoint;
+  FEmitterType := etPoint;
 end;
 
-procedure TParticleEmitter.SetEmitterTypeLine( P2: TPointF);
+procedure TParticleEmitter.SetEmitterTypeLine(P2: TPointF);
 var polar: TPolarCoor;
 begin
- FEmitterType := etLine;
- FLineP2 := P2;
-
- polar := CartesianToPolar( GetXY, P2);
- FLineSize := polar.Distance;
- Direction.Value := polar.Angle;
+  FEmitterType := etLine;
+  polar := CartesianToPolar(GetXY, P2);
+  FLineSize := polar.Distance;
+  Direction.Value := polar.Angle;
+  EmitterParam.LineSize := FLineSize;
 end;
 
-procedure TParticleEmitter.SetEmitterTypeLine(aDirection, aSize: single );
-var polar: TPolarCoor;
+procedure TParticleEmitter.SetEmitterTypeLine(aDirection, aSize: single);
 begin
- polar.Angle:=aDirection;
- polar.Distance:=aSize;
- FLineP2 := PolarToCartesian( GetXY, polar);
-
- FEmitterType := etLine;
- Direction.Value := aDirection;
- FLineSize := aSize;
-
+  FEmitterType := etLine;
+  Direction.Value := aDirection;
+  FLineSize := aSize;
+  EmitterParam.LineSize := aSize;
 end;
 
 procedure TParticleEmitter.SetEmitterTypeRectangle(aWidth, aHeight: integer);
 begin
- FEmitterType := etRectangle;
- SetSize( aWidth, aHeight );
+  FEmitterType := etRectangle;
+  SetSize(aWidth, aHeight);
 end;
 
 procedure TParticleEmitter.SetEmitterTypeCircle(Radius: single);
 begin
- FEmitterType := etCircle;
- FSmallRadius := Radius;
+  FEmitterType := etCircle;
+  FSmallRadius := Radius;
+  EmitterParam.SmallRadius := Radius;
 end;
 
 procedure TParticleEmitter.SetEmitterTypeInnerCircle(Radius: single);
 begin
- FEmitterType := etInnerCircle;
- FSmallRadius := Radius;
+  FEmitterType := etInnerCircle;
+  FSmallRadius := Radius;
+  EmitterParam.SmallRadius := Radius;
 end;
 
 procedure TParticleEmitter.SetEmitterTypeOuterCircle(Radius: single);
 begin
- FEmitterType := etOuterCircle;
- FSmallRadius := Radius;
+  FEmitterType := etOuterCircle;
+  FSmallRadius := Radius;
+  EmitterParam.SmallRadius := Radius;
 end;
 
-procedure TParticleEmitter.SetEmitterTypeRing( SmallRadius,
-  BigRadius: single);
+procedure TParticleEmitter.SetEmitterTypeRing(aSmallRadius, aBigRadius: single);
 begin
- FEmitterType := etRing;
- if SmallRadius < BigRadius then begin
-  FSmallRadius := SmallRadius;
-  FBigRadius := BigRadius;
- end else begin
-  FSmallRadius := BigRadius;
-  FBigRadius := SmallRadius;
- end;
+  FEmitterType := etRing;
+  if aSmallRadius < aBigRadius then begin
+    FSmallRadius := aSmallRadius;
+    FBigRadius := aBigRadius;
+  end else begin
+    FSmallRadius := aBigRadius;
+    FBigRadius := aSmallRadius;
+  end;
+  EmitterParam.SmallRadius := FSmallRadius;
+  EmitterParam.BigRadius := FBigRadius;
 end;
 
 function TParticleEmitter.ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect): boolean;
@@ -768,7 +1026,7 @@ begin
  Result := FALSE;
  for i:=0 to length(FParticles)-1 do begin
   if FParticles[i].CurrentLife > 0
-   then Result:=aSurface.CollisionTestWith(FParticles[i].X, FParticles[i].Y,
+   then Result := aSurface.CollisionTestWith(FParticles[i].X, FParticles[i].Y,
                                      FParticleParam.Texture^.FrameWidth*FParticles[i].CurrentSize,
                                      FParticleParam.Texture^.FrameHeight*FParticles[i].CurrentSize);
   if Result then exit;

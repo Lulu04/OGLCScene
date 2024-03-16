@@ -1,0 +1,16 @@
+object Form_ToolLayer: TForm_ToolLayer
+  Left = 492
+  Height = 409
+  Top = 313
+  Width = 320
+  BorderIcons = []
+  BorderStyle = bsToolWindow
+  Caption = 'F6 to show/hide'
+  Color = 8582395
+  FormStyle = fsStayOnTop
+  KeyPreview = True
+  OnDeactivate = FormDeactivate
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  LCLVersion = '2.2.6.0'
+end

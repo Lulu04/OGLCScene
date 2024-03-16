@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fpdoc-descriptions><package name="Template_1_screen"><module name="OGLCScene"><element name="TOGLCContext.MakeCurrent"><short>Make this <var>CONTEXT</var> as current.</short><descr>Because a <var>CONTEXT</var> is the owner of texture, shader, etc... we must select it before working with it.
+It's not necessary if your application use a single only <var>CONTEXT</var>.
+</descr>
+      </element>
+    <element name="TOGLCContext.DefaultCursorVisible"><short>Show/Hide the system mouse cursor.</short><descr>Set it to False if your application manage the mouse cursor throught MouseManager.
+</descr>
+      </element>
+    </module>
+  </package>
+</fpdoc-descriptions>

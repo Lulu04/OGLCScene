@@ -1,67 +1,58 @@
-{
-  Message to communicate between surfaces.
-  example:
-            Sprite1,
-            Sprite2: TSprite;
-            ....
-
-        - Send a message with user value 3 to sprite1
-            Sprite1.AddMessage( 3 );
-
-        - Wait 1.5 sec then send a message with user value 5 to sprite1
-            Sprite1.AddMessage( 5, 1.5 );
-}
-
 {$ifdef oglcINTERFACE}
 type
-PMessageObject = ^TMessageObject;
-TMessageObject = record
-                  Delay    : single;
-                  UserValue: word;
-                  CallBack : TMessageCallBack;
-                  Next     : PMessageObject;
-                  Prev     : PMessageObject;
+
+TUserMessageValue = $00000000..$0FFFFFF;
+
+PMessageItem = ^TMessageItem;
+TMessageItem = record
+  Delay: single;
+  UserValue: TUserMessageValue;
+  Next,Prev: PMessageItem;
 end;
 
-{ TMessageManager }
-TOGLCGMessageListSpec = specialize TOGLCGList<TMessageObject>;
+TMessageCallBack = procedure(UserValue: TUserMessageValue) of object;
 
-TMessageList = class( TOGLCGMessageListSpec )
+{ TMessageList }
+
+TMessageList = class(specialize TOGLCGList<TMessageItem>)
 private
- procedure ProcessMessages( const aElapsedTime: single );
+  FCallBack: TMessageCallBack;
+  procedure ProcessMessages(const aElapsedTime: single);
 public
- procedure Add( aUserValue: word; aCallBack: TMessageCallBack; aDelay: single=0 );
+  constructor Create(aCallBack: TMessageCallBack);
+  procedure Add(aUserValue: TUserMessageValue; aDelay: single=0);
 end;
-
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
 procedure TMessageList.ProcessMessages(const aElapsedTime: single);
-var p, p1 :PMessageObject;
+var p :PMessageItem;
 begin
- p := FInstance0;
- while p^.Next<>NIL do p:=p^.Next;
-
- while p<>NIL do begin
-   if p=FInstance0 then exit;
+  if Count = 0 then exit;
+  p := LastItem;
+  repeat
    p^.Delay := p^.Delay - aElapsedTime;
    if p^.Delay <= 0 then begin
-     if p^.CallBack <> NIL then p^.CallBack( p^.UserValue );
-     p1 := p;
-     p:=p^.Prev;
-     DoDelete( p1 );
-   end else p:=p^.Prev;
- end;
+     FCallBack(p^.UserValue);
+     p := p^.Prev;
+     DoDelete(p^.Next);
+   end else p := p^.Prev;
+  until p = FInstance0;
 end;
 
-procedure TMessageList.Add(aUserValue: word; aCallBack: TMessageCallBack; aDelay: single);
-var m: PMessageObject;
+constructor TMessageList.Create(aCallBack: TMessageCallBack);
 begin
- m := AddInstanceToList;
- m^.Delay := aDelay;
- m^.CallBack := aCallBack;
- m^.UserValue := aUserValue;
+  inherited Create;
+  FCallBack := aCallBack;
+end;
+
+procedure TMessageList.Add(aUserValue: TUserMessageValue; aDelay: single);
+var m: PMessageItem;
+begin
+  m := AddInstanceToList;
+  m^.Delay := aDelay;
+  m^.UserValue := aUserValue;
 end;
 
 {$endif oglcIMPLEMENTATION}

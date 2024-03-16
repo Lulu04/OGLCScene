@@ -1,0 +1,2394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <Title Value="OGLC_Particles_Editor"/>
+      <ResourceType Value="res"/>
+      <Icon Value="0"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <BuildNr Value="317"/>
+      <Language Value="040C"/>
+      <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.24"/>
+    </VersionInfo>
+    <BuildModes Count="2" Active="Debug">
+      <Item1 Name="Debug" Default="True"/>
+      <Item2 Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="OGLC_Particles_Editor"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="..;Units;..\.."/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+              <VariablesInRegisters Value="True"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item2>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="4">
+      <Item1>
+        <PackageName Value="LazOpenGLContext"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LazUtils"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
+    </RequiredPackages>
+    <Units Count="281">
+      <Unit0>
+        <Filename Value="OGLC_Particles_Editor.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="5"/>
+        <CursorPos Y="23"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Unit pour jeux pour tous\principal.pas"/>
+        <ComponentName Value="Form_Principale"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="17" Y="19"/>
+        <UsageCount Value="121"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Unit pour jeux pour tous\dictionnaire_de_mot.pas"/>
+        <TopLine Value="80"/>
+        <CursorPos X="2" Y="82"/>
+        <UsageCount Value="121"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="Unit pour jeux pour tous\gestion_des_ecrans.pas"/>
+        <TopLine Value="4"/>
+        <CursorPos Y="17"/>
+        <UsageCount Value="122"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="Unit pour jeux pour tous\utilitaire.pas"/>
+        <CursorPos X="26" Y="51"/>
+        <UsageCount Value="121"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="Unit pour jeux pour tous\utilitaire_bgrabitmap.pas"/>
+        <TopLine Value="364"/>
+        <CursorPos X="4" Y="373"/>
+        <UsageCount Value="121"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Unit pour jeux pour tous\sprite_bgrabitmap.pas"/>
+        <TopLine Value="126"/>
+        <CursorPos X="14" Y="142"/>
+        <UsageCount Value="121"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="Unit pour jeux pour tous\droite_affine.pas"/>
+        <TopLine Value="261"/>
+        <CursorPos X="60" Y="277"/>
+        <UsageCount Value="121"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="Unit pour jeux pour tous\sprite_surface.pas"/>
+        <TopLine Value="268"/>
+        <CursorPos X="2" Y="308"/>
+        <UsageCount Value="121"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="Unit pour jeux pour tous\sprite_ambiance.pas"/>
+        <TopLine Value="147"/>
+        <CursorPos X="14" Y="157"/>
+        <UsageCount Value="121"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="Unit pour jeux pour tous\sprite_scene.pas"/>
+        <TopLine Value="323"/>
+        <CursorPos Y="330"/>
+        <UsageCount Value="121"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="Unit pour jeux pour tous\dictionnaire_de_proverbes.pas"/>
+        <TopLine Value="50"/>
+        <CursorPos X="2" Y="52"/>
+        <UsageCount Value="121"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Unit pour jeux pour tous\catalogue_de_themes.pas"/>
+        <TopLine Value="8"/>
+        <CursorPos X="9" Y="9"/>
+        <UsageCount Value="121"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="Unit pour jeux pour tous\editer_les_themes.pas"/>
+        <ComponentName Value="Form_EditerThemes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="28" Y="13"/>
+        <UsageCount Value="121"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="Unit pour jeux pour tous\utilitaire_creation_de_sprite.pas"/>
+        <TopLine Value="911"/>
+        <CursorPos X="2" Y="921"/>
+        <UsageCount Value="121"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Unit pour jeux pour tous\fenetre_message.pas"/>
+        <ComponentName Value="Form_Message"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="77"/>
+        <CursorPos X="23" Y="91"/>
+        <UsageCount Value="121"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="Unit pour jeux pour tous\fenetre_joueur.pas"/>
+        <ComponentName Value="Form_Joueur"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="44"/>
+        <CursorPos Y="62"/>
+        <UsageCount Value="121"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="Unit pour jeux pour tous\commun.pas"/>
+        <TopLine Value="7"/>
+        <CursorPos X="27" Y="16"/>
+        <UsageCount Value="121"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="Unit pour jeux pour tous\sprite_gestion_jeu.pas"/>
+        <TopLine Value="26"/>
+        <CursorPos Y="117"/>
+        <UsageCount Value="125"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="Unit pour jeux pour tous\fenetreoperateur_photosecrete.pas"/>
+        <ComponentName Value="Form_OperateurPhotosecrete"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="14" Y="14"/>
+        <UsageCount Value="121"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="Unit pour jeux pour tous\gestion_photosecrete.pas"/>
+        <TopLine Value="147"/>
+        <CursorPos X="39" Y="177"/>
+        <UsageCount Value="121"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="Unit pour jeux pour tous\editer_le_dictionnaire.pas"/>
+        <ComponentName Value="Form_EditerDictionnaire"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="67"/>
+        <UsageCount Value="125"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="Unit pour jeux pour tous\transfert_des_dictionnaires.pas"/>
+        <ComponentName Value="Form_Transfert"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <CursorPos X="14" Y="11"/>
+        <UsageCount Value="121"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="Unit pour jeux pour tous\manager_de_exe.pas"/>
+        <TopLine Value="171"/>
+        <CursorPos X="40" Y="172"/>
+        <UsageCount Value="118"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="Unit pour jeux pour tous\communication_par_fichier.pas"/>
+        <TopLine Value="71"/>
+        <CursorPos X="13" Y="80"/>
+        <UsageCount Value="121"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="Unit pour jeux pour tous\preference.pas"/>
+        <TopLine Value="111"/>
+        <CursorPos X="10" Y="129"/>
+        <UsageCount Value="125"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="Unit pour jeux pour tous\fenetre_outil.pas"/>
+        <ComponentName Value="Form_Outils"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="52"/>
+        <CursorPos X="19" Y="60"/>
+        <UsageCount Value="124"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="Unit pour jeux pour tous\saisie_code_activation.pas"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <TopLine Value="126"/>
+        <CursorPos X="26" Y="131"/>
+        <UsageCount Value="112"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\Unit Universite\repertoire.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="34" Y="8"/>
+        <UsageCount Value="4524"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="..\Unit Universite\principal.pas"/>
+        <ComponentName Value="Form_Principale"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="105"/>
+        <CursorPos Y="129"/>
+        <UsageCount Value="106"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="..\Unit pour jeux pour tous\protection.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="19"/>
+        <UsageCount Value="117"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="..\Unit Universite\manager_de_jeux.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="234"/>
+        <CursorPos X="11" Y="260"/>
+        <UsageCount Value="132"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="..\Unit Universite\utilitaire_creation_de_sprite.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="457"/>
+        <CursorPos X="2" Y="465"/>
+        <UsageCount Value="2235"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="..\Unit Universite\alphabet_code.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="4444"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="..\Unit Universite\fenetre_outil.pas"/>
+        <ComponentName Value="Form_Outils"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos Y="37"/>
+        <UsageCount Value="108"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="..\Unit pour jeux pour tous\bon_de_commande.pas"/>
+        <ComponentName Value="Form_BonDeCommande"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="12"/>
+        <UsageCount Value="121"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="..\Unit Universite\fenetre_joueur.pas"/>
+        <ComponentName Value="Form_Joueur"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="15"/>
+        <UsageCount Value="128"/>
+      </Unit36>
+      <Unit37>
+        <Filename Value="..\Unit Universite\gestion_des_ecrans.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="29"/>
+        <CursorPos X="14" Y="36"/>
+        <UsageCount Value="106"/>
+      </Unit37>
+      <Unit38>
+        <Filename Value="..\Unit Universite\fenetreoperateur_photosecrete.pas"/>
+        <ComponentName Value="Form_OperateurPhotosecrete"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="312"/>
+        <CursorPos X="14" Y="332"/>
+        <UsageCount Value="109"/>
+      </Unit38>
+      <Unit39>
+        <Filename Value="..\Unit Universite\gestion_photosecrete.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="9"/>
+        <UsageCount Value="109"/>
+      </Unit39>
+      <Unit40>
+        <Filename Value="..\Unit Universite\fenetre_daide.pas"/>
+        <ComponentName Value="Form_Aide"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="3" Y="14"/>
+        <UsageCount Value="2150"/>
+      </Unit40>
+      <Unit41>
+        <Filename Value="..\Unit Universite\ajouter_item.pas"/>
+        <ComponentName Value="Form_AjouterItem"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="14"/>
+        <CursorPos X="98" Y="24"/>
+        <UsageCount Value="128"/>
+      </Unit41>
+      <Unit42>
+        <Filename Value="..\Unit Universite\geometricshapes.pas"/>
+        <UnitName Value="GeometricShapes"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="40"/>
+        <UsageCount Value="133"/>
+      </Unit42>
+      <Unit43>
+        <Filename Value="..\Unit Universite\ma_palette.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="16"/>
+        <UsageCount Value="133"/>
+      </Unit43>
+      <Unit44>
+        <Filename Value="..\Unit pour jeux pour tous\demande_du_numero_client.pas"/>
+        <ComponentName Value="Form_DemandeNumClient"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="31" Y="9"/>
+        <UsageCount Value="113"/>
+      </Unit44>
+      <Unit45>
+        <Filename Value="C:\BGRA SPRITE\parameter.pas"/>
+        <TopLine Value="23"/>
+        <CursorPos X="59" Y="41"/>
+        <UsageCount Value="123"/>
+      </Unit45>
+      <Unit46>
+        <Filename Value="..\Unit Universite\sprite_gestion_jeu.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="22" Y="11"/>
+        <UsageCount Value="106"/>
+      </Unit46>
+      <Unit47>
+        <Filename Value="..\Unit pour jeux pour tous\utilitaire_fichier.pas"/>
+        <TopLine Value="16"/>
+        <CursorPos X="29" Y="31"/>
+        <UsageCount Value="4481"/>
+      </Unit47>
+      <Unit48>
+        <Filename Value="..\Unit Universite\editer_les_proverbes.pas"/>
+        <ComponentName Value="Form_EditerProverbe"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="80" Y="76"/>
+        <UsageCount Value="128"/>
+      </Unit48>
+      <Unit49>
+        <Filename Value="..\Unit Universite\fenetre_message.pas"/>
+        <ComponentName Value="Form_Message"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="41" Y="11"/>
+        <UsageCount Value="2217"/>
+      </Unit49>
+      <Unit50>
+        <Filename Value="..\Unit Universite\ajouter_theme.pas"/>
+        <ComponentName Value="Form_Ajoutertheme"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <UsageCount Value="128"/>
+      </Unit50>
+      <Unit51>
+        <Filename Value="..\Unit Universite\fenetre_input.pas"/>
+        <ComponentName Value="Form_DemandeValeur"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="128"/>
+      </Unit51>
+      <Unit52>
+        <Filename Value="..\Unit pour jeux pour tous\thread_http.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="29" Y="305"/>
+        <UsageCount Value="117"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="..\Unit pour jeux pour tous\fenetre_miseajour.pas"/>
+        <ComponentName Value="Form_MiseAJour"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="11"/>
+        <UsageCount Value="121"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="..\Unit pour jeux pour tous\telechargement_tarif.pas"/>
+        <ComponentName Value="Form_TelechargeTarif"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="21" Y="9"/>
+        <UsageCount Value="123"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="..\Unit Universite\commun.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="43" Y="13"/>
+        <UsageCount Value="110"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="..\Unit Universite\fenetreoperateur_pyramide.pas"/>
+        <ComponentName Value="Form_OperateurPyramide"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="236"/>
+        <CursorPos Y="246"/>
+        <UsageCount Value="131"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="..\Unit Universite\gestion_pyramide.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="21" Y="17"/>
+        <UsageCount Value="131"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="..\Unit Universite\fenetreoperateur_lettrescachees.pas"/>
+        <ComponentName Value="Form_OperateurDuPendu"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="325"/>
+        <CursorPos Y="340"/>
+        <UsageCount Value="129"/>
+      </Unit58>
+      <Unit59>
+        <Filename Value="..\Unit Universite\gestion_lettrescachees.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="22" Y="17"/>
+        <UsageCount Value="129"/>
+      </Unit59>
+      <Unit60>
+        <Filename Value="..\Unit Universite\gestion_de_liste_de_mot.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="10"/>
+        <UsageCount Value="4460"/>
+      </Unit60>
+      <Unit61>
+        <Filename Value="..\Unit Universite\fenetreoperateur_lettresdesirees.pas"/>
+        <ComponentName Value="Form_LettreDesirees"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="236"/>
+        <CursorPos X="34" Y="242"/>
+        <UsageCount Value="4507"/>
+      </Unit61>
+      <Unit62>
+        <Filename Value="..\Unit Universite\gestion_lettresdesirees.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="131"/>
+        <CursorPos X="34" Y="153"/>
+        <UsageCount Value="128"/>
+      </Unit62>
+      <Unit63>
+        <Filename Value="..\Unit Universite\fenetreoperateur_motscodes.pas"/>
+        <ComponentName Value="Form_OperateurMotsCodes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="238"/>
+        <CursorPos X="23" Y="238"/>
+        <UsageCount Value="128"/>
+      </Unit63>
+      <Unit64>
+        <Filename Value="..\Unit Universite\gestion_motscodes.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="40" Y="16"/>
+        <UsageCount Value="128"/>
+      </Unit64>
+      <Unit65>
+        <Filename Value="..\Unit Universite\fenetreoperateur_lesmotsgrilles.pas"/>
+        <ComponentName Value="Form_OperateurLesMotsGrilles"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="383"/>
+        <CursorPos X="37" Y="410"/>
+        <UsageCount Value="130"/>
+      </Unit65>
+      <Unit66>
+        <Filename Value="..\Unit Universite\gestion_lesmotsgrilles.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="22" Y="15"/>
+        <UsageCount Value="130"/>
+      </Unit66>
+      <Unit67>
+        <Filename Value="..\Unit Universite\fenetreoperateur_phraseendesordre.pas"/>
+        <ComponentName Value="Form_OperateurPhraseEnDesordre"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3"/>
+        <CursorPos Y="18"/>
+        <UsageCount Value="129"/>
+      </Unit67>
+      <Unit68>
+        <Filename Value="..\Unit Universite\gestion_phraseendesordre.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="21" Y="16"/>
+        <UsageCount Value="129"/>
+      </Unit68>
+      <Unit69>
+        <Filename Value="..\Unit Universite\dlg_jeu_challenge.pas"/>
+        <ComponentName Value="Form_DlgJeuChallenge"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="28"/>
+        <UsageCount Value="2182"/>
+      </Unit69>
+      <Unit70>
+        <Filename Value="..\Unit Universite\fenetre_parametres.pas"/>
+        <ComponentName Value="Form_Parametres"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="41" Y="9"/>
+        <UsageCount Value="4513"/>
+      </Unit70>
+      <Unit71>
+        <Filename Value="C:\fpc\2.6.2\source\packages\fcl-base\src\inifiles.pp"/>
+        <UnitName Value="IniFiles"/>
+        <TopLine Value="130"/>
+        <CursorPos X="18" Y="160"/>
+        <UsageCount Value="2121"/>
+      </Unit71>
+      <Unit72>
+        <Filename Value="C:\ZENGL\ZGLScene\zglscene.pas"/>
+        <UnitName Value="ZGLScene"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="134"/>
+        <CursorPos X="12" Y="139"/>
+        <UsageCount Value="2188"/>
+      </Unit72>
+      <Unit73>
+        <Filename Value="C:\ZENGL\ZGLScene\zglSurfaceimplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="676"/>
+        <CursorPos Y="692"/>
+        <UsageCount Value="2176"/>
+      </Unit73>
+      <Unit74>
+        <Filename Value="C:\BGRABitmap\bgrabitmaptypes.pas"/>
+        <UnitName Value="BGRABitmapTypes"/>
+        <TopLine Value="88"/>
+        <CursorPos X="3" Y="98"/>
+        <UsageCount Value="2117"/>
+      </Unit74>
+      <Unit75>
+        <Filename Value="C:\ZENGL\ZGLScene\zglLayerDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="318"/>
+        <UsageCount Value="2149"/>
+      </Unit75>
+      <Unit76>
+        <Filename Value="C:\ZENGL\ZGLScene\zglLayerImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="706"/>
+        <UsageCount Value="2149"/>
+      </Unit76>
+      <Unit77>
+        <Filename Value="C:\ZENGL\ZGLScene\zglSurfaceDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="209"/>
+        <UsageCount Value="4385"/>
+      </Unit77>
+      <Unit78>
+        <Filename Value="..\Unit Universite\audio.pas"/>
+        <UnitName Value="Audio"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="20" Y="14"/>
+        <UsageCount Value="4382"/>
+      </Unit78>
+      <Unit79>
+        <Filename Value="..\Unit pour jeux pour tous\trucs_et_astuces.pas"/>
+        <ComponentName Value="Form_TrucEtAstuces"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="22" Y="9"/>
+        <UsageCount Value="4365"/>
+      </Unit79>
+      <Unit80>
+        <Filename Value="..\Unit pour jeux pour tous\svgtobgrabitmap.pas"/>
+        <UnitName Value="SvgToBGRABitmap"/>
+        <TopLine Value="136"/>
+        <CursorPos X="29" Y="148"/>
+        <UsageCount Value="106"/>
+      </Unit80>
+      <Unit81>
+        <Filename Value="C:\lcl\graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <TopLine Value="569"/>
+        <CursorPos X="5" Y="579"/>
+        <UsageCount Value="1"/>
+      </Unit81>
+      <Unit82>
+        <Filename Value="C:\fpc\2.6.2\source\packages\fcl-xml\src\dom.pp"/>
+        <UnitName Value="DOM"/>
+        <TopLine Value="359"/>
+        <CursorPos X="19" Y="355"/>
+        <UsageCount Value="1"/>
+      </Unit82>
+      <Unit83>
+        <Filename Value="C:\BGRABitmap\bgragradients.pas"/>
+        <UnitName Value="BGRAGradients"/>
+        <CursorPos X="19" Y="26"/>
+        <UsageCount Value="2"/>
+      </Unit83>
+      <Unit84>
+        <Filename Value="C:\BGRABitmap\bgragradientscanner.pas"/>
+        <UnitName Value="BGRAGradientScanner"/>
+        <TopLine Value="336"/>
+        <CursorPos Y="346"/>
+        <UsageCount Value="2"/>
+      </Unit84>
+      <Unit85>
+        <Filename Value="C:\BGRABitmap\bgradefaultbitmap.pas"/>
+        <UnitName Value="BGRADefaultBitmap"/>
+        <TopLine Value="3042"/>
+        <CursorPos X="29" Y="3047"/>
+        <UsageCount Value="5"/>
+      </Unit85>
+      <Unit86>
+        <Filename Value="C:\BGRABitmap\bgrapath.pas"/>
+        <UnitName Value="BGRAPath"/>
+        <TopLine Value="9"/>
+        <CursorPos X="23" Y="23"/>
+        <UsageCount Value="1"/>
+      </Unit86>
+      <Unit87>
+        <Filename Value="..\Unit Universite\utilitaire.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="33" Y="526"/>
+        <UsageCount Value="106"/>
+      </Unit87>
+      <Unit88>
+        <Filename Value="..\Unit Universite\remplissage_fenetre.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="8"/>
+        <CursorPos X="5" Y="30"/>
+        <UsageCount Value="89"/>
+      </Unit88>
+      <Unit89>
+        <Filename Value="C:\ZENGL\ZGLScene\zglAffineDeclaration.inc"/>
+        <CursorPos Y="6"/>
+        <UsageCount Value="22"/>
+      </Unit89>
+      <Unit90>
+        <Filename Value="C:\UNITE COMMUNE\utilitaire_fichier.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="29" Y="42"/>
+        <UsageCount Value="128"/>
+      </Unit90>
+      <Unit91>
+        <Filename Value="C:\UNITE COMMUNE\svgtobgrabitmap.pas"/>
+        <UnitName Value="SvgToBGRABitmap"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="226"/>
+        <CursorPos Y="238"/>
+        <UsageCount Value="128"/>
+      </Unit91>
+      <Unit92>
+        <Filename Value="..\Unit Universite\dictionnaire_de_mot.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="69" Y="48"/>
+        <UsageCount Value="74"/>
+      </Unit92>
+      <Unit93>
+        <Filename Value="..\Unit Universite\editer_le_dictionnaire.pas"/>
+        <ComponentName Value="Form_EditerDictionnaire"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="144"/>
+        <CursorPos X="33" Y="167"/>
+        <UsageCount Value="74"/>
+      </Unit93>
+      <Unit94>
+        <Filename Value="..\Unit Universite\dictionnaire_de_proverbes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="9"/>
+        <CursorPos Y="26"/>
+        <UsageCount Value="73"/>
+      </Unit94>
+      <Unit95>
+        <Filename Value="..\Unit Universite\catalogue_de_themes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="114"/>
+        <CursorPos X="28" Y="148"/>
+        <UsageCount Value="73"/>
+      </Unit95>
+      <Unit96>
+        <Filename Value="..\Unit Universite\editer_les_themes.pas"/>
+        <ComponentName Value="Form_EditerThemes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="190"/>
+        <CursorPos X="42" Y="218"/>
+        <UsageCount Value="73"/>
+      </Unit96>
+      <Unit97>
+        <Filename Value="..\Unit Universite\transfert_des_dictionnaires.pas"/>
+        <ComponentName Value="Form_Transfert"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="9"/>
+        <UsageCount Value="73"/>
+      </Unit97>
+      <Unit98>
+        <Filename Value="C:\components\lazutils\lazutf8.pas"/>
+        <UnitName Value="LazUTF8"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2988"/>
+        <CursorPos X="54" Y="2994"/>
+        <UsageCount Value="6"/>
+      </Unit98>
+      <Unit99>
+        <Filename Value="C:\fpc\3.0.0\source\rtl\objpas\classes\classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="4" Y="27"/>
+        <UsageCount Value="6"/>
+      </Unit99>
+      <Unit100>
+        <Filename Value="C:\UNITE COMMUNE\utilitaire_chaine_utf8.pas"/>
+        <UnitName Value="Utilitaire_chaine_utf8"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="84"/>
+        <CursorPos X="6" Y="95"/>
+        <UsageCount Value="117"/>
+      </Unit100>
+      <Unit101>
+        <Filename Value="..\Unit Universite\melangeur_de_texte.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="13"/>
+        <CursorPos X="20" Y="22"/>
+        <UsageCount Value="32"/>
+      </Unit101>
+      <Unit102>
+        <Filename Value="..\Unit Universite\preference.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="196"/>
+        <UsageCount Value="26"/>
+      </Unit102>
+      <Unit103>
+        <Filename Value="..\Unit Universite\tbuffer_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="26"/>
+      </Unit103>
+      <Unit104>
+        <Filename Value="..\Unit Universite\ttablotext_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="26"/>
+      </Unit104>
+      <Unit105>
+        <Filename Value="..\Unit Lecteur EVE\lecteur_eve.pas"/>
+        <UnitName Value="Lecteur_EVE"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="339"/>
+        <CursorPos X="29" Y="366"/>
+        <UsageCount Value="26"/>
+      </Unit105>
+      <Unit106>
+        <Filename Value="..\Unit Lecteur EVE\fenetre_choix_portcom_eve.pas"/>
+        <ComponentName Value="Form_choixcom"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="27"/>
+        <CursorPos X="14" Y="47"/>
+        <UsageCount Value="23"/>
+      </Unit106>
+      <Unit107>
+        <Filename Value="..\Unit Lecteur EVE\usbcom_manager_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="82"/>
+        <CursorPos X="15" Y="102"/>
+        <UsageCount Value="8"/>
+      </Unit107>
+      <Unit108>
+        <Filename Value="Unit Automates\pistes_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="151"/>
+        <CursorPos X="34" Y="173"/>
+        <UsageCount Value="175"/>
+      </Unit108>
+      <Unit109>
+        <Filename Value="Unit Automates\automate_tatisimone.pas"/>
+        <UnitName Value="automate_TatiSimone"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="51"/>
+        <CursorPos X="2" Y="71"/>
+        <UsageCount Value="175"/>
+      </Unit109>
+      <Unit110>
+        <Filename Value="unit bass\Bass.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit110>
+      <Unit111>
+        <Filename Value="Unit Lecteur EVE\eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="523"/>
+        <CursorPos X="20" Y="538"/>
+        <UsageCount Value="175"/>
+      </Unit111>
+      <Unit112>
+        <Filename Value="Unit Lecteur EVE\eve_commun.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="17" Y="10"/>
+        <UsageCount Value="175"/>
+      </Unit112>
+      <Unit113>
+        <Filename Value="Unit Lecteur EVE\fenetre_choix_portcom_eve.pas"/>
+        <ComponentName Value="Form_choixcom"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="17"/>
+        <CursorPos X="53" Y="31"/>
+        <UsageCount Value="175"/>
+      </Unit113>
+      <Unit114>
+        <Filename Value="Unit Lecteur EVE\lecteur_eve.pas"/>
+        <UnitName Value="Lecteur_EVE"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="28" Y="15"/>
+        <UsageCount Value="79"/>
+      </Unit114>
+      <Unit115>
+        <Filename Value="Unit Lecteur EVE\liste_effet_temps_reel.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="210"/>
+        <CursorPos X="16" Y="247"/>
+        <UsageCount Value="79"/>
+      </Unit115>
+      <Unit116>
+        <Filename Value="Unit Lecteur EVE\objets_rvb.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit116>
+      <Unit117>
+        <Filename Value="Unit Lecteur EVE\tbuffer_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit117>
+      <Unit118>
+        <Filename Value="Unit Lecteur EVE\thread_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="68"/>
+        <CursorPos Y="96"/>
+        <UsageCount Value="175"/>
+      </Unit118>
+      <Unit119>
+        <Filename Value="Unit Lecteur EVE\ttablotext_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit119>
+      <Unit120>
+        <Filename Value="Unit Lecteur EVE\usbcom_manager_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="27"/>
+        <CursorPos X="42" Y="43"/>
+        <UsageCount Value="175"/>
+      </Unit120>
+      <Unit121>
+        <Filename Value="Unit Lecteur EVE\utilitaire_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="9"/>
+        <UsageCount Value="175"/>
+      </Unit121>
+      <Unit122>
+        <Filename Value="Unit Lecteur EVE\var_globale_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="8"/>
+        <UsageCount Value="80"/>
+      </Unit122>
+      <Unit123>
+        <Filename Value="Unit Universite\ajouter_item.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="9"/>
+        <UsageCount Value="175"/>
+      </Unit123>
+      <Unit124>
+        <Filename Value="Unit Universite\ajouter_theme.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos X="19" Y="47"/>
+        <UsageCount Value="175"/>
+      </Unit124>
+      <Unit125>
+        <Filename Value="Unit Universite\alphabet_code.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit125>
+      <Unit126>
+        <Filename Value="Unit Universite\audio.pas"/>
+        <UnitName Value="Audio"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="28" Y="9"/>
+        <UsageCount Value="175"/>
+      </Unit126>
+      <Unit127>
+        <Filename Value="Unit Universite\catalogue_de_themes.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit127>
+      <Unit128>
+        <Filename Value="Units\common.pas"/>
+        <IsPartOfProject Value="True"/>
+        <TopLine Value="5"/>
+        <CursorPos X="3" Y="22"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+      </Unit128>
+      <Unit129>
+        <Filename Value="Unit Universite\dictionnaire_de_mot.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit129>
+      <Unit130>
+        <Filename Value="Unit Universite\dictionnaire_de_proverbes.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit130>
+      <Unit131>
+        <Filename Value="Unit Universite\dlg_jeu_challenge.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit131>
+      <Unit132>
+        <Filename Value="Unit Universite\editer_les_proverbes.pas"/>
+        <ComponentName Value="Form_EditerProverbe"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="14"/>
+        <CursorPos Y="28"/>
+        <UsageCount Value="175"/>
+      </Unit132>
+      <Unit133>
+        <Filename Value="Unit Universite\editer_les_themes.pas"/>
+        <ComponentName Value="Form_EditerThemes"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="77" Y="8"/>
+        <UsageCount Value="175"/>
+      </Unit133>
+      <Unit134>
+        <Filename Value="Unit Universite\editer_le_dictionnaire.pas"/>
+        <ComponentName Value="Form_EditerDictionnaire"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="28"/>
+        <CursorPos Y="41"/>
+        <UsageCount Value="175"/>
+      </Unit134>
+      <Unit135>
+        <Filename Value="Unit Universite\fenetreoperateur_lesmotsgrilles.pas"/>
+        <ComponentName Value="Form_OperateurLesMotsGrilles"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="106"/>
+        <CursorPos Y="120"/>
+        <UsageCount Value="175"/>
+      </Unit135>
+      <Unit136>
+        <Filename Value="Unit Universite\fenetreoperateur_lettrescachees.pas"/>
+        <ComponentName Value="Form_OperateurDuPendu"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="219"/>
+        <CursorPos X="37" Y="236"/>
+        <UsageCount Value="175"/>
+      </Unit136>
+      <Unit137>
+        <Filename Value="Unit Universite\fenetreoperateur_lettresdesirees.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="106"/>
+        <CursorPos Y="120"/>
+        <UsageCount Value="175"/>
+      </Unit137>
+      <Unit138>
+        <Filename Value="Unit Universite\fenetreoperateur_motscodes.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="101"/>
+        <CursorPos Y="104"/>
+        <UsageCount Value="175"/>
+      </Unit138>
+      <Unit139>
+        <Filename Value="Unit Universite\fenetreoperateur_photosecrete.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit139>
+      <Unit140>
+        <Filename Value="Unit Universite\fenetreoperateur_phraseendesordre.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="82"/>
+        <CursorPos Y="93"/>
+        <UsageCount Value="175"/>
+      </Unit140>
+      <Unit141>
+        <Filename Value="Unit Universite\fenetreoperateur_pyramide.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="65"/>
+        <CursorPos Y="68"/>
+        <UsageCount Value="175"/>
+      </Unit141>
+      <Unit142>
+        <Filename Value="Unit Universite\fenetre_daide.pas"/>
+        <ComponentName Value="Form_Aide"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="14"/>
+        <UsageCount Value="175"/>
+      </Unit142>
+      <Unit143>
+        <Filename Value="Unit Universite\fenetre_input.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit143>
+      <Unit144>
+        <Filename Value="Units\windowsscene.pas"/>
+        <ComponentName Value="Window_Scene"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="WindowsScene"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="2" Y="36"/>
+        <UsageCount Value="176"/>
+      </Unit144>
+      <Unit145>
+        <Filename Value="Unit Universite\fenetre_message.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit145>
+      <Unit146>
+        <Filename Value="Unit Universite\fenetre_outil.pas"/>
+        <ComponentName Value="Form_Outils"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="45"/>
+        <CursorPos Y="60"/>
+        <UsageCount Value="175"/>
+      </Unit146>
+      <Unit147>
+        <Filename Value="Unit Universite\fenetre_parametres.pas"/>
+        <ComponentName Value="Form_Parametres"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="130"/>
+        <CursorPos X="57" Y="147"/>
+        <UsageCount Value="175"/>
+      </Unit147>
+      <Unit148>
+        <Filename Value="Unit Universite\geometricshapes.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit148>
+      <Unit149>
+        <Filename Value="Unit Universite\gestion_des_ecrans.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="33" Y="25"/>
+        <UsageCount Value="176"/>
+      </Unit149>
+      <Unit150>
+        <Filename Value="Unit Universite\gestion_de_liste_de_mot.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit150>
+      <Unit151>
+        <Filename Value="Unit Universite\gestion_lesmotsgrilles.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="261"/>
+        <CursorPos X="19" Y="275"/>
+        <UsageCount Value="175"/>
+      </Unit151>
+      <Unit152>
+        <Filename Value="Unit Universite\gestion_lettrescachees.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="187"/>
+        <CursorPos X="26" Y="192"/>
+        <UsageCount Value="175"/>
+      </Unit152>
+      <Unit153>
+        <Filename Value="Unit Universite\gestion_lettresdesirees.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="182"/>
+        <CursorPos X="7" Y="195"/>
+        <UsageCount Value="175"/>
+      </Unit153>
+      <Unit154>
+        <Filename Value="Unit Universite\gestion_motscodes.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="239"/>
+        <CursorPos X="2" Y="263"/>
+        <UsageCount Value="175"/>
+      </Unit154>
+      <Unit155>
+        <Filename Value="Unit Universite\gestion_photosecrete.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="147"/>
+        <CursorPos X="13" Y="160"/>
+        <UsageCount Value="175"/>
+      </Unit155>
+      <Unit156>
+        <Filename Value="Unit Universite\gestion_phraseendesordre.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="199"/>
+        <CursorPos X="9" Y="216"/>
+        <UsageCount Value="175"/>
+      </Unit156>
+      <Unit157>
+        <Filename Value="Unit Universite\gestion_pyramide.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="33" Y="33"/>
+        <UsageCount Value="175"/>
+      </Unit157>
+      <Unit158>
+        <Filename Value="Unit Universite\manager_de_jeux.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="154"/>
+        <CursorPos X="68" Y="168"/>
+        <UsageCount Value="175"/>
+      </Unit158>
+      <Unit159>
+        <Filename Value="Unit Universite\ma_palette.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit159>
+      <Unit160>
+        <Filename Value="Unit Universite\melangeur_de_texte.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit160>
+      <Unit161>
+        <Filename Value="Unit Universite\preference.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit161>
+      <Unit162>
+        <Filename Value="Units\main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form_Principale"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1157"/>
+        <CursorPos X="24" Y="1172"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit162>
+      <Unit163>
+        <Filename Value="Unit Universite\remplissage_fenetre.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="53" Y="9"/>
+        <UsageCount Value="175"/>
+      </Unit163>
+      <Unit164>
+        <Filename Value="Unit Universite\repertoire.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="16"/>
+        <UsageCount Value="175"/>
+      </Unit164>
+      <Unit165>
+        <Filename Value="Unit Universite\sprite_gestion_jeu.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="7" Y="13"/>
+        <UsageCount Value="175"/>
+      </Unit165>
+      <Unit166>
+        <Filename Value="Unit Universite\tbuffer_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit166>
+      <Unit167>
+        <Filename Value="Unit Universite\transfert_des_dictionnaires.pas"/>
+        <ComponentName Value="Form_Transfert"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="175"/>
+      </Unit167>
+      <Unit168>
+        <Filename Value="Unit Universite\ttablotext_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit168>
+      <Unit169>
+        <Filename Value="Unit Universite\utilitaire.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="175"/>
+      </Unit169>
+      <Unit170>
+        <Filename Value="Unit Universite\utilitaire_creation_de_sprite.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="51" Y="4"/>
+        <UsageCount Value="175"/>
+      </Unit170>
+      <Unit171>
+        <Filename Value="..\UNITE COMMUNE\parametre_variable.pas"/>
+        <UnitName Value="Parametre_Variable"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="7"/>
+        <CursorPos X="2" Y="1069"/>
+        <UsageCount Value="74"/>
+      </Unit171>
+      <Unit172>
+        <Filename Value="..\ZENGL\ZGLScene\zglLayerImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="427"/>
+        <CursorPos X="8" Y="455"/>
+        <UsageCount Value="6"/>
+      </Unit172>
+      <Unit173>
+        <Filename Value="..\ZENGL\ZGLScene\zglSurfaceimplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="343"/>
+        <CursorPos X="43" Y="362"/>
+        <UsageCount Value="19"/>
+      </Unit173>
+      <Unit174>
+        <Filename Value="..\ZENGL\ZGLScene\zglscene.pas"/>
+        <UnitName Value="ZGLScene"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="398"/>
+        <CursorPos X="2" Y="400"/>
+        <UsageCount Value="76"/>
+      </Unit174>
+      <Unit175>
+        <Filename Value="Unit Automates\automates_eve.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="359"/>
+        <UsageCount Value="175"/>
+      </Unit175>
+      <Unit176>
+        <Filename Value="..\UNITE COMMUNE\BassSoundManager\BassSoundManager.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="344"/>
+        <CursorPos X="35" Y="355"/>
+        <UsageCount Value="74"/>
+      </Unit176>
+      <Unit177>
+        <Filename Value="Unit Automates\automate_systemeeve.pas"/>
+        <UnitName Value="automate_systemeEVE"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="44"/>
+        <CursorPos Y="17"/>
+        <UsageCount Value="177"/>
+      </Unit177>
+      <Unit178>
+        <Filename Value="Unit Automates\fenetre_edition.pas"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="272"/>
+        <CursorPos X="3" Y="275"/>
+        <UsageCount Value="175"/>
+      </Unit178>
+      <Unit179>
+        <Filename Value="..\UNITE COMMUNE\pbtimed.pas"/>
+        <UnitName Value="PBTimed"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="18" Y="26"/>
+        <UsageCount Value="175"/>
+      </Unit179>
+      <Unit180>
+        <Filename Value="..\bgrabitmap9.0\bgrabitmap\csscolorconst.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="30"/>
+        <CursorPos X="55" Y="61"/>
+        <UsageCount Value="1"/>
+      </Unit180>
+      <Unit181>
+        <Filename Value="Unit Construction Scenario\ajoute_etape.pas"/>
+        <ComponentName Value="Form_AjouteEtape"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Ajoute_Etape"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="14"/>
+        <UsageCount Value="181"/>
+      </Unit181>
+      <Unit182>
+        <Filename Value="Unit Construction Scenario\etape.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="5" Y="57"/>
+        <UsageCount Value="180"/>
+      </Unit182>
+      <Unit183>
+        <Filename Value="C:\fpc\3.0.0\source\rtl\win\wininc\redef.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="757"/>
+        <CursorPos X="10" Y="768"/>
+        <UsageCount Value="6"/>
+      </Unit183>
+      <Unit184>
+        <Filename Value="C:\lcl\dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="495"/>
+        <CursorPos X="20" Y="501"/>
+        <UsageCount Value="10"/>
+      </Unit184>
+      <Unit185>
+        <Filename Value="..\UNITE COMMUNE\project_util.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="59"/>
+        <CursorPos X="42" Y="286"/>
+        <UsageCount Value="175"/>
+      </Unit185>
+      <Unit186>
+        <Filename Value="..\UNITE COMMUNE\utilitaire_fichier.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="90"/>
+        <CursorPos X="17" Y="107"/>
+        <UsageCount Value="4"/>
+      </Unit186>
+      <Unit187>
+        <Filename Value="Unit Construction Scenario\repertoire_stockage.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="15"/>
+        <UsageCount Value="6"/>
+      </Unit187>
+      <Unit188>
+        <Filename Value="Unit Construction Scenario\projet_sequence.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="88"/>
+        <CursorPos Y="101"/>
+        <UsageCount Value="176"/>
+      </Unit188>
+      <Unit189>
+        <Filename Value="Unit Construction Scenario\fiche_nom_nouveau_projet.pas"/>
+        <ComponentName Value="Form_Nouveau"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="30"/>
+        <UsageCount Value="175"/>
+      </Unit189>
+      <Unit190>
+        <Filename Value="Unit Construction Scenario\preparation_audio.pas"/>
+        <ComponentName Value="Form_prepaaudio"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="384"/>
+        <CursorPos Y="406"/>
+        <UsageCount Value="175"/>
+      </Unit190>
+      <Unit191>
+        <Filename Value="Unit Lecteur EVE\fenetre_statut_eve.pas"/>
+        <ComponentName Value="Form_StatutSystemeEVE"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="181"/>
+        <CursorPos X="46" Y="205"/>
+        <UsageCount Value="177"/>
+      </Unit191>
+      <Unit192>
+        <Filename Value="Unit Construction Scenario\preparation_automate.pas"/>
+        <ComponentName Value="Form_PrepaAutomate"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="15" Y="51"/>
+        <UsageCount Value="175"/>
+      </Unit192>
+      <Unit193>
+        <Filename Value="Unit Construction Scenario\fenetre_nouvellepiste_automate.pas"/>
+        <ComponentName Value="Form_NouvellePiste"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="36" Y="9"/>
+        <UsageCount Value="182"/>
+      </Unit193>
+      <Unit194>
+        <Filename Value="Unit Construction Scenario\etape_def_audio.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="81"/>
+        <CursorPos X="23" Y="101"/>
+        <UsageCount Value="76"/>
+      </Unit194>
+      <Unit195>
+        <Filename Value="Unit Construction Scenario\etape_imp_audio.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="93" Y="10"/>
+        <UsageCount Value="76"/>
+      </Unit195>
+      <Unit196>
+        <Filename Value="Unit Construction Scenario\choix_courbure.pas"/>
+        <ComponentName Value="Form_ChoixCourbure"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="96"/>
+        <CursorPos X="2" Y="99"/>
+        <UsageCount Value="175"/>
+      </Unit196>
+      <Unit197>
+        <Filename Value="Unit Construction Scenario\etape_def_sprite.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="106"/>
+        <CursorPos Y="126"/>
+        <UsageCount Value="177"/>
+      </Unit197>
+      <Unit198>
+        <Filename Value="Unit Construction Scenario\etape_imp_sprite.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="509"/>
+        <CursorPos X="54" Y="523"/>
+        <UsageCount Value="177"/>
+      </Unit198>
+      <Unit199>
+        <Filename Value="..\ZENGL\ZGLScene\zglSurfaceDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="209"/>
+        <UsageCount Value="25"/>
+      </Unit199>
+      <Unit200>
+        <Filename Value="..\bgrabitmap9.0\bgrabitmap\bgrapixel.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="241"/>
+        <CursorPos X="68" Y="255"/>
+        <UsageCount Value="4"/>
+      </Unit200>
+      <Unit201>
+        <Filename Value="..\bgrabitmap9.0\bgrabitmap\bgragraphics.pas"/>
+        <UnitName Value="BGRAGraphics"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="23" Y="14"/>
+        <UsageCount Value="6"/>
+      </Unit201>
+      <Unit202>
+        <Filename Value="Unit Construction Scenario\sprite.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="92"/>
+        <UsageCount Value="175"/>
+      </Unit202>
+      <Unit203>
+        <Filename Value="..\UNITE COMMUNE\coloris.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="42" Y="16"/>
+        <UsageCount Value="72"/>
+      </Unit203>
+      <Unit204>
+        <Filename Value="..\ZENGL\ZGLScene\zglLayerDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="126"/>
+        <CursorPos X="3" Y="154"/>
+        <UsageCount Value="6"/>
+      </Unit204>
+      <Unit205>
+        <Filename Value="..\ZENGL\ZGLScene\zglScenarioDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="22" Y="29"/>
+        <UsageCount Value="16"/>
+      </Unit205>
+      <Unit206>
+        <Filename Value="..\ZENGL\ZGLScene\zglScenarioImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="162"/>
+        <CursorPos Y="182"/>
+        <UsageCount Value="16"/>
+      </Unit206>
+      <Unit207>
+        <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\VolColombe.sce.txt"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="9" Y="25"/>
+        <UsageCount Value="175"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit207>
+      <Unit208>
+        <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\DeformationColombe.sce.txt"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="14"/>
+        <UsageCount Value="180"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit208>
+      <Unit209>
+        <Filename Value="Unit Construction Scenario\etape_def_divers.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="2" Y="24"/>
+        <UsageCount Value="85"/>
+      </Unit209>
+      <Unit210>
+        <Filename Value="Unit Construction Scenario\etape_imp_divers.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3"/>
+        <UsageCount Value="79"/>
+      </Unit210>
+      <Unit211>
+        <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\DroiteGaucheColombe.sce.txt"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="72" Y="5"/>
+        <UsageCount Value="68"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit211>
+      <Unit212>
+        <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\Opacity Colombe.sce.txt"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="25" Y="2"/>
+        <UsageCount Value="62"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit212>
+      <Unit213>
+        <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\InitColombe.sce.txt"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="36" Y="5"/>
+        <UsageCount Value="61"/>
+        <DefaultSyntaxHighlighter Value="None"/>
+      </Unit213>
+      <Unit214>
+        <Filename Value="..\UNITE COMMUNE\svgtobgrabitmap.pas"/>
+        <UnitName Value="SvgToBGRABitmap"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="205"/>
+        <CursorPos X="24" Y="222"/>
+        <UsageCount Value="11"/>
+      </Unit214>
+      <Unit215>
+        <Filename Value="..\ZENGL\ZGLScene\zglListTypeDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="250"/>
+        <CursorPos Y="267"/>
+        <UsageCount Value="3"/>
+      </Unit215>
+      <Unit216>
+        <Filename Value="..\ZENGL\ZGLScene\zglUtilsDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="18" Y="18"/>
+        <UsageCount Value="6"/>
+      </Unit216>
+      <Unit217>
+        <Filename Value="..\ZENGL\ZGLScene\zglUtilsImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="292"/>
+        <CursorPos X="3" Y="302"/>
+        <UsageCount Value="6"/>
+      </Unit217>
+      <Unit218>
+        <Filename Value="..\ZENGL\ZGLScene\zglListTypeImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="85"/>
+        <CursorPos X="46" Y="94"/>
+        <UsageCount Value="1"/>
+      </Unit218>
+      <Unit219>
+        <Filename Value="..\UNITE COMMUNE\variable_parameter_V2.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="186"/>
+        <CursorPos X="3" Y="200"/>
+        <UsageCount Value="6"/>
+      </Unit219>
+      <Unit220>
+        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32wscontrols.pp"/>
+        <UnitName Value="Win32WSControls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="231"/>
+        <CursorPos Y="244"/>
+        <UsageCount Value="4"/>
+      </Unit220>
+      <Unit221>
+        <Filename Value="..\bgrabitmap\bgrabitmap\bgrabitmap.pas"/>
+        <UnitName Value="BGRABitmap"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="124"/>
+        <CursorPos X="11" Y="138"/>
+        <UsageCount Value="4"/>
+      </Unit221>
+      <Unit222>
+        <Filename Value="..\ZENGL\zengl-src-0.3.8\src\zgl_primitives_2d.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="72"/>
+        <CursorPos X="41" Y="78"/>
+        <UsageCount Value="6"/>
+      </Unit222>
+      <Unit223>
+        <Filename Value="C:\lazarus\lcl\graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="19"/>
+        <CursorPos X="20" Y="59"/>
+        <UsageCount Value="4"/>
+      </Unit223>
+      <Unit224>
+        <Filename Value="Units\screen_home.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="screen_Home"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="94"/>
+        <CursorPos X="68" Y="95"/>
+        <UsageCount Value="205"/>
+        <Loaded Value="True"/>
+      </Unit224>
+      <Unit225>
+        <Filename Value="C:\lazarus\lcl\forms.pp"/>
+        <UnitName Value="Forms"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="145"/>
+        <CursorPos X="38" Y="154"/>
+        <UsageCount Value="2"/>
+      </Unit225>
+      <Unit226>
+        <Filename Value="..\UNITE COMMUNE\OGLCScene\oglcLayerDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="124"/>
+        <CursorPos X="15" Y="138"/>
+        <UsageCount Value="1"/>
+      </Unit226>
+      <Unit227>
+        <Filename Value="..\UNITE COMMUNE\OGLCScene\oglcLayerImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="394"/>
+        <CursorPos X="7" Y="396"/>
+        <UsageCount Value="1"/>
+      </Unit227>
+      <Unit228>
+        <Filename Value="..\OGLCScene.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="433"/>
+        <CursorPos Y="447"/>
+        <UsageCount Value="100"/>
+      </Unit228>
+      <Unit229>
+        <Filename Value="..\oglcSurfaceDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="402"/>
+        <CursorPos X="12" Y="415"/>
+        <UsageCount Value="96"/>
+      </Unit229>
+      <Unit230>
+        <Filename Value="..\oglcListTypeDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="146"/>
+        <CursorPos X="10" Y="155"/>
+        <UsageCount Value="96"/>
+      </Unit230>
+      <Unit231>
+        <Filename Value="..\oglcSurfaceImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1281"/>
+        <CursorPos X="37" Y="1305"/>
+        <UsageCount Value="96"/>
+      </Unit231>
+      <Unit232>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FrameEditCurve"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="Frame_CurveEdit"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="212"/>
+        <CursorPos X="17" Y="219"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit232>
+      <Unit233>
+        <Filename Value="..\oglcUtilsDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="11" Y="15"/>
+        <UsageCount Value="65"/>
+      </Unit233>
+      <Unit234>
+        <Filename Value="..\oglcUtilsImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="243"/>
+        <CursorPos X="9" Y="299"/>
+        <UsageCount Value="64"/>
+      </Unit234>
+      <Unit235>
+        <Filename Value="C:\lazarus\lcl\extctrls.pp"/>
+        <UnitName Value="ExtCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="422"/>
+        <CursorPos X="17" Y="440"/>
+        <UsageCount Value="4"/>
+      </Unit235>
+      <Unit236>
+        <Filename Value="C:\lazarus\lcl\include\paintbox.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="26"/>
+        <CursorPos X="17" Y="45"/>
+        <UsageCount Value="4"/>
+      </Unit236>
+      <Unit237>
+        <Filename Value="C:\lazarus\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2324"/>
+        <CursorPos X="40" Y="2336"/>
+        <UsageCount Value="4"/>
+      </Unit237>
+      <Unit238>
+        <Filename Value="C:\lazarus\lcl\include\graphiccontrol.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="86"/>
+        <CursorPos X="3" Y="95"/>
+        <UsageCount Value="4"/>
+      </Unit238>
+      <Unit239>
+        <Filename Value="C:\lazarus\lcl\graphtype.pp"/>
+        <UnitName Value="GraphType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="46"/>
+        <CursorPos X="3" Y="37"/>
+        <UsageCount Value="4"/>
+      </Unit239>
+      <Unit240>
+        <Filename Value="Units\frame_showcolor.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FrameShowColor"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="frame_ShowColor"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="15"/>
+        <CursorPos X="36" Y="24"/>
+        <UsageCount Value="197"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit240>
+      <Unit241>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrapixel.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="154"/>
+        <CursorPos X="28" Y="175"/>
+        <UsageCount Value="6"/>
+      </Unit241>
+      <Unit242>
+        <Filename Value="C:\lazarus\fpc\3.0.4\source\rtl\objpas\math.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="151"/>
+        <CursorPos X="37" Y="326"/>
+        <UsageCount Value="23"/>
+      </Unit242>
+      <Unit243>
+        <Filename Value="..\..\VelocityCurve.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="217"/>
+        <CursorPos X="28" Y="230"/>
+        <UsageCount Value="34"/>
+      </Unit243>
+      <Unit244>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgradefaultbitmap.pas"/>
+        <UnitName Value="BGRADefaultBitmap"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="842"/>
+        <CursorPos X="2" Y="856"/>
+        <UsageCount Value="15"/>
+      </Unit244>
+      <Unit245>
+        <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="676"/>
+        <CursorPos X="69" Y="690"/>
+        <UsageCount Value="1"/>
+      </Unit245>
+      <Unit246>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrafreetype.pas"/>
+        <UnitName Value="BGRAFreeType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="502"/>
+        <CursorPos X="17" Y="524"/>
+        <UsageCount Value="8"/>
+      </Unit246>
+      <Unit247>
+        <Filename Value="C:\lazarus\components\lazutils\easylazfreetype.pas"/>
+        <UnitName Value="EasyLazFreeType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="226"/>
+        <CursorPos X="15" Y="192"/>
+        <UsageCount Value="8"/>
+      </Unit247>
+      <Unit248>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgracolorint.pas"/>
+        <UnitName Value="BGRAColorInt"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="304"/>
+        <UsageCount Value="1"/>
+      </Unit248>
+      <Unit249>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgracolorquantization.pas"/>
+        <UnitName Value="BGRAColorQuantization"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <UsageCount Value="1"/>
+      </Unit249>
+      <Unit250>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgracolorspace.pas"/>
+        <UnitName Value="BGRAColorspace"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="46"/>
+        <UsageCount Value="1"/>
+      </Unit250>
+      <Unit251>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrapalette.pas"/>
+        <UnitName Value="BGRAPalette"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="151"/>
+        <UsageCount Value="2"/>
+      </Unit251>
+      <Unit252>
+        <Filename Value="..\oglcListTypeImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="481"/>
+        <CursorPos X="7" Y="499"/>
+        <UsageCount Value="21"/>
+      </Unit252>
+      <Unit253>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrabitmap.pas"/>
+        <UnitName Value="BGRABitmap"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="10" Y="42"/>
+        <UsageCount Value="1"/>
+      </Unit253>
+      <Unit254>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrabitmap.inc"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="1"/>
+      </Unit254>
+      <Unit255>
+        <Filename Value="C:\bgrabitmap-9.5\bgrabitmap\bgrapath.pas"/>
+        <UnitName Value="BGRAPath"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="250"/>
+        <CursorPos X="24" Y="262"/>
+        <UsageCount Value="1"/>
+      </Unit255>
+      <Unit256>
+        <Filename Value="..\oglcLayerDeclaration.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="16" Y="46"/>
+        <UsageCount Value="15"/>
+      </Unit256>
+      <Unit257>
+        <Filename Value="..\oglcLayerImplementation.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="42"/>
+        <CursorPos X="15" Y="49"/>
+        <UsageCount Value="15"/>
+      </Unit257>
+      <Unit258>
+        <Filename Value="C:\bgrabitmap-9.6\bgrabitmap\bgrapath.pas"/>
+        <UnitName Value="BGRAPath"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="247"/>
+        <CursorPos X="10" Y="262"/>
+        <UsageCount Value="4"/>
+      </Unit258>
+      <Unit259>
+        <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
+        <UnitName Value="LCLType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="480"/>
+        <CursorPos X="3" Y="497"/>
+        <UsageCount Value="7"/>
+      </Unit259>
+      <Unit260>
+        <Filename Value="..\oglcParticle.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="463"/>
+        <CursorPos Y="476"/>
+        <UsageCount Value="33"/>
+      </Unit260>
+      <Unit261>
+        <Filename Value="..\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="43"/>
+        <CursorPos X="21" Y="60"/>
+        <UsageCount Value="31"/>
+      </Unit261>
+      <Unit262>
+        <Filename Value="..\oglcLayer.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="268"/>
+        <CursorPos X="35" Y="278"/>
+        <UsageCount Value="30"/>
+      </Unit262>
+      <Unit263>
+        <Filename Value="..\oglcCamera.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="201"/>
+        <CursorPos X="39" Y="217"/>
+        <UsageCount Value="30"/>
+      </Unit263>
+      <Unit264>
+        <Filename Value="..\oglcMultiRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="417"/>
+        <CursorPos X="46" Y="437"/>
+        <UsageCount Value="30"/>
+      </Unit264>
+      <Unit265>
+        <Filename Value="..\oglcRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="311"/>
+        <CursorPos X="3" Y="314"/>
+        <UsageCount Value="27"/>
+      </Unit265>
+      <Unit266>
+        <Filename Value="..\oglcScreenTemplate.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="26" Y="12"/>
+        <UsageCount Value="27"/>
+      </Unit266>
+      <Unit267>
+        <Filename Value="..\oglcUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="85"/>
+        <CursorPos X="38" Y="102"/>
+        <UsageCount Value="27"/>
+      </Unit267>
+      <Unit268>
+        <Filename Value="..\gl_core_matrix.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="80"/>
+        <CursorPos X="14" Y="103"/>
+        <UsageCount Value="24"/>
+      </Unit268>
+      <Unit269>
+        <Filename Value="..\oglcPath.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2"/>
+        <CursorPos X="13" Y="17"/>
+        <UsageCount Value="24"/>
+      </Unit269>
+      <Unit270>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\math.pp"/>
+        <UnitName Value="Math"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="748"/>
+        <CursorPos X="50" Y="750"/>
+        <UsageCount Value="16"/>
+      </Unit270>
+      <Unit271>
+        <Filename Value="..\..\UnitsCommon\VelocityCurve.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="370"/>
+        <CursorPos X="46" Y="385"/>
+        <UsageCount Value="16"/>
+      </Unit271>
+      <Unit272>
+        <Filename Value="..\oglcShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="68"/>
+        <CursorPos Y="82"/>
+        <UsageCount Value="14"/>
+      </Unit272>
+      <Unit273>
+        <Filename Value="..\oglcSurface.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="1466"/>
+        <CursorPos Y="1480"/>
+        <UsageCount Value="11"/>
+      </Unit273>
+      <Unit274>
+        <Filename Value="..\oglcType.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="683"/>
+        <CursorPos X="37" Y="684"/>
+        <UsageCount Value="11"/>
+      </Unit274>
+      <Unit275>
+        <Filename Value="..\..\OGLCScene.pas"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="832"/>
+        <CursorPos X="17" Y="838"/>
+        <UsageCount Value="24"/>
+        <Loaded Value="True"/>
+      </Unit275>
+      <Unit276>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <EditorIndex Value="1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="539"/>
+        <CursorPos X="7" Y="550"/>
+        <UsageCount Value="24"/>
+        <Loaded Value="True"/>
+      </Unit276>
+      <Unit277>
+        <Filename Value="..\..\..\ZENGL\zengl-src-0.3.12\src\zgl_particles_2d.pas"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="1377"/>
+        <CursorPos X="3" Y="1329"/>
+        <UsageCount Value="9"/>
+      </Unit277>
+      <Unit278>
+        <Filename Value="..\..\gl_core_matrix.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos Y="6"/>
+        <UsageCount Value="9"/>
+      </Unit278>
+      <Unit279>
+        <Filename Value="..\..\oglcEnvironment.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="41" Y="4"/>
+        <UsageCount Value="9"/>
+      </Unit279>
+      <Unit280>
+        <Filename Value="..\..\oglcElectricalFX.inc"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="1"/>
+        <CursorPos X="53" Y="123"/>
+        <UsageCount Value="9"/>
+      </Unit280>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="119" Column="14" TopLine="106"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="230" Column="20" TopLine="220"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="870" Column="38" TopLine="859"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="242" Column="56" TopLine="232"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="532" Column="20" TopLine="528"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="152" Column="27" TopLine="140"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="26" Column="21" TopLine="20"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="121" Column="7" TopLine="113"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="26" Column="15" TopLine="16"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="117" TopLine="113"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="64" Column="20" TopLine="53"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="226" Column="2" TopLine="213"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="29" Column="15" TopLine="19"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="10" Column="13"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="12" Column="16"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="217" Column="43" TopLine="202"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="12" Column="16" TopLine="3"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="1121" Column="15" TopLine="1112"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="230" Column="20" TopLine="221"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="219" Column="17" TopLine="211"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\frame_curveedit.pas"/>
+        <Caret Line="29" Column="18" TopLine="20"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="780" Column="3" TopLine="763"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="236" Column="22" TopLine="233"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="194" Column="15" TopLine="194"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\OGLCScene.pas"/>
+        <Caret Line="164" Column="14" TopLine="151"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\OGLCScene.pas"/>
+        <Caret Line="851" Column="12" TopLine="832"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\OGLCScene.pas"/>
+        <Caret Line="838" Column="17" TopLine="832"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="76" Column="15" TopLine="68"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="251" TopLine="248"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\oglcParticle.inc"/>
+        <Caret Line="194" Column="15" TopLine="189"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="OGLC_Particles_Editor"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="..;Units;..\..;..\..\UnitsCommon"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <VariablesInRegisters Value="True"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+        <UseHeaptrc Value="True"/>
+        <TrashVariables Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

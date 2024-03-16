@@ -40,6 +40,7 @@ end;
 
 TOGLCCamera = class
  FParentScene: TOGLCScene;
+ FPreviousModelViewMatrix: TOGLCMatrix;
  Constructor Create;
  Destructor Destroy; override;
  procedure Update( const AElapsedTime: single );
@@ -84,6 +85,8 @@ public
   procedure AssignToLayer( aLayerIndex: integer ); overload;
   // the camera will be used to several layers, given by their indexes
   procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
+  // the camera will be used by all layers
+  procedure AssignToAllLayers;
   // The camera will no longer be used by any layer
   procedure Unassign;
   {
@@ -135,7 +138,7 @@ end;
 
 function TOGLCCamera.DistanceToPoint(aPt: TPointF): single;
 begin
- Result := Distance( aPt, LookAt.Value );
+ Result := aPt.Distance(LookAt.Value);
 end;
 
 function TOGLCCamera.WorldToScreen(aPt: TPointF): TPointF;
@@ -185,28 +188,58 @@ begin
     AssignToLayer( aLayerIndexList[i] );
 end;
 
+procedure TOGLCCamera.AssignToAllLayers;
+var
+  i: Integer;
+begin
+  for i:=0 to FParentScene.LayerCount-1 do
+    AssignToLayer(i);
+end;
+
 procedure TOGLCCamera.Unassign;
 var
   i: Integer;
 begin
  for i:=0 to FParentScene.LayerCount-1 do
-   with FParentScene.Layer[i] do if Camera=self then Camera := NIL;
+   with FParentScene.Layer[i] do
+     if Camera = Self then Camera := NIL;
 end;
 
 procedure TOGLCCamera.Use;
+var tx, ty, sx, sy, a: single;
+  doscale, dorotate: boolean;
 begin
- glPushMatrix;
+ FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+
+ FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                                           FParentScene.Width*0.5, FParentScene.Height*0.5,
+                                           LookAt.x.Value, LookAt.y.Value);
+
+{ tx := FParentScene.Width*0.5;
+ ty := FParentScene.Height*0.5;
+ sx := Scale.x.Value;
+ sy := Scale.y.Value;
+ a := Angle.Value;
+ with FParentScene.ModelViewMatrix do begin
+  Translate(tx, ty);
+  Scale(sx, sy);
+  Rotate(a);
+  Translate(-tx+LookAt.x.Value, -ty+LookAt.y.Value);
+ end;      }
+
+{ glPushMatrix;
 
  glTranslatef( FParentScene.Width * 0.5, FParentScene.Height * 0.5 , 0 );
 
  glScalef( Scale.x.Value, Scale.y.Value, 0 );
  glRotatef( Angle.Value, 0, 0, 1 );
  glTranslatef( -FParentScene.Width * 0.5 + LookAt.x.Value, -FParentScene.Height * 0.5 + LookAt.y.Value, 0 );
+}
 end;
 
 procedure TOGLCCamera.Release;
 begin
- glPopMatrix;
+  FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
 end;
 
 procedure TOGLCCamera.MoveTo(aPt: TPointF);
@@ -252,8 +285,6 @@ begin
   acCenterOnScene: FParentCamera.LookAt.ChangeTo( FParentCamera.FParentScene.Center,
                                                   StringToSingle( FTemp[1] ),
                                                   StringToCurveID( FTemp[2] ));
-
-  acSendEvent : if FScenarioEvent <> NIL then FScenarioEvent( NIL, ID, strtoint( FTemp[1] ) );
 
   acLoop : CurrentLine := -1 ;
   acLabel :;
