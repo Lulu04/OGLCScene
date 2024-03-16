@@ -20,5 +20,5 @@ Matrix computation located in file 'gl_core_matrix.inc' was originaly written by
 You can find the original at https://github.com/neurolabusc/OpenGLCoreTutorials/gl_core_matrix.pas
 
 The code of TWaterSurface in file 'oglcEnvironment.inc' is written by Circular, the creator and maintainer of BGRABitmap library, widly used in OGLCScene.
-#Note from the author
+# Note from the author
 I'm an amateur programmer who loves the Pascal language. OGLCScene is an attempt to go as far as possible in my understanding of OpenGL and game engines. The path has been sometimes frustrating, sometimes happy, but very interesting.
