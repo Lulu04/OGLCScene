@@ -71,45 +71,45 @@ type
 
 function TSlideShow.GetSlideStep(aIndex: integer): TSlideStep;
 begin
- Result := TSlideStep( FList.Items[aIndex] );
+  Result := TSlideStep(FList.Items[aIndex]);
 end;
 
 function TSlideShow.GetCount: integer;
 begin
- Result := FList.Count;
+  Result := FList.Count;
 end;
 
 function TSlideShow.GetCurrentIndex: integer;
 begin
- Result := FCurrentIndex;
+  Result := FCurrentIndex;
 end;
 
 procedure TSlideShow.GotoNextStep;
 var i: integer;
     s: TSlideStep;
 begin
- if FSlideState = stEmpty then exit;
+  if FSlideState = stEmpty then exit;
 
 // if ( FCurrentIndex = GetCount-1 ) and not FLoop then exit;
 
  // take next step index
- i := FCurrentIndex;
- inc(i);
- if i >= GetCount then begin
-   if FLoop then i := 0
-            else begin
-              i := GetCount-1;
-              FSlideState := stStopped;
-              exit;
-            end;
- end;
+  i := FCurrentIndex;
+  inc(i);
+  if i >= GetCount then begin
+    if FLoop then i := 0
+      else begin
+        i := GetCount-1;
+        FSlideState := stStopped;
+        exit;
+      end;
+  end;
 
- if i = FCurrentIndex then exit;
- s := GetSlideStep( i );
+  if i = FCurrentIndex then exit;
+  s := GetSlideStep(i);
 
- UnsetCurrentStep(s.TransitionType, s.TransitionTime );
- FCurrentIndex := i;
- SetCurrentStep;
+  UnsetCurrentStep(s.TransitionType, s.TransitionTime);
+  FCurrentIndex := i;
+  SetCurrentStep;
 end;
 
 procedure TSlideShow.SetCurrentStep;
@@ -125,189 +125,187 @@ var s: TSlideStep;
     end;
 
 begin
- s := GetSlideStep( FCurrentIndex );
+  s := GetSlideStep( FCurrentIndex );
 
- if s.Effect = sfxNormal
-   then FCurrentTexture := TextureManager.Add( s.Filename )
-   else begin
-    ima := TBGRABitmap.Create( s.Filename );
-    case s.Effect of
-     sfxGray: temp := ima.FilterGrayscale as TBGRABitmap;
-     sfxSphere: temp := ima.FilterSphere as TBGRABitmap;
-     sfxSmooth: temp :=ima.FilterSmooth as TBGRABitmap;
-     sfxContour: temp := ima.FilterContour as TBGRABitmap;
+  if s.Effect = sfxNormal
+    then FCurrentTexture := FParentScene.TexMan.Add(s.Filename)
+    else begin
+     ima := TBGRABitmap.Create( s.Filename );
+     case s.Effect of
+      sfxGray: temp := ima.FilterGrayscale;
+      sfxSphere: temp := ima.FilterSphere;
+      sfxSmooth: temp := ima.FilterSmooth;
+      sfxContour: temp := ima.FilterContour;
+    end;
+    FCurrentTexture := FParentScene.TexMan.Add(temp);
+    ima.Free;
+    temp.Free;
+  end;
+
+  FCurrentSprite := TSprite.Create(FCurrentTexture, TRUE);
+  FParentLayer.Add(FCurrentSprite);
+
+  case s.TransitionType of
+   stNone: begin
+     FCurrentSprite.CenterOnSurface(self);
+     SetScaleValue;
    end;
-   FCurrentTexture := TextureManager.Add( {%H-}temp );
-   ima.Free;
-   temp.Free;
- end;
 
- FCurrentSprite := TSprite.Create( FCurrentTexture, TRUE );
- FParentLayer.Add( FCurrentSprite );
+   stFadeToColor:begin
+     FCurrentSprite.CenterOnSurface(self);
+     SetScaleValue;
+   end;
 
- case s.TransitionType of
-  stNone: begin
-    FCurrentSprite.CenterOnSurface( self );
-    SetScaleValue;
-  end;
+   stFadeToNextImage: begin
+     FCurrentSprite.CenterOnSurface( self );
+     SetScaleValue;
+     FCurrentSprite.Opacity.Value := 0;
+     FCurrentSprite.Opacity.ChangeTo(255, s.TransitionTime);
+   end;
+   stFadeToNextImageFrom100: begin
+     FCurrentSprite.CenterOnSurface(self);
+     SetScaleValue;
+     FCurrentSprite.Opacity.Value := 100;
+     FCurrentSprite.Opacity.ChangeTo(255, s.TransitionTime);
+   end;
+  end;//case
 
-  stFadeToColor:begin
-    FCurrentSprite.CenterOnSurface( self );
-    SetScaleValue;
-  end;
-
-  stFadeToNextImage: begin
-    FCurrentSprite.CenterOnSurface( self );
-    SetScaleValue;
-    FCurrentSprite.Opacity.Value:=0;
-    FCurrentSprite.Opacity.ChangeTo( 255, s.TransitionTime );
-  end;
-  stFadeToNextImageFrom100: begin
-    FCurrentSprite.CenterOnSurface( self );
-    SetScaleValue;
-    FCurrentSprite.Opacity.Value:=100;
-    FCurrentSprite.Opacity.ChangeTo( 255, s.TransitionTime );
-  end;
- end;//case
-
- FCurrentStayTime := s.StayTime;
+  FCurrentStayTime := s.StayTime;
 end;
 
-procedure TSlideShow.UnsetCurrentStep( ATransition: TSlideTransition; ATransitionTime: single );
+procedure TSlideShow.UnsetCurrentStep(ATransition: TSlideTransition; ATransitionTime: single);
 begin
- if FCurrentSprite=NIL then exit;
+  if FCurrentSprite = NIL then exit;
 
- case ATransition of
+  case ATransition of
 
-  stNone: FCurrentSprite.Kill;
+   stNone: FCurrentSprite.Kill;
 
-  stFadeToColor:;
+   stFadeToColor:;
 
-  stFadeToNextImage,
-  stFadeToNextImageFrom100: begin
-    FCurrentSprite.Opacity.ChangeTo( 0, ATransitionTime );
-    FCurrentSprite.KillDefered( ATransitionTime );
-  end;
+   stFadeToNextImage,
+   stFadeToNextImageFrom100: begin
+     FCurrentSprite.Opacity.ChangeTo(0, ATransitionTime);
+     FCurrentSprite.KillDefered(ATransitionTime);
+   end;
 
- end;//case
+  end;//case
 
- FCurrentSprite := NIL;
+  FCurrentSprite := NIL;
 end;
 
 function TSlideShow.GetWidth: integer;
 begin
- Result := FWidth;
+  Result := FWidth;
 end;
 
 function TSlideShow.GetHeight: integer;
 begin
- Result := FHeight;
+  Result := FHeight;
 end;
 
 constructor TSlideShow.Create;
 begin
- inherited Create;
- FList:= TList.Create;
- FCurrentTexture:=NIL;
- FCurrentSprite:=NIL;
- FCurrentIndex:=-1;
- FLoop:=FALSE;
- FSlideState:=stEmpty;
- StretchStayTime:= TFParam.Create;
- StretchStayTime.Value:=1.0;
+  inherited Create;
+  FList:= TList.Create;
+  FCurrentTexture := NIL;
+  FCurrentSprite := NIL;
+  FCurrentIndex := -1;
+  FLoop := FALSE;
+  FSlideState := stEmpty;
+  StretchStayTime := TFParam.Create;
+  StretchStayTime.Value := 1.0;
 end;
 
 destructor TSlideShow.Destroy;
 begin
- Clear;
- FList.Free;
- StretchStayTime.Free;
- inherited Destroy;
+  Clear;
+  FList.Free;
+  StretchStayTime.Free;
+  inherited Destroy;
 end;
 
 procedure TSlideShow.Update(const aElapsedTime: single);
 begin
- inherited Update(aElapsedTime);
- StretchStayTime.OnElapse( aElapsedTime );
- if FSlideState = stEmpty then exit;
+  inherited Update(aElapsedTime);
+  StretchStayTime.OnElapse( aElapsedTime );
+  if FSlideState = stEmpty then exit;
 
+  if FCurrentSprite <> NIL then begin
+    FCurrentSprite.Update( aElapsedTime );
+    FCurrentSprite.Tint.Value := Tint.Value;
+  end;
 
- if FCurrentSprite <> NIL then begin
-   FCurrentSprite.Update( aElapsedTime );
-   FCurrentSprite.Tint.Value := Tint.Value;
- end;
-
- if FSlideState = stPlaying then begin
-     if FCurrentStayTime > 0.0
-     then FCurrentStayTime -= aElapsedTime*StretchStayTime.Value
-     else GotoNextStep;
- end;
+  if FSlideState = stPlaying then begin
+      if FCurrentStayTime > 0.0
+        then FCurrentStayTime -= aElapsedTime*StretchStayTime.Value
+        else GotoNextStep;
+  end;
 end;
 
 procedure TSlideShow.SetSize(aW, aH: integer);
 begin
- FWidth := aW;
- FHeight := aH;
+  FWidth := aW;
+  FHeight := aH;
 end;
 
 procedure TSlideShow.AddImage(AFilename: string; AEffect: TSlideFX;
   AStayTime: single; ATransition: TSlideTransition; ATransitionTime: single);
 var o:TSlideStep;
 begin
- o := TSlideStep.Create;
- o.Filename:=AFilename;
- o.Effect:=AEffect;
- o.StayTime:=AStayTime;
- o.TransitionType:=ATransition;
- o.TransitionTime:=ATransitionTime;
+  o := TSlideStep.Create;
+  o.Filename := AFilename;
+  o.Effect := AEffect;
+  o.StayTime := AStayTime;
+  o.TransitionType := ATransition;
+  o.TransitionTime := ATransitionTime;
 
- FList.Add( o );
+  FList.Add(o);
 
- if FSlideState = stEmpty
-   then FSlideState := stStopped;
+  if FSlideState = stEmpty
+    then FSlideState := stStopped;
 end;
 
 procedure TSlideShow.Clear;
 begin
- UnsetCurrentStep( stNone, 0 );
+  UnsetCurrentStep(stNone, 0);
 
- while FList.Count > 0 do begin
-   GetSlideStep(0).Free;
-   FList.Delete(0);
- end;
+  while FList.Count > 0 do begin
+    GetSlideStep(0).Free;
+    FList.Delete(0);
+  end;
 
- FCurrentIndex := -1;
- FSlideState := stEmpty;
+  FCurrentIndex := -1;
+  FSlideState := stEmpty;
 end;
 
 procedure TSlideShow.Play( AFromBegin: boolean );
 begin
- if FSlideState = stEmpty then exit;
+  if FSlideState = stEmpty then exit;
 
- if AFromBegin or ( FCurrentIndex = -1 ) then begin
-   UnsetCurrentStep( stFadeToNextImage, 1 );
-   FCurrentIndex := 0;
-   SetCurrentStep;
- end;
-
- FSlideState := stPlaying;
+  if AFromBegin or (FCurrentIndex = -1) then begin
+    UnsetCurrentStep(stFadeToNextImage, 1);
+    FCurrentIndex := 0;
+    SetCurrentStep;
+  end;
+  FSlideState := stPlaying;
 end;
 
 procedure TSlideShow.Pause;
 begin
- if FSlideState = stEmpty then exit;
- if FSlideState = stStopped then exit;
+  if FSlideState = stEmpty then exit;
+  if FSlideState = stStopped then exit;
 
- if FSlideState = stPlaying
-   then FSlideState := stPaused
-   else FSlideState := stPlaying;
+  if FSlideState = stPlaying
+    then FSlideState := stPaused
+    else FSlideState := stPlaying;
 
 end;
 
 procedure TSlideShow.Stop;
 begin
- if FSlideState = stEmpty then exit;
- FSlideState := stStopped;
+  if FSlideState = stEmpty then exit;
+  FSlideState := stStopped;
 end;
 {$endif oglcIMPLEMENTATION}
 

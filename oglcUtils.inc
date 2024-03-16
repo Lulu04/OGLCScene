@@ -1,69 +1,60 @@
 {$ifdef oglcINTERFACE}
 
+function GLErrorToString(aError: GLenum): string;
+
+function FormatFloatWithDot(const aFmt: string; aValue: single): string;
+// convert the string to single. The string can have '.' or ','
 function StringToSingle(const aStr: string): single;
+
+
+// Add chars to a charset, avoiding redundant char. Return the modified charset.
+// Replace all kind of LineEnding by #10.
+function AddToCharset(const aCharSet, aCharsToAdd: string): string; overload;
+function AddToCharset(const aCharset: string; aCharsToAdd: TStringArray): string; overload;
+
+// Replace all kind of LineEnding by a simple #10.
+function AdjustLineEnding(const aText: string): string;
 
 function BGRAPixelToHex(aColor: TBGRAPixel): string;
 function HexToBGRAPixel(const s: string): TBGRAPixel;
-function PercentColor( const aColor : TBGRAPixel ;aPercent:single ) :TBGRAPixel;
+function PercentColor(const aColor : TBGRAPixel ;aPercent:single) :TBGRAPixel;
 
 // returns a time formated string HH:MM:SS.xx
 // if aShowFractionalPart is set to FALSE the .xx part is removed
-function SecondsToString( aTime: single; aShowFractionalPart: boolean ): string;
+function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
 
+function NextPowerOfTwo(aValue: integer): integer;
 
-// return a TBGRABitmap from a text and font attributes
-// aFillTexture is a texture used to fill the letters
-// Fill prior use aFillTexture, then gradient, then font color
-function TextToBitmap( aCaption: string; const aFont: TGuiFont;
-                        aFillTexture: TBGRABitmap=NIL): TBGRABitmap;
-
-// return a PTexture from a text and font attributes
-function TextToTexture( aCaption: string; const aFont: TGuiFont;
-                        aFillTexture: TBGRABitmap=NIL): PTexture;
-
-// return a sprite from a text and font attributes
-function TextToSprite( aCaption: string; const aFont: TGuiFont;
-                        aFillTexture: TBGRABitmap=NIL): TSprite;
-
-
-// return an array of sprite. One sprite for one character.
-// UseChilds=TRUE  => Result[0] have all the others sprites as children. Children coordinate are initialized
-// UseChilds=FALSE => all sprites are independent of each other.
-function TextToLetterSprite( aCaption: string; aFont: TGuiFont;
-                             aFillTexture: TBGRABitmap=NIL;
-                             UseChilds: boolean=FALSE): TArrayOfSprite;
+// load an svg file and return a BGRABitmap.
+// You can set aHeight=-1 to force TextureManager to calculate the right height to conserve aspect ratio.
+// Or you can set aWidth=-1 to force TextureManager to calculates the right width to conserve aspect ratio.
+// Both aWidth and aHeight can not be equal to -1.
+function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 
 // splits each words of a text. #10(line feed) is considered as a line break
-function SplitTextToWordArray( aText: string; aCharSeparator: char=' ' ): ArrayOfString;
+function SplitTextToWordArray(aText: string; aCharSeparator: char=' '): TStringArray;
 
-procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y, aAngle: single; aAlpha: byte; ATint: TBGRAPixel ); overload;
-procedure DrawTexture( aTexture: PTexture; AFrameIndex: integer; X, Y: single; Param: TSimpleSurfaceWithEffect; ALayerPercentOpacity: single=1.0 ); overload;
+// draw a box (without filling) using the current scene MVP matrix.
+procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0); overload;
+procedure DrawBox(const aScene: TOGLCScene; const aRect: TRect; const aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0); overload;
+procedure FillBox(const aScene: TOGLCScene; aX, aY, aWidth, aHeight: single; const aFillColor: TBGRAPixel; aOpacity: single=1.0); overload;
+procedure FillBox(const aScene: TOGLCScene; const aRect: TRect; const aFillColor: TBGRAPixel; aOpacity: single=1.0); overload;
+procedure DrawLine(const aScene: TOGLCScene; x1, y1, x2, y2: single; aColor: TBGRAPixel; w: single=1.0); overload;
+procedure DrawLine(const aScene: TOGLCScene; pt1, pt2: TPointF; aColor: TBGRAPixel; w: single=1.0); overload;
+procedure DrawEllipse(const aScene: TOGLCScene; aWidth, aHeight: integer; aRx, aRy: single; aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0);
 
-procedure DrawTexturePart( aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
-                           aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
-                           aPercentOpacity: single);
 
-procedure DrawStretchedTexture( aTexture: PTexture; AFrameIndex: integer;
-                                TopLeft, TopRight, BottomRight, BottomLeft: TPointF;
-                                aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
-                                aPercentOpacity: single);
+function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer=0): TPointF;
+function ScaleValueToFitSurface(aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 
-procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
-procedure DrawBox(X, Y, Width, Height: single; const BorderColor, FillColor: TBGRAPixel; w: single=1.0; aLayerPercentOpacity: single=1.0 ); overload;
-
-procedure FillBox(X, Y, Width, Height: single; FillColor: TBGRAPixel; const aLayerPercentOpacity: single=1.0 );
-procedure FillBox(X, Y, Width, Height: single; const aTopLeftColor, aTopRightColor, aBottomRightColor, aBottomLeftColor: TBGRAPixel; const aLayerPercentOpacity: single=1.0 ); overload;
-
-procedure DrawLine( x1, y1, x2, y2: single; Color: TBGRAPixel; w: single; const aLayerPercentOpacity: single=1.0 ); overload;
-procedure DrawLine( P1, P2: TPointF; Color: TBGRAPixel; w: single; const aLayerPercentOpacity: single=1.0 ); overload;
-
-procedure DrawPolygon( aPath:ArrayOfTPointF; Color: TBGRAPixel; w: single );
-
-procedure DrawEllipse( aCenter: TPointF; aRadius1, aRadius2: single; Color: TBGRAPixel; w: single );
-
-function ScaleValueToFitScene( aTexture: PTexture; AScene: TOGLCScene ): TPointF;
-function ScaleValueToFitSurface( aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect ): TPointF;
-function ScaleValueToFitRect( aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect ): TPointF;
+// This is an helper to distribute regularly child surfaces on their parent vertically or horizontally.
+//     aArea: the length of the parent area where the childs will be positionned
+//     aItemSize: the size of a child
+//     aItemCount: the child count
+//     aMargin: the computed margin between childs
+//     aDelta: the computed delta to add to separate childs
+procedure Distribute(aArea, aItemSize, aItemCount: integer; out aMargin, aDelta: single);
 
 function Distance(aPt1, aPt2: TPointF): single;
 
@@ -78,12 +69,9 @@ function IndexToColorAttachment( aIndex: integer ): GLenum;
 // the max value will be the returned value minus 1.
 function ColorAttachmentCount: GLint;
 
-// Activate/Deactivate the screen vertical blank synchonization
-procedure SetVSync( AValue: boolean );
-
 type
 TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
-procedure SetBlendMode( ABlendMode: byte );
+procedure SetBlendMode(ABlendMode: byte);
 
 var
   _glBlendFuncSeparateInitialized: boolean = FALSE;
@@ -91,15 +79,35 @@ var
   _FglCurrentBlendMode: byte = $FF;
 
 const
-  deg2rad = 0.017453292;
-  rad2deg = 57.29578049;
+  deg2rad: single = 0.017453292;
+  rad2deg: single = 57.29578049;
+  OneDiv255: single = 1/255;
 
 {$endif oglcINTERFACE}
-
-
-
 {$ifdef oglcIMPLEMENTATION}
 
+function GLErrorToString(aError: GLenum): string;
+begin
+  case aError of
+    GL_NO_ERROR: Result := 'no error';
+    GL_INVALID_ENUM: Result := 'invalid enum';
+    GL_INVALID_VALUE: Result := 'invalid value';
+    GL_INVALID_OPERATION: Result := 'invalid operation';
+    GL_STACK_OVERFLOW: Result := 'stack overflow';
+    GL_STACK_UNDERFLOW: Result := 'stack underflow';
+    GL_OUT_OF_MEMORY: Result := 'out of memory';
+    else Result := '???';
+  end;
+end;
+
+function FormatFloatWithDot(const aFmt: string; aValue: single): string;
+var i: integer;
+begin
+  Result := FormatFloat(aFmt, aValue);
+  i := Pos(',', Result);
+  if i > 0 then
+    Result[i] := '.';
+end;
 
 function StringToSingle(const aStr: string): single;
 var i, k, integerPart, decimalPart: integer;
@@ -122,6 +130,42 @@ begin
 
     Result := Single(integerPart+decimalPart/divisor);
   end;
+end;
+
+function AddToCharset(const aCharSet, aCharsToAdd: string): string;
+var pCur, pEnd: PChar;
+  len: integer;
+  codePoint: string;
+  i: PtrInt;
+begin
+  Result := Copy(aCharset, 1, Length(aCharSet));
+  if aCharsToAdd = '' then exit;
+  codePoint := '';
+  pCur := PChar(aCharsToAdd);
+  pEnd := pCur + Length(aCharsToAdd);
+  while pCur < pEnd do begin
+    len := UTF8CodepointSize(pCur);
+    SetLength(codePoint, len);
+    Move(pCur^, codePoint[1], len);
+    if (codePoint = #10) or (codePoint = #13) then i := 1 // remove all lineEnding
+      else i := UTF8Pos(codePoint, Result); //aCharSet);
+    if i = 0 then Result := Result + codepoint;
+    inc(pCur, len);
+  end;
+end;
+
+function AddToCharset(const aCharset: string; aCharsToAdd: TStringArray): string;
+var i: Integer;
+begin
+  Result := aCharset;
+  for i:=0 to High(aCharsToAdd) do
+    Result := AddToCharset(Result, aCharsToAdd[i]);
+end;
+
+function AdjustLineEnding(const aText: string): string;
+begin
+  Result := StringReplace(aText, #13#10, #10, [rfReplaceAll{, rfIgnoreCase}]);
+  Result := StringReplace(Result, #13, #10, [rfReplaceAll{, rfIgnoreCase}]);
 end;
 
 function BGRAPixelToHex(aColor: TBGRAPixel): string;
@@ -180,127 +224,64 @@ begin
      else Result+='.'+inttostr(t);
 end;
 
-function GradientRecordToBGRAGradient( FG: TFontGradient ): TBGRAGradientScanner;
+function NextPowerOfTwo(aValue: integer): integer;
 begin
- with FG do
- Result:=TBGRAGradientScanner.Create(c1, c2, GradientType, Origin, d1, gammaColorCorrection, Sinus);
+  Result := 1;
+  while Result < aValue do Result := Result shl 1;
 end;
 
-
-function TextToBitmap(aCaption: string; const aFont: TGuiFont; aFillTexture: TBGRABitmap): TBGRABitmap;
-var xx,yy:single;
-    renderer: TBGRATextEffectFontRenderer;
-    ts: TSize;
-    _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
-    _OutLineWidth: single;
-   grad: TBGRAGradientScanner;
+function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
+var svg: TBGRASVG;
+  FWHFactor, cw, ch: single;
 begin
- renderer:= TBGRATextEffectFontRenderer.Create;
- with aFont do begin
-    renderer.ShadowVisible := ShadowColor.alpha<>0;
-    renderer.ShadowColor := ShadowColor;
-    renderer.ShadowOffset.x := ShadowOffsetX;
-    renderer.ShadowOffset.y := ShadowOffsetY;
-    renderer.ShadowRadius := ShadowRadius;
-    renderer.OutlineVisible := (OutLineColor.alpha>0) and (OutLineWidth>0);
-    renderer.OutlineColor := OutLineColor;
-    renderer.OuterOutlineOnly := True;
-    renderer.OutlineWidth := OutLineWidth;
+  try
+    svg := TBGRASVG.Create(aSVGFileName);
 
-    Result := TBGRABitmap.Create( 1, 1 );
-    Result.FontRenderer := renderer;
-    Result.FontQuality:= fqFineAntialiasing;
-    Result.FontName := FontName;
-    Result.FontHeight := FontHeight;
-    Result.FontStyle := Style;
+    cw := svg.WidthAsPixel;
+    ch := svg.HeightAsPixel;
 
-    // force shadow param. to 0 if there is no shadow
-    if renderer.ShadowVisible then begin
-      _ShadowOffsetX:=ShadowOffsetX;
-      _ShadowOffsetY:=ShadowOffsetY;
-      _ShadowRadius:=ShadowRadius;
-    end else begin
-       _ShadowOffsetX:=0;
-       _ShadowOffsetY:=0;
-       _ShadowRadius:=0;
-    end;
-    // force outline param. to 0 if there is no outline
-    if renderer.OutlineVisible
-      then _OutLineWidth:=OutLineWidth
-      else _OutLineWidth:=0;
-
-    // size of the rendered font. try to take into account shadow and outline.
-    ts := Result.TextSize(aCaption);
-
-    Result.SetSize( ts.cx + round(_OutlineWidth)+abs( _ShadowOffsetX ){%H-}+_ShadowRadius*2,
-                    ts.cy + round(_OutlineWidth)+abs( _ShadowOffsetY ){%H-}+_ShadowRadius*2 );
-
-    xx := _OutlineWidth*0.5+_ShadowRadius;
-    yy:= xx;
-    if _ShadowOffsetX<0 then xx += Abs(_ShadowOffsetX);
-    if _ShadowOffsetY<0 then yy += Abs(_ShadowOffsetY);
-
-    Result.Fill( BGRAPixelTransparent );
-    if aFillTexture<>NIL
-      then Result.TextOut( xx, yy, aCaption, aFillTexture)
-      else if UseGradient then begin
-             grad:= GradientRecordToBGRAGradient( Gradient );
-             Result.TextOut( xx, yy, aCaption, grad );
-             grad.Free;
-           end else Result.TextOut( xx, yy, aCaption, FontColor );
-
- end;
+    FWHFactor := cw/ch;
+    if (aWidth = -1) and (aHeight = -1) then
+      Exception.Create('SVGDraw: parameters aImageWidth and aImageHeight are both equal to -1...');
+    if aWidth = -1 then aWidth := round(aHeight*FWHFactor);
+    if aHeight = -1 then aHeight := round(aWidth/FWHFactor);
+    Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
+    svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, FALSE);
+  finally
+    svg.Free;
+  end;
 end;
 
-function TextToTexture(aCaption: string; const aFont: TGuiFont;aFillTexture: TBGRABitmap=NIL): PTexture;
-var ima: TBGRABitmap;
-begin
- ima := TextToBitmap( aCaption, aFont, aFillTexture );
- Result := TextureManager.Add( ima );
- ima.Free;
-end;
-
-function TextToSprite(aCaption: string; const aFont: TGuiFont;
-  aFillTexture: TBGRABitmap): TSprite;
-var t: PTexture;
-begin
- t := TextToTexture(aCaption, aFont, aFillTexture );
- Result := TSprite.Create( t, TRUE );
-end;
-
-function TextToLetterSprite(aCaption: string; aFont: TGuiFont;
-  aFillTexture: TBGRABitmap; UseChilds: boolean): TArrayOfSprite;
+function SplitTextToWordArray(aText: string; aCharSeparator: char): TStringArray;
 var i: integer;
-begin
- Result := NIL;
- SetLength( Result, UTF8Length( aCaption ));
-
- for i:=0 to Length( Result )-1 do begin
-   Result[i] := TextToSprite( UTF8Copy(aCaption, i+1, 1 ), aFont, aFillTexture );
-   if UseChilds and (i>0) then begin
-     Result[i].SetCoordinate( Result[i-1].Width, 0 );
-     Result[0].AddChild( Result[i] );
-   end;
- end;
-end;
-
-function SplitTextToWordArray(aText: string; aCharSeparator: char): ArrayOfString;
-var i, w: integer;
-   function IsLineFeed: boolean;
+{   function IsLineFeed: boolean;
    begin
-    Result := aText[i]=#10;
+    Result := aText[i] = #10;
    end;
    procedure AddNewLine;
    begin
     inc(w);
     SetLength(Result, w+1);
-    Result[w] := '';
-   end;
+    Result[w] := #10;
+   end;  }
 begin
- SetLength( Result, 0 );
- if Length( aText ) = 0 then exit;
+  Result := NIL;
+  if Length(aText) = 0 then exit;
 
- // prepare the string
+  // replace all possible LineEnding combinations by #10
+  aText := StringReplace(aText, #13#10, #10, [rfReplaceAll{, rfIgnoreCase}]);
+  aText := StringReplace(aText, #13, #10, [rfReplaceAll{, rfIgnoreCase}]);
+
+  // add a aCharSeparator before and after each #10
+  for i:=Length(aText) downTo 1 do
+    if (aText[i] = #10) and (i > 1) then begin
+      Insert(aCharSeparator, aText, i+1);
+      Insert(aCharSeparator, aText, i);
+    end;
+
+  Result := aText.Split([aCharSeparator]);
+
+{ // prepare the string
  if aText[1] <> aCharSeparator
    then aText := aCharSeparator {%H-}+ aText;
 
@@ -308,396 +289,80 @@ begin
  w := -1;
  repeat
   if IsLineFeed then begin
-    if Result[w]<>'' then AddNewLine;
+    if Result[w] <> '' then AddNewLine;
     Result[w] := aText[i];
     AddNewLine;
   end else if aText[i] <> aCharSeparator
              then Result[w] := Result[w] + aText[i]
              else AddNewLine;
   inc ( i );
- until i>Length( aText );
+ until i>Length( aText ); }
 end;
 
-
-procedure DrawTexture(aTexture: PTexture; AFrameIndex: integer; X, Y, aAngle: single; aAlpha: byte; ATint: TBGRAPixel);
-var
-  quad : array[ 0..3 ] of TPointF;
-  TexCoord : TTexCoor;
-  AlphaTint: byte;
-  x1, x2 : Single;
-  y1, y2 : Single;
-  cX, cY : Single;
-  c, s   : Single;
-  aX, aY, aW, aH : Single;
-  procedure DrawVertex;
-   begin
-    glBegin( GL_QUADS );
-      glTexCoord2fv( @TexCoord[0] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @TexCoord[1] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @TexCoord[2] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @TexCoord[3] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
+procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single; aOpacity: single);
+var path: TOGLCPath;
 begin
- if aTexture = nil then exit;
+  path := NIL;
+  path.CreateRect(aWidth, aHeight);
+  path.ClosePath;
+  path.Translate(PointF(aX, aY));
+//  aScene.SmoothLineRenderer.PushPath(path, lpInside, aColor, w, aOpacity, False);
 
- if AFrameIndex < 0
-   then AFrameIndex := 0
-   else if AFrameIndex >= aTexture^.FrameCount
-          then AFrameIndex := aTexture^.FrameCount-1;
-
- TexCoord := aTexture^.FramesCoord[AFrameIndex];
-
- aX := X;
- aY := Y;
- if AFrameIndex > 0
-   then begin
-    aW := aTexture^.FrameWidth;
-    aH := aTexture^.FrameHeight;
-   end else begin
-    aW := aTexture^.ImageWidth;
-    aH := aTexture^.ImageHeight;
-   end;
-
- if aAngle <> 0
-   then begin
-         x1 := -aW / 2;
-         y1 := -aH / 2;
-         x2 := -x1;
-         y2 := -y1;
-         cX :=  aX + x2;
-         cY :=  aY + y2;
-         sincos( aAngle * deg2rad, s, c );
-         quad[ 0 ].X := x1 * c - y1 * s + cX; quad[ 0 ].Y := x1 * s + y1 * c + cY;
-         quad[ 1 ].X := x2 * c - y1 * s + cX; quad[ 1 ].Y := x2 * s + y1 * c + cY;
-         quad[ 2 ].X := x2 * c - y2 * s + cX; quad[ 2 ].Y := x2 * s + y2 * c + cY;
-         quad[ 3 ].X := x1 * c - y2 * s + cX; quad[ 3 ].Y := x1 * s + y2 * c + cY;
-        end
-   else begin
-         quad[ 0 ].X := aX; quad[ 0 ].Y := aY;
-         quad[ 1 ].X := aX + aW; quad[ 1 ].Y := aY;
-         quad[ 2 ].X := aX + aW; quad[ 2 ].Y := aY + aH;
-         quad[ 3 ].X := aX; quad[ 3 ].Y := aY + aH;
-        end;
-
-// glEnable(GL_BLEND);
-// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
- TextureManager.BindTexture( aTexture );
-
- if ATint.alpha < 255
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-         glColor4ub( 255, 255, 255, aAlpha );
-         DrawVertex;
-        end;
-
- if ATint.alpha <> 0
-   then begin  //Apply Tint
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-         AlphaTint:=round( ATint.alpha * aAlpha / 255 );
-         glColor4ub( ATint.red, ATint.Green, ATint.Blue, AlphaTint);
-         DrawVertex;
-        end;
-
- TextureManager.DisableTextureUsage;
- {$IFDEF DEBUG_MODE_ON}
-   DrawBox(X, Y, aTexture^.TextureWidth, aTexture^.TextureHeight, BGRA(255,0,0) );
- {$ENDIF}
+  aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
+  aScene.FastLineRenderer.PushPath(path, aColor, w, lpMiddle);
 end;
 
-procedure DrawTexture(aTexture: PTexture; AFrameIndex: integer; X, Y: single; Param: TSimpleSurfaceWithEffect; ALayerPercentOpacity: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  tci  : PTextureCoordIndex;
-  TexCoord : TTexCoor;
-
-  x1, x2 : Single;
-  y1, y2 : Single;
-  cX, cY : Single;
-  c, s   : Single;
-  AlphaTint:byte;
-  i:integer;
-  aX, aY, aW, aH : Single ;
-  procedure DrawVertex ;
-   begin
-    glBegin( GL_QUADS );
-      glTexCoord2fv( @TexCoord[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
+procedure DrawBox(const aScene: TOGLCScene; const aRect: TRect; const aColor: TBGRAPixel; w: single; aOpacity: single);
 begin
- if aTexture = nil then exit;
+  DrawBox(aScene, aRect.Left, aRect.Top, aRect.Width, aRect.Height, aColor, w, aOpacity);
+end;
 
- if AFrameIndex < 0
-   then AFrameIndex := 0
-   else if AFrameIndex >= aTexture^.FrameCount
-          then AFrameIndex := aTexture^.FrameCount-1;
+procedure FillBox(const aScene: TOGLCScene; aX, aY, aWidth, aHeight: single; const aFillColor: TBGRAPixel; aOpacity: single);
+var computedTint: TColorF;
+begin
+  computedTint.SetAsTransparent;
+  aScene.ThreeColorTriangleRenderer.Prepare(ptTriangleStrip, aScene.MVPMatrix, aOpacity, computedTint, 0);
+  aScene.ThreeColorTriangleRenderer.PushRectangle(aX, aY, aWidth, aHeight, aFillColor);
+end;
 
- TexCoord := aTexture^.FramesCoord[AFrameIndex];
+procedure FillBox(const aScene: TOGLCScene; const aRect: TRect; const aFillColor: TBGRAPixel; aOpacity: single);
+begin
+  FillBox(aScene, aRect.Left, aRect.Top, aRect.Width, aRect.Height, aFillColor, aOpacity);
+end;
 
- aX := X;
- aY := Y;
+procedure DrawLine(const aScene: TOGLCScene; x1, y1, x2, y2: single; aColor: TBGRAPixel; w: single);
+begin
+  aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
+  aScene.FastLineRenderer.PushLine(PointF(x1, y1), PointF(x2, y2), aColor, w, lpMiddle);
+end;
 
- with Param do
-  begin
-            if AFrameIndex>0
-              then begin
-                    aW := Width;
-                    aH := Height;
-              end else begin
-                    aW := aTexture^.ImageWidth;
-                    aH := aTexture^.ImageHeight;
-              end;
+procedure DrawLine(const aScene: TOGLCScene; pt1, pt2: TPointF; aColor: TBGRAPixel; w: single);
+begin
+  aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
+  aScene.FastLineRenderer.PushLine(pt1, pt2, aColor, w, lpMiddle);
+end;
 
-            // Scale
-            if (Scale.x.Value <> 1) or (Scale.y.Value <> 1) Then
-              begin
-                aX := aX + ( aW - aW * Scale.x.Value ) / 2;
-                aY := aY + ( aH - aH * Scale.y.Value ) / 2;
-                aW := aW * Scale.x.Value;
-                aH := aH * Scale.y.Value;
-              end;
-            // Flip
-            i:=0;
-            if FFlipH then inc( i );
-            if FFlipV then inc( i, 2 );
-            tci := @FLIP_TEXCOORD[ i ];
+procedure DrawEllipse(const aScene: TOGLCScene; aWidth, aHeight: integer; aRx, aRy: single; aColor: TBGRAPixel;
+  w: single; aOpacity: single);
+var path: TOGLCPath;
+begin
+  path := NIL;
+  path.CreateEllipse(aWidth, aHeight, aRx, aRy);
+  path.ClosePath;
+  aScene.SmoothLineRenderer.PushPath(path, lpInside, aColor, w, aOpacity, True);
+end;
 
-            if Angle.Value <> 0
-              then begin
-                    x1 := -aW / 2;
-                    y1 := -aH / 2;
-                    x2 := -x1;
-                    y2 := -y1;
-                    cX :=  aX + x2;
-                    cY :=  aY + y2;
-                    sincos( Angle.Value * deg2rad, s, c );
-                    quad[ 0 ].X := x1 * c - y1 * s + cX; quad[ 0 ].Y := x1 * s + y1 * c + cY;
-                    quad[ 1 ].X := x2 * c - y1 * s + cX; quad[ 1 ].Y := x2 * s + y1 * c + cY;
-                    quad[ 2 ].X := x2 * c - y2 * s + cX; quad[ 2 ].Y := x2 * s + y2 * c + cY;
-                    quad[ 3 ].X := x1 * c - y2 * s + cX; quad[ 3 ].Y := x1 * s + y2 * c + cY;
-                   end
-              else begin
-                    quad[ 0 ].X := aX; quad[ 0 ].Y := aY;
-                    quad[ 1 ].X := aX + aW; quad[ 1 ].Y := aY;
-                    quad[ 2 ].X := aX + aW; quad[ 2 ].Y := aY + aH;
-                    quad[ 3 ].X := aX; quad[ 3 ].Y := aY + aH;
-                   end;
-            // Skew
-            quad[0].X += Skew.x.Value;
-            quad[0].Y += Skew.y.Value;
-            quad[1].X += Skew.x.Value;
-            quad[1].Y += Skew.y.Value;
-
-     //       glEnable(GL_BLEND);
-     //       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-            TextureManager.BindTexture( aTexture );
-
-            if Tint.alpha.Value < 255
-              then begin
-                    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-                    glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-                    DrawVertex;
-                   end;
-
-            if Tint.alpha.Value <> 0
-              then begin  //Apply Tint
-                    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-                    glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-                    glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-                    AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-                    glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-                    DrawVertex;
-                   end;
-
-      //      TextureManager.DisableTextureUsage;
-            {$IFDEF DEBUG_MODE_ON}
-              DrawBox(X.Value, Y.Value, Width, Height, BGRA(255,0,0));
-            {$ENDIF}
+procedure Distribute(aArea, aItemSize, aItemCount: integer; out aMargin, aDelta: single);
+var delta: Integer;
+begin
+  delta := aArea - aItemSize * aItemCount;
+  if delta < 0 then begin
+    aMargin := 0;
+    aDelta := aItemSize;
+  end else begin
+    aMargin := delta/(aItemCount+1);
+    aDelta := aItemSize + aMargin;
   end;
-end;
-
-procedure DrawTexturePart(aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
-  aFlipH, aFlipV: boolean; aTint: TBGRAPixel; aPercentOpacity: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  tci  : PTextureCoordIndex;
-  i: integer;
-  procedure DrawVertex ;
-   begin
-    glBegin( GL_QUADS );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
-begin
- if aTexture = nil then exit;
- TextureManager.BindTexture( aTexture );
-
- quad[0] := aScreenCoor^[0];
- quad[1] := aScreenCoor^[1];
- quad[2] := aScreenCoor^[2];
- quad[3] := aScreenCoor^[3];
-
- // Flip
- i:=0;
- if aFlipH then inc( i );
- if aFlipV then inc( i, 2 );
- tci := @FLIP_TEXCOORD[ i ];
-
- if aTint.alpha < 255
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-         glColor4ub(255,255,255,round(255*aPercentOpacity));
-         DrawVertex;
-        end;
-
- if aTint.alpha <> 0
-   then begin  //Apply Tint
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-         glColor4ub( aTint.red, aTint.Green, aTint.Blue, round(aTint.alpha*aPercentOpacity));
-         DrawVertex;
-        end;
-end;
-
-procedure DrawStretchedTexture(aTexture: PTexture; AFrameIndex: integer;
-                          TopLeft, TopRight, BottomRight, BottomLeft: TPointF;
-                          aFlipH, aFlipV: boolean; aTint: TBGRAPixel;
-                          aPercentOpacity: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  tci  : PTextureCoordIndex;
-  i: integer;
-  TexCoord : TTexCoor;
-  procedure DrawVertex;
-   begin
-    glBegin( GL_QUADS );
-      glTexCoord2fv( @TexCoord[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @TexCoord[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
-begin
-// if aTexture = nil then exit;
-// if aPercentOpacity=0 then exit;
- TextureManager.BindTexture( aTexture );
-
- AFrameIndex := EnsureRange( AFrameIndex, 0, aTexture^.FrameCount-1);
- TexCoord := aTexture^.FramesCoord[AFrameIndex];
-
- quad[0] := TopLeft;
- quad[1] := TopRight;
- quad[2] := BottomRight;
- quad[3] := BottomLeft;
-
- // Flip
- i:=0;
- if aFlipH then inc( i );
- if aFlipV then inc( i, 2 );
- tci := @FLIP_TEXCOORD[ i ];
-
- if aTint.alpha < 255
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-         glColor4ub(255,255,255,round(255*aPercentOpacity));
-         DrawVertex;
-        end;
-
- if aTint.alpha <> 0
-   then begin  //Apply Tint
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-         glColor4ub( aTint.red, aTint.Green, aTint.Blue, round(aTint.alpha*aPercentOpacity));
-         DrawVertex;
-        end;
-end;
-
-procedure DrawBox(X, Y, Width, Height: single; const BorderColor: TBGRAPixel; w: single; aLayerPercentOpacity: single);
-begin
- X += 0.5;
- Y += 0.5;
-
- if (width=0) or (Height=0) then exit;
-
- glLineWidth( w );
- glColor4ub( BorderColor.red, BorderColor.green, BorderColor.blue, round(BorderColor.alpha*aLayerPercentOpacity) );
- glBegin( GL_LINES );
-   glVertex2f( X, Y );
-   glVertex2f( X + Width, Y );
-
-   glVertex2f( X + Width, Y );
-   glVertex2f( X + Width, Y + Height );
-
-   glVertex2f( X + Width, Y + Height );
-   glVertex2f( X, Y + Height );
-
-   glVertex2f( X, Y + Height );
-   glVertex2f( X, Y );
- glEnd;
-end;
-
-procedure DrawBox(X, Y, Width, Height: single; const BorderColor, FillColor: TBGRAPixel; w: single; aLayerPercentOpacity: single);
-begin
- FillBox( X, Y, Width, Height, FillColor, aLayerPercentOpacity );
- DrawBox(X, Y, Width, Height, BorderColor, w, aLayerPercentOpacity );
-end;
-
-procedure FillBox(X, Y, Width, Height: single; FillColor: TBGRAPixel; const aLayerPercentOpacity : single);
-begin
- if (width=0) or (Height=0) then exit;
- glColor4ub( FillColor.red, FillColor.green, FillColor.blue, round(FillColor.alpha*aLayerPercentOpacity) );
- glBegin( GL_QUADS );
-   glVertex2f( X, Y );
-   glVertex2f( X + Width, Y );
-   glVertex2f( X + Width, Y + Height );
-   glVertex2f( X, Y + Height );
- glEnd;
-end;
-
-procedure FillBox(X, Y, Width, Height: single; const aTopLeftColor, aTopRightColor, aBottomRightColor,
-  aBottomLeftColor: TBGRAPixel; const aLayerPercentOpacity: single);
-begin
- if (width=0) or (Height=0) then exit;
- glBegin( GL_QUADS );
-   with aTopLeftColor do glColor4ub( red, green, blue, round(alpha*aLayerPercentOpacity) );
-   glVertex2f( X, Y );
-   with aTopRightColor do glColor4ub( red, green, blue, round(alpha*aLayerPercentOpacity) );
-   glVertex2f( X + Width, Y );
-   with aBottomRightColor do glColor4ub( red, green, blue, round(alpha*aLayerPercentOpacity) );
-   glVertex2f( X + Width, Y + Height );
-   with aBottomLeftColor do glColor4ub( red, green, blue, round(alpha*aLayerPercentOpacity) );
-   glVertex2f( X, Y + Height );
- glEnd;
-end;
-
-procedure DrawLine(x1, y1, x2, y2: single; Color: TBGRAPixel; w: single; const aLayerPercentOpacity: single);
-begin
- glLineWidth( w );
- glEnable( GL_LINE_SMOOTH );
- glColor4ub( Color.red, Color.green, Color.blue, round(Color.alpha*aLayerPercentOpacity) );
- glBegin( GL_LINES );
-   glVertex2f( x1 + 0.5, y1 + 0.5 );
-   glVertex2f( x2 + 0.5, y2 + 0.5 );
- glEnd;
- glDisable( GL_LINE_SMOOTH );
-end;
-
-procedure DrawLine(P1, P2: TPointF; Color: TBGRAPixel;
-  w:single; const aLayerPercentOpacity: single);
-begin
- DrawLine( P1.x, P1.y, P2.x, P2.y, Color, w, aLayerPercentOpacity);
 end;
 
 function Distance(aPt1, aPt2: TPointF): single;
@@ -720,98 +385,15 @@ end;
 
 function IndexToColorAttachment(aIndex: integer): GLenum;
 begin
-{ case aIndex of
-   1: Result:=GL_COLOR_ATTACHMENT1;
-   2: Result:=GL_COLOR_ATTACHMENT2;
-   3: Result:=GL_COLOR_ATTACHMENT3;
-   4: Result:=GL_COLOR_ATTACHMENT4;
-   5: Result:=GL_COLOR_ATTACHMENT5;
-   6: Result:=GL_COLOR_ATTACHMENT6;
-   7: Result:=GL_COLOR_ATTACHMENT7;
-   8: Result:=GL_COLOR_ATTACHMENT8;
-   9: Result:=GL_COLOR_ATTACHMENT9;
-   10: Result:=GL_COLOR_ATTACHMENT10;
-   11: Result:=GL_COLOR_ATTACHMENT11;
-   12: Result:=GL_COLOR_ATTACHMENT12;
-   13: Result:=GL_COLOR_ATTACHMENT13;
-   14: Result:=GL_COLOR_ATTACHMENT14;
-   15: Result:=GL_COLOR_ATTACHMENT15;
-   else Result:= GL_COLOR_ATTACHMENT0;
- end;   }
- Result:= GL_COLOR_ATTACHMENT0+aIndex;
+ Result := GL_COLOR_ATTACHMENT0+aIndex;
 end;
 
 function ColorAttachmentCount: GLint;
 var c: GLint;
 begin
  glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, @c);
- Result:=c;
+ Result := c;
 end;
-
-
-procedure SetVSync( AValue: boolean );
-const
-{$IFDEF Windows}
-opengllib = 'opengl32.dll';
-{$ELSE}
-{$IFDEF OS2}
-opengllib = 'opengl.dll';
-{$ELSE OS2}
-{$ifdef darwin}
-opengllib = '/System/Library/Frameworks/OpenGL.framework/Libraries/libGL.dylib';
-{$ELSE}
-{$ifdef haiku}
-opengllib = 'libGL.so';
-{$else}
-opengllib = 'libGL.so.1';
-{$endif}
-{$endif}
-{$ENDIF OS2}
-{$ENDIF}
-
-{$MACRO ON}
-{$IFDEF Windows}
-{$DEFINE extdecl := stdcall}
-{$ELSE}
-{$DEFINE extdecl := cdecl}
-{$ENDIF}
-var
-  HLib: TLibHandle;
-  wglSwapInterval: function(interval: GLint): LongBool; extdecl;
-begin
- HLib := DynLibs.LoadLibrary( opengllib );
- if HLib <> DynLibs.NilHandle then begin
-  Pointer(wglSwapInterval) := DynLibs.GetProcedureAddress( HLib, PChar('wglSwapInterval'));
-  if wglSwapInterval<>NIL then wglSwapInterval( Integer( AValue ));
-  DynLibs.UnloadLibrary(HLib);
- end;
-end;
-
-{
-function dlopen ( lpLibFileName : PAnsiChar) : HMODULE; stdcall; external 'kernel32.dll' name 'LoadLibraryA';
-function dlclose( hLibModule : HMODULE ) : Boolean; stdcall; external 'kernel32.dll' name 'FreeLibrary';
-//function dlsym  ( hModule : HMODULE; lpProcName : PAnsiChar) : Pointer; stdcall; external 'kernel32.dll' name 'GetProcAddress';
-function wglGetProcAddress(proc: PAnsiChar): Pointer; stdcall; external 'opengl32.dll';
-procedure SetVSync( AValue: boolean );
-type
-  TSwapIntervalFunc = function( interval: GLInt ): LongBool ; stdcall;
-var oglLibrary: HMODULE=0;
-    wglSwapInterval: function(interval: GLint): LongBool; stdcall;
-  function gl_GetProc( const Proc : UTF8String ) : Pointer;
-  begin
-    Result := wglGetProcAddress( PAnsiChar( Proc ) );
-    if Result = nil Then
-      Result := wglGetProcAddress( PAnsiChar( Proc + 'ARB' ) );
-    if Result = nil Then
-      Result := wglGetProcAddress( PAnsiChar( Proc + 'EXT' ) );
-  end;
-begin
- oglLibrary := dlopen( 'opengl32.dll' {$IFDEF UNIX}, $001 {$ENDIF} );
- wglSwapInterval := TSwapIntervalFunc( gl_GetProc( 'wglSwapInterval' ));
- if wglSwapInterval<>NIL then wglSwapInterval( Integer( AValue ));
- dlclose( oglLibrary );
-end;
-}
 
 procedure SetBlendMode(ABlendMode: byte);
 var src : LongWord;
@@ -819,14 +401,14 @@ var src : LongWord;
     procedure EnableglBlend; inline;
     begin
      if not _FglBlendIsEnabled
-       then glEnable( GL_BLEND );
-     _FglBlendIsEnabled := TRUE;
+       then glEnable(GL_BLEND);
+     _FglBlendIsEnabled := True;
     end;
     procedure DisableglBlend; inline;
     begin
      if _FglBlendIsEnabled
-       then glDisable( GL_BLEND );
-     _FglBlendIsEnabled := FALSE;
+       then glDisable(GL_BLEND);
+     _FglBlendIsEnabled := False;
     end;
 begin
  if _FglCurrentBlendMode = ABlendMode then exit;
@@ -853,51 +435,34 @@ begin
    end;
  end;
  if not _glBlendFuncSeparateInitialized then begin
-   glBlendFuncSeparate := TBlendFuncSeparateProc( wglGetProcAddress( 'glBlendFuncSeparate' ));
-   _glBlendFuncSeparateInitialized := true;
+   glBlendFuncSeparate := TBlendFuncSeparateProc(wglGetProcAddress( 'glBlendFuncSeparate'));
+   _glBlendFuncSeparateInitialized := True;
  end;
  if Assigned( glBlendFuncSeparate )
-   then glBlendFuncSeparate( {%H-}src, {%H-}dst, GL_ONE, GL_ONE_MINUS_SRC_ALPHA )
-   else glBlendFunc( src, dst );
+   then glBlendFuncSeparate({%H-}src, {%H-}dst, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+   else glBlendFunc(src, dst);
  _FglCurrentBlendMode := ABlendMode;
 end;
 
-procedure DrawPolygon(aPath: ArrayOfTPointF; Color: TBGRAPixel; w: single);
-var i: integer;
-begin
- for i:=1 to Length( aPath )-1 do
-  DrawLine( aPath[i-1], aPath[i], Color, w, 1 );
-end;
-
-procedure DrawEllipse(aCenter: TPointF; aRadius1, aRadius2: single;
-  Color: TBGRAPixel; w: single);
-var path: ArrayOfTPointF;
-begin
- path := ComputeEllipse( aCenter.x, aCenter.y, aRadius1, aRadius2 );
- DrawPolygon( path, Color, w );
-end;
-
-function ScaleValueToFitScene( aTexture: PTexture; AScene: TOGLCScene): TPointF;
+function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer): TPointF;
 var rl,rh,r: single;
 begin
- rl := AScene.Width / aTexture^.ImageWidth;
- rh := AScene.Height / aTexture^.ImageHeight;
+ rl := (AScene.Width-aSideMargin) / aTexture^.TextureWidth;
+ rh := (AScene.Height-aSideMargin) / aTexture^.TextureHeight;
  if rl < rh then r := rl else r := rh;
  Result := PointF(r, r);
 end;
 
-function ScaleValueToFitSurface(aTexture: PTexture;
-  aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+function ScaleValueToFitSurface(aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 var rl,rh,r: single;
 begin
- rl := aTargetSurface.Width / aTexture^.ImageWidth;
- rh := aTargetSurface.Height / aTexture^.ImageHeight;
+ rl := aTargetSurface.Width / aTexture^.TextureWidth;
+ rh := aTargetSurface.Height / aTexture^.TextureHeight;
  if rl < rh then r := rl else r := rh;
  Result := PointF(r, r);
 end;
 
-function ScaleValueToFitRect(aRect: TRectF;
-  aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 var rl,rh,r: single;
 begin
  rl := aTargetSurface.Width / aRect.Width;

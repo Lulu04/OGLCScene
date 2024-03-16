@@ -4,56 +4,61 @@ type
 
   { TDeformationGrid }
 
-  TDeformationType = ( dtNone, dtWaveH, dtWaveV, dtTumultuousWater, dtTumultuousWater2, dtFinFish,
+  TDeformationType = ( dtNone,
+                       dtBasic,
+                       dtWaveH, dtWaveV,
+                       dtTumultuousWater,
+                       dtFinFish,
                        dtSnakeH, dtSnakeV,
-                       dtFlagRight);
+                       dtFlagRight,
+                       dtWindingUp, dtWindingDown, dtWindingLeft, dtWindingRight);
 
-TDeformationGrid = class( TSprite )
-    Destructor Destroy; override;
-  private
-    FGridPts: ArrayOfArrayOfTPointF;
-    FWidth, FHeight: integer;
-    FRowCount, FColumnCount: integer;
-    FShowGrid: boolean;
-    FDeformationType: TDeformationType;
-    FTimeCount: single;
+TDeformedPoint = record
+  x, y,                      // transformed node coordinates
+  DeformationAmount,         // [0..1] to control the amount of deformation per node
+  TimeMultiplicator: single; // <1 is slower  =1 is normal   >1 is faster
+end;
+PDeformedPoint = ^TDeformedPoint;
+ArrayOfArrayOfDeformedPoint = array of array of TDeformedPoint;
 
-    FHCell, FWCell,
-    YpcRef: single;
-    FApplyShadows: boolean;
-    procedure Init; override;
-    // draw part of texture
-    procedure DrawTexturePart( aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor; aLayerPercentOpacity : single );
+TDeformationGrid = class(TSprite)
+private
+  FGridPts: ArrayOfArrayOfDeformedPoint;
+  FRowCount, FColumnCount: integer;
+  FShowGrid, FInitialized: boolean;
+  FDeformationType: TDeformationType;
+  FTimeCount: single;
+  FCellHeight, FCellWidth: single;
+  procedure Init; override;
+public
+  Destructor Destroy; override;
+  procedure Update(const aElapsedTime: single); override;
+  procedure DoDraw; override;
+public
+  DeformationSpeed: TPointFParam; // <1 = slower  >1 faster   .X=Horizontam speed  .Y=Vertical speed
+  Amplitude: TPointFParam; // deformation amplitude
+  // apply a prebuild deformation on the grid
+  procedure ApplyDeformation(aType: TDeformationType);
+public
+  // set grid size.
+  // Row index range is 0 to aRowCount
+  // Column index range is 0 to aColumnCount
+  procedure SetGrid(aRowCount, aColumnCount: integer);
 
-    // draw part of texture and darkened the hollow areas
-    // the idea is that the y coordinate of the vertex represents its height
-    // if a vertex.y > aHeightRef -> mix color White
-    // else the color of the vertex is proportionally closer to black
-    procedure DrawTexturePartWithShadows( aTexture: PTexture; aScreenCoor, aTexCoor: PTexCoor;
-                               aHeightRef, aLayerPercentOpacity : single );
-  protected
-    function GetWidth: integer; override;
-    function GetHeight: integer; override;
-  public
-    procedure Update( const aElapsedTime: single ); override;
-    procedure Draw( const aLayerPercentOpacity: single ); override;
-  public
-   DeformationSpeed: TPointFParam; // <1 = slower  >1 faster   .X=Horizontam speed  .Y=Vertical speed
-   Amplitude: TPointFParam; // deformation amplitude
-   // apply a prebuild transformation on the grid
-   procedure ApplyDeformation( aType: TDeformationType );
-  public
-   // set grid size
-   procedure SetGrid( aWidth, aHeight, aRowCount, aColumnCount: integer );
+  procedure SetDeformationAmountOnRow(aRowIndex: integer; aDeformationAmount: single);
+  procedure SetDeformationAmountOnColumn(aColIndex: integer; aDeformationAmount: single);
 
-   // access grid points
-   property Grid: ArrayOfArrayOfTPointF read FGridPts;
-   property ShowGrid: boolean read FShowGrid write FShowGrid;
-   property RowCount: integer read FRowCount;
-   property ColumnCount: integer read FColumnCount;
+  procedure SetTimeMultiplicatorOnRow(aRowIndex: integer; aTimeMultiplicator: single);
+  procedure SetTimeMultiplicatorOnColumn(aColIndex: integer; aTimeMultiplicator: single);
 
-   property ApplyShadows: boolean read FApplyShadows write FApplyShadows;
-   property pcHeightRef: single read YpcRef write YpcRef;
+  procedure SetDeformationAmountOnAllSide(aDeformationAmount: single);
+  procedure SetTimeMultiplicatorOnAllSide(aTimeMultiplicator: single);
+
+  // access grid points
+  property Grid: ArrayOfArrayOfDeformedPoint read FGridPts;
+  property ShowGrid: boolean read FShowGrid write FShowGrid;
+  property RowCount: integer read FRowCount;
+  property ColumnCount: integer read FColumnCount;
 end;
   {$endif oglcINTERFACE}
   {$ifdef oglcIMPLEMENTATION}
@@ -62,390 +67,288 @@ end;
 
 destructor TDeformationGrid.Destroy;
 begin
- DeformationSpeed.Free;
- Amplitude.Free;
- inherited Destroy;
+  FreeAndNil(DeformationSpeed);
+  FreeAndNil(Amplitude);
+  inherited Destroy;
 end;
 
 procedure TDeformationGrid.Init;
 begin
- inherited Init;
- SetLength( FGridPts, 2, 2 );
- FGridPts[0][0] := PointF(0,0);
- FGridPts[0][1] := PointF(50,0);
- FGridPts[1][0] := PointF(0,50);
- FGridPts[1][1] := PointF(50,50);
+  inherited Init;
+  FShowGrid := FALSE;
+  FInitialized := False;
 
- FRowCount := 2;
- FColumnCount := 2;
+  FDeformationType := dtNone;
 
- FWidth := 50;
- FHeight := 50;
+  DeformationSpeed := TPointFParam.Create;
+  DeformationSpeed.Value := PointF(1,1);
 
- FShowGrid := FALSE;
-
- FDeformationType := dtNone;
-
- FHCell := 50;
- FWCell := 50;
- YpcRef := 0.5;
- FApplyShadows:=FALSE;
-
- DeformationSpeed := TPointFParam.Create;
- DeformationSpeed.Value := PointF(1,1);
-
- Amplitude := TPointFParam.Create;
- Amplitude.Value := PointF(1,1);
-end;
-
-procedure TDeformationGrid.DrawTexturePart(aTexture: PTexture; aScreenCoor,
-  aTexCoor: PTexCoor; aLayerPercentOpacity: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  tci  : PTextureCoordIndex;
-  AlphaTint:byte;
-  i: integer;
-  procedure DrawVertex ;
-   begin
-{    glBegin( GL_TRIANGLES );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-    glBegin( GL_TRIANGLES );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;  }
-    glBegin( GL_QUADS );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
-begin
- if aTexture = nil then exit;
- if not FVisible then exit;
-
- quad[0] := aScreenCoor^[0];
- quad[1] := aScreenCoor^[1];
- quad[2] := aScreenCoor^[2];
- quad[3] := aScreenCoor^[3];
-
- // Skew
- quad[0].X += Skew.x.Value * Scale.x.Value;
- quad[0].Y += Skew.y.Value * Scale.y.Value;
- quad[1].X += Skew.x.Value * Scale.x.Value;
- quad[1].Y += Skew.y.Value * Scale.y.Value;
-
- // Flip
- i:=0;
- if FFlipH then inc( i );
- if FFlipV then inc( i, 2 );
- tci := @FLIP_TEXCOORD[ i ];
-
- if Tint.alpha.Value < 255
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-         glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-         DrawVertex;
-        end;
-
- if Tint.alpha.Value <> 0
-   then begin  //Apply Tint
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-         AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-         glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-         DrawVertex;
-        end;
-end;
-
-procedure TDeformationGrid.DrawTexturePartWithShadows(aTexture: PTexture;
-  aScreenCoor, aTexCoor: PTexCoor; aHeightRef, aLayerPercentOpacity: single);
-var
-  quad : array[ 0..3 ] of TPointF;
-  tci  : PTextureCoordIndex;
-  AlphaTint:byte;
-  i: integer;
-  ColorFactor, opac: single;
-
-  procedure ComputeTopVertexColor( ay: single ); inline;
-  begin
-   ColorFactor := ay - aHeightRef;
-   if ColorFactor<=0 then ColorFactor:=1.0
-    else begin
-    ColorFactor:= 1-(ColorFactor/FHCell);
-    if ColorFactor<0 then ColorFactor:=0;
-   end;
-  end;
-  procedure ComputeBottomVertexColor( ay: single ); inline;
-  begin
-   ColorFactor := ay - aHeightRef;
-   if ColorFactor<=0 then ColorFactor:=1.0
-    else begin
-    ColorFactor:= 1-(ColorFactor/FHCell);
-    if ColorFactor<0 then ColorFactor:=0.0;
-ColorFactor+=0.5;
-   end;
-  end;
-
-  procedure DrawVertex ;
-   begin
-{    glBegin( GL_TRIANGLES );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-    glBegin( GL_TRIANGLES );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;  }
-    glBegin( GL_QUADS );
-
-      ComputeTopVertexColor( quad[0].y );
-      glColor4f(ColorFactor, ColorFactor, ColorFactor, opac);
-      glTexCoord2fv( @aTexCoor^[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-
-      ComputeTopVertexColor( quad[1].y );
-      glColor4f(ColorFactor, ColorFactor, ColorFactor, opac);
-      glTexCoord2fv( @aTexCoor^[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-
-      ComputeBottomVertexColor( quad[2].y );
-      glColor4f(ColorFactor, ColorFactor, ColorFactor, opac);
-      glTexCoord2fv( @aTexCoor^[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-
-      ComputeBottomVertexColor( quad[3].y );
-      glColor4f(ColorFactor, ColorFactor, ColorFactor, opac);
-      glTexCoord2fv( @aTexCoor^[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-    glEnd;
-   end;
-begin
- if aTexture = nil then exit;
- if not FVisible then exit;
-
- quad[0] := aScreenCoor^[0];
- quad[1] := aScreenCoor^[1];
- quad[2] := aScreenCoor^[2];
- quad[3] := aScreenCoor^[3];
-
- // Skew
- quad[0].X += Skew.x.Value * Scale.x.Value;
- quad[0].Y += Skew.y.Value * Scale.y.Value;
- quad[1].X += Skew.x.Value * Scale.x.Value;
- quad[1].Y += Skew.y.Value * Scale.y.Value;
-
- // Flip
- i:=0;
- if FFlipH then inc( i );
- if FFlipV then inc( i, 2 );
- tci := @FLIP_TEXCOORD[ i ];
-
- opac := Opacity.Value/255 * aLayerPercentOpacity;
-
- if Tint.alpha.Value < 255
-   then begin
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-         glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-         DrawVertex;
-        end;
-
- if Tint.alpha.Value <> 0
-   then begin  //Apply Tint
-         glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-         glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-         glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-         AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-         glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-         DrawVertex;
-        end;
-end;
-
-function TDeformationGrid.GetWidth: integer;
-begin
-  Result := FWidth;
-end;
-
-function TDeformationGrid.GetHeight: integer;
-begin
-  Result := FHeight;
+  Amplitude := TPointFParam.Create;
+  Amplitude.Value := PointF(1,1);
 end;
 
 procedure TDeformationGrid.Update(const aElapsedTime: single);
-var ix,iy: integer;
-    ixbegin, ixend, iybegin, iyend: integer;
+var ix, iy: integer;
+    ampX, ampY, speedX, speedY: single;
+    p: PDeformedPoint;
 begin
- inherited Update(aElapsedTime);
- if FFreeze then exit;
- if FDeformationType=dtNone then exit;
+  inherited Update(aElapsedTime);
+  if FFreeze then exit;
+  if (FDeformationType = dtNone) or not FInitialized then exit;
 
- DeformationSpeed.OnElapse( aElapsedTime );
- Amplitude.OnElapse( aElapsedTime );
+  DeformationSpeed.OnElapse(aElapsedTime);
+  Amplitude.OnElapse(aElapsedTime);
 
- if FDeformationType in [dtSnakeH,dtSnakeV,dtTumultuousWater2]{(FDeformationType=dtSnakeH) or FDeformationType in [
-    (FDeformationType=dtSnakeV)} then begin
-   ixbegin := 0;
-   ixend := ColumnCount-1;
-   iybegin := 0;
-   iyend := RowCount-1;
- end else if (FDeformationType=dtFlagRight) then begin
-   ixbegin := 1;
-   ixend := ColumnCount-1;
-   iybegin := 0;
-   iyend := RowCount-1;
- end else begin
-   ixbegin := 1;
-   ixend := ColumnCount-2;
-   iybegin := 1;
-   iyend := RowCount-2;
- end;
+  ampX := Amplitude.x.Value;
+  ampY := Amplitude.y.Value;
+  FTimeCount := FTimeCount + AElapsedTime;
+  speedX := DeformationSpeed.x.Value * FTimeCount;
+  speedY := DeformationSpeed.y.Value * FTimeCount;
 
- FTimeCount += AElapsedTime;
- for iy:=iybegin to iyend do
-  for ix:=ixbegin to ixend do begin
-   case FDeformationType of
-    //FGrid.Grid[iy][ix].x := ix*FGrid.Width/FGrid.ColumnCount + cos(TimeCount)*3*(ix+1);
-    //FGrid.Grid[iy][ix].y := iy*FGrid.Height/FGrid.RowCount + sin(TimeCount*(iy*0.5+1))*2*(iy+1);
+  for iy:=0 to RowCount do
+   for ix:=0 to ColumnCount do begin
+    p := @Grid[iy][ix];
+    case FDeformationType of
+     dtBasic: begin
+      p^.x := ix*FCellWidth+cos(speedX*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+      p^.y := iy*FCellHeight+sin(speedY*p^.TimeMultiplicator)*FCellHeight*0.5*ampY*p^.DeformationAmount;
+     end;
 
-    // FGrid.Grid[iy][ix].y := iy*FGrid.Height/FGrid.RowCount + sin(TimeCount*(iy*0.2))*2*(iy+1);
+     dtTumultuousWater: begin
+       p^.x := ix*FCellWidth+cos((speedX+ix+iy*0.5)*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+       p^.y := iy*FCellHeight+sin((speedY+iy+ix*0.5)*p^.TimeMultiplicator)*FCellHeight*0.5*ampY*p^.DeformationAmount;
+     end;
 
-    dtTumultuousWater, dtTumultuousWater2: begin
-      Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+ix+iy*0.5)*FWCell*0.5*Amplitude.x.Value;
-      Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+iy+ix*0.5)*FHCell*0.5*Amplitude.y.Value;
+     dtWaveV: p^.y := iy*FCellHeight+sin((speedY+iy)*p^.TimeMultiplicator)*FCellHeight*0.5*ampY*p^.DeformationAmount;
+
+     dtWaveH: p^.x := ix*FCellWidth+cos((speedX+ix)*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+
+     dtFinFish: p^.x := ix*FCellWidth + cos((speedX-(PI/(ix+1)))*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+
+     dtSnakeH: begin
+       p^.y := iy*FCellHeight+sin((speedY+(iy*0.5))*p^.TimeMultiplicator)*FCellHeight*0.5*ampY*p^.DeformationAmount;
+       p^.x := ix*FCellWidth+cos((speedX+(ix*0.3))*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+     end;
+
+     dtSnakeV: begin
+       p^.y := iy*FCellHeight+sin((speedY+(iy*0.3))*p^.TimeMultiplicator)*FCellHeight*0.5*ampY*p^.DeformationAmount;
+       p^.x := ix*FCellWidth+cos((speedX+(ix*0.5))*p^.TimeMultiplicator)*FCellWidth*0.5*ampX*p^.DeformationAmount;
+     end;
+
+     dtFlagRight: begin
+       p^.x := ix*FCellWidth+cos((speedX+ix*0.5)*p^.TimeMultiplicator)*FCellWidth*2/(ColumnCount-ix+2)*ampX*p^.DeformationAmount;
+       p^.y := iy*FCellHeight+sin((speedY+ix*0.5)*p^.TimeMultiplicator)*FCellHeight*0.5/(ColumnCount-ix+2)*ampY*p^.DeformationAmount;
+     end;
+
+     dtWindingUp: begin
+      if DeformationSpeed.x.Value > 0 then begin
+        if p^.y > 0 then begin
+          p^.y := p^.y - aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
+          if p^.y < 0 then p^.y := 0
+            else if p^.y > Height then p^.y := Height;
+        end;
+      end else begin
+        if p^.y < iy*FCellHeight then begin
+          p^.y := p^.y - aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
+          if p^.y > iy*FCellHeight then p^.y := iy*FCellHeight;
+        end;
+      end;
+     end;
+
+     dtWindingDown: begin
+      if DeformationSpeed.x.Value > 0 then begin
+        if p^.y < Height then begin
+          p^.y := p^.y + aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
+          if p^.y > Height then p^.y := Height
+            else if p^.y < 0 then p^.y := 0;
+        end;
+       end else begin
+        if p^.y > iy*FCellHeight then begin
+          p^.y := p^.y + aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
+          if p^.y < iy*FCellHeight then p^.y := iy*FCellHeight;
+        end;
+       end;
+     end;
+
+     dtWindingLeft: begin
+      if DeformationSpeed.x.Value > 0 then begin
+        if p^.x > 0 then begin
+          p^.x := p^.x - aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.x.Value*ampX*p^.DeformationAmount;
+          if p^.x < 0 then p^.x := 0;
+        end;
+      end else begin
+        if p^.x < ix*FCellWidth then begin
+          p^.x := p^.x - aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.x.Value*ampX*p^.DeformationAmount;
+          if p^.x > ix*FCellWidth then p^.x := ix*FCellWidth;
+        end;
+      end;
+     end;
+
+     dtWindingRight: begin
+      if DeformationSpeed.x.Value > 0 then begin
+        if p^.x < Width then begin
+          p^.x := p^.x + aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.x.Value*ampX*p^.DeformationAmount;
+          if p^.x > Width then p^.x := Width;
+        end;
+      end else begin
+        if p^.x > ix*FCellWidth then begin
+          p^.x := p^.x + aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.x.Value*ampX*p^.DeformationAmount;
+          if p^.x < ix*FCellWidth then p^.x := ix*FCellWidth;
+        end;
+      end;
+     end;
+    end;//case
+   end;
+end;
+
+procedure TDeformationGrid.DoDraw;
+var WholeTexCoor, PartTexCoor, ScreenCellCoor: TQuadCoor;
+    tx, ty, tw, th: single;
+    ix, iy, ixf, iyf: integer;
+    pt1, pt2: TPointF;
+begin
+  if not FInitialized then exit;
+  WholeTexCoor := FTexture^.FramesCoord[trunc(FFrame)];
+
+  ty := WholeTexCoor[cTL].y;
+  tw := (WholeTexCoor[cTR].x - WholeTexCoor[cTL].x)/FColumnCount;
+  th := (WholeTexCoor[cTR].y - WholeTexCoor[cBR].y)/FRowCount;
+
+  FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FTexture, 0, FBlendmode);
+  for iy:=0 to FRowCount-1 do
+  begin
+    tx := WholeTexCoor[cTL].x;
+    for ix:=0 to FColumnCount-1 do
+    begin
+      if FFlipH then ixf := FColumnCount-1-ix else ixf := ix;
+      if FFlipV then iyf := FRowCount-1-iy else iyf := iy;
+
+      ScreenCellCoor[cTL].x := FGridPts[iyf][ixf].x;
+      ScreenCellCoor[cTL].y := FGridPts[iyf][ixf].y;
+
+      ScreenCellCoor[cTR].x := FGridPts[iyf][ixf+1].x;
+      ScreenCellCoor[cTR].y := FGridPts[iyf][ixf+1].y;
+
+      ScreenCellCoor[cBR].x := FGridPts[iyf+1][ixf+1].x;
+      ScreenCellCoor[cBR].y := FGridPts[iyf+1][ixf+1].y;
+
+      ScreenCellCoor[cBL].x := FGridPts[iyf+1][ixf].x;
+      ScreenCellCoor[cBL].y := FGridPts[iyf+1][ixf].y;
+
+      PartTexCoor[cTL].x := tx;
+      PartTexCoor[cTL].y := ty;
+
+      PartTexCoor[cTR].x := tx + tw;
+      PartTexCoor[cTR].y := ty;
+
+      PartTexCoor[cBR].x := PartTexCoor[cTR].x;
+      PartTexCoor[cBR].y := ty - th;
+
+      PartTexCoor[cBL].x := tx;
+      PartTexCoor[cBL].y := PartTexCoor[cBR].y;
+
+      tx := PartTexCoor[cTR].x;
+
+      FParentScene.TexturedMVTriangleRenderer.PushQuad2(ScreenCellCoor, PartTexCoor, FlipToIndex, NIL, FComputedOpacity, FComputedTint);
     end;
-
-    dtWaveV: Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+iy)*FHCell*0.5*Amplitude.y.Value;
-
-    dtWaveH: Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+ix)*FWCell*0.5*Amplitude.x.Value;
-
-    dtFinFish: Grid[iy][ix].x := ix*Width/(ColumnCount) + cos(DeformationSpeed.x.Value*FTimeCount-(PI/(ix+1)))*FWCell*0.5*Amplitude.x.Value;
-
-    dtSnakeH: begin
-      Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+(iy*0.5))*FHCell*0.5*Amplitude.y.Value;
-      Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+(ix*0.3))*FWCell*0.5*Amplitude.x.Value;
-    end;
-
-    dtSnakeV: begin
-      Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+(iy*0.3))*FHCell*0.5*Amplitude.y.Value;
-      Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+(ix*0.5))*FWCell*0.5*Amplitude.x.Value;
-    end;
-
-    dtFlagRight: begin
-      Grid[iy][ix].x := ix*Width/(ColumnCount)+cos(DeformationSpeed.x.Value*FTimeCount+ix*0.5)*FWCell*2/(ixend-ix+2)*Amplitude.x.Value;
-      Grid[iy][ix].y := iy*Height/(RowCount)+sin(DeformationSpeed.y.Value*FTimeCount+ix*0.5)*FHCell*0.5/(ixend-ix+2)*Amplitude.y.Value;
-    end;
-   end;//case
+    ty := {%H-}PartTexCoor[cBR].y;
   end;
 
+  if FShowGrid then begin
+    FParentScene.FastLineRenderer.Prepare(FParentScene.MVPMatrix, FX_BLEND_NORMAL);
+    for iy:=0 to FRowCount-2 do
+     for ix:=0 to FColumnCount-2 do begin
+       pt1 := PointF(FGridPts[iy][ix].x, FGridPts[iy][ix].y);
+       pt2 := PointF(FGridPts[iy][ix+1].x, FGridPts[iy][ix+1].y);
+       FParentScene.FastLineRenderer.PushLine(pt1, pt2, BGRA(255,0,0), 1.0, lpMiddle);
+       pt1 := PointF(FGridPts[iy+1][ix+1].x, FGridPts[iy+1][ix+1].y);
+       FParentScene.FastLineRenderer.PushLine(pt2, pt1, BGRA(255,0,0), 1.0, lpMiddle);
+       pt2 := PointF(FGridPts[iy+1][ix].x, FGridPts[iy+1][ix].y);
+       FParentScene.FastLineRenderer.PushLine(pt1, pt2, BGRA(255,0,0), 1.0, lpMiddle);
+       pt1 := PointF(FGridPts[iy][ix].x, FGridPts[iy][ix].y);
+       FParentScene.FastLineRenderer.PushLine(pt2, pt1, BGRA(255,0,0), 1.0, lpMiddle);
+     end;
+  end;
 end;
 
-procedure TDeformationGrid.Draw(const aLayerPercentOpacity: single);
-var WholeTexCoor, PartTexCoor, ScreenCellCoor: TTexCoor;
-    tx, ty, tw, th: single;
-    ix, iy: integer;
-    yref: single;
-begin
- if FTexture=NIL then exit;
- if (FWidth=0) or (FHeight=0) then exit;
- if (FRowCount<2) or (FColumnCount<2) then exit;
-
- PushAndPrepareMatrix;
- SetBlendMode( FBlendMode );
- TextureManager.BindTexture( FTexture );
-
- WholeTexCoor := FTexture^.FramesCoord[trunc(FFrame)];
-
- ty := WholeTexCoor[0].y;
- tw := (WholeTexCoor[1].x - WholeTexCoor[0].x)/(FColumnCount-1);
- th := (WholeTexCoor[1].y - WholeTexCoor[2].y)/(FRowCount-1);
-
- for iy:=0 to FRowCount-2 do begin
-  if FApplyShadows then yref := FHCell * ( iy + YpcRef );
-
-  tx := WholeTexCoor[0].x;
-  for ix:=0 to FColumnCount-2 do
-   begin
-    ScreenCellCoor[0].x := FGridPts[iy][ix].x;
-    ScreenCellCoor[0].y := FGridPts[iy][ix].y;
-
-    ScreenCellCoor[1].x := FGridPts[iy][ix+1].x;
-    ScreenCellCoor[1].y := FGridPts[iy][ix+1].y;
-
-    ScreenCellCoor[2].x := FGridPts[iy+1][ix+1].x;
-    ScreenCellCoor[2].y := FGridPts[iy+1][ix+1].y;
-
-    ScreenCellCoor[3].x := FGridPts[iy+1][ix].x;
-    ScreenCellCoor[3].y := FGridPts[iy+1][ix].y;
-
-    PartTexCoor[0].x := tx;
-    PartTexCoor[0].y := ty;
-
-    PartTexCoor[1].x := tx + tw;
-    PartTexCoor[1].y := ty;
-
-    PartTexCoor[2].x := PartTexCoor[1].x;
-    PartTexCoor[2].y := ty - th;
-
-    PartTexCoor[3].x := tx;
-    PartTexCoor[3].y := PartTexCoor[2].y;
-
-    tx := PartTexCoor[1].x;
-
-    if FApplyShadows
-     then DrawTexturePartWithShadows( FTexture, @ScreenCellCoor, @PartTexCoor, {%H-}yref, aLayerPercentOpacity )
-     else DrawTexturePart( FTexture, @ScreenCellCoor, @PartTexCoor, aLayerPercentOpacity );
-   end;
-  ty := {%H-}PartTexCoor[2].y;
- end;
-
- if FShowGrid then begin
-  TextureManager.DisableTextureUsage;
-  for iy:=0 to FRowCount-2 do
-   for ix:=0 to FColumnCount-2 do
-   begin
-    DrawLine( FGridPts[iy][ix], FGridPts[iy][ix+1], BGRA(255,0,0), 1.0 );
-    DrawLine( FGridPts[iy][ix+1], FGridPts[iy+1][ix+1], BGRA(255,0,0), 1.0 );
-    DrawLine( FGridPts[iy+1][ix+1], FGridPts[iy+1][ix], BGRA(255,0,0), 1.0 );
-    DrawLine( FGridPts[iy+1][ix], FGridPts[iy][ix], BGRA(255,0,0), 1.0 );
-   end;
- end;
-
- DrawChildSurfaces( aLayerPercentOpacity );
-
- PopMatrix;
-end;
-
-procedure TDeformationGrid.SetGrid(aWidth, aHeight, aRowCount, aColumnCount: integer);
+procedure TDeformationGrid.SetGrid(aRowCount, aColumnCount: integer);
 var ix, iy: integer;
 begin
- if aRowCount<2 then aRowCount := 2;
- if aColumnCount<2 then aColumnCount := 2;
- if aWidth<1 then aWidth:=1;
- if aHeight<1 then aHeight:=1;
+  if aRowCount < 1 then aRowCount := 1;
+  if aColumnCount < 1 then aColumnCount := 1;
 
- FWidth := aWidth;
- FHeight := aHeight;
+  FRowCount := aRowCount;
+  FColumnCount := aColumnCount;
+  SetLength(FGridPts, aRowCount+1, aColumnCount+1);
 
- FRowCount := aRowCount;
- FColumnCount := aColumnCount;
- SetLength( FGridPts, aRowCount, aColumnCount );
+  FCellHeight := Height/aRowCount;
+  FCellWidth := Width/aColumnCount;
 
- for iy:=0 to aRowCount-1 do
-  for ix:=0 to aColumnCount-1 do begin
-   FGridPts[iy][ix] := PointF( aWidth/aColumnCount*ix, aHeight/aRowCount*iy );
-  end;
+  for iy:=0 to High(FGridPts) do
+   for ix:=0 to High(FGridPts[0]) do begin
+    with FGridPts[iy][ix] do begin
+      x := ix*FCellWidth;
+      y := iy*FCellHeight;
+      DeformationAmount := 1.0;
+      TimeMultiplicator := 1.0;
+    end;
+   end;
+  FInitialized := True;
+end;
 
- FHCell := aHeight/(aRowCount-1);
- FWCell := aWidth/(aColumnCount-1);
+procedure TDeformationGrid.SetDeformationAmountOnRow(aRowIndex: integer; aDeformationAmount: single);
+var i: integer;
+begin
+  if not FInitialized then exit;
+  for i:=0 to FColumnCount do
+    FGridPts[aRowIndex][i].DeformationAmount := aDeformationAmount;
+end;
+
+procedure TDeformationGrid.SetDeformationAmountOnColumn(aColIndex: integer; aDeformationAmount: single);
+var i: integer;
+begin
+  if not FInitialized then exit;
+  for i:=0 to FRowCount do
+    FGridPts[i][aColIndex].DeformationAmount := aDeformationAmount;
+end;
+
+procedure TDeformationGrid.SetTimeMultiplicatorOnRow(aRowIndex: integer; aTimeMultiplicator: single);
+var i: integer;
+begin
+  if not FInitialized then exit;
+  for i:=0 to FColumnCount do
+    FGridPts[aRowIndex][i].TimeMultiplicator := aTimeMultiplicator;
+end;
+
+procedure TDeformationGrid.SetTimeMultiplicatorOnColumn(aColIndex: integer; aTimeMultiplicator: single);
+var i: integer;
+begin
+  if not FInitialized then exit;
+  for i:=0 to FRowCount do
+    FGridPts[i][aColIndex].TimeMultiplicator := aTimeMultiplicator;
+end;
+
+procedure TDeformationGrid.SetDeformationAmountOnAllSide(aDeformationAmount: single);
+begin
+  if not FInitialized then exit;
+  SetDeformationAmountOnRow(0, aDeformationAmount);
+  SetDeformationAmountOnRow(FRowCount, aDeformationAmount);
+  SetDeformationAmountOnColumn(0, aDeformationAmount);
+  SetDeformationAmountOnColumn(FColumnCount, aDeformationAmount);
+end;
+
+procedure TDeformationGrid.SetTimeMultiplicatorOnAllSide(aTimeMultiplicator: single);
+begin
+  if not FInitialized then exit;
+  SetTimeMultiplicatorOnRow(0, aTimeMultiplicator);
+  SetTimeMultiplicatorOnRow(FRowCount, aTimeMultiplicator);
+  SetTimeMultiplicatorOnColumn(0, aTimeMultiplicator);
+  SetTimeMultiplicatorOnColumn(FColumnCount, aTimeMultiplicator);
 end;
 
 procedure TDeformationGrid.ApplyDeformation(aType: TDeformationType);
 begin
-// FTimeCount := 0;
- FDeformationType := aType;
+  FDeformationType := aType;
 end;
 
 {$endif oglcIMPLEMENTATION}

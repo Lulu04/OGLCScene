@@ -1,0 +1,11 @@
+Inspiration from:
+
+ZENGL by Andrew Kemka
+
+OpenGL CORE tutorials by Chris Rorden
+  https://github.com/neurolabusc/OpenGLCoreTutorials
+
+Delphi learn OpenGL by Erik van Bilsen
+  https://github.com/neslib/DelphiLearnOpenGL
+
+and many many other infos by various author found on the net!

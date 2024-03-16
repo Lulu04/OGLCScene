@@ -1,133 +1,134 @@
 {$ifdef oglcINTERFACE}
 const
-  OGLC_DEFAULT_CHAR_SET = ' '+
-                          '0123456789'+
-                          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'+
-                          'ÉéÈèÊêËëÁáÂâÀàÆæÇçÙùÛûÏïÎîÔôŒœŸÿ'+
-                          'ÄäÖöÜüß'+
-                          'Ññ'+
-                          '''"?!,.;:/*-+=()[]@#&';
+  ASCII_SYMBOL_CHARSET='!"#$%&''()*+,-./:;<=>?[\]^_`{|}~';
+  SIMPLELATIN_CHARSET=' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+  LATIN1_SUPP_CHARSET='ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ';
+  LATIN1_SUPP_SYMBOL_CHARSET=' ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿';
+
+  LATIN_EXTENDED_A_CHARSET='ĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞş'+
+                           'ŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſ';
+
+  LATIN_EXTENDED_B_CHARSET='ƀƁƂƃƄƅƆƇƈƉƊƋƌƍƎƏƐƑƒƓƔƕƖƗƘƙƚƛƜƝƞƟƠơƢƣƤƥƦƧƨƩƪƫƬƭƮƯưƱƲƳƴƵƶƷƸƹƺƻƼƽƾƿǀǁǂǃǄǅǆǇǈǉǊǋǌǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǝǞǟ'+
+                           'ǠǡǢǣǤǥǦǧǨǩǪǫǬǭǮǯǰǱǲǳǴǵǶǷǸǹǺǻǼǽǾǿȀȁȂȃȄȅȆȇȈȉȊȋȌȍȎȏȐȑȒȓȔȕȖȗȘșȚțȜȝȞȟȠȡȢȣȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳȴȵȶȷȸȹȺȻȼȽȾȿ'+
+                           'ɀɁɂɃɄɅɆɇɈɉɊɋɌɍɎɏ';
+
+  GREEK_AND_COPTIC_CHARSET='ͰͱͲͳʹ͵Ͷͷ'#$CD#$B8#$CD#$B9'ͺͻͼͽ;Ϳ΄΅Ά·ΈΉΊΌΎΏΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΪΫάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώϏϐϑϒϓϔϕϖϗϘϙϚϛϜϝϞϟϠϡϢϣϤϥϦϧϨϩϪϫϬϭϮϯϰϱϲϳϴϵ϶ϷϸϹϺϻϼϽϾϿ';
+
+  CYRILLIC_CHARSET='ЀЁЂЃЄЅІЇЈЉЊЋЌЍЎЏАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяѐёђѓєѕіїјљњћќѝўџѠѡѢѣѤѥѦѧѨѩѪѫѬѭѮѯѰѱѲѳѴѵѶѷѸѹѺѻѼѽѾѿҀҁ҂҃҄҅҆҇҈҉ҊҋҌҍҎҏҐґҒғҔҕҖҗҘҙҚқҜҝҞҟҠҡҢңҤҥҦҧҨҩҪҫҬҭҮүҰұҲҳҴҵҶҷҸҹҺһҼҽҾҿӀӁӂӃӄӅӆӇӈӉӊӋӌӍӎӏӐӑӒӓӔӕӖӗӘәӚӛӜӝӞӟӠӡӢӣӤӥӦӧӨөӪӫӬӭӮӯӰӱӲӳӴӵӶӷӸӹӺӻӼӽӾӿ'+
+                   'ԀԁԂԃԄԅԆԇԈԉԊԋԌԍԎԏԐԑԒԓԔԕԖԗԘԙԚԛԜԝԞԟԠԡԢԣԤԥԦԧԨԩԪԫԬԭԮԯ';
+
+  ARMENIAN_CHARSET=#$D4#$B0'ԱԲԳԴԵԶԷԸԹԺԻԼԽԾԿՀՁՂՃՄՅՆՇՈՉՊՋՌՍՎՏՐՑՒՓՔՕՖ'#$D5#$97#$D5#$98'ՙ՚՛՜՝՞՟'#$D5#$A0'աբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև'#$D6#$88'։֊'#$D6#$8B#$D6#$8C'֍֎֏';
+
 type
-
-// construct an image with each character in the charset.
-
-TTexturedChar = record
-  Character: string;
-  DecoratedCharSize,          // size of the character with outline and shadow
-  OriginalCharSize: TSize;    // normal size of the character (as given by TBGRABitmap.TextSize())
-  TexCoor: TTexCoor;          // texture coordinates for this character
-end;
-PTexturedChar=^TTexturedChar;
 
 { TTexturedFont }
 
-TTexturedFont = class
-  Constructor Create( aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
-  Destructor Destroy; override;
+TTexturedFont = class{(TFPHashList)}
  private
-  FTexture: PTexture;
-  FTexCharArray: array of TTexturedChar ;
-  FFont: TGuiFont;
-  function IndexOf( c: string ): integer;
-  procedure BuildTexture( aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string );
-  function GetTexturedChar( aChar: string ): PTexturedChar;
-  procedure DrawChar( aChar: PTexturedChar; const aLoc: TPointF; const aLayerPercentOpacity: single;
-                      aSetTextureParameters: boolean=TRUE);
+  FParentScene: TOGLCScene;
+  FAtlas: TOGLCTextureAtlas;
+  FAtlasOwner: boolean;
+  FTexCharArray: array of TTexturedChar;
+  FFont: TFontDescriptor;
+  function GetChar(aUTF8Char: string): PTexturedChar;
+  procedure Init(aFont: TFontDescriptor);
+  function GetTexture: PTexture;
+  procedure InternalBuild(aPacker: TOGLCImagePacker; const aCharSet: string; aFillTexture: TBGRABitmap);
  public
-  // coeff affect the space between character
-  // [0..1[ the characters are close together
-  // 1  normal
-  // >1   the characters are farther apart from each other
-  CharSpaceCoeff: TBoundedFParam;
-  procedure DrawText( aText: string; aLocation: TPointF; const aLayerPercentOpacity: single;
-                      aSetTextureParameters: boolean=TRUE );
-  procedure DrawCenteredChar( aChar: string; aCenterLocation: TPointF; const aLayerPercentOpacity: single;
-                      aSetTextureParameters: boolean=TRUE );
+  // This property affect the space between character
+  //   value from 0.1 to 1 -> the characters are closest
+  //   value equal to 1 -> normal font spacing
+  //   value > 1 -> the characters are farther apart from each other
+  CharSpacingCoeff: TBoundedFParam;
+  Constructor Create(aParentScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
+  constructor CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aFont: TFontDescriptor;
+                                    const aCharSet: string; aFillTexture: TBGRABitmap=NIL);
+  Destructor Destroy; override;
+
+  function StringToCharIndexes(const aCaption: string): TTexturedCharIndexes;
+  function CharIndexesToSize(const aIndexes: TTexturedCharIndexes): TSize;
+  procedure DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer;
+                     const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44;
+                     const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+  procedure DrawChars(const aCharIdx: TTexturedCharIndexes; aX, aY, aFlipIndex: integer;
+                      const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44;
+                      const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+
   // original size (equal to TBGRABitmap.TextSize())
-  function GetCharWidth( const c: string ): integer;
-  function GetCharHeight( const c: string ): integer;
-  function GetTextWidth( const t: string ): integer;
-  function GetTextHeight( const t: string ): integer;
-  function GetCharSize( const c: string ): TSize;
+  function GetCharWidth(const c: string): integer;
+  function GetCharHeight(const c: string): integer;
+  function GetTextWidth(const t: string): integer;
+  function GetTextHeight(const t: string): integer;
+  function GetCharSize(const c: string): TSize;
   // size with outline and shadow
-  function GetDecoratedCharWidth( const c: string ): integer;
-  function GetDecoratedCharHeight( const c: string ): integer;
-  function GetDecoratedTextWidth( const t: string ): integer;
-  function GetDecoratedTextHeight( const t: string ): integer;
-  function GetDecoratedCharSize( const c: string ): TSize;
-  property Texture: PTexture read FTexture;
-  property Font: TGuiFont read FFont;
+  function GetDecoratedCharWidth(const c: string): integer;
+  function GetDecoratedCharHeight(const c: string): integer;
+  function GetDecoratedTextWidth(const t: string): integer;
+  function GetDecoratedTextHeight(const t: string): integer;
+  function GetDecoratedCharSize(const c: string): TSize;
+
+  function IndexOf(const aUTF8Char: string): integer;
+  function GetCharByIndex(aIndex: integer): PTexturedChar;
+  property Chars[aUTF8Char: string]: PTexturedChar read GetChar;
+
+  property Texture: PTexture read GetTexture;
+  // a copy of the font descriptor used to construct this textured font.
+  property Font: TFontDescriptor read FFont;
 end;
 
 
-{ TFontManager }
-
-TFontManager = class
- constructor Create;
- Destructor Destroy; override;
-private
- FList: TList;
- function GetCount: integer;
- procedure Update( const aElapsedTime: single );
-public
- function AddFont(const aGuiFont: TGuiFont; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
- function AddFont(const aGuiFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string=OGLC_DEFAULT_CHAR_SET): TTexturedFont;
- procedure DeleteFont( var aFont: TTexturedFont );
- procedure Clear;
- property Count: integer read GetCount;
-end;
-
-var
- FontManager : TFontManager ;
-
-
-type
 
 { TFreeText }
+// A surface that draw a single line string.
+// Instead of TUILabel, TFreeText is not clipped and mouse can't interact with it.
 
 TFreeText = class(TSimpleSurfaceWithEffect)
 private
+  FCharIndexes: TTexturedCharIndexes;
   FCaption: string;
   FTexturedFont: TTexturedFont;
+  FSize: TSize;
+  FSizeComputationNeeded: boolean;
+  procedure UpdateCharIndexesAndComputeSize;
   function GetCaption: string;
   procedure SetCaption(AValue: string); virtual;
   procedure SetTexturedFont(AValue: TTexturedFont); virtual;
 protected
- function GetWidth: integer; override;
- function GetHeight: integer; override;
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
 public
-  procedure Draw( const aLayerPercentOpacity: single );  override;
+  procedure DoDraw; override;
 public
+  constructor Create(aParentScene: TOGLCScene);
   property Caption: string read GetCaption write SetCaption;
   property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
 end;
 
 
-{ TFreeTextOnPath }
+{ TFreeTextOnPathToFollow }
 
-TFreeTextOnPath = class(TFreeText)
+TFreeTextOnPathToFollow = class(TFreeText)
 private
-  FPath: TOGLCPath;
-  FPathOwner: boolean;
-  procedure SetCaption(AValue: string); override;
+  FAutoRotate: boolean;
+  FAngleAdjust: single;
 public
-  procedure Update( const aElapsedTime: single ); override;
-  procedure Draw( const aLayerPercentOpacity: single );  override;
+  procedure Update(const aElapsedTime: single); override;
+  procedure Draw(const aLayerPercentOpacity: single);  override;
+  procedure DoDraw; override;
 public
   // Distance traveled on the path
   DistanceTraveled: TFParam;
-  // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
-  AutoRotate: boolean;
-  // set this value to ajust the right orientation of the sprite along the path. Default is '0'.
-  AngleAdjust: single;
 
-  constructor Create;
+  constructor CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow);
   destructor Destroy; override;
-  // use this method to assign a path to the sprite.
-  // if Owner is TRUE, the path is automatically destroyed when the sprite is killed
-  procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
-  property Path: TOGLCPath read FPath;
+
+  // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
+  property AutoRotate: boolean read FAutoRotate write FAutoRotate;
+  // Set this value to ajust the right orientation of the sprite. Default is '0'.
+  property AngleAdjust: single read FAngleAdjust write FAngleAdjust;
 end;
+
 
 { TFreeTextClockLabel }
 
@@ -142,10 +143,10 @@ private
   procedure SetTime(AValue: single);
   procedure UpdateCaption;
 public
-  // the TexturedFont used by the inherited TFreeText must have [0 1 2 3 4 5 6 7 8 9 : .] characters included
-  // aPaused to TRUE to pause the count/countdown at the begining
-  constructor Create( aPaused: boolean );
-  procedure Update(const aElapsedTime: single ); override;
+  // the TexturedFont used by the inherited TFreeText must have the characters 0123456789:. included
+  // Set aPaused to TRUE to pause the count/countdown at the begining
+  constructor Create(aParentScene: TOGLCScene; aPaused: boolean);
+  procedure Update(const aElapsedTime: single); override;
   // pause the clock
   procedure Pause;
   // run the clock
@@ -164,18 +165,17 @@ end;
 { TMultilineText }
 // Draws a text in a rectangular area with horizontal and vertical align.
 // The caption can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
-TMultilineText=class(TFreeText)
+TMultilineText = class(TFreeText)   // TSimpleSurfaceWithEffect
 private type
-  TFreeTextWord=record
+  TFreeTextWord = record
     Word: string;
-    Location: TPointF;
+    CharIndexes: TTexturedCharIndexes;
+    Location: TPoint;
     Width,
     LineIndex: integer;
-    Visible: boolean;
   end;
   ArrayOfFreeTextWord = array of TFreeTextWord;
 private
-  FRect,
   FDrawingRect: TRect;
   FAlign: TOGLCAlignment;
   procedure DoVTopAlign;
@@ -186,7 +186,8 @@ private
   procedure DoHRightAlign;
   procedure DoAlign;
 private
-  FWords : ArrayOfFreeTextWord;
+  FRect: TRect;
+  FWords: ArrayOfFreeTextWord;
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
@@ -194,46 +195,49 @@ private
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
   procedure SetAlign(AValue: TOGLCAlignment); virtual;
-  procedure GetWordsIndexes( aLineIndex: integer; out iBegin, iEnd: integer );
+  procedure GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer);
 protected
- function GetWidth: integer; override;
- function GetHeight: integer; override;
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
 public
- procedure Draw( const aLayerPercentOpacity: single ); override;
+  procedure DoDraw; override;
 public
-  constructor Create( aFont: TTexturedFont; aRect: TRect );
+  constructor Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
+  // Redefine the size of the area where the text is displayed.
+  procedure SetSize(aWidth, aHeight: integer);
   property Align: TOGLCAlignment read FAlign write SetAlign;
   property DrawingRect: TRect read FDrawingRect; // real size of the text area
 end;
 
+
 // TMaximizedText is an area where the text is displayed as large as possible and aligned.
-// the font height is maximized and the corresponding textured font is then created
+// the font height is maximized and the corresponding textured font is created
 // Usefull for screen title for example
-TMaximizedText = class( TMultilineText )
+{TMaximizedText = class(TMultilineText)
 private
- FGuiFont: TGuiFont;
+ FGuiFont: TFontDescriptor;
  FTemp: TBGRABitmap;
  FCharSet: string;
  procedure MakeMaximizedFont;
- function ComputeDrawingSize( aGuiFont: TGuiFont ): TSize;
+ function ComputeDrawingSize(aGuiFont: TFontDescriptor): TSize;
  procedure UpdateCharsetFromCaption;
  procedure SetCaption(AValue: string); override;
  procedure SetTexturedFont({%H-}AValue: TTexturedFont); override;
 public
   // the font height field of 'aGuiFont' will be maximized.
-  constructor Create( aRect: TRect; aGuiFont: TGuiFont );
+  constructor Create(aParentScene: TOGLCScene; aRect: TRect; aGuiFont: TFontDescriptor);
   destructor destroy; override;
 
-  function GetComputedGuiFont: TGuiFont;
+  function GetComputedGuiFont: TFontDescriptor;
   function GetComputedTexturedFont: TTexturedFont;
-end;
+end; }
 
 
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
  { TMaximizedText }
 
- procedure TMaximizedText.MakeMaximizedFont;
+{ procedure TMaximizedText.MakeMaximizedFont;
  var s: TSize;
  begin
 
@@ -258,13 +262,13 @@ end;
   end;
   FTemp.Free;
 
-  if FTexturedFont<>NIL then FontManager.DeleteFont( FTexturedFont );
   UpdateCharsetFromCaption;
-  FTexturedFont := FontManager.AddFont( FGuiFont, FCharSet );
+  if FTexturedFont <> NIL then FTexturedFont.Free;
+  FTexturedFont := TexturedFont.Create(FParentScene, FGuiFont, FCharSet, NIL);
  end;
 
- function TMaximizedText.ComputeDrawingSize(aGuiFont: TGuiFont): TSize;
- var W: ArrayOfString;
+ function TMaximizedText.ComputeDrawingSize(aGuiFont: TFontDescriptor): TSize;
+ var W: TStringArray;
      i, SpaceWidth, WordWidth, xx, yy: Integer;
  procedure NextLine;
  begin
@@ -351,9 +355,9 @@ end;
  // does nothing because it's no sense to manually change the font height in TMaximizedtext...
  end;
 
- constructor TMaximizedText.Create(aRect: TRect; aGuiFont: TGuiFont);
+ constructor TMaximizedText.Create(aParentScene: TOGLCScene; aRect: TRect; aGuiFont: TFontDescriptor);
  begin
-  inherited Create( NIL, aRect );
+  inherited Create(aParentScene, NIL, aRect);
   FGuiFont := aGuiFont;
   FCharSet:='';
   Caption:='';
@@ -361,118 +365,143 @@ end;
 
  destructor TMaximizedText.destroy;
 begin
-  if FTexturedFont<>NIl then FontManager.DeleteFont( FTexturedFont );
+  FreeAndNil(FTexturedFont);
   inherited destroy;
 end;
 
- function TMaximizedText.GetComputedGuiFont: TGuiFont;
+ function TMaximizedText.GetComputedGuiFont: TFontDescriptor;
  begin
-  Result :=FGuiFont;
+  Result := FGuiFont;
  end;
 
  function TMaximizedText.GetComputedTexturedFont: TTexturedFont;
  begin
-  Result:=FTexturedFont;
- end;
+  Result := FTexturedFont;
+ end;   }
 
  { TMultilineText }
 
- procedure TMultilineText.DistributeTheWordsOnTheSurface;
- var W: ArrayOfString;
-   i, SpaceWidth, xx, yy: Integer;
-   procedure NextLine;
+procedure TMultilineText.DistributeTheWordsOnTheSurface;
+var W: TStringArray;
+   iw, j, spaceWidth, xx, yy: Integer;
+   procedure _NextLine;
    begin
-    yy+=FTexturedFont.Font.FontHeight;
-    xx:=0;
+    yy += FTexturedFont.Font.FontHeight;
+    xx := 0;
     inc(FLineCount);
    end;
    procedure PutWordOnCurrentLine;
    begin
-    FWords[i].Location:=PointF(xx,yy);
-    FWords[i].LineIndex:=FLineCount-1;
-    xx+=FWords[i].Width+SpaceWidth;
-    // the word is not visible if we are vertically out of bounds
-    FWords[i].Visible := FWords[i].Location.y<FRect.Height;
+    FWords[j].Location := Point(xx, yy);
+    FWords[j].LineIndex := FLineCount-1;
+    xx += FWords[j].Width+spaceWidth;
+    inc(j);
    end;
-   function CurrentLineIsEmpty: boolean;
+   procedure DoWordWrapOnCurrentLine;
+   var ch: PTexturedChar;
+      k, ww: integer;
    begin
-    Result := xx=0;
+     SetLength(FWords, Length(FWords)+1);
+     ww := 0;
+     for k:=0 to High(FWords[j].CharIndexes) do begin
+       ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
+       if ww + ch^.OriginalCharSize.cx > FRect.Width then break;
+       ww := ww + ch^.OriginalCharSize.cx;
+     end;
+     FWords[j+1].Width := FWords[j].Width - ww;
+     FWords[j+1].CharIndexes := Copy(FWords[j].CharIndexes, k, Length(FWords[j].CharIndexes)-k);
+     FWords[j+1].LineIndex := FLineCount;
+     FWords[j].Width := ww;
+     FWords[j].Location := Point(xx, yy);
+     FWords[j].LineIndex := FLineCount-1;
+     xx := FWords[j+1].Width+ spaceWidth;
+     FWords[j+1].Location := Point(0, yy);
+     yy += FTexturedFont.Font.FontHeight;
+     inc(FLineCount);
+     inc(j);
    end;
 
- begin
+   function CurrentLineIsEmpty: boolean;
+   begin
+    Result := xx = 0;
+   end;
+
+begin
    FLineCount := 0;
    FDrawingWidth := 0;
-   FDrawingRect.Width:=0;
-   FDrawingRect.Height:=0;
-   if (FCaption ='') or (FTexturedFont=NIL) then begin
-     SetLength(FWords,0);
-     exit;
-   end;
+   FDrawingRect.Width := 0;
+   FDrawingRect.Height := 0;
+   FWords := NIL;
+   if (FCaption = '') or (FTexturedFont = NIL) then exit;
 
    W := SplitTextToWordArray(FCaption, ' ');
    SetLength(FWords, Length(W));
 
-   SpaceWidth := FTexturedFont.GetCharWidth(' ');
+   spaceWidth := FTexturedFont.GetCharWidth(' ');
 
    xx := 0;
    yy := 0;
    FLineCount := 1;
-   i := 0;
+   iw := 0;
+   j := 0;
    repeat
-    FWords[i].Word := W[i];
-    FWords[i].Width := FTexturedFont.GetTextWidth(FWords[i].Word);
+    FWords[j].Word := W[iw];
+    FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
+    FWords[j].Width := FTexturedFont.GetTextWidth(FWords[j].Word);
 
-    if FWords[i].Word=#10 then begin
-        NextLine;
-        inc(i);
-    end else if xx+FWords[i].Width <= FRect.Width then begin
+    if FWords[j].Word = #10 then begin
+        _NextLine;
+        inc(iw);
+    end else if xx+FWords[j].Width <= FRect.Width then begin
       // the word fit
       PutWordOnCurrentLine;
-      inc(i);
+      inc(iw);
     end else begin
          // the word don't fit
          if CurrentLineIsEmpty then begin
-           PutWordOnCurrentLine;
-           NextLine;
-           inc(i);
+           DoWordWrapOnCurrentLine;
+           //_NextLine;
+           inc(iw);
          end else begin
-              NextLine;
-              PutWordOnCurrentLine;
-              inc(i);
+              _NextLine;
+              DoWordWrapOnCurrentLine;
+              inc(iw);
          end;
     end;
-    if xx>FDrawingWidth then FDrawingWidth:=xx;
-   until i=Length(FWords);
-   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
- end;
+    if xx > FDrawingWidth then FDrawingWidth := xx;
+   until iw = Length(FWords);
 
- procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
- begin
+   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
+end;
+
+procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
+begin
    if FAlign=AValue then Exit;
    FAlign:=AValue;
    DoAlign;
- end;
+end;
 
- procedure TMultilineText.SetCaption(AValue: string);
- begin
-   if FCaption=AValue then exit;
-   FCaption := AValue;
-   DistributeTheWordsOnTheSurface;
-   DoAlign;
- end;
+procedure TMultilineText.SetCaption(AValue: string);
+begin
+  AValue := StringReplace(AValue, #13#10, #10, [rfReplaceAll{, rfIgnoreCase}]);
+  AValue := StringReplace(AValue, #13, #10, [rfReplaceAll{, rfIgnoreCase}]);
+  if FCaption = AValue then exit;
+  FCaption := AValue;
+  DistributeTheWordsOnTheSurface;
+  DoAlign;
+end;
 
- procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
- begin
-   if FTexturedFont=AValue then exit;
+procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
+begin
+   if FTexturedFont = AValue then exit;
    FTexturedFont := AValue;
    DistributeTheWordsOnTheSurface;
    DoAlign;
- end;
+end;
 
- procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin,
-   iEnd: integer);
- var i : integer;
- begin
+procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer);
+var i: integer;
+begin
   iBegin := -1;
   iEnd := -1;
   for i:=low(FWords) to high(FWords) do
@@ -482,68 +511,46 @@ end;
          iEnd := i;
     end else if iBegin <> -1 then exit;
    end;
- end;
-
- function TMultilineText.GetWidth: integer;
-begin
-  Result:=FRect.Width;
 end;
 
- function TMultilineText.GetHeight: integer;
+function TMultilineText.GetWidth: integer;
 begin
-  Result:=FRect.Height;
+  Result := FRect.Width;
 end;
 
- procedure TMultilineText.Draw(const aLayerPercentOpacity: single);
- var AlphaTint: byte;
-  i: integer;
- begin
-  if FCaption='' then exit;
-  if FTexturedFont=NIL then exit;
+function TMultilineText.GetHeight: integer;
+begin
+  Result := FRect.Height;
+end;
 
-  PushAndPrepareMatrix;
-  SetBlendMode( FBlendMode );
+procedure TMultilineText.DoDraw;
+var i: integer;
+begin
+  for i:=0 to Length(FWords)-1 do
+    if FWords[i].Location.y < FRect.Height then
+      FTexturedFont.DrawChars(FWords[i].CharIndexes, FWords[i].Location.x, FWords[i].Location.y, 0, NIL, NIL,
+                               FComputedOpacity, FComputedTint, FBlendMode);
+end;
 
-//  TextureManager.DisableTextureUsage;
-//  FillBox(0,0,Width, Height, BGRA(0,0,80,100));
-
-  TextureManager.BindTexture( FTexturedFont.Texture );
-
-  for i:=0 to Length(FWords)-1 do begin
-    if FWords[i].Visible then begin
-      if Tint.alpha.Value < 255 then begin
-        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-        glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-        FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
-      end;
-
-      if Tint.alpha.Value <> 0 then begin  //Apply Tint
-        glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-        glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-        glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-        AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-        glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-        FTexturedFont.DrawText( FWords[i].Word, FWords[i].Location, Opacity.Value/255*aLayerPercentOpacity, FALSE );
-      end;
-    end;
-  end;
-
-  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
-  PopMatrix;
- end;
-
- constructor TMultilineText.Create(aFont: TTexturedFont; aRect: TRect);
- begin
-  inherited Create;
+constructor TMultilineText.Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
+begin
+  inherited Create(aParentScene);
   FTexturedFont := aFont;
-  FRect := aRect;
   FAlign := taCenterCenter;
- end;
+  FRect.Create(Point(0,0), aWidth, aHeight);
+end;
 
- procedure TMultilineText.DoVTopAlign;
- var i, j, iBegin, iEnd: integer;
-  yy: single;
- begin
+procedure TMultilineText.SetSize(aWidth, aHeight: integer);
+begin
+  FRect.Create(Point(0,0), aWidth, aHeight);
+  DistributeTheWordsOnTheSurface;
+  DoAlign;
+end;
+
+procedure TMultilineText.DoVTopAlign;
+var i, j, iBegin, iEnd: integer;
+  yy: integer;
+begin
   FDrawingRect.Top:=0;
   yy := 0;
   for i:=0 to FLineCount-1 do begin
@@ -551,27 +558,27 @@ end;
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight; //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
- end;
+end;
 
- procedure TMultilineText.DoVCenterAlign;
- var i, j, iBegin, iEnd, h: integer;
-  yy: single;
- begin
-  h:=FLineCount*FTexturedFont.Font.FontHeight; //FLineCount*FTexturedFont.Font.FontHeight*Scale.y.Value
-  if h=0 then exit;
-  yy := ( FRect.Height - h )*0.5;
-  FDrawingRect.Top:=round(yy);
+procedure TMultilineText.DoVCenterAlign;
+var i, j, iBegin, iEnd, h: integer;
+  yy: integer;
+begin
+  h := FLineCount*FTexturedFont.Font.FontHeight;
+  if h = 0 then exit;
+  yy := (FRect.Height - h) div 2;
+  FDrawingRect.Top := round(yy);
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes( i, iBegin, iEnd );
+    GetWordsIndexes(i, iBegin, iEnd);
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
-    yy += FTexturedFont.Font.FontHeight; //FTexturedFont.Font.FontHeight*Scale.y.Value
+    yy += FTexturedFont.Font.FontHeight;
   end;
- end;
+end;
 
- procedure TMultilineText.DoVBottomAlign;
- var i, j, iBegin, iEnd: integer;
-  yy: single;
- begin
+procedure TMultilineText.DoVBottomAlign;
+var i, j, iBegin, iEnd: integer;
+  yy: integer;
+begin
   yy := FRect.Height-FTexturedFont.Font.FontHeight; //FRect.Height-FTexturedFont.Font.FontHeight*Scale.y.Value
   FDrawingRect.Top:=FRect.Height-FDrawingHeight;
   for i:=FLineCount-1 downto 0 do begin
@@ -579,11 +586,11 @@ end;
     for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy -= FTexturedFont.Font.FontHeight;  //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
- end;
+end;
 
- procedure TMultilineText.DoHLeftAlign;
- var i, j, w, iBegin, iEnd: integer;
- begin
+procedure TMultilineText.DoHLeftAlign;
+var i, j, w, iBegin, iEnd: integer;
+begin
   FDrawingRect.Left:=0;
   for i:=0 to FLineCount-1 do
    begin
@@ -595,12 +602,12 @@ end;
       w += FWords[j].Width + FTexturedFont.GetCharWidth(' '); //*Scale.x.Value
      end;
    end;
- end;
+end;
 
- procedure TMultilineText.DoHCenterAlign;
- var i, j, iBegin, iEnd: integer;
-  w: single;
- begin
+procedure TMultilineText.DoHCenterAlign;
+var i, j, iBegin, iEnd: integer;
+  w: integer;
+begin
   FDrawingRect.Left:=FRect.Width;
   for i:=0 to FLineCount-1 do
    begin
@@ -612,7 +619,7 @@ end;
     end;
 
 //    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
-    w := ( FRect.Width - w )*0.5;
+    w := ( FRect.Width - w ) div 2;
 
     if FDrawingRect.Left>w then FDrawingRect.Left:=round(w);
 
@@ -621,11 +628,11 @@ end;
       w += {(}FWords[j].Width + FTexturedFont.GetCharWidth(' '){)*Scale.x.Value};
     end;
    end;
- end;
+end;
 
- procedure TMultilineText.DoHRightAlign;
- var i, j, w, iBegin, iEnd: integer;
- begin
+procedure TMultilineText.DoHRightAlign;
+var i, j, w, iBegin, iEnd: integer;
+begin
   FDrawingRect.Left:=FRect.Width;
 
   for i:=0 to FLineCount-1 do begin
@@ -640,10 +647,10 @@ end;
      end;
   end;
 
- end;
+end;
 
- procedure TMultilineText.DoAlign;
- begin
+procedure TMultilineText.DoAlign;
+begin
   case FAlign of
    taTopLeft, taCenterLeft, taBottomLeft: DoHLeftAlign;
    taTopRight, taCenterRight, taBottomRight: DoHRightAlign;
@@ -656,563 +663,471 @@ end;
   end;
   FDrawingRect.Bottom:=FDrawingRect.Top+FDrawingHeight;
   FDrawingRect.Right:=FDrawingRect.Left+FDrawingWidth;
- end;
+end;
 
 
  { TFreeText }
 
- function TFreeText.GetCaption: string;
- begin
-  Result := FCaption;
- end;
+procedure TFreeText.UpdateCharIndexesAndComputeSize;
+begin
+  if (FTexturedFont = NIL) or (Length(FCaption) = 0) then begin
+    FCharIndexes := NIL;
+    FSize.cx := 0;
+    FSize.cy := 0;
+    exit;
+  end else begin
+   FCharIndexes := FTexturedFont.StringToCharIndexes(FCaption);
+   FSize := FTexturedFont.CharIndexesToSize(FCharIndexes);
+  end;
 
- procedure TFreeText.SetCaption(AValue: string);
- begin
+  FSizeComputationNeeded := False;
+end;
+
+function TFreeText.GetCaption: string;
+begin
+  Result := FCaption;
+end;
+
+procedure TFreeText.SetCaption(AValue: string);
+begin
+ if FCaption = AValue then exit;
   FCaption := AValue;
- end;
+  UpdateCharIndexesAndComputeSize;
+end;
 
 procedure TFreeText.SetTexturedFont(AValue: TTexturedFont);
 begin
-  if FTexturedFont=AValue then Exit;
-  FTexturedFont:=AValue;
+  if FTexturedFont = AValue then Exit;
+  FTexturedFont := AValue;
+  UpdateCharIndexesAndComputeSize;
 end;
 
- function TFreeText.GetWidth: integer;
- begin
-  Result := FTexturedFont.GetTextWidth( FCaption );
- end;
+function TFreeText.GetWidth: integer;
+begin
+  Result := FSize.cx;
+end;
 
- function TFreeText.GetHeight: integer;
- begin
-  Result := FTexturedFont.GetTextHeight( FCaption );
- end;
+function TFreeText.GetHeight: integer;
+begin
+  Result := FSize.cy;
+end;
 
- procedure TFreeText.Draw(const aLayerPercentOpacity: single);
- var AlphaTint: byte;
- begin
-  if not FVisible then exit;
-  if FCaption='' then exit;
-  if FTexturedFont=NIL then exit;
-  PushAndPrepareMatrix;
-  SetBlendMode( FBlendMode );
-  TextureManager.BindTexture( FTexturedFont.Texture );
+procedure TFreeText.DoDraw;
+begin
+  if (FSize.cx = 0) or (FTexturedFont = NIL) then exit;
+  FTexturedFont.DrawChars(FCharIndexes, 0, 0, FlipToIndex, NIL,
+                             NIL, FComputedOpacity, FComputedTint, FBlendMode);
+end;
 
-  if Tint.alpha.Value < 255
-    then begin
-          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-          glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-          FTexturedFont.DrawText( FCaption, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity, FALSE );
-         end;
-
-  if Tint.alpha.Value <> 0
-    then begin  //Apply Tint
-          glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-          glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-          glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-          AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-          glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-          FTexturedFont.DrawText( FCaption, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity, FALSE );
-         end;
-
-  DrawChildSurfaces( aLayerPercentOpacity*Opacity.pcValue );
-  PopMatrix;
- end;
-
- { TFreeTextOnPath }
-
- procedure TFreeTextOnPath.SetCaption(AValue: string);
- begin
-  inherited SetCaption(AValue);
- end;
-
- procedure TFreeTextOnPath.Update(const aElapsedTime: single);
- begin
-   inherited Update(aElapsedTime);
-   if FFreeze then exit;
-   DistanceTraveled.OnElapse( aElapsedTime );
- end;
-
- procedure TFreeTextOnPath.Draw(const aLayerPercentOpacity: single);
- var AlphaTint: byte;
-  P: TPointF;
-  A, dist: single;
-  ch: string;
-  i: Integer;
-  chSize: TSize;
- begin
-  if FCaption='' then exit;
-  if FTexturedFont=NIL then exit;
-  if FPath=NIL then exit;
-
-  SetBlendMode( FBlendMode );
-  TextureManager.BindTexture( FTexturedFont.Texture );
-
-  dist:=DistanceTraveled.Value;
-
-  for i:=1 to UTF8Length(FCaption) do begin
-   ch := UTF8Copy(FCaption,i,1);
-   chSize := FTexturedFont.GetCharSize(ch);
-   if FPath.IsOnThePath( dist ) then begin
-     FPath.GetPosAndAngle( dist, P, A);
-     if AutoRotate then Angle.Value:=A;
-
-     glPushMatrix;
-     glTranslatef( P.x + chSize.cx * 0.5, P.y + chSize.cy * 0.5, 0 );
-     glScalef( Scale.x.Value, Scale.y.Value, 0 );
-     glRotatef( Angle.Value, 0, 0, 1 );
-     glTranslatef( -chSize.cx * 0.5, -chSize.cy * 0.5, 0 );
-
-     if Tint.alpha.Value < 255
-       then begin
-             glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-             glColor4ub(255,255,255,round(Opacity.Value * aLayerPercentOpacity));
-             FTexturedFont.DrawCenteredChar(ch, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity );
-            end;
-
-     if Tint.alpha.Value <> 0
-       then begin  //Apply Tint
-             glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, $8570 );
-             glTexEnvi( GL_TEXTURE_ENV, $8571,  GL_REPLACE );
-             glTexEnvi( GL_TEXTURE_ENV, $8580,  $8577 );
-             AlphaTint:=round( Tint.alpha.Value * Opacity.Value / 255 * aLayerPercentOpacity );
-             glColor4ub( round(Tint.red.Value), round(Tint.Green.Value), round(Tint.Blue.Value), AlphaTint);
-             FTexturedFont.DrawCenteredChar(ch, PointF(0,0), Opacity.Value/255*aLayerPercentOpacity );
-            end;
-
-     PopMatrix;
-   end;
-   dist+=FTexturedFont.GetDecoratedCharWidth( ch );
-  end;
- end;
-
- constructor TFreeTextOnPath.Create;
- begin
+constructor TFreeText.Create(aParentScene: TOGLCScene);
+begin
   inherited Create;
-  DistanceTraveled:= TFParam.Create;
-  AutoRotate:=TRUE;
- end;
+  FParentScene := aParentScene;
+end;
 
- destructor TFreeTextOnPath.Destroy;
- begin
-  DistanceTraveled.Free;
-  if (FPath<>NIL) and FPathOwner then FPath.Free;
+ { TFreeTextOnPathToFollow }
+
+procedure TFreeTextOnPathToFollow.Update(const aElapsedTime: single);
+begin
+   inherited Update(aElapsedTime);
+   if not FFreeze then
+     DistanceTraveled.OnElapse(aElapsedTime);
+end;
+
+procedure TFreeTextOnPathToFollow.Draw(const aLayerPercentOpacity: single);
+var i, yOffset, flipIndex: integer;
+  m: TOGLCMatrix;
+  pos: TPointF;
+  ang, dist, spacingCoef: single;
+  ch: PTexturedChar;
+begin
+  if (FSize.cx = 0) or (FTexturedFont = NIL) then exit;
+
+  FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
+  if FComputedOpacity = 0 then exit;
+  FComputedTint.InitFromTint(TintMode, Tint.Value);
+
+  // render childs with negative ZOrder
+  if (FChilds.Count > 0) and (TSimpleSurfaceWithEffect(FChilds[0]).FZOrderAsChild < 0) then begin
+    PushAndPrepareSceneMV;
+    if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
+      else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
+    PopSceneMV;
+  end;
+
+  // here model view matrix is set individually for each characters to draw.
+
+  flipIndex := FlipToIndex;
+  spacingCoef := FTexturedFont.CharSpacingCoeff.Value;
+  dist := DistanceTraveled.Value;
+  yOffset := FTexturedFont.Font.FontPixelMetric.Baseline;
+
+  for i:=0 to High(FCharIndexes) do begin
+   ch := FTexturedFont.GetCharByIndex(FCharIndexes[i]);
+   if ch <> NIL then begin
+     TOGLCPathToFollow(FParentSurface).GetPosAndAngle(dist, pos, ang);
+     m.CopyFrom(FParentScene.ModelViewMatrix);
+     with m do begin
+       Translate(pos.x, pos.y);
+       Scale(Self.Scale.x.Value, Self.Scale.y.Value);
+       if FAutoRotate then Rotate(ang + FAngleAdjust);
+     end;
+     FTexturedFont.DrawChar(FCharIndexes[i], 0, -yOffset, flipIndex, NIL, @m.Matrix, FComputedOpacity, FComputedTint, FBlendMode);
+     dist := dist + ch^.OriginalCharSize.cx * spacingCoef * Scale.x.Value;
+   end;
+  end;
+
+  // render childs with positive ZOrder
+  if FChilds.Count > 0 then begin
+    PushAndPrepareSceneMV;
+    if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
+      else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
+    PopSceneMV;
+  end;
+end;
+
+procedure TFreeTextOnPathToFollow.DoDraw;
+begin
+end;
+
+constructor TFreeTextOnPathToFollow.CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow);
+begin
+  inherited Create(aParentPathToFollow.ParentScene);
+  DistanceTraveled := TFParam.Create;
+  AutoRotate := TRUE;
+  aParentPathToFollow.AddChild(Self);
+end;
+
+destructor TFreeTextOnPathToFollow.Destroy;
+begin
+  FreeAndNil(DistanceTraveled);
   inherited Destroy;
- end;
-
- procedure TFreeTextOnPath.AssignPath(aPath: TOGLCPath; Owner: boolean);
- begin
-  if (FPath<>NIL) and FPathOwner then FPath.Free;
-
-  FPathOwner:= Owner;
-  FPath:=aPath;
- end;
+end;
 
  { TFreeTextClockLabel }
 
- procedure TFreeTextClockLabel.SetTime(AValue: single);
- begin
-  if FTime=AValue then Exit;
-  FTime:=AValue;
-  UpdateCaption;
- end;
-
-procedure TFreeTextClockLabel.SetShowFractionalPart(AValue: boolean);
+procedure TFreeTextClockLabel.SetTime(AValue: single);
 begin
-  if FShowFractionalPart=AValue then Exit;
-  FShowFractionalPart:=AValue;
+  if FTime = AValue then Exit;
+  FTime := AValue;
   UpdateCaption;
 end;
 
- procedure TFreeTextClockLabel.UpdateCaption;
- begin
-  Caption := SecondsToString( FTime, FShowFractionalPart );
- end;
+procedure TFreeTextClockLabel.SetShowFractionalPart(AValue: boolean);
+begin
+  if FShowFractionalPart = AValue then Exit;
+  FShowFractionalPart := AValue;
+  UpdateCaption;
+end;
 
- constructor TFreeTextClockLabel.Create(aPaused: boolean);
- begin
-  inherited Create;
-  FPaused:=aPaused;
-  FShowFractionalPart :=TRUE;
- end;
+procedure TFreeTextClockLabel.UpdateCaption;
+begin
+  if FShowFractionalPart then
+    Caption := SecondsToString(FTime, FShowFractionalPart)
+  else
+    Caption := IntToStr(Ceil(FTime));
+end;
 
- procedure TFreeTextClockLabel.Update(const aElapsedTime: single);
- begin
+constructor TFreeTextClockLabel.Create(aParentScene: TOGLCScene; aPaused: boolean);
+begin
+  inherited Create(aParentScene);
+  FPaused := aPaused;
+  FShowFractionalPart := TRUE;
+end;
+
+procedure TFreeTextClockLabel.Update(const aElapsedTime: single);
+begin
   inherited Update(aElapsedTime);
   if FFreeze or FPaused then exit;
+
   if FCountdown then begin
-    FTime -=aElapsedTime;
-    if FTime<0 then begin
-      FTime:=0;
-      if FOnCountdownDone<>NIL
-        then FOnCountdownDone( self );
+    if FTime > 0 then begin
+      FTime := FTime - aElapsedTime;
+      if FTime < 0 then begin
+        FTime := 0;
+        if FOnCountdownDone <> NIL then FOnCountdownDone(self);
+        FPaused := True;
+      end;
     end;
-  end else FTime +=aElapsedTime;
+  end else FTime := FTime + aElapsedTime;
   UpdateCaption;
- end;
+end;
 
- procedure TFreeTextClockLabel.Pause;
- begin
+procedure TFreeTextClockLabel.Pause;
+begin
   FPaused := TRUE;
- end;
+end;
 
- procedure TFreeTextClockLabel.Run;
- begin
+procedure TFreeTextClockLabel.Run;
+begin
   FPaused := FALSE;
- end;
+end;
 
 { TTexturedFont }
 
-  constructor TTexturedFont.Create(aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
- begin
-  SetLength( FTexCharArray, 0 );
-  BuildTexture( aFont, aFillTexture, aCharSet );
-  CharSpaceCoeff:= CreateBoundedFParam(0, 1000000, FALSE );
-  CharSpaceCoeff.Value := 1.0;
- end;
+constructor TTexturedFont.Create(aParentScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
+begin
+  FPArentScene := aParentScene;
+  Init(aFont);
+  FAtlasOwner := True;
+  FAtlas := TOGLCTextureAtlas.Create(aParentScene);
+  InternalBuild(FAtlas, aCharSet, aFillTexture);
+  FAtlas.TryToPack;
+  FAtlas.Build;
+end;
 
- destructor TTexturedFont.Destroy;
- begin
-  TextureManager.Delete( FTexture );
-  SetLength( FTexCharArray, 0 );
-  CharSpaceCoeff.Free;
+constructor TTexturedFont.CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aFont: TFontDescriptor;
+  const aCharSet: string; aFillTexture: TBGRABitmap);
+begin
+  FParentScene := aParentScene;
+  Init(aFont);
+  InternalBuild(aPacker, aCharSet, aFillTexture);
+  FAtlasOwner := False;
+end;
+
+destructor TTexturedFont.Destroy;
+begin
+  if FAtlasOwner then FreeAndNil(FAtlas);
+  FTexCharArray := NIL;
+  FreeAndNil(CharSpacingCoeff);
   inherited Destroy;
- end;
+end;
 
- function TTexturedFont.IndexOf(c: string): integer;
- var i: integer;
- begin
+function TTexturedFont.IndexOf(const aUTF8Char: string): integer;
+var i: integer;
+begin
+  if aUTF8Char <> '' then
+    for i:=0 to Length(FTexCharArray)-1 do
+      if aUTF8Char = FTexCharArray[i].Character then begin
+        Result := i;
+        exit;
+      end;
   Result := -1;
-  for i:=0 to Length(FTexCharArray)-1 do
-   if c = FTexCharArray[i].Character
-      then begin
-            Result := i;
-            exit ;
-           end;
- end;
+end;
 
-
- procedure TTexturedFont.BuildTexture(aFont: TGuiFont; aFillTexture: TBGRABitmap; const aCharSet: string);
- var i, j, xx, yy, maxCharHeight : integer;
-     ima, temp: TBGRABitmap;
-     s1 : string;
-     renderer: TBGRATextEffectFontRenderer;
-
- begin
+procedure TTexturedFont.Init(aFont: TFontDescriptor);
+begin
   FFont := aFont;
-  if FFont.FontHeight>150 then FFont.FontHeight:=150; // max FontHeight is 150
+  FFont.Check;
+  CharSpacingCoeff := CreateBoundedFParam(0.1, 100000, FALSE);
+  CharSpacingCoeff.Value := 1.0;
+end;
 
-  renderer:= TBGRATextEffectFontRenderer.Create;
-  with FFont do begin
-    renderer.ShadowVisible := (ShadowColor<>BGRAPixelTransparent) and (ShadowRadius>0);
-    renderer.ShadowColor := ShadowColor;
-    renderer.ShadowOffset.x := ShadowOffsetX;
-    renderer.ShadowOffset.y := ShadowOffsetY;
-    renderer.ShadowRadius := ShadowRadius;
-    renderer.OutlineVisible := (OutLineColor<>BGRAPixelTransparent) and (OutLineWidth>0);
-    renderer.OutlineColor := OutLineColor;
-    renderer.OuterOutlineOnly := True;
-    renderer.OutlineWidth := OutLineWidth;
+function TTexturedFont.GetChar(aUTF8Char: string): PTexturedChar;
+var i: integer;
+begin
+  for i:=0 to High(FTexCharArray) do
+    if FTexCharArray[i].Character = aUTF8Char then begin
+      Result := @FTexCharArray[i];
+      exit;
+    end;
+  Result := NIL;
+end;
 
-    ima:= TBGRABitmap.Create(1024, 1024, BGRAPixelTransparent );
-    ima.FontRenderer := renderer;
-    ima.FontQuality:= fqFineAntialiasing;
-    ima.FontName := FontName;
-    ima.FontHeight := FontHeight;
-    ima.FontStyle := Style;
-  end;
+function TTexturedFont.GetTexture: PTexture;
+begin
+  Result := FAtlas.Texture;
+end;
+
+
+procedure TTexturedFont.InternalBuild(aPacker: TOGLCImagePacker; const aCharSet: string; aFillTexture: TBGRABitmap);
+var i: integer;
+    temp: TBGRABitmap;
+    s: string;
+begin
+  temp := TBGRABitmap.Create(1, 1);
+  FFont.SetFontRendererOn(temp);
 
   // build the font
-  SetLength(FTexCharArray, UTF8Length(aCharSet));
-  xx:=0;
-  yy:=0;
-  maxCharHeight:=0;
+  SetLength(FTexCharArray, UTF8LengthFast(aCharSet));
   for i:=0 to Length(FTexCharArray)-1 do
    begin
-    s1 := UTF8Copy( aCharSet, i+1, 1 );
-    temp := TextToBitmap( s1, FFont, aFillTexture );
-
-    if xx+temp.Width>ima.Width then begin
-          // next line
-          xx := 0;
-          yy += maxCharHeight;
-    end;
-
-    ima.PutImage(xx, yy, temp, dmDrawWithTransparency);
-    if maxCharHeight < temp.Height then maxCharHeight:=temp.Height;
-
-    FTexCharArray[i].Character := s1;
+    s := UTF8Copy(aCharSet, i+1, 1);
+    FFont.ResizeAndDrawStringOn(temp, s, aFillTexture);
+    FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate);
+    FTexCharArray[i].Character := s;
     FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
-    FTexCharArray[i].OriginalCharSize := temp.TextSize(s1);
-    // coordinates of the character on the whole image
-    FTexCharArray[i].TexCoor[0].x := xx;
-    FTexCharArray[i].TexCoor[0].y := yy;
-    FTexCharArray[i].TexCoor[1].x := xx+temp.Width;
-    FTexCharArray[i].TexCoor[1].y := yy;
-    FTexCharArray[i].TexCoor[2].x := xx+temp.Width;
-    FTexCharArray[i].TexCoor[2].y := yy+temp.Height;
-    FTexCharArray[i].TexCoor[3].x := xx;
-    FTexCharArray[i].TexCoor[3].y := yy+temp.Height;
-    xx += temp.Width;
-    temp.Free;
+    FTexCharArray[i].OriginalCharSize := temp.TextSize(s);
    end;
-
-  // reduce the size of the image to remove the unused pixels
-  if yy>0 then begin
-     // reduce only verticaly because all width is occupied
-     temp := TBGRABitmap.Create( ima.Width, yy+maxCharHeight );
-  end else begin
-     // reduce both horizontaly and verticaly
-     temp := TBGRABitmap.Create( xx, yy+maxCharHeight );
-  end;
-
-  temp.PutImage( 0, 0, ima, dmSet );
-  ima.Free;
-
-  // transform texture coordinate in their equivalent range [0..1]
-  for i:=0 to Length(FTexCharArray)-1 do
-    with FTexCharArray[i] do begin
-     for j:=0 to 3 do begin
-       TexCoor[j].x := TexCoor[j].x/temp.Width;
-       TexCoor[j].y := (temp.Height-TexCoor[j].y)/temp.Height;
-     end;
-    end;
-
-  // create the texture from image
-  FTexture := TextureManager.Add( temp );
   temp.Free;
- end;
+end;
 
- function TTexturedFont.GetTexturedChar(aChar: string): PTexturedChar;
- var i: integer;
- begin
-  i := IndexOf( aChar );
-  if i=-1
-    then Result := NIL
-    else Result := @FTexCharArray[i];
- end;
+function TTexturedFont.StringToCharIndexes(const aCaption: string): TTexturedCharIndexes;
+var i, charCount: Integer;
+begin
+  Result := NIL;
+  charCount := UTF8Length(aCaption);
+  if charCount = 0 then exit;
+  SetLength(Result, charCount);
+  for i:=1 to charCount do
+    Result[i-1] := IndexOf(UTF8Copy(aCaption, i, 1));
+end;
 
- procedure TTexturedFont.DrawChar(aChar: PTexturedChar; const aLoc: TPointF;
-   const aLayerPercentOpacity: single; aSetTextureParameters: boolean);
- var
-   quad : TTexCoor;
-   tci  : PTextureCoordIndex;
-   procedure DrawVertex;
-    begin
-     glBegin( GL_QUADS );
-       glTexCoord2fv( @aChar^.TexCoor[ tci^[ 0 ] ] );  glVertex2fv( @quad[ 0 ] );
-       glTexCoord2fv( @aChar^.TexCoor[ tci^[ 1 ] ] );  glVertex2fv( @quad[ 1 ] );
-       glTexCoord2fv( @aChar^.TexCoor[ tci^[ 2 ] ] );  glVertex2fv( @quad[ 2 ] );
-       glTexCoord2fv( @aChar^.TexCoor[ tci^[ 3 ] ] );  glVertex2fv( @quad[ 3 ] );
-     glEnd;
+function TTexturedFont.CharIndexesToSize(const aIndexes: TTexturedCharIndexes): TSize;
+var i: integer;
+  ch: PTexturedChar;
+  pixelCount, coefCharSpacing: single;
+begin
+  if Length(aIndexes) = 0 then Result.Create(0,0)
+    else begin
+      coefCharSpacing := CharSpacingCoeff.Value;
+      pixelCount := 0;
+      Result.cy := 0;
+      for i:=0 to High(aIndexes) do begin
+           ch := GetCharByIndex(aIndexes[i]);
+           if ch <> NIL then with ch^ do begin
+             if i = High(aIndexes) then pixelCount := pixelCount + DecoratedCharSize.cx * coefCharSpacing
+               else pixelCount := pixelCount + OriginalCharSize.cx * coefCharSpacing;
+             if Result.cy < DecoratedCharSize.cy then Result.cy := DecoratedCharSize.cy;
+           end;
+         end;
+      Result.cx := Trunc(pixelCount);
     end;
- begin
-//  if aChar^.Character=' ' then exit;
-  quad[0] := aLoc;
-  quad[1] := aLoc+PointF(aChar^.DecoratedCharSize.cx,0);
-  quad[2] := aLoc+PointF(aChar^.DecoratedCharSize.cx,aChar^.DecoratedCharSize.cy);
-  quad[3] := aLoc+PointF(0,aChar^.DecoratedCharSize.cy);
+end;
 
-  tci := @FLIP_TEXCOORD[ 0 ];
-
-  if aSetTextureParameters then begin
-    glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-    glColor4ub(255,255,255,round(255 * aLayerPercentOpacity));
+procedure TTexturedFont.DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer; const aClippingArea: PUIClipArea;
+  const aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+var tc: PTexturedChar;
+  modelArea: TRect;
+  texCoor: TQuadCoor;
+begin
+  FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FAtlas.Texture, 0, aBlendMode);
+  tc := GetCharByIndex(aCharIdx);
+  if tc <> NIL then begin
+    modelArea := tc^.ModelArea;
+    modelArea.Offset(Point(aX, aY));
+    texCoor := tc^.Texture^.FramesCoord[0];
+    if (aClippingArea <> NIL) and not aClippingArea^.CheckAndAdjust(modelArea, texCoor) then exit;
+    FParentScene.TexturedMVTriangleRenderer.PushQuad3(modelArea, texCoor, aFlipIndex, aModelViewMatrix,
+                                                     aOpacity, aComputedTint);
   end;
-  DrawVertex;
- end;
+end;
 
- procedure TTexturedFont.DrawText(aText: string; aLocation: TPointF;
-   const aLayerPercentOpacity: single; aSetTextureParameters: boolean);
- var i: integer;
+procedure TTexturedFont.DrawChars(const aCharIdx: TTexturedCharIndexes; aX, aY, aFlipIndex: integer;
+   const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44; const aOpacity: single;
+   const aComputedTint: TColorF; aBlendMode: byte);
+var i, xx, yy: integer;
   tc: PTexturedChar;
- begin
-  if aText='' then exit;
-  if Length(FTexCharArray)=0 then exit;
-
-  if aSetTextureParameters then TextureManager.BindTexture( FTexture );
-
-  if FFont.ShadowOffsetX>=0 then begin // font shadow is on the right => put letter from left to right
-    for i:=1 to UTF8Length(aText) do begin
-     tc := GetTexturedChar( UTF8Copy(aText,i,1) );
-     if tc <> NIL then begin
-        DrawChar( tc, aLocation, aLayerPercentOpacity );
-        aLocation.x+=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
-     end;
-    end;
-  end else begin  // font shadow is on the left => put letter from right to left
-   for i:=1 to UTF8Length(aText) do begin
-    tc := GetTexturedChar( UTF8Copy(aText,i,1) );
-    if tc <> NIL then aLocation.x+=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
-    end;
-
-   for i:=UTF8Length(aText) downto 1 do begin
-    tc := GetTexturedChar( UTF8Copy(aText,i,1) );
-    if tc <> NIL then begin
-       aLocation.x-=tc^.OriginalCharSize.cx*CharSpaceCoeff.Value;
-       DrawChar( tc, aLocation, aLayerPercentOpacity );
-    end;
+  modelArea: TRect;
+  texCoor: TQuadCoor;
+  spaceCoef: single;
+  flagDraw: Boolean;
+begin
+  if Length(aCharIdx) = 0 then exit;
+  FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FAtlas.Texture, 0, aBlendMode);
+  xx := aX;
+  yy := aY;
+  spaceCoef := CharSpacingCoeff.Value;
+  for i:=0 to High(aCharIdx) do begin
+   tc := GetCharByIndex(aCharIdx[i]);
+   if tc <> NIL then begin
+     modelArea := tc^.ModelArea;
+     modelArea.Offset(Point(xx, yy));
+     texCoor := tc^.Texture^.FramesCoord[0];
+     if aClippingArea <> NIL then flagDraw := aClippingArea^.CheckAndAdjust(modelArea, texCoor)
+       else flagDraw := True;
+     if flagDraw then
+       FParentScene.TexturedMVTriangleRenderer.PushQuad3(modelArea, texCoor, aFlipIndex, aModelViewMatrix,
+                                                        aOpacity, aComputedTint);
+     xx := xx + Trunc(tc^.OriginalCharSize.cx * spaceCoef);
    end;
   end;
- end;
+end;
 
- procedure TTexturedFont.DrawCenteredChar(aChar: string;
-   aCenterLocation: TPointF; const aLayerPercentOpacity: single;
-   aSetTextureParameters: boolean);
- var tc: PTexturedChar;
- begin
-  if aChar='' then exit;
-  if aSetTextureParameters then TextureManager.BindTexture( FTexture );
-
-  tc := GetTexturedChar( aChar );
-  if tc <> NIL then
-    DrawChar( tc, aCenterLocation-PointF(tc^.OriginalCharSize.cx*0.5,tc^.OriginalCharSize.cy*0.5 ), aLayerPercentOpacity );
- end;
-
- function TTexturedFont.GetCharWidth(const c: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetCharWidth(const c: string): integer;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].OriginalCharSize.cx ;
- end;
+    else Result := Round(FTexCharArray[i].OriginalCharSize.cx*CharSpacingCoeff.Value);
+end;
 
- function TTexturedFont.GetCharHeight(const c: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetCharHeight(const c: string): integer;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
     else Result := FTexCharArray[i].OriginalCharSize.cy ;
- end;
+end;
 
- function TTexturedFont.GetTextWidth(const t: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetTextWidth(const t: string): integer;
+var i: integer;
+begin
   Result := 0;
-  for i:=1 to UTF8Length(t) do Result += GetCharWidth( UTF8Copy( t, i, 1 ));
- end;
+  for i:=1 to UTF8Length(t) do Result += GetCharWidth(UTF8Copy( t, i, 1 ));
+end;
 
- function TTexturedFont.GetTextHeight(const t: string): integer;
- var i, h: integer;
- begin
+function TTexturedFont.GetTextHeight(const t: string): integer;
+var i, h: integer;
+begin
   Result := 0;
   for i:=1 to UTF8Length(t) do begin
    h := GetCharHeight( UTF8Copy( t, i, 1 ));
    if Result<h then Result :=h;
   end;
- end;
+end;
 
- function TTexturedFont.GetCharSize(const c: string): TSize;
- var i: integer;
- begin
+function TTexturedFont.GetCharSize(const c: string): TSize;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := Size(0,0)
-    else Result := FTexCharArray[i].OriginalCharSize;
- end;
+    else Result := Size(Round(FTexCharArray[i].OriginalCharSize.cx*CharSpacingCoeff.Value), FTexCharArray[i].OriginalCharSize.cy);
+end;
 
- function TTexturedFont.GetDecoratedCharWidth(const c: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetDecoratedCharWidth(const c: string): integer;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := FTexCharArray[i].DecoratedCharSize.cx ;
- end;
+    else Result := FTexCharArray[i].DecoratedCharSize.cx;
+end;
 
- function TTexturedFont.GetDecoratedCharHeight(const c: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetDecoratedCharHeight(const c: string): integer;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
     else Result := FTexCharArray[i].DecoratedCharSize.cy ;
- end;
+end;
 
- function TTexturedFont.GetDecoratedTextWidth(const t: string): integer;
- var i: integer;
- begin
+function TTexturedFont.GetDecoratedTextWidth(const t: string): integer;
+var i: integer;
+begin
   Result := 0;
   for i:=1 to UTF8Length(t) do Result += GetDecoratedCharWidth( UTF8Copy( t, i, 1 ));
- end;
+end;
 
- function TTexturedFont.GetDecoratedTextHeight(const t: string): integer;
- var i, h: integer;
- begin
+function TTexturedFont.GetDecoratedTextHeight(const t: string): integer;
+var i, h: integer;
+begin
   Result := 0;
   for i:=1 to UTF8Length(t) do begin
    h := GetDecoratedCharHeight( UTF8Copy( t, i, 1 ));
    if Result<h then Result :=h;
   end;
- end;
+end;
 
- function TTexturedFont.GetDecoratedCharSize(const c: string): TSize;
- var i: integer;
- begin
+function TTexturedFont.GetDecoratedCharSize(const c: string): TSize;
+var i: integer;
+begin
   i := IndexOf( c );
   if i=-1
     then Result := Size(0,0)
     else Result := FTexCharArray[i].DecoratedCharSize ;
- end;
-
- constructor TFontManager.Create;
- begin
-  inherited Create;
-  FList := TList.Create;
- end;
-
- { TFontManager }
- destructor TFontManager.Destroy;
- begin
-  Clear;
-  FList.Free;
-  inherited Destroy;
- end;
-
- procedure TFontManager.Update(const aElapsedTime: single);
- var i: integer;
- begin
-  for i:=0 to FList.Count-1 do
-    TTexturedFont(FList.Items[i]).CharSpaceCoeff.OnElapse( aElapsedTime );
- end;
-
-function TFontManager.GetCount: integer;
-begin
- Result := FList.Count;
 end;
 
-  function TFontManager.AddFont(const aGuiFont: TGuiFont; const aCharSet: string): TTexturedFont;
- begin
-  Result := TTexturedFont.Create( aGuiFont, NIL, aCharSet );
-  FList.Add( Result );
- end;
-
-  function TFontManager.AddFont(const aGuiFont: TGuiFont; aFillTexture: TBGRABitmap;
-    const aCharSet: string): TTexturedFont;
-  begin
-   Result := TTexturedFont.Create( aGuiFont, aFillTexture, aCharSet );
-   FList.Add( Result );
-  end;
-
- procedure TFontManager.DeleteFont(var aFont: TTexturedFont);
- var i: integer;
- begin
-  if aFont=NIL then exit;
-  i := FList.IndexOf( Pointer(aFont) );
-  if i<> -1 then FList.delete( i );
-  aFont.Free;
-  aFont := NIL;
- end;
-
- procedure TFontManager.Clear;
- begin
-  while FList.Count>0 do begin
-   TTexturedFont(FList.Items[0]).Free;
-   FList.Delete(0);
-  end;
- end;
-
+function TTexturedFont.GetCharByIndex(aIndex: integer): PTexturedChar;
+begin
+  if (aIndex >= 0) and (aIndex < Length(FTexCharArray)) then
+    Result := @FTexCharArray[aIndex]
+  else Result := NIL;
+end;
 
 {$endif oglcIMPLEMENTATION}
 

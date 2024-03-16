@@ -10,15 +10,14 @@ TDelayObject = record
 end;
 
 { TDelayManager }
-TOGLCGDelayManagerSpec = specialize TOGLCGList<TDelayObject>;
 
-TDelayManager = class( TOGLCGDelayManagerSpec )
+TDelayManager = class(specialize TOGLCGList<TDelayObject>)
  Constructor Create;
 private
- FActual, FOrigin : QWord;
+ FActual, FOrigin: QWord;
  procedure ProcessDelay;
 public
- function Add( aDelayMSec: integer; aCallBack: TDelayCallBack; aUserValue: word ): PDelayObject;
+ function Add(aDelayMSec: integer; aCallBack: TDelayCallBack; aUserValue: word): PDelayObject;
 end;
 
 var
@@ -38,15 +37,14 @@ TTimerObject = record
                end;
 
 { TTimerManager }
-TOGLCGTimerManagerSpec = specialize TOGLCGList<TTimerObject>;
 
-TTimerManager = class(TOGLCGTimerManagerSpec)
+TTimerManager = class(specialize TOGLCGList<TTimerObject>)
 private
  procedure ProcessTimer;
 public
- function Add( aCallBack : TOGLCEvent; aIntervalMSec: integer ) : PTimerObject;
- procedure Delete( aTimer: PTimerObject);
- property Count : integer read FCount;
+ function Add(aCallBack: TOGLCEvent; aIntervalMSec: integer): PTimerObject;
+ procedure Delete(var aTimer: PTimerObject);
+ property Count: integer read FCount;
 end;
 
 var
@@ -58,54 +56,47 @@ var
 
 function TTimerManager.Add(aCallBack: TOGLCEvent; aIntervalMSec: integer ): PTimerObject;
 begin
- Result := AddInstanceToList;
- Result^.CallBack := aCallBack ;
- Result^.Interval := QWord(aIntervalMSec) ;
- Result^.Kill:=FALSE;
- Result^.Time := GetTickCount64; // DateTimeToTimeStamp ( Now ) ;
+  Result := AddInstanceToList;
+  Result^.CallBack := aCallBack ;
+  Result^.Interval := QWord(aIntervalMSec) ;
+  Result^.Kill:=FALSE;
+  Result^.Time := GetTickCount64;
 end;
 
-procedure TTimerManager.Delete( aTimer: PTimerObject);
+procedure TTimerManager.Delete( var aTimer: PTimerObject);
 begin
- aTimer^.Kill := TRUE;
+  if aTimer = NIL then exit;
+  aTimer^.Kill := TRUE;
+  aTimer := NIL;
 end;
 
 procedure TTimerManager.ProcessTimer;
 var p: PTimerObject;
-    tactual, timetop: QWord; //TTimeStamp ;
-    //delta: QWord;
+    tactual, timetop: QWord;
 begin
- // delete all killed timer
- p := FInstance0;
- while p <> NIL do
+  // delete all killed timers
+  p := FInstance0;
+  while p <> NIL do
   begin
-   if p^.Next <> NIL
-     then begin
-           if p^.Next^.Kill
-             then DoDelete( p^.Next )
-             else p := p^.Next;
-     end else p:=NIL;
+    if p^.Next <> NIL then
+    begin
+      if p^.Next^.Kill then DoDelete(p^.Next)
+        else p := p^.Next;
+    end else p := NIL;
   end;
- // process timer
- p := FInstance0^.Next;
- tactual := GetTickCount64; //DateTimeToTimeStamp ( Now ) ;
- while p <> NIL do
-  begin
-   timetop := p^.Time + p^.Interval;
-   if timetop <= tactual then begin
-     p^.Time := timetop;
-     if p^.CallBack <> NIL then p^.CallBack();
-   end;
 
-{   delta := tactual - p^.Time; //tactual.Time - p^.Time.Time ;
-   if delta >= p^.Interval
-     then begin
-           p^.Time := p^.Time + p^.Interval;
-          // p^.Time := tactual + delta - p^.Interval;//p^.Time.Time := tactual.Time + delta - p^.Interval;
-           if p^.CallBack <> NIL then p^.CallBack();
-   end; }
-   p := p^.Next;
-  end;
+  // process timers
+  p := FInstance0^.Next;
+  tactual := GetTickCount64;
+  while p <> NIL do
+   begin
+    timetop := p^.Time + p^.Interval;
+    if timetop <= tactual then begin
+      p^.Time := timetop;
+      if p^.CallBack <> NIL then p^.CallBack();
+    end;
+    p := p^.Next;
+   end;
 end;
 
 

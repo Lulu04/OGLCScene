@@ -1,397 +1,171 @@
 {$ifdef oglcINTERFACE}
 type
 
-{ TOGLCPath }
+TOGLCPath = ArrayOfTPointF;
+TArrayOfOGLCPath = array of TOGLCPath;
 
-TOGLCPath=class
-private
-  FPathLength: single;
-  FPts: ArrayOfTPointF;
-  FDistanceAndAngle: ArrayOfTPointF; // contains x=distance to the path node, y=angle to the path node
-  FLooped: boolean;
-  FRect: TRectF;
-  procedure SetPts( aPts: ArrayOfTPointF );
-public
-  // return TRUE if the distance traveled value is on the path
-  // 0 <= aDis < PathLength
-  function IsOnThePath( aDis: single ): boolean;
-  // adjust the distance traveled
-  function AdjustDistanceTraveled( aDis: single ): single;
-  // return the current scene position and angle(direction in degree) from a distance traveled
-  procedure GetPosAndAngle( aDistanceTraveled: single; out Pos: TPointF; out Angle: single );
-  // use this property to set the path nodes (in scene coordinates)
-  property Pts: ArrayOfTPointF read FPts write SetPts;
-  // for each node: x=distance to the next node, y=angle(direction) to the next node
-  property DistanceAndAngle: ArrayOfTPointF read FDistanceAndAngle;
-  // return the total path length in pixel
-  property PathLength: single read FPathLength;
-  property Looped: boolean read FLooped write FLooped;
-  property RectArea: TRectF read FRect;
+{ TOGLCPathHelper }
+
+TOGLCPathHelper = type helper for TOGLCPath
+  procedure CreateLine(pt1, pt2: TPointF); overload;
+  procedure CreateLine(x1, y1, x2, y2: single); overload;
+  procedure CreateTriangle(pt1, pt2, pt3: TPointF);
+  procedure CreateRect(aWidth, aHeight: single);
+  procedure CreateRoundRect(aWidth, aHeight: integer; aRx, aRy: single; aOptions: TRoundRectangleOptions=[]);
+  procedure CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single);
+  procedure RemoveIdenticalConsecutivePoint;
+  procedure ClosePath;
+  function IsClosed: boolean;
+  function Bounds: TRectF;
+  procedure Translate(aVector: TPointF);
+  procedure Reduce(aOffset: single);
+
+  procedure ForceTopLeftToOrigin;
+  procedure Scale(aValue: single);
 end;
 
-
-
-{ TOGLCPathDrawing }
-
-TOGLCPathDrawing=class(TSimpleSurfaceWithEffect)
-private
-  FDottedLine: ArrayOfSingle;
-  FPath: TOGLCPath;
-  FPathOwner: boolean;
-  FLineWidth: single;
-protected
- function GetWidth: integer; override;
- function GetHeight: integer; override;
- procedure ReleaseCurrentPath;
- procedure DoDraw( const pt1, pt2: TPointF; aLayerPercentOpacity: single); virtual;
- function GetPoint( aIndex: integer ): TPointF; virtual;
-public
-   procedure Update( const aElapsedTime: single ); override;
-   procedure Draw( const aLayerPercentOpacity: single );  override;
-public
- // the virtual distance traveled on the path.
- // virtual because it can be higher than path length when path is looped
-  DistanceTraveled: TFParam;
-  LineColor: TBGRAParam;
-  DottedLineOffset: TFParam;
-
-  Constructor Create;
-  Destructor Destroy; override;
-  // assign a path to draw
-  // if Owner is TRUE, the path is automatically destroyed when the sprite is killed
-  procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
-  // because DistanceTraveled can be higher than path length (in case where the path is looped)
-  // this function return the real position on the path
-  function RealDistanceTraveled: single;
-
-  // Use this method to define how to draw lines on the path:
-  // [n1, n2, n3, n4,...]   n1,n3... are the length of the drawn part  n2,n4,... the length of holes
-  // use [] for solid line (default)
-  procedure SetDottedLine( const AArray: array of single );
-  property LineWidth: single read FLineWidth write FLineWidth;
-  property Path: TOGLCPath read FPath;
-end;
-
-
-
-{ TSpriteOnPath }
-// a sprite that moves along a path
-TSpriteOnPath=class(TSprite)
-private
-  FPath: TOGLCPath;
-  FPathOwner: boolean;
-public
- Constructor Create( ATexture: PTexture; Owner: boolean=FALSE );
- Destructor Destroy; override;
- procedure Update( const aElapsedTime: single ); override;
-public
- // Distance traveled on the path
- DistanceTraveled: TFParam;
- // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
- AutoRotate: boolean;
- // set this value to ajust the right orientation of the sprite along the path. Default is '0'.
- AngleAdjust: single;
- // use this method to assign a path to the sprite.
- // if Owner is TRUE, the path is automatically destroyed when the sprite is killed
- procedure AssignPath( aPath: TOGLCPath; Owner: boolean=FALSE );
- property Path: TOGLCPath read FPath;
-end;
 
 
 
 {$endif oglcINTERFACE}
-
-
-
 {$ifdef oglcIMPLEMENTATION}
-{ TOGLCPath }
 
-procedure TOGLCPath.SetPts(aPts: ArrayOfTPointF);
-var i: Integer;
-  p: TPolarCoor;
+{ TOGLCPathHelper }
+
+procedure TOGLCPathHelper.CreateLine(pt1, pt2: TPointF);
 begin
- FRect:=RectF(100000,100000,-100000,-100000);
- FPathLength:=0;
-
- SetLength(FPts, Length(aPts));
- SetLength(FDistanceAndAngle, Length(aPts));
- FDistanceAndAngle[0]:=PointF(0,0);
- for i:=0 to high(aPts) do begin
-   // retrieves the rectangle boundary of the path
-   if FRect.Left>aPts[i].x then FRect.Left:=aPts[i].x;
-   if FRect.Right<aPts[i].x then FRect.Right:=aPts[i].x;
-   if FRect.Top>aPts[i].y then FRect.Top:=aPts[i].y;
-   if FRect.Bottom<aPts[i].y then FRect.Bottom:=aPts[i].y;
-
-   FPts[i]:=aPts[i];
-   // computes total path length, and the distance and angle (direction) between each node
-   if i>0 then begin
-     p:=CartesianToPolar(aPts[i-1], aPts[i]);
-     FDistanceAndAngle[i] := PointF(p.Distance, p.Angle);
-
-     FPathLength+=p.Distance;
-   end;
- end;
+  Self := NIL;
+  SetLength(Self, 2);
+  Self[0] := pt1;
+  Self[1] := pt2;
 end;
 
-function TOGLCPath.IsOnThePath(aDis: single): boolean;
+procedure TOGLCPathHelper.CreateLine(x1, y1, x2, y2: single);
 begin
- Result:= (aDis>=0) and (aDis<FPathLength);
+  Self := NIL;
+  SetLength(Self, 2);
+  Self[0].x := x1;
+  Self[0].y := y1;
+  Self[1].x := x2;
+  Self[1].y := y2;
 end;
 
-function TOGLCPath.AdjustDistanceTraveled( aDis: single ): single;
+procedure TOGLCPathHelper.CreateTriangle(pt1, pt2, pt3: TPointF);
 begin
- Result:=aDis;
- if FPathLength<=0 then exit;
-
- if Result>FPathLength then begin
-   if FLooped then begin
-     repeat
-      Result:=Result-FPathLength;
-     until Result<FPathLength;
-   end else Result:=FPathLength;
- end;
+  Self := NIL;
+  SetLength(Self, 3);
+  Self[0] := pt1;
+  Self[1] := pt2;
+  Self[2] := pt3;
 end;
 
-procedure TOGLCPath.GetPosAndAngle(aDistanceTraveled: single; out Pos: TPointF; out Angle: single);
-var i: integer;
-  d, dnext: single;
-  p: TPolarCoor;
+procedure TOGLCPathHelper.CreateRect(aWidth, aHeight: single);
 begin
- aDistanceTraveled:=AdjustDistanceTraveled(aDistanceTraveled);
-
- if aDistanceTraveled=PathLength then begin
-   Pos:=FPts[high(FPts)];
-   Angle:=FDistanceAndAngle[high(FPts)].y;
-   exit;
- end;
-
- d:=0;
- for i:=1 to high(FPts) do begin
-   dnext:=d+FDistanceAndAngle[i].x;
-   if (aDistanceTraveled>=d) and (aDistanceTraveled<dnext) then begin
-     Angle := FDistanceAndAngle[i].y;
-     p:= CartesianToPolar(FPts[i-1], FPts[i]);
-     p.Distance:=aDistanceTraveled-d;
-     Pos:=PolarToCartesian( FPts[i-1], p );
-     exit;
-   end;
-   d:=dnext;
- end;
+  Self := NIL;
+  SetLength(Self, 4);
+  Self[0] := PointF(aWidth-1, 0);
+  Self[1] := PointF(0, 0);
+  Self[2] := PointF(0, aHeight-1);
+  Self[3] := PointF(aWidth-1, aHeight-1);
 end;
 
-
-{ TOGLCPathDrawing }
-
-procedure TOGLCPathDrawing.SetDottedLine(const AArray: array of single);
-var i: Integer;
-  s: single;
+procedure TOGLCPathHelper.CreateRoundRect(aWidth, aHeight: integer; aRx, aRy: single; aOptions: TRoundRectangleOptions);
 begin
- SetLength(FDottedLine, Length(AArray));
- s:=0;
- for i:=0 to high(AArray) do begin
-  FDottedLine[i]:=AArray[i];
-  s+=AArray[i];
- end;
- if s=0 then SetLength(FDottedLine, 0);
+  Self := ComputeRoundRect(0, 0, aWidth-1, aHeight-1, aRx, aRy, aOptions);
+  Self.RemoveIdenticalConsecutivePoint;
 end;
 
-function TOGLCPathDrawing.GetWidth: integer;
+procedure TOGLCPathHelper.CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single);
 begin
- Result:= round(FPath.RectArea.Width);
+  Self := ComputeEllipse(aWidth*0.5, aHeight*0.5, aRx, aRy);
+  Self.RemoveIdenticalConsecutivePoint;
 end;
 
-function TOGLCPathDrawing.GetHeight: integer;
+procedure TOGLCPathHelper.RemoveIdenticalConsecutivePoint;
+var i, j: integer;
 begin
- Result:= round(FPath.RectArea.Height);
-end;
-
-procedure TOGLCPathDrawing.ReleaseCurrentPath;
-begin
- if (FPath<>NIL) and FPathOwner then FPath.Free;
- FPath:=NIL;
-end;
-
-procedure TOGLCPathDrawing.DoDraw(const pt1, pt2: TPointF; aLayerPercentOpacity: single);
-begin
- DrawLine( pt1, pt2, LineColor.Value, FLineWidth, aLayerPercentOpacity*Opacity.pcValue);
-end;
-
-function TOGLCPathDrawing.GetPoint(aIndex: integer): TPointF;
-begin
- Result := FPath.Pts[aIndex];
-end;
-
-procedure TOGLCPathDrawing.Update(const aElapsedTime: single);
-begin
- inherited Update(AElapsedTime);
- if FFreeze then exit;
-
- DistanceTraveled.OnElapse( AElapsedTime );
- LineColor.OnElapse( AElapsedTime );
-end;
-
-procedure TOGLCPathDrawing.Draw(const aLayerPercentOpacity: single);
-var i: integer;
-  p1,p2: TPointF;
-  d, d1: single;
-  po: TPolarCoor;
-  iDL, lp: integer;
-  DLRemainingDistance: single;
-  DLFlag, Notdotted: boolean;
-
-  procedure NextIndex;
+  if Length(Self) = 0 then exit;
+  j := 0;
+  for i:=High(Self) downto 0 do
   begin
-   repeat
-    inc(iDL);
-    if iDL>high(FDottedLine) then iDL:=0;
-    DLRemainingDistance:=FDottedLine[iDL];
-    DLFlag:=not DLFlag;
-   until DLRemainingDistance<>0;
+    if Self[i] = Self[j] then begin
+      Delete(Self, i, 1);
+      dec(j);
+    end;
+
+    dec(j);
+    if j < 0 then j := j+High(Self);
   end;
+end;
 
-  procedure DrawDottedLine;
-  var p3: TPointF;
-  begin
-   if DLRemainingDistance>=po.Distance then begin
-     if DLFlag then DoDraw( p1, PolarToCartesian(p1, po), aLayerPercentOpacity );
-     DLRemainingDistance-=po.Distance;
-     if DLRemainingDistance=0 then NextIndex;
-   end else begin
-       p3:= PolarToCartesian(p1, PolarCoor(DLRemainingDistance, po.Angle));
-       if DLFlag then DoDraw( p1, p3, aLayerPercentOpacity );
-       p1:=p3;
-       po.Distance:=po.Distance-DLRemainingDistance;
-       NextIndex;
-       DrawDottedLine;
-   end;
+procedure TOGLCPathHelper.ClosePath;
+begin
+  if Length(Self) = 0 then exit;
+  if Self[0] <> Self[High(Self)] then begin
+    SetLength(Self, Length(Self)+1);
+    Self[High(Self)] := Self[0];
   end;
-
-begin
- if not FVisible then exit;
- if Opacity.Value=0 then exit;
-
- if FPath=NIL then exit;
- lp:=Length(FPath.Pts);
- if lp<2 then exit;
- if DistanceTraveled.Value<0 then exit;
-
- SetBlendMode( FBlendMode );
- PushAndPrepareMatrix;
- TextureManager.DisableTextureUsage;
- glLineWidth( FLineWidth );
-
- d:=0;
- p1 := GetPoint(0);
- i := 1;
-
- Notdotted:=Length(FDottedLine)=0;
- if not Notdotted then begin //Length(FDottedLine)>0 then begin
-   iDL:=0;
-   DLRemainingDistance:=FDottedLine[0];
-   DLFlag:=TRUE;
- end;
-
- repeat
-   p2 := GetPoint(i);
-   d1:=d;
-   d+=FPath.DistanceAndAngle[i].x;
-   if DistanceTraveled.Value>=d then begin // draw whole line segment
-     if Notdotted
-       then DoDraw( p1, p2, aLayerPercentOpacity )
-       else begin
-         po:=CartesianToPolar( p1, p2 );
-         DrawDottedLine;
-       end;
-   end else begin // draw only part of line segment
-       po:=CartesianToPolar( p1, p2 );
-       po.Distance:=DistanceTraveled.Value-d1;
-       if Notdotted
-         then DoDraw( p1, PolarToCartesian(p1, po), aLayerPercentOpacity )
-         else DrawDottedLine;
-   end;
-   if d>DistanceTraveled.Value then break;
-
-   p1 := p2;
-   inc( i );
- until i=lp;
-
-// DrawBox(FPath.RectArea.Left, FPath.RectArea.Top, FPath.RectArea.Width, FPath.RectArea.Height, BGRA(255,0,0),2);
-
- DrawChildSurfaces( aLayerPercentOpacity * Opacity.pcValue );
- PopMatrix;
 end;
 
-constructor TOGLCPathDrawing.Create;
+function TOGLCPathHelper.IsClosed: boolean;
 begin
- inherited Create;
- DistanceTraveled:= TFParam.Create;
- LineColor:= TBGRAParam.Create;
- LineColor.Value := BGRAWhite;
- FLineWidth :=1.5;
+  if Length(Self) < 2 then exit(False);
+  Result := Self[0] = Self[High(Self)];
 end;
 
-destructor TOGLCPathDrawing.Destroy;
+function TOGLCPathHelper.Bounds: TRectF;
+var i: integer;
 begin
- DistanceTraveled.Free;
- ReleaseCurrentPath;
- LineColor.Free;
- inherited Destroy;
+  FillChar(Result, SizeOf(TRectF), $00);
+  for i:=0 to High(Self) do
+    with Result, Self[i] do begin
+    if Left > x then Left := x
+      else if Right < x then Right := x;
+    if Top > y then Top := y
+      else if Bottom < y then Bottom := y;
+  end;
 end;
 
-procedure TOGLCPathDrawing.AssignPath(aPath: TOGLCPath; Owner: boolean);
+procedure TOGLCPathHelper.Translate(aVector: TPointF);
+var i: Integer;
 begin
- ReleaseCurrentPath;
-
- FPathOwner:= Owner;
- FPath:=aPath;
+  if (aVector.x = 0) and (aVector.y = 0) then exit;
+  for i:=0 to High(Self) do
+    Self[i] := Self[i] + aVector;
 end;
 
-function TOGLCPathDrawing.RealDistanceTraveled: single;
+procedure TOGLCPathHelper.Reduce(aOffset: single);
+var r: TRectF;
+  xCenter, yCenter: single;
+  i: Integer;
 begin
- Result := Path.AdjustDistanceTraveled(DistanceTraveled.Value);
+  if aOffset = 0 then exit;
+  r := Bounds;
+  xCenter := (r.Right-r.Left)*0.5;
+  yCenter := (r.Bottom-r.Top)*0.5;
+  for i:=0 to High(Self) do
+    with Self[i] do begin
+    if x > xCenter then x := x + aOffset
+      else if x < xCenter then x := x - aOffset;
+    if y > yCenter then y := y + aOffset
+      else if y < yCenter then y := y - aOffset;
+  end;
 end;
 
-
-{ TSpriteOnPath }
-
-constructor TSpriteOnPath.Create(ATexture: PTexture; Owner: boolean);
+procedure TOGLCPathHelper.ForceTopLeftToOrigin;
+var r: TRectF;
 begin
- inherited Create(ATexture, Owner);
- DistanceTraveled:= TFParam.Create;
- AutoRotate:=TRUE;
+  r := Bounds;
+  if (r.Top <> 0) or (r.Left <> 0) then
+    Translate(PointF(-r.Left, -r.Top));
 end;
 
-destructor TSpriteOnPath.Destroy;
+procedure TOGLCPathHelper.Scale(aValue: single);
+var i: integer;
 begin
- DistanceTraveled.Free;
- if (FPath<>NIL) and FPathOwner then FPath.Free;
- inherited Destroy;
+  for i:=0 to High(Self) do
+    Self[i] := PointF(Self[i].x*aValue, Self[i].y*aValue);
 end;
-
-procedure TSpriteOnPath.Update(const aElapsedTime: single);
-var p: TPointF;
-  a: single;
-begin
- inherited Update(aElapsedTime);
- if Freeze then exit;
-
- DistanceTraveled.OnElapse( aElapsedTime );
- if FPath<>NIL then begin
-   FPath.GetPosAndAngle( DistanceTraveled.Value, p, a);
-   MoveCenterTo( p, 0.2 );
-   if AutoRotate then Angle.ChangeTo( a+AngleAdjust, 0.2);
- end;
-end;
-
-procedure TSpriteOnPath.AssignPath(aPath: TOGLCPath; Owner: boolean);
-begin
- if (FPath<>NIL) and FPathOwner then FPath.Free;
-
- FPathOwner:= Owner;
- FPath:=aPath;
-end;
-
 
 {$endif oglcIMPLEMENTATION}
 

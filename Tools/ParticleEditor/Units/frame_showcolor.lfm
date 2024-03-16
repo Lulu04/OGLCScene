@@ -1,0 +1,19 @@
+object FrameShowColor: TFrameShowColor
+  Left = 0
+  Height = 56
+  Top = 0
+  Width = 320
+  ClientHeight = 56
+  ClientWidth = 320
+  TabOrder = 0
+  DesignLeft = 555
+  DesignTop = 271
+  object PB: TPaintBox
+    Left = 0
+    Height = 56
+    Top = 0
+    Width = 320
+    Align = alClient
+    OnPaint = PBPaint
+  end
+end
