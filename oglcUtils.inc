@@ -25,10 +25,12 @@ function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
 
 function NextPowerOfTwo(aValue: integer): integer;
 
-// load an svg file and return a BGRABitmap.
-// You can set aHeight=-1 to force TextureManager to calculate the right height to conserve aspect ratio.
-// Or you can set aWidth=-1 to force TextureManager to calculates the right width to conserve aspect ratio.
-// Both aWidth and aHeight can not be equal to -1.
+// return a TBGRABitmap from an SVG file.
+// aImageWidth and aImageHeight = -1 => return an image with original size as described in svg.
+// aImageWidth and aImageHeight <> -1 => return streched image.
+// Only aImageWidth = '-1' => returned image width is computed from aImageHeight to keep aspect ratio.
+// Only aImageHeight = '-1' => returned image height is computed from aImageWidth to keep aspect ratio.
+// the drawing is centered in the returned bitmap
 function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 
 // splits each words of a text. #10(line feed) is considered as a line break
@@ -234,19 +236,32 @@ function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer)
 var svg: TBGRASVG;
   FWHFactor, cw, ch: single;
 begin
+  Result := NIL;
+  svg := TBGRASVG.Create( aSVGFileName );
   try
-    svg := TBGRASVG.Create(aSVGFileName);
-
     cw := svg.WidthAsPixel;
     ch := svg.HeightAsPixel;
-
     FWHFactor := cw/ch;
-    if (aWidth = -1) and (aHeight = -1) then
-      Exception.Create('SVGDraw: parameters aImageWidth and aImageHeight are both equal to -1...');
-    if aWidth = -1 then aWidth := round(aHeight*FWHFactor);
-    if aHeight = -1 then aHeight := round(aWidth/FWHFactor);
+
+    if (aWidth > -1) and (aHeight > -1) then begin
+      Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
+      svg.StretchDraw(Result.Canvas2D, 0, 0, Result.Width, Result.Height, False);
+      exit;
+    end;
+
+    if (aWidth = -1) and (aHeight = -1) then begin
+      aWidth := Round(cw);
+      aHeight := Round(ch);
+    end
+    else
+    if aWidth = -1
+      then aWidth := round(aHeight*FWHFactor)
+    else
+    if aHeight = -1
+      then aHeight := round(aWidth/FWHFactor);
+
     Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-    svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, FALSE);
+    svg.StretchDraw(Result.Canvas2D, taCenter, tlCenter, 0, 0, Result.Width, Result.Height);
   finally
     svg.Free;
   end;
