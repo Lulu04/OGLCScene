@@ -46,9 +46,10 @@ public
   // Image Packer become the owner of aImage, don't free it in your code !
   function Add(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer): PTexture; overload;
   // create a texture from an svg file.
-  // You can set aHeight=-1 to force the computation of the height to conserve aspect ratio.
-  // Or you can set aWidth=-1 to force the computation of the width to conserve aspect ratio.
-  // Both aWidth and aHeight can not be equal to -1.
+  // aImageWidth and aImageHeight = -1 => return an image with original size as described in svg.
+  // aImageWidth and aImageHeight <> -1 => return streched image.
+  // Only aImageWidth = '-1' => returned image width is computed from aImageHeight to keep aspect ratio.
+  // Only aImageHeight = '-1' => returned image height is computed from aImageWidth to keep aspect ratio.
   function AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture;
 
   // Construct a bitmap with several frames and add it to the Image Packer.
