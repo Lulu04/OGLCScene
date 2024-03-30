@@ -26,10 +26,10 @@ function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
 function NextPowerOfTwo(aValue: integer): integer;
 
 // return a TBGRABitmap from an SVG file.
-// aImageWidth and aImageHeight = -1 => return an image with original size as described in svg.
-// aImageWidth and aImageHeight <> -1 => return streched image.
-// Only aImageWidth = '-1' => returned image width is computed from aImageHeight to keep aspect ratio.
-// Only aImageHeight = '-1' => returned image height is computed from aImageWidth to keep aspect ratio.
+// aWidth and aHeight = -1 => return an image with original size as described in svg.
+// aWidth and aHeight <> -1 => return a maximized image that fit in the given rectangle (keep aspect ratio).
+// Only aImageWidth = '-1' => returned image width is computed from aHeight to keep aspect ratio.
+// Only aImageHeight = '-1' => returned image height is computed from aWidth to keep aspect ratio.
 // the drawing is centered in the returned bitmap
 function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 
@@ -245,7 +245,7 @@ begin
 
     if (aWidth > -1) and (aHeight > -1) then begin
       Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-      svg.StretchDraw(Result.Canvas2D, 0, 0, Result.Width, Result.Height, False);
+      svg.StretchDraw(Result.Canvas2D, 0, 0, Result.Width, Result.Height, True);
       exit;
     end;
 
