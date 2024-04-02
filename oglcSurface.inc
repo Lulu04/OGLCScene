@@ -244,8 +244,11 @@ public  // Scenario
   property FlipH: boolean read FFlipH write FFlipH;
   property FlipV: boolean read FFlipV write FFlipV;
   // utils
+  // Center the surface on its parent scene
   procedure CenterOnScene;
+  // Center the surface on another surface
   procedure CenterOnSurface(ASurface: TSimpleSurface);
+  // Center the surface on its parent
   procedure CenterOnParent;
   // Collision test
   function CollisionTestWith(aPoint: TPointF): boolean; overload;
