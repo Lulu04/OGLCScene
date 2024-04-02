@@ -660,15 +660,15 @@ begin
   p := FOGLC.Parent;
   if p.ClientWidth > p.ClientHeight then begin
     w := Round(p.ClientHeight*FAspectRatio);
-    h := p.ClientHeight;
-    xx := (p.ClientWidth-w) div 2;
-    yy := 0;
+    if w > p.ClientWidth then w := p.ClientWidth;
+    h := Trunc(w/FAspectRatio);
   end else begin
-   w := p.ClientWidth;
    h := Round(p.ClientWidth/FAspectRatio);
-   xx := 0;
-   yy := (p.ClientHeight-h) div 2;
+   if h > p.ClientHeight then h := p.ClientHeight;
+   w := Trunc(h*FAspectRatio);
   end;
+   xx := (p.ClientWidth-w) div 2;
+   yy := (p.ClientHeight-h) div 2;
   FOGLC.SetBounds(xx, yy, w, h);
 end;
 
