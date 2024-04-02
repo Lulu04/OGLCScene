@@ -392,7 +392,7 @@ TOGLCScene = class(TOGLCContext)
   property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
   // use this callback to load your global ressources
   property OnLoadCommonData: TOGLCEvent read FOnLoadCommonData write FOnLoadCommonData;
-  // use this callback to free them
+  // use this callback to free your global ressources
   property OnFreeCommonData: TOGLCEvent read FOnFreeCommonData write FOnFreeCommonData;
 
   property Mouse: TMouseManager read FMouseManager;
