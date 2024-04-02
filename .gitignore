@@ -1,6 +1,9 @@
 *.bak
 *.exe
 *.dbg
+*.lps
+*.res
+*.log
 lib/
 backup/
 .DS_Store
