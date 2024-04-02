@@ -340,7 +340,10 @@ TOGLCScene = class(TOGLCContext)
   FRendererForPostProcessing: TOGLCRenderToTexture;
   FPostProcessingShader: TOGLCPostProcessingFX;   }
  public
-  constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single); override;
+  // Aspect ratio can be any value >= 1.0 i.e 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
+  // and centered on its parent.
+  // If you set aspect ratio to -1 the TOpenGLControl is resized to fit its parent client area.
+  constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single=-1); override;
   Destructor Destroy; override;
 
   procedure CreateLogFile(const aFilename: string; aDeletePrevious: boolean; aCallback: TOGLCLogCallback=NIL; aCallbackData: pointer=NIL);
@@ -658,14 +661,19 @@ var p: TWinControl;
     xx, yy, w, h: integer;
 begin
   p := FOGLC.Parent;
-  if p.ClientWidth > p.ClientHeight then begin
-    w := Round(p.ClientHeight*FAspectRatio);
-    if w > p.ClientWidth then w := p.ClientWidth;
-    h := Trunc(w/FAspectRatio);
+  if FAspectRatio = -1 then begin
+    w := p.ClientWidth;
+    h := p.ClientHeight;
   end else begin
-   h := Round(p.ClientWidth/FAspectRatio);
-   if h > p.ClientHeight then h := p.ClientHeight;
-   w := Trunc(h*FAspectRatio);
+    if p.ClientWidth > p.ClientHeight then begin
+      w := Round(p.ClientHeight*FAspectRatio);
+      if w > p.ClientWidth then w := p.ClientWidth;
+      h := Trunc(w/FAspectRatio);
+    end else begin
+     h := Round(p.ClientWidth/FAspectRatio);
+     if h > p.ClientHeight then h := p.ClientHeight;
+     w := Trunc(h*FAspectRatio);
+    end;
   end;
    xx := (p.ClientWidth-w) div 2;
    yy := (p.ClientHeight-h) div 2;
@@ -855,6 +863,10 @@ end;
 
 constructor TOGLCScene.Create(aOGLContext: TOpenGLControl; aAspectRatio: single);
 begin
+  if aAspectRatio <> -1 then begin
+    aOGLContext.Align := alNone;
+    if aAspectRatio < 1.0 then aAspectRatio := 4/3;
+  end;
   inherited Create(aOGLContext, aAspectRatio);
 
   FBackgroundColorF.Init(0,0,0,1);
