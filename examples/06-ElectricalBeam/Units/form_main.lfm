@@ -1,0 +1,181 @@
+object FormMain: TFormMain
+  Left = 516
+  Height = 425
+  Top = 190
+  Width = 303
+  Caption = 'OGLCScene - Deformation grid '
+  ClientHeight = 425
+  ClientWidth = 303
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  LCLVersion = '2.2.6.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 24
+    Height = 108
+    Top = 24
+    Width = 96
+  end
+  object Panel1: TPanel
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 156
+    Height = 408
+    Top = 0
+    Width = 147
+    Anchors = [akTop, akRight]
+    ClientHeight = 408
+    ClientWidth = 147
+    Color = 12961221
+    ParentColor = False
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 14
+      Height = 15
+      Top = 56
+      Width = 60
+      Caption = 'Aperture 5°'
+      ParentColor = False
+    end
+    object TrackBar1: TTrackBar
+      Left = 7
+      Height = 31
+      Top = 77
+      Width = 137
+      Max = 45
+      Min = 5
+      OnChange = TrackBar1Change
+      Position = 5
+      ShowSelRange = False
+      TabOrder = 0
+    end
+    object Label2: TLabel
+      Left = 14
+      Height = 15
+      Top = 125
+      Width = 71
+      Caption = 'BeamWidth 3'
+      ParentColor = False
+    end
+    object TrackBar2: TTrackBar
+      Left = 7
+      Height = 31
+      Top = 146
+      Width = 137
+      Max = 20
+      Min = 1
+      OnChange = TrackBar1Change
+      Position = 3
+      ShowSelRange = False
+      TabOrder = 1
+    end
+    object ColorButton1: TColorButton
+      Left = 23
+      Height = 25
+      Top = 210
+      Width = 103
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = 4227327
+      OnColorChanged = TrackBar1Change
+    end
+    object Label3: TLabel
+      Left = 14
+      Height = 15
+      Top = 197
+      Width = 59
+      Caption = 'BeamColor'
+      ParentColor = False
+    end
+    object Label4: TLabel
+      Left = 14
+      Height = 15
+      Top = 245
+      Width = 72
+      Caption = 'HaloWidth 20'
+      ParentColor = False
+    end
+    object TrackBar3: TTrackBar
+      Left = 8
+      Height = 31
+      Top = 266
+      Width = 137
+      Frequency = 10
+      Max = 50
+      Min = 1
+      OnChange = TrackBar1Change
+      Position = 20
+      ShowSelRange = False
+      TabOrder = 2
+    end
+    object Label5: TLabel
+      Left = 14
+      Height = 15
+      Top = 309
+      Width = 54
+      Caption = 'HaloColor'
+      ParentColor = False
+    end
+    object ColorButton2: TColorButton
+      Left = 25
+      Height = 25
+      Top = 322
+      Width = 103
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = clFuchsia
+      OnColorChanged = TrackBar1Change
+    end
+    object Label6: TLabel
+      Left = 14
+      Height = 15
+      Top = 349
+      Width = 109
+      Caption = 'HaloColor.Alpha 120'
+      ParentColor = False
+    end
+    object TrackBar4: TTrackBar
+      Left = 10
+      Height = 31
+      Top = 362
+      Width = 137
+      Frequency = 10
+      Max = 255
+      OnChange = TrackBar1Change
+      Position = 120
+      ShowSelRange = False
+      TabOrder = 3
+    end
+    object Label7: TLabel
+      Left = 14
+      Height = 15
+      Top = 8
+      Width = 95
+      Caption = 'Refresh time 0.01s'
+      ParentColor = False
+    end
+    object TrackBar5: TTrackBar
+      Left = 8
+      Height = 31
+      Top = 24
+      Width = 137
+      Max = 100
+      Min = 1
+      OnChange = TrackBar1Change
+      Position = 5
+      ShowSelRange = False
+      TabOrder = 4
+    end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 34
+    Top = 26
+  end
+end
