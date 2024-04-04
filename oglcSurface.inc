@@ -236,9 +236,11 @@ public  // Scenario
   function ScenarioIsPlaying(aID: TIDScenario): boolean;
   // set a callbak proc to decode custom additionnal actions
   procedure SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
-  // Frame anime
-  procedure SetFrameLoopBounds( AStartFrameIndex, AEndFrameIndex: integer );
-  procedure FrameAddPerSecond( ADeltaFramePerSecond: single );
+  // Frame animation
+  // You can set the range of frame index to use to animate the surface.
+  // A texture frame start from 1 because 0 means the whole texture
+  procedure SetFrameLoopBounds(AStartFrameIndex, AEndFrameIndex: integer);
+  procedure FrameAddPerSecond(ADeltaFramePerSecond: single);
   property Frame: single read FFrame write SetFrame;
   // Flip H and V
   property FlipH: boolean read FFlipH write FFlipH;
@@ -575,6 +577,7 @@ begin
     if FTimeBeforeKill <= 0 then FKill := TRUE;
   end;
 
+  // Frame
   FFrame += aElapsedTime * FFrameDeltaPerSecond;
   if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then
   begin
