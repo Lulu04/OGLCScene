@@ -1,4 +1,4 @@
-unit screen_title;
+unit screen_demo;
 
 {$mode objfpc}{$H+}
 
@@ -12,9 +12,9 @@ uses
 
 type
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-TScreenTitle = class(TScreenTemplate)
+TScreenDemo = class(TScreenTemplate)
 private
   FAtlas: TOGLCTextureAtlas; // we need an atlas to contains all images in a single texture
 
@@ -29,14 +29,14 @@ public
   procedure SetWindSpeed(aValue: single);
 end;
 
-var ScreenTitle: TScreenTitle = NIL;
+var ScreenDemo: TScreenDemo = NIL;
 
 implementation
 uses Forms;
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-procedure TScreenTitle.CreateObjects;
+procedure TScreenDemo.CreateObjects;
 var ima: TBGRABitmap;
    path: string;
 begin
@@ -67,18 +67,18 @@ begin
 
 end;
 
-procedure TScreenTitle.FreeObjects;
+procedure TScreenDemo.FreeObjects;
 begin
   FScene.ClearAllLayer;    // kill all surfaces on all layer
   FreeAndNil(FAtlas);
 end;
 
-procedure TScreenTitle.Update(const AElapsedTime: single);
+procedure TScreenDemo.Update(const AElapsedTime: single);
 begin
   inherited Update(AElapsedTime);
 end;
 
-procedure TScreenTitle.SetWindSpeed(aValue: single);
+procedure TScreenDemo.SetWindSpeed(aValue: single);
 begin
   FLittleRed.SetWindSpeed(aValue);
 end;

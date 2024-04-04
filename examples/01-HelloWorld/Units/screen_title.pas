@@ -12,21 +12,21 @@ uses
 
 type
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-TScreenTitle = class(TScreenTemplate)
+TScreenDemo = class(TScreenTemplate)
   procedure CreateObjects; override;
   procedure FreeObjects; override;
   procedure ProcessMessage({%H-}UserValue: TUserMessageValue); override;
 end;
 
-var ScreenTitle: TScreenTitle = NIL;
+var ScreenDemo: TScreenDemo = NIL;
 
 implementation
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-procedure TScreenTitle.CreateObjects;
+procedure TScreenDemo.CreateObjects;
 var o: TSprite;
   fd: TFontDescriptor;
 begin
@@ -37,12 +37,12 @@ begin
   o.CenterOnScene;
 end;
 
-procedure TScreenTitle.FreeObjects;
+procedure TScreenDemo.FreeObjects;
 begin
   FScene.ClearAllLayer;
 end;
 
-procedure TScreenTitle.ProcessMessage(UserValue: TUserMessageValue);
+procedure TScreenDemo.ProcessMessage(UserValue: TUserMessageValue);
 begin
   inherited ProcessMessage(UserValue); // keep this line please
 end;

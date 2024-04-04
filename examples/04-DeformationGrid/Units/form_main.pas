@@ -79,13 +79,13 @@ end;
 procedure TFormMain.LoadCommonData;
 begin
   // we create the single screen of our example
-  ScreenTitle := TScreenTitle.Create;
-  FScene.RunScreen(ScreenTitle, False);
+  ScreenDemo := TScreenDemo.Create;
+  FScene.RunScreen(ScreenDemo, False);
 end;
 
 procedure TFormMain.FreeCommonData;
 begin
-  FreeAndNil(ScreenTitle);
+  FreeAndNil(ScreenDemo);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);

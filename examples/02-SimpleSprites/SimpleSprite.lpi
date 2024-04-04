@@ -84,7 +84,7 @@
       <Unit0>
         <Filename Value="SimpleSprite.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="3"/>
         <CursorPos X="33" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -96,8 +96,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="34"/>
-        <CursorPos X="45" Y="52"/>
+        <TopLine Value="67"/>
+        <CursorPos X="47" Y="83"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -117,8 +117,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="47"/>
-        <CursorPos X="19" Y="50"/>
+        <TopLine Value="5"/>
+        <CursorPos X="12" Y="16"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -192,30 +192,27 @@
       </Unit13>
       <Unit14>
         <Filename Value="..\..\oglcTextureAtlas.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="67"/>
         <CursorPos X="12" Y="80"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\oglcScreenTemplate.inc"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="23"/>
         <CursorPos X="13" Y="36"/>
         <UsageCount Value="11"/>
-        <Loaded Value="True"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\oglcSurface.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="233"/>
         <CursorPos X="7" Y="241"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit16>
     </Units>
-    <JumpHistory Count="23" HistoryIndex="22">
+    <JumpHistory Count="21" HistoryIndex="20">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="50" Column="38" TopLine="35"/>
@@ -265,49 +262,41 @@
         <Caret Line="17" Column="30" TopLine="11"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\oglcScreenTemplate.inc"/>
-        <Caret Line="36" Column="16" TopLine="17"/>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="30" Column="17" TopLine="11"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\oglcScreenTemplate.inc"/>
-        <Caret Line="72" Column="3" TopLine="47"/>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="91" Column="5" TopLine="66"/>
       </Position14>
       <Position15>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="30" Column="17" TopLine="11"/>
+        <Caret Line="63" Column="14" TopLine="46"/>
       </Position15>
       <Position16>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="91" Column="5" TopLine="66"/>
+        <Caret Line="56" TopLine="42"/>
       </Position16>
       <Position17>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="63" Column="14" TopLine="46"/>
+        <Caret Line="82" Column="24" TopLine="64"/>
       </Position17>
       <Position18>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="56" TopLine="42"/>
+        <Caret Line="82" Column="21" TopLine="64"/>
       </Position18>
       <Position19>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="82" Column="24" TopLine="64"/>
+        <Caret Line="33" Column="19" TopLine="31"/>
       </Position19>
       <Position20>
-        <Filename Value="..\..\oglcSurface.inc"/>
-        <Caret Line="241" Column="13" TopLine="226"/>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="66" Column="14" TopLine="51"/>
       </Position20>
       <Position21>
-        <Filename Value="..\..\oglcSurface.inc"/>
-        <Caret Line="954" Column="27" TopLine="945"/>
-      </Position21>
-      <Position22>
-        <Filename Value="..\..\oglcSurface.inc"/>
-        <Caret Line="161" Column="15" TopLine="148"/>
-      </Position22>
-      <Position23>
         <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="82" Column="21" TopLine="64"/>
-      </Position23>
+        <Caret Line="11" Column="17"/>
+      </Position21>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
