@@ -383,6 +383,11 @@ var xx,yy:single;
 begin
   // size of the rendered font. try to take into account shadow and outline.
   ts := aBitmap.TextSize(aStr)+DecorationSize;
+
+  // to avoid a division by 0
+  if ts.cx = 0 then ts.cx := 1;
+  if ts.cy = 0 then ts.cy := 1;
+
   aBitmap.SetSize(ts.cx, ts.cy);
 
   // force shadow param. to 0 if there is no shadow
