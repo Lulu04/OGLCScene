@@ -77,7 +77,7 @@ TOGLCElectricalBeam = class(TSimpleSurfaceWithEffect)
 private
   FBeamWidth, FHaloWidth, FThreshold: single;
   FPtTarget: TPointF;
-  FRecomputePathTime,
+  FRefreshTime,
   FRecomputePathTimeAccu: single;
   FAperture: single;
   FPath: TOGLCPath;
@@ -121,10 +121,10 @@ procedure debugVertices;
   property HaloWidth: single read FHaloWidth write SetHaloWidth;
 
   // For each slice of time (in seconds) the beam is recomputed.
-  // This period is computed with this formula: PathRecomputeTime+random*PathRecomputeTime*0.5
+  // This period is computed with this formula: RefreshTime+random*RefreshTime*0.5
   // If you don't want to re-compute periodically the beam, set it to negative value (default).
   // default value is -1.
-  property PathRecomputeTime: single read FRecomputePathTime write FRecomputePathTime;
+  property RefreshTime: single read FRefreshTime write FRefreshTime;
 end;
 
 {$endif oglcINTERFACE}
@@ -399,12 +399,12 @@ begin
 
   BeamColor.OnElapse(aElapsedTime);
 
-  if (FRecomputePathTime > 0) and FTargetInitialized then begin
+  if (FRefreshTime > 0) and FTargetInitialized then begin
     FRecomputePathTimeAccu := FRecomputePathTimeAccu - aElapsedTime;
     if FRecomputePathTimeAccu <= 0 then begin
       RecomputePath;
       DoComputeBeam;
-      FRecomputePathTimeAccu := FRecomputePathTime + random*FRecomputePathTime*0.5;
+      FRecomputePathTimeAccu := FRefreshTime + random*FRefreshTime*0.5;
     end;
   end;
 end;
@@ -441,7 +441,7 @@ begin
   HaloColor.Value := BGRA(255,0,255);
   HaloAttenuation := 2.0;
   HaloWidth := 3.0;
-  FRecomputePathTime := -1;
+  FRefreshTime := -1;
   FAperture := 35;
 
   if aParentScene.FElectricalBeamRenderer = NIL then
