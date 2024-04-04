@@ -45,13 +45,21 @@ public
   // Column index range is 0 to aColumnCount
   procedure SetGrid(aRowCount, aColumnCount: integer);
 
+  // Allow to control the amount of deformation to apply on a particular row of the grid.
+  // i.e. SetDeformationAmountOnRow(0, 0.0) sets no deformation on the first row.
   procedure SetDeformationAmountOnRow(aRowIndex: integer; aDeformationAmount: single);
+  // Allow to control the amount of deformation to apply on a particular column of the grid.
   procedure SetDeformationAmountOnColumn(aColIndex: integer; aDeformationAmount: single);
 
+  // Allow to speed up or slow down the deformations on a particular row.
+  // i.e. SetTimeMultiplicatorOnRow(4, 2.0) speed up 2 time the deformation on the row of index 4.
   procedure SetTimeMultiplicatorOnRow(aRowIndex: integer; aTimeMultiplicator: single);
+  // Allow to speed up or slow down the deformations on a particular column.
   procedure SetTimeMultiplicatorOnColumn(aColIndex: integer; aTimeMultiplicator: single);
 
+  // Allow to control the amount of deformation on all sides (on the periphery) of the grid.
   procedure SetDeformationAmountOnAllSide(aDeformationAmount: single);
+  // Allow to control the deformation speed on all sides (on the periphery) of the grid.
   procedure SetTimeMultiplicatorOnAllSide(aTimeMultiplicator: single);
 
   // access grid points
