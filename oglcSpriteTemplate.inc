@@ -120,6 +120,8 @@ end;
 // a virtual sprite without texture but only childs surface.
 // use it to compose a complex sprite made with several child surfaces ordered by ZOrder.
 TSpriteContainer = class(TSimpleSurfaceWithEffect)
+private
+  FShowOrigin: boolean;
 protected
   function GetWidth: integer; override;
   function GetHeight: integer; override;
@@ -128,6 +130,7 @@ public
   procedure DoDraw; override;
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer=0); override;
   constructor Create(aParentScene: TOGLCScene);
+  property ShowOrigin: boolean read FShowOrigin write FShowOrigin;
 end;
 
 
@@ -521,9 +524,11 @@ end;
 procedure TSpriteContainer.Draw(const aLayerPercentOpacity: single);
 begin
   inherited Draw(aLayerPercentOpacity);
-{  PushAndPrepareSceneMV;
-  FillBox(FParentScene, -2,-2,4,4,BGRA(255,0,0));
-  PopSceneMV;   }
+  if FShowOrigin then begin
+    PushAndPrepareSceneMV;
+    FillBox(FParentScene, -2,-2,4,4,BGRA(255,0,0));
+    PopSceneMV;
+  end;
 end;
 
 procedure TSpriteContainer.DoDraw;
