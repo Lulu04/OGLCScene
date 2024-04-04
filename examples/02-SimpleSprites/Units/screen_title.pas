@@ -12,9 +12,9 @@ uses
 
 type
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-TScreenTitle = class(TScreenTemplate)
+TScreenDemo = class(TScreenTemplate)
 private
   FAtlas: TOGLCTextureAtlas; // we need an atlas to contains all images in a single texture
   FtexTruck: PTexture;   // the texture for the truck
@@ -26,14 +26,14 @@ public
   procedure Update(const AElapsedTime: single); override;
 end;
 
-var ScreenTitle: TScreenTitle = NIL;
+var ScreenDemo: TScreenDemo = NIL;
 
 implementation
 uses Forms;
 
-{ TScreenTitle }
+{ TScreenDemo }
 
-procedure TScreenTitle.CreateObjects;
+procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
 begin
@@ -57,13 +57,13 @@ begin
   FScene.BackgroundColor := BGRA(50,50,50);
 end;
 
-procedure TScreenTitle.FreeObjects;
+procedure TScreenDemo.FreeObjects;
 begin
   FScene.ClearAllLayer;    // kill all surfaces on all layer
   FreeAndNil(FAtlas);
 end;
 
-procedure TScreenTitle.Update(const AElapsedTime: single);
+procedure TScreenDemo.Update(const AElapsedTime: single);
 var truck: TSprite;
 begin
   inherited Update(AElapsedTime);

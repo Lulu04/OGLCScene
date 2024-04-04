@@ -40,7 +40,7 @@ var
   FormMain: TFormMain;
 
 implementation
-uses screen_title;
+uses screen_demo;
 {$R *.lfm}
 
 { TFormMain }
@@ -84,27 +84,27 @@ end;
 
 procedure TFormMain.TrackBar1Change(Sender: TObject);
 begin
-  if ScreenTitle = NIL then exit;
+  if ScreenDemo = NIL then exit;
 
-  if Sender = TrackBar1 then ScreenTitle.LittleRed.SetWindSpeed(TrackBar1.Position*0.01);
+  if Sender = TrackBar1 then ScreenDemo.LittleRed.SetWindSpeed(TrackBar1.Position*0.01);
 
-  if Sender = CheckBox1 then ScreenTitle.LittleRed.ToogleFlipH;
+  if Sender = CheckBox1 then ScreenDemo.LittleRed.ToogleFlipH;
 
-  if Sender = CheckBox2 then ScreenTitle.LittleRed.ToogleFlipV;
+  if Sender = CheckBox2 then ScreenDemo.LittleRed.ToogleFlipV;
 
-  if Sender = CheckBox3 then ScreenTitle.LittleRed.ShowOrigin := CheckBox3.Checked;
+  if Sender = CheckBox3 then ScreenDemo.LittleRed.ShowOrigin := CheckBox3.Checked;
 end;
 
 procedure TFormMain.LoadCommonData;
 begin
   // we create the single screen of our example
-  ScreenTitle := TScreenTitle.Create;
-  FScene.RunScreen(ScreenTitle, False);
+  ScreenDemo := TScreenDemo.Create;
+  FScene.RunScreen(ScreenDemo, False);
 end;
 
 procedure TFormMain.FreeCommonData;
 begin
-  FreeAndNil(ScreenTitle);
+  FreeAndNil(ScreenDemo);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
