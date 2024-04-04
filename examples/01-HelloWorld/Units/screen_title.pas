@@ -17,7 +17,6 @@ type
 TScreenDemo = class(TScreenTemplate)
   procedure CreateObjects; override;
   procedure FreeObjects; override;
-  procedure ProcessMessage({%H-}UserValue: TUserMessageValue); override;
 end;
 
 var ScreenDemo: TScreenDemo = NIL;
@@ -27,24 +26,25 @@ implementation
 { TScreenDemo }
 
 procedure TScreenDemo.CreateObjects;
-var o: TSprite;
+var spriteText: TSprite;
   fd: TFontDescriptor;
 begin
-  fd.Create('Arial', 32, [], BGRA(255,0,200), BGRA(200,0,150), 1, BGRA(0,0,0,0), 0, 0, 0);
+  // font is drawn in black: this way we can choose the color of the text at sprite level (see below)
+  fd.Create('Arial', 32, [], BGRA(0,0,0));
 
-  o := TSprite.Create(FScene, fd, 'Hello world');
-  FScene.Add(o);
-  o.CenterOnScene;
+  // It's the easiest way to create a texture with text written on it.
+  // But this means you'll have one texture for one text, which isn't optimized for OpenGL.
+  // It's better to use a TTexturedFont object: see example 07
+  spriteText := TSprite.Create(FScene, fd, 'Hello world');
+  FScene.Add(spriteText);
+  spriteText.CenterOnScene;
+  // we apply a Tint on the sprite because the font is draw in black
+  spriteText.Tint.Value := BGRA(255,255,220);
 end;
 
 procedure TScreenDemo.FreeObjects;
 begin
   FScene.ClearAllLayer;
-end;
-
-procedure TScreenDemo.ProcessMessage(UserValue: TUserMessageValue);
-begin
-  inherited ProcessMessage(UserValue); // keep this line please
 end;
 
 
