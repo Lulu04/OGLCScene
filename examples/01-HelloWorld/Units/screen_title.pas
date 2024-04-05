@@ -34,7 +34,7 @@ begin
 
   // It's the easiest way to create a texture with text written on it.
   // But this means you'll have one texture for one text, which isn't optimized for OpenGL.
-  // It's better to use a TTexturedFont object: see example 08
+  // It's better to use a TTexturedFont object: see example TexturedFont
   spriteText := TSprite.Create(FScene, fd, 'Hello world');
   FScene.Add(spriteText);
   spriteText.CenterOnScene;
