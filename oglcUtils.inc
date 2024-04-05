@@ -270,16 +270,6 @@ end;
 
 function SplitTextToWordArray(aText: string; aCharSeparator: char): TStringArray;
 var i: integer;
-{   function IsLineFeed: boolean;
-   begin
-    Result := aText[i] = #10;
-   end;
-   procedure AddNewLine;
-   begin
-    inc(w);
-    SetLength(Result, w+1);
-    Result[w] := #10;
-   end;  }
 begin
   Result := NIL;
   if Length(aText) = 0 then exit;
@@ -296,23 +286,6 @@ begin
     end;
 
   Result := aText.Split([aCharSeparator]);
-
-{ // prepare the string
- if aText[1] <> aCharSeparator
-   then aText := aCharSeparator {%H-}+ aText;
-
- i := 1;
- w := -1;
- repeat
-  if IsLineFeed then begin
-    if Result[w] <> '' then AddNewLine;
-    Result[w] := aText[i];
-    AddNewLine;
-  end else if aText[i] <> aCharSeparator
-             then Result[w] := Result[w] + aText[i]
-             else AddNewLine;
-  inc ( i );
- until i>Length( aText ); }
 end;
 
 procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single; aOpacity: single);
