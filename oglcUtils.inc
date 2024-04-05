@@ -286,6 +286,10 @@ begin
     end;
 
   Result := aText.Split([aCharSeparator]);
+
+  // delete all empty characters
+  for i:=High(Result) downto 0 do
+    if Length(Result[i]) = 0 then Delete(Result, i , 1);
 end;
 
 procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single; aOpacity: single);
