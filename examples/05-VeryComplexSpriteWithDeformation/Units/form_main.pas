@@ -49,6 +49,7 @@ procedure TFormMain.FormCreate(Sender: TObject);
 begin
   FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
   FScene.LayerCount := LAYER_COUNT;
+  FScene.CreateLogFile(Application.Location+'scene.log', True);
 
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
