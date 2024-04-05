@@ -80,9 +80,9 @@ end;
 
 
 { TFreeText }
+
 // A surface that draw a single line string.
 // Instead of TUILabel, TFreeText is not clipped and mouse can't interact with it.
-
 TFreeText = class(TSimpleSurfaceWithEffect)
 private
   FCharIndexes: TTexturedCharIndexes;
