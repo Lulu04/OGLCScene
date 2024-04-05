@@ -8,7 +8,8 @@ function StringToSingle(const aStr: string): single;
 
 
 // Add chars to a charset, avoiding redundant char. Return the modified charset.
-// Replace all kind of LineEnding by #10.
+// Usefull to create a charset for Textured Font.
+// The function replace all kind of LineEnding by #10.
 function AddToCharset(const aCharSet, aCharsToAdd: string): string; overload;
 function AddToCharset(const aCharset: string; aCharsToAdd: TStringArray): string; overload;
 
