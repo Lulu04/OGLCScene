@@ -264,8 +264,8 @@ begin
 
   if FShowGrid then begin
     FParentScene.FastLineRenderer.Prepare(FParentScene.MVPMatrix, FX_BLEND_NORMAL);
-    for iy:=0 to FRowCount-2 do
-     for ix:=0 to FColumnCount-2 do begin
+    for iy:=0 to FRowCount-1 do
+     for ix:=0 to FColumnCount-1 do begin
        pt1 := PointF(FGridPts[iy][ix].x, FGridPts[iy][ix].y);
        pt2 := PointF(FGridPts[iy][ix+1].x, FGridPts[iy][ix+1].y);
        FParentScene.FastLineRenderer.PushLine(pt1, pt2, BGRA(255,0,0), 1.0, lpMiddle);
