@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="68"/>
+      <BuildNr Value="69"/>
       <Language Value="040C"/>
       <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.0"/>
     </VersionInfo>
@@ -115,7 +115,6 @@
       <Unit3>
         <Filename Value="Units\screen_title.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="64"/>
         <CursorPos X="34" Y="75"/>
@@ -221,9 +220,10 @@
       </Unit17>
       <Unit18>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="104"/>
-        <CursorPos X="28" Y="112"/>
+        <TopLine Value="111"/>
+        <CursorPos X="15" Y="126"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit18>
@@ -251,8 +251,8 @@
       <Unit22>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="148"/>
-        <CursorPos X="21" Y="157"/>
+        <TopLine Value="187"/>
+        <CursorPos X="75" Y="205"/>
         <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit22>
@@ -260,123 +260,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="74" Column="9" TopLine="59"/>
+        <Caret Line="88" Column="75" TopLine="80"/>
       </Position1>
       <Position2>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="73" Column="9" TopLine="58"/>
+        <Caret Line="91" Column="43" TopLine="80"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="75" Column="9" TopLine="60"/>
-      </Position3>
-      <Position4>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="86" Column="75" TopLine="78"/>
-      </Position4>
-      <Position5>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="88" Column="75" TopLine="80"/>
-      </Position5>
-      <Position6>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="91" Column="43" TopLine="80"/>
-      </Position6>
-      <Position7>
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="33" Column="28" TopLine="19"/>
+      </Position3>
+      <Position4>
+        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
+        <Caret Line="214" Column="77" TopLine="187"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
+        <Caret Line="194" Column="13" TopLine="187"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
+        <Caret Line="745" Column="3" TopLine="743"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
+        <Caret Line="197" Column="16" TopLine="179"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="214" Column="77" TopLine="187"/>
+        <Caret Line="796" Column="3" TopLine="792"/>
       </Position8>
       <Position9>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="194" Column="13" TopLine="187"/>
+        <Caret Line="196" Column="15" TopLine="192"/>
       </Position9>
       <Position10>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="745" Column="3" TopLine="743"/>
+        <Caret Line="769" Column="2" TopLine="769"/>
       </Position10>
       <Position11>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="197" Column="16" TopLine="179"/>
+        <Caret Line="193" Column="23" TopLine="181"/>
       </Position11>
       <Position12>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="796" Column="3" TopLine="792"/>
+        <Caret Line="214" Column="65" TopLine="191"/>
       </Position12>
       <Position13>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="196" Column="15" TopLine="192"/>
+        <Caret Line="734" Column="23" TopLine="710"/>
       </Position13>
       <Position14>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="769" Column="2" TopLine="769"/>
+        <Caret Line="745" Column="23" TopLine="721"/>
       </Position14>
       <Position15>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="193" Column="23" TopLine="181"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="117" Column="15" TopLine="99"/>
       </Position15>
       <Position16>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="214" Column="65" TopLine="191"/>
+        <Caret Line="767" Column="8" TopLine="759"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="734" Column="23" TopLine="710"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="648" Column="53" TopLine="637"/>
       </Position17>
       <Position18>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="745" Column="23" TopLine="721"/>
+        <Caret Line="767" Column="69" TopLine="759"/>
       </Position18>
       <Position19>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="117" Column="15" TopLine="99"/>
+        <Caret Line="125" Column="18" TopLine="102"/>
       </Position19>
       <Position20>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="767" Column="8" TopLine="759"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="684" Column="31" TopLine="679"/>
       </Position20>
       <Position21>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="648" Column="53" TopLine="637"/>
+        <Caret Line="137" Column="74" TopLine="110"/>
       </Position21>
       <Position22>
         <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="767" Column="69" TopLine="759"/>
+        <Caret Line="194" Column="18" TopLine="181"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="125" Column="18" TopLine="102"/>
+        <Caret Line="624" TopLine="621"/>
       </Position23>
       <Position24>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="684" Column="31" TopLine="679"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="92" Column="2" TopLine="77"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="137" Column="74" TopLine="110"/>
+        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
+        <Caret Line="752" Column="32" TopLine="743"/>
       </Position25>
       <Position26>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="194" Column="18" TopLine="181"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="660" Column="44" TopLine="649"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="624" TopLine="621"/>
+        <Caret Line="126" Column="26" TopLine="104"/>
       </Position27>
       <Position28>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="92" Column="2" TopLine="77"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="692" Column="3" TopLine="690"/>
       </Position28>
       <Position29>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <Caret Line="752" Column="32" TopLine="743"/>
+        <Filename Value="..\..\oglcTexturedFont.inc"/>
+        <Caret Line="126" Column="89" TopLine="111"/>
       </Position29>
       <Position30>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="660" Column="44" TopLine="649"/>
+        <Caret Line="696" Column="49" TopLine="690"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
