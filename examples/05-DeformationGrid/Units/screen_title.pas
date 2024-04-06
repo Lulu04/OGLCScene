@@ -29,6 +29,8 @@ public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
   procedure Update(const AElapsedTime: single); override;
+
+  procedure ShowGrid(aValue: boolean);
 end;
 
 var ScreenDemo: TScreenDemo = NIL;
@@ -82,7 +84,7 @@ begin
   FScene.Add(FTitle2);
   with FTitle2 do begin
     SetCoordinate((FScene.Width-FTitle1.Width)*0.5, yy);
-    SetGrid(20,20);
+    SetGrid(1,20);
     ApplyDeformation(dtWindingLeft);
     DeformationSpeed.Value := PointF(FScene.Width*0.1,0);
   end;
@@ -92,7 +94,7 @@ begin
   FScene.Add(FTitle3);
   with FTitle3 do begin
     SetCoordinate((FScene.Width-FTitle1.Width)*0.5, yy);
-    SetGrid(20,20);
+    SetGrid(1,20);
     ApplyDeformation(dtWindingRight);
     DeformationSpeed.Value := PointF(FScene.Width*0.1,0);
   end;
@@ -105,7 +107,7 @@ begin
     SetGrid(20,20);
     ApplyDeformation(dtFlagRight);
     DeformationSpeed.Value := PointF(2,2.6);
-    Amplitude.Value := PointF(1.2,1.3);
+    Amplitude.Value := PointF(2,1.3);
   end;
 
 end;
@@ -126,6 +128,14 @@ begin
     FTitle2.DeformationSpeed.x.Value := -FTitle2.DeformationSpeed.x.Value;
     FTitle3.DeformationSpeed.x.Value := -FTitle3.DeformationSpeed.x.Value;
   end;
+end;
+
+procedure TScreenDemo.ShowGrid(aValue: boolean);
+begin
+  FTitle1.ShowGrid := aValue;
+  FTitle2.ShowGrid := aValue;
+  FTitle3.ShowGrid := aValue;
+  FTitle4.ShowGrid := aValue;
 end;
 
 
