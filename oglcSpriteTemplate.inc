@@ -199,7 +199,8 @@ public
   // Distance traveled on path. Use this property to move the sprite along the path.
   DistanceTraveled: TFParam;
   // This sprite is created as a child of an TOGLCPathToFollow instance.
-  Constructor CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture; Owner: boolean=FALSE);
+  // A positive ZOrder means the sprite is above its parent, negative value means the sprite is under its parent.
+  Constructor CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture; Owner: boolean=FALSE; aZOrder: integer=0);
   Destructor Destroy; override;
 
   // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
@@ -723,12 +724,13 @@ end;
 
 { TSpriteOnPathToFollow }
 
-constructor TSpriteOnPathToFollow.CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture; Owner: boolean);
+constructor TSpriteOnPathToFollow.CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture;
+  Owner: boolean; aZOrder: integer);
 begin
   inherited Create(ATexture, Owner);
   DistanceTraveled := TFParam.Create;
   AutoRotate := TRUE;
-  aPathToFollow.AddChild(Self);
+  aPathToFollow.AddChild(Self, aZOrder);
   FCoeffPositionOnPath := 0.5;
 end;
 

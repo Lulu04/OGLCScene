@@ -107,11 +107,13 @@ end;
 
 
 { TFreeTextOnPathToFollow }
-
+// a text that moves along a TOGLCPathToFollow instance
 TFreeTextOnPathToFollow = class(TFreeText)
 private
   FAutoRotate: boolean;
-  FAngleAdjust: single;
+  FAngleAdjust,
+  FCoeffPositionOnPath: single;
+  procedure SetCoeffPositionOnLine(AValue: single);
 public
   procedure Update(const aElapsedTime: single); override;
   procedure Draw(const aLayerPercentOpacity: single);  override;
@@ -120,18 +122,24 @@ public
   // Distance traveled on the path
   DistanceTraveled: TFParam;
 
-  constructor CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow);
+  // Use this constructor to create the text associated with a TOGLCPathToFollow instance.
+  constructor CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow; aZOrder: integer=0);
   destructor Destroy; override;
 
   // 'TRUE' force the sprite to rotate on the right direction along the path. Default is TRUE.
   property AutoRotate: boolean read FAutoRotate write FAutoRotate;
   // Set this value to ajust the right orientation of the sprite. Default is '0'.
   property AngleAdjust: single read FAngleAdjust write FAngleAdjust;
+  // Allow to control the position of the sprite on the path. Range is from 0 to 1. Default value is 0.5
+  //   0 -> the sprite is above the path
+  // 0.5 -> the sprite is centered on the path
+  //   1 -> the sprite is below the path
+  property CoeffPositionOnPath: single read FCoeffPositionOnPath write SetCoeffPositionOnLine;
 end;
 
 
 { TFreeTextClockLabel }
-
+// A surface that can count/count down time and show the current time
 TFreeTextClockLabel = class(TFreeText)
 private
   FOnCountdownDone: TNotifyEvent;
@@ -217,6 +225,8 @@ end;
 procedure TMultilineText.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
+   flagLastWasLineEnding: boolean;
+debugs: string;
    procedure _NextLine;
    begin
     yy += FTexturedFont.Font.FontHeight;
@@ -232,26 +242,48 @@ var W: TStringArray;
    end;
    procedure DoWordWrapOnCurrentLine;
    var ch: PTexturedChar;
-      k, ww: integer;
+      k, ww, previousCount: integer;
+      fullWord, partialWord: string;
    begin
-     SetLength(FWords, Length(FWords)+1);
      ww := 0;
-     for k:=0 to High(FWords[j].CharIndexes) do begin
-       ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
-       if ww + ch^.OriginalCharSize.cx > FRect.Width then break;
-       ww := ww + ch^.OriginalCharSize.cx;
-     end;
-     FWords[j+1].Width := FWords[j].Width - ww;
-     FWords[j+1].CharIndexes := Copy(FWords[j].CharIndexes, k, Length(FWords[j].CharIndexes)-k);
-     FWords[j+1].LineIndex := FLineCount;
-     FWords[j].Width := ww;
-     FWords[j].Location := Point(xx, yy);
-     FWords[j].LineIndex := FLineCount-1;
-     xx := FWords[j+1].Width+ spaceWidth;
-     FWords[j+1].Location := Point(0, yy);
-     yy += FTexturedFont.Font.FontHeight;
-     inc(FLineCount);
-     inc(j);
+     k := 0;
+     fullWord := FWords[j].Word;
+     repeat
+       // fill the current line
+      partialWord := '';
+       repeat
+         ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
+         if ww + ch^.OriginalCharSize.cx > FRect.Width then break;
+         ww := ww + ch^.OriginalCharSize.cx;
+         partialWord := partialWord + ch^.Character;
+         inc(k);
+       until k = Length(FWords[j].CharIndexes);
+       // if no letter is placed -> exit
+       if partialWord = '' then exit;
+       // register the partial line
+       FWords[j].Width := ww;
+       FWords[j].Location := Point(xx, yy);
+       FWords[j].LineIndex := FLineCount-1;
+       FWords[j].Word := partialWord;
+       previousCount := Length(FWords[j].CharIndexes);
+       FWords[j].CharIndexes := TexturedFont.StringToCharIndexes(partialWord);
+       // remove partial line from full word
+       Delete(fullWord, 1, Length(partialWord));
+       // add a new line if there remain some characters to position
+       if k <> previousCount then begin
+         SetLength(FWords, Length(FWords)+1);
+         _NextLine;
+         inc(j);
+         FWords[j].Word := fullWord;
+         FWords[j].CharIndexes := TexturedFont.StringToCharIndexes(fullWord);
+         FWords[j].Width := TexturedFont.CharIndexesToSize(FWords[j].CharIndexes).cx;
+         FWords[j].LineIndex := FLineCount-1;
+         FWords[j].Location := Point(xx, yy);
+         k := 0;
+         ww := 0;
+        // inc(j);
+       end;
+     until k = Length(FWords[j].CharIndexes);
    end;
 
    function CurrentLineIsEmpty: boolean;
@@ -260,51 +292,75 @@ var W: TStringArray;
    end;
 
 begin
-   FLineCount := 0;
-   FDrawingWidth := 0;
-   FDrawingRect.Width := 0;
-   FDrawingRect.Height := 0;
-   FWords := NIL;
-   if (FCaption = '') or (FTexturedFont = NIL) then exit;
+  FLineCount := 0;
+  FDrawingWidth := 0;
+  FDrawingRect.Width := 0;
+  FDrawingRect.Height := 0;
+  FWords := NIL;
+  if (FCaption = '') or (FTexturedFont = NIL) then exit;
 
-   W := SplitTextToWordArray(FCaption, ' ');
-   SetLength(FWords, Length(W));
+  W := SplitTextToWordArray(FCaption, ' ');
+FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
+for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1);
+  // compute the number of word except #10
+  xx := 0;
+  for j:=0 to High(W) do if W[j] <> #10 then inc(xx);
+  SetLength(FWords, xx);
 
-   spaceWidth := FTexturedFont.GetCharWidth(' ');
+  spaceWidth := FTexturedFont.GetCharWidth(' ');
 
-   xx := 0;
-   yy := 0;
-   FLineCount := 1;
-   iw := 0;
-   j := 0;
-   repeat
+  xx := 0;
+  yy := 0;
+  FLineCount := 1;
+  iw := 0;
+  j := 0;
+  flagLastWasLineEnding := False;
+  repeat
     FWords[j].Word := W[iw];
     FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
     FWords[j].Width := FTexturedFont.GetTextWidth(FWords[j].Word);
 
     if FWords[j].Word = #10 then begin
-        _NextLine;
-        inc(iw);
+      //if CurrentLineIsEmpty then dec(FLineCount) else flagLastWasLineEnding := True;
+      if CurrentLineIsEmpty then dec(FLineCount);
+      flagLastWasLineEnding := True;
+      _NextLine;
+      inc(iw);
     end else if xx+FWords[j].Width <= FRect.Width then begin
       // the word fit
       PutWordOnCurrentLine;
       inc(iw);
+      flagLastWasLineEnding := False;
     end else begin
+         flagLastWasLineEnding := False;
          // the word don't fit
          if CurrentLineIsEmpty then begin
            DoWordWrapOnCurrentLine;
-           //_NextLine;
            inc(iw);
          end else begin
-              _NextLine;
-              DoWordWrapOnCurrentLine;
-              inc(iw);
+           _NextLine;
+           DoWordWrapOnCurrentLine;
+           inc(iw);
          end;
     end;
     if xx > FDrawingWidth then FDrawingWidth := xx;
-   until iw = Length(FWords);
+  until iw = Length(W);
 
-   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
+  if flagLastWasLineEnding then dec(FLineCount);
+
+  FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
+
+// debug
+  FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
+  FParentScene.LogDebug('FLineCount='+FLineCount.ToString, 1);
+  for j:=0 to High(FWords) do begin
+   FParentScene.LogDebug('FWords['+j.ToString+'] = LineIndex:'+FWords[j].LineIndex.ToString+
+                         '  Word:'''+FWords[j].Word+'''  Width:'+FWords[j].Width.ToString, 1);
+   debugs := '';
+   for xx:=0 to High(FWords[j].CharIndexes) do
+     debugs := debugs + FWords[j].CharIndexes[xx].ToString+' ';
+   FParentScene.LogDebug('CharIndexes:'+debugs, 1);
+  end;
 end;
 
 procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
@@ -342,8 +398,10 @@ begin
     if FWords[i].LineIndex = aLineIndex then begin
          if iBegin = -1 then iBegin := i;
          iEnd := i;
-    end else if iBegin <> -1 then exit;
+    end else if iBegin <> -1 then break;
    end;
+
+  if (iBegin=-1) or (iEnd=-1) then raise exception.create('pas bon! -1');
 end;
 
 function TMultilineText.GetWidth: integer;
@@ -560,6 +618,11 @@ end;
 
  { TFreeTextOnPathToFollow }
 
+procedure TFreeTextOnPathToFollow.SetCoeffPositionOnLine(AValue: single);
+begin
+  FCoeffPositionOnPath := EnsureRange(AValue, 0.0, 1.0);
+end;
+
 procedure TFreeTextOnPathToFollow.Update(const aElapsedTime: single);
 begin
    inherited Update(aElapsedTime);
@@ -594,6 +657,7 @@ begin
   spacingCoef := FTexturedFont.CharSpacingCoeff.Value;
   dist := DistanceTraveled.Value;
   yOffset := FTexturedFont.Font.FontPixelMetric.Baseline;
+  yOffset := yOffset - Round(yOffset*FCoeffPositionOnPath);
 
   for i:=0 to High(FCharIndexes) do begin
    ch := FTexturedFont.GetCharByIndex(FCharIndexes[i]);
@@ -623,12 +687,13 @@ procedure TFreeTextOnPathToFollow.DoDraw;
 begin
 end;
 
-constructor TFreeTextOnPathToFollow.CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow);
+constructor TFreeTextOnPathToFollow.CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow; aZOrder: integer);
 begin
   inherited Create(aParentPathToFollow.ParentScene);
   DistanceTraveled := TFParam.Create;
   AutoRotate := TRUE;
-  aParentPathToFollow.AddChild(Self);
+  FCoeffPositionOnPath := 0.0;
+  aParentPathToFollow.AddChild(Self, aZOrder);
 end;
 
 destructor TFreeTextOnPathToFollow.Destroy;
