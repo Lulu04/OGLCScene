@@ -173,7 +173,7 @@ end;
 { TMultilineText }
 // Draws a text in a rectangular area with horizontal and vertical align.
 // The caption can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
-TMultilineText = class(TFreeText)   // TSimpleSurfaceWithEffect
+TMultilineText = class(TFreeText)
 private type
   TFreeTextWord = record
     Word: string;
