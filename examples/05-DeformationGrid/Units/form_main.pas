@@ -5,7 +5,7 @@ unit form_main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls,
+  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls, StdCtrls,
   BGRABitmap, BGRABitmapTypes,
   OpenGLContext, OGLCScene,
   u_common;
@@ -15,8 +15,11 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
+    CheckBox1: TCheckBox;
     OpenGLControl1: TOpenGLControl;
+    Panel1: TPanel;
     Timer1: TTimer;
+    procedure CheckBox1Change(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -60,6 +63,12 @@ end;
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
   Timer1.Enabled := FALSE;
+end;
+
+procedure TFormMain.CheckBox1Change(Sender: TObject);
+begin
+  if ScreenDemo = NIL then exit;
+  ScreenDemo.ShowGrid(CheckBox1.Checked);
 end;
 
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
