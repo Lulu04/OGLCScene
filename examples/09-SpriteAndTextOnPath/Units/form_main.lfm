@@ -1,0 +1,84 @@
+object FormMain: TFormMain
+  Left = 516
+  Height = 277
+  Top = 190
+  Width = 303
+  Caption = 'Program name'
+  ClientHeight = 277
+  ClientWidth = 303
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  LCLVersion = '2.2.6.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 24
+    Height = 92
+    Top = 24
+    Width = 104
+  end
+  object Panel1: TPanel
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 160
+    Height = 246
+    Top = 0
+    Width = 143
+    Anchors = [akTop, akRight]
+    ClientHeight = 246
+    ClientWidth = 143
+    Color = 13092807
+    ParentColor = False
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 10
+      Height = 15
+      Top = 15
+      Width = 109
+      Caption = 'Position of the sprite'
+      ParentColor = False
+    end
+    object TrackBar1: TTrackBar
+      Left = 7
+      Height = 38
+      Top = 40
+      Width = 129
+      Frequency = 10
+      Max = 100
+      OnChange = TrackBar1Change
+      Position = 0
+      ShowSelRange = False
+      TabOrder = 0
+    end
+    object Label2: TLabel
+      Left = 10
+      Height = 15
+      Top = 96
+      Width = 100
+      Caption = 'Position of the text'
+      ParentColor = False
+    end
+    object TrackBar2: TTrackBar
+      Left = 7
+      Height = 38
+      Top = 121
+      Width = 129
+      Frequency = 10
+      Max = 100
+      OnChange = TrackBar1Change
+      Position = 0
+      ShowSelRange = False
+      TabOrder = 1
+    end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 34
+    Top = 26
+  end
+end
