@@ -6,9 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls, StdCtrls,
-  BGRABitmap, BGRABitmapTypes,
-  OpenGLContext, OGLCScene,
-  u_common;
+  ComCtrls, BGRABitmap, BGRABitmapTypes, OpenGLContext, OGLCScene, u_common;
 
 type
 
@@ -77,7 +75,9 @@ end;
 
 procedure TFormMain.RadioGroup1SelectionChanged(Sender: TObject);
 begin
-  if ScreenDemo <> NIL then ScreenDemo.SetMultilineTextAlignProperty(RadioGroup1.ItemIndex);
+  if ScreenDemo = NIL then exit;
+
+  ScreenDemo.SetMultilineTextAlignProperty(RadioGroup1.ItemIndex);
 end;
 
 procedure TFormMain.Timer1Timer(Sender: TObject);
