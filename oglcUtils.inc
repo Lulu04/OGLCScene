@@ -46,9 +46,11 @@ procedure DrawLine(const aScene: TOGLCScene; x1, y1, x2, y2: single; aColor: TBG
 procedure DrawLine(const aScene: TOGLCScene; pt1, pt2: TPointF; aColor: TBGRAPixel; w: single=1.0); overload;
 procedure DrawEllipse(const aScene: TOGLCScene; aWidth, aHeight: integer; aRx, aRy: single; aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0);
 
-
+// Compute the scale value to maximize the passed texture on the scene. Aspect ration is keeped.
 function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer=0): TPointF;
+// Compute the scale value to maximize the passed texture on the surface. Aspect ration is keeped.
 function ScaleValueToFitSurface(aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+// Compute the scale value to maximize the passed texture on a rectangle. Aspect ration is keeped.
 function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 
 // This is an helper to distribute regularly child surfaces on their parent vertically or horizontally.
