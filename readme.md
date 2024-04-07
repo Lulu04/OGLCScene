@@ -16,9 +16,9 @@ The current release use OpenGL 3.3 to render graphics.
 # Credits
 A large part of the code of the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
-Matrix computation located in file 'gl_core_matrix.inc' was originaly written by Chris Rorden and modified for the use in OGLCScene. Thanks !
-You can find the original at https://github.com/neurolabusc/OpenGLCoreTutorials/gl_core_matrix.pas
+Matrix computation located in file 'gl_core_matrix.inc' was originaly written by Chris Rorden and modified for the use in OGLCScene. The file 'glcorearb.pas' was also written by Chris Rorden. Thanks !
+You can find the original at [HERE](https://github.com/neurolabusc/OpenGLCoreTutorials/gl_core_matrix.pas)
 
-The code of TWaterSurface in file 'oglcEnvironment.inc' is written by Circular, the creator and maintainer of BGRABitmap library, widly used in OGLCScene.
+The code of TWaterSurface in file 'oglcEnvironment.inc' is written by Circular, the creator and maintainer of BGRABitmap library, widly used in OGLCScene. https://github.com/bgrabitmap/bgrabitmap
 # Note from the author
 I'm an amateur programmer who loves the Pascal language. OGLCScene is an attempt to go as far as possible in my understanding of OpenGL and game engines. The path has been sometimes frustrating, sometimes happy, but very interesting.
