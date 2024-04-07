@@ -46,7 +46,7 @@ var path, charset: string;
   ima: TBGRABitmap;
   fd: TFontDescriptor;
 begin
-  // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
+  // we create an atlas at run time to ensure all images are in the same OpenGL texture -> speed optimization
   FAtlas := FScene.CreateAtlas;
   // to avoid texture artifacts, we want all image in the packed texture separated by 1 pixel
   FAtlas.Spacing := 1;
@@ -55,7 +55,7 @@ begin
   fd.Create('Arial Black', 80, [], BGRA(255,60,97,200), BGRA(255,255,150), 8, BGRA(0,255,0,255), 20, 20, 15);
   // before creating the font, we have to define which character to use: the charset.
   // because in our title there is several instance of 'T', space, 'E', 'H' and 'I' we use the
-  // function AddToCharset() to avoid the redundant characters.
+  // function AddToCharset() to eliminate the redundant characters.
   charset := '';
   charset := AddToCharset(charset, DEMO_TITLE); // now we are sure we won't have a redundant character in our charset.
   FtexFontTitle := FAtlas.AddTexturedFont(fd, charset); // we can create our textured font.
@@ -89,7 +89,7 @@ begin
   FScene.Add(FSingleLineText);
   with FSingleLineText do begin
     TexturedFont := FtexFont;
-    Caption := 'Another TFreeText instance...';
+    Caption := 'TFreeText is a surface that draw a single line string. It use a TTexturedFont';
     Tint.Value := BGRA(255,255,0);
     Y.Value := FTitle.BottomY;  // equivalent to  FSingleLineText.Y.Value := FTitle.Y.Value + FTitle.Height;
     CenterX := FScene.Center.x;
@@ -98,10 +98,10 @@ begin
   FMultilineText := TMultilineText.Create(FScene, FtexFont, Round(FScene.Width*0.5), Round(FScene.Height/3));
   FScene.Add(FMultilineText);
   with FMultilineText do begin
-    Caption := 'Here we are in the TMultilineText instance.'#10+
+    Caption := 'TMultilineText is a surface that draw a text in a rectangular area with horizontal and vertical align. '+
+               'It use a TTexturedFont.'#10+
                'With ''#10'' we can jump to the next line.'#10#10+
                'The size of the area where this text is written is '+FMultilineText.Width.ToString+'x'+FMultilineText.Height.ToString+#10+
-               'QzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzQoooooooooooooooooooooooooooooooooooooooooooooooooooooooooooM'#10+
                'Try to change the Align property to center the text differently.';
     Tint.Value := BGRA(255,128,64);
     Y.Value := FSingleLineText.BottomY + FSingleLineText.Height;
