@@ -62,6 +62,9 @@ public
   property SystemMouseCursorVisible: boolean read FSystemMouseCursorVisible write SetSystemMouseCursorVisible;
 end;
 
+TMouseEvent = Controls.TMouseEvent;
+TMouseWheelEvent = Controls.TMouseWheelEvent;
+TMouseButton = Controls.TMouseButton;
 
 TUIEvent = procedure(Sender: TSimpleSurfaceWithEffect) of object;
 TUIAnimCallBack = procedure(Sender: TSimpleSurfaceWithEffect) of object;
