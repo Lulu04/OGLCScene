@@ -507,7 +507,7 @@ begin
   if (Length(FMap) = 0) or (GetTextureCount = 0) then
   begin
     PushAndPrepareSceneMV;
-    SetBlendMode(FBlendMode);
+    FParentScene.BlendMode := FBlendMode;
     FillBox(FParentScene, 0, 0, Width-1, Height-1, MapHoleColor.Value, FComputedOpacity);
     DrawChildSurfacesWithPositiveZOrder(FComputedOpacity);
     PopSceneMV;
