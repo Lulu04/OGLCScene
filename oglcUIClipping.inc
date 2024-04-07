@@ -2,21 +2,10 @@
 type
 
 { TZBufferClipping }
-{  https://stackoverflow.com/questions/13742556/best-approach-to-draw-clipped-ui-elements-in-opengl
+// Don't work with nested clipped surfaces.
 
-    Enable depth buffer and set glDepthFunc(GL_LEQUAL);
-    Render Container A and its frame at Z = 0
-    Render Container A internal area / background (where other nested containers will be) at Z = 1
-    Now you have a "depth stencil" with container frame at depth 0 and container internals at depth 1.
-       That means that anything you render inbetween will be above internals, but below frame (and clipped by it).
-    Now with next Container B, render its frame to Z = 0.5 (it will get clipped by parent container A on GPU)
-    Render container B internal area at Z = 0.75
-    Now anything you want to render within container B will have to go at Z = 0.75.
-       It will overlay containers internal area, but will be clipped by both container A and B frames.
-
-}
-
-TZBufferClipping = record
+// concept from https://stackoverflow.com/questions/13742556/best-approach-to-draw-clipped-ui-elements-in-opengl
+{TZBufferClipping = record
 private const DELTA_ZVALUE = 0.001;
 public
   IsActive: boolean;
@@ -25,26 +14,14 @@ public
   procedure Start; inline;
   procedure NextZValues; inline;
   procedure Stop; inline;
-end;
+end;  }
 
 
 
 
-{ from https://stackoverflow.com/questions/7465360/nested-scissor-boxes-with-opengl
+// concept from https://stackoverflow.com/questions/7465360/nested-scissor-boxes-with-opengl
 
-  For this it is probably easier to use the stencil buffer.
-  You can use INCR to increase the stencil buffer values when writing a quad to it,
-  and when drawing you set the test to EQUAL or GEQUAL to only write where the stencil buffer has the highest value,
-  thus it will only write in the region constrained by all current clipping regions.
-  To remove them when drawing an hierarchy use DECR to remove them again.
-  This way you can also have non rectangular clipping regions.
 
-  Every window (or view) first draws it's clipping region to the stencil buffer,
-  then draws it's own contents, then draws its children, and finally removes its changes to the stencil buffer.
-  If a window does not add and remove its clipping region, it will be able to draw outside its bounds,
-  which is not what you would want.
-
-}
 { TStencilClipping }
 
 TStencilClipping = record
@@ -113,7 +90,7 @@ end;
 
 { TZBufferClipping }
 
-procedure TZBufferClipping.Start;
+{procedure TZBufferClipping.Start;
 begin
   if IsActive then exit;
 
@@ -138,7 +115,7 @@ begin
   FrontZValue := 0.0;
   BackZValue := 1.0;
   IsActive := False;
-end;
+end; }
 
 { TUIClipAreaHelper }
 
