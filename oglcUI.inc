@@ -101,14 +101,6 @@ private
   FOnAnimMouseEnter: TUIAnimCallBack;
   FOnAnimMouseLeave: TUIAnimCallBack;
   FOnAnimMouseUp: TUIAnimCallBack;
-public // check with public
-  procedure DoOnMouseEnter; virtual;
-  procedure DoOnMouseLeave; virtual;
-  procedure DoOnMouseClick; virtual;
-  procedure DoOnMouseDown(aButton: TMouseButton; aShift: TShiftState; aPt: TPoint); virtual;
-  procedure DoOnMouseUp(aButton: TMouseButton; aShift: TShiftState; aPt: TPoint); virtual;
-  procedure DoOnMouseMove(aShift: TShiftState; aPt: TPoint); virtual;
-  procedure DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer; aMousePos: TPoint; var aHandled: Boolean); virtual;
 private
   procedure CheckMouseEnterOrLeave;
   procedure SetMouseInteractionEnabled(AValue: boolean); virtual;
@@ -124,6 +116,14 @@ private
   procedure SetScrollOffset(AValue: TPoint);
   // offset when the surface is a child of a TUIClickableAndScrollableWithBodyShape parent.
   property ScrollOffset: TPoint read FScrollOffset write SetScrollOffset;
+public
+  procedure DoOnMouseEnter; virtual;
+  procedure DoOnMouseLeave; virtual;
+  procedure DoOnMouseClick; virtual;
+  procedure DoOnMouseDown(aButton: TMouseButton; aShift: TShiftState; aPt: TPoint); virtual;
+  procedure DoOnMouseUp(aButton: TMouseButton; aShift: TShiftState; aPt: TPoint); virtual;
+  procedure DoOnMouseMove(aShift: TShiftState; aPt: TPoint); virtual;
+  procedure DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer; aMousePos: TPoint; var aHandled: Boolean); virtual;
 public
   procedure Update(const aElapsedTime: single); override;
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer=0); override;
