@@ -344,7 +344,6 @@ TOGLCScene = class(TOGLCContext)
  private
   FStencilClipping: TStencilClipping;
  private
-  FBlendFuncSeparateInitialized: boolean;
   FBlendIsEnabled: boolean;
   FCurrentBlendMode: byte;
   procedure SetBlendMode(AValue: byte);
@@ -452,6 +451,7 @@ TOGLCScene = class(TOGLCContext)
   function Add_UIButton(const aCaption: string; aFont: TTexturedFont; aTexture: PTexture; aLayer: integer=0): TUIButton; overload;
   function Add_UICheck(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUICheck; overload;
   function Add_UIRadio(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUIRadio;
+  function Add_UIPanel(aLayer: integer=0): TUIPanel;
   function Add_UIProgressBar(aOrientation: TUIOrientation; aLayer: integer=0): TUIProgressBar;
   function Add_ModalPanel: TUIModalPanel;
 end;
@@ -1339,6 +1339,12 @@ end;
 function TOGLCScene.Add_UIRadio(const aCaption: string; aFont: TTexturedFont; aLayer: integer): TUIRadio;
 begin
   Result := TUIRadio.Create(Self, aCaption, aFont);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_UIPanel(aLayer: integer): TUIPanel;
+begin
+  Result := TUIPanel.Create(Self);
   Add(Result, aLayer);
 end;
 
