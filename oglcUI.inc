@@ -142,21 +142,28 @@ public
 
   // Callback to customize the animation of the surface when the mouse enters
   property OnAnimMouseEnter: TUIAnimCallBack read FOnAnimMouseEnter write FOnAnimMouseEnter;
-  // override to customize the animation of the surface when the mouse leaves
+  // Callback to customize the animation of the surface when the mouse leaves
   property OnAnimMouseLeave: TUIAnimCallBack read FOnAnimMouseLeave write FOnAnimMouseLeave;
-  // override to customize the animation of the surface when the user clicks on it
+  // Callback to customize the animation of the surface when the user clicks on it
   property OnAnimClick: TUIAnimCallBack read FOnAnimClick write FOnAnimClick;
-  // override to customize the animation of the surface when the user press a mouse button
+  // Callback to customize the animation of the surface when the user press a mouse button
   property OnAnimMouseDown: TUIAnimCallBack read FOnAnimMouseDown write FOnAnimMouseDown;
-  // override to customize the animation of the surface when the user release a mouse button
+  // Callback to customize the animation of the surface when the user release a mouse button
   property OnAnimMouseUp: TUIAnimCallBack read FOnAnimMouseUp write FOnAnimMouseUp;
 
+  // Callback fired when the mouse enter the surface
   property OnMouseEnter: TUIEvent read FOnMouseEnter write FOnMouseEnter;
+  // Callback fired when the mouse leaves the surface
   property OnMouseLeave: TUIEvent read FOnMouseLeave write FOnMouseLeave;
+  // Callback fired when user click on the surface
   property OnClick: TUIEvent read FOnClick write FOnClick;
+  // Callback fired when user press a mouse button on the srface
   property OnMouseDown: TMouseEvent read FOnMouseDown write FOnMouseDown;
+  // Callback fired when user release a mouse button on the surface
   property OnMouseUp: TMouseEvent read FOnMouseUp write FOnMouseUp;
+  // Callback fired when user moves the mouse on the surface
   property OnMouseMove: TMouseMoveEvent read FOnMouseMove write FOnMouseMove;
+  // Callback fired when user use the mouse wheel on the surface
   property OnMouseWheel: TMouseWheelEvent read FOnMouseWheel write FOnMouseWheel;
 
   // True if the mouse cursor is currently over the widget.
