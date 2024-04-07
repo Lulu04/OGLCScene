@@ -895,7 +895,7 @@ begin
   if lp < 2 then exit;
   if DistanceTraveled.Value < 0 then exit;
 
-  SetBlendMode(FBlendMode);
+  FParentScene.BlendMode := FBlendMode;
 //  PushAndPrepareMatrix;
   FParentScene.TexMan.UnbindTexture;
   glLineWidth(FLineWidth);
