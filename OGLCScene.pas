@@ -453,6 +453,8 @@ TOGLCScene = class(TOGLCContext)
   function Add_UIRadio(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUIRadio;
   function Add_UIPanel(aLayer: integer=0): TUIPanel;
   function Add_UIProgressBar(aOrientation: TUIOrientation; aLayer: integer=0): TUIProgressBar;
+  function Add_UIScrollBar(aOrientation: TUIOrientation; aLayer: integer=0): TUIScrollBar;
+  function Add_UIListBox(aFont: TTexturedFont; aLayer: integer=0): TUIListBox;
   function Add_ModalPanel: TUIModalPanel;
 end;
 POGLCScene = ^TOGLCScene;
@@ -1351,6 +1353,18 @@ end;
 function TOGLCScene.Add_UIProgressBar(aOrientation: TUIOrientation; aLayer: integer): TUIProgressBar;
 begin
   Result := TUIProgressBar.Create(Self, aOrientation);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_UIScrollBar(aOrientation: TUIOrientation; aLayer: integer): TUIScrollBar;
+begin
+  Result := TUIScrollBar.Create(Self, aOrientation);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_UIListBox(aFont: TTexturedFont; aLayer: integer): TUIListBox;
+begin
+  Result := TUIListBox.Create(Self, aFont);
   Add(Result, aLayer);
 end;
 
