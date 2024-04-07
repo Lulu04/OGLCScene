@@ -72,15 +72,6 @@ function IndexToColorAttachment( aIndex: integer ): GLenum;
 // the max value will be the returned value minus 1.
 function ColorAttachmentCount: GLint;
 
-type
-TBlendFuncSeparateProc = procedure(sfactorRGB: GLenum; dfactorRGB: GLenum; sfactorAlpha: GLenum; dfactorAlpha: GLenum); {$IFDEF Windows} stdcall; {$ELSE} cdecl; {$ENDIF}
-procedure SetBlendMode(ABlendMode: byte);
-
-var
-  _glBlendFuncSeparateInitialized: boolean = FALSE;
-  _FglBlendIsEnabled: boolean = FALSE;
-  _FglCurrentBlendMode: byte = $FF;
-
 const
   deg2rad: single = 0.017453292;
   rad2deg: single = 57.29578049;
@@ -386,55 +377,6 @@ var c: GLint;
 begin
  glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, @c);
  Result := c;
-end;
-
-procedure SetBlendMode(ABlendMode: byte);
-var src : LongWord;
-    dst : LongWord;
-    procedure EnableglBlend; inline;
-    begin
-     if not _FglBlendIsEnabled
-       then glEnable(GL_BLEND);
-     _FglBlendIsEnabled := True;
-    end;
-    procedure DisableglBlend; inline;
-    begin
-     if _FglBlendIsEnabled
-       then glDisable(GL_BLEND);
-     _FglBlendIsEnabled := False;
-    end;
-begin
- if _FglCurrentBlendMode = ABlendMode then exit;
- case ABlendMode of
-
-   FX_BLEND_ADD: begin
-       src := GL_SRC_ALPHA;
-       dst := GL_ONE;
-       EnableglBlend;
-   end;
-
-   FX_BLEND_MULT: begin
-       src := GL_ZERO;
-       dst := GL_SRC_COLOR;
-       EnableglBlend;
-   end;
-
-   FX_NOBLEND: DisableglBlend
-
-   else begin  // normal blend
-      src := GL_SRC_ALPHA;
-      dst := GL_ONE_MINUS_SRC_ALPHA;
-      EnableglBlend;
-   end;
- end;
- if not _glBlendFuncSeparateInitialized then begin
-   glBlendFuncSeparate := TBlendFuncSeparateProc(wglGetProcAddress( 'glBlendFuncSeparate'));
-   _glBlendFuncSeparateInitialized := True;
- end;
- if Assigned( glBlendFuncSeparate )
-   then glBlendFuncSeparate({%H-}src, {%H-}dst, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-   else glBlendFunc(src, dst);
- _FglCurrentBlendMode := ABlendMode;
 end;
 
 function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer): TPointF;
