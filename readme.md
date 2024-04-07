@@ -1,5 +1,5 @@
 # OGLCScene
-Tiny homemade 2D game engine for FreePascal/Lazarus.  
+2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS.  
 # Dependencies
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
 # Release
@@ -11,8 +11,9 @@ The current release use OpenGL 3.3 to render graphics.
 - sprites and other kind of surface with automated effect like tint, opacity, moves...
 - all kind of surface that can be displayed have script support: they can execute scripts written in external files in order to perform certain actions on the surface.
 - particle engine and its tool 'Particles Editor' to make your own particle effects.
-- tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your maps.
+- tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
 - velocity curve applied to any value that can be changed in time, like coordinates, rotation, opacity, tint,...
+- UI elements: buttons, check, radio button, label, panel, scroll bar, progress bar, scroll box, text area and list box.
 # Credits
 A large part of the code of the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
