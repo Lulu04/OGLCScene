@@ -145,7 +145,7 @@ end;
 TAlignedTextDescriptor = record
 private type
   TFreeTextWord = record
-    //Word: string;
+    Word: string;
     CharIndexes: TTexturedCharIndexes;
     Location: TPoint;
     Width,
@@ -924,6 +924,8 @@ end;
 procedure TAlignedTextDescriptor.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
+   flagLastWasLineEnding: boolean;
+debugs: string;
    procedure _NextLine;
    begin
     yy += FTexturedFont.Font.FontHeight;
@@ -940,24 +942,46 @@ var W: TStringArray;
    procedure DoWordWrapOnCurrentLine;
    var ch: PTexturedChar;
       k, ww: integer;
+      fullWord, partialWord: string;
    begin
-     SetLength(FWords, Length(FWords)+1);
      ww := 0;
-     for k:=0 to High(FWords[j].CharIndexes) do begin
-       ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
-       if ww + ch^.OriginalCharSize.cx > Area.Width then break;
-       ww := ww + ch^.OriginalCharSize.cx;
-     end;
-     FWords[j+1].Width := FWords[j].Width - ww;
-     FWords[j+1].CharIndexes := Copy(FWords[j].CharIndexes, k, Length(FWords[j].CharIndexes)-k);
-     FWords[j+1].LineIndex := FLineCount;
-     FWords[j].Width := ww;
-     FWords[j].Location := Point(xx, yy);
-     FWords[j].LineIndex := FLineCount-1;
-     xx := FWords[j+1].Width+ spaceWidth;
-     FWords[j+1].Location := Point(0, yy);
-     yy += FTexturedFont.Font.FontHeight;
-     inc(FLineCount);
+     k := 0;
+     fullWord := FWords[j].Word;
+     repeat
+       // fill the current line
+      partialWord := '';
+       repeat
+         ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
+         if ww + ch^.OriginalCharSize.cx > Area.Width then break;
+         ww := ww + ch^.OriginalCharSize.cx;
+         partialWord := partialWord + ch^.Character;
+         inc(k);
+       until k = Length(FWords[j].CharIndexes);
+       // if no letter is placed -> exit
+       if partialWord = '' then exit;
+       // register the partial line
+       FWords[j].Width := ww;
+       FWords[j].Location := Point(xx, yy);
+       FWords[j].LineIndex := FLineCount-1;
+       FWords[j].Word := partialWord;
+       FWords[j].CharIndexes := TexturedFont.StringToCharIndexes(partialWord);
+       // remove partial line from full word
+       Delete(fullWord, 1, Length(partialWord));
+       // add a new line if there remain some characters to position
+       if fullWord <> '' then begin
+         SetLength(FWords, Length(FWords)+1);
+         _NextLine;
+         inc(j);
+         FWords[j].Word := fullWord;
+         FWords[j].CharIndexes := TexturedFont.StringToCharIndexes(fullWord);
+         FWords[j].Width := TexturedFont.CharIndexesToSize(FWords[j].CharIndexes).cx;
+         FWords[j].LineIndex := FLineCount-1;
+         FWords[j].Location := Point(xx, yy);
+         k := 0;
+         ww := 0;
+       end;
+     until fullWord = '';
+     xx := FWords[j].Width + spaceWidth;
      inc(j);
    end;
 
@@ -967,60 +991,62 @@ var W: TStringArray;
    end;
 
 begin
-   FLineCount := 0;
-   DrawingRect.Width := 0;
-   DrawingRect.Height := 0;
-   DrawingSize.Create(0, 0);
-   FWords := NIL;
-   if (Length(FCaption) = 0) or (FTexturedFont = NIL) then exit;
+  FLineCount := 0;
+  DrawingSize.cx := 0;
+  DrawingSize.cy := 0;
+  DrawingRect.Width := 0;
+  DrawingRect.Height := 0;
+  FWords := NIL;
+  if (FCaption = '') or (FTexturedFont = NIL) then exit;
 
-   W := FCaption.Split([' ']); //SplitTextToWordArray(FCaption, ' ');
-   SetLength(FWords, Length(W));
+  W := SplitTextToWordArray(FCaption, ' ');
+  // compute the number of word except #10
+  xx := 0;
+  for j:=0 to High(W) do if W[j] <> #10 then inc(xx);
+  SetLength(FWords, xx);
 
-   spaceWidth := FTexturedFont.GetCharWidth(' ');
+  spaceWidth := FTexturedFont.GetCharWidth(' ');
 
-   xx := 0;
-   yy := 0;
-   FLineCount := 1;
-   iw := 0;
-   j := 0;
-   repeat
-//if j>High(FWords) then raise exception.create('bug');
-//if iw > High(W) then raise exception.create('bug');
+  xx := 0;
+  yy := 0;
+  FLineCount := 1;
+  iw := 0;
+  j := 0;
+  flagLastWasLineEnding := False;
+  repeat
+    FWords[j].Word := W[iw];
+    FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
+    FWords[j].Width := FTexturedFont.GetTextWidth(FWords[j].Word);
 
-    if W[iw] = #10 then begin
-        _NextLine;
-    end else begin
-      //FWords[j].Word := W[iw];
-      FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
-      FWords[j].Width := FTexturedFont.GetTextWidth(W[iw]); //FWords[j].Word);
-      if xx+FWords[j].Width <= Area.Width then begin
+    if FWords[j].Word = #10 then begin
+      //if CurrentLineIsEmpty then dec(FLineCount) else flagLastWasLineEnding := True;
+      //if CurrentLineIsEmpty then dec(FLineCount);
+      flagLastWasLineEnding := True;
+      _NextLine;
+      inc(iw);
+    end else if xx+FWords[j].Width <= Area.Width then begin
       // the word fit
       PutWordOnCurrentLine;
+      inc(iw);
+      flagLastWasLineEnding := False;
     end else begin
+         flagLastWasLineEnding := False;
          // the word don't fit
-         if FWords[j].Width >= Area.Width then begin
-           // the word is too large-> wordwrap
-           if CurrentLineIsEmpty then begin
-             DoWordWrapOnCurrentLine;
-             //_NextLine;
-           end else begin
-                _NextLine;
-                DoWordWrapOnCurrentLine;
-           end;
+         if CurrentLineIsEmpty then begin
+           DoWordWrapOnCurrentLine;
+           inc(iw);
          end else begin
            _NextLine;
-           PutWordOnCurrentLine;
+           DoWordWrapOnCurrentLine;
+           inc(iw);
          end;
     end;
-    end;
     if xx > DrawingSize.cx then DrawingSize.cx := xx;
-    inc(iw);
-   until iw = Length(W);
+  until iw = Length(W);
 
-   DrawingSize.cy := FTexturedFont.Font.FontHeight * FLineCount;
-   DrawingRect.Width := DrawingSize.cx;
-   DrawingRect.Height := DrawingSize.cy;
+  if flagLastWasLineEnding then dec(FLineCount);
+
+  DrawingSize.cy := FTexturedFont.Font.FontHeight*FLineCount;
 end;
 
 function TAlignedTextDescriptor.GetCaption: string;
@@ -1058,17 +1084,16 @@ end;
 function TAlignedTextDescriptor.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
 var i: integer;
 begin
-  Result := False;
   iBegin := -1;
   iEnd := -1;
-  for i:=low(FWords) to high(FWords) do
-   begin
+  for i:=low(FWords) to high(FWords) do begin
     if FWords[i].LineIndex = aLineIndex then begin
       Result := True;
       if iBegin = -1 then iBegin := i;
       iEnd := i;
-    end else if iBegin <> -1 then exit;
+    end else if iBegin <> -1 then break;
    end;
+  Result := (iBegin <> -1) and (iEnd <> -1);
 end;
 
 procedure TAlignedTextDescriptor.DoVTopAlign;

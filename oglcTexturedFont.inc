@@ -178,9 +178,9 @@ private type
   TFreeTextWord = record
     Word: string;
     CharIndexes: TTexturedCharIndexes;
-    Location: TPoint;
     Width,
     LineIndex: integer;
+    Location: TPoint;
   end;
   ArrayOfFreeTextWord = array of TFreeTextWord;
 private
@@ -203,7 +203,7 @@ private
   procedure SetTexturedFont(AValue: TTexturedFont); override;
   procedure DistributeTheWordsOnTheSurface;
   procedure SetAlign(AValue: TOGLCAlignment); virtual;
-  procedure GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer);
+  function GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
 protected
   function GetWidth: integer; override;
   function GetHeight: integer; override;
@@ -242,7 +242,7 @@ debugs: string;
    end;
    procedure DoWordWrapOnCurrentLine;
    var ch: PTexturedChar;
-      k, ww, previousCount: integer;
+      k, ww: integer;
       fullWord, partialWord: string;
    begin
      ww := 0;
@@ -265,12 +265,11 @@ debugs: string;
        FWords[j].Location := Point(xx, yy);
        FWords[j].LineIndex := FLineCount-1;
        FWords[j].Word := partialWord;
-       previousCount := Length(FWords[j].CharIndexes);
        FWords[j].CharIndexes := TexturedFont.StringToCharIndexes(partialWord);
        // remove partial line from full word
        Delete(fullWord, 1, Length(partialWord));
        // add a new line if there remain some characters to position
-       if k <> previousCount then begin
+       if fullWord <> '' then begin
          SetLength(FWords, Length(FWords)+1);
          _NextLine;
          inc(j);
@@ -281,9 +280,10 @@ debugs: string;
          FWords[j].Location := Point(xx, yy);
          k := 0;
          ww := 0;
-        // inc(j);
        end;
-     until k = Length(FWords[j].CharIndexes);
+     until fullWord = '';
+     xx := FWords[j].Width + spaceWidth;
+     inc(j);
    end;
 
    function CurrentLineIsEmpty: boolean;
@@ -300,8 +300,8 @@ begin
   if (FCaption = '') or (FTexturedFont = NIL) then exit;
 
   W := SplitTextToWordArray(FCaption, ' ');
-FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
-for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1);
+{FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
+for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1); }
   // compute the number of word except #10
   xx := 0;
   for j:=0 to High(W) do if W[j] <> #10 then inc(xx);
@@ -322,7 +322,7 @@ for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1);
 
     if FWords[j].Word = #10 then begin
       //if CurrentLineIsEmpty then dec(FLineCount) else flagLastWasLineEnding := True;
-      if CurrentLineIsEmpty then dec(FLineCount);
+      //if CurrentLineIsEmpty then dec(FLineCount);
       flagLastWasLineEnding := True;
       _NextLine;
       inc(iw);
@@ -350,17 +350,18 @@ for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1);
 
   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
 
-// debug
+{// debug
   FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
   FParentScene.LogDebug('FLineCount='+FLineCount.ToString, 1);
   for j:=0 to High(FWords) do begin
    FParentScene.LogDebug('FWords['+j.ToString+'] = LineIndex:'+FWords[j].LineIndex.ToString+
-                         '  Word:'''+FWords[j].Word+'''  Width:'+FWords[j].Width.ToString, 1);
+                         '  Word:'''+FWords[j].Word+'''  Width:'+FWords[j].Width.ToString+
+                         '  XY:('+FWords[j].Location.X.ToString+','+FWords[j].Location.Y.ToString+')', 1);
    debugs := '';
    for xx:=0 to High(FWords[j].CharIndexes) do
      debugs := debugs + FWords[j].CharIndexes[xx].ToString+' ';
    FParentScene.LogDebug('CharIndexes:'+debugs, 1);
-  end;
+  end; }
 end;
 
 procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
@@ -388,20 +389,18 @@ begin
    DoAlign;
 end;
 
-procedure TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer);
+function TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
 var i: integer;
 begin
   iBegin := -1;
   iEnd := -1;
-  for i:=low(FWords) to high(FWords) do
-   begin
+  for i:=low(FWords) to high(FWords) do begin
     if FWords[i].LineIndex = aLineIndex then begin
          if iBegin = -1 then iBegin := i;
          iEnd := i;
     end else if iBegin <> -1 then break;
    end;
-
-  if (iBegin=-1) or (iEnd=-1) then raise exception.create('pas bon! -1');
+  Result := (iBegin <> -1) and (iEnd <> -1);
 end;
 
 function TMultilineText.GetWidth: integer;
@@ -445,9 +444,9 @@ begin
   FDrawingRect.Top:=0;
   yy := 0;
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes( i, iBegin, iEnd );
-    for j:=iBegin to iEnd do FWords[j].Location.y := yy;
-    yy += FTexturedFont.Font.FontHeight; //FTexturedFont.Font.FontHeight*Scale.y.Value
+    if GetWordsIndexes(i, iBegin, iEnd) then
+      for j:=iBegin to iEnd do FWords[j].Location.y := yy;
+    yy +=  FTexturedFont.Font.FontHeight;
   end;
 end;
 
@@ -460,8 +459,8 @@ begin
   yy := (FRect.Height - h) div 2;
   FDrawingRect.Top := round(yy);
   for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes(i, iBegin, iEnd);
-    for j:=iBegin to iEnd do FWords[j].Location.y := yy;
+    if GetWordsIndexes(i, iBegin, iEnd) then
+      for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy += FTexturedFont.Font.FontHeight;
   end;
 end;
@@ -473,8 +472,8 @@ begin
   yy := FRect.Height-FTexturedFont.Font.FontHeight; //FRect.Height-FTexturedFont.Font.FontHeight*Scale.y.Value
   FDrawingRect.Top:=FRect.Height-FDrawingHeight;
   for i:=FLineCount-1 downto 0 do begin
-    GetWordsIndexes( i, iBegin, iEnd );
-    for j:=iBegin to iEnd do FWords[j].Location.y := yy;
+    if GetWordsIndexes(i, iBegin, iEnd) then
+      for j:=iBegin to iEnd do FWords[j].Location.y := yy;
     yy -= FTexturedFont.Font.FontHeight;  //FTexturedFont.Font.FontHeight*Scale.y.Value
   end;
 end;
@@ -484,14 +483,12 @@ var i, j, w, iBegin, iEnd: integer;
 begin
   FDrawingRect.Left:=0;
   for i:=0 to FLineCount-1 do
-   begin
-    GetWordsIndexes( i, iBegin, iEnd );
-    w := 0;
-    for j:=iBegin to iEnd do
-     begin
-      FWords[j].Location.x := w;
-      w += FWords[j].Width + FTexturedFont.GetCharWidth(' '); //*Scale.x.Value
-     end;
+    if GetWordsIndexes(i, iBegin, iEnd) then begin
+      w := 0;
+      for j:=iBegin to iEnd do begin
+        FWords[j].Location.x := w;
+        w += FWords[j].Width + FTexturedFont.GetCharWidth(' '); //*Scale.x.Value
+      end;
    end;
 end;
 
@@ -501,23 +498,22 @@ var i, j, iBegin, iEnd: integer;
 begin
   FDrawingRect.Left:=FRect.Width;
   for i:=0 to FLineCount-1 do
-   begin
-    GetWordsIndexes ( i, iBegin, iEnd );
-    w := 0;
-    for j:=iBegin to iEnd do begin
-     w+= FWords[j].Width;
-     if i<>iEnd then w+=FTexturedFont.GetCharWidth(' ');
-    end;
+    if GetWordsIndexes(i, iBegin, iEnd) then begin
+      w := 0;
+      for j:=iBegin to iEnd do begin
+        w += FWords[j].Width;
+        if i <> iEnd then w += FTexturedFont.GetCharWidth(' ');
+      end;
 
 //    w := FWords[iEnd].Location.x + FWords[iEnd].Width - FWords[iBegin].Location.x; // total width of the line
-    w := ( FRect.Width - w ) div 2;
+      w := ( FRect.Width - w ) div 2;
 
-    if FDrawingRect.Left>w then FDrawingRect.Left:=round(w);
+      if FDrawingRect.Left > w then FDrawingRect.Left := round(w);
 
-    for j:=iBegin to iEnd do begin
-      FWords[j].Location.x := w ;
-      w += {(}FWords[j].Width + FTexturedFont.GetCharWidth(' '){)*Scale.x.Value};
-    end;
+      for j:=iBegin to iEnd do begin
+        FWords[j].Location.x := w ;
+        w += {(}FWords[j].Width + FTexturedFont.GetCharWidth(' '){)*Scale.x.Value};
+      end;
    end;
 end;
 
@@ -526,18 +522,16 @@ var i, j, w, iBegin, iEnd: integer;
 begin
   FDrawingRect.Left:=FRect.Width;
 
-  for i:=0 to FLineCount-1 do begin
-    GetWordsIndexes ( i, iBegin, iEnd );
-    w := FRect.Width;
-    for j:=iEnd downto iBegin do
-     begin
-      w -= FWords[j].Width;
-      FWords[j].Location.x := w;
-      if FDrawingRect.Left>w then FDrawingRect.Left:=w;
-      w-=FTexturedFont.GetCharWidth(' ');
-     end;
-  end;
-
+  for i:=0 to FLineCount-1 do
+    if GetWordsIndexes(i, iBegin, iEnd) then begin
+      w := FRect.Width;
+      for j:=iEnd downto iBegin do begin
+        w -= FWords[j].Width;
+        FWords[j].Location.x := w;
+        if FDrawingRect.Left>w then FDrawingRect.Left:=w;
+        w-=FTexturedFont.GetCharWidth(' ');
+      end;
+    end;
 end;
 
 procedure TMultilineText.DoAlign;
