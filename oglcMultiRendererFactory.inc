@@ -550,7 +550,7 @@ end;
 procedure TRendererBase.Batch_Flush;
 begin
   if FCurrentRenderer <> NIL then begin
-    SetBlendMode(FCurrentBlendMode);
+    FParentScene.BlendMode := FCurrentBlendMode;
     FCurrentRenderer.Draw(True);
     FCurrentRenderer := NIL;
   end;

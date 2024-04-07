@@ -27,15 +27,22 @@ unit OGLCScene;
 {$modeswitch TypeHelpers}
 
 
-//{$DEFINE DEBUG_MODE_ON}
+//{$DEFINE DEBUG_MODE_ON}  // enable to draw a red rectangle around all surfaces.
 {$define CHECKGLERROR_ON}  // call 'CheckGLError' to raise an exception if an gl error occurs
+{$define USE_glcorearb}  // enable to use the glcorearb.pas header for OpenGL written by Chris Rorden.
 
+
+{$ifdef USE_glcorearb}
+  {$MACRO ON}
+  {$define GL:=glcorearb}
+{$endif}
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Graphics, Dialogs, Controls, lcltype, LazFileUtils,
   types, {contnrs,}
-  OpenGLContext, {glcorearb,} GLExt, GL,
+  OpenGLContext,
+  {$ifdef USE_glcorearb}glcorearb,{$else} GLExt, GL,{$endif}
   DynLibs,
   lazutf8,
   BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath, BGRAGradientScanner, BGRAFreeType, BGRASVG,//EasyLazFreeType,
@@ -336,6 +343,11 @@ TOGLCScene = class(TOGLCContext)
   function GetBackgroundColor: TBGRAPixel;
  private
   FStencilClipping: TStencilClipping;
+ private
+  FBlendFuncSeparateInitialized: boolean;
+  FBlendIsEnabled: boolean;
+  FCurrentBlendMode: byte;
+  procedure SetBlendMode(AValue: byte);
 { public
   FRendererForPostProcessing: TOGLCRenderToTexture;
   FPostProcessingShader: TOGLCPostProcessingFX;   }
@@ -387,6 +399,7 @@ TOGLCScene = class(TOGLCContext)
   property TopLeft: TPointF read GetViewPortTopLeft;
   property Center: TPointF read GetViewPortCenter;
   property BackgroundColor: TBGRAPixel read GetBackgroundColor write SetBackgroundColor;
+  property BlendMode: byte read FCurrentBlendMode write SetBlendMode;
   // Callback
   property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
   property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
@@ -907,6 +920,8 @@ begin
   FWaitLoopCountBeforeRunning := 5;
 
   FModalPanelList := TModalPanelList.Create;
+
+  FCurrentBlendMode := $FF;
 end;
 
 destructor TOGLCScene.Destroy;
@@ -1005,8 +1020,9 @@ begin
   if not MakeCurrent then exit;
 
   if not FGLInitialized then begin
-    if not Load_GL_version_3_3_CORE // Load_GL_version_3_0 // Load_GL_VERSION_3_3_CORE
-      then raise Exception.Create('Cannot load OpenGL 3.3 core...');
+    if not Load_GL_version_3_3_CORE
+      then raise Exception.Create('Cannot load OpenGL 3.3 core...')
+      {$ifdef USE_glcorearb};{$else}else Load_GL_EXT_blend_func_separate;{$endif}
     SetBlendMode(FX_BLEND_NORMAL);
     //glEnable(GL_POLYGON_SMOOTH);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
@@ -1542,6 +1558,57 @@ end;
 function TOGLCScene.GetBackgroundColor: TBGRAPixel;
 begin
  Result := FBackgroundColorF.ToBGRA;
+end;
+
+procedure TOGLCScene.SetBlendMode(AValue: byte);
+var src : LongWord;
+    dst : LongWord;
+    procedure EnableglBlend; inline;
+    begin
+     if not FBlendIsEnabled
+       then glEnable(GL_BLEND);
+     FBlendIsEnabled := True;
+    end;
+    procedure DisableglBlend; inline;
+    begin
+     if FBlendIsEnabled
+       then glDisable(GL_BLEND);
+     FBlendIsEnabled := False;
+    end;
+begin
+ if FCurrentBlendMode = AValue then exit;
+ case AValue of
+
+   FX_BLEND_ADD: begin
+       src := GL_SRC_ALPHA;
+       dst := GL_ONE;
+       EnableglBlend;
+   end;
+
+   FX_BLEND_MULT: begin
+       src := GL_ZERO;
+       dst := GL_SRC_COLOR;
+       EnableglBlend;
+   end;
+
+   FX_NOBLEND: DisableglBlend
+
+   else begin  // normal blend
+      src := GL_SRC_ALPHA;
+      dst := GL_ONE_MINUS_SRC_ALPHA;
+      EnableglBlend;
+   end;
+ end;
+ {$ifdef USE_glcorearb}
+ glBlendFuncSeparate({%H-}src, {%H-}dst, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+ {$else}
+ {if not FBlendFuncSeparateInitialized then
+   FBlendFuncSeparateInitialized := Load_GL_EXT_blend_func_separate;  }
+ if Assigned(glBlendFuncSeparate)
+   then glBlendFuncSeparate({%H-}src, {%H-}dst, GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+   else glBlendFunc(src, dst);
+ {$endif}
+ FCurrentBlendMode := AValue;
 end;
 
 function TOGLCScene.GetFastLineRenderer: TOGLCFastLineRenderer;
