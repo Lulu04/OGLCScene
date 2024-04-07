@@ -172,7 +172,7 @@ public
   // Enable mouse interaction with the widget. Default is True.
   property MouseInteractionEnabled: boolean read FMouseInteractionEnabled write SetMouseInteractionEnabled;
 
-public // anchor utils - only position, not size - H for Horizontal, V for Vertical
+public // anchor utils - only the position, do not change the size - H for Horizontal, V for Vertical
   procedure AnchorHPosToParent(aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer);
   procedure AnchorVPosToParent(aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
   procedure AnchorPosToParent(aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer;
