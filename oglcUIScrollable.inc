@@ -215,6 +215,7 @@ public
   Text: TAlignedTextDescriptor;
   Constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
+  procedure MakeLastLineVisible;
 end;
 
 {$endif oglcINTERFACE}
@@ -1341,6 +1342,12 @@ destructor TUITextArea.Destroy;
 begin
   Text.FreeObjects;
   inherited Destroy;
+end;
+
+procedure TUITextArea.MakeLastLineVisible;
+begin
+  if FVScrollBar = NIL then exit;
+  FVScrollBar.Position := FVScrollBar.Max;
 end;
 
 {$endif oglcIMPLEMENTATION}
