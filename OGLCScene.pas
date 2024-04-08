@@ -441,13 +441,6 @@ TOGLCScene = class(TOGLCContext)
   function CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer=0): TSprite;
 
   function Add_UILabel(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUILabel;
-
-{  function Add_UITextArea(const aText: string;
-                            aX, aY, aWidth, aHeight: integer;
-                            aFont: TTexturedFont;
-                            aAlignment: TOGLCAlignment;
-                            aLayer: integer=0): TUITextArea;  }
-
   function Add_UIButton(const aCaption: string; aFont: TTexturedFont; aTexture: PTexture; aLayer: integer=0): TUIButton; overload;
   function Add_UICheck(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUICheck; overload;
   function Add_UIRadio(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUIRadio;
@@ -455,6 +448,8 @@ TOGLCScene = class(TOGLCContext)
   function Add_UIProgressBar(aOrientation: TUIOrientation; aLayer: integer=0): TUIProgressBar;
   function Add_UIScrollBar(aOrientation: TUIOrientation; aLayer: integer=0): TUIScrollBar;
   function Add_UIListBox(aFont: TTexturedFont; aLayer: integer=0): TUIListBox;
+  function Add_UITextArea(aLayer: integer=0): TUITextArea;
+  function Add_UIScrollBox(aUseVScrollBar, aUseHScrollBar: boolean; aLayer: integer=0): TUIScrollBox;
   function Add_ModalPanel: TUIModalPanel;
 end;
 POGLCScene = ^TOGLCScene;
@@ -1319,13 +1314,6 @@ begin
   Add(Result, aLayer);
 end;
 
-{function TOGLCScene.Add_UITextArea(const aText: string; aX, aY, aWidth,
-  aHeight: integer; aFont: TTexturedFont; aAlignment: TOGLCAlignment; aLayer: integer): TUITextArea;
-begin
- Result := TUITextArea.Create(Self, aText, aX, aY, aWidth, aHeight, aFont, aAlignment);
- Add(Result, aLayer);
-end; }
-
 function TOGLCScene.Add_UIButton(const aCaption: string; aFont: TTexturedFont; aTexture: PTexture; aLayer: integer): TUIButton;
 begin
   Result := TUIButton.Create(Self, aCaption, aFont, aTexture);
@@ -1365,6 +1353,18 @@ end;
 function TOGLCScene.Add_UIListBox(aFont: TTexturedFont; aLayer: integer): TUIListBox;
 begin
   Result := TUIListBox.Create(Self, aFont);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_UITextArea(aLayer: integer): TUITextArea;
+begin
+  Result := TUITextArea.Create(Self);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_UIScrollBox(aUseVScrollBar, aUseHScrollBar: boolean; aLayer: integer): TUIScrollBox;
+begin
+  Result := TUIScrollBox.Create(Self, aUseVScrollBar, aUseHScrollBar);
   Add(Result, aLayer);
 end;
 
