@@ -46,6 +46,9 @@ public
   procedure Update(const aElapsedTime: single); override;
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect); reintroduce;
   property NeedUpdateScrollBar: boolean read FNeedUpdateScrollBar write FNeedUpdateScrollBar;
+  // Return the offset of the top/left corner of the view, according to the scrollbars position.
+  // If there is no ScrollBar visible, (0,0) is returned.
+  property ViewOffset: TPoint read GetViewOffset;
 end;
 
 
@@ -367,9 +370,9 @@ end;
 
 function TUIScrollBox.GetViewOffset: TPoint;
 begin
-  if (FHScrollBar <> NIL) and FHScrollBar.Visible then Result.x := -FHScrollBar.Position
+  if (FHScrollBar <> NIL) and FHScrollBar.Visible then Result.x := FHScrollBar.Position
     else Result.x := 0;
-  if (FVScrollBar <> NIL) and FVScrollBar.Visible then Result.y := -FVScrollBar.Position
+  if (FVScrollBar <> NIL) and FVScrollBar.Visible then Result.y := FVScrollBar.Position
     else Result.y := 0;
 end;
 
@@ -460,7 +463,7 @@ var m: TOGLCMatrix;
 begin
   m.CopyFrom(FParentScene.ModelViewMatrix);
 
-  p := GetViewOffset + ClientArea.TopLeft;
+  p := ClientArea.TopLeft - GetViewOffset;
   FParentScene.ModelViewMatrix.Translate(p.X, p.Y);
 
   for i:=0 to FChilds.Count-1 do begin
@@ -481,7 +484,7 @@ var i: integer;
   p: TPoint;
   nestedScrollableParent: boolean;
 begin
-  p := GetViewOffset + ClientArea.TopLeft;
+  p := ClientArea.TopLeft - GetViewOffset;
   nestedScrollableParent := HaveScrollableParent;
 
   // set or add scroll offset on childs
