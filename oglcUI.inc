@@ -176,13 +176,19 @@ public
   property MouseInteractionEnabled: boolean read FMouseInteractionEnabled write SetMouseInteractionEnabled;
 
 public // anchor utils - only the position, do not change the size - H for Horizontal, V for Vertical
+  // Anchor the surface horizontally to its parent. if there is no parent, the surface is anchored to the scene.
   procedure AnchorHPosToParent(aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer);
+  // Anchor the surface vertically to its parent. if there is no parent, the surface is anchored to the scene.
   procedure AnchorVPosToParent(aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
+  // Anchor the surface both horizontally and vertically to its parent. if there is no parent, the surface is anchored to the scene.
   procedure AnchorPosToParent(aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer;
                               aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
 
+  // Anchor the surface horizontally to another surface.
   procedure AnchorHPosToSurface(aSurface: TSimpleSurfaceWithEffect; aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer);
+  // Anchor the surface vertically to another surface.
   procedure AnchorVPosToSurface(aSurface: TSimpleSurfaceWithEffect; aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
+  // Anchor the surface both horizontally and vertically to another surface.
   procedure AnchorPosToSurface(aSurface: TSimpleSurfaceWithEffect;
                                aHSelfSide, aHTargetSide: THAnchorType; aHMargin: integer;
                                aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
