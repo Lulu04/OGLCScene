@@ -619,6 +619,7 @@ begin
     else begin
       ClearSelection;
       FirstSelectedindex := idx;
+      if FOnSelectionChange <> NIL then FOnSelectionChange(Self);
     end;
   end else begin
     FirstSelectedindex := idx;
