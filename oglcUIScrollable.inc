@@ -144,20 +144,20 @@ end;
 
 TAlignedTextDescriptor = record
 private type
-  TFreeTextWord = record
+  TWord_ = record
     Word: string;
     CharIndexes: TTexturedCharIndexes;
     Location: TPoint;
     Width,
     LineIndex: integer;
   end;
-  ArrayOfFreeTextWord = array of TFreeTextWord;
+  ArrayOfWord_ = array of TWord_;
 private
   FCaption: string;
   FAlign: TOGLCAlignment;
   FTexturedFont: TTexturedFont;
   FSpaceCharWidth: integer;
-  FWords: ArrayOfFreeTextWord;
+  FWords: ArrayOfWord_;
   FLineCount: integer;
 private
   FCallbackSizeChanged: TOGLCEvent;
@@ -1197,12 +1197,12 @@ begin
   if (FTexturedFont = NIL) or (FLineCount = 0) then exit;
 
   adjustedAlign := FAlign;
-  // vertical center becomes vertical top if the vertical size of the text don't fit in the area
+  // vertical center/bottom becomes vertical top if the vertical size of the text don't fit in the area
   if DrawingSize.cy > Area.Height then begin
     case FAlign of
-      taCenterLeft: adjustedAlign := taTopLeft;
-      taCenterCenter: adjustedAlign := taTopCenter;
-      taCenterRight: adjustedAlign := taTopRight;
+      taCenterLeft, taBottomLeft: adjustedAlign := taTopLeft;
+      taCenterCenter, taBottomCenter: adjustedAlign := taTopCenter;
+      taCenterRight, taBottomRight: adjustedAlign := taTopRight;
     end;
   end;
 
@@ -1272,12 +1272,22 @@ begin
     maxi := Text.DrawingRect.Height;
     page := ClientArea.Height;
     UpdateVScrollBar(needScrollBar, maxi, page);
+
+    Text.Area := ClientArea;
+    Text.Area.Width := Text.Area.Width - FVScrollBar.Width;
+    Text.DistributeTheWordsOnTheSurface;
+    Text.DoAlign;
+
     //FIndexFirstLineVisible := FVScrollBar.Position div Text.TexturedFont.Font.FontHeight;
     //FYFirstLineVisible := -FVScrollBar.Position mod Text.TexturedFont.Font.FontHeight;
   end else begin
     UpdateVScrollBar(needScrollBar, 0, 0);
     FIndexFirstLineVisible := 0;
     FYFirstLineVisible := 0;
+
+    Text.Area := ClientArea;
+    Text.DistributeTheWordsOnTheSurface;
+    Text.DoAlign;
   end;
 end;
 
