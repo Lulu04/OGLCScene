@@ -116,27 +116,47 @@ public
   destructor Destroy; override;
 
   procedure Clear;
+  // Add one string to the list.
   function Add(const aStr: string): integer;
+  // Add an array of strings to the list
   procedure Append(const aStrArr: TStringArray);
+  // Delete an item by its index.
   procedure Delete(aIndex: integer);
+  // Insert an item at the specified index.
   procedure Insert(aIndex: integer; const aStr: string);
+  // exchange the position of 2 items.
   procedure Exchange(aIndex1, aIndex2: integer);
+  // Return the index of an item, -1 if not found.
   function IndexOf(const aStr: string): integer;
+  // Return the index of the item currently on the view at the specified Y coordinate.
+  // Return -1 if none.
   function IndexAt(aY: integer): integer;
   //procedure Sort;  // to do
   //procedure CustomSort(CompareFn: TStringListSortCompare);  // to do
 
+  // Unselect all items.
   procedure ClearSelection;
+  // Select all items.
   procedure SelectAll;
+  // Force an item to be visible in the list.
   procedure MakeItemVisible(aIndex: integer);
 
+  // The item height .
   property ItemHeight: integer read FItemHeight write SetItemHeight;
+  // Number of items currently in the listbox.
   property Count: integer read GetCount;
+  // Get/Set the index of first selected item.
   property FirstSelectedIndex: integer read FIndexFirstItemSelected write SetIndexFirstItemSelected;
+  // Get the string of the item currently selected. '' is returned if there is no selection.
   property FirstSelectedItem: string read GetFirstSelectedItem;
+  // Access to Items by their indexes.
   property Items[index: integer]: string read GetStrItem write SetStrItem;
+  // Get/Set the selected state of an item by its index.
   property Selected[index: integer]: boolean read GetSelected write SetSelected;
+  // Return the selected count.
   property SelectedCount: integer read FSelectedCount;
+  // Set this property to True to allow the user to select more than one item in the list with
+  // key Shift or Ctrl.
   property MultiSelect: boolean read FMultiSelect write FMultiSelect;
   // Fired when user change the selection.
   property OnSelectionChange: TUIEvent read FOnSelectionChange write FOnSelectionChange;
