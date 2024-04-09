@@ -11,9 +11,7 @@ uses
 const
 
 // LAYER
-   LAYER_COUNT = 2;
-     LAYER_GUI  = 0;
-     LAYER_BACK = 1;
+   LAYER_COUNT = 1;
 
 
 var

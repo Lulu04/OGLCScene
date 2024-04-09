@@ -21,16 +21,17 @@ private
   FtexFont: TTexturedFont;
   FtexWarning, FtexChecked, FtexUnchecked: PTexture;
 
-  FLabel1, FLabel2, FLabel3, FLabel4, FLabel5, FLabel6, FLabel7, FLabel8, FLabel9, FLabel10: TUILabel;
-  FButton1: TUIButton;
+  FLabel1, FLabel2, FLabel3, FLabel4, FLabel5, FLabel6, FLabel7, FLabel8, FLabel9, FLabel10, FLabel11: TUILabel;
+  FButton1, FButtonReset: TUIButton;
   FPanel1, FPanel2, FPanel3, FPanel4, FPanel5: TUIPanel;
   FCheckBox1, FCheckBox2: TUICheck;
   FRadio1, FRadio2, FRadio3: TUIRadio;
   FProgressBar1, FProgressBar2: TUIProgressBar;
   FScrollBar1: TUIScrollBar;
   FListBox1: TUIListBox;
-  FTextArea1, FTextArea2: TUITextArea;
   FScrollBox1: TUIScrollBox;
+  FTextArea1: TUITextArea;
+  FTheme1, FTheme2, FTheme3: TUIRadio;
 
   procedure InitCallbackOn(aSurface: TUIClickableObject);
   procedure ProcessUIClick(Sender: TSimpleSurfaceWithEffect);
@@ -68,67 +69,105 @@ begin
 end;
 
 procedure TScreenDemo.ProcessUIClick(Sender: TSimpleSurfaceWithEffect);
+var s: string;
 begin
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - clicked');
-  if Sender = FButton1 then begin
-    FormMain.Memo1.Lines.Add('Button1 - clicked');
-    FTextArea1.Text.Caption := 'Hello from here!';
-  end;
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - clicked');
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - clicked');
+  s := '';
+  if Sender = FButtonReset then FTextArea1.Text.Caption := '';
+  if Sender = FLabel1 then s := 'Label1 - clicked';
+  if Sender = FButton1 then s := 'Button1 - clicked';
+  if Sender = FPanel1 then s := 'Panel1 - clicked';
+  if Sender = FCheckBox1 then s := 'CheckBox1 - clicked';
   if Sender = FScrollBar1 then FLabel3.Caption := Format('TUIScrollBar     %d/%d  page size %d', [FScrollBar1.Position, FScrollBar1.Max, FScrollBar1.PageSize]);
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
+  end;
 end;
 
 procedure TScreenDemo.ProcessUIMouseEnter(Sender: TSimpleSurfaceWithEffect);
+var s: string;
 begin
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - mouse enter');
-  if Sender = FButton1 then FormMain.Memo1.Lines.Add('Button1 - mouse enter');
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - mouse enter');
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - mouse enter');
+  s := '';
+  if Sender = FLabel1 then s := 'Label1 - mouse enter';
+  if Sender = FButton1 then s := 'Button1 - mouse enter';
+  if Sender = FPanel1 then s := 'Panel1 - mouse enter';
+  if Sender = FCheckBox1 then s := 'CheckBox1 - mouse enter';
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
+  end;
 end;
 
 procedure TScreenDemo.ProcessUIMouseLeave(Sender: TSimpleSurfaceWithEffect);
+var s: string;
 begin
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - mouse leave');
-  if Sender = FButton1 then FormMain.Memo1.Lines.Add('Button1 - mouse leave');
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - mouse leave');
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - mouse leave');
+  s := '';
+  if Sender = FLabel1 then s := 'Label1 - mouse leave';
+  if Sender = FButton1 then s := 'Button1 - mouse leave';
+  if Sender = FPanel1 then s := 'Panel1 - mouse leave';
+  if Sender = FCheckBox1 then s := 'CheckBox1 - mouse leave';
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
+  end;
 end;
 
 procedure TScreenDemo.ProcessUIMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var s: string;
+var s, s1: string;
 begin
-  s := ' @('+X.ToString+','+Y.ToString+')';
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - mouse down'+s);
-  if Sender = FButton1 then FormMain.Memo1.Lines.Add('Button1 - mouse down'+s);
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - mouse down'+s);
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - mouse down'+s);
+  s := '';
+  s1 := ' @('+X.ToString+','+Y.ToString+')';
+  if Sender = FLabel1 then s := 'Label1 - mouse down' + s1;
+  if Sender = FButton1 then s := 'Button1 - mouse down' + s1;
+  if Sender = FPanel1 then s := 'Panel1 - mouse down' + s1;
+  if Sender = FCheckBox1 then s := 'CheckBox1 - mouse down' + s1;
   if Sender = FScrollBox1 then begin
-    s := ' @('+(X+FScrollBox1.ViewOffset.x).ToString+','+(Y+FScrollBox1.ViewOffset.y).ToString+')';
-    FormMain.Memo1.Lines.Add('ScrollBox1 - mouse down'+s);
+    s1 := ' @('+(X+FScrollBox1.ViewOffset.x).ToString+','+(Y+FScrollBox1.ViewOffset.y).ToString+')';
+    s := 'ScrollBox1 - mouse down'+s1;
+  end;
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
   end;
 end;
 
 procedure TScreenDemo.ProcessUIMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var s: string;
+var s, s1: string;
 begin
-  s := ' @('+X.ToString+','+Y.ToString+')';
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - mouse up'+s);
-  if Sender = FButton1 then FormMain.Memo1.Lines.Add('Button1 - mouse up'+s);
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - mouse up'+s);
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - mouse up'+s);
+  s := '';
+  s1 := ' @('+X.ToString+','+Y.ToString+')';
+  if Sender = FLabel1 then s := 'Label1 - mouse up'+s1;
+  if Sender = FButton1 then s := 'Button1 - mouse up'+s1;
+  if Sender = FPanel1 then s := 'Panel1 - mouse up'+s1;
+  if Sender = FCheckBox1 then s := 'CheckBox1 - mouse up'+s1;
   if Sender = FScrollBox1 then begin
-    s := ' @('+(X+FScrollBox1.ViewOffset.x).ToString+','+(Y+FScrollBox1.ViewOffset.y).ToString+')';
-    FormMain.Memo1.Lines.Add('ScrollBox1 - mouse up'+s);
+    s1 := ' @('+(X+FScrollBox1.ViewOffset.x).ToString+','+(Y+FScrollBox1.ViewOffset.y).ToString+')';
+    s := 'ScrollBox1 - mouse up'+s1;
+  end;
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
   end;
 end;
 
 procedure TScreenDemo.ProcessUIMouseWheel(Sender: TObject; Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var s: string;
 begin
-  if Sender = FLabel1 then FormMain.Memo1.Lines.Add('Label1 - mouse wheel');
-  if Sender = FButton1 then FormMain.Memo1.Lines.Add('Button1 - mouse wheel');
-  if Sender = FPanel1 then FormMain.Memo1.Lines.Add('Panel1 - mouse wheel');
-  if Sender = FCheckBox1 then FormMain.Memo1.Lines.Add('CheckBox1 - mouse wheel');
+  s := '';
+  if Sender = FLabel1 then s := 'Label1 - mouse wheel';
+  if Sender = FButton1 then s := 'Button1 - mouse wheel';
+  if Sender = FPanel1 then s := 'Panel1 - mouse wheel';
+  if Sender = FCheckBox1 then s := 'CheckBox1 - mouse wheel';
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
+  end;
 end;
 
 procedure TScreenDemo.ProcessUICheckboxChange(Sender: TSimpleSurfaceWithEffect);
@@ -142,39 +181,55 @@ begin
 end;
 
 procedure TScreenDemo.ProcessUIRadioChange(Sender: TSimpleSurfaceWithEffect);
+var s: string;
 begin
-  if FRadio1.Checked then FormMain.Memo1.Lines.Add('Radio1 checked');
-  if FRadio2.Checked then FormMain.Memo1.Lines.Add('Radio2 checked');
-  if FRadio3.Checked then FormMain.Memo1.Lines.Add('Radio3 checked');
+  s := '';
+  if FRadio1.Checked then s := 'Radio1 checked';
+  if FRadio2.Checked then s := 'Radio2 checked';
+  if FRadio3.Checked then s := 'Radio3 checked';
+
+  if (Sender = FTheme1) or (Sender = FTheme2) or (Sender = FTheme3) then SetColorTheme;
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
+  end;
 end;
 
 procedure TScreenDemo.ProcessListBoxSelectionChange(Sender: TSimpleSurfaceWithEffect);
 var i: Integer;
+  s: string;
 begin
-  if FListBox1.SelectedCount = 0 then FormMain.Memo1.Lines.Add('ListBox1: no selection')
+  s := '';
+  if FListBox1.SelectedCount = 0 then s := 'ListBox1: no selection'
   else begin
-    FormMain.Memo1.Lines.Add('ListBox1 selection:');
+    s := #10'ListBox1 selection:';
     for i:=0 to FListBox1.Count-1 do
-      if FListBox1.Selected[i] then FormMain.Memo1.Lines.Add('   '+FListBox1.Items[i]);
+      if FListBox1.Selected[i] then s := s + #10'   '+FListBox1.Items[i];
+  end;
+
+  if s <> '' then begin
+    FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
+    FTextArea1.MakeLastLineVisible;
   end;
 end;
 
 procedure TScreenDemo.SetColorTheme;
-const COLOR_POSITION: array[0..2] of single=(0, 0.5, 1);
+const COLOR_POSITION: array[0..2] of single=(0, 0.5, 1);  // left, middle, right
 var cLeft, cMiddle, cRight: TBGRAPixel;
   gradHeavy, gradSoft, gradButton: TGradientDescriptor;
   o: TSimpleSurfaceWithEffect;
   i: Integer;
 
 begin
-  gradHeavy.InitDefault;
+  gradHeavy.InitDefault;  // we have to do that because type of TGradientDescriptor is record.
   gradSoft.InitDefault;
   gradButton.InitDefault;
   cLeft := BGRA(30,30,30);
   cRight := cLeft;
   cMiddle := BGRA(220,220,220);
 
-  if FormMain.RadioButton1.Checked then begin
+  if FTheme1.Checked then begin
     cLeft := BGRA(100,50,255,100);
     cMiddle := BGRA(255,0,255,200);
     cRight := BGRA(50,0,255,100);
@@ -182,7 +237,7 @@ begin
     gradSoft.CreateHorizontal([BGRA(0,0,255,10), BGRA(255,0,255,30), BGRA(0,0,255,10)], COLOR_POSITION);
     gradButton.CreateVertical([cLeft, cMiddle, cRight], COLOR_POSITION);
   end else
-  if FormMain.RadioButton2.Checked then begin
+  if FTheme2.Checked then begin
     cLeft := BGRA(100,255,50,30);
     cMiddle := BGRA(100,255,0,180);
     cRight := BGRA(50,255,0,30);
@@ -190,7 +245,7 @@ begin
     gradSoft.CreateHorizontal([BGRA(100,255,50,10), BGRA(100,255,0,30), BGRA(50,255,0,10)], COLOR_POSITION);
     gradButton.CreateVertical([cLeft, cMiddle, cRight], COLOR_POSITION);
   end else
-  if FormMain.RadioButton3.Checked then begin
+  if FTheme3.Checked then begin
     cLeft := BGRA(255,64,0,60);
     cMiddle := BGRA(255,128,32,220);
     cRight := BGRA(255,64,0,60);
@@ -199,6 +254,7 @@ begin
     gradButton.CreateVertical([cLeft, cMiddle, cRight], COLOR_POSITION);
   end;
 
+  // we scan all the surfaces in the layer where are the UI elements.
   for i:=0 to FScene.Layer[0].SurfaceCount-1 do begin
     o := FScene.Layer[0].Surface[i];
     if (o is TUIPanel) or (o is TUITextArea) or (o is TUIScrollBar) or (o is TUIScrollBox) then
@@ -220,21 +276,6 @@ begin
     if (o is TUIButton) then
       TUIButton(o).BackGradient.CopyFrom(gradButton);
   end;
-
-{  FPanel1.BackGradient.CopyFrom(gradHeavy);
-  FPanel2.BackGradient.CopyFrom(gradHeavy);
-  FTextArea1.BackGradient.CopyFrom(gradHeavy);
-
-  FScrollBar1.BackGradient.CopyFrom(gradSoft);
-  FScrollBar1.SliderShape.Fill.Color := cLeft;
-  //FProgressBar1.BackGradient.CopyFrom(gradSoft);
-  //FProgressBar2.BackGradient.CopyFrom(gradSoft);
-  FProgressBar1.BodyShape.Fill.Color := cLeft;
-  FProgressBar2.BodyShape.Fill.Color := cLeft;
-
-  FListBox1.ItemColor.GradientItem.CopyFrom(gradSoft);
-  FListBox1.ItemColor.GradientItemSelected.CopyFrom(gradHeavy);  }
-
 end;
 
 procedure TScreenDemo.CreateObjects;
@@ -268,9 +309,7 @@ begin
 
   // label on the scene
   FLabel1 := FScene.Add_UILabel('Hello! My name is Label1 and I''m a TUILabel ! I''m only clipped by the bounds of the scene.', FtexFont);
-  FLabel1.CenterX := FScene.Width*0.5;
-  FLabel1.Y.Value := FScene.Height*0.1;
-  FLabel1.SetCoordinate(10, 64);
+  FLabel1.AnchorPosToParent(haLeft, haLeft, 0, vaTop, vaTop, FtexFont.Font.FontHeight);
   FLabel1.Tint.Value := BGRA(220,220,220);
   InitCallbackOn(FLabel1);
 
@@ -278,14 +317,14 @@ begin
   FButton1 := FScene.Add_UIButton('Button1', FtexFont, FtexWarning);
   FButton1.BodyShape.SetShapeRoundRect(10,5,8,8,2);
   FButton1._Label.Tint.Value := BGRA(220,220,220);
-  FButton1.CenterX := FLabel1.CenterX;
-  FButton1.Y.Value := FLabel1.BottomY;
+  FButton1.AnchorPosToSurface(FLabel1, haCenter, haCenter, 0, vaTop, vaBottom, 0);
   InitCallbackOn(FButton1);
 
   // Panel1
   FPanel1 := FScene.Add_UIPanel;
-  FPanel1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(135), 10, 10, 2, []);
-  FPanel1.AnchorPosToSurface(FButton1, haCenter, haCenter, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
+  FPanel1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(90), 10, 10, 2, []);
+  FPanel1.AnchorHPosToParent(haLeft, haLeft, FScene.ScaleDesignToScene(10));
+  FPanel1.AnchorVPosToSurface(FButton1, vaTop, vaBottom, FScene.ScaleDesignToScene(10));
   InitCallbackOn(FPanel1);
     // label2, child of FPanel1
     FLabel2 := TUILabel.Create(FScene, 'A TUILabel child of TUIPanel -> I''m clipped by my parent!', FtexFont);
@@ -311,16 +350,15 @@ begin
 
   // Panel2
   FPanel2 := FScene.Add_UIPanel;
-  FPanel2.AnchorPosToSurface(FPanel1, haCenter, haCenter, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FPanel2.SetCoordinate(170,350);
-  FPanel2.BodyShape.SetShapeRoundRect(400, 275, 10, 10, 2, []);
+  FPanel2.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(300), FScene.ScaleDesignToScene(200), 10, 10, 2, []);
+  FPanel2.AnchorPosToSurface(FPanel1, haRight, haRight, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
   FPanel2.BodyShape.Border.Color := BGRA(255,255,255);
   FPanel2.BodyShape.Border.LinePosition := lpInside; // bpInside   bpMiddle
   FPanel2.BodyShape.Fill.Color := BGRA(81,79,66);
     // checkbox2, child of FPanel2
-    FCheckBox2 := TUICheck.Create(FScene, 'Enabled Child clipping', FtexFont);
+    FCheckBox2 := TUICheck.Create(FScene, 'Enabled Child clipping (nested)', FtexFont);
     FPanel2.AddChild(FCheckBox2);
-    FCheckBox2.AnchorPosToParent(haRight, haRight, 0, vaTop, vaTop, FScene.ScaleDesignToScene(5));
+    FCheckBox2.AnchorPosToParent(haLeft, haLeft, 0, vaTop, vaTop, FScene.ScaleDesignToScene(5));
     FCheckBox2._Label.Tint.Value := BGRA(230,230,200);
     FCheckBox2.CustomizeCheckBox(ctCircle, cfColor);
     FCheckBox2.ColorChecked := BGRA(255,255,0);
@@ -328,17 +366,15 @@ begin
     FCheckBox2.OnChange := @ProcessUICheckboxChange;
     // panel3 child of panel2
     FPanel3 := TUIPanel.Create(FScene);
-    FPanel3.BodyShape.SetShapeRoundRect(200, 150, 5, 5, 5);
+    FPanel3.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(200), FScene.ScaleDesignToScene(150), 5, 5, 5);
     FPanel3.BodyShape.Fill.Color := BGRA(255,0,0);
     FPanel3.BodyShape.Border.Color := BGRA(0,255,0);
     FPanel3.BodyShape.Border.LinePosition := lpInside;
     FPanel2.AddChild(FPanel3);
     FPanel3.SetCenterCoordinate(20, FPanel2.Height*0.5);
-    //Panel2.MoveXRelative(150, 5.0, idcSinusoid);
-    //Panel2.Angle.AddConstant(20);
       // panel4, child of panel3
       FPanel4 := TUIPanel.Create(FScene);
-      FPanel4.BodyShape.SetShapeEllipse(240, 35, 3);
+      FPanel4.BodyShape.SetShapeEllipse(FScene.ScaleDesignToScene(240), FScene.ScaleDesignToScene(35), 3);
       FPanel4.BodyShape.Fill.Color := BGRA(0,0,255, 80);
       FPanel4.BodyShape.Border.Color := BGRA(255,128,64);
       FPanel3.AddChild(FPanel4);
@@ -346,7 +382,7 @@ begin
       FPanel4.Angle.AddConstant(-30);
         // panel5, child of panel4
         FPanel5 := TUIPanel.Create(FScene);
-        FPanel5.BodyShape.SetShapeRectangle(280, 10, 3);
+        FPanel5.BodyShape.SetShapeRectangle(FScene.ScaleDesignToScene(280), FScene.ScaleDesignToScene(10), 3);
         FPanel5.BodyShape.Fill.Color := BGRA(255,0,255);
         FPanel5.BodyShape.Border.Color := BGRA(0,255,255);
         FPanel4.AddChild(FPanel5);
@@ -355,11 +391,11 @@ begin
 
   // 3x radio button on scene
   FRadio1 := FScene.Add_UIRadio('TUIRadio 1', FtexFont);
-  FRadio1.AnchorPosToSurface(FPanel2, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
+  FRadio1.AnchorHPosToSurface(FPanel1, haLeft, haLeft, 0);
+  FRadio1.AnchorVPosToSurface(FPanel2, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
   FRadio1._Label.Tint.Value := BGRA(220,220,220);
   FRadio1.Checked := True;
   FRadio1.OnChange := @ProcessUIRadioChange;
-
   FRadio2 := FScene.Add_UIRadio('TUIRadio 2', FtexFont);
   FRadio2.AnchorPosToSurface(FRadio1, haLeft, haRight, FScene.ScaleDesignToScene(20), vaCenter, vaCenter, 0);
   FRadio2.CustomizeCheckBox(ctRectangle, cfCross);
@@ -372,10 +408,11 @@ begin
   FRadio3._Label.Tint.Value := BGRA(220,220,220);
   FRadio3.OnChange := @ProcessUIRadioChange;
 
+
   // 2x progress bar
   FProgressBar1 := FScene.Add_UIProgressBar(uioHorizontal);
   FProgressBar1.AnchorPosToSurface(FRadio1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FProgressBar1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(50),10,10,2);
+  FProgressBar1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(30),10,10,2);
   FProgressBar1.BodyShape.Border.Color := BGRA(200,200,200);
   FProgressBar1.BodyShape.Fill.Color := BGRA(20,20,20);
   FProgressBar1.Gradient.CreateHorizontal([BGRA(0,255,0), BGRA(255,255,0), BGRA(255,0,0)], [0,0.7,1]);
@@ -386,7 +423,7 @@ begin
 
   FProgressBar2 := FScene.Add_UIProgressBar(uioHorizontal);
   FProgressBar2.AnchorPosToSurface(FProgressBar1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(5));
-  FProgressBar2.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(50),10,10,2);
+  FProgressBar2.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(30),10,10,2);
   FProgressBar2.BodyShape.Border.Color := BGRA(200,200,200);
   FProgressBar2.BodyShape.Fill.Color := BGRA(20,20,20);
   FProgressBar2.Gradient.Clear;
@@ -417,9 +454,6 @@ begin
   FListBox1.ItemColor.ColorSelectedText := BGRA(255,255,255);
   FListBox1.ItemHeight := 20;
 
-  FListBox1.ItemColor.GradientItem.CreateHorizontal([BGRA(0,0,255,10), BGRA(255,0,255,20), BGRA(0,0,255,10)],[0,0.5,1]);
-  FListBox1.ItemColor.GradientItemSelected.CreateHorizontal([BGRA(100,50,255,100), BGRA(255,0,255,200), BGRA(50,0,255,100)], [0,0.5,1]);
-
   FListBox1.Append(['00 Apple','01 Pear','02 Plum','03 Banana','04 Mango','05 Lychee','06 Cherry']);
   FListBox1.Append(['00 Apple','01 Pear','02 Plum','03 Banana','04 Mango','05 Lychee','06 Cherry']);
   FListBox1.Append(['00 Apple','01 Pear','02 Plum','03 Banana','04 Mango','05 Lychee','06 Cherry']);
@@ -434,22 +468,46 @@ begin
   FLabel4.AnchorPosToSurface(FListBox1, haLeft, haLeft, 0, vaBottom, vaTop, 0);
   FLabel4.Tint.Value := BGRA(255,255,0);
 
+  // button reset
+  FButtonReset := FScene.Add_UIButton('Reset', FtexFont, NIL);
+  FButtonReset.BodyShape.SetShapeRoundRect(5, 5, 8, 8, 2, []);
+  FButtonReset.AnchorPosToParent(haRight, haRight, 0, vaTop, vaTop, FtexFont.Font.FontHeight);
+  FButtonReset._Label.Tint.Value := BGRA(220,220,220);
+  FButtonReset.OnClick := @ProcessUIClick;
   // text area
   FTextArea1 := FScene.Add_UITextArea;
-  FTextArea1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(150), 8, 8, 2);
-  FTextArea1.AnchorPosToSurface(FListBox1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FTextArea1.Text.Caption := 'We believe that we can change the things around us in accordance with our desires-we believe it because otherwise we can see no favourable outcome. We do not think of the outcome which generally comes to pass and is also favourable: we do not succeed in changing things in accordance with our desires, but gradually our desires change. The situation that we hoped to change because it was intolerable becomes unimportant to us. We have failed to surmount the obstacle, as we were absolutely determined to do, but life has taken us round it, led us beyond it, and then if we turn round to gaze into the distance of the past, we can barely see it, so imperceptible has it become.'#10'Marcel Proust, In Search of Lost Time';
+  FTextArea1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(500), 8, 8, 2);
+  FTextArea1.RightX := FScene.Width;
+  FTextArea1.AnchorPosToSurface(FButtonReset, haRight, haRight, 0, vaTop, vaBottom, 0);
   FTextArea1.Text.TexturedFont := FtexFont;
-  FTextArea1.Text.Align := taTopCenter;
-FTextArea1.MakeLastLineVisible;
+  FTextArea1.Text.Align := taTopLeft;
   // label above text area
   FLabel5 := FScene.Add_UILabel('TUITextArea', FtexFont);
   FLabel5.AnchorPosToSurface(FTextArea1, haLeft, haLeft, 0, vaBottom, vaTop, 0);
   FLabel5.Tint.Value := BGRA(255,255,0);
 
+  // label above theme selection
+  FLabel11 := FScene.Add_UILabel('Color theme', FtexFont);
+  FLabel11.AnchorPosToSurface(FTextArea1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
+  FLabel11.Tint.Value := BGRA(255,255,0);
+  // 3x radio button for theme selection
+  FTheme1 := FScene.Add_UIRadio('Purple', FtexFont);
+  FTheme1.AnchorPosToSurface(FLabel11, haLeft, haLeft, 0, vaTop, vaBottom, 0);
+  FTheme1._Label.Tint.Value := BGRA(255,20,255);
+  FTheme1.OnChange := @ProcessUIRadioChange;
+  FTheme2 := FScene.Add_UIRadio('Green', FtexFont);
+  FTheme2.AnchorPosToSurface(FTheme1, haLeft, haRight, FScene.ScaleDesignToScene(20), vaCenter, vaCenter, 0);
+  FTheme2._Label.Tint.Value := BGRA(100,255,20);
+  FTheme2.OnChange := @ProcessUIRadioChange;
+  FTheme3 := FScene.Add_UIRadio('Orange', FtexFont);
+  FTheme3.AnchorPosToSurface(FTheme2, haLeft, haRight, FScene.ScaleDesignToScene(20), vaCenter, vaCenter, 0);
+  FTheme3._Label.Tint.Value := BGRA(255,128,64);
+  FTheme3.OnChange := @ProcessUIRadioChange;
+
+
   FScrollBox1 := FScene.Add_UIScrollBox(True, True);
   FScrollBox1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(150), 8, 8, 2);
-  FScrollBox1.AnchorPosToSurface(FTextArea1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
+  FScrollBox1.AnchorPosToSurface(FListBox1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
   InitCallbackOn(FScrollBox1);
   // label above scrollbox1
   FLabel9 := FScene.Add_UILabel('TUIScrollBox', FtexFont);
