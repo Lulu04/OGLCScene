@@ -13,20 +13,13 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    Label1: TLabel;
-    Memo1: TMemo;
     OpenGLControl1: TOpenGLControl;
-    Panel1: TPanel;
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
-    RadioButton3: TRadioButton;
     Timer1: TTimer;
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure RadioButton1Change(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
     procedure LoadCommonData;
@@ -75,11 +68,6 @@ end;
 procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   FScene.ProcessOnKeyUp(Key, Shift);
-end;
-
-procedure TFormMain.RadioButton1Change(Sender: TObject);
-begin
-  if ScreenDemo <> NIL then ScreenDemo.SetColorTheme;
 end;
 
 procedure TFormMain.Timer1Timer(Sender: TObject);
