@@ -397,7 +397,12 @@ public
   procedure DoDraw; override;
   constructor Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont);
 
+  // Customize the check with predefined shape and fill.
+  // The shape can be ctRectangle, ctRoundRect or ctCircle.
+  // The fill mode can be cfColor or cfCross.
   procedure CustomizeCheckBox(aShape: TUICheckShape; aFill: TUICheckFill); overload;
+  // customize the check box with 2 textures. If aAdjustImageToFontHeight is True,
+  // the size of the rendered textures is reduced or increased to match with the font height.
   procedure CustomizeCheckBox(aTextureUncheck, aTextureCheck: PTexture; aAdjustImageToFontHeight: boolean=True); overload;
   procedure CustomizeWithoutCheckBox;
 
@@ -405,6 +410,7 @@ public
   // The color used when the checkbox is checked: to fill it or to draw the cross.
   // Ignored if textures are used.
   property ColorChecked: TBGRAPixel read FColorChecked write SetColorChecked;
+  // Fired when the check box state is changed by user.
   property OnChange: TUIEvent read FOnChange write FOnChange;
   // callback to animate the control when its checked state change
   property OnAnimChange: TUIAnimCallback read FOnAnimChange write FOnAnimChange;
