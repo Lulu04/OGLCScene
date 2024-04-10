@@ -22,7 +22,7 @@ private
   FtexWarning, FtexChecked, FtexUnchecked: PTexture;
 
   FLabel1, FLabel2, FLabel3, FLabel4, FLabel5, FLabel6, FLabel7, FLabel8, FLabel9, FLabel10, FLabel11: TUILabel;
-  FButton1, FButtonReset: TUIButton;
+  FButton1, FButtonClear: TUIButton;
   FPanel1, FPanel2, FPanel3, FPanel4, FPanel5: TUIPanel;
   FCheckBox1, FCheckBox2: TUICheck;
   FRadio1, FRadio2, FRadio3: TUIRadio;
@@ -72,7 +72,7 @@ procedure TScreenDemo.ProcessUIClick(Sender: TSimpleSurfaceWithEffect);
 var s: string;
 begin
   s := '';
-  if Sender = FButtonReset then FTextArea1.Text.Caption := '';
+  if Sender = FButtonClear then FTextArea1.Text.Caption := '';
   if Sender = FLabel1 then s := 'Label1 - clicked';
   if Sender = FButton1 then s := 'Button1 - clicked';
   if Sender = FPanel1 then s := 'Panel1 - clicked';
@@ -282,6 +282,7 @@ procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
   fd: TFontDescriptor;
+  itemWidth: integer;
 begin
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
 
@@ -320,9 +321,11 @@ begin
   FButton1.AnchorPosToSurface(FLabel1, haCenter, haCenter, 0, vaTop, vaBottom, 0);
   InitCallbackOn(FButton1);
 
+  itemWidth := FScene.Width div 3 - FScene.ScaleDesignToScene(10);
+
   // Panel1
   FPanel1 := FScene.Add_UIPanel;
-  FPanel1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(90), 10, 10, 2, []);
+  FPanel1.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(90), 10, 10, 2, []);
   FPanel1.AnchorHPosToParent(haLeft, haLeft, FScene.ScaleDesignToScene(10));
   FPanel1.AnchorVPosToSurface(FButton1, vaTop, vaBottom, FScene.ScaleDesignToScene(10));
   InitCallbackOn(FPanel1);
@@ -389,30 +392,33 @@ begin
         FPanel5.SetCenterCoordinate(FPanel4.Width*0.5, FPanel4.Height*0.5);
         FPanel5.Angle.AddConstant(30);
 
-  // 3x radio button on scene
-  FRadio1 := FScene.Add_UIRadio('TUIRadio 1', FtexFont);
-  FRadio1.AnchorHPosToSurface(FPanel1, haLeft, haLeft, 0);
-  FRadio1.AnchorVPosToSurface(FPanel2, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FRadio1._Label.Tint.Value := BGRA(220,220,220);
-  FRadio1.Checked := True;
-  FRadio1.OnChange := @ProcessUIRadioChange;
-  FRadio2 := FScene.Add_UIRadio('TUIRadio 2', FtexFont);
-  FRadio2.AnchorPosToSurface(FRadio1, haLeft, haRight, FScene.ScaleDesignToScene(20), vaCenter, vaCenter, 0);
-  FRadio2.CustomizeCheckBox(ctRectangle, cfCross);
-  FRadio2._Label.Tint.Value := BGRA(220,220,220);
-  FRadio2.OnChange := @ProcessUIRadioChange;
-  // radio3 is customized with textures
-  FRadio3 := FScene.Add_UIRadio('TUIRadio 3', FtexFont);
-  FRadio3.AnchorPosToSurface(FRadio2, haLeft, haRight, FScene.ScaleDesignToScene(20), vaCenter, vaCenter, 0);
-  FRadio3.CustomizeCheckBox(FtexUnchecked, FtexChecked, False);
-  FRadio3._Label.Tint.Value := BGRA(220,220,220);
-  FRadio3.OnChange := @ProcessUIRadioChange;
+    // 3x radio button on panel2
+    FRadio2 := TUIRadio.Create(FScene, 'TUIRadio 2', FtexFont);
+    FPanel2.AddChild(FRadio2);
+    FRadio2.AnchorPosToParent(haLeft, haCenter, 0, vaCenter, vaCenter, 0);
+    FRadio2.CustomizeCheckBox(ctRectangle, cfCross);
+    FRadio2._Label.Tint.Value := BGRA(220,220,220);
+    FRadio2.OnChange := @ProcessUIRadioChange;
+    FRadio1 := TUIRadio.Create(FScene, 'TUIRadio 1', FtexFont);
+    FPanel2.AddChild(FRadio1);
+    FRadio1.AnchorPosToSurface(FRadio2, haLeft, haLeft, 0, vaBottom, vaTop, -FRadio2.Height);
+    FRadio1._Label.Tint.Value := BGRA(220,220,220);
+    FRadio1.Checked := True;
+    FRadio1.OnChange := @ProcessUIRadioChange;
+    // radio3 is customized with textures
+    FRadio3 := TUIRadio.Create(FScene, 'TUIRadio 3', FtexFont);
+    FPanel2.AddChild(FRadio3);
+    FRadio3.AnchorPosToSurface(FRadio2, haLeft, haLeft, 0, vaTop, vaBottom, FRadio2.Height);
+    FRadio3.CustomizeCheckBox(FtexUnchecked, FtexChecked, False);
+    FRadio3._Label.Tint.Value := BGRA(220,220,220);
+    FRadio3.OnChange := @ProcessUIRadioChange;
 
 
   // 2x progress bar
   FProgressBar1 := FScene.Add_UIProgressBar(uioHorizontal);
-  FProgressBar1.AnchorPosToSurface(FRadio1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FProgressBar1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(30),10,10,2);
+  FProgressBar1.AnchorHPosToSurface(FPanel1, haLeft, haLeft, 0);
+  FProgressBar1.AnchorVPosToSurface(FPanel2, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
+  FProgressBar1.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(30),10,10,2);
   FProgressBar1.BodyShape.Border.Color := BGRA(200,200,200);
   FProgressBar1.BodyShape.Fill.Color := BGRA(20,20,20);
   FProgressBar1.Gradient.CreateHorizontal([BGRA(0,255,0), BGRA(255,255,0), BGRA(255,0,0)], [0,0.7,1]);
@@ -423,7 +429,7 @@ begin
 
   FProgressBar2 := FScene.Add_UIProgressBar(uioHorizontal);
   FProgressBar2.AnchorPosToSurface(FProgressBar1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(5));
-  FProgressBar2.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(30),10,10,2);
+  FProgressBar2.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(30),10,10,2);
   FProgressBar2.BodyShape.Border.Color := BGRA(200,200,200);
   FProgressBar2.BodyShape.Fill.Color := BGRA(20,20,20);
   FProgressBar2.Gradient.Clear;
@@ -438,7 +444,7 @@ begin
   // scroll bar
   FScrollBar1 := FScene.Add_UIScrollBar(uioHorizontal);
   FScrollBar1.AnchorPosToSurface(FProgressBar2, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
-  FScrollBar1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(15), 30, 30, 1.6);
+  FScrollBar1.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(15), 30, 30, 1.6);
   FScrollBar1.SetParams(250, 0, 1500, 250);
   FScrollBar1.OnChange := @ProcessUIClick;
   // label above the scroll bar
@@ -448,8 +454,8 @@ begin
 
   // list box
   FListBox1 := FScene.Add_UIListBox(FtexFont);
-  FListBox1.AnchorPosToSurface(FPanel1, haLeft, haRight, FScene.ScaleDesignToScene(20), vaTop, vaTop, 0);
-  FListBox1.BodyShape.SetShapeRoundRect(200, 250, 10, 10, 2);
+  FListBox1.AnchorPosToSurface(FPanel1, haLeft, haRight, FScene.ScaleDesignToScene(10), vaTop, vaTop, 0);
+  FListBox1.BodyShape.SetShapeRoundRect(itemWidth, 250, 10, 10, 2);
   FListBox1.ItemColor.ColorText := BGRA(220,220,220);
   FListBox1.ItemColor.ColorSelectedText := BGRA(255,255,255);
   FListBox1.ItemHeight := 20;
@@ -468,17 +474,17 @@ begin
   FLabel4.AnchorPosToSurface(FListBox1, haLeft, haLeft, 0, vaBottom, vaTop, 0);
   FLabel4.Tint.Value := BGRA(255,255,0);
 
-  // button reset
-  FButtonReset := FScene.Add_UIButton('Reset', FtexFont, NIL);
-  FButtonReset.BodyShape.SetShapeRoundRect(5, 5, 8, 8, 2, []);
-  FButtonReset.AnchorPosToParent(haRight, haRight, 0, vaTop, vaTop, FtexFont.Font.FontHeight);
-  FButtonReset._Label.Tint.Value := BGRA(220,220,220);
-  FButtonReset.OnClick := @ProcessUIClick;
+  // button clear
+  FButtonClear := FScene.Add_UIButton('Clear', FtexFont, NIL);
+  FButtonClear.BodyShape.SetShapeRoundRect(5, 5, 8, 8, 2, []);
+  FButtonClear.AnchorPosToParent(haRight, haRight, 0, vaTop, vaTop, FtexFont.Font.FontHeight);
+  FButtonClear._Label.Tint.Value := BGRA(220,220,220);
+  FButtonClear.OnClick := @ProcessUIClick;
   // text area
   FTextArea1 := FScene.Add_UITextArea;
-  FTextArea1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(500), 8, 8, 2);
+  FTextArea1.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(500), 8, 8, 2);
   FTextArea1.RightX := FScene.Width;
-  FTextArea1.AnchorPosToSurface(FButtonReset, haRight, haRight, 0, vaTop, vaBottom, 0);
+  FTextArea1.AnchorPosToSurface(FButtonClear, haRight, haRight, 0, vaTop, vaBottom, 0);
   FTextArea1.Text.TexturedFont := FtexFont;
   FTextArea1.Text.Align := taTopLeft;
   // label above text area
@@ -506,7 +512,7 @@ begin
 
 
   FScrollBox1 := FScene.Add_UIScrollBox(True, True);
-  FScrollBox1.BodyShape.SetShapeRoundRect(FScene.ScaleDesignToScene(400), FScene.ScaleDesignToScene(150), 8, 8, 2);
+  FScrollBox1.BodyShape.SetShapeRoundRect(itemWidth, FScene.ScaleDesignToScene(150), 8, 8, 2);
   FScrollBox1.AnchorPosToSurface(FListBox1, haLeft, haLeft, 0, vaTop, vaBottom, FScene.ScaleDesignToScene(20));
   InitCallbackOn(FScrollBox1);
   // label above scrollbox1

@@ -39,7 +39,7 @@ uses screen_title;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
+  FScene := TOGLCScene.Create(OpenGLControl1, 16/9);
   FScene.LayerCount := LAYER_COUNT;
   FScene.CreateLogFile(Application.Location+'scene.log', True);
 
