@@ -9,3 +9,4 @@ backup/
 .DS_Store
 Tools/GameHelper/
 examples/Data/atlas.png
+*.odg
