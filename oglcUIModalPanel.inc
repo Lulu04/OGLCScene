@@ -3,7 +3,10 @@ type
 PModalPanelItem = ^TModalPanelItem;
 
 { TUIModalPanel }
-
+// When a modal panel is shown, the scene is freezed and little darkened.
+// An application of the modal panel can be i.e. when user press ESC key during the game,
+// a modal panel show a menu with button to resume game, a button to return to the main game menu...
+// When the modal panel is hidden, the scene continue where it left off.
 TUIModalPanel = class(TUIPanel)
 private type ModalPanelState = (mpsShown, mpsHidden);
 private
@@ -19,7 +22,9 @@ public
   constructor Create(aParentScene: TOGLCScene; aBlackOpacity: byte=100);
   destructor Destroy; override;
 
+  // Show the modal panel: the scene is freezed and darkened.
   procedure ShowModal; virtual;
+  // Hide the modal panel: the scene continue normally.
   procedure Hide; virtual;
 end;
 
