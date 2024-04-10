@@ -222,8 +222,33 @@ procedure TScreenDemo.SetColorTheme;
 const COLOR_POSITION: array[0..2] of single=(0, 0.5, 1);  // left, middle, right
 var cLeft, cMiddle, cRight: TBGRAPixel;
   gradHeavy, gradSoft, gradButton: TGradientDescriptor;
-  o: TSimpleSurfaceWithEffect;
   i: Integer;
+
+  procedure Scan(aSurface: TSimpleSurfaceWithEffect);
+  var j: integer;
+  begin
+    if (aSurface is TUIPanel) or (aSurface is TUITextArea) or (aSurface is TUIScrollBar) or (aSurface is TUIScrollBox) then
+      TUIClickableWithBodyShape(aSurface).BackGradient.CopyFrom(gradSoft) // gradHeavy)
+    else
+    if (aSurface is TUIListBox) then begin
+      TUIListBox(aSurface).ItemColor.GradientItem.CopyFrom(gradSoft);
+      TUIListBox(aSurface).ItemColor.GradientItemSelected.CopyFrom(gradHeavy);
+    end else
+    if (aSurface is TUIProgressBar) then
+      TUIProgressBar(aSurface).BodyShape.Fill.Color := cLeft
+    else
+    if (aSurface is TUICheck) then
+      TUICheck(aSurface).ColorChecked := cMiddle
+    else
+    if (aSurface is TUIRadio) then
+      TUIRadio(aSurface).ColorChecked := cMiddle
+    else
+    if (aSurface is TUIButton) then
+      TUIButton(aSurface).BackGradient.CopyFrom(gradButton);
+    // we scan also the childs
+    for j:=0 to aSurface.ChildCount-1 do
+      Scan(aSurface.Childs[j]);
+  end;
 
 begin
   gradHeavy.InitDefault;  // we have to do that because type of TGradientDescriptor is record.
@@ -258,28 +283,9 @@ begin
     gradButton.CreateVertical([cLeft, cMiddle, cRight], COLOR_POSITION);
   end;
 
-  // we scan all the surfaces in the layer where are the UI elements.
-  for i:=0 to FScene.Layer[0].SurfaceCount-1 do begin
-    o := FScene.Layer[0].Surface[i];
-    if (o is TUIPanel) or (o is TUITextArea) or (o is TUIScrollBar) or (o is TUIScrollBox) then
-      TUIClickableWithBodyShape(o).BackGradient.CopyFrom(gradSoft) // gradHeavy)
-    else
-    if (o is TUIListBox) then begin
-      TUIListBox(o).ItemColor.GradientItem.CopyFrom(gradSoft);
-      TUIListBox(o).ItemColor.GradientItemSelected.CopyFrom(gradHeavy);
-    end else
-    if (o is TUIProgressBar) then
-      TUIProgressBar(o).BodyShape.Fill.Color := cLeft
-    else
-    if (o is TUICheck) then
-      TUICheck(o).ColorChecked := cMiddle
-    else
-    if (o is TUIRadio) then
-      TUIRadio(o).ColorChecked := cMiddle
-    else
-    if (o is TUIButton) then
-      TUIButton(o).BackGradient.CopyFrom(gradButton);
-  end;
+  // we scan recursively all the surfaces in the layer where are the UI elements.
+  for i:=0 to FScene.Layer[0].SurfaceCount-1 do
+    Scan(FScene.Layer[0].Surface[i]);
 end;
 
 procedure TScreenDemo.CreateObjects;
