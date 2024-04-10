@@ -251,13 +251,10 @@ var cLeft, cMiddle, cRight: TBGRAPixel;
   end;
 
 begin
-  gradHeavy.InitDefault;  // we have to do that because type of TGradientDescriptor is record.
+  // first we create 3 gradients with the appropriate colors
+  gradHeavy.InitDefault;  // we have to do that because TGradientDescriptor is a record.
   gradSoft.InitDefault;
   gradButton.InitDefault;
-  cLeft := BGRA(30,30,30);
-  cRight := cLeft;
-  cMiddle := BGRA(220,220,220);
-
   if FTheme1.Checked then begin
     cLeft := BGRA(100,50,255,100);
     cMiddle := BGRA(255,0,255,200);
