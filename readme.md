@@ -18,8 +18,10 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Velocity curve applied to any value that can be changed in time, like coordinates, rotation, opacity, tint,...
 - Log file.  
   
+UI elements with customized colors
 ![UI elements with customized colors](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/UIElements.png)
   
+Workshop screen in game Little Red Riding Hood
 ![Workshop screen in game Little Red Riding Hood](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/GameLittleRedRidingHood.png)
   
 # Credits
