@@ -83,51 +83,51 @@ const
      acToggleFlipH          =  'ToggleFlipH' ; // ToggleFlipH
      acToggleFlipV          =  'ToggleFlipV' ; // ToggleFlipV
 
-     acOpacity              =  'Opacity' ;       // Opacity NewOpacity
-     acOpacityChange        =  'OpacityChange' ; // OpacityChange NewOpacity Duration CurveID
+     acOpacity              =  'Opacity' ;       // Opacity NewOpacityI
+     acOpacityChange        =  'OpacityChange' ; // OpacityChange NewOpacityI DurationF CurveID
 
-     acAnimate              =  'Animate' ; // Animate StartFrameIndex EndFrameIndex FramePerSecond(single)
+     acAnimate              =  'Animate' ; // Animate StartFrameIndexI EndFrameIndexI FramePerSecondF
      acIncFrame             =  'IncFrame'; // IncFrame
      acDecFrame             =  'DecFrame'; // DecFrame
-     acSetFrame             =  'SetFrame'; // SetFrame ImageIndex
+     acSetFrame             =  'SetFrame'; // SetFrame FrameIndexI
 
-     acTint                 =  'Tint'    ; // Tint red green blue alpha
-     acTintChange           =  'TintChange' ; // TintChange Red Green Blue Alpha Duration CurveID
-     acTintRedChange        =  'TintRedChange' ;   // TintRedChange NewRedValue Duration CurveID
-     acTintGreenChange      =  'TintGreenChange' ; // TintGreenChange NewGreenValue Duration CurveID
-     acTintBlueChange       =  'TintBlueChange' ;  // TintBlueChange NewBlueValue Duration CurveID
-     acTintAlphaChange      =  'TintAlphaChange' ; // TintAlphaChange NewAlphaValue Duration CurveID
+     acTint                 =  'Tint'    ; // Tint redI greenI blueI alphaI
+     acTintChange           =  'TintChange' ; // TintChange RedI GreenI BlueI AlphaI DurationF CurveID
+     acTintRedChange        =  'TintRedChange' ;   // TintRedChange NewRedValueI DurationF CurveID
+     acTintGreenChange      =  'TintGreenChange' ; // TintGreenChange NewGreenValueI DurationF CurveID
+     acTintBlueChange       =  'TintBlueChange' ;  // TintBlueChange NewBlueValueI DurationF CurveID
+     acTintAlphaChange      =  'TintAlphaChange' ; // TintAlphaChange NewAlphaValueI DurationF CurveID
 
-     acAngle                = 'Angle'    ; // Angle NewAngle
-     acRotate               = 'Rotate'   ; // Rotate AnglePerSecond
-     acRotateTo             = 'RotateTo' ; // RotateTo Angle Duration CurveID
-     acRotationAroundAxis   = 'RotationAroundAxis'    ; // RotationAroundAxis XAxis YAxis AnglePerSecond SelfRotate
+     acAngle                = 'Angle'    ; // Angle NewAngleF
+     acRotate               = 'Rotate'   ; // Rotate AnglePerSecondF
+     acRotateTo             = 'RotateTo' ; // RotateTo AngleF DurationF CurveID
+     acRotationAroundAxis   = 'RotationAroundAxis'    ; // RotationAroundAxis XAxisF YAxisF AnglePerSecondF SelfRotate
 
-     acScale                = 'Scale'          ; // Scale HVValue      // [1]= normal size, [0..1[->reduced, ]1..inf[->enlarged
-     acScaleChange          = 'ScaleChange'    ; // ScaleChange HVNewValue Duration CurveID
-     acScaleH               = 'ScaleH'         ; // ScaleH HValue      // to set scale value for horizontaly axis
-     acScaleHChange         = 'ScaleHChange'   ; // ScaleHChange HNewValue Duration CurveID
-     acScaleV               = 'ScaleV'         ; // ScaleV VValue      // to set scale value for verticaly axis
-     acScaleVChange         = 'ScaleVChange'   ; // ScaleVChange VNewValue Duration CurveID
+     acScale                = 'Scale'          ; // Scale HVValueF      // [1]= normal size, [0..1[->reduced, ]1..inf[->enlarged
+     acScaleChange          = 'ScaleChange'    ; // ScaleChange HVNewValueF DurationF CurveID
+     acScaleH               = 'ScaleH'         ; // ScaleH HValueF      // to set scale value for horizontaly axis
+     acScaleHChange         = 'ScaleHChange'   ; // ScaleHChange HNewValueF DurationF CurveID
+     acScaleV               = 'ScaleV'         ; // ScaleV VValueF      // to set scale value for verticaly axis
+     acScaleVChange         = 'ScaleVChange'   ; // ScaleVChange VNewValueF DurationF CurveID
 
 
-     acBlink                = 'Blink'    ; // Blink NumberOfBlink(-1 for infinite) aVisibleTime aInvisibleTime
+     acBlink                = 'Blink'    ; // Blink NumberOfBlinkI(-1 for infinite) aVisibleTimeF aInvisibleTimeF
      acStopBlink            = 'StopBlink'; // StopBlink
 
-     acMoveTo               = 'MoveTo'         ; // MoveTo X Y Duration CurveID
-     acMoveXTo              = 'MoveXTo'        ; // MoveXTo X Duration CurveID
-     acMoveYTo              = 'MoveYTo'        ; // MoveYTo Y Duration CurveID
+     acMoveTo               = 'MoveTo'         ; // MoveTo XF YF DurationF CurveID
+     acMoveXTo              = 'MoveXTo'        ; // MoveXTo XF DurationF CurveID
+     acMoveYTo              = 'MoveYTo'        ; // MoveYTo YF DurationF CurveID
 
-     acMoveCenterTo         = 'MoveCenterTo'   ; // MoveCenterTo Xcenter YCenter Duration CurveID
-     acMoveXCenterTo        = 'MoveXCenterTo'  ; // MoveXCenterTo X Duration CurveID
-     acMoveYCenterTo        = 'MoveYCenterTo'  ; // MoveYCenterTo Y Duration CurveID
+     acMoveCenterTo         = 'MoveCenterTo'   ; // MoveCenterTo XcenterF YCenterF DurationF CurveID
+     acMoveXCenterTo        = 'MoveXCenterTo'  ; // MoveXCenterTo XF DurationF CurveID
+     acMoveYCenterTo        = 'MoveYCenterTo'  ; // MoveYCenterTo YF DurationF CurveID
 
-     acMoveRelative         = 'MoveRelative'   ; // MoveRelative DeltaX DeltaY Duration CurveID
-     acMoveXRelative        = 'MoveXRelative'  ; // MoveXRelative DeltaX Duration CurveID
-     acMoveYRelative        = 'MoveYRelative'  ; // MoveYRelative DeltaY Duration CurveID
+     acMoveRelative         = 'MoveRelative'   ; // MoveRelative DeltaXF DeltaYF DurationF CurveID
+     acMoveXRelative        = 'MoveXRelative'  ; // MoveXRelative DeltaXF DurationF CurveID
+     acMoveYRelative        = 'MoveYRelative'  ; // MoveYRelative DeltaYF DurationF CurveID
 
-     acSetCoor              = 'SetCoor'        ; // SetCoor X Y
-     acSetCenterCoor        = 'SetCenterCoor'  ; // SetCenterCoor X Y  (single)
+     acSetCoor              = 'SetCoor'        ; // SetCoor XF YF
+     acSetCenterCoor        = 'SetCenterCoor'  ; // SetCenterCoor XF YF
 
      acCenterOnScene        = 'CenterOnScene'  ; // CenterOnScene
 
