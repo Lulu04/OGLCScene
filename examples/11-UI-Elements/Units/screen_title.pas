@@ -183,12 +183,16 @@ end;
 procedure TScreenDemo.ProcessUIRadioChange(Sender: TSimpleSurfaceWithEffect);
 var s: string;
 begin
+  if (Sender = FTheme1) or (Sender = FTheme2) or (Sender = FTheme3) then begin
+    SetColorTheme;
+    exit;
+  end;
+
   s := '';
   if FRadio1.Checked then s := 'Radio1 checked';
   if FRadio2.Checked then s := 'Radio2 checked';
   if FRadio3.Checked then s := 'Radio3 checked';
 
-  if (Sender = FTheme1) or (Sender = FTheme2) or (Sender = FTheme3) then SetColorTheme;
 
   if s <> '' then begin
     FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
@@ -258,7 +262,7 @@ begin
   for i:=0 to FScene.Layer[0].SurfaceCount-1 do begin
     o := FScene.Layer[0].Surface[i];
     if (o is TUIPanel) or (o is TUITextArea) or (o is TUIScrollBar) or (o is TUIScrollBox) then
-      TUIClickableWithBodyShape(o).BackGradient.CopyFrom(gradHeavy)
+      TUIClickableWithBodyShape(o).BackGradient.CopyFrom(gradSoft) // gradHeavy)
     else
     if (o is TUIListBox) then begin
       TUIListBox(o).ItemColor.GradientItem.CopyFrom(gradSoft);
