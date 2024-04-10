@@ -19,6 +19,9 @@ The current release use OpenGL 3.3 to render graphics.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
 - Velocity curve applied to any value that can be changed in time, like coordinates, rotation, opacity, tint,...
 - Log file.
+![UI elements with customized colors](https://github.com/Lulu04/OGLCScene/blob/main/screenshot/UIElements.png)
+![Workshop screen in game Little Red Riding Hood](https://github.com/Lulu04/OGLCScene/blob/main/screenshot/GameLittleRedRidingHood.png)
+
 # Credits
 A large part of the code of the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
