@@ -28,7 +28,6 @@ unit OGLCScene;
 
 
 //{$DEFINE DEBUG_MODE_ON}  // enable to draw a red rectangle around all surfaces.
-{$define CHECKGLERROR_ON}  // call 'CheckGLError' to raise an exception if an gl error occurs
 {$define USE_glcorearb}  // enable to use the glcorearb.pas header for OpenGL written by Chris Rorden.
 
 
@@ -462,18 +461,7 @@ var
     ElapsedTime: single;
 
 implementation
-uses LclIntf;
-
-
-procedure CheckGLError; inline;
-{$ifdef CHECKGLERROR_ON} var errorCode: GLenum; {$endif}
-begin
- {$ifdef CHECKGLERROR_ON}
-  errorCode := glGetError();
-  if errorCode <> GL_NO_ERROR then
-    raise exception.Create('error code $'+IntToHex(errorCode, 4)+' appears: '+GLErrorToString(errorCode));
- {$endif}
-end;
+uses LclIntf;   // for function GetKeyState()
 
 { TOGLCContext }
 
@@ -1028,7 +1016,7 @@ begin
     glEnable(GL_PRIMITIVE_RESTART);
     glPrimitiveRestartIndex(PRIMITIVE_INDEX_RESTART_VALUE);
 
-    CheckGLError;
+    glGetError();
 
     UpdateViewPortSize;
     CreateRenderers;
