@@ -1253,7 +1253,7 @@ procedure TUITextArea.DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer;
   aMousePos: TPoint; var aHandled: Boolean);
 begin
   inherited DoOnMouseWheel(aShift, aWheelDelta, aMousePos, aHandled);
-  FVScrollBar.DoOnMouseWheel(aShift, aWheelDelta, aMousePos, aHandled);
+  if FVScrollBar.Visible then FVScrollBar.DoOnMouseWheel(aShift, aWheelDelta, aMousePos, aHandled);
   aHandled := True;
 end;
 
