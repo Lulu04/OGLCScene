@@ -13,7 +13,7 @@ The current release use OpenGL 3.3 to render graphics.
 - Sprites and other kind of surface with self-managed effects like tint, opacity, moves, angle...
 - UI with Button, Label, Image, Panel, CheckBox, RadioButton, ScrollBar, ProgressBar, ListBox, ScrollBox, TextArea.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
-- All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available to perform Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
+- All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
 - Messages system to synchronize surfaces between them.
 - Particle engine and its tool 'Particles Editor' to make your own particle effects.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
