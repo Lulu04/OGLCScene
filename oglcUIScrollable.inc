@@ -1264,10 +1264,11 @@ begin
 end;
 
 procedure TUITextArea.ProcessEventScrollBarChange(aSurface: TSimpleSurfaceWithEffect);
+var fHeight: integer;
 begin
-  FIndexFirstLineVisible := FVScrollBar.Position div Text.TexturedFont.Font.FontHeight;
-  FYFirstLineVisible := -FVScrollBar.Position mod Text.TexturedFont.Font.FontHeight;
-  UpdateWidgetSizeAndLayout;
+  fHeight := Text.TexturedFont.Font.FontHeight;
+  FIndexFirstLineVisible := FVScrollBar.Position div fHeight;
+  FYFirstLineVisible := -FVScrollBar.Position mod fHeight;
 end;
 
 procedure TUITextArea.UpdateWidgetSizeAndLayout;
@@ -1289,10 +1290,10 @@ begin
     FNeedFormatText := False;
   end;
 
-  // update VScrollBar
+  // update VScrollBar visibility
   needScrollBar := (VScrollBarMode <> sbmNeverShow) and
                    (ClientArea.Height > 0) and
-                   (Text.DrawingRect.Height {+ ClientArea.Top} > ClientArea.Height);
+                   (Text.DrawingRect.Height > ClientArea.Height);
   if needScrollBar then begin
     maxi := Text.DrawingRect.Height;
     page := ClientArea.Height;
@@ -1300,9 +1301,6 @@ begin
 
     Text.Area := ClientArea;
     Text.Area.Width := Text.Area.Width - FVScrollBar.Width;
-    Text.DistributeTheWordsOnTheSurface;
-    Text.DoAlign;
-
     //FIndexFirstLineVisible := FVScrollBar.Position div Text.TexturedFont.Font.FontHeight;
     //FYFirstLineVisible := -FVScrollBar.Position mod Text.TexturedFont.Font.FontHeight;
   end else begin
@@ -1311,9 +1309,9 @@ begin
     FYFirstLineVisible := 0;
 
     Text.Area := ClientArea;
-    Text.DistributeTheWordsOnTheSurface;
-    Text.DoAlign;
   end;
+  Text.DistributeTheWordsOnTheSurface;
+  Text.DoAlign;
 end;
 
 procedure TUITextArea.Update(const aElapsedTime: single);
@@ -1367,7 +1365,7 @@ end;
 procedure TUITextArea.MakeLastLineVisible;
 begin
   if FVScrollBar = NIL then exit;
-  FVScrollBar.Position := FVScrollBar.Max;
+  if FVScrollBar.Visible then FVScrollBar.Position := FVScrollBar.Max;
 end;
 
 {$endif oglcIMPLEMENTATION}
