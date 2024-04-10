@@ -2,11 +2,9 @@
 2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS.  
 # Dependencies
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
-# Release
-The current release use OpenGL 3.3 to render graphics.
 # Support
 - Only 2D !
-- OpenGL 3.3
+- Use OpenGL 3.3 to render graphics.
 - Renderers with batch system to improve performance.
 - Multi layers architecture.
 - Multi screens architecture to separates the different parts of the game.
@@ -18,10 +16,11 @@ The current release use OpenGL 3.3 to render graphics.
 - Particle engine and its tool 'Particles Editor' to make your own particle effects.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
 - Velocity curve applied to any value that can be changed in time, like coordinates, rotation, opacity, tint,...
-- Log file.
+- Log file.  
 ![UI elements with customized colors](https://github.com/Lulu04/OGLCScene/blob/main/screenshot/UIElements.png)
+  
 ![Workshop screen in game Little Red Riding Hood](https://github.com/Lulu04/OGLCScene/blob/main/screenshot/GameLittleRedRidingHood.png)
-
+  
 # Credits
 A large part of the code of the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
