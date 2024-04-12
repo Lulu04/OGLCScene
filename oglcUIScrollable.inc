@@ -953,7 +953,6 @@ procedure TAlignedTextDescriptor.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
    flagLastWasLineEnding: boolean;
-debugs: string;
    procedure _NextLine;
    begin
     yy += FTexturedFont.Font.FontHeight;
@@ -1043,17 +1042,19 @@ begin
   j := 0;
   flagLastWasLineEnding := False;
   repeat
-    FWords[j].Word := W[iw];
-    FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
-    FWords[j].Width := FTexturedFont.GetTextWidth(FWords[j].Word);
 
-    if FWords[j].Word = #10 then begin
+    if {FWords[j].Word}W[iw] = #10 then begin
       //if CurrentLineIsEmpty then dec(FLineCount) else flagLastWasLineEnding := True;
       //if CurrentLineIsEmpty then dec(FLineCount);
       flagLastWasLineEnding := True;
       _NextLine;
       inc(iw);
-    end else if xx+FWords[j].Width <= Area.Width then begin
+    end else begin
+      FWords[j].Word := W[iw];
+      FWords[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
+      FWords[j].Width := FTexturedFont.GetTextWidth(FWords[j].Word);
+
+      if xx+FWords[j].Width <= Area.Width then begin
       // the word fit
       PutWordOnCurrentLine;
       inc(iw);
@@ -1069,6 +1070,7 @@ begin
            DoWordWrapOnCurrentLine;
            inc(iw);
          end;
+    end;
     end;
     if xx > DrawingSize.cx then DrawingSize.cx := xx;
   until iw = Length(W);
