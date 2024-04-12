@@ -1,0 +1,43 @@
+E_Coor
+0 0
+E_GlobalOpacity
+255
+E_Direction
+207
+E_Spread
+0
+E_Life
+3,000
+E_LoopMode
+TRUE
+E_Emission
+136
+E_Gravity
+0 0
+E_Type
+2 100 100
+P_ParticlesPositionsRelativeToEmitterPosition
+FALSE
+P_Texture
+RainDrop_Particle.png
+32 32
+P_Frame
+1 1
+P_Life
+0,799 0,000
+P_ColorMode
+0
+P_BlendMode
+0
+P_Color
+4 0,00000 170 213 211 255 0,33000 170 213 211 100 0,66000 170 213 211 60 1,00000 170 213 211 0
+P_Velocity
+110 11 2 0,00000 0,00000 1,00000 0,00000
+P_AVelocity
+0 0 2 0,00000 0,00000 1,00000 1,00000
+P_Size
+0,61000 0,15000 3 0,00000 1,02381 0,52020 0,95327 1,00000 0,29907
+P_StartAngle
+33 0
+P_Spin
+0 0 2 0,00000 1,00000 1,00000 -10,00000
