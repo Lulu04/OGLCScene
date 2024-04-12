@@ -32,7 +32,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="Units;..\.."/>
+            <OtherUnitFiles Value="Units;..\..\source"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -213,19 +213,17 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\OGLCScene.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="169"/>
         <CursorPos X="29" Y="189"/>
         <UsageCount Value="22"/>
-        <Loaded Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="343"/>
         <CursorPos X="14" Y="352"/>
         <UsageCount Value="22"/>
-        <Loaded Value="True"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\oglcUtils.inc"/>
@@ -256,40 +254,7 @@
         <UsageCount Value="11"/>
       </Unit22>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
-      <Position1>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="403" Column="46" TopLine="391"/>
-      </Position1>
-      <Position2>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="189" Column="17" TopLine="180"/>
-      </Position2>
-      <Position3>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="448" Column="28" TopLine="439"/>
-      </Position3>
-      <Position4>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="204" Column="19" TopLine="190"/>
-      </Position4>
-      <Position5>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="275" Column="29" TopLine="260"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="189" Column="19" TopLine="184"/>
-      </Position6>
-      <Position7>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="456" Column="19" TopLine="439"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <Caret Line="204" Column="20" TopLine="185"/>
-      </Position8>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
@@ -299,7 +264,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="Units;..\.."/>
+      <OtherUnitFiles Value="Units;..\..\source"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
