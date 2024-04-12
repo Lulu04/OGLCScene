@@ -1,0 +1,54 @@
+object FormMain: TFormMain
+  Left = 516
+  Height = 204
+  Top = 190
+  Width = 464
+  Caption = 'Program name'
+  ClientHeight = 204
+  ClientWidth = 464
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  LCLVersion = '2.2.6.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 24
+    Height = 96
+    Top = 24
+    Width = 80
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 40
+    Top = 72
+    Width = 232
+    BorderSpacing.Top = 72
+    ClientHeight = 40
+    ClientWidth = 232
+    Color = 14737632
+    ParentColor = False
+    TabOrder = 1
+    object CheckBox1: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 8
+      Width = 220
+      Caption = 'Ship.ParticlesPosRelativeToEmitterPos'
+      OnChange = CheckBox1Change
+      TabOrder = 0
+    end
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 34
+    Top = 26
+  end
+end
