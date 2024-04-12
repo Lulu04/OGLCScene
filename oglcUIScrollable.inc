@@ -182,6 +182,7 @@ private
   FSpaceCharWidth: integer;
   FWords: ArrayOfWord_;
   FLineCount: integer;
+  FReadyToRender: boolean;
 private
   FCallbackSizeChanged: TOGLCEvent;
   procedure InitDefault;
@@ -213,6 +214,8 @@ public
   property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
   // fired when caption or Textured font change.
   property OnSizeChanged: TOGLCEvent read FCallbackSizeChanged write FCallbackSizeChanged;
+  // True if the caption is <> '' and property TexturedFont is initialized
+  property ReadyToRender: boolean read FReadyToRender;
 end;
 
 { TUITextArea }
@@ -1022,7 +1025,8 @@ begin
   DrawingRect.Width := 0;
   DrawingRect.Height := 0;
   FWords := NIL;
-  if (FCaption = '') or (FTexturedFont = NIL) then exit;
+  FReadyToRender := (FCaption <> '') and (FTexturedFont <> NIL);
+  if not FReadyToRender then exit;
 
   W := SplitTextToWordArray(FCaption, ' ');
   // compute the number of word except #10
@@ -1326,6 +1330,7 @@ var i: integer;
   yy, yOffset, minYVisible: integer;
   m: TOGLCMatrix;
 begin
+  if not Text.ReadyToRender then exit;
   m.CopyFrom(FParentScene.ModelViewMatrix);
   FParentScene.ModelViewMatrix.Translate(ClientArea.Left, ClientArea.Top);
 
