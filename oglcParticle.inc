@@ -175,6 +175,8 @@ end;
 TParticleEmitter = class(TSimpleSurfaceWithEffect)
 private
   FOnParticleDies: TOnParticleDies;
+  FParticlesPosRelativeToEmitterPos: boolean;
+  procedure SetParticlesPosRelativeToEmitterPos(AValue: boolean);
 protected
   FCurrentLife: single;
   FParticleRate: single;
@@ -206,15 +208,18 @@ public
   Spread: TBoundedFParam;          // [0..360] degree
   EmitterLife: single;             // duration in seconds of one shoot if emitter is not in loop mode
   LoopMode: boolean;
-  ParticlesPositionsRelativeToEmitterPosition: boolean; // FALSE by default
   Constructor Create(aParentScene: TOGLCScene);
   Destructor Destroy; override;
-  // load the parameters from a file.
+  // Load the parameters from a file '.par' (made with the tool ParticleEditor)
   // You can specify an atlas where the used texture can be found.
   // If you don't use an atlas, set aAtlas parameter to NIL. In that case, the texture
   // will be created (the texture image must be in the same directory than aFilename).
   procedure LoadFromFile(const aFilename: string; aAtlas: TOGLCTextureAtlas);
+  // When the emitter is not looped (property LoopMode to False), call this method to start
+  // the particle creation.
   procedure Shoot;
+  // Kill all particles currently active. If the emitter is in LoopMode,
+  // it continue to create new particles immediatly.
   procedure Clear;
 
   // (X,Y) is the position of the point
@@ -231,11 +236,16 @@ public
   procedure SetEmitterTypeOuterCircle(Radius: single);
   procedure SetEmitterTypeRing(aSmallRadius, aBigRadius: single);
 
-  // return TRUE if at least one particle collide the specified surface
+  // Return TRUE if at least one particle collide the specified surface
   function ParticlesCollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean;
 
+  // Sets this property to True if you want the particles follow the moves of the emitter.
+  // Sets it to False to have the particles independant from the emitter position.
+  property ParticlesPosRelativeToEmitterPos: boolean read FParticlesPosRelativeToEmitterPos write SetParticlesPosRelativeToEmitterPos;
   property EmitterType: TEmitterType read FEmitterType;
+  // The number of particles currently active
   property ParticlesCount: integer read FParticleCount;
+  // Fired when a particle dies
   property OnParticleDies: TOnParticleDies read FOnParticleDies write FOnParticleDies;
 end;
 
@@ -480,7 +490,7 @@ begin
   Gravity := TPointFParam.Create;
   Spread := CreateBoundedFParam(0, 360, TRUE);
   Direction := CreateBoundedFParam(0, 360, TRUE);
-  ParticlesPositionsRelativeToEmitterPosition := FALSE;
+  ParticlesPosRelativeToEmitterPos := FALSE;
   SetSize(1, 1);
 
   if ParticleRenderer = NIL then
@@ -612,7 +622,7 @@ begin
 
       offsetX := -FParticleParam.Texture^.FrameWidth*0.5;
       offsetY := -FParticleParam.Texture^.FrameHeight*0.5;
-      if not ParticlesPositionsRelativeToEmitterPosition then begin
+      if not ParticlesPosRelativeToEmitterPos then begin
         offsetX += Self.X.Value;
         offsetY += Self.Y.Value;
       end;
@@ -697,7 +707,7 @@ begin
   {$ENDIF}
 
   FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
-  if ParticlesPositionsRelativeToEmitterPosition then begin
+  if ParticlesPosRelativeToEmitterPos then begin
    PushAndPrepareSceneMV;
   end;
 
@@ -725,7 +735,7 @@ begin
     end;
 //  ParticleRenderer.Batch_Flush;
 
-  if ParticlesPositionsRelativeToEmitterPosition then PopSceneMV;
+  if ParticlesPosRelativeToEmitterPos then PopSceneMV;
 
   {$IFDEF DEBUG_MODE_ON}
     SetBlendMode(FX_BLEND_NORMAL);
@@ -796,8 +806,8 @@ begin
 
   k := F.IndexOf('P_ParticlesPositionsRelativeToEmitterPosition');
   if k<>-1 then
-    ParticlesPositionsRelativeToEmitterPosition := LowerCase(F.Strings[k+1]) = 'true'
-  else ParticlesPositionsRelativeToEmitterPosition := FALSE;
+    ParticlesPosRelativeToEmitterPos := LowerCase(F.Strings[k+1]) = 'true'
+  else ParticlesPosRelativeToEmitterPos := FALSE;
 
    k := F.IndexOf('P_Texture');
    SplittedText := F.Strings[k+2].Split([' ']);
@@ -948,6 +958,13 @@ begin
     FParticles[i].InitialLife := 0;
   end;
   FParticleCount := 0 ;
+end;
+
+procedure TParticleEmitter.SetParticlesPosRelativeToEmitterPos(AValue: boolean);
+begin
+  if FParticlesPosRelativeToEmitterPos = AValue then Exit;
+  FParticlesPosRelativeToEmitterPos := AValue;
+  Clear;
 end;
 
 procedure TParticleEmitter.SetSize(AWidth, AHeight: integer);
