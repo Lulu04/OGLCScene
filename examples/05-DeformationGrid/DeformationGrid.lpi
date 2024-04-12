@@ -32,7 +32,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="Units;..\.."/>
+            <OtherUnitFiles Value="Units;..\..\source"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -84,7 +84,7 @@
       <Unit0>
         <Filename Value="DeformationGrid.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <CursorPos X="33" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -213,14 +213,13 @@
       </Unit16>
       <Unit17>
         <Filename Value="..\..\oglcDeformationGrid.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="219"/>
         <CursorPos X="2" Y="224"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit17>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="89" Column="5" TopLine="63"/>
@@ -306,41 +305,33 @@
         <Caret Line="89" Column="17" TopLine="73"/>
       </Position21>
       <Position22>
-        <Filename Value="..\..\oglcDeformationGrid.inc"/>
-        <Caret Line="36" Column="16" TopLine="22"/>
-      </Position22>
-      <Position23>
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="108" Column="27" TopLine="88"/>
-      </Position23>
-      <Position24>
-        <Filename Value="..\..\oglcDeformationGrid.inc"/>
-        <Caret Line="35" Column="15" TopLine="22"/>
-      </Position24>
-      <Position25>
+      </Position22>
+      <Position23>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="71" Column="42" TopLine="68"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="73" Column="44" TopLine="66"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="34" Column="36" TopLine="17"/>
       </Position25>
       <Position26>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="73" Column="44" TopLine="66"/>
+        <Caret Line="72" Column="3" TopLine="66"/>
       </Position26>
       <Position27>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="34" Column="36" TopLine="17"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="71" Column="3" TopLine="65"/>
       </Position27>
       <Position28>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="72" Column="3" TopLine="66"/>
-      </Position28>
-      <Position29>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="71" Column="3" TopLine="65"/>
-      </Position29>
-      <Position30>
-        <Filename Value="Units\form_main.pas"/>
         <Caret Line="82" Column="44" TopLine="65"/>
-      </Position30>
+      </Position28>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -351,7 +342,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="Units;..\.."/>
+      <OtherUnitFiles Value="Units;..\..\source"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

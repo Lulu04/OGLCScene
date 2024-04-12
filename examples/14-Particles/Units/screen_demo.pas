@@ -147,7 +147,7 @@ begin
   FTextArea.BodyShape.Fill.Visible := False;
   FTextArea.BodyShape.Border.Visible := False;
   FTextArea.Text.Tint.Value := BGRA(255,255,200);
-  FTextArea.Text.Caption := 'You can create your own particle emitters with the ParticleEditor tool (in folder Tools)'#10;
+  FTextArea.Text.Caption := 'You can create your own particle emitters with the ParticleEditor tool (in folder tools)'#10;
   FTextArea.Text.TexturedFont := FtexFont;
 
   // ship engine particle emitter: we create it first so that it is displayed before the ship
