@@ -351,7 +351,7 @@ end;
 
 procedure TSimpleSurfaceWithEffect.SetFrame(AValue: single);
 begin
-  FFrame:=AValue;
+  FFrame := AValue;
 end;
 
 procedure TSimpleSurfaceWithEffect.SetScaledAreaF(AValue: TRectF);
