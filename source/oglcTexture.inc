@@ -311,14 +311,14 @@ begin
   FramesCoord[ 0, cTL ].X := originX;
   FramesCoord[ 0, cTL ].Y := originY;
 
-  FramesCoord[ 0, cTR ].X := originX + fw;
+  FramesCoord[ 0, cTR ].X := originX + fw*fcx;
   FramesCoord[ 0, cTR ].Y := originY;
 
-  FramesCoord[ 0, cBR ].X := originX + fw;
-  FramesCoord[ 0, cBR ].Y := originY - fh;
+  FramesCoord[ 0, cBR ].X := originX + fw*fcx;
+  FramesCoord[ 0, cBR ].Y := originY - fh*fcy;
 
   FramesCoord[ 0, cBL ].X := originX;
-  FramesCoord[ 0, cBL ].Y := originY - fh;
+  FramesCoord[ 0, cBL ].Y := originY - fh*fcy;
   if FrameCount = 1 then exit;
 
   i := 1;
