@@ -5,7 +5,7 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 # Support
 - Only 2D !
 - Use OpenGL 3.3 to render graphics.
-- Renderers with batch system to improve performance. Use of vertices and indices buffer.
+- Renderers with batch system to improve performance. Use vertex and index buffers.
 - Multi layers architecture.
 - Multi screens architecture to separates the different parts of the game.
 - Sprites and other kind of surface with self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
@@ -13,10 +13,9 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
 - All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
 - Messages system to synchronize surfaces between them.
+- Log file.
 - Particle engine and its tool 'Particles Editor' to make your own particle effects.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
-- Velocity curve applied to any value that can be changed in time, like coordinates, rotation, opacity, tint,...
-- Log file.  
   
 UI elements with customized colors
 ![UI elements with customized colors](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/UIElements.png)
