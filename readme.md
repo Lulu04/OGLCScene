@@ -5,10 +5,10 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 # Support
 - Only 2D !
 - Use OpenGL 3.3 to render graphics.
-- Renderers with batch system to improve performance.
+- Renderers with batch system to improve performance. Use of vertices and indices buffer.
 - Multi layers architecture.
 - Multi screens architecture to separates the different parts of the game.
-- Sprites and other kind of surface with self-managed effects like tint, opacity, moves, angle...
+- Sprites and other kind of surface with self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
 - UI with Button, Label, Image, Panel, CheckBox, RadioButton, ScrollBar, ProgressBar, ListBox, ScrollBox, TextArea.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
 - All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
