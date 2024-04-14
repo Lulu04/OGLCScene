@@ -1,4 +1,4 @@
-program Tile_Map_Designer;
+program TileMapDesigner;
 
 {$mode objfpc}{$H+}
 
