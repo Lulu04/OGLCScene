@@ -80,7 +80,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="19">
       <Unit0>
         <Filename Value="DeformationGrid.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -96,8 +96,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="65"/>
-        <CursorPos X="44" Y="82"/>
+        <CursorPos X="30" Y="15"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -117,8 +116,7 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="20"/>
-        <CursorPos Y="34"/>
+        <CursorPos X="24" Y="15"/>
         <UsageCount Value="54"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -218,8 +216,15 @@
         <CursorPos X="2" Y="224"/>
         <UsageCount Value="10"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="..\..\source\oglcDeformationGrid.inc"/>
+        <EditorIndex Value="4"/>
+        <CursorPos X="38" Y="24"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit18>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="89" Column="5" TopLine="63"/>
@@ -332,6 +337,10 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="82" Column="44" TopLine="65"/>
       </Position28>
+      <Position29>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="25" Column="23"/>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

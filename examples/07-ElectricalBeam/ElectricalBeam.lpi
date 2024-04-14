@@ -80,7 +80,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="19">
+    <Units Count="20">
       <Unit0>
         <Filename Value="ElectricalBeam.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -95,10 +95,8 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="54"/>
-        <CursorPos X="64" Y="60"/>
+        <CursorPos X="25" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -116,9 +114,10 @@
       <Unit3>
         <Filename Value="Units\screen_title.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="25"/>
-        <CursorPos X="34" Y="40"/>
+        <CursorPos X="23" Y="35"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -225,8 +224,16 @@
         <CursorPos X="71" Y="127"/>
         <UsageCount Value="10"/>
       </Unit18>
+      <Unit19>
+        <Filename Value="..\..\source\oglcElectricalFX.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="73"/>
+        <CursorPos X="59" Y="76"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit19>
     </Units>
-    <JumpHistory Count="27" HistoryIndex="26">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="82" Column="19" TopLine="59"/>
@@ -335,6 +342,10 @@
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="40" Column="15" TopLine="25"/>
       </Position27>
+      <Position28>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="35" Column="23" TopLine="25"/>
+      </Position28>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

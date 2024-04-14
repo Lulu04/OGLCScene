@@ -66,7 +66,7 @@ begin
 
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));
-  FtexShip := FAtlas.AddFromSVG(path+'SpaceShip.svg', Round(FScene.Width/8), -1);
+  FtexShip := FAtlas.AddFromSVG(path+'SpaceShip.svg', Round(FScene.Width/6), -1);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
@@ -97,20 +97,22 @@ begin
   inherited Update(AElapsedTime);
 
   // stars creation
-  FTimeAccu := FTimeAccu + AElapsedTime;
-  if FTimeAccu > 0.05 then begin
-    FTimeAccu := 0.0;
-    star := TStar.Create(FtexStar, False);  // creation of the sprite. False because texture is owned by the atlas.
-    FScene.Add(star, LAYER_MIDDLE);   // add the sprite instance to the scene
-    with star do begin
-      X.Value := Random(FScene.Width-star.Width);  // set a random horizontal coordinate
-      Y.Value := -star.Height;      // the star start from the top of the scene
-      zoom := 0.5 + Random*0.8;
-      Scale.Value := PointF(zoom, zoom);          // scale the sprite
-      Speed.y.Value := (100 + Random*50) * zoom;  // set the vertical speed
-      b := Random(192)+64;
-      Tint.Value := BGRA(b,b,50);                 // set the color
-      Angle.AddConstant(Random(180));             // add a rotation effect
+  if not FScene.Layer[LAYER_MIDDLE].Freeze then begin
+    FTimeAccu := FTimeAccu + AElapsedTime;
+    if FTimeAccu > 0.01 then begin
+      FTimeAccu := 0.0;
+      star := TStar.Create(FtexStar, False);  // creation of the sprite. False because texture is owned by the atlas.
+      FScene.Add(star, LAYER_MIDDLE);   // add the sprite instance to the scene
+      with star do begin
+        X.Value := Random(FScene.Width-star.Width);  // set a random horizontal coordinate
+        Y.Value := -star.Height;      // the star start from the top of the scene
+        zoom := 0.5 + Random*0.8;
+        Scale.Value := PointF(zoom, zoom);          // scale the sprite
+        Speed.y.Value := (100 + Random*50) * zoom;  // set the vertical speed
+        b := Random(192)+64;
+        Tint.Value := BGRA(b,b,50);                 // set the color
+        Angle.AddConstant(Random(180));             // add a rotation effect
+      end;
     end;
   end;
 end;
