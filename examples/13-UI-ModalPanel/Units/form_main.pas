@@ -42,6 +42,8 @@ uses screen_title;
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
   FScene := TOGLCScene.Create(OpenGLControl1, -1);
+  FScene.DesignPPI := 96;  // this project was made with a 96ppi monitor
+                           // This affect FScene.ScaleDesignToScene() method;
   FScene.LayerCount := LAYER_COUNT;
   FScene.CreateLogFile(Application.Location+'scene.log', True);
 

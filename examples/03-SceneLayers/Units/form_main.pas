@@ -6,21 +6,23 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls, StdCtrls,
-  BGRABitmap, BGRABitmapTypes,
-  OpenGLContext, OGLCScene,
-  u_common;
+  ComCtrls, BGRABitmap, BGRABitmapTypes, OpenGLContext, OGLCScene, u_common;
 
 type
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     Label1: TLabel;
+    Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     Timer1: TTimer;
+    TrackBar1: TTrackBar;
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -47,6 +49,8 @@ uses screen_title;
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
   FScene := TOGLCScene.Create(OpenGLControl1, -1);
+  FScene.DesignPPI := 96;  // this project was made with a 96ppi monitor
+                           // This affect FScene.ScaleDesignToScene() method;
   FScene.LayerCount := LAYER_COUNT;
   FScene.CreateLogFile(Application.Location+'scene.log', True);
 
@@ -80,10 +84,22 @@ end;
 procedure TFormMain.RadioButton1Change(Sender: TObject);
 begin
   if ScreenDemo = NIL then exit;
-  if RadioButton1.Checked then
-    FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_TOP)
-  else
-    FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_BACK);
+
+  if Sender is TRadioButton then begin
+    if RadioButton1.Checked then
+      FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_TOP)
+    else
+      FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_BACK);
+  end;
+
+  if Sender = TrackBar1 then begin
+    FScene.Layer[LAYER_MIDDLE].Opacity.Value := TrackBar1.Position;
+    Label2.Caption := 'Middle layer opacity '+TrackBar1.Position.ToString;
+  end;
+
+  if Sender = CheckBox1 then FScene.Layer[LAYER_MIDDLE].Freeze := CheckBox1.Checked;
+
+  if Sender = CheckBox2 then FScene.Layer[LAYER_MIDDLE].Visible := CheckBox2.Checked;
 end;
 
 procedure TFormMain.Timer1Timer(Sender: TObject);

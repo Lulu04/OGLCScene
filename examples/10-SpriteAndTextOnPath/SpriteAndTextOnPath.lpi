@@ -80,7 +80,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="24">
       <Unit0>
         <Filename Value="SpriteAndTextOnPath.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -96,8 +96,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="38"/>
-        <CursorPos X="24" Y="56"/>
+        <TopLine Value="19"/>
+        <CursorPos X="18" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -115,15 +115,14 @@
       <Unit3>
         <Filename Value="Units\screen_title.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="64"/>
-        <CursorPos X="34" Y="75"/>
+        <CursorPos X="31" Y="15"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Units\u_common.pas"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos Y="19"/>
         <UsageCount Value="23"/>
         <Loaded Value="True"/>
@@ -253,8 +252,16 @@
         <CursorPos X="75" Y="205"/>
         <UsageCount Value="11"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="141"/>
+        <CursorPos X="55" Y="156"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit23>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="88" Column="75" TopLine="80"/>
@@ -271,6 +278,10 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="92" Column="2" TopLine="77"/>
       </Position4>
+      <Position5>
+        <Filename Value="Units\screen_title.pas"/>
+        <Caret Line="24" Column="26"/>
+      </Position5>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

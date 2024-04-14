@@ -1,10 +1,10 @@
 object FormMain: TFormMain
   Left = 516
-  Height = 204
+  Height = 306
   Top = 190
   Width = 303
   Caption = 'Program name'
-  ClientHeight = 204
+  ClientHeight = 306
   ClientWidth = 303
   Color = clBlack
   DefaultMonitor = dmPrimary
@@ -26,11 +26,11 @@ object FormMain: TFormMain
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 152
-    Height = 192
+    Height = 280
     Top = 0
     Width = 151
     Anchors = [akTop, akRight]
-    ClientHeight = 192
+    ClientHeight = 280
     ClientWidth = 151
     Color = 14737632
     ParentColor = False
@@ -38,7 +38,7 @@ object FormMain: TFormMain
     object RadioButton1: TRadioButton
       Left = 7
       Height = 19
-      Top = 128
+      Top = 104
       Width = 135
       Caption = 'Ship is on LAYER_TOP'
       Checked = True
@@ -49,7 +49,7 @@ object FormMain: TFormMain
     object RadioButton2: TRadioButton
       Left = 7
       Height = 19
-      Top = 152
+      Top = 128
       Width = 143
       Caption = 'Ship is on LAYER_BACK'
       TabOrder = 0
@@ -67,6 +67,46 @@ object FormMain: TFormMain
       Caption = 'This scene have 3 layers: top, middle and back.'#13#10'On the middle there are the stars.'#13#10'We can switch the ship from the top or back layer.'
       ParentColor = False
       WordWrap = True
+    end
+    object Label2: TLabel
+      Left = 8
+      Height = 15
+      Top = 168
+      Width = 128
+      Caption = 'Middle layer opacity 255'
+      ParentColor = False
+    end
+    object TrackBar1: TTrackBar
+      Left = 8
+      Height = 24
+      Top = 192
+      Width = 136
+      Frequency = 20
+      Max = 255
+      OnChange = RadioButton1Change
+      Position = 255
+      ShowSelRange = False
+      TabOrder = 2
+    end
+    object CheckBox1: TCheckBox
+      Left = 7
+      Height = 19
+      Top = 226
+      Width = 121
+      Caption = 'Freeze middle layer'
+      OnChange = RadioButton1Change
+      TabOrder = 3
+    end
+    object CheckBox2: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 254
+      Width = 121
+      Caption = 'Middle layer visible'
+      Checked = True
+      OnChange = RadioButton1Change
+      State = cbChecked
+      TabOrder = 4
     end
   end
   object Timer1: TTimer
