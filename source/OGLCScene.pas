@@ -350,7 +350,7 @@ TOGLCScene = class(TOGLCContext)
   FRendererForPostProcessing: TOGLCRenderToTexture;
   FPostProcessingShader: TOGLCPostProcessingFX;   }
  public
-  // Aspect ratio can be any value >= 1.0 i.e 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
+  // Aspect ratio can be any value >= 1.0 ex. 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
   // and centered on its parent.
   // If you set aspect ratio to -1 the TOpenGLControl is resized to fit its parent client area.
   constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single=-1); override;
