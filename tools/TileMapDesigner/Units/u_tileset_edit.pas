@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, VelocityCurve,
+  OGLCScene,
   common;
 
 type
@@ -121,7 +121,7 @@ procedure SetViewOnTileSetEdit;
 procedure SetViewOnPatternList;
 
 implementation
-uses umaps, u_main, Controls,gl;
+uses umaps, u_main, Controls, glcorearb; //, gl;
 
 function WorkingPattern: TTiledPattern;
 begin
@@ -173,11 +173,11 @@ begin
 end;
 
 procedure TPatternList.FillTileEngineWithPatterns;
-var o: TGuiLabel;
+var o: TUILabel;
     p: TPoint;
 begin
- if Count=0 then begin
-   o:= FScene.Add_GuiLabel('Pattern''s list is empty', FTitleFont, NIL, Layer_Pattern);
+ if Count = 0 then begin
+   o := FScene.Add_UILabel('Pattern''s list is empty', FHintFont, Layer_Pattern);
    o.CenterOnScene;
    exit;
  end;
@@ -190,21 +190,21 @@ end;
 
 constructor TPatternList.Create;
 begin
- FTileEngine:= TTileEngine.Create;
- FScene.Add( FTileEngine, Layer_Pattern );
+ FTileEngine := TTileEngine.Create(FScene);
+ FScene.Add(FTileEngine, Layer_Pattern);
 // FTileEngine.SetTextureListFromAnotherTileEngine( MapList.MainMap.TileEngine );
- FTileEngine.ForceTheDrawingOfAllTheTiles:=TRUE;
+ FTileEngine.ForceTheDrawingOfAllTheTiles := TRUE;
  FTileEngine.MapHoleColor.Value := BGRA(0,0,0,0);
 
- FList:= TList.Create;
- FWorkingPattern:= TTiledPattern.Create;
+ FList := TList.Create;
+ FWorkingPattern := TTiledPattern.Create;
 end;
 
 destructor TPatternList.Destroy;
 begin
  Clear;
- FWorkingPattern.Free;
- FList.Free;
+ FreeAndNil(FWorkingPattern);
+ FreeAndNil(FList);
  inherited Destroy;
 end;
 
@@ -386,7 +386,8 @@ begin
  glLogicOp(GL_INVERT);
  for i:=0 to GetCount-1 do begin
   p:= GetTileCellByIndex(i)^.Pos;
-  DrawBox(p.x, p.y, w, h, BGRA(255,255,255,0), BGRA(255,255,255,100), 1.5 );
+  FillBox(FScene, p.x, p.y, w, h, BGRA(255,255,255,0));
+  DrawBox(FScene, p.x, p.y, w, h, BGRA(255,255,255,100), 1.5);
  end;
  glDisable(GL_COLOR_LOGIC_OP);
 end;
@@ -475,10 +476,10 @@ end;
 
 constructor TTilesetEdit.Create;
 begin
- FTileEngine:= TTileEngine.Create;
- FScene.Add( FTileEngine, Layer_WorkTileSet );
- FTileEngine.SetTextureListFromAnotherTileEngine( MapList.MainMap.TileEngine );
- FTileEngine.ForceTheDrawingOfAllTheTiles:=TRUE;
+ FTileEngine := TTileEngine.Create(FScene);
+ FScene.Add(FTileEngine, Layer_WorkTileSet);
+ FTileEngine.SetTextureListFromAnotherTileEngine(MapList.MainMap.TileEngine);
+ FTileEngine.ForceTheDrawingOfAllTheTiles := TRUE;
  FTileEngine.MapHoleColor.Value := BGRA(0,0,0,0);
 end;
 

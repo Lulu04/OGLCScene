@@ -118,7 +118,7 @@ object Form_Principale: TForm_Principale
           Left = 33
           Height = 15
           Top = 40
-          Width = 39
+          Width = 38
           Caption = 'Texture'
           ParentColor = False
         end
@@ -202,7 +202,7 @@ object Form_Principale: TForm_Principale
           Left = 26
           Height = 15
           Top = 136
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -304,7 +304,7 @@ object Form_Principale: TForm_Principale
           Left = 25
           Height = 15
           Top = 104
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -369,7 +369,7 @@ object Form_Principale: TForm_Principale
           Left = 17
           Height = 15
           Top = 8
-          Width = 42
+          Width = 41
           Caption = 'Velocity'
           ParentColor = False
         end
@@ -377,7 +377,7 @@ object Form_Principale: TForm_Principale
           Left = 196
           Height = 15
           Top = 8
-          Width = 43
+          Width = 44
           Caption = '0 px/sec'
           ParentColor = False
         end
@@ -397,7 +397,7 @@ object Form_Principale: TForm_Principale
           Left = 18
           Height = 15
           Top = 57
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -405,7 +405,7 @@ object Form_Principale: TForm_Principale
           Left = 196
           Height = 15
           Top = 57
-          Width = 43
+          Width = 44
           Caption = '0 px/sec'
           ParentColor = False
         end
@@ -425,7 +425,7 @@ object Form_Principale: TForm_Principale
           Left = 312
           Height = 19
           Top = 1
-          Width = 31
+          Width = 32
           Caption = 'x1'
           Checked = True
           OnChange = TBParticleVelocityChange
@@ -436,7 +436,7 @@ object Form_Principale: TForm_Principale
           Left = 360
           Height = 19
           Top = 1
-          Width = 31
+          Width = 32
           Caption = 'x2'
           OnChange = TBParticleVelocityChange
           TabOrder = 2
@@ -445,7 +445,7 @@ object Form_Principale: TForm_Principale
           Left = 408
           Height = 19
           Top = 1
-          Width = 31
+          Width = 32
           Caption = 'x5'
           OnChange = TBParticleVelocityChange
           TabOrder = 4
@@ -454,7 +454,7 @@ object Form_Principale: TForm_Principale
           Left = 456
           Height = 19
           Top = 1
-          Width = 37
+          Width = 38
           Caption = 'x10'
           OnChange = TBParticleVelocityChange
           TabOrder = 5
@@ -509,7 +509,7 @@ object Form_Principale: TForm_Principale
           Left = 18
           Height = 15
           Top = 57
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -604,7 +604,7 @@ object Form_Principale: TForm_Principale
           Left = 904
           Height = 15
           Top = 8
-          Width = 44
+          Width = 45
           Caption = '32 pixels'
           ParentColor = False
         end
@@ -625,7 +625,7 @@ object Form_Principale: TForm_Principale
           Left = 8
           Height = 15
           Top = 48
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -633,7 +633,7 @@ object Form_Principale: TForm_Principale
           Left = 904
           Height = 15
           Top = 48
-          Width = 33
+          Width = 34
           Caption = '0 pixel'
           ParentColor = False
         end
@@ -708,7 +708,7 @@ object Form_Principale: TForm_Principale
           Left = 18
           Height = 15
           Top = 57
-          Width = 47
+          Width = 46
           Caption = 'Variation'
           ParentColor = False
         end
@@ -934,7 +934,7 @@ object Form_Principale: TForm_Principale
               Left = 16
               Height = 15
               Top = 96
-              Width = 26
+              Width = 24
               Caption = 'Type'
               ParentColor = False
             end
@@ -1066,7 +1066,7 @@ object Form_Principale: TForm_Principale
               Left = 248
               Height = 15
               Top = 280
-              Width = 34
+              Width = 35
               Caption = 'px/sec'
               ParentColor = False
             end
@@ -1092,7 +1092,7 @@ object Form_Principale: TForm_Principale
               Left = 168
               Height = 12
               Top = 264
-              Width = 30
+              Width = 29
               Caption = 'Vertical'
               Font.Height = -9
               ParentColor = False
@@ -1426,7 +1426,7 @@ object Form_Principale: TForm_Principale
             Left = 120
             Height = 15
             Top = 136
-            Width = 20
+            Width = 21
             Caption = 'x1.0'
             ParentColor = False
           end

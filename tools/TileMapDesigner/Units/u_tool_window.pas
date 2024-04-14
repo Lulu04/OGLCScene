@@ -10,7 +10,6 @@ uses
   StdCtrls, ExtCtrls, Menus, Spin, ComCtrls, CheckLst, Arrow,
   BGRABitmap, BGRABitmapTypes,
   common,
-  VelocityCurve,
   tileset_manager,
   uAskTileSize,
   uabout,
@@ -579,31 +578,31 @@ end;
 // Help button click page 'Setting'
 procedure TForm_Tools.SBHelp1Click(Sender: TObject);
 begin
- Showmessage('Tile Map Designer offer the possibility to create maps with multiple layer.'+lineending+
+ Showmessage('Tile Map Designer offer the possibility to create maps with multiple layers.'+lineending+
              'A session file groups all the informations to organize the layers in your map.'+lineending+
              'Each layer data is saved in a separate file with the name of its layer plus ''.map'' extension.'+lineending+
              'It is at your charge to put all the tilesets used in the same folder.'+lineending+lineending+
 
-             'MAP SIZE -> reflect the size in tile of your project. Click ''Set size'' button to change it.'+lineending+
+             'MAP SIZE -> reflect the size in tiles of your project. Click ''Set size'' button to change it.'+lineending+
              '            All layers will be affected.'+lineending+lineending+
              'HOLE COLOR -> A colored square will be drawn if there isn''t specified tile in a cell of your map.'+lineending+
              '        You can set the color of your choice here.'+lineending+
              '        Set the opacity less than 255 for transparency.'+lineending+
              '        All layers will be affected.'+lineending+lineending+
-             'VIEW SIZE IN GAME -> Here you can set the size of the rectangular surface where the map will be display'+lineending+
-             '                     This size can be in tiles or in pixels count.'+lineending+
-             'Use TTileEngine.SetViewSize method to change it at running time in your game application.'+lineending+
+             'VIEW SIZE IN GAME -> Here you can set the size of the rectangular surface where the map will be displayed'+lineending+
+             '                     This size can be in tiles or in pixels.'+lineending+
+             'Use TTileEngine.SetViewSize method to change it at running time in your game/application.'+lineending+
              lineending+
              'START GAME ON TILE -> This is the row and column indexes of the top left tile'+lineending+
              '        where your game will start on. You can set this by RIGHT CLICK'+lineending+
-             '        on render window.'+lineending+
+             '        on a tile.'+lineending+
              lineending+
              'SCROLLING -> You can enable or not the horizontal and vertical scrolling individualy for each map''s layer.'+lineending+
-             'LOOP -> Checked means your map repeat itself infinitely on both axis.'+lineending+
+             'LOOP -> Checked means your map repeat itself indefinitely on both axis.'+lineending+
              ' If not checked, map position will be bounded by map size.'+lineending+
              ' If checked, map position can be greater than map size, and tiles will be repeated from the beginning.'+lineending+
              ' Use TTileEngine.HScrollEnable, TTileEngine.VScrollEnable, TTileEngine.HLoopMode'+lineending+
-             ' and TTileEngine.VLoopMode property to change these options at running time in your game application.');
+             ' and TTileEngine.VLoopMode property to change these options at running time in your game/application.');
 end;
 
 // Help button click Tileset
@@ -623,7 +622,7 @@ begin
              'RIGHT CLICK -> Tileset contextual menu'+lineending+
              '  - GROUND TYPE -> Open a window where you can manage the tile''s ground type.'+lineending+
              '  - COPY GROUND TYPE TO CLIPBOARD -> Copy the ground types list in clipboard, so you can'+lineending+
-             '    paste them under Lazarus, in your Pascal game application.' );
+             '    paste them in your game/application.' );
 
 end;
 

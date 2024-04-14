@@ -7,21 +7,22 @@ interface
 uses
   Classes, SysUtils, Controls, LCLType, Graphics,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, VelocityCurve,
+  OGLCScene,
   common;
 
 type
 
 { TScreenMap }
 
-TScreenMap = class( TStageSkeleton )
+TScreenMap = class(TScreenTemplate)
 private
+  FAtlas: TOGLCTextureAtlas;
   TexGrid: PTexture;
   FGrid: TSprite;
 public
-  procedure LoadData; override;
-  procedure FreeData; override;
-  procedure Update( {%H-}AElapsedTime: single ); override;
+  procedure CreateObjects; override;
+  procedure FreeObjects; override;
+  procedure Update(const{%H-}AElapsedTime: single ); override;
 end;
 
 var ScreenMap: TScreenMap = NIL;
@@ -32,77 +33,91 @@ uses umaps;
 { TScreenMap }
 
 
-procedure TScreenMap.LoadData;
-var o: TGUILabel;
-  FImaGrid : TBGRABitmap;
+procedure TScreenMap.CreateObjects;
+var o: TSprite;
+  ima : TBGRABitmap;
+  margin: integer;
+  fd: TFontDescriptor;
 begin
-  FTitleFont := GuiFont( 'Arial', 32, [], BGRA(0,255,100), BGRA(20,100,50), 1, BGRA(0,0,0,0), 0, 0, 0 );
+  FAtlas := FScene.CreateAtlas;
+  FAtlas.Spacing := 1;
 
-  FEventFont:= FontManager.AddFont(GuiFont( 'Arial', 9, [fsBold], BGRA(200,200,200), BGRA(200,200,200,0), 0, BGRA(0,0,0,0), 0, 0, 0));
-  FHintFont:= FontManager.AddFont(GuiFont( 'Tahoma', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5 ));
+  fd.Create('Arial', 9, [fsBold], BGRA(200,200,200));
+  FEventFont:= FAtlas.AddTexturedFont(fd, ASCII_SYMBOL_CHARSET+SIMPLELATIN_CHARSET);
 
-  FLabelMapPosition:=TFreeText.Create;
-  FLabelMapPosition.TexturedFont:=FHintFont;
-  FLabelMapPosition.Caption:='Map position:';
-  FLabelMapPosition.SetCoordinate(0,30);
-  FScene.add( FLabelMapPosition, Layer_InfoMap );
+  fd.Create('Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
+  FHintFont:= FAtlas.AddTexturedFont(fd, ASCII_SYMBOL_CHARSET+SIMPLELATIN_CHARSET);
 
-  o := TGUILabel.Create('T I L E    M A P    D E S I G N E R', FTitleFont );
-  o.SetCenterCoordinate( FScene.Width/2, FScene.Height/2 );
-  FScene.Add( o, Layer_InfoMap );
-  o.Opacity.ChangeTo( 0, 5, idcStartSlowEndFast );
-  o.Scale.ChangeTo( PointF(1.2,1.2), 6 );
-  o.KillDefered( 5 );
+  ima := TBGRABitmap.Create(FScene.Width, FScene.Height);
+  ima.Fill(FImageBackGround);
+  TexGrid := FAtlas.Add(ima);
 
-  FLabelTileIndexes := TFreeText.Create;
-  FLabelTileIndexes.TexturedFont:=FHintFont;
-  FLabelTileIndexes.Caption:='Tile:';
-  FScene.add( FLabelTileIndexes, Layer_InfoMap );
-  FLabelTileIndexes.SetCoordinate( 0, FLabelMapPosition.BottomY+5 );
+  FAtlas.TryToPack;
+  FAtlas.Build;
 
-  FLabelSelectionInfo := TFreeText.Create;
-  FLabelSelectionInfo.TexturedFont:=FHintFont;
-  FLabelSelectionInfo.Caption:='Sel:';
-  FScene.add( FLabelSelectionInfo, Layer_InfoMap );
-  FLabelSelectionInfo.SetCoordinate( 0, FLabelTileIndexes.BottomY+5 );
+  FLabelMapPosition := TFreeText.Create(FScene);
+  FLabelMapPosition.TexturedFont := FHintFont;
+  FLabelMapPosition.Caption := 'Map position:';
+  FLabelMapPosition.SetCoordinate(0, 30);
+  FScene.add(FLabelMapPosition, Layer_InfoMap);
 
-  FLabelGroundType := TFreeText.Create;
-  FLabelGroundType.TexturedFont:=FHintFont;
+  // title
+  fd.Create('Arial', FScene.ScaleDesignToScene(40), [fsBold], BGRA(255,255,100));
+  o := TSprite.Create(FScene, fd, 'T I L E    M A P    D E S I G N E R');
+  FScene.Add(o, Layer_InfoMap);
+  o.CenterOnScene;
+  o.Opacity.ChangeTo(0, 5, idcStartSlowEndFast);
+  o.Scale.ChangeTo(PointF(1.2, 1.2), 6);
+  o.KillDefered(5);
+
+  margin := FScene.ScaleDesignToScene(5);
+
+  FLabelTileIndexes := TFreeText.Create(FScene);
+  FLabelTileIndexes.TexturedFont := FHintFont;
+  FLabelTileIndexes.Caption := 'Tile:';
+  FScene.Add(FLabelTileIndexes, Layer_InfoMap);
+  FLabelTileIndexes.SetCoordinate(0, FLabelMapPosition.BottomY+margin);
+
+  FLabelSelectionInfo := TFreeText.Create(FScene);
+  FLabelSelectionInfo.TexturedFont := FHintFont;
+  FLabelSelectionInfo.Caption := 'Sel:';
+  FScene.add(FLabelSelectionInfo, Layer_InfoMap);
+  FLabelSelectionInfo.SetCoordinate(0, FLabelTileIndexes.BottomY+margin);
+
+  FLabelGroundType := TFreeText.Create(FScene);
+  FLabelGroundType.TexturedFont := FHintFont;
   FLabelGroundType.Caption := 'Ground:';
-  FLabelGroundType.SetCoordinate( 0, FLabelSelectionInfo.BottomY+5 );
-  FScene.Add( FLabelGroundType, Layer_InfoMap );
+  FLabelGroundType.SetCoordinate(0, FLabelSelectionInfo.BottomY+margin);
+  FScene.Add(FLabelGroundType, Layer_InfoMap);
 
-  FLabelEventName := TFreeText.Create;
-  FLabelEventName.TexturedFont:=FHintFont;
+  FLabelEventName := TFreeText.Create(FScene);
+  FLabelEventName.TexturedFont := FHintFont;
   FLabelEventName.Caption := 'Event:';
-  FLabelEventName.SetCoordinate( 0, FLabelGroundType.BottomY+5 );
-  FScene.Add( FLabelEventName, Layer_InfoMap );
+  FLabelEventName.SetCoordinate(0, FLabelGroundType.BottomY+margin);
+  FScene.Add(FLabelEventName, Layer_InfoMap);
 
-  FLabelDebug := TFreeText.Create;
-  FLabelDebug.TexturedFont:=FEventFont;
+  FLabelDebug := TFreeText.Create(FScene);
+  FLabelDebug.TexturedFont := FEventFont;
   FLabelDebug.Caption := 'Debug';
-  FLabelDebug.SetCoordinate( 0, FScene.Height-FLabelDebug.Height );
-  FScene.Add( FLabelDebug, Layer_InfoMap );
+  FLabelDebug.SetCoordinate(0, FScene.Height-FLabelDebug.Height);
+  FScene.Add(FLabelDebug, Layer_InfoMap);
 
-  FImaGrid := TBGRABitmap.Create( FScene.Width, FScene.Height );
-  FImaGrid.Fill( FImageBackGround );
-  TexGrid := TextureManager.Add( FImaGrid );
-  FImaGrid.free;
-  FGrid := TSprite.create( TexGrid );
-  FGrid.SetCoordinate( 0, 0 );
+  FGrid := TSprite.create(TexGrid);
+  FGrid.SetCoordinate(0, 0);
   FGrid.Opacity.Value := 150;
-  FScene.Add( FGrid, Layer_Grid );
+  FScene.Add(FGrid, Layer_Grid);
 
-  FReady:=TRUE;
+  FReady := TRUE;
 end;
 
-procedure TScreenMap.FreeData;
+procedure TScreenMap.FreeObjects;
 begin
   FScene.OnAfterPaint := NIL;
   FScene.ClearAllLayer;
+  FreeAndNil(FAtlas);
 end;
 
-procedure TScreenMap.Update(AElapsedTime: single);
+procedure TScreenMap.Update(const AElapsedTime: single);
 begin
 
   FLabelDebug.Caption := 'TileEngine: ('+inttostr(round(MapList.MainMap.TileEngine.X.Value))+','+inttostr(round(MapList.MainMap.TileEngine.Y.Value))+')    '+
