@@ -29,7 +29,6 @@ type
     Arrow1: TArrow;
     Arrow2: TArrow;
     Button1: TButton;
-    Button10: TButton;
     Button11: TButton;
     Button2: TButton;
     Button4: TButton;
@@ -37,7 +36,6 @@ type
     Button6: TButton;
     Button7: TButton;
     Button8: TButton;
-    Button9: TButton;
     CB1: TComboBox;
     CB2: TCheckBox;
     CB3: TCheckBox;
@@ -47,6 +45,7 @@ type
     CheckBox1: TCheckBox;
     CLBLayer: TCheckListBox;
     ColorButton1: TColorButton;
+    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -76,9 +75,11 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LBJeux: TListBox;
-    ListBox1: TListBox;
     MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
+    MILoadSession: TMenuItem;
+    MISaveSession: TMenuItem;
     Menu_ExportGroundType: TMenuItem;
     Menu_ClearAllMap: TMenuItem;
     MenuItem2: TMenuItem;
@@ -113,7 +114,6 @@ type
     pageLayer: TTabSheet;
     procedure Arrow1Click(Sender: TObject);
     procedure Arrow2Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
     procedure Button11Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -122,7 +122,6 @@ type
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
     procedure CB1Change(Sender: TObject);
     procedure CB4Change(Sender: TObject);
     procedure CB5Change(Sender: TObject);
@@ -136,6 +135,8 @@ type
     procedure MenuItem9Click(Sender: TObject);
     procedure Menu_ClearAllMapClick(Sender: TObject);
     procedure Menu_ExportGroundTypeClick(Sender: TObject);
+    procedure MILoadSessionClick(Sender: TObject);
+    procedure MISaveSessionClick(Sender: TObject);
     procedure Panel2Click(Sender: TObject);
     procedure PB1MouseDown(Sender: TObject; {%H-}Button: TMouseButton;
       {%H-}Shift: TShiftState; X, Y: Integer);
@@ -306,21 +307,6 @@ begin
   MapList.DeleteMap;
 end;
 
-// load project
-procedure TForm_Tools.Button9Click(Sender: TObject);
-var mr: TModalResult;
-begin
-  if FProjectIsModified then
-  begin
-    mr := MessageDlg('', 'Before load, do you want to save the current(s) map(s) ?', mtWarning, [mbYes, mbNo, mbCancel],0);
-   if mr = mrCancel then exit;
-   if mr = mrYes then MapList.SaveSession;
-   FProjectIsModified := FALSE;
-  end;
-
-  MapList.LoadSession;
-end;
-
 // tileset choice
 procedure TForm_Tools.CB1Change(Sender: TObject);
 begin
@@ -427,12 +413,6 @@ begin
   MapList.ShiftMapDown;
 end;
 
-// save project
-procedure TForm_Tools.Button10Click(Sender: TObject);
-begin
-  MapList.SaveSession;
-end;
-
 // rename a map layer
 procedure TForm_Tools.Button11Click(Sender: TObject);
 begin
@@ -471,6 +451,25 @@ end;
 procedure TForm_Tools.Menu_ExportGroundTypeClick(Sender: TObject);
 begin
   Form_ExportGroundType.ShowModal;
+end;
+
+procedure TForm_Tools.MILoadSessionClick(Sender: TObject);
+var mr: TModalResult;
+begin
+  if FProjectIsModified then
+  begin
+    mr := MessageDlg('', 'Before load, do you want to save the current(s) map(s) ?', mtWarning, [mbYes, mbNo, mbCancel],0);
+   if mr = mrCancel then exit;
+   if mr = mrYes then MapList.SaveSession;
+   FProjectIsModified := FALSE;
+  end;
+
+  MapList.LoadSession;
+end;
+
+procedure TForm_Tools.MISaveSessionClick(Sender: TObject);
+begin
+  MapList.SaveSession;
 end;
 
 procedure TForm_Tools.Panel2Click(Sender: TObject);

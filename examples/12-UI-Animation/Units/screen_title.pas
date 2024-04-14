@@ -103,6 +103,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // ship creation
   FShip := TSprite.Create(FtexShip, False);
@@ -139,7 +141,7 @@ begin
 
   // stars creation
   FTimeAccu := FTimeAccu + AElapsedTime;
-  if FTimeAccu > 0.05 then begin
+  if FTimeAccu > 0.01 then begin
     FTimeAccu := 0.0;
     star := TStar.Create(FtexStar, False);  // creation of the sprite. False because texture is owned by the atlas.
     FScene.Add(star, LAYER_STARS);   // add the sprite instance to the scene

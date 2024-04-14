@@ -60,6 +60,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // creation of the main sprite: helicopter body
   FHelicopterBody := TSprite.Create(FtexHelicopterBody, False); // the owner of the texture is the atlas

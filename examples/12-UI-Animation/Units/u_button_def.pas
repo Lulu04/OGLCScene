@@ -40,7 +40,7 @@ begin
   AutoSize := False;
   BodyShape.SetShapeRoundRect(Round(Fscene.Width/5), Round(aFont.Font.FontHeight*1.5), 10, 10, 3);
   BodyShape.Border.Color := BGRA(64,128,255);
-  BodyShape.Fill.Color := BGRA(30,30,30,150);
+  BodyShape.Fill.Color := BGRA(30,30,130,150);
   SetCenterCoordinate(aX , aY);
 
   // define the callbacks for animations

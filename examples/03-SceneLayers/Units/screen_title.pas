@@ -76,6 +76,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // ship creation
   FShip := TSprite.Create(FtexShip, False);

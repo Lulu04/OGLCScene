@@ -83,7 +83,6 @@ type
     SpeedButton5: TSpeedButton;
     ToggleBox1: TToggleBox;
     procedure ComboBox1Change(Sender: TObject);
-    procedure FormClose(Sender: TObject; var {%H-}CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -110,6 +109,7 @@ type
     procedure SBHelp3Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton2Click(Sender: TObject);
+    procedure SpeedButton3Click(Sender: TObject);
     procedure SpeedButton5Click(Sender: TObject);
   private
     FCoorBeginLeftClick,
@@ -159,8 +159,7 @@ implementation
 uses u_tool_window,
      uAskGroundType,
      umaps, u_tileset_edit,
-     u_tool_minimap,
-     u_tool_layer,
+     u_tool_layer, u_tool_minimap,
      Clipbrd;
 {$R *.lfm}
 
@@ -191,12 +190,6 @@ begin
   FProjectIsModified := FALSE;
  end;
  CanClose:=TRUE;
-end;
-
-procedure TForm_Main.FormClose(Sender: TObject; var CloseAction: TCloseAction);
-begin
- FScene.ColorFadeIn(BGRABlack,0.5);
- FScene.ExecuteDuring(0.5);
 end;
 
 // user change the view
@@ -250,6 +243,8 @@ begin
  // we don't use Panel2.Align:=alTop because the clientRect is modified by LCL...
  Panel2.SetBounds(0,0,ClientWidth,Panel2.Height);
 
+ Form_Tools.Left := Width - Form_Tools.Width;
+ Form_Tools.Top := Panel5.Height;
  Form_Tools.Show;
 end;
 
@@ -826,6 +821,13 @@ begin
  MapList.SaveSession;
 end;
 
+procedure TForm_Main.SpeedButton3Click(Sender: TObject);
+begin
+ if Form_Minimap = NIL then exit;
+ if Form_Minimap.Visible then Form_Minimap.Hide
+   else Form_Minimap.Show;
+end;
+
 //
 procedure TForm_Main.SpeedButton5Click(Sender: TObject);
 begin
@@ -835,6 +837,8 @@ end;
 
 function TForm_Main.XYCoorIsInMap(AX, AY: integer): boolean;
 begin
+ if FWorkingTileEngine = NIL then exit(False);
+
  with FWorkingTileEngine do
  Result := ( AX >= X.Value ) and ( AX < X.Value + Width ) and
            ( AY >= Y.Value ) and ( AY < Y.Value + Height );
@@ -960,6 +964,8 @@ procedure TForm_Main.DoPaintMap;
 var p1, p2: TPoint;
 begin
  if MapList.Count = 0 then exit;
+ if FWorkingTileEngine = NIL then exit;
+
  if ( FWorkingTileEngine.TileSize.cx = 0 ) or ( FWorkingTileEngine.TileSize.cy = 0 ) then exit;
 
  FScene.BlendMode := FX_BLEND_NORMAL;

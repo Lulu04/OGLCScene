@@ -55,7 +55,7 @@ begin
   aButton.OnClick := @ProcessButtonClick;
   aButton._Label.Tint.Value := BGRA(255,255,150);
   aButton.BodyShape.SetShapeRoundRect(20, 20, PPIScale(8), PPIScale(8), PPIScale(2));
-  aButton.BodyShape.Fill.Color := BGRA(0,0,0);
+  aButton.BodyShape.Fill.Color := BGRA(20,20,100);
   aButton.BodyShape.Fill.CenterColor := BGRA(30,30,30);
 end;
 
@@ -67,7 +67,6 @@ begin
   if Sender = BExitGame then begin
     Hide;
     FormMain.Close;
-    //FScene.RunScreen(ScreenMap);
   end;
 end;
 
@@ -88,7 +87,7 @@ begin
 
   title := TUILabel.Create(FScene, 'game paused', aFont);
   AddChild(title);
-  title.Tint.Value := BGRA(220,220,220);
+  title.Tint.Value := BGRA(200,200,255);
   title.Blink(-1, 0.5, 0.5);
   title.AnchorPosToSurface(BResumeGame, haCenter, haCenter, 0, vaBottom, vaTop, -VMargin);
 

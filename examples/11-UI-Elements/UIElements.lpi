@@ -95,7 +95,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="21" Y="13"/>
         <UsageCount Value="200"/>
@@ -115,8 +114,9 @@
       <Unit3>
         <Filename Value="Units\screen_title.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="24" Y="15"/>
+        <CursorPos X="44" Y="17"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit3>

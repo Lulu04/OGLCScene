@@ -74,6 +74,8 @@ begin
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // now, the textures are ready, we can create the text objects
   FTitle := TFreeText.Create(FScene);

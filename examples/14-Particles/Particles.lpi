@@ -80,7 +80,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="20">
+    <Units Count="21">
       <Unit0>
         <Filename Value="Particles.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -95,7 +95,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="37"/>
         <CursorPos Y="50"/>
@@ -116,9 +115,9 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="134"/>
-        <CursorPos X="113" Y="150"/>
+        <CursorPos X="40" Y="15"/>
         <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -233,8 +232,16 @@
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="..\..\source\oglcParticle.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="161"/>
+        <CursorPos X="54" Y="175"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit20>
     </Units>
-    <JumpHistory Count="27" HistoryIndex="26">
+    <JumpHistory Count="28" HistoryIndex="27">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="45" Column="16" TopLine="23"/>
@@ -343,6 +350,10 @@
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="230" Column="18" TopLine="216"/>
       </Position27>
+      <Position28>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="155" Column="24" TopLine="134"/>
+      </Position28>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

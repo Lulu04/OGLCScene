@@ -13,6 +13,8 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     Label1: TLabel;
     Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
@@ -92,6 +94,10 @@ begin
 
   if Sender = TrackBar2 then
     ScreenDemo.TextOnPath.CoeffPositionOnPath := TrackBar2.Position*0.01;
+
+  if Sender = CheckBox1 then ScreenDemo.SpriteOnPath.AutoRotate := CheckBox1.Checked;
+
+  if Sender = CheckBox2 then ScreenDemo.TextOnPath.AutoRotate := CheckBox2.Checked;
 end;
 
 procedure TFormMain.LoadCommonData;

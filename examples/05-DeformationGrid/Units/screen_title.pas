@@ -64,6 +64,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   margin := FScene.Height/20;
   yy := margin;

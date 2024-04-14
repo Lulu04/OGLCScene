@@ -121,6 +121,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // creation of the colored square
   coloredSquare := TMultiColorRectangle.Create(Round(FScene.Width*0.5), FScene.Height);
