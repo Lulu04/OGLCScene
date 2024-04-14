@@ -1,5 +1,5 @@
 # OGLCScene
-2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS.  
+2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS compatible with OpenGL 3.3.  
 # Dependencies
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
 # Support
