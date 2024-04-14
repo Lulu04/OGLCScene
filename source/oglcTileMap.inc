@@ -1221,8 +1221,8 @@ begin
   FWidth := Max(1, AWidth);
   FHeight := Max(1, AHeight);
 
-  if FRenderToTexture <> NIL then FRenderToTexture.Free;
-  FRenderToTexture := TOGLCRenderToTexture.Create(FParentScene, FWidth, FHeight, 1);
+  if FRenderToTexture <> NIL then FreeAndNil(FRenderToTexture);
+  //FRenderToTexture := TOGLCRenderToTexture.Create(FParentScene, FWidth, FHeight, 1);
 end;
 
 function TTileEngine.GetFirstTileColumnIndex: integer;
