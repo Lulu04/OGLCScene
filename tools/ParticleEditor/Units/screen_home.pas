@@ -55,7 +55,7 @@ begin
 
   if DrawEmitterShape then begin
     FScene.TexMan.UnbindTexture;
-    SetBlendMode(FX_BLEND_NORMAL);
+    FScene.BlendMode := FX_BLEND_NORMAL;
     p := PointF(0,0); //GetXY;
     c := BGRA(255,0,0);
     case EmitterType of

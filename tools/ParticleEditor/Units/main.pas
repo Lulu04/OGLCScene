@@ -418,7 +418,7 @@ end;
 
 procedure TForm_Principale.CheckBox2Change(Sender: TObject);
 begin
-  PE.ParticlesPositionsRelativeToEmitterPosition := CheckBox2.Checked;
+  PE.ParticlesPosRelativeToEmitterPos := CheckBox2.Checked;
   SetWindowTitle(True);
 end;
 
@@ -560,7 +560,7 @@ begin
   end;
 
   s.Add('P_ParticlesPositionsRelativeToEmitterPosition');
-  if PE.ParticlesPositionsRelativeToEmitterPosition
+  if PE.ParticlesPosRelativeToEmitterPos
     then s.Add('TRUE')
     else s.Add('FALSE');
 
