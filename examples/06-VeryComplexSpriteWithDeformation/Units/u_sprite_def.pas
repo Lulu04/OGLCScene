@@ -98,6 +98,7 @@ public
   Face: TLRFace;
   RightArm, LeftArm, RightLeg, LeftLeg: TSprite;
   constructor Create;
+  procedure ProcessMessage({%H-}UserValue: TUserMessageValue); override;
   procedure ToogleFlipH;
   procedure SetFlipH(AValue: boolean);
   procedure ToogleFlipV;
@@ -110,7 +111,6 @@ end;
 
 procedure LoadLRFaceTextures(aAtlas: TOGLCTextureAtlas);
 procedure LoadLRFrontViewTextures(aAtlas: TOGLCTextureAtlas);
-function PathToSVGFiles: string;
 
 // The design of the character is done with Inkscape on a working page with size of 1024x768  (aspect ratio 4/3)
 // To keep proportion on a screen with different resolution (or PPI) wa have to scale the size of our sprites.
@@ -168,11 +168,6 @@ begin
   texLRFrontViewLeftLeg := aAtlas.AddFromSVG(path+'LeftLeg.svg', ScaleW(20), -1);
   texLRFrontViewRightLeg := aAtlas.AddFromSVG(path+'RightLeg.svg', ScaleW(20), -1);
   texLRFrontViewBasket := aAtlas.AddFromSVG(path+'Basket.svg', ScaleW(26), -1);
-end;
-
-function PathToSVGFiles: string;
-begin
-
 end;
 
 function ScaleW(AValue: integer): integer;
@@ -407,7 +402,7 @@ begin
 
   LeftArm := TSprite.Create(texLRFrontViewLeftArm, False);
   FDress.AddChild(LeftArm, 1);
-  LeftArm.SetCoordinate(FDress.Width*0.5, FDress.Height*0.25);
+  LeftArm.SetCoordinate(FDress.Width*0.5, FDress.Height*0.22);
   LeftArm.Pivot := PointF(0.8, 0.1);
   LeftArm.ApplySymmetryWhenFlip := True;
 
@@ -421,6 +416,22 @@ begin
   FDress.AddChild(FBasket, 0);
   FBasket.SetCoordinate(FDress.Width*0.25, FDress.Height*0.6);
   FBasket.ApplySymmetryWhenFlip := True;
+
+  PostMessage(0, 4.0); // start left arm anim
+end;
+
+procedure TLRFrontView.ProcessMessage(UserValue: TUserMessageValue);
+begin
+  case UserValue of
+    0: begin
+      LeftArm.Angle.ChangeTo(-Random(7)-1, 1.0, idcSinusoid);
+      PostMessage(1, 2.0+Random*1);
+    end;
+    1: begin
+      LeftArm.Angle.ChangeTo(0, 1.0, idcSinusoid);
+      PostMessage(0, 2.0+Random*4);
+    end;
+  end;
 end;
 
 procedure TLRFrontView.ToogleFlipH;
