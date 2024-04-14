@@ -7,7 +7,7 @@
       <Flags>
         <CompatibilityMode Value="True"/>
       </Flags>
-      <Title Value="TileMap"/>
+      <Title Value="TileEngine"/>
       <ResourceType Value="res"/>
     </General>
     <i18n>
@@ -28,7 +28,7 @@
           <Version Value="11"/>
           <PathDelim Value="\"/>
           <Target>
-            <Filename Value="TileMap"/>
+            <Filename Value="TileEngine"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -80,9 +80,9 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="28">
+    <Units Count="29">
       <Unit0>
-        <Filename Value="TileMap.lpr"/>
+        <Filename Value="TileEngine.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos X="32" Y="14"/>
@@ -96,8 +96,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="5"/>
-        <CursorPos X="36" Y="14"/>
+        <CursorPos X="25" Y="12"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -117,7 +116,7 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="27" Y="15"/>
+        <CursorPos X="26" Y="15"/>
         <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -232,11 +231,10 @@
       </Unit19>
       <Unit20>
         <Filename Value="..\..\source\oglcTileMap.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="24" Y="70"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit20>
       <Unit21>
         <Filename Value="..\..\source\oglcSurface.inc"/>
@@ -288,8 +286,16 @@
         <CursorPos X="3" Y="212"/>
         <UsageCount Value="10"/>
       </Unit27>
+      <Unit28>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="85"/>
+        <CursorPos X="49" Y="100"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit28>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="63" TopLine="51"/>
@@ -310,13 +316,17 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="80" Column="54" TopLine="68"/>
       </Position5>
+      <Position6>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="22" Column="15"/>
+      </Position6>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="TileMap"/>
+      <Filename Value="TileEngine"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
