@@ -96,8 +96,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="19"/>
-        <CursorPos X="18" Y="13"/>
+        <CursorPos X="34" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -117,7 +116,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="31" Y="15"/>
+        <TopLine Value="5"/>
+        <CursorPos X="50" Y="16"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -255,13 +255,13 @@
       <Unit23>
         <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="141"/>
-        <CursorPos X="55" Y="156"/>
+        <TopLine Value="193"/>
+        <CursorPos Y="206"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit23>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="88" Column="75" TopLine="80"/>
@@ -282,6 +282,18 @@
         <Filename Value="Units\screen_title.pas"/>
         <Caret Line="24" Column="26"/>
       </Position5>
+      <Position6>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="13" Column="18" TopLine="20"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="97" Column="85" TopLine="87"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="98" Column="85" TopLine="88"/>
+      </Position8>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

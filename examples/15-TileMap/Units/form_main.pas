@@ -80,7 +80,7 @@ end;
 
 procedure TFormMain.Timer1Timer(Sender: TObject);
 begin
-  Caption := Format('OGLCScene - Scene layers   -   (%d,%d) - %d FPS  -  %d sprites',
+  Caption := Format('OGLCScene - Tile engine   -   (%d,%d) - %d FPS  -  %d sprites',
   [FScene.Width, FScene.Height, FScene.FPS, FScene.SurfaceCount]);
 
   if ScreenDemo <> NIL then

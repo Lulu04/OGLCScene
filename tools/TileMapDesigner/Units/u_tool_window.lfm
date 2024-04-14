@@ -1,13 +1,13 @@
 object Form_Tools: TForm_Tools
-  Left = 867
-  Height = 668
-  Top = 49
-  Width = 377
+  Left = 835
+  Height = 641
+  Top = 54
+  Width = 339
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Tool Layers'
-  ClientHeight = 648
-  ClientWidth = 377
+  ClientHeight = 621
+  ClientWidth = 339
   Color = 3685953
   DefaultMonitor = dmPrimary
   Font.Color = 8895729
@@ -19,26 +19,26 @@ object Form_Tools: TForm_Tools
   LCLVersion = '2.2.6.0'
   object PageControl1: TPageControl
     Left = 0
-    Height = 648
+    Height = 621
     Top = 0
-    Width = 377
+    Width = 339
     ActivePage = pageLayer
     Align = alClient
     TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Tilesets'
-      ClientHeight = 620
-      ClientWidth = 369
+      ClientHeight = 593
+      ClientWidth = 331
       object Panel12: TPanel
         Left = 0
-        Height = 620
+        Height = 593
         Top = 0
-        Width = 369
+        Width = 331
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 620
-        ClientWidth = 369
+        ClientHeight = 593
+        ClientWidth = 331
         Color = 4937317
         ParentColor = False
         TabOrder = 0
@@ -46,10 +46,10 @@ object Form_Tools: TForm_Tools
           Left = 0
           Height = 57
           Top = 0
-          Width = 369
+          Width = 331
           Align = alTop
           ClientHeight = 57
-          ClientWidth = 369
+          ClientWidth = 331
           Color = 3028029
           ParentColor = False
           TabOrder = 0
@@ -213,10 +213,10 @@ object Form_Tools: TForm_Tools
         end
         object PB1: TPaintBox
           Left = 0
-          Height = 563
+          Height = 536
           Hint = 'Right click = set ground type'
           Top = 57
-          Width = 369
+          Width = 331
           Align = alClient
           ParentShowHint = False
           PopupMenu = PopupMenu1
@@ -228,17 +228,17 @@ object Form_Tools: TForm_Tools
     end
     object pageLayer: TTabSheet
       Caption = 'Layer'
-      ClientHeight = 620
-      ClientWidth = 369
+      ClientHeight = 593
+      ClientWidth = 331
       object Panel14: TPanel
         Left = 0
-        Height = 620
+        Height = 593
         Top = 0
-        Width = 369
+        Width = 331
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 620
-        ClientWidth = 369
+        ClientHeight = 593
+        ClientWidth = 331
         Color = 4937317
         ParentColor = False
         TabOrder = 0
@@ -307,24 +307,6 @@ object Form_Tools: TForm_Tools
           OnClick = Arrow2Click
           ShadowType = stNone
         end
-        object Button9: TButton
-          Left = 239
-          Height = 32
-          Top = 16
-          Width = 88
-          Caption = 'Load session'
-          OnClick = Button9Click
-          TabOrder = 3
-        end
-        object Button10: TButton
-          Left = 239
-          Height = 32
-          Top = 56
-          Width = 88
-          Caption = 'Save session'
-          OnClick = Button10Click
-          TabOrder = 4
-        end
         object Panel7: TPanel
           Left = 8
           Height = 60
@@ -335,7 +317,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 243
           Color = 9210954
           ParentColor = False
-          TabOrder = 5
+          TabOrder = 3
           object Shape1: TShape
             AnchorSideLeft.Control = Label15
             AnchorSideLeft.Side = asrBottom
@@ -412,7 +394,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 64
           Color = 7290425
           ParentColor = False
-          TabOrder = 6
+          TabOrder = 4
           object Label41: TLabel
             Left = 7
             Height = 15
@@ -468,7 +450,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 243
           Color = 3829058
           ParentColor = False
-          TabOrder = 7
+          TabOrder = 5
           object CB4: TComboBox
             AnchorSideLeft.Control = SE4
             AnchorSideLeft.Side = asrBottom
@@ -598,7 +580,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 312
           Color = 6440540
           ParentColor = False
-          TabOrder = 8
+          TabOrder = 6
           object Label11: TLabel
             AnchorSideLeft.Control = Label10
             AnchorSideLeft.Side = asrBottom
@@ -689,7 +671,7 @@ object Form_Tools: TForm_Tools
           ClientWidth = 312
           Color = 4154217
           ParentColor = False
-          TabOrder = 9
+          TabOrder = 7
           object Label17: TLabel
             AnchorSideLeft.Control = CB3
             AnchorSideTop.Control = CB3
@@ -832,19 +814,19 @@ object Form_Tools: TForm_Tools
         end
         object Panel1: TPanel
           Left = 18
-          Height = 130
+          Height = 106
           Top = 480
-          Width = 322
+          Width = 300
           BevelOuter = bvNone
-          ClientHeight = 130
-          ClientWidth = 322
+          ClientHeight = 106
+          ClientWidth = 300
           Color = 3299433
           ParentColor = False
-          TabOrder = 10
+          TabOrder = 8
           object Label46: TLabel
-            Left = 16
+            Left = 24
             Height = 15
-            Top = 16
+            Top = 24
             Width = 80
             Caption = 'Scrolling speed'
             Font.Color = 8895729
@@ -925,6 +907,16 @@ object Form_Tools: TForm_Tools
             OnClick = Button6Click
             TabOrder = 3
           end
+          object Label1: TLabel
+            Left = 8
+            Height = 15
+            Top = 0
+            Width = 47
+            Caption = 'PREVIEW'
+            Font.Color = 10671092
+            ParentColor = False
+            ParentFont = False
+          end
         end
         object Button11: TButton
           Left = 104
@@ -936,11 +928,11 @@ object Form_Tools: TForm_Tools
           OnClick = Button11Click
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 11
+          TabOrder = 9
         end
         object SBHelp1: TSpeedButton
           Cursor = crHandPoint
-          Left = 344
+          Left = 239
           Height = 19
           Hint = 'Help'
           Top = 0
@@ -988,20 +980,23 @@ object Form_Tools: TForm_Tools
           ShowHint = True
           ParentShowHint = False
         end
-        object ListBox1: TListBox
-          Left = 297
-          Height = 45
-          Top = 138
-          Width = 57
-          ItemHeight = 0
-          TabOrder = 12
-        end
       end
     end
   end
   object MainMenu1: TMainMenu
-    Left = 128
-    Top = 600
+    Left = 40
+    Top = 160
+    object MenuItem1: TMenuItem
+      Caption = 'Session'
+      object MILoadSession: TMenuItem
+        Caption = 'Load session'
+        OnClick = MILoadSessionClick
+      end
+      object MISaveSession: TMenuItem
+        Caption = 'Save session'
+        OnClick = MISaveSessionClick
+      end
+    end
     object MenuItem10: TMenuItem
       Caption = 'Tools'
       object Menu_ClearAllMap: TMenuItem
@@ -1021,27 +1016,27 @@ object Form_Tools: TForm_Tools
     Title = 'Add tileset to project'
     Filter = 'Images|*.png;*.jpg;*.bmp|All files|*.*'
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    Left = 136
-    Top = 464
+    Left = 40
+    Top = 48
   end
   object OD2: TOpenDialog
     Title = 'Open map file'
     Filter = 'Map files|*.map|All files|*.*'
     FilterIndex = 0
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    Left = 280
-    Top = 504
+    Left = 40
+    Top = 104
   end
   object SD1: TSaveDialog
     Title = 'Save map'
     Filter = 'Map files|*.map|All files|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 200
-    Top = 472
+    Left = 96
+    Top = 48
   end
   object PopupMenu1: TPopupMenu
-    Left = 264
-    Top = 576
+    Left = 136
+    Top = 160
     object MenuItem5: TMenuItem
       Caption = 'Ground type...'
       OnClick = MenuItem5Click
@@ -1056,14 +1051,14 @@ object Form_Tools: TForm_Tools
     Filter = 'Map session files|*.mapsession|All files|*.*'
     FilterIndex = 0
     Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
-    Left = 328
-    Top = 504
+    Left = 160
+    Top = 104
   end
   object SD2: TSaveDialog
     Title = 'Save map'
     Filter = 'Map session files|*.mapsession|All files|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 328
-    Top = 568
+    Left = 96
+    Top = 104
   end
 end

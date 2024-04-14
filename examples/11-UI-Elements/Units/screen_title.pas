@@ -314,6 +314,8 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  // free some memory because we no longer need individual images
+  FAtlas.FreeItemImages;
 
   // label on the scene
   FLabel1 := FScene.Add_UILabel('Hello! My name is Label1 and I''m a TUILabel ! I''m only clipped by the bounds of the scene.', FtexFont);

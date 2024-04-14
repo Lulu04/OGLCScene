@@ -53,6 +53,7 @@ begin
   ima := FAtlas.GetPackedImage(True, True);
   ima.SaveToFile(path+'atlas.png');
   ima.Free;
+  FAtlas.FreeItemImages; // free some memory because we no longer need individual images
 
   FScene.BackgroundColor := BGRA(50,50,50);
 end;
