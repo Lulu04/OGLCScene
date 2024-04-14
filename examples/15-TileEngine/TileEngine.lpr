@@ -1,4 +1,4 @@
-program TileMap;
+program TileEngine;
 
 {$mode objfpc}{$H+}
 {$DEFINE ProgrammePrincipal}
