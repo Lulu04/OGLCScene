@@ -935,7 +935,6 @@
       <Unit113>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="101"/>
         <CursorPos X="18" Y="118"/>
         <UsageCount Value="200"/>
@@ -1080,6 +1079,7 @@
         <ComponentName Value="Form_Main"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="11"/>
         <TopLine Value="810"/>
         <CursorPos X="40" Y="813"/>

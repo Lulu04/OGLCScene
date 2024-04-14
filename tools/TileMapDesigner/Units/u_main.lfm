@@ -9,7 +9,6 @@ object Form_Main: TForm_Main
   Color = clWhite
   Font.Name = 'Tahoma'
   KeyPreview = True
-  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -473,7 +472,7 @@ object Form_Main: TForm_Main
           7B7B7B7B7B7B7B79767A60737C5475764E76734C7771557B7A767B7B7B7B7B7B
           7B7B7B7B7C7B83736700
         }
-        OnClick = SpeedButton2Click
+        OnClick = SpeedButton3Click
         ShowCaption = False
         ShowHint = True
         ParentShowHint = False
