@@ -111,7 +111,7 @@ public
   // don't use this method directly. Use instead TOGLCCamera.AssignToLayer method to assign
   // a camera view to the layer
   property Camera: TOGLCCamera read FCamera write FCamera;
-  // specify a function to sort the surface on the layer
+  // specify a function to sort the surfaces on this layer
   property OnSortCompare:TListSortCompare read FOnSortCompare write FOnSortCompare;
 
   // Assign this callback if you want to do some initializations before surfaces are rendered on the layer.
