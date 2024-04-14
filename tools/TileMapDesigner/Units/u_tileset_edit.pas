@@ -174,7 +174,6 @@ end;
 
 procedure TPatternList.FillTileEngineWithPatterns;
 var o: TUILabel;
-    p: TPoint;
 begin
  if Count = 0 then begin
    o := FScene.Add_UILabel('Pattern''s list is empty', FHintFont, Layer_Pattern);

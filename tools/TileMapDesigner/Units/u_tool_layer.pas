@@ -25,9 +25,7 @@ var
   Form_ToolLayer: TForm_ToolLayer;
 
 implementation
-uses LCLType,
-  u_main,
-  umaps;
+uses LCLType;
 
 {$R *.lfm}
 
