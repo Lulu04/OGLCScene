@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons,
   LCLType, LCLIntf,
-  StdCtrls, ExtCtrls, Menus, ComCtrls,
+  ExtCtrls, Menus, ComCtrls,
   BGRABitmap, BGRABitmapTypes,
   common,
   umaps;
