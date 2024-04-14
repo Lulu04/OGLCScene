@@ -190,7 +190,7 @@ TOGLCCamera = class;
 {$I oglcDeformationGrid.inc}
 {$I oglcSlideShow.inc}
 {$I oglcUIClipping.inc}
-{$I oglcTileMap.inc}
+{$I oglcTileEngine.inc}
 {$I oglcParticle.inc}
 {$I oglcTexturedFont.inc}
 {$I oglcUITheme.inc}
@@ -846,7 +846,7 @@ end;
 {$I oglcDeformationGrid.inc}
 {$I oglcSlideShow.inc}
 {$I oglcUIClipping.inc}
-{$I oglcTileMap.inc}
+{$I oglcTileEngine.inc}
 {$I oglcParticle.inc}
 {$I oglcUtils.inc}
 {$I oglcUITheme.inc}
