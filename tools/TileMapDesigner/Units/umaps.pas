@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Dialogs, Controls, StdCtrls,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, VelocityCurve,
+  OGLCScene,
   common;
 
 type
@@ -88,7 +88,7 @@ uses u_tool_window,
 
 constructor TMapInfo.Create;
 begin
-  TileEngine := TTileEngine.Create;
+  TileEngine := TTileEngine.Create(FScene);
   TileEngine.TileMapDesignerModeEnable := TRUE;
   TileEngine.OnTileEvent := @Form_Main.ProcessTileEngineEvent;
   TileEngine.MapHoleColor.Value := ColorToBGRA(Form_Tools.ColorButton1.ButtonColor,

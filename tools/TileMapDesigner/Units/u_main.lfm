@@ -15,7 +15,7 @@ object Form_Main: TForm_Main
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 0
@@ -319,13 +319,13 @@ object Form_Main: TForm_Main
         AnchorSideLeft.Control = Label1
         AnchorSideLeft.Side = asrBottom
         AnchorSideTop.Control = Panel4
-        Left = 53
-        Height = 27
+        Left = 46
+        Height = 22
         Top = 1
         Width = 125
         BorderSpacing.Left = 10
         Color = 16777196
-        ItemHeight = 19
+        ItemHeight = 14
         ItemIndex = 0
         Items.Strings = (
           'Layers'
@@ -343,9 +343,9 @@ object Form_Main: TForm_Main
         AnchorSideTop.Control = Panel4
         AnchorSideTop.Side = asrCenter
         Left = 11
-        Height = 19
-        Top = 6
-        Width = 32
+        Height = 14
+        Top = 8
+        Width = 25
         BorderSpacing.Left = 10
         Caption = 'view'
         ParentColor = False
@@ -480,9 +480,9 @@ object Form_Main: TForm_Main
       end
       object Label2: TLabel
         Left = 52
-        Height = 19
+        Height = 14
         Top = 6
-        Width = 80
+        Width = 61
         Caption = 'working on'
         ParentColor = False
       end
@@ -597,8 +597,8 @@ object Form_Main: TForm_Main
   end
   object PopupMenu1: TPopupMenu
     Alignment = paCenter
-    left = 111
-    top = 149
+    Left = 111
+    Top = 149
     object Menu_FillWithSelectedTile: TMenuItem
       Caption = 'Fill with selected tile (Space)'
       OnClick = Menu_FillWithSelectedTileClick
@@ -687,7 +687,7 @@ object Form_Main: TForm_Main
   end
   object ApplicationProperties1: TApplicationProperties
     HintColor = 5634047
-    left = 629
-    top = 180
+    Left = 629
+    Top = 180
   end
 end

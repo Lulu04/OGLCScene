@@ -28,7 +28,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, OpenGLContext, Forms, Controls, Graphics,
   Dialogs, LCLIntf, ExtCtrls, LCLType, Menus, Buttons, ComCtrls, StdCtrls,
-  Types, BGRABitmap, BGRABitmapTypes, common, OGLCScene, VelocityCurve,
+  Types, BGRABitmap, BGRABitmapTypes, common, OGLCScene,
   uinsertlinecolumn, uAskEventValue, uexporteventtype, screen_map,
   tileset_manager;
 
@@ -844,21 +844,21 @@ procedure TForm_Main.ShowActionText(aX, aY: single; aTxt: string);
 var o : TFreeText;
   rx, ry, time: single;
 begin
-  o := TFreeText.Create;
-  o.TexturedFont:=FHintFont;
-  o.Caption:=aTxt;
-  o.SetCenterCoordinate( aX, aY );
-  FScene.Add( o, Layer_InfoMap );
+  o := TFreeText.Create(FScene);
+  o.TexturedFont := FHintFont;
+  o.Caption := aTxt;
+  o.SetCenterCoordinate(aX, aY);
+  FScene.Add(o, Layer_InfoMap);
   time := 2.0;
-  o.Opacity.ChangeTo( 0, time, idcStartSlowEndFast );
+  o.Opacity.ChangeTo(0, time, idcStartSlowEndFast);
   if aX > FScene.Width/2
     then rx := -100
     else rx := 100;
   if aY > FScene.Height/2
     then ry := -100
     else ry := 100;
-  o.MoveRelative( rx, ry, time, idcSinusoid );
-  o.KillDefered( time );
+  o.MoveRelative(rx, ry, time, idcSinusoid);
+  o.KillDefered(time);
 end;
 
 procedure TForm_Main.ProcessTileEngineEvent(Sender: TTileEngine;
@@ -866,14 +866,14 @@ procedure TForm_Main.ProcessTileEngineEvent(Sender: TTileEngine;
 var o: TFreeText;
     p: TPointF;
 begin
- if not ToggleBox1.Checked or ( Event = -1 ) then exit;
- o := TFreeText.Create;
- o.TexturedFont:=FEventFont;
- p := SceneTileCoor + PointF( FWorkingTileEngine.TileSize.cx*0.5, FWorkingTileEngine.TileSize.cy*0.5 );
- o.SetCenterCoordinate( p.x, p.y );
- TextureManager.DisableTextureUsage;
- FillBox( o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(1,0,0) );
- o.Draw( 1.0 );
+ if not ToggleBox1.Checked or (Event = -1) then exit;
+ o := TFreeText.Create(FScene);
+ o.TexturedFont := FEventFont;
+ p := SceneTileCoor + PointF(FWorkingTileEngine.TileSize.cx*0.5, FWorkingTileEngine.TileSize.cy*0.5);
+ o.SetCenterCoordinate(p.x, p.y);
+
+ FillBox(FScene, o.X.Value-3, o.Y.Value-3, o.Width+6, o.Height+6, BGRA(1,0,0));
+ o.Draw(1.0);
  o.Free;
 end;
 
@@ -962,31 +962,30 @@ begin
  if MapList.Count = 0 then exit;
  if ( FWorkingTileEngine.TileSize.cx = 0 ) or ( FWorkingTileEngine.TileSize.cy = 0 ) then exit;
 
- TextureManager.DisableTextureUsage;
- SetBlendMode( FX_BLEND_NORMAL );
+ FScene.BlendMode := FX_BLEND_NORMAL;
 
- if ( FState = sSelecting ) or ( FState = sSelectionDone )
+ if (FState = sSelecting) or (FState = sSelectionDone)
    then begin  // rectangular selection area
      p1 := ClientCoorToTileTopLeftCoor( FCoorBeginLeftClick );
      p2 := ClientCoorToTileTopLeftCoor( FCoorEndLeftClick );
      p2.x := p2.x + FWorkingTileEngine.TileSize.cx - p1.x;
      p2.y := p2.y + FWorkingTileEngine.TileSize.cy - p1.y;
 
-     DrawBox( p1.x, p1.y, p2.x, p2.y, BGRA(255,255,255,190), 1.5 );
+     DrawBox(FScene, p1.x, p1.y, p2.x, p2.y, BGRA(255,255,255,190), 1.5);
  end
  else begin  // tile under the mouse
-      p1 := Form_Main.ScreenToClient( Mouse.CursorPos );
-      if XYCoorIsInMap( p1.x, p1.y )
+      p1 := Form_Main.ScreenToClient(Mouse.CursorPos);
+      if XYCoorIsInMap(p1.x, p1.y)
         then begin
           p1 := ClientCoorToTileTopLeftCoor( p1 );
-          DrawBox( p1.x, p1.y, FWorkingTileEngine.TileSize.cx, FWorkingTileEngine.TileSize.cy, BGRA(255,0,0), 1.5 );
+          DrawBox(FScene, p1.x, p1.y, FWorkingTileEngine.TileSize.cx, FWorkingTileEngine.TileSize.cy, BGRA(255,0,0), 1.5);
         end;
  end;
 
  // draw a box around the map boundary
- DrawBox( FWorkingTileEngine.X.Value, FWorkingTileEngine.Y.Value,
-          FWorkingTileEngine.Width, FWorkingTileEngine.Height,
-          BGRA(50,50,50), 1);
+ DrawBox(FScene, FWorkingTileEngine.X.Value, FWorkingTileEngine.Y.Value,
+         FWorkingTileEngine.Width, FWorkingTileEngine.Height,
+         BGRA(50,50,50), 1);
 
  // draw a box around selection in WorkingPattern
  WorkingPattern.DrawBoxAroundTiles;
@@ -994,20 +993,20 @@ end;
 
 procedure TForm_Main.LoadCommonRessource;
 var ima: TBGRABitmap;
+    w: integer;
 begin
-
- ScreenMap := TScreenMap.Create;
- FScene.LaunchStage( ScreenMap );
-
- TileSetManager := TTilesetManager.Create;
-
  // white/gray image for grid
- ima := TBGRABitmap.Create( 8, 8, BGRA(220,220,220));
- FImageBackGround := TBGRABitmap.Create( 16, 16, BGRAWhite );
- FImageBackGround.PutImage( 8, 0, ima, dmSet, 255 );
- FImageBackGround.PutImage( 0, 8, ima, dmSet, 255 );
+ w := ScaleDesignToForm(8);
+ ima := TBGRABitmap.Create(w, w, BGRA(220,220,220));
+ FImageBackGround := TBGRABitmap.Create(w*2, w*2, BGRAWhite);
+ FImageBackGround.PutImage(w, 0, ima, dmSet, 255);
+ FImageBackGround.PutImage(0, w, ima, dmSet, 255);
  ima.Free;
 
+ ScreenMap := TScreenMap.Create;
+ FScene.RunScreen(ScreenMap);
+
+ TileSetManager := TTilesetManager.Create;
 end;
 
 procedure TForm_Main.FreeCommonRessource;

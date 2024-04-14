@@ -9,7 +9,7 @@ uses
   LCLType, LCLIntf,
   StdCtrls, ExtCtrls, Menus, ComCtrls,
   BGRABitmap, BGRABitmapTypes,
-  common, VelocityCurve,
+  common,
   umaps;
 
 type

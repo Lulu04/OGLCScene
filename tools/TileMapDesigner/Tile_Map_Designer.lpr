@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, lazopenglcontext, OGLCScene, common, u_main, u_tool_window, screen_map,
   tileset_manager, uAskTileSize, uabout, uAskGroundType, uinsertlinecolumn,
-  uAskMapSize, uexportgroundtype, VelocityCurve, uaskeventvalue, usavemap,
+  uAskMapSize, uexportgroundtype, uaskeventvalue, usavemap,
   uexporteventtype, umaps, uasknewlayermapinfo, uaskrenamemap, u_tileset_edit,
   u_tool_minimap, u_tool_layer;
 

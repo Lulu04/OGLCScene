@@ -1,7 +1,7 @@
 object Form_Tools: TForm_Tools
-  Left = 347
+  Left = 867
   Height = 668
-  Top = 108
+  Top = 49
   Width = 377
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow

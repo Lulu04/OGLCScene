@@ -29,9 +29,6 @@ FWorkingTileEngine: TTileEngine;
 
 FImageBackGround: TBGRABitmap;
 
-
-FTitleFont: TGuiFont;
-
 FEventFont,
 FHintFont: TTexturedFont;
 
