@@ -1,4 +1,4 @@
-unit screen_title;
+unit screen_demo;
 
 {$mode objfpc}{$H+}
 
@@ -8,7 +8,7 @@ uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
   OGLCScene,
-  u_common, u_sprite_def;
+  u_common, u_button_def;
 
 type
 
@@ -18,31 +18,70 @@ TScreenDemo = class(TScreenTemplate)
 private
   FAtlas: TOGLCTextureAtlas; // we need an atlas to pack all images in a single texture
   FTexFont: TTexturedFont;
-  FLabel: TFreeText;
   FtexStar,             // the texture for the star image
   FtexShip: PTexture;   // the texture for the ship
 
-  FShip: TShip;       // the sprite for the ship
-  FInGamePausePanel: TInGamePausePanel; // our 'prepared' modal panel
+  FShip: TSprite;       // the sprite for the ship
+
+  FButtonPlay, FButtonOptions, FButtonQuit: TTitleMenuButton;
 private
   FTimeAccu: single;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
   procedure Update(const AElapsedTime: single); override;
+
+  procedure ProcessGUIEvent(Sender: TSimpleSurfaceWithEffect);
 end;
 
 var ScreenDemo: TScreenDemo = NIL;
 
 implementation
-uses Forms, LCLType;
+uses Forms, Graphics, form_main;
+
+type
+{ TStar }
+
+TStar = class(TSprite)
+  procedure Update(const AElapsedTime: single); override;
+end;
+
+procedure TStar.Update(const AElapsedTime: single);
+begin
+  inherited Update(AElapsedTime);
+  // we kill the sprite when it disappear at the bottom of the scene.
+  if Y.Value > FScene.Height then Kill;
+end;
 
 { TScreenDemo }
+
+procedure TScreenDemo.ProcessGUIEvent(Sender: TSimpleSurfaceWithEffect);
+var text: TFreeText;
+begin
+  if Sender = FButtonQuit then begin
+    FormMain.Close;
+    exit;
+  end;
+
+  text := TFreeText.Create(FScene);
+  text.TexturedFont := FtexFont;
+  if Sender = FButtonPlay then text.Caption := 'Sorry no game! this is only a demo for button animation';
+  if Sender = FButtonOptions then text.Caption := 'This is a fake game! No options...';
+  text.Tint.Value := BGRA(50,200,255);
+  FScene.Add(text, LAYER_GUI);
+  text.CenterX := FScene.Width*0.5;
+  text.CenterY := FScene.Height*0.35;
+
+  text.Scale.ChangeTo(PointF(2,2), 5, idcStartFastEndSlow);
+  text.Opacity.ChangeTo(0, 5, idcSinusoid);
+  text.KillDefered(5);
+end;
 
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
   fd: TFontDescriptor;
+  xx, yy: single;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
   FAtlas := FScene.CreateAtlas;
@@ -53,7 +92,7 @@ begin
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));
   FtexShip := FAtlas.AddFromSVG(path+'SpaceShip.svg', Round(FScene.Width/8), -1);
 
-  fd.Create('Arial', 20, [], BGRA(0,0,0));
+  fd.Create('Arial', 30, [fsBold], BGRA(0,0,0));
   FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET+ASCII_SYMBOL_CHARSET);
 
   FAtlas.TryToPack;
@@ -67,21 +106,24 @@ begin
   // free some memory because we no longer need individual images
   FAtlas.FreeItemImages;
 
-  // label creation
-  FLabel := TFreeText.Create(FScene);
-  FScene.Add(FLabel, LAYER_GUI);
-  FLabel.TexturedFont := FtexFont;
-  FLabel.Caption := 'Press ESCAPE key to show the modal panel';
-  FLabel.Tint.Value := BGRA(200,200,200);
-  FLabel.SetCoordinate(0, 0);
-
   // ship creation
-  FShip := TShip.Create(FtexShip);
+  FShip := TSprite.Create(FtexShip, False);
+  FScene.Add(FShip, LAYER_SHIP);
+  FShip.CenterX := FScene.Width*0.5;
+  FShip.Y.value := FScene.Height - FShip.Height*1.25;
 
-  FInGamePausePanel := TInGamePausePanel.Create(FtexFont);
+  // menu buttons creation
+  xx := FScene.Width*0.75;
+  yy := FScene.Height*0.5;
+  // button Play
+  FButtonPlay := TTitleMenuButton.Create(xx, yy, 'PLAY', FtexFont, LAYER_GUI);
+  yy := yy + FButtonPlay.Height + FScene.ScaleDesignToScene(20);
+  // button Options
+  FButtonOptions := TTitleMenuButton.Create(xx, yy, 'Options', FtexFont, LAYER_GUI);
+  yy := yy + FButtonOptions.Height + FScene.ScaleDesignToScene(20);
+  // button Quit
+  FButtonQuit := TTitleMenuButton.Create(xx, yy, 'Quit', FtexFont, LAYER_GUI);
 
-  // the mouse pointer is hidden
-  FScene.Mouse.SystemMouseCursorVisible := False;
 end;
 
 procedure TScreenDemo.FreeObjects;
@@ -99,7 +141,7 @@ begin
 
   // stars creation
   FTimeAccu := FTimeAccu + AElapsedTime;
-  if FTimeAccu > 0.05 then begin
+  if FTimeAccu > 0.01 then begin
     FTimeAccu := 0.0;
     star := TStar.Create(FtexStar, False);  // creation of the sprite. False because texture is owned by the atlas.
     FScene.Add(star, LAYER_STARS);   // add the sprite instance to the scene
@@ -114,11 +156,6 @@ begin
       Angle.AddConstant(Random(180));             // add a rotation effect
     end;
   end;
-
-  // check ESC key
-  if FScene.KeyState[VK_ESCAPE] then
-    FInGamePausePanel.ShowModal;
-
 end;
 
 

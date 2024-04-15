@@ -85,7 +85,7 @@
         <Filename Value="SpriteAndTextOnPath.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="33" Y="14"/>
+        <CursorPos X="32" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -112,7 +112,7 @@
         <UsageCount Value="196"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Units\screen_title.pas"/>
+        <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
@@ -261,7 +261,7 @@
         <Loaded Value="True"/>
       </Unit23>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="88" Column="75" TopLine="80"/>
@@ -271,29 +271,17 @@
         <Caret Line="91" Column="43" TopLine="80"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="33" Column="28" TopLine="19"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="92" Column="2" TopLine="77"/>
       </Position3>
       <Position4>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="92" Column="2" TopLine="77"/>
+        <Caret Line="97" Column="85" TopLine="87"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="24" Column="26"/>
-      </Position5>
-      <Position6>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="13" Column="18" TopLine="20"/>
-      </Position6>
-      <Position7>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="97" Column="85" TopLine="87"/>
-      </Position7>
-      <Position8>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="98" Column="85" TopLine="88"/>
-      </Position8>
+      </Position5>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

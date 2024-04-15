@@ -11,7 +11,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, lazopenglcontext, OGLCScene,
   u_common,
-  form_main, screen_title, u_button_def;
+  form_main, screen_demo, u_button_def;
 
 {$R *.res}
 

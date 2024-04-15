@@ -80,12 +80,12 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="13">
+    <Units Count="14">
       <Unit0>
         <Filename Value="HelloWorld.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="33" Y="14"/>
+        <CursorPos X="32" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -112,11 +112,11 @@
         <UsageCount Value="198"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Units\screen_title.pas"/>
+        <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="26" Y="15"/>
+        <CursorPos X="27" Y="15"/>
         <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -182,8 +182,14 @@
         <CursorPos Y="16"/>
         <UsageCount Value="10"/>
       </Unit12>
+      <Unit13>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit13>
     </Units>
-    <JumpHistory Count="10" HistoryIndex="9">
+    <JumpHistory Count="9" HistoryIndex="8">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="50" Column="38" TopLine="35"/>
@@ -217,13 +223,9 @@
         <Caret Line="55" Column="21" TopLine="42"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="5" Column="17"/>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="10" Column="8"/>
       </Position9>
-      <Position10>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="45" Column="22" TopLine="21"/>
-      </Position10>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

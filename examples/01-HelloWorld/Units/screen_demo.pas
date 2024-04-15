@@ -1,4 +1,4 @@
-unit screen_title;
+unit screen_demo;
 
 {$mode objfpc}{$H+}
 

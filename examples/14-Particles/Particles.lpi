@@ -84,8 +84,8 @@
       <Unit0>
         <Filename Value="Particles.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <CursorPos X="46" Y="14"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="37" Y="6"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -117,8 +117,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="40" Y="15"/>
-        <UsageCount Value="66"/>
+        <CursorPos X="42" Y="23"/>
+        <UsageCount Value="67"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -226,22 +226,20 @@
       </Unit18>
       <Unit19>
         <Filename Value="Units\u_sprite_def.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="10"/>
         <UsageCount Value="31"/>
-        <Loaded Value="True"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\source\oglcParticle.inc"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="161"/>
         <CursorPos X="54" Y="175"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="45" Column="16" TopLine="23"/>
@@ -354,6 +352,10 @@
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="155" Column="24" TopLine="134"/>
       </Position28>
+      <Position29>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="54" Column="18" TopLine="32"/>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

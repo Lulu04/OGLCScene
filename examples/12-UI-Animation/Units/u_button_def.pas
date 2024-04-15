@@ -25,7 +25,7 @@ TTitleMenuButton = class(TUIButton)
 end;
 
 implementation
-uses screen_title, u_common, BGRABitmapTypes;
+uses screen_demo, u_common, BGRABitmapTypes;
 
 { TTitleMenuButton }
 

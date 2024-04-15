@@ -80,12 +80,12 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="27">
+    <Units Count="29">
       <Unit0>
         <Filename Value="UIElements.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="33" Y="14"/>
+        <CursorPos X="32" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -95,6 +95,7 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="21" Y="13"/>
         <UsageCount Value="200"/>
@@ -112,11 +113,10 @@
         <UsageCount Value="194"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Units\screen_title.pas"/>
+        <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="44" Y="17"/>
+        <CursorPos X="24" Y="15"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -278,40 +278,31 @@
         <CursorPos X="3" Y="541"/>
         <UsageCount Value="16"/>
       </Unit26>
+      <Unit27>
+        <Filename Value="..\..\source\oglcUI.inc"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="250"/>
+        <CursorPos Y="265"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="55" Y="6"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit28>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="472" Column="15" TopLine="466"/>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="26" Column="51" TopLine="7"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="23" Column="8" TopLine="10"/>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="32" Column="20" TopLine="7"/>
       </Position2>
-      <Position3>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="28" Column="10" TopLine="17"/>
-      </Position3>
-      <Position4>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="187" Column="13" TopLine="163"/>
-      </Position4>
-      <Position5>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="410" Column="68" TopLine="387"/>
-      </Position5>
-      <Position6>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="44" Column="19" TopLine="21"/>
-      </Position6>
-      <Position7>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="51" Column="19" TopLine="32"/>
-      </Position7>
-      <Position8>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="267" Column="79" TopLine="251"/>
-      </Position8>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
