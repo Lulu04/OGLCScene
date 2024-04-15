@@ -83,7 +83,7 @@ constructor TPanelStatus.Create(aFont: TTexturedFont);
 var marg: integer;
 begin
   inherited Create(FScene);
-  FScene.Add(Self, LAYER_TOP);
+  FScene.Add(Self, LAYER_GUI);
   BodyShape.SetShapeRoundRect(Round(FScene.Width/3), Round(FScene.Height*0.1),
                              FScene.ScaleDesignToScene(8), FScene.ScaleDesignToScene(8), FScene.ScaleDesignToScene(3));
   BodyShape.Fill.Color := BGRA(255,0,255,80);

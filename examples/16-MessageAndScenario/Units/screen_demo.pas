@@ -125,7 +125,7 @@ begin
 
   // ship creation
   FShip := TSprite.Create(FtexShip, False);
-  FScene.Add(FShip, LAYER_TOP);
+  FScene.Add(FShip, LAYER_SHIP);
   FShip.CenterOnScene;
 
   // add the radar to the chip as child
@@ -142,7 +142,7 @@ begin
 
   // meteor creation
   FMeteor := TSprite.Create(FtexMeteor, False);
-  FScene.Add(FMeteor, LAYER_MIDDLE);
+  FScene.Add(FMeteor, LAYER_BACK);
   FMeteor.X.Value := FShip.RightX;
   FMeteor.CenterY := FShip.Y.Value;
   FMeteor.Angle.AddConstant(2.5);
@@ -152,7 +152,7 @@ begin
 
   // explanation label
   FLabel := TFreeText.Create(FScene);
-  FScene.Add(FLabel, LAYER_TOP);
+  FScene.Add(FLabel, LAYER_GUI);
   FLabel.TexturedFont := FtexFont;
   FLabel.Caption := 'Press SPACE to deploy/retract the arm to harvest the meteor';
   FLabel.Tint.Value := BGRA(255,0,255);

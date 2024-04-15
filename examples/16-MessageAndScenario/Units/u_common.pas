@@ -12,8 +12,8 @@ const
 
 // LAYER
    LAYER_COUNT = 3;
-     LAYER_TOP    = 0;
-     LAYER_MIDDLE = 1;
+     LAYER_GUI    = 0;
+     LAYER_SHIP   = 1;
      LAYER_BACK   = 2;
 
 
