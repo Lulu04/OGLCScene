@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="14.491606mm"
+   height="9.1447344mm"
+   viewBox="0 0 14.491606 9.1447344"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="SpaceShip.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient18"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#dd9523;stop-opacity:1;"
+         offset="0"
+         id="stop18" />
+      <stop
+         style="stop-color:#e8d5b4;stop-opacity:1;"
+         offset="0.5"
+         id="stop20" />
+      <stop
+         style="stop-color:#db972c;stop-opacity:1;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient18"
+       id="linearGradient47"
+       x1="158.7003"
+       y1="113.24124"
+       x2="181.9032"
+       y2="113.24124"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.63653771,0,0,0.63653771,50.351653,30.792058)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-151.50936,-98.355775)">
+    <path
+       id="path41"
+       style="fill:url(#linearGradient47);fill-opacity:1;fill-rule:evenodd;stroke:#704c14;stroke-width:0.556;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1"
+       d="m 153.11119,98.873678 -1.29175,4.820622 3.52854,3.52821 h 0.0645 6.68538 0.0645 l 3.52854,-3.52821 -1.29175,-4.820622 -5.64395,5.243302 z" />
+  </g>
+</svg>

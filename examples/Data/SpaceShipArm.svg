@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="6.3501778mm"
+   height="37.252716mm"
+   viewBox="0 0 6.3501778 37.252716"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="SpaceShip.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient18"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#dd9523;stop-opacity:1;"
+         offset="0"
+         id="stop18" />
+      <stop
+         style="stop-color:#e8d5b4;stop-opacity:1;"
+         offset="0.5"
+         id="stop20" />
+      <stop
+         style="stop-color:#db972c;stop-opacity:1;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient18"
+       id="linearGradient39"
+       x1="96.600449"
+       y1="24.510387"
+       x2="102.95079"
+       y2="24.510387"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(6.1076167,91.100404)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-102.70814,-96.984435)">
+    <path
+       id="rect38"
+       style="fill:url(#linearGradient39);fill-rule:evenodd;stroke:#704c14;stroke-width:0.556;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 102.98614,99.310988 c 0,0 1.71436,-2.048554 2.89709,-2.048554 1.18273,0 2.89709,2.048554 2.89709,2.048554 V 132.0311 c 0,0 -1.73709,1.92805 -2.89709,1.92805 -1.16001,0 -2.89709,-1.92805 -2.89709,-1.92805 z"
+       sodipodi:nodetypes="caccacc"
+       inkscape:transform-center-x="-0.17041723"
+       inkscape:transform-center-y="-16.700889" />
+  </g>
+</svg>
