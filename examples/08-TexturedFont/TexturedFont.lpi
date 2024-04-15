@@ -85,7 +85,7 @@
         <Filename Value="TexturedFont.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="33" Y="14"/>
+        <CursorPos X="32" Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -112,7 +112,7 @@
         <UsageCount Value="196"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Units\screen_title.pas"/>
+        <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
@@ -260,16 +260,7 @@
         <Loaded Value="True"/>
       </Unit23>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
-      <Position1>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="22" Column="20"/>
-      </Position1>
-      <Position2>
-        <Filename Value="Units\screen_title.pas"/>
-        <Caret Line="79" TopLine="56"/>
-      </Position2>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

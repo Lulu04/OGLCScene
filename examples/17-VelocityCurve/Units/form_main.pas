@@ -32,7 +32,7 @@ var
   FormMain: TFormMain;
 
 implementation
-uses screen_title;
+uses screen_demo;
 {$R *.lfm}
 
 { TFormMain }
