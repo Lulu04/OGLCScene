@@ -254,42 +254,42 @@ var
 function CurveIDToString(ACurveID: word): string;
 begin
   case ACurveID of
-    idcStartFastEndSlow: Result := 'StartFastEndSlow';
-    idcStartSlowEndFast: Result := 'StartSlowEndFast';
-    idcSinusoid: Result := 'Sinusoid';
-    idcSinusoid2: Result := 'Sinusoid2';
-    idcBouncy: Result := 'Bouncy';
-    idcSpring: Result := 'Spring';
-    idcSpring2: Result := 'Spring2';
-    idc5steps: Result := '5Steps';
-    idcExtend: Result := 'Extend';
-    idcExtend2: Result := 'Extend2';
-    idcDrop: Result := 'Drop';
-    idcSlowAtMiddle: Result := 'SlowAtMiddle';
-    idcPauseAtMiddle: Result := 'PauseAtMiddle';
-    idcSingleRebound: Result := 'SingleRebound'
+    idcStartFastEndSlow: Result := 'idcStartFastEndSlow';
+    idcStartSlowEndFast: Result := 'idcStartSlowEndFast';
+    idcSinusoid: Result := 'idcSinusoid';
+    idcSinusoid2: Result := 'idcSinusoid2';
+    idcBouncy: Result := 'idcBouncy';
+    idcSpring: Result := 'idcSpring';
+    idcSpring2: Result := 'idcSpring2';
+    idc5steps: Result := 'idc5Steps';
+    idcExtend: Result := 'idcExtend';
+    idcExtend2: Result := 'idcExtend2';
+    idcDrop: Result := 'idcDrop';
+    idcSlowAtMiddle: Result := 'idcSlowAtMiddle';
+    idcPauseAtMiddle: Result := 'idcPauseAtMiddle';
+    idcSingleRebound: Result := 'idcSingleRebound'
     else
-      Result := 'Linear';
+      Result := 'idcLinear';
   end;
 end;
 
 function StringToCurveID(ACurveName: string): word;
 begin
   case LowerCase(ACurveName) of
-    'startfastendslow': Result := idcStartFastEndSlow;
-    'startslowendfast': Result := idcStartSlowEndFast;
-    'sinusoid': Result := idcSinusoid;
-    'sinusoid2': Result := idcSinusoid2;
-    'bouncy': Result := idcBouncy;
-    'spring': Result := idcSpring;
-    'spring2': Result := idcSpring2;
-    '5steps': Result := idc5steps;
-    'extend': Result := idcExtend;
-    'extend2': Result := idcExtend2;
-    'drop': Result := idcDrop;
-    'slowatmiddle': Result := idcSlowAtMiddle;
-    'pauseatmiddle': Result := idcPauseAtMiddle;
-    'SingleRebound': Result := idcSingleRebound
+    'idcstartfastendslow': Result := idcStartFastEndSlow;
+    'idcstartslowendfast': Result := idcStartSlowEndFast;
+    'idcsinusoid': Result := idcSinusoid;
+    'idcsinusoid2': Result := idcSinusoid2;
+    'idcbouncy': Result := idcBouncy;
+    'idcspring': Result := idcSpring;
+    'idcspring2': Result := idcSpring2;
+    'idc5steps': Result := idc5steps;
+    'idcextend': Result := idcExtend;
+    'idcextend2': Result := idcExtend2;
+    'idcdrop': Result := idcDrop;
+    'idcslowatmiddle': Result := idcSlowAtMiddle;
+    'idcpauseatmiddle': Result := idcPauseAtMiddle;
+    'idcSingleRebound': Result := idcSingleRebound
     else
       Result := idcLinear;
   end;
