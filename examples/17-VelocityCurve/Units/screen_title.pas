@@ -60,7 +60,7 @@ begin
   AddChild(FLabel, 0);
   with FLabel do begin
     TexturedFont := aFont;
-    Caption := 'idc' + CurveIDToString(aVelocityCurveID);
+    Caption := CurveIDToString(aVelocityCurveID);
     Y.Value := 0;
     CenterX := FScene.Width*0.5;
     Tint.Value := BGRA(220,220,220);
