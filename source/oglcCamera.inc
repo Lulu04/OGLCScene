@@ -1,7 +1,5 @@
 {$ifdef oglcINTERFACE}
 type
-// Don't create a TCamera instance directly by TOGLCCamera.Create
-// Use instead TOGLCScene.CreateCamera
 
 {
 available action for camera scenario
@@ -41,15 +39,17 @@ end;
 TOGLCCamera = class
  FParentScene: TOGLCScene;
  FPreviousModelViewMatrix: TOGLCMatrix;
- Constructor Create;
- Destructor Destroy; override;
+ // Don't create a TCamera instance directly by TOGLCCamera.Create
+ // Use instead TOGLCScene.CreateCamera
+ constructor Create;
+ destructor Destroy; override;
  procedure Update( const AElapsedTime: single );
 protected
   procedure Use;
   procedure Release;
 public
   // by default, LookAt is initialized with the center coodinates of its parent scene
-  // use instead MoveTo to easyly translate the camera to the target position
+  // use instead MoveTo to easily translate the camera to the target position
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
@@ -58,7 +58,7 @@ public
   procedure MoveTo( aPt: TPointF ); overload;
   // move the camera to the specified location
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
-  // reset camera to screen center with scale of 1:1 and no rotation, in specified time in seconds
+  // reset camera to scene center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
 
   // gives the distance between a point and the camera lookAt value
