@@ -1,0 +1,29 @@
+object FormMain: TFormMain
+  Left = 516
+  Height = 306
+  Top = 190
+  Width = 303
+  Caption = 'Program name'
+  ClientHeight = 306
+  ClientWidth = 303
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  LCLVersion = '2.2.6.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 24
+    Height = 96
+    Top = 24
+    Width = 80
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 34
+    Top = 26
+  end
+end
