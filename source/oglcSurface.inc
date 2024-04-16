@@ -224,6 +224,7 @@ public
   procedure RotationAroundPoint( aPt: TPointF; aAnglePerSecond: single; aSelfRotate: boolean=TRUE ) ; overload;
   // Bind this surface to another
   procedure BindToSprite(aTargetSurface:TSimpleSurface; aOffsetX, aOffsetY: single);
+  // Bind the center of this surface to the center of another
   procedure BindCenterToSprite(aTargetSurface:TSimpleSurface);
   procedure UnBind;
 public  // Scenario
