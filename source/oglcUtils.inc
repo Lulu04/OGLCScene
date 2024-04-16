@@ -65,6 +65,15 @@ function Distance(aPt1, aPt2: TPointF): single;
 
 function PointFToRectF( p1, p2: TPointF ): TRectF;
 
+// COLLISION TEST
+function CollisionPointVersusCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
+function CollisionPointVersusRectF(const aPt: TPointF; const r: TRectF): boolean;
+function CollisionCircleVersusCircle(const aCenter1: TPointF; const aRadius1: single;
+                                     const aCenter2: TPointF; const aRadius2: single): boolean;
+function CollisionCircleVersusRectF(const aCenter: TPointF; const aRadius: single;
+                                        const r: TRectF): boolean;
+function CollisionRectFVersusRectF(const r1, r2: TRectF): boolean;
+
 // return the appropriate GL_COLOR_ATTACHMENTx
 // ie: aIndex=0  returns GL_COLOR_ATTACHMENT0
 //     aIndex=8  returns GL_COLOR_ATTACHMENT8
@@ -367,6 +376,49 @@ begin
 
  Result.TopLeft:=topleft;
  Result.BottomRight:=bottomright;
+end;
+
+function CollisionPointVersusCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
+begin
+  Result := Distance(aPt, aCenter) < aRadius;
+end;
+
+function CollisionPointVersusRectF(const aPt: TPointF; const r: TRectF): boolean;
+begin
+  Result := (aPt.x >= r.Left) and (aPt.x < r.Right) and
+            (aPt.y >= r.Top) and (aPt.y < r.Bottom);
+end;
+
+function CollisionCircleVersusCircle(const aCenter1: TPointF;
+  const aRadius1: single; const aCenter2: TPointF; const aRadius2: single): boolean;
+begin
+  Result := Distance(aCenter1, aCenter2) < aRadius1 + aRadius2;
+end;
+
+function CollisionCircleVersusRectF(const aCenter: TPointF;
+  const aRadius: single; const r: TRectF): boolean;
+var closestX, closestY{, dX, dY}: single;
+begin
+  closestX := aCenter.x;
+  if closestX <= r.Left then closestX := r.Left
+    else if closestX > r.Right then closestX := r.Right;
+
+  closestY := aCenter.y;
+  if closestY < r.Top then closestY := r.Top
+    else if closestY > r.Bottom then closestY := r.Bottom;
+
+  Result := Distance(PointF(closestX, closestY), aCenter) < aRadius;
+
+{  dX := aCenter.x - closestX;
+  dY := aCenter.y - closestY;
+
+  Result := sqr(dX) + sqr(dY) < sqr(aRadius);  }
+end;
+
+function CollisionRectFVersusRectF(const r1, r2: TRectF): boolean;
+begin
+  Result := (r1.Right >= r2.Left) and ( r1.Left <= r2.Right) and
+            (r1.Bottom >= r2.Top) and (r1.Top <= r2.Bottom);
 end;
 
 function IndexToColorAttachment(aIndex: integer): GLenum;
