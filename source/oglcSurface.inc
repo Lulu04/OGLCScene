@@ -158,16 +158,17 @@ protected
   procedure DrawChildSurfacesWithPositiveZOrder(const aLayerPercentOpacity: single); virtual;
   procedure DrawChildSurfacesWithNegativeZOrder(const aLayerPercentOpacity: single); virtual;
 public
+  // called every frames.
   procedure Update(const aElapsedTime: single); override;
   procedure Draw(const aLayerPercentOpacity: single);  override;
   procedure DoDraw; virtual; abstract;
 public
-  Speed   : TPointFParam;
-  Angle   : TBoundedFParam;
+  Speed   : TPointFParam;  // the speed of the surface in pixels/sec, on both axis
+  Angle   : TBoundedFParam; // the angle to rotate the surface
   Pivot: TPointF; // percent position of the center rotation. (0,0) mean topleft, (0.5,0.5) mean the center, (1,1) mean bottomright.
-  Scale   : TPointFParam;
-  Opacity : TBoundedFParam;
-  Tint    : TBGRAParam;
+  Scale   : TPointFParam; // the scale values on both axis. (1,1) means no scaling (default)
+  Opacity : TBoundedFParam; // the opacity of the surface, range is [0..255]
+  Tint    : TBGRAParam; // the tint applyed to the surface. Alpha channel controls the amount.
   TintMode: TTintMode; // Can be tmMixColor or tmReplaceColor. Default value is tmReplaceColor.
   // Post a message to the surface.
   // The delay allows to post the message only after a lapse of time (in seconds): it's usefull to construct chained animation.
