@@ -10,6 +10,11 @@ const
 {$endif}
 type
 
+TMouseEvent = Controls.TMouseEvent;
+TMouseWheelEvent = Controls.TMouseWheelEvent;
+TMouseButton = Controls.TMouseButton;
+
+
 TOGLCMouseEvent = procedure(Button: TMouseButton; Shift: TShiftState; X, Y: Integer) of object;
 
 { TMouseManager }
@@ -61,10 +66,6 @@ public
   property OnClickOnScene: TOGLCMouseEvent read FOnClickOnScene write FOnClickOnScene;
   property SystemMouseCursorVisible: boolean read FSystemMouseCursorVisible write SetSystemMouseCursorVisible;
 end;
-
-TMouseEvent = Controls.TMouseEvent;
-TMouseWheelEvent = Controls.TMouseWheelEvent;
-TMouseButton = Controls.TMouseButton;
 
 TUIEvent = procedure(Sender: TSimpleSurfaceWithEffect) of object;
 TUIAnimCallBack = procedure(Sender: TSimpleSurfaceWithEffect) of object;
