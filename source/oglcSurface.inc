@@ -908,6 +908,7 @@ end;
 procedure TSimpleSurfaceWithEffect.StopBlink;
 begin
   FBlink.BlinkToGo := 0;
+  Visible := True;
 end;
 
 procedure TSimpleSurfaceWithEffect.RotationAroundPoint(aXPt, aYPt: single; aAnglePerSecond: single; aSelfRotate: boolean);
