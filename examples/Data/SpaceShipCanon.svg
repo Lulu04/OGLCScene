@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="10.985283mm"
+   height="23.627438mm"
+   viewBox="0 0 10.985283 23.627438"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="SpaceShip.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient18"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#dd9523;stop-opacity:1;"
+         offset="0"
+         id="stop18" />
+      <stop
+         style="stop-color:#e8d5b4;stop-opacity:1;"
+         offset="0.5"
+         id="stop20" />
+      <stop
+         style="stop-color:#db972c;stop-opacity:1;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient18"
+       id="linearGradient19"
+       x1="129.21936"
+       y1="107.47971"
+       x2="140.20465"
+       y2="107.47971"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient18"
+       id="linearGradient22"
+       x1="133.23573"
+       y1="100.15068"
+       x2="136.35699"
+       y2="100.15068"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0266762,0,0,0.75309158,-3.6802087,22.579559)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-122.71219,-111.06724)">
+    <g
+       id="g22"
+       transform="translate(-6.5071717,19.762521)">
+      <path
+         id="rect18"
+         style="fill:url(#linearGradient22);fill-rule:evenodd;stroke:#704c14;stroke-width:0.496808;stroke-linecap:round;stroke-linejoin:round"
+         d="m 133.39978,92.162734 c 0,0 0.79448,-0.609614 1.31223,-0.609614 0.51775,0 1.31223,0.609614 1.31223,0.609614 v 11.678926 h -2.62446 z"
+         sodipodi:nodetypes="cscccc" />
+      <ellipse
+         style="fill:url(#linearGradient19);fill-rule:evenodd;stroke:#704c14;stroke-width:0.48483;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+         id="path1"
+         cx="134.71201"
+         cy="107.47971"
+         rx="5.250226"
+         ry="7.2100239" />
+    </g>
+  </g>
+</svg>

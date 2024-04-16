@@ -12,7 +12,7 @@ TOGLCPathHelper = type helper for TOGLCPath
   procedure CreateTriangle(pt1, pt2, pt3: TPointF);
   procedure CreateRect(aWidth, aHeight: single);
   procedure CreateRoundRect(aWidth, aHeight: integer; aRx, aRy: single; aOptions: TRoundRectangleOptions=[]);
-  procedure CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single);
+  procedure CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single; aClosePath: boolean);
   procedure RemoveIdenticalConsecutivePoint;
   procedure ClosePath;
   function IsClosed: boolean;
@@ -75,7 +75,7 @@ begin
   Self.RemoveIdenticalConsecutivePoint;
 end;
 
-procedure TOGLCPathHelper.CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single);
+procedure TOGLCPathHelper.CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single; aClosePath: boolean);
 begin
   Self := ComputeEllipse(aWidth*0.5, aHeight*0.5, aRx, aRy);
   Self.RemoveIdenticalConsecutivePoint;
