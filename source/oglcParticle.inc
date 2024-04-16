@@ -240,7 +240,7 @@ public
   function ParticlesCollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean;
 
   // Sets this property to True if you want the particles follow the moves of the emitter.
-  // Sets it to False to have the particles independant from the emitter position.
+  // Sets it to False to have the particles independant from the emitter position. Default is False.
   property ParticlesPosRelativeToEmitterPos: boolean read FParticlesPosRelativeToEmitterPos write SetParticlesPosRelativeToEmitterPos;
   property EmitterType: TEmitterType read FEmitterType;
   // The number of particles currently active
