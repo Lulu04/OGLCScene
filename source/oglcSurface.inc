@@ -235,16 +235,19 @@ public  // Scenario
   procedure StopScenario(aID: TIDScenario);
   procedure StopAllScenario;
   function ScenarioIsPlaying(aID: TIDScenario): boolean;
-  // set a callbak proc to decode custom additionnal actions
+  // set a callbak proc to decode custom additionnal actions.
   procedure SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
   // Frame animation
   // You can set the range of frame index to use to animate the surface.
-  // A texture frame start from 1 because 0 means the whole texture
+  // A texture frame start from 1 because 0 means the whole texture.
   procedure SetFrameLoopBounds(AStartFrameIndex, AEndFrameIndex: integer);
+  // Specify how many frame must be added to the frame index per second to perform animation.
   procedure FrameAddPerSecond(ADeltaFramePerSecond: single);
+  // You can set/get the frame index. Frame index start at 1.
   property Frame: single read FFrame write SetFrame;
-  // Flip H and V
+  // Flip horizontally
   property FlipH: boolean read FFlipH write FFlipH;
+  // Flip vertically
   property FlipV: boolean read FFlipV write FFlipV;
   // utils
   // Center the surface on its parent scene
@@ -260,7 +263,11 @@ public  // Scenario
   function CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean; overload;
   function CollisionTestWith(aRect: TRect): boolean; overload;
 
+  // All the surface properties that change throught time (like Tint, Angle, Scale, X, Y...)
+  // are freezed if you sets this property to True.
   property Freeze: boolean read FFreeze write FFreeze ;  // set to TRUE to stop all variations on surface ( move, opacity change, scale change, etc...)
+  // You can change the blend mode for this surface.
+  // Possible value are: FX_BLEND_NORMAL, FX_BLEND_ADD, FX_BLEND_MULT, FX_NOBLEND
   property BlendMode: byte read FBlendMode write FBlendMode;
 public
   // add a child to the surface.
@@ -269,6 +276,7 @@ public
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
   procedure DeleteAllChilds;
+  // Remove the child without killing it.
   procedure RemoveChild(aSurface: TSimpleSurfaceWithEffect);
   // Remove the child dependency and add the surface to the scene. Do nothing if the surface don't have a parent.
   procedure MoveFromChildToScene(aLayer: integer);
