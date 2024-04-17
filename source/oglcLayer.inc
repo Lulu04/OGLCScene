@@ -98,10 +98,17 @@ public
   procedure GroupFlipH(aGroup: integer; aValue:boolean);
   procedure GroupFlipV(aGroup: integer; aValue:boolean);
 
-  // Collision test: return surface collided, NIL if no collision
+  // Check if the passed surface collide with one in this layer.
+  // Return the surface collided, NIL if no collision.
   function CollisionTest(aSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
+  // Check if the passed surface collide with one in this layer.
+  // Return the surface collided, NIL if no collision.
   function CollisionTest(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: single): TSimpleSurfaceWithEffect; overload;
+  // Check if the rect collide with one in this layer.
+  // Return the surface collided, NIL if no collision.
   function CollisionTest(aX, aY, aWidth, aHeight: single) : TSimpleSurfaceWithEffect; overload;
+  // Check if the rect collide with one in this layer, excluding the passed surface.
+  // Return the surface collided, NIL if no collision.
   function CollisionTest(aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect) : TSimpleSurfaceWithEffect; overload;
 
   // Freeze the layer and its surfaces
