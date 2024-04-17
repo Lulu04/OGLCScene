@@ -23,7 +23,7 @@ end;
 
 TMeteor = class(TSprite)
 private
-  FDebug: TUIPanel;
+  FDebug: TShapeOutline;
   FAtlas: TOGLCTextureAtlas;
   FHitCount: integer;
   procedure Explode;
@@ -31,6 +31,7 @@ public
   constructor Create(aAtlas: TOGLCTextureAtlas);
   procedure Update(const AElapsedTime: single); override;
   procedure Hit;
+  procedure CollisionBoxVisible(AValue: boolean);
 end;
 
 { TLaserBullet }
@@ -48,7 +49,7 @@ private
   FTexLaser: PTexture;
   FCanonTimeCooling: single;
   FCanonSide, FInvulnerability: boolean;
-  FDebug1, FDebug2: TUIPanel;
+  FDebug1, FDebug2: TShapeOutline;
 public
   constructor Create(aAtlas: TOGLCTextureAtlas);
   procedure Update(const AElapsedTime: single); override;
@@ -57,6 +58,7 @@ public
   procedure Move(aDelta: single);
   procedure Shoot;
   function DoCollisionTestWithMeteor: boolean;
+  procedure CollisionBoxVisible(AValue: boolean);
 end;
 
 function PathToDataFolder: string;
@@ -108,13 +110,12 @@ begin
   Tint.Value := BGRA(0,0,b,80);         // modify the color
   Angle.AddConstant((Random(20)-10)*3); // add a rotation effect
 
-  FDebug := TUIPanel.Create(FScene);
-  FDebug.BodyShape.SetShapeEllipse(Round(Width*0.844), Round(Width*0.844), 3.0);
-  FDebug.BodyShape.Fill.Visible := False;
-  FDebug.BodyShape.Border.Color := BGRA(255,0,0);
-  FDebug.BodyShape.Border.LinePosition := lpInside;
+  FDebug := TShapeOutline.Create(FScene);
+  FDebug.SetShapeEllipse(X.Value, Y.Value, Round(Width*0.844), Round(Width*0.844));
+  FDebug.SetParam(2.0, BGRA(255,0,0), lpInside, True);
   FScene.Add(FDebug, LAYER_GUI);
   FDebug.BindCenterToSprite(Self);
+  FDebug.Visible := FShowCollisionBox;
 end;
 
 procedure TMeteor.Update(const AElapsedTime: single);
@@ -131,6 +132,11 @@ procedure TMeteor.Hit;
 begin
   inc(FHitCount);
   if FHitCount = 1 then Explode;
+end;
+
+procedure TMeteor.CollisionBoxVisible(AValue: boolean);
+begin
+  FDebug.Visible := AValue;
 end;
 
 { TLaserBullet }
@@ -231,21 +237,19 @@ begin
   pe.SetCoordinate(Width*0.5, Height);
 
 
-  FDebug1 := TUIPanel.Create(FScene);  // CenterX - Width*0.29*0.5;
-  FDebug1.BodyShape.SetShapeRectangle(Round(Width*0.29), Round(Height*0.5), 3.0);
-  FDebug1.BodyShape.Fill.Visible := False;
-  FDebug1.BodyShape.Border.Color := BGRA(255,0,0);
-  FDebug1.BodyShape.Border.LinePosition := lpInside;
+  FDebug1 := TShapeOutline.Create(FScene);
+  FDebug1.SetShapeRectangle(0, 0, Round(Width*0.29), Round(Height*0.5));
+  FDebug1.SetParam(2.0, BGRA(255,0,0), lpInside, True);
   FScene.Add(FDebug1, LAYER_GUI);
   FDebug1.BindToSprite(Self, (Width - FDebug1.Width)*0.5, 0);
+  FDebug1.Visible := FShowCollisionBox;
 
-  FDebug2 := TUIPanel.Create(FScene);  // CenterX - Width*0.29*0.5;
-  FDebug2.BodyShape.SetShapeRectangle(Width, Round(Height*0.35), 3.0);
-  FDebug2.BodyShape.Fill.Visible := False;
-  FDebug2.BodyShape.Border.Color := BGRA(255,0,0);
-  FDebug2.BodyShape.Border.LinePosition := lpInside;
+  FDebug2 := TShapeOutline.Create(FScene);
+  FDebug2.SetShapeRectangle(0, 0, Width, Round(Height*0.35));
+  FDebug2.SetParam(2.0, BGRA(255,0,0), lpInside, True);
   FScene.Add(FDebug2, LAYER_GUI);
   FDebug2.BindToSprite(Self, 0, Height*0.5);
+  FDebug2.Visible := FShowCollisionBox;
 
   FTexLaser := aAtlas.RetrieveTextureByFileName('SpaceShipLaser.svg');
 end;
@@ -302,7 +306,7 @@ var p: TPointF;
   laser: TLaserBullet;
 begin
   if FCanonTimeCooling > 0 then exit;
-  FCanonTimeCooling := 0.25; // the delay before another shoot
+  FCanonTimeCooling := 0.1; // the delay before another shoot
   FCanonSide := not FCanonSide;  // we toggle the side of the shoot
   if FCanonSide then p.x := FCanonL.CenterX
     else p.x := FCanonR.CenterX;
@@ -314,7 +318,7 @@ begin
   FScene.Add(laser, LAYER_LASER);
   laser.CenterX := p.x;
   laser.BottomY := p.y;
-  laser.Speed.y.Value := -FScene.Height;  // the laser passes through the scene in 1s
+  laser.Speed.y.Value := -FScene.Height*1.5;  // the distance traveled by the laser in 1s
 end;
 
 // principe: the ship is treated as two rectangle, due to its shape.
@@ -359,6 +363,12 @@ begin
       exit;
     end;
   end;
+end;
+
+procedure TPlayerShip.CollisionBoxVisible(AValue: boolean);
+begin
+  FDebug1.Visible := AValue;
+  FDebug2.Visible := AValue;
 end;
 
 { TStar }

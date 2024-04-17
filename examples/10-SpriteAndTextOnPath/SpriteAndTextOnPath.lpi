@@ -17,9 +17,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="69"/>
+      <BuildNr Value="75"/>
       <Language Value="040C"/>
-      <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.0"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
       <Item1 Name="Debug" Default="True"/>
@@ -80,7 +79,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="24">
+    <Units Count="26">
       <Unit0>
         <Filename Value="SpriteAndTextOnPath.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -116,8 +115,7 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="5"/>
-        <CursorPos X="50" Y="16"/>
+        <CursorPos X="27" Y="15"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -260,8 +258,22 @@
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit23>
+      <Unit24>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="102"/>
+        <CursorPos X="39" Y="108"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="427"/>
+        <UsageCount Value="10"/>
+      </Unit25>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="88" Column="75" TopLine="80"/>
@@ -282,6 +294,38 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="98" Column="85" TopLine="88"/>
       </Position5>
+      <Position6>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="94" Column="24" TopLine="78"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="119" Column="15" TopLine="94"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="712" TopLine="710"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="118" Column="13" TopLine="103"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="674" Column="17" TopLine="658"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="10" Column="6"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="170" Column="8" TopLine="167"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="558" Column="22" TopLine="531"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -49,7 +49,7 @@ private
   FFreighter: TSprite; // the sprite for the freighter
 
   FPanelStatus: TPanelStatus; // a panel to show informations to the player
-  FExplanation: TMultilineText; // to contains the explanation text
+  FExplanation: TAlignedText; // to contains the explanation text
 
   FCamera: TOGLCCamera;
   FGameState: TGameState;
@@ -185,7 +185,7 @@ begin
   FPanelStatus := TPanelStatus.Create(FtexFont);
 
   // explanation text
-  FExplanation := TMultilineText.Create(FScene, FtexFont, Round(FScene.Width*0.8), FScene.Height div 3);
+  FExplanation := TAlignedText.Create(FScene, FtexFont, Round(FScene.Width*0.8), FScene.Height div 3);
   FScene.Add(FExplanation, LAYER_GUI);
   FExplanation.Caption := 'Press ''SPACE'' to deploy/retract the arm to harvest the meteor.'#10+
                           'Press ''C'' to reach the freighter to transfert the cargo.'#10+

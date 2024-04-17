@@ -22,8 +22,8 @@ private
   FtexFont: TTexturedFont;
 
   FTitle: TFreeText;
-  FSingleLineText: TFreeText;
-  FMultilineText: TMultilineText;
+  FText: TFreeText;
+  FAlignedText: TAlignedText;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -62,7 +62,7 @@ begin
 
 
   // we define another font for the text
-  fd.Create('Arial', 20, [], BGRA(0,0,0));
+  fd.Create('Arial', FScene.ScaleDesignToScene(20), [], BGRA(0,0,0));
   FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET + ASCII_SYMBOL_CHARSET); // use 2 predefined charsets
 
   FAtlas.TryToPack;
@@ -87,26 +87,27 @@ begin
     CenterY := FScene.Height / 3;
   end;
 
-  FSingleLineText := TFreeText.Create(FScene);
-  FScene.Add(FSingleLineText);
-  with FSingleLineText do begin
+  FText := TFreeText.Create(FScene);
+  FScene.Add(FText);
+  with FText do begin
     TexturedFont := FtexFont;
-    Caption := 'TFreeText is a surface that draw a single line string. It use a TTexturedFont';
+    Caption := 'TFreeText is a surface that draw a string. It use a TTexturedFont.'#10+
+       'With ''#10'' we can jump to the next line';
     Tint.Value := BGRA(255,255,0);
-    Y.Value := FTitle.BottomY;  // equivalent to  FSingleLineText.Y.Value := FTitle.Y.Value + FTitle.Height;
+    Y.Value := FTitle.BottomY;  // equivalent to  FText.Y.Value := FTitle.Y.Value + FTitle.Height;
     CenterX := FScene.Center.x;
   end;
 
-  FMultilineText := TMultilineText.Create(FScene, FtexFont, Round(FScene.Width*0.5), Round(FScene.Height/3));
-  FScene.Add(FMultilineText);
-  with FMultilineText do begin
+  FAlignedText := TAlignedText.Create(FScene, FtexFont, Round(FScene.Width*0.5), Round(FScene.Height/3));
+  FScene.Add(FAlignedText);
+  with FAlignedText do begin
     Caption := 'TMultilineText is a surface that draw a text in a rectangular area with horizontal and vertical align. '+
                'It use a TTexturedFont.'#10+
                'With ''#10'' we can jump to the next line.'#10#10+
-               'The size of the area where this text is written is '+FMultilineText.Width.ToString+'x'+FMultilineText.Height.ToString+#10+
+               'The size of the area where this text is written is '+FAlignedText.Width.ToString+'x'+FAlignedText.Height.ToString+#10+
                'Try to change the Align property to center the text differently.';
     Tint.Value := BGRA(255,128,64);
-    Y.Value := FSingleLineText.BottomY + FSingleLineText.Height;
+    Y.Value := FText.BottomY + fd.FontHeight;
     CenterX := FScene.Center.x;
     Align := taTopCenter;
   end;
@@ -120,7 +121,7 @@ end;
 
 procedure TScreenDemo.SetMultilineTextAlignProperty(aValue: integer);
 begin
-  FMultilineText.Align := TOGLCAlignment(aValue);
+  FAlignedText.Align := TOGLCAlignment(aValue);
 end;
 
 

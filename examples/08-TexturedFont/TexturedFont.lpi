@@ -17,9 +17,8 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="79"/>
+      <BuildNr Value="83"/>
       <Language Value="040C"/>
-      <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.0"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
       <Item1 Name="Debug" Default="True"/>
@@ -116,9 +115,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="5"/>
-        <CursorPos X="35" Y="15"/>
-        <UsageCount Value="78"/>
+        <CursorPos X="37" Y="15"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -255,12 +253,41 @@
       <Unit23>
         <Filename Value="..\..\source\oglcTexturedFont.inc"/>
         <EditorIndex Value="4"/>
-        <CursorPos X="41" Y="27"/>
+        <CursorPos X="47" Y="26"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit23>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="7" HistoryIndex="6">
+      <Position1>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="92" Column="19" TopLine="76"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="102" Column="12" TopLine="87"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="23" Column="12" TopLine="9"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="101" Column="26" TopLine="82"/>
+      </Position4>
+      <Position5>
+        <Filename Value="..\..\source\oglcTexturedFont.inc"/>
+        <Caret Line="175" TopLine="105"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="23" Column="10" TopLine="10"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="124" Column="15" TopLine="97"/>
+      </Position7>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
