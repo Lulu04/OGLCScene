@@ -404,8 +404,7 @@ end;
 
 procedure TShapeOutline.SetRectangle(aX, aY: single; aWidth, aHeight: integer);
 begin
-  FPath.CreateRect(aWidth, aHeight);
-  FPath.ClosePath;
+  FPath.CreateRect(0, 0, aWidth, aHeight, True);
   FWidth := aWidth;
   FHeight := aHeight;
   SetCoordinate(aX, aY);
