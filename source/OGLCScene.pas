@@ -438,6 +438,7 @@ TOGLCScene = class(TOGLCContext)
   function CreateTileEngine(aLayer: integer=0): TTileEngine;
 
   function CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer=0): TSprite;
+  function Add_FreeText(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TFreeText;
 
   function Add_UILabel(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUILabel;
   function Add_UIButton(const aCaption: string; aFont: TTexturedFont; aTexture: PTexture; aLayer: integer=0): TUIButton; overload;
@@ -1282,6 +1283,14 @@ end;
 function TOGLCScene.CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer): TSprite;
 begin
   Result := TSprite.Create(aTexture, aTextureOwner);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.Add_FreeText(const aCaption: string; aFont: TTexturedFont; aLayer: integer): TFreeText;
+begin
+  Result := TFreeText.Create(Self);
+  Result.TexturedFont := aFont;
+  Result.Caption := aCaption;
   Add(Result, aLayer);
 end;
 
