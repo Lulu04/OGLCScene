@@ -9,10 +9,11 @@ TArrayOfOGLCPath = array of TOGLCPath;
 TOGLCPathHelper = type helper for TOGLCPath
   procedure CreateLine(pt1, pt2: TPointF); overload;
   procedure CreateLine(x1, y1, x2, y2: single); overload;
-  procedure CreateTriangle(pt1, pt2, pt3: TPointF);
-  procedure CreateRect(aWidth, aHeight: single);
-  procedure CreateRoundRect(aWidth, aHeight: integer; aRx, aRy: single; aOptions: TRoundRectangleOptions=[]);
-  procedure CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single; aClosePath: boolean);
+  procedure CreateTriangle(pt1, pt2, pt3: TPointF; aClosePath: boolean);
+  procedure CreateRect(aX, aY, aWidth, aHeight: single; aClosePath: boolean);
+  procedure CreateRoundRect(aX, aY, aWidth, aHeight, aRx, aRy: single;
+                            aOptions: TRoundRectangleOptions; aClosePath: boolean);
+  procedure CreateEllipse(aX, aY, aRx, aRy: single; aClosePath: boolean);
   procedure RemoveIdenticalConsecutivePoint;
   procedure ClosePath;
   function IsClosed: boolean;
@@ -50,35 +51,40 @@ begin
   Self[1].y := y2;
 end;
 
-procedure TOGLCPathHelper.CreateTriangle(pt1, pt2, pt3: TPointF);
+procedure TOGLCPathHelper.CreateTriangle(pt1, pt2, pt3: TPointF; aClosePath: boolean);
 begin
   Self := NIL;
   SetLength(Self, 3);
   Self[0] := pt1;
   Self[1] := pt2;
   Self[2] := pt3;
+  if aClosePath then Self.ClosePath;
 end;
 
-procedure TOGLCPathHelper.CreateRect(aWidth, aHeight: single);
+procedure TOGLCPathHelper.CreateRect(aX, aY, aWidth, aHeight: single; aClosePath: boolean);
 begin
   Self := NIL;
   SetLength(Self, 4);
-  Self[0] := PointF(aWidth-1, 0);
-  Self[1] := PointF(0, 0);
-  Self[2] := PointF(0, aHeight-1);
-  Self[3] := PointF(aWidth-1, aHeight-1);
+  Self[0] := PointF(aX+aWidth-1, aY);
+  Self[1] := PointF(aX, aY);
+  Self[2] := PointF(aX, aY+aHeight-1);
+  Self[3] := PointF(aX+aWidth-1, aY+aHeight-1);
+  if aClosePath then Self.ClosePath;
 end;
 
-procedure TOGLCPathHelper.CreateRoundRect(aWidth, aHeight: integer; aRx, aRy: single; aOptions: TRoundRectangleOptions);
+procedure TOGLCPathHelper.CreateRoundRect(aX, aY, aWidth, aHeight, aRx, aRy: single;
+  aOptions: TRoundRectangleOptions; aClosePath: boolean);
 begin
-  Self := ComputeRoundRect(0, 0, aWidth-1, aHeight-1, aRx, aRy, aOptions);
+  Self := ComputeRoundRect(aX, aY, aX+aWidth-1, aY+aHeight-1, aRx, aRy, aOptions);
   Self.RemoveIdenticalConsecutivePoint;
+  if aClosePath then Self.ClosePath;
 end;
 
-procedure TOGLCPathHelper.CreateEllipse(aWidth, aHeight: integer; aRx, aRy: single; aClosePath: boolean);
+procedure TOGLCPathHelper.CreateEllipse(aX, aY, aRx, aRy: single; aClosePath: boolean);
 begin
-  Self := ComputeEllipse(aWidth*0.5, aHeight*0.5, aRx, aRy);
+  Self := ComputeEllipse(aX, aY, aRx, aRy);
   Self.RemoveIdenticalConsecutivePoint;
+  if aClosePath then Self.ClosePath;
 end;
 
 procedure TOGLCPathHelper.RemoveIdenticalConsecutivePoint;

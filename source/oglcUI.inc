@@ -731,27 +731,24 @@ begin
   SetLength(FCheckCross, 2);
   case aShape of
     ctRectangle: begin
-      borderPath.CreateRect(w, w);
-      borderPath.ClosePath;
-      fillPath.CreateRect(w-2, w-2);
+      borderPath.CreateRect(0, 0, w, w, True);
+      fillPath.CreateRect(0, 0, w-2, w-2, False);
       rectCross := RectF(lineWidth*0.5, lineWidth*0.5, w-lineWidth, w-lineWidth);
       FCheckCross[0].CreateLine(rectCross.TopLeft, rectCross.BottomRight);
       FCheckCross[1].CreateLine(PointF(rectCross.Left, rectCross.Bottom), PointF(rectCross.Right, rectCross.Top));
     end;
     ctRoundRect: begin
       v := Max(2, w*0.3);
-      borderPath.CreateRoundRect(w, w, v, v);
-      borderPath.ClosePath;
-      fillPath.CreateRoundRect(w-2, w-2, v, v);
+      borderPath.CreateRoundRect(0, 0, w, w, v, v, [], True);
+      fillPath.CreateRoundRect(0, 0, w-2, w-2, v, v, [], False);
       v := v*0.5;
       rectCross := RectF(v, v, w-v-lineWidth*0.5, w-v-lineWidth*0.5);
       FCheckCross[0].CreateLine(rectCross.TopLeft, rectCross.BottomRight);
       FCheckCross[1].CreateLine(PointF(rectCross.Left, rectCross.Bottom), PointF(rectCross.Right, rectCross.Top));
     end;
     ctCircle: begin
-      borderPath.CreateEllipse(w, w, w*0.5, w*0.5);
-      borderPath.ClosePath;
-      fillPath.CreateEllipse(w-2, w-2, (w-2)*0.5, (w-2)*0.5);
+      borderPath.CreateEllipse(w*0.5, w*0.5, w*0.5, w*0.5, True);
+      fillPath.CreateEllipse((w-2)*0.5, (w-2)*0.5, (w-2)*0.5, (w-2)*0.5, False);
       v := w * 0.5 * 0.707 - lineWidth*0.5;   // for angle 45° 135° 225° and 315° -> sin and cos = +-0.707
       rectCross := RectF(w*0.5-v, w*0.5-v, w*0.5+v, w*0.5+v);
       FCheckCross[0].CreateLine(rectCross.TopLeft, rectCross.BottomRight);
@@ -1179,7 +1176,7 @@ begin
       h := ClientArea.Height*FPercent; //Height*FPercent;
     end;
     path := NIL;
-    path.CreateRect(w, h);
+    path.CreateRect(0, 0, w, h, False);
     FFillForStencil.InitFromPath(path, PointF(w*0.5, h*0.5));
   end;
   Gradient.ComputeVerticesAndIndices(Width, Height);
@@ -2005,11 +2002,9 @@ begin
   fillPath := NIL;
   FShapetype := stRectangle;
 
-  if aBorderWidth > 0 then begin
-    borderPath.CreateRect(aWidth, aHeight);
-    borderPath.ClosePath;
-  end;
-  fillPath.CreateRect(aWidth-2, aHeight-2);
+  if aBorderWidth > 0 then borderPath.CreateRect(0, 0, aWidth, aHeight, True);
+
+  fillPath.CreateRect(0, 0, aWidth-2, aHeight-2, False);
   fillPath.Translate(PointF(1,1));
 
   SetShape(borderPath, fillPath, aWidth, aHeight, aBorderWidth);
@@ -2040,10 +2035,9 @@ begin
   end;
 
   if aBorderWidth > 0 then begin
-    borderPath.CreateRoundRect(aWidth, aHeight, aRx, aRy, aOptions);
-    borderPath.ClosePath;
+    borderPath.CreateRoundRect(0, 0, aWidth, aHeight, aRx, aRy, aOptions, True);
   end;
-  fillPath.CreateRoundRect(aWidth-2, aHeight-2, aRx, aRy, aOptions);
+  fillPath.CreateRoundRect(0, 0, aWidth-2, aHeight-2, aRx, aRy, aOptions, False);
   fillPath.Translate(PointF(1,1));
 
   SetShape(borderPath, fillPath, aWidth, aHeight, aBorderWidth);
@@ -2057,10 +2051,9 @@ begin
   FShapetype := stEllipse;
 
   if aBorderWidth > 0 then begin
-    borderPath.CreateEllipse(aWidth, aHeight, aWidth*0.5, aHeight*0.5);
-    borderPath.ClosePath;
+    borderPath.CreateEllipse(aWidth*0.5, aHeight*0.5, aWidth*0.5, aHeight*0.5, True);
   end;
-  fillPath.CreateEllipse(aWidth-2, aHeight-2, (aWidth-2)*0.5, (aHeight-2)*0.5);
+  fillPath.CreateEllipse((aWidth-2)*0.5, (aHeight-2)*0.5, (aWidth-2)*0.5, (aHeight-2)*0.5, False);
   fillPath.Translate(PointF(1,1));
 
   SetShape(borderPath, fillPath, aWidth, aHeight, aBorderWidth);

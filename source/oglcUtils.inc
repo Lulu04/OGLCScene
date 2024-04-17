@@ -44,7 +44,7 @@ procedure FillBox(const aScene: TOGLCScene; aX, aY, aWidth, aHeight: single; con
 procedure FillBox(const aScene: TOGLCScene; const aRect: TRect; const aFillColor: TBGRAPixel; aOpacity: single=1.0); overload;
 procedure DrawLine(const aScene: TOGLCScene; x1, y1, x2, y2: single; aColor: TBGRAPixel; w: single=1.0); overload;
 procedure DrawLine(const aScene: TOGLCScene; pt1, pt2: TPointF; aColor: TBGRAPixel; w: single=1.0); overload;
-procedure DrawEllipse(const aScene: TOGLCScene; aWidth, aHeight: integer; aRx, aRy: single; aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0);
+procedure DrawEllipse(const aScene: TOGLCScene; aX, aY, aRx, aRy: single; aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0);
 
 // Compute the scale value to maximize the passed texture on the scene. Aspect ration is keeped.
 function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer=0): TPointF;
@@ -298,9 +298,8 @@ procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: singl
 var path: TOGLCPath;
 begin
   path := NIL;
-  path.CreateRect(aWidth, aHeight);
-  path.ClosePath;
-  path.Translate(PointF(aX, aY));
+  path.CreateRect(aX, aY, aWidth, aHeight, True);
+//  path.Translate(PointF(aX, aY));
 //  aScene.SmoothLineRenderer.PushPath(path, lpInside, aColor, w, aOpacity, False);
 
   aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
@@ -337,13 +336,13 @@ begin
   aScene.FastLineRenderer.PushLine(pt1, pt2, aColor, w, lpMiddle);
 end;
 
-procedure DrawEllipse(const aScene: TOGLCScene; aWidth, aHeight: integer; aRx, aRy: single; aColor: TBGRAPixel;
+procedure DrawEllipse(const aScene: TOGLCScene; aX, aY, aRx, aRy: single; aColor: TBGRAPixel;
   w: single; aOpacity: single);
 var path: TOGLCPath;
 begin
   path := NIL;
-  path.CreateEllipse(aWidth, aHeight, aRx, aRy);
-  path.ClosePath;
+  path.CreateEllipse(aX, aY, aRx, aRy, True);
+  //path.ClosePath;
   aScene.SmoothLineRenderer.PushPath(path, lpInside, aColor, w, aOpacity, True);
 end;
 
