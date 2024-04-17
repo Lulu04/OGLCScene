@@ -76,10 +76,13 @@ public
   procedure DoDraw; override;
   constructor Create(aParentScene: TOGLCScene);
 
-  procedure SetLine(pt1, pt2: TPointF);
-  procedure SetRectangle(aX, aY: single; aWidth, aHeight: integer);
+  procedure SetShapeLine(pt1, pt2: TPointF);
+  procedure SetShapeRectangle(aX, aY: single; aWidth, aHeight: integer);
   // (aX, aY) are the coordinates of the Top/Left of the ellipse
-  procedure SetEllipse(aX, aY: single; aWidth, aHeight: integer);
+  procedure SetShapeEllipse(aX, aY: single; aWidth, aHeight: integer);
+  procedure SetShapeCustom(aX, aY: single; aPath: TOGLCPath);
+  // convenient method to set all the parameters in one call.
+  procedure SetParam(aLineWidth: single; aLineColor: TBGRAPixel; aLinePosition: TOGLCLinePosition; aAntialiasing: boolean);
   property LineWidth: single read FLineWidth write FLineWidth;
   property LineColor: TBGRAPixel read FLineColor write FLineColor;
   // default is lpMiddle
@@ -396,7 +399,7 @@ begin
   FLineColor := BGRA(30,30,30);
 end;
 
-procedure TShapeOutline.SetLine(pt1, pt2: TPointF);
+procedure TShapeOutline.SetShapeLine(pt1, pt2: TPointF);
 begin
   SetCoordinate(pt1);
   FPath.CreateLine((PointF(0,0)), (pt2-pt1));
@@ -404,7 +407,7 @@ begin
   FHeight := Trunc(Abs(pt1.y-pt2.y));
 end;
 
-procedure TShapeOutline.SetRectangle(aX, aY: single; aWidth, aHeight: integer);
+procedure TShapeOutline.SetShapeRectangle(aX, aY: single; aWidth, aHeight: integer);
 begin
   FPath.CreateRect(0, 0, aWidth, aHeight, True);
   FWidth := aWidth;
@@ -412,12 +415,33 @@ begin
   SetCoordinate(aX, aY);
 end;
 
-procedure TShapeOutline.SetEllipse(aX, aY: single; aWidth, aHeight: integer);
+procedure TShapeOutline.SetShapeEllipse(aX, aY: single; aWidth, aHeight: integer);
 begin
-  FPath.CreateEllipse(0, 0, aWidth*0.5, aHeight*0.5, True);
+  FPath.CreateEllipse(aWidth*0.5, aHeight*0.5, aWidth*0.5, aHeight*0.5, True);
   FWidth := aWidth;
   FHeight := aHeight;
   SetCoordinate(aX, aY);
+end;
+
+procedure TShapeOutline.SetShapeCustom(aX, aY: single; aPath: TOGLCPath);
+var r: TRectF;
+begin
+  FPath := NIL;
+  SetLength(FPath, Length(aPath));
+  Move(aPath[0], FPath[0], Length(aPath));
+  r := FPath.Bounds;
+  FWidth := Round(r.Width);
+  FHeight := Round(r.Height);
+  SetCoordinate(aX, aY);
+end;
+
+procedure TShapeOutline.SetParam(aLineWidth: single; aLineColor: TBGRAPixel;
+  aLinePosition: TOGLCLinePosition; aAntialiasing: boolean);
+begin
+  LineWidth := aLineWidth;
+  LineColor := aLineColor;
+  LinePosition := aLinePosition;
+  Antialiasing := aAntialiasing;
 end;
 
 { TMultiColorRectangle }
