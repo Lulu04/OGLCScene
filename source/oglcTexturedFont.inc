@@ -81,7 +81,7 @@ end;
 
 { TFreeText }
 
-// A surface that draw text. The text can be multiline. Lines are separated by #10
+// A surface that draw text. The text can be multiline. Lines are separated by #10.
 // Instead of TUILabel, TFreeText is not clipped and mouse can't interact with it.
 TFreeText = class(TSimpleSurfaceWithEffect)
 private
@@ -169,10 +169,11 @@ public
 end;
 
 
-{ TMultilineText }
+{ TAlignedText }
 // Draws a text in a rectangular area with horizontal and vertical align.
-// The caption can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
-TMultilineText = class(TSimpleSurfaceWithEffect)
+// The text can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
+// Instead of TUITextArea, the text is not clipped and mouse can't interact with it.
+TAlignedText = class(TSimpleSurfaceWithEffect)
 private type
   TFreeTextWord = record
     Word: string;
@@ -224,9 +225,9 @@ end;
  {$endif oglcINTERFACE}
  {$ifdef oglcIMPLEMENTATION}
 
- { TMultilineText }
+ { TAlignedText }
 
-procedure TMultilineText.DistributeTheWordsOnTheSurface;
+procedure TAlignedText.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
    flagLastWasLineEnding: boolean;
@@ -304,7 +305,7 @@ begin
   if (FCaption = '') or (FTexturedFont = NIL) then exit;
 
   W := SplitTextToWordArray(FCaption, ' ');
-{FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
+{FParentScene.LogDebug('TAlignedText.DistributeTheWordsOnTheSurface');
 for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1); }
   // compute the number of word except #10
   xx := 0;
@@ -355,7 +356,7 @@ for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1); }
   FDrawingHeight := FTexturedFont.Font.FontHeight*FLineCount;
 
 {// debug
-  FParentScene.LogDebug('TMultilineText.DistributeTheWordsOnTheSurface');
+  FParentScene.LogDebug('TAlignedText.DistributeTheWordsOnTheSurface');
   FParentScene.LogDebug('FLineCount='+FLineCount.ToString, 1);
   for j:=0 to High(FWords) do begin
    FParentScene.LogDebug('FWords['+j.ToString+'] = LineIndex:'+FWords[j].LineIndex.ToString+
@@ -368,14 +369,14 @@ for xx:=0 to High(W) do FParentScene.LogDebug(''''+W[xx]+'''', 1); }
   end; }
 end;
 
-procedure TMultilineText.SetAlign(AValue: TOGLCAlignment);
+procedure TAlignedText.SetAlign(AValue: TOGLCAlignment);
 begin
    if FAlign=AValue then Exit;
    FAlign:=AValue;
    DoAlign;
 end;
 
-procedure TMultilineText.SetCaption(AValue: string);
+procedure TAlignedText.SetCaption(AValue: string);
 begin
   AValue := StringReplace(AValue, #13#10, #10, [rfReplaceAll{, rfIgnoreCase}]);
   AValue := StringReplace(AValue, #13, #10, [rfReplaceAll{, rfIgnoreCase}]);
@@ -385,7 +386,7 @@ begin
   DoAlign;
 end;
 
-procedure TMultilineText.SetTexturedFont(AValue: TTexturedFont);
+procedure TAlignedText.SetTexturedFont(AValue: TTexturedFont);
 begin
    if FTexturedFont = AValue then exit;
    FTexturedFont := AValue;
@@ -393,7 +394,7 @@ begin
    DoAlign;
 end;
 
-function TMultilineText.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
+function TAlignedText.GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
 var i: integer;
 begin
   iBegin := -1;
@@ -407,17 +408,17 @@ begin
   Result := (iBegin <> -1) and (iEnd <> -1);
 end;
 
-function TMultilineText.GetWidth: integer;
+function TAlignedText.GetWidth: integer;
 begin
   Result := FRect.Width;
 end;
 
-function TMultilineText.GetHeight: integer;
+function TAlignedText.GetHeight: integer;
 begin
   Result := FRect.Height;
 end;
 
-procedure TMultilineText.DoDraw;
+procedure TAlignedText.DoDraw;
 var i: integer;
 begin
   for i:=0 to Length(FWords)-1 do
@@ -426,7 +427,7 @@ begin
                                FComputedOpacity, FComputedTint, FBlendMode);
 end;
 
-constructor TMultilineText.Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
+constructor TAlignedText.Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
 begin
   inherited Create;
   FParentScene := aParentScene;
@@ -435,14 +436,14 @@ begin
   FRect.Create(Point(0,0), aWidth, aHeight);
 end;
 
-procedure TMultilineText.SetSize(aWidth, aHeight: integer);
+procedure TAlignedText.SetSize(aWidth, aHeight: integer);
 begin
   FRect.Create(Point(0,0), aWidth, aHeight);
   DistributeTheWordsOnTheSurface;
   DoAlign;
 end;
 
-procedure TMultilineText.DoVTopAlign;
+procedure TAlignedText.DoVTopAlign;
 var i, j, iBegin, iEnd: integer;
   yy: integer;
 begin
@@ -455,7 +456,7 @@ begin
   end;
 end;
 
-procedure TMultilineText.DoVCenterAlign;
+procedure TAlignedText.DoVCenterAlign;
 var i, j, iBegin, iEnd, h: integer;
   yy: integer;
 begin
@@ -470,7 +471,7 @@ begin
   end;
 end;
 
-procedure TMultilineText.DoVBottomAlign;
+procedure TAlignedText.DoVBottomAlign;
 var i, j, iBegin, iEnd: integer;
   yy: integer;
 begin
@@ -483,7 +484,7 @@ begin
   end;
 end;
 
-procedure TMultilineText.DoHLeftAlign;
+procedure TAlignedText.DoHLeftAlign;
 var i, j, w, iBegin, iEnd: integer;
 begin
   FDrawingRect.Left:=0;
@@ -497,7 +498,7 @@ begin
    end;
 end;
 
-procedure TMultilineText.DoHCenterAlign;
+procedure TAlignedText.DoHCenterAlign;
 var i, j, iBegin, iEnd: integer;
   w: integer;
 begin
@@ -522,7 +523,7 @@ begin
    end;
 end;
 
-procedure TMultilineText.DoHRightAlign;
+procedure TAlignedText.DoHRightAlign;
 var i, j, w, iBegin, iEnd: integer;
 begin
   FDrawingRect.Left:=FRect.Width;
@@ -539,7 +540,7 @@ begin
     end;
 end;
 
-procedure TMultilineText.DoAlign;
+procedure TAlignedText.DoAlign;
 begin
   case FAlign of
    taTopLeft, taCenterLeft, taBottomLeft: DoHLeftAlign;
@@ -555,7 +556,7 @@ begin
   FDrawingRect.Right:=FDrawingRect.Left+FDrawingWidth;
 end;
 
-function TMultilineText.GetCaption: string;
+function TAlignedText.GetCaption: string;
 begin
   Result := FCaption;
 end;
