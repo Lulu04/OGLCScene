@@ -78,6 +78,8 @@ public
 
   procedure SetLine(pt1, pt2: TPointF);
   procedure SetRectangle(aX, aY: single; aWidth, aHeight: integer);
+  // (aX, aY) are the coordinates of the Top/Left of the ellipse
+  procedure SetEllipse(aX, aY: single; aWidth, aHeight: integer);
   property LineWidth: single read FLineWidth write FLineWidth;
   property LineColor: TBGRAPixel read FLineColor write FLineColor;
   // default is lpMiddle
@@ -405,6 +407,14 @@ end;
 procedure TShapeOutline.SetRectangle(aX, aY: single; aWidth, aHeight: integer);
 begin
   FPath.CreateRect(0, 0, aWidth, aHeight, True);
+  FWidth := aWidth;
+  FHeight := aHeight;
+  SetCoordinate(aX, aY);
+end;
+
+procedure TShapeOutline.SetEllipse(aX, aY: single; aWidth, aHeight: integer);
+begin
+  FPath.CreateEllipse(0, 0, aWidth*0.5, aHeight*0.5, True);
   FWidth := aWidth;
   FHeight := aHeight;
   SetCoordinate(aX, aY);
