@@ -461,30 +461,40 @@ end;
 
 function TLayer.CollisionTest(aX, aY, aWidth, aHeight: single): TSimpleSurfaceWithEffect;
 var i: integer;
+    r: TRectF;
 begin
+  r.Left := aX;
+  r.Top := aY;
+  r.Right := aX + aWidth;
+  r.Bottom := aY + aHeight;
+
   for i:=0 to FList.Count-1 do
-    with Surface[i] do
-     if not ((aX > GetRightX) or (aX+aWidth < X.Value) or
-              (aY > GetBottomY) or (aY+aHeight < Y.Value)) then begin
-         Result := Surface[i];
-         exit;
-     end;
+    if CollisionRectFVersusRectF(Surface[i].GetScaledAreaF, r) then begin
+      Result := Surface[i];
+      exit;
+    end;
+
   Result := NIL;
 end;
 
 function TLayer.CollisionTest(aX, aY, aWidth, aHeight: single; DontTestSurface: TSimpleSurfaceWithEffect): TSimpleSurfaceWithEffect;
 var i: integer;
+    r: TRectF;
     o: TSimpleSurfaceWithEffect;
 begin
+  r.Left := aX;
+  r.Top := aY;
+  r.Right := aX + aWidth;
+  r.Bottom := aY + aHeight;
+
   for i:=0 to FList.Count-1 do begin
     o := Surface[i];
-    if not ((aX > o.GetRightX) or (aX+aWidth < o.X.Value) or
-            (aY > o.GetBottomY) or (aY+aHeight < o.Y.Value)) and
-       (o <> DontTestSurface) then begin
+    if (o <> DontTestSurface) and CollisionRectFVersusRectF(o.GetScaledAreaF, r) then begin
       Result := o;
       exit;
     end;
   end;
+
   Result := NIL;
 end;
 
