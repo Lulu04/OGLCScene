@@ -299,9 +299,6 @@ var path: TOGLCPath;
 begin
   path := NIL;
   path.CreateRect(aX, aY, aWidth, aHeight, True);
-//  path.Translate(PointF(aX, aY));
-//  aScene.SmoothLineRenderer.PushPath(path, lpInside, aColor, w, aOpacity, False);
-
   aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
   aScene.FastLineRenderer.PushPath(path, aColor, w, lpMiddle);
 end;
