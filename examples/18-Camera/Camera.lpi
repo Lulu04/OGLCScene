@@ -17,9 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="32"/>
-      <Language Value="040C"/>
-      <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.0"/>
+      <BuildNr Value="33"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
       <Item1 Name="Debug" Default="True"/>
@@ -114,15 +112,15 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="168"/>
-        <CursorPos X="35" Y="186"/>
+        <CursorPos X="55" Y="13"/>
         <UsageCount Value="72"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Units\u_common.pas"/>
-        <CursorPos X="15" Y="15"/>
+        <CursorPos X="27" Y="13"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -227,10 +225,8 @@
       <Unit19>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="83"/>
-        <CursorPos X="70" Y="92"/>
+        <CursorPos X="28" Y="13"/>
         <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -313,107 +309,107 @@
       </Position4>
       <Position5>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="141" Column="20" TopLine="150"/>
+        <Caret Line="65" Column="30" TopLine="52"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="65" Column="30" TopLine="52"/>
+        <Caret Line="141" Column="15" TopLine="137"/>
       </Position6>
       <Position7>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="141" Column="15" TopLine="137"/>
+        <Caret Line="60" Column="24" TopLine="52"/>
       </Position7>
       <Position8>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="60" Column="24" TopLine="52"/>
+        <Caret Line="245" Column="25" TopLine="236"/>
       </Position8>
       <Position9>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="245" Column="25" TopLine="236"/>
-      </Position9>
-      <Position10>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="55" Column="19" TopLine="29"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="118" Column="8" TopLine="112"/>
       </Position10>
       <Position11>
         <Filename Value="Units\u_sprite_def.pas"/>
-        <Caret Line="118" Column="8" TopLine="112"/>
+        <Caret Line="47" Column="13" TopLine="32"/>
       </Position11>
       <Position12>
         <Filename Value="Units\u_sprite_def.pas"/>
-        <Caret Line="47" Column="13" TopLine="32"/>
+        <Caret Line="117" Column="3" TopLine="112"/>
       </Position12>
       <Position13>
         <Filename Value="Units\u_sprite_def.pas"/>
-        <Caret Line="117" Column="3" TopLine="112"/>
+        <Caret Line="47" Column="16" TopLine="32"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\u_sprite_def.pas"/>
-        <Caret Line="47" Column="16" TopLine="32"/>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="211" Column="23" TopLine="202"/>
       </Position14>
       <Position15>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="211" Column="23" TopLine="202"/>
+        <Caret Line="231" Column="41" TopLine="210"/>
       </Position15>
       <Position16>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="231" Column="41" TopLine="210"/>
+        <Caret Line="59" Column="20" TopLine="45"/>
       </Position16>
       <Position17>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="59" Column="20" TopLine="45"/>
+        <Caret Line="140" Column="7" TopLine="120"/>
       </Position17>
       <Position18>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="140" Column="7" TopLine="120"/>
+        <Caret Line="57" Column="13" TopLine="43"/>
       </Position18>
       <Position19>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="57" Column="13" TopLine="43"/>
+        <Caret Line="91" Column="7" TopLine="74"/>
       </Position19>
       <Position20>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="91" Column="7" TopLine="74"/>
+        <Caret Line="59" Column="23" TopLine="51"/>
       </Position20>
       <Position21>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="59" Column="23" TopLine="51"/>
+        <Caret Line="155" Column="27" TopLine="138"/>
       </Position21>
       <Position22>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="155" Column="27" TopLine="138"/>
+        <Filename Value="..\..\source\oglcCamera.inc"/>
+        <Caret Line="31" Column="2" TopLine="17"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="31" Column="2" TopLine="17"/>
+        <Caret Line="48" Column="14" TopLine="37"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="48" Column="14" TopLine="37"/>
+        <Caret Line="212" Column="2" TopLine="208"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="212" Column="2" TopLine="208"/>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="223" Column="31" TopLine="210"/>
       </Position25>
       <Position26>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="121" Column="55" TopLine="146"/>
+        <Caret Line="59" Column="13" TopLine="47"/>
       </Position26>
       <Position27>
         <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="223" Column="31" TopLine="210"/>
+        <Caret Line="186" Column="35" TopLine="168"/>
       </Position27>
       <Position28>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="59" Column="13" TopLine="47"/>
-      </Position28>
-      <Position29>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="186" Column="35" TopLine="168"/>
-      </Position29>
-      <Position30>
         <Filename Value="Units\u_sprite_def.pas"/>
         <Caret Line="46" Column="15" TopLine="32"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="92" Column="70" TopLine="83"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="52" Column="25" TopLine="38"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

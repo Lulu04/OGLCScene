@@ -25,6 +25,8 @@ private
   FtexStar: PTexture;
 
   FShip: TPlayerShip;       // the sprite for the ship
+
+  FText: TFreeText;
 private
   FGameState: TGameState;
   FStarTimeAccu,
@@ -45,7 +47,7 @@ uses Forms, LCLType;
 { TScreenDemo }
 
 procedure TScreenDemo.CreateObjects;
-var path: string;
+var path, s: string;
   ima: TBGRABitmap;
   zoom: single;
   fd: TFontDescriptor;
@@ -95,6 +97,12 @@ begin
     with TStar.Create(FtexStar) do
       Y.Value := Random(FScene.Height-Height);  // set a random vertical coordinate
 
+  s := 'LEFT/RIGHT move the ship'#10+'SHIFT to shoot'#10+'SPACE to show/hide collision box';
+  FText := FScene.Add_FreeText(s, FtexFont, LAYER_GUI);
+  FText.Tint.Value := BGRA(255,255,0);
+  FText.CenterX := FScene.Width*0.5;
+  FText.BottomY := FScene.Height;
+
   GameState := gsRunning;
 end;
 
@@ -120,6 +128,14 @@ begin
 
       // check if player press SHIFT
       if FScene.KeyState[VK_SHIFT] then FShip.Shoot;
+
+      // check if player press SPACE
+      if FScene.KeyPressed[VK_SPACE] then begin
+        FShowCollisionBox := not FShowCollisionBox;
+        FShip.CollisionBoxVisible(FShowCollisionBox);
+        for i:=0 to FScene.Layer[LAYER_METEOR].SurfaceCount-1 do
+          TMeteor(FScene.Layer[LAYER_METEOR].Surface[i]).CollisionBoxVisible(FShowCollisionBox);
+      end;
 
       // check collision between the laser (in LAYER_LASER) and the meteors (in LAYER_METEOR)
       for i:=0 to FScene.Layer[LAYER_LASER].SurfaceCount-1 do

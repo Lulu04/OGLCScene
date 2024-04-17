@@ -22,7 +22,7 @@ const
 
 var
 FScene: TOGLCScene;
-
+FShowCollisionBox: boolean = False;
 
 implementation
 
