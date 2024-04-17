@@ -81,15 +81,14 @@ end;
 
 { TFreeText }
 
-// A surface that draw a single line string.
+// A surface that draw text. The text can be multiline. Lines are separated by #10
 // Instead of TUILabel, TFreeText is not clipped and mouse can't interact with it.
 TFreeText = class(TSimpleSurfaceWithEffect)
 private
-  FCharIndexes: TTexturedCharIndexes;
-  FCaption: string;
+  FCharIndexes: array of TTexturedCharIndexes;
+  FCaptions: TStringArray;
   FTexturedFont: TTexturedFont;
   FSize: TSize;
-  FSizeComputationNeeded: boolean;
   procedure UpdateCharIndexesAndComputeSize;
   function GetCaption: string;
   procedure SetCaption(AValue: string); virtual;
@@ -173,7 +172,7 @@ end;
 { TMultilineText }
 // Draws a text in a rectangular area with horizontal and vertical align.
 // The caption can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
-TMultilineText = class(TFreeText)
+TMultilineText = class(TSimpleSurfaceWithEffect)
 private type
   TFreeTextWord = record
     Word: string;
@@ -194,13 +193,16 @@ private
   procedure DoHRightAlign;
   procedure DoAlign;
 private
+  FCaption: string;
+  FTexturedFont: TTexturedFont;
   FRect: TRect;
   FWords: ArrayOfFreeTextWord;
   FLineCount: integer;
   FDrawingWidth,
   FDrawingHeight: integer;
-  procedure SetCaption(AValue: string); override;
-  procedure SetTexturedFont(AValue: TTexturedFont); override;
+  function GetCaption: string;
+  procedure SetCaption(AValue: string);
+  procedure SetTexturedFont(AValue: TTexturedFont);
   procedure DistributeTheWordsOnTheSurface;
   procedure SetAlign(AValue: TOGLCAlignment); virtual;
   function GetWordsIndexes(aLineIndex: integer; out iBegin, iEnd: integer): boolean;
@@ -213,6 +215,8 @@ public
   constructor Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
   // Redefine the size of the area where the text is displayed.
   procedure SetSize(aWidth, aHeight: integer);
+  property Caption: string read GetCaption write SetCaption;
+  property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
   property Align: TOGLCAlignment read FAlign write SetAlign;
   property DrawingRect: TRect read FDrawingRect; // real size of the text area
 end;
@@ -424,7 +428,8 @@ end;
 
 constructor TMultilineText.Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
 begin
-  inherited Create(aParentScene);
+  inherited Create;
+  FParentScene := aParentScene;
   FTexturedFont := aFont;
   FAlign := taCenterCenter;
   FRect.Create(Point(0,0), aWidth, aHeight);
@@ -550,33 +555,50 @@ begin
   FDrawingRect.Right:=FDrawingRect.Left+FDrawingWidth;
 end;
 
-
- { TFreeText }
-
-procedure TFreeText.UpdateCharIndexesAndComputeSize;
-begin
-  if (FTexturedFont = NIL) or (Length(FCaption) = 0) then begin
-    FCharIndexes := NIL;
-    FSize.cx := 0;
-    FSize.cy := 0;
-    exit;
-  end else begin
-   FCharIndexes := FTexturedFont.StringToCharIndexes(FCaption);
-   FSize := FTexturedFont.CharIndexesToSize(FCharIndexes);
-  end;
-
-  FSizeComputationNeeded := False;
-end;
-
-function TFreeText.GetCaption: string;
+function TMultilineText.GetCaption: string;
 begin
   Result := FCaption;
 end;
 
+
+ { TFreeText }
+
+procedure TFreeText.UpdateCharIndexesAndComputeSize;
+var i: integer;
+  s: TSize;
+begin
+  FSize.cx := 0;
+  FSize.cy := 0;
+
+  if (FTexturedFont = NIL) or (Length(FCaptions) = 0) then begin
+    FCharIndexes := NIL;
+    exit;
+  end;
+
+  SetLength(FCharIndexes, Length(FCaptions));
+  for i:=0 to High(FCaptions) do begin
+    FCharIndexes[i] := FTexturedFont.StringToCharIndexes(FCaptions[i]);
+
+    s := FTexturedFont.CharIndexesToSize(FCharIndexes[i]);
+    if FSize.cx < s.cx then FSize.cx := s.cx;
+    FSize.cy := FSize.cy + s.cy;
+  end;
+end;
+
+function TFreeText.GetCaption: string;
+var i: integer;
+begin
+  Result := '';
+  for i:=0 to High(FCaptions) do begin
+    Result := Result + FCaptions[i];
+    if i < High(FCaptions) then Result := Result + #10;
+  end;
+end;
+
 procedure TFreeText.SetCaption(AValue: string);
 begin
- if FCaption = AValue then exit;
-  FCaption := AValue;
+  if AValue = '' then FCaptions := NIL
+    else FCaptions := AdjustLineEnding(AValue).Split([#10]);
   UpdateCharIndexesAndComputeSize;
 end;
 
@@ -598,10 +620,15 @@ begin
 end;
 
 procedure TFreeText.DoDraw;
+var i, yy: integer;
 begin
   if (FSize.cx = 0) or (FTexturedFont = NIL) then exit;
-  FTexturedFont.DrawChars(FCharIndexes, 0, 0, FlipToIndex, NIL,
-                             NIL, FComputedOpacity, FComputedTint, FBlendMode);
+  yy := 0;
+  for i:=0 to High(FCaptions) do begin
+    FTexturedFont.DrawChars(FCharIndexes[i], 0, yy, FlipToIndex, NIL,
+                            NIL, FComputedOpacity, FComputedTint, FBlendMode);
+    yy := yy + FTexturedFont.Font.FontHeight;
+  end;
 end;
 
 constructor TFreeText.Create(aParentScene: TOGLCScene);
@@ -625,7 +652,7 @@ begin
 end;
 
 procedure TFreeTextOnPathToFollow.Draw(const aLayerPercentOpacity: single);
-var i, yOffset, flipIndex: integer;
+var i, j, yOffset, flipIndex: integer;
   m: TOGLCMatrix;
   pos: TPointF;
   ang, dist, spacingCoef: single;
@@ -654,18 +681,21 @@ begin
   yOffset := yOffset - Round(yOffset*FCoeffPositionOnPath);
 
   for i:=0 to High(FCharIndexes) do begin
-   ch := FTexturedFont.GetCharByIndex(FCharIndexes[i]);
-   if ch <> NIL then begin
-     TOGLCPathToFollow(FParentSurface).GetPosAndAngle(dist, pos, ang);
-     m.CopyFrom(FParentScene.ModelViewMatrix);
-     with m do begin
-       Translate(pos.x, pos.y);
-       Scale(Self.Scale.x.Value, Self.Scale.y.Value);
-       if FAutoRotate then Rotate(ang + FAngleAdjust);
-     end;
-     FTexturedFont.DrawChar(FCharIndexes[i], 0, -yOffset, flipIndex, NIL, @m.Matrix, FComputedOpacity, FComputedTint, FBlendMode);
-     dist := dist + ch^.OriginalCharSize.cx * spacingCoef * Scale.x.Value;
-   end;
+     for j:=0 to High(FCharIndexes[i]) do begin
+      ch := FTexturedFont.GetCharByIndex(FCharIndexes[i][j]);
+      if ch <> NIL then begin
+        TOGLCPathToFollow(FParentSurface).GetPosAndAngle(dist, pos, ang);
+        m.CopyFrom(FParentScene.ModelViewMatrix);
+        with m do begin
+          Translate(pos.x, pos.y + FTexturedFont.Font.FontHeight*i);
+          Scale(Self.Scale.x.Value, Self.Scale.y.Value);
+          if FAutoRotate then Rotate(ang + FAngleAdjust);
+        end;
+        FTexturedFont.DrawChar(FCharIndexes[i][j], 0, -yOffset, flipIndex, NIL, @m.Matrix, FComputedOpacity, FComputedTint, FBlendMode);
+        dist := dist + ch^.OriginalCharSize.cx * spacingCoef * Scale.x.Value;
+      end;
+    end;
+    dist := DistanceTraveled.Value;
   end;
 
   // render childs with positive ZOrder
