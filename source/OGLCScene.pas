@@ -231,6 +231,7 @@ TOGLCContext = class(TLayerList)
   FLastKeyDown: Byte;
   FMouseManager: TMouseManager;
   FTextureManager: TTextureManager;
+  FTimerManager: TTimerManager;
   function GetKeyToString(index: byte): string;
   function GetMouseButtonState(btn: TMouseButton): boolean;
   function GetUserPressAKey: boolean;
@@ -454,12 +455,6 @@ TOGLCScene = class(TOGLCContext)
 end;
 POGLCScene = ^TOGLCScene;
 
-// this global variable represents the current context
-var
-    Scene: TOGLCScene;
-    TexMan: TTextureManager;
-    MouseMan: TMouseManager;
-    ElapsedTime: single;
 
 implementation
 uses LclIntf;   // for function GetKeyState()
@@ -792,11 +787,6 @@ begin
     Key := 0;
   end;
 if FKeyPressedCount < 0 then raise exception.create('FKeyPressedCount is < 0');
-{ shift := GetKeyShiftState;
- if ssCtrl in Shift then FKeyState[VK_LCONTROL] := FALSE
-  else if ssShift in Shift then FKeyState[VK_LSHIFT] := FALSE
-   else if ssAlt in Shift then FKeyState[VK_MENU] := FALSE
-    else}
 end;
 
 procedure TOGLCContext.ProcessOnUTF8KeyPress(var UTF8Key: TUTF8Char);
@@ -884,10 +874,8 @@ begin
 
   FTextureManager := TTextureManager.Create(Self);
 
-  TimerManager := TTimerManager.Create;
-  TimerManager.Add( @CallBackTimerFPS, 1000 );
-
-  DelayManager := TDelayManager.Create;
+  FTimerManager := TTimerManager.Create;
+  FTimerManager.Add( @CallBackTimerFPS, 1000 );
 
   FMouseManager := TMouseManager.Create(Self);
 
@@ -932,8 +920,7 @@ begin
   FreeAndNil(FGlobalFadeColor);
 
   SetLayerCount(0);
-  FreeAndNil(TimerManager);
-  FreeAndNil(DelayManager);
+  FreeAndNil(FTimerManager);
   FreeAndNil(FTextureManager);
   DestroyRenderers;
 
@@ -1002,6 +989,7 @@ end;
 
 procedure TOGLCScene.DoLoop;
 var tick, delta: QWord;
+    ElapsedTime: single;
 begin
   if not MakeCurrent then exit;
 
@@ -1056,8 +1044,7 @@ begin
     FCommonDataLoaded := TRUE;
   end;
 
-  TimerManager.ProcessTimer;
-  DelayManager.ProcessDelay;
+  FTimerManager.ProcessTimer;
 
   tick := GetTickCount64;
   delta := tick - FTickOriginUpdate;
@@ -1173,12 +1160,11 @@ end;
 
 procedure TOGLCScene.UpdateViewPortSize;
 begin
- inherited UpdateViewPortSize;
+  inherited UpdateViewPortSize;
 
- ProjectionMatrix.Ortho(0, FOGLC.Width, FOGLC.Height, 0, 0.0, 1.0);
- //ProjectionMatrix.Ortho(FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
- ModelViewMatrix.LoadIdentity; // can be used to resize the view
-                               // to fit high dpi screen ?
+  ProjectionMatrix.Ortho(0, FOGLC.Width, FOGLC.Height, 0, 0.0, 1.0);
+  //ProjectionMatrix.Ortho(FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
+  ModelViewMatrix.LoadIdentity;
 {
  // Matrix for legacy OpenGL
  glMatrixMode(GL_PROJECTION);
@@ -1518,12 +1504,12 @@ begin
   Mouse.PrepareBeforeUpdate;
 
   // update Modal Panel or layer
-  if FModalPanelList.OneModalIsVisible then FModalPanelList.Update(ElapsedTime)
+  if FModalPanelList.OneModalIsVisible then FModalPanelList.Update(DT)
   else begin
   //if not FModalPanelList.Update(ElapsedTime) then begin
     // update camera objects
     for i:=0 to FCameraList.Count-1 do
-      TOGLCCamera(FCameraList.Items[i]).Update(ElapsedTime);
+      TOGLCCamera(FCameraList.Items[i]).Update(DT);
     // update all layers
     for i:=LayerCount-1 downto 0 do Layer[i].Update(DT);
     // update current screen
@@ -1555,11 +1541,6 @@ end;
 function TOGLCScene.MakeCurrent: boolean;
 begin
   Result := MakeContextCurrent;
-  if Result then begin
-    OGLCScene.Scene := Self;
-    OGLCScene.TexMan := TexMan;
-    OGLCScene.MouseMan := Mouse;
-  end;
 end;
 
 procedure TOGLCScene.SetLayerCount(AValue: integer);
