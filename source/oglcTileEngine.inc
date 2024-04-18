@@ -297,12 +297,15 @@ begin
 end;
 
 procedure TOGLCTileRenderer.PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-var w, h: single;
+var w, h, deltax, deltay: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
     texCoord: PQuadCoor;
     fi: Integer;
 begin
+  deltax := 0.25; // 1/FParentScene.Width*0.5;
+  deltay := 0.25; // 1/FParentScene.Height*0.5;
+
   fi := EnsureRange(aFrameIndex, 0, FTexture^.FrameCount-1);
   texCoord := @FTexture^.FramesCoord[fi];
   w := FTexture^.FrameWidth;
@@ -314,26 +317,26 @@ begin
       with p[0] do begin             // BD
         u := texCoord^[ tci^[0] ].x; // AC
         v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
+        x := aXPosOffset-deltax;
+        y := h + aYPosOffset+deltay;
       end;
       with p[1] do begin
         u := texCoord^[ tci^[1] ].x;
         v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
+        x := aXPosOffset-deltax;
+        y := aYPosOffset-deltay;
       end;
       with p[2] do begin
         u := texCoord^[ tci^[2] ].x;
         v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
+        x := w + aXPosOffset+deltax;
+        y := h + aYPosOffset+deltay;
       end;
       with p[3] do begin
         u := texCoord^[ tci^[3] ].x;
         v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
+        x := w + aXPosOffset+deltax;
+        y := aYPosOffset-deltay;
       end;
     end;
 
@@ -343,28 +346,28 @@ begin
       with p[0] do begin  // A           // B   BD
         u := texCoord^[ tci^[0] ].x;     // AC  C
         v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
+        x := aXPosOffset-deltax;
+        y := h + aYPosOffset+deltay;
       end;
       with p[1] do begin  // B
         u := texCoord^[ tci^[1] ].x;
         v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
+        x := aXPosOffset-deltax;
+        y := aYPosOffset-deltay;
       end;
       with p[2] do begin  // C
         u := texCoord^[ tci^[2] ].x;
         v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
+        x := w + aXPosOffset+deltax;
+        y := h + aYPosOffset+deltay;
       end;
       Move(p[2], p[3], SizeOf(Txyuv)); // C
       Move(p[1], p[4], SizeOf(Txyuv)); // B
       with p[5] do begin               // D
         u := texCoord^[ tci^[3] ].x;
         v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
+        x := w + aXPosOffset+deltax;
+        y := aYPosOffset-deltay;
       end;
     end;
   end;
