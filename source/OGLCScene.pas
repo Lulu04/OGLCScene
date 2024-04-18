@@ -717,6 +717,8 @@ begin
 
   ClearKeysState;
   DesignPPI := DEFAULT_DESIGN_PPI;
+
+  FOGLC.Visible := False;
 end;
 
 destructor TOGLCContext.Destroy;
@@ -997,6 +999,7 @@ begin
   if not MakeCurrent then exit;
 
   if not FGLInitialized then begin
+    FOGLC.Visible := True;
     if not Load_GL_version_3_3_CORE
       then raise Exception.Create('Cannot load OpenGL 3.3 core...')
       {$ifdef USE_glcorearb};{$else}else Load_GL_EXT_blend_func_separate;{$endif}
