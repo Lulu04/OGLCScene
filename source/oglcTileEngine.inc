@@ -51,6 +51,7 @@ private
   FLocOpacity: GLint;
   FMVP: TOGLCMatrix;
   FTexture: PTexture;
+  FTextureUnit: integer;
   FTintF: TColorF;
   FOpacity: single;
   procedure InitShaderCodeAndCallBack; override;
@@ -306,7 +307,7 @@ begin
   texCoord := @FTexture^.FramesCoord[fi];
   w := FTexture^.FrameWidth;
   h := FTexture^.FrameHeight;
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       tci := @FLIP_INDEXES[aFlipIndex];
       p := QueryVertex(4);

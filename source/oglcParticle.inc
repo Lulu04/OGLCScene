@@ -72,6 +72,7 @@ private
   FLocProjectionMatrix,
   FLocTextureUnit: GLint;
   FTexture: PTexture;
+  FTextureUnit: integer;
   FProjectionMatrix: TOGLCMatrix;
   procedure InitShaderCodeAndCallBack; override;
   procedure DefineVertexAttribPointer;
@@ -382,7 +383,7 @@ begin
 
 exit;
 
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       p := QueryVertex(4);
       with p[0] do begin

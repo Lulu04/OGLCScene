@@ -5,8 +5,7 @@ type
 
 TOGLCShader = class
  private
-  class var FCurrentShaderIDInUse: GLuint;
- private
+  FParentScene: TOGLCScene;
   FProgramID,
   FFragmentID,
   FVertexID: GLuint;
@@ -20,11 +19,11 @@ TOGLCShader = class
   procedure SetUniform1i(AUniform: GLint; AValue: GLint);
   procedure SetUniformMatrix4(AUniform: GLint; AValue: PGLfloat);
  public
-  constructor Create(const AVertexCodeSource, AFragmentCodeSource: string);
+  constructor Create(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
   destructor Destroy; override;
 
   procedure Use;
-  class procedure Release;
+  procedure Release;
   function Ready: boolean;
   property ID: GLuint read FProgramID;
 end;
@@ -66,7 +65,7 @@ begin
   raise Exception.Create('GetUniform error on '+s);
 end;
 
-constructor TOGLCShader.Create(const AVertexCodeSource, AFragmentCodeSource: string);
+constructor TOGLCShader.Create(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
 var R : GLint ;
     code:string;
   procedure NotifyError(aPrg: GLUint; const aPrefix: string);
@@ -84,6 +83,7 @@ var R : GLint ;
     raise Exception.Create(aPrefix+' '+msg);
   end;
 begin
+  FParentScene := aParentScene;
   FProgramID := 0;
   FVertexID := 0;
   FFragmentID := 0;
@@ -132,17 +132,17 @@ end;
 
 procedure TOGLCShader.Use;
 begin
-  if FProgramID <> FCurrentShaderIDInUse then
+  if FProgramID <> FParentScene.FCurrentShaderIDInUse then
   begin
     glUseProgram(FProgramID);
-    FCurrentShaderIDInUse := FProgramID;
+    FParentScene.FCurrentShaderIDInUse := FProgramID;
   end;
 end;
 
-class procedure TOGLCShader.Release;
+procedure TOGLCShader.Release;
 begin
   glUseProgram(0);
-  FCurrentShaderIDInUse := 0;
+  FParentScene.FCurrentShaderIDInUse := 0;
 end;
 
 function TOGLCShader.Ready: boolean;

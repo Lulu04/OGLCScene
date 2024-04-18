@@ -2,17 +2,23 @@
 type
 
 TProcOfObject = procedure() of object;
+TRendererBase = class;
+
+TRendererBatchDescriptor = record
+  CurrentRenderer: TRendererBase;
+  CurrentTexture: PTexture;
+  CurrentTextureUnit: integer;
+  CurrentRendererBlendMode: byte;
+  CurrentPrimitiveType: TPrimitiveType;
+end;
+PRendererBatchDescriptor = ^TRendererBatchDescriptor;
 
 { TRendererBase }
 
 TRendererBase = class
 private
-  class var FCurrentRenderer: TRendererBase;
-  class var FCurrentTexture: PTexture;
-  class var FTextureUnit: integer;
-  class var FCurrentBlendMode: byte;
-  class var FCurrentPrimitiveType: TPrimitiveType;
   FParentScene: TOGLCScene;
+  FBatch: PRendererBatchDescriptor;
   procedure Batch_CheckIfNeedFlush(aNewRenderer: TRendererBase; aPrimitiveType: TPrimitiveType;
                                    aNewTexture: PTexture; aTextureUnit: integer; aNewBlendMode: byte; aExtraTest: boolean);
   procedure Batch_Flush;
@@ -522,16 +528,16 @@ procedure TRendererBase.Batch_CheckIfNeedFlush(aNewRenderer: TRendererBase; aPri
                    aNewTexture: PTexture; aTextureUnit: integer; aNewBlendMode: byte; aExtraTest: boolean);
 var needFlush: boolean;
 begin
-  if FCurrentRenderer <> NIL then
+  if FBatch^.CurrentRenderer <> NIL then
     if aExtraTest then Batch_Flush
     else begin
-      needFlush := (FCurrentRenderer <> aNewRenderer) or
-                   (FCurrentBlendMode <> aNewBlendMode) or
-                   (FCurrentPrimitiveType <> aPrimitiveType) or
-                   (FTextureUnit <> aTextureUnit);
-      if aNewTexture = NIL then needFlush := needFlush or (FCurrentTexture <> NIL)
-      else if FCurrentTexture = NIL then needFlush := needFlush or (aNewTexture <> NIL)
-      else needFlush := needFlush or (aNewTexture^.ID <> FCurrentTexture^.ID);
+      needFlush := (FBatch^.CurrentRenderer <> aNewRenderer) or
+                   (FBatch^.CurrentRendererBlendMode <> aNewBlendMode) or
+                   (FBatch^.CurrentPrimitiveType <> aPrimitiveType) or
+                   (FBatch^.CurrentTextureUnit <> aTextureUnit);
+      if aNewTexture = NIL then needFlush := needFlush or (FBatch^.CurrentTexture <> NIL)
+      else if FBatch^.CurrentTexture = NIL then needFlush := needFlush or (aNewTexture <> NIL)
+      else needFlush := needFlush or (aNewTexture^.ID <> FBatch^.CurrentTexture^.ID);
 
       if needFlush then Batch_Flush;
     end;
@@ -540,19 +546,19 @@ begin
   if not aExtraTest and not needFlush and
     ((aPrimitiveType = ptTriangleStrip) or (aPrimitiveType = ptTriangleFan)) then AddPrimitiveRestart;
 
-  FCurrentRenderer := aNewRenderer;
-  FCurrentPrimitiveType := aPrimitiveType;
-  FCurrentBlendMode := aNewBlendMode;
-  FCurrentTexture := aNewTexture;
-  FTextureUnit := aTextureUnit;
+  FBatch^.CurrentRenderer := aNewRenderer;
+  FBatch^.CurrentPrimitiveType := aPrimitiveType;
+  FBatch^.CurrentRendererBlendMode := aNewBlendMode;
+  FBatch^.CurrentTexture := aNewTexture;
+  FBatch^.CurrentTextureUnit := aTextureUnit;
 end;
 
 procedure TRendererBase.Batch_Flush;
 begin
-  if FCurrentRenderer <> NIL then begin
-    FParentScene.BlendMode := FCurrentBlendMode;
-    FCurrentRenderer.Draw(True);
-    FCurrentRenderer := NIL;
+  if FBatch^.CurrentRenderer <> NIL then begin
+    FParentScene.BlendMode := FBatch^.CurrentRendererBlendMode;
+    FBatch^.CurrentRenderer.Draw(True);
+    FBatch^.CurrentRenderer := NIL;
   end;
 end;
 
@@ -603,7 +609,7 @@ end;
 procedure TOGLCGenericPrimitiveRenderer.AddPrimitiveRestartIfNeeded;
 begin
   if (FIndexInIndexArray > 0) and
-     ((FCurrentPrimitiveType = ptTriangleStrip) or (FCurrentPrimitiveType = ptTriangleFan)) then AddPrimitiveRestart;
+     (FBatch^.CurrentPrimitiveType in [ptTriangleStrip, ptTriangleFan]) then AddPrimitiveRestart;
 end;
 
 procedure TOGLCGenericPrimitiveRenderer.SetCapacity(aCount: ptrint);
@@ -632,7 +638,7 @@ end;
 
 procedure TOGLCGenericPrimitiveRenderer.ResetBufferState;
 begin
-  FCurrentPrimitiveType := ptNone;
+  FBatch^.CurrentPrimitiveType := ptNone;
   FIndexInAttribsArray := 0;
   FIndexInIndexArray := 0;
 end;
@@ -641,7 +647,8 @@ constructor TOGLCGenericPrimitiveRenderer.Create(aParentScene: TOGLCScene; aInit
 begin
   InitShaderCodeAndCallBack;
   FParentScene := aParentScene;
-  FShader := TOGLCShader.Create(FVertexShaderCode, FFragmentShaderCode);
+  FBatch := @FParentScene.FRendererBatch;
+  FShader := TOGLCShader.Create(FParentScene, FVertexShaderCode, FFragmentShaderCode);
   FGetUniformLocation();
   CreateID;
   SetCapacity(aInitialBufferCapacity);
@@ -738,11 +745,11 @@ begin
 
     glBindVertexArray(FVAO);
 if not DEBUG_USE_INDEX_ARRAY then
-    glDrawArrays(GLenum(FCurrentPrimitiveType), 0, FIndexInAttribsArray)
+    glDrawArrays(GLenum(FBatch^.CurrentPrimitiveType), 0, FIndexInAttribsArray)
 else begin
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FVIO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, SizeOf(TVertexIndex)*FIndexInIndexArray, @FIndexesArray[0], GL_DYNAMIC_DRAW);
-  glDrawElements(GLenum(FCurrentPrimitiveType){mode}, FIndexInIndexArray{count}, OPENGL_TYPE_USED_FOR_INDICE{type}, PChar(0)); // element array buffer offset
+  glDrawElements(GLenum(FBatch^.CurrentPrimitiveType){mode}, FIndexInIndexArray{count}, OPENGL_TYPE_USED_FOR_INDICE{type}, PChar(0)); // element array buffer offset
 end;
     glBindVertexArray(0);
 
@@ -1204,7 +1211,7 @@ begin
 
   //push index before query vertex because QueryVertex() change the value of FIndexInAttribsArray
   currentIndex := FIndexInAttribsArray;
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin           // 24
       AddPrimitiveRestartIfNeeded;
       pIndex := QueryIndex(4);       // 13
@@ -1294,11 +1301,11 @@ end;
 
 procedure TOGLCTexturedTriangleRenderer.SetUniformValuesAndTexture;
 begin
-  glUniform1i(FLocTextureUnit, FTextureUnit);
+  glUniform1i(FLocTextureUnit, FBatch^.CurrentTextureUnit);
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
   glUniform4fv(FLocTintColor, 4, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
-  FParentScene.TexMan.Bind(FCurrentTexture, FTextureUnit);
+  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
 procedure TOGLCTexturedTriangleRenderer.Prepare(aTriangleType: TTriangleType;
@@ -1311,7 +1318,7 @@ begin
                 not FTintF.EqualTo(aComputedTint);
 
   Batch_CheckIfNeedFlush(Self, aTriangleType, aTexture, aTextureUnit, aBlendMode, forceFlush);
-  FTextureUnit := aTextureUnit;
+  FBatch^.CurrentTextureUnit := aTextureUnit;
   FMVP.CopyFrom(aMVP);
   FTintF.CopyFrom(aComputedTint);
   FOpacity := aOpacity;
@@ -1326,13 +1333,15 @@ var w, h: single;
     texCoord: PQuadCoor;
     fi: Integer;
     currentIndex: Int64;
+    tex: PTexture;
 begin
-  fi := EnsureRange(aFrameIndex, 0, FCurrentTexture^.FrameCount-1);
-  texCoord := @FCurrentTexture^.FramesCoord[fi];
-  w := FCurrentTexture^.FrameWidth;
-  h := FCurrentTexture^.FrameHeight;
+  tex := FBatch^.CurrentTexture;
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
+  texCoord := @tex^.FramesCoord[fi];
+  w := tex^.FrameWidth;
+  h := tex^.FrameHeight;
   currentIndex := FIndexInAttribsArray;
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       tci := @FLIP_INDEXES[aFlipIndex];
       p := QueryVertex(4);
@@ -1394,7 +1403,7 @@ begin
     end;
   end;
   // indices
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin           // 24
       AddPrimitiveRestartIfNeeded;   // 13
       pIndex := QueryIndex(4);
@@ -1425,13 +1434,15 @@ var w, h: single;
     texCoord: PQuadCoor;
     fi: Integer;
     currentIndex: Int64;
+    tex: PTexture;
 begin
-  fi := EnsureRange(aFrameIndex, 0, FCurrentTexture^.FrameCount-1);
-  texCoord := @FCurrentTexture^.FramesCoord[fi];
-  w := FCurrentTexture^.FrameWidth;
-  h := FCurrentTexture^.FrameHeight;
+  tex := FBatch^.CurrentTexture;
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
+  texCoord := @tex^.FramesCoord[fi];
+  w := tex^.FrameWidth;
+  h := tex^.FrameHeight;
   currentIndex := FIndexInAttribsArray;
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       p := QueryVertex(4);
       tci := @FLIP_INDEXES[aFlipIndex];
@@ -1493,7 +1504,7 @@ begin
     end;
   end;
   // indices
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin           // 24
       AddPrimitiveRestartIfNeeded;   // 13
       pIndex := QueryIndex(4);
@@ -1559,9 +1570,9 @@ end;
 
 procedure TOGLCTexturedMVTriangleRenderer.SetUniformValuesAndTexture;
 begin
-  glUniform1i(FLocTextureUnit, GLint(FTextureUnit));
+  glUniform1i(FLocTextureUnit, GLint(FBatch^.CurrentTextureUnit));
   glUniformMatrix4fv(FLocProjectionMatrix, 1, GL_FALSE, @FParentScene.ProjectionMatrix.Matrix[0,0]);
-  FParentScene.TexMan.Bind(FCurrentTexture, FTextureUnit);
+  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
 procedure TOGLCTexturedMVTriangleRenderer.Prepare(aTriangleType: TTriangleType;
@@ -1575,11 +1586,13 @@ procedure TOGLCTexturedMVTriangleRenderer.PushQuad(const aFrameIndex, aFlipIndex
 var w, h: single;
     fi: Integer;
     area: {TRect;} TQuadCoor;
+    tex: PTexture;
 begin
-  w := FCurrentTexture^.FrameWidth;
-  h := FCurrentTexture^.FrameHeight;
+  tex := FBatch^.CurrentTexture;
+  w := tex^.FrameWidth;
+  h := tex^.FrameHeight;
 
-  fi := EnsureRange(aFrameIndex, 0, FCurrentTexture^.FrameCount-1);
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
 
   area[cBL].x := aXPosOffset;
   area[cBL].y := h + aYPosOffset;
@@ -1590,7 +1603,7 @@ begin
   area[cTR].x := w + aXPosOffset;
   area[cTR].y := aYPosOffset;
 
-  PushQuad2(area, FCurrentTexture^.FramesCoord[fi], aFlipIndex, aModelViewMatrix, aOpacity, aComputedTint);
+  PushQuad2(area, tex^.FramesCoord[fi], aFlipIndex, aModelViewMatrix, aOpacity, aComputedTint);
 end;
 
 procedure TOGLCTexturedMVTriangleRenderer.PushQuad2(const aModelArea, aTexCoor: TQuadCoor; aFlipIndex: integer;
@@ -1605,7 +1618,7 @@ begin
   if aModelViewMatrix = NIL then
     aModelViewMatrix := @FParentScene.ModelViewMatrix.Matrix;
 
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin           // 24
       AddPrimitiveRestartIfNeeded;   // 13
       pIndex := QueryIndex(4);
@@ -1678,7 +1691,7 @@ begin
 
   // push indexes
   currentIndex := FIndexInAttribsArray;
-  case FCurrentPrimitiveType of
+  case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       AddPrimitiveRestartIfNeeded;
       pIndex := QueryIndex(4);
