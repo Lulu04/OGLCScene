@@ -303,8 +303,9 @@ var w, h, deltax, deltay: single;
     texCoord: PQuadCoor;
     fi: Integer;
 begin
-  deltax := 0.25; // 1/FParentScene.Width*0.5;
-  deltay := 0.25; // 1/FParentScene.Height*0.5;
+  // we add 1/4 pixel on each quad rendered to prevents any artifacts
+  deltax := 0.25;
+  deltay := 0.25;
 
   fi := EnsureRange(aFrameIndex, 0, FTexture^.FrameCount-1);
   texCoord := @FTexture^.FramesCoord[fi];
