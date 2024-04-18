@@ -303,7 +303,7 @@ var w, h, deltax, deltay: single;
     texCoord: PQuadCoor;
     fi: Integer;
 begin
-  // we add 1/4 pixel on each quad rendered to prevents any artifacts
+  // we inflate each quad of 1/4 pixel to prevents any artifacts
   deltax := 0.25;
   deltay := 0.25;
 
