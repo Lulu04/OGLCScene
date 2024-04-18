@@ -1,5 +1,7 @@
 {$ifdef oglcINTERFACE}
 type
+// TODO: don't work
+// avoid class var to keep multi scenes possible
 
 { TOGLCRenderToTexture }
 
