@@ -175,7 +175,7 @@ TOGLCCamera = class;
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
-{$I oglcShaderFXPostProcessing.inc}
+// {$I oglcShaderFXPostProcessing.inc}
 {$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
 {$I oglcSurface.inc}
@@ -290,6 +290,9 @@ TOGLCScene = class(TOGLCContext)
   FScreenRequested: TScreenTemplate;
   FIsChangingScreen,
   FDoBlackScreenOnNewScreen: boolean;
+ private // renderer batch
+  FRendererBatch: TRendererBatchDescriptor;
+  FCurrentShaderIDInUse: GLuint;
  private
   FSmoothLineRenderer: TOGLCSmoothLineRenderer;
   FTileRenderer: TOGLCTileRenderer;
@@ -822,7 +825,7 @@ end;
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
-{$I oglcShaderFXPostProcessing.inc}
+// {$I oglcShaderFXPostProcessing.inc}
 {$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
 {$I oglcSurface.inc}
