@@ -1161,7 +1161,7 @@ end;
 procedure TOGLCScene.UpdateViewPortSize;
 begin
   inherited UpdateViewPortSize;
-  ProjectionMatrix.Ortho(0, FOGLC.Width, FOGLC.Height, 0, 0.0, 1.0);
+  ProjectionMatrix.Ortho(0, Width, Height, 0, 0.0, 1.0);
   //ProjectionMatrix.Ortho(FOGLC.Left, FOGLC.Width, FOGLC.Height, FOGLC.Top, 0.0, 1.0);
   ModelViewMatrix.LoadIdentity;
 {
@@ -1173,7 +1173,7 @@ begin
  glLoadIdentity();  }
 
   MakeContextCurrent;
-  glViewport(0, 0, FOGLC.Width, FOGLC.Height);
+  glViewport(0, 0, Width, Height);
 end;
 
 {procedure TOGLCScene.ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
