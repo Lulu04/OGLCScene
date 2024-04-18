@@ -1,30 +1,5 @@
 {$ifdef oglcINTERFACE}
 type
-PDelayObject = ^TDelayObject;
-TDelayObject = record
-                DelayMs  : integer;
-                CallBack : TDelayCallBack;
-                UserValue: word;
-                Next     : PDelayObject;
-                Prev     : PDelayObject;
-end;
-
-{ TDelayManager }
-
-TDelayManager = class(specialize TOGLCGList<TDelayObject>)
- Constructor Create;
-private
- FActual, FOrigin: QWord;
- procedure ProcessDelay;
-public
- function Add(aDelayMSec: integer; aCallBack: TDelayCallBack; aUserValue: word): PDelayObject;
-end;
-
-var
- DelayManager: TDelayManager;
-
-
-type
 
 PTimerObject = ^TTimerObject;
 TTimerObject = record
@@ -46,9 +21,6 @@ public
  procedure Delete(var aTimer: PTimerObject);
  property Count: integer read FCount;
 end;
-
-var
- TimerManager: TTimerManager;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -100,39 +72,5 @@ begin
 end;
 
 
-{ TDelayManager }
-
-constructor TDelayManager.Create;
-begin
- Inherited Create;
- FOrigin := GetTickCount64;
-end;
-
-procedure TDelayManager.ProcessDelay;
-var p :PDelayObject ;
-    delta : QWord;
-begin
- p := FInstance0;
- Factual := GetTickCount64;
- delta := FActual - FOrigin;
- while p^.Next <> NIL do
-  begin
-   p^.Next^.DelayMs := p^.Next^.DelayMs - delta;
-   if p^.Next^.DelayMs <= 0
-     then begin
-           if p^.Next^.CallBack <> NIL then p^.Next^.CallBack ( p^.Next^.UserValue );
-           DoDelete( p^.Next );
-     end else p := p^.Next;
-  end;
- FOrigin := FActual;
-end;
-
-function TDelayManager.Add(aDelayMSec: integer; aCallBack: TDelayCallBack; aUserValue: word): PDelayObject;
-begin
- Result := AddInstanceToList;
- Result^.DelayMs := aDelayMSec;
- Result^.CallBack := aCallBack;
- Result^.UserValue := aUserValue;
-end;
 {$endif oglcIMPLEMENTATION}
 
