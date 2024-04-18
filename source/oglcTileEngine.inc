@@ -275,7 +275,7 @@ end;
 
 procedure TOGLCTileRenderer.SetUniformValuesAndTexture;
 begin
-  glUniform1i(FLocTextureUnit, GL_TEXTURE0+FTextureUnit);
+  glUniform1i(FLocTextureUnit, FTextureUnit);
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
   glUniform4fv(FLocTintColor, 4, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);

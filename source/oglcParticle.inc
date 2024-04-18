@@ -299,7 +299,7 @@ end;
 
 procedure TOGLCParticleRenderer.SetUniformValuesAndTexture;
 begin
-  glUniform1i(FLocTextureUnit, GL_TEXTURE0+FTextureUnit);
+  glUniform1i(FLocTextureUnit, FTextureUnit);
   glUniformMatrix4fv(FLocProjectionMatrix, 1, GL_FALSE, @FProjectionMatrix.Matrix[0,0]);
   FParentScene.TexMan.Bind(FTexture, FTextureUnit);
 end;
