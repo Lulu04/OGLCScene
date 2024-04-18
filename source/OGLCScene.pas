@@ -174,7 +174,7 @@ TOGLCCamera = class;
 {$I oglcScreenTemplate.inc}
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
-{$I oglcTimerDelay.inc}
+{$I oglcTimer.inc}
 {$I oglcShaderFXPostProcessing.inc}
 {$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
@@ -821,7 +821,7 @@ end;
 {$I oglcScreenTemplate.inc}
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
-{$I oglcTimerDelay.inc}
+{$I oglcTimer.inc}
 {$I oglcShaderFXPostProcessing.inc}
 {$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
