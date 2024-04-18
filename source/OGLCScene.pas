@@ -255,9 +255,11 @@ TOGLCContext = class(TLayerList)
   constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single); virtual;
   destructor Destroy; override;
 
-  // call from main windows (because TOpenGLControl don't handle key events)
+  // must be called from main windows to ensure keyboard input
   procedure ProcessOnKeyDown(var Key: Word; Shift: TShiftState);
+  // must be called from main windows to ensure keyboard input
   procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
+  // must be called from main windows to ensure keyboard input
   procedure ProcessOnUTF8KeyPress(var UTF8Key: TUTF8Char);
 
   procedure ClearKeysState;
