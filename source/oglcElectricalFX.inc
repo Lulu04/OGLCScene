@@ -134,7 +134,6 @@ end;
 
 procedure TOGLCElectricalBeamRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -411,22 +410,14 @@ end;
 
 procedure TOGLCElectricalBeam.DoDraw;
 var p: Pxydistance;
-//fborder: TOGLCBorder;
 begin
   if (Length(FVertices) = 0) or (Length(FIndices) = 0) then exit;
 
-  FParentScene.FElectricalBeamRenderer.Prepare(BeamColor.Value, HaloColor.Value, FThreshold,
+  FParentScene.ElectricalBeamRenderer.Prepare(BeamColor.Value, HaloColor.Value, FThreshold,
                   HaloAttenuation, FComputedOpacity, FComputedTint, FBlendmode);
-  FParentScene.FElectricalBeamRenderer.PushIndices(FIndices);
-  p := FParentScene.FElectricalBeamRenderer.QueryVertex(Length(FVertices));
+  FParentScene.ElectricalBeamRenderer.PushIndices(FIndices);
+  p := FParentScene.ElectricalBeamRenderer.QueryVertex(Length(FVertices));
   Move(FVertices[0], p^, SizeOf(Txydistance)*Length(FVertices));
-
-{  fborder.InitDefault;
-  fborder.LinePosition:=lpMiddle;
-  fborder.Color:=bgra(50,50,50,50);
-  FParentScene.ModelViewMatrix.Translate(0, 50);
-  fborder.InitFromPath(FPath, 15);
-  FParentScene.SmoothLineRenderer.DrawBorder(fborder, FComputedOpacity, FComputedTint);   }
 end;
 
 
@@ -443,9 +434,6 @@ begin
   HaloWidth := 3.0;
   FRefreshTime := -1;
   FAperture := 35;
-
-  if aParentScene.FElectricalBeamRenderer = NIL then
-    aParentScene.FElectricalBeamRenderer := TOGLCElectricalBeamRenderer.Create(aParentScene);
 end;
 
 destructor TOGLCElectricalBeam.Destroy;

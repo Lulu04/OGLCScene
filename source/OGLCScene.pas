@@ -305,8 +305,11 @@ TOGLCScene = class(TOGLCContext)
   FThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer;
   FThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
   FFastLineRenderer: TOGLCFastLineRenderer;
+  FParticleRenderer: TOGLCParticleRenderer;
   function GetFastLineRenderer: TOGLCFastLineRenderer;
   function GetGlowRenderer: TOGLCGlowRenderer;
+  function GetElectricalBeamRenderer: TOGLCElectricalBeamRenderer;
+  function GetParticleRenderer: TOGLCParticleRenderer;
   function GetSmoothLineRenderer: TOGLCSmoothLineRenderer;
   function GetTexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer;
   function GetTexturedTriangleRenderer: TOGLCTexturedTriangleRenderer;
@@ -414,6 +417,7 @@ TOGLCScene = class(TOGLCContext)
 
   property Mouse: TMouseManager read FMouseManager;
   property TexMan: TTextureManager read FTextureManager;
+  property Timer: TTimerManager read FTimerManager;
 
   property StencilClipping: TStencilClipping read FStencilClipping;
  public
@@ -425,6 +429,8 @@ TOGLCScene = class(TOGLCContext)
   property SmoothLineRenderer: TOGLCSmoothLineRenderer read GetSmoothLineRenderer;
   property TileRenderer: TOGLCTileRenderer read GetTileRenderer; // is instancied only when a TOGLCTileMap is instancied
   property GlowRenderer: TOGLCGlowRenderer read GetGlowRenderer; // is instancied only when a TOGLCGlow is instancied
+  property ElectricalBeamRenderer: TOGLCElectricalBeamRenderer read GetElectricalBeamRenderer;
+  property ParticleRenderer: TOGLCParticleRenderer read GetParticleRenderer;
   property FastLineRenderer: TOGLCFastLineRenderer read GetFastLineRenderer;
   property ThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer read GetThreeColorTriangleRenderer;
   property ThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer read GetThreeColorMVTriangleRenderer;
@@ -1143,26 +1149,21 @@ end;
 
 procedure TOGLCScene.CreateRenderers;
 begin
-  FFastLineRenderer := TOGLCFastLineRenderer.Create(Self);
-  FThreeColorTriangleRenderer := TOGLCThreeColorTriangleRenderer.Create(Self);
-  FThreeColorMVTriangleRenderer := TOGLCThreeColorMVTriangleRenderer.Create(Self);
-  FTexturedTriangleRenderer := TOGLCTexturedTriangleRenderer.Create(Self);
-  FTexturedMVTriangleRenderer := TOGLCTexturedMVTriangleRenderer.Create(Self);
-  FSmoothLineRenderer := TOGLCSmoothLineRenderer.Create(Self);
+  FTexturedMVTriangleRenderer := TOGLCTexturedMVTriangleRenderer.Create(Self, True);
 end;
 
 procedure TOGLCScene.DestroyRenderers;
 begin
   FreeAndNil(FFastLineRenderer);
+  FreeAndNil(FSmoothLineRenderer);
   FreeAndNil(FThreeColorTriangleRenderer);
   FreeAndNil(FThreeColorMVTriangleRenderer);
   FreeAndNil(FTexturedMVTriangleRenderer);
   FreeAndNil(FTexturedTriangleRenderer);
-  FreeAndNil(FSmoothLineRenderer);
+
   FreeAndNil(FTileRenderer);
   FreeAndNil(FGlowRenderer);
-
-  FreeAndNil(ParticleRenderer);
+  FreeAndNil(FParticleRenderer);
   FreeAndNil(FElectricalBeamRenderer);
 end;
 
@@ -1619,49 +1620,63 @@ end;
 
 function TOGLCScene.GetFastLineRenderer: TOGLCFastLineRenderer;
 begin
-  if FFastLineRenderer = NIL then FFastLineRenderer := TOGLCFastLineRenderer.Create(Self);
+  if FFastLineRenderer = NIL then FFastLineRenderer := TOGLCFastLineRenderer.Create(Self, True);
   Result := FFastLineRenderer;
 end;
 
 function TOGLCScene.GetGlowRenderer: TOGLCGlowRenderer;
 begin
-  if FGlowRenderer = NIL then FGlowRenderer := TOGLCGlowRenderer.Create(Self);
+  if FGlowRenderer = NIL then FGlowRenderer := TOGLCGlowRenderer.Create(Self, False);
   Result := FGlowRenderer;
+end;
+
+function TOGLCScene.GetElectricalBeamRenderer: TOGLCElectricalBeamRenderer;
+begin
+  if FElectricalBeamRenderer = NIL then
+    FElectricalBeamRenderer := TOGLCElectricalBeamRenderer.Create(Self, True);
+  Result := FElectricalBeamRenderer;
+end;
+
+function TOGLCScene.GetParticleRenderer: TOGLCParticleRenderer;
+begin
+  if FParticleRenderer = NIL then
+    FParticleRenderer := TOGLCParticleRenderer.Create(Self, True);
+  Result := FParticleRenderer;
 end;
 
 function TOGLCScene.GetSmoothLineRenderer: TOGLCSmoothLineRenderer;
 begin
-  if FSmoothLineRenderer = NIL then FSmoothLineRenderer := TOGLCSmoothLineRenderer.Create(Self);
+  if FSmoothLineRenderer = NIL then FSmoothLineRenderer := TOGLCSmoothLineRenderer.Create(Self, True);
   Result := FSmoothLineRenderer;
 end;
 
 function TOGLCScene.GetTexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer;
 begin
-  if FTexturedMVTriangleRenderer = NIL then FTexturedMVTriangleRenderer := TOGLCTexturedMVTriangleRenderer.Create(Self);
+  if FTexturedMVTriangleRenderer = NIL then FTexturedMVTriangleRenderer := TOGLCTexturedMVTriangleRenderer.Create(Self, True);
   Result := FTexturedMVTriangleRenderer;
 end;
 
 function TOGLCScene.GetTexturedTriangleRenderer: TOGLCTexturedTriangleRenderer;
 begin
-  if FTexturedTriangleRenderer = NIL then FTexturedTriangleRenderer := TOGLCTexturedTriangleRenderer.Create(Self);
+  if FTexturedTriangleRenderer = NIL then FTexturedTriangleRenderer := TOGLCTexturedTriangleRenderer.Create(Self, True);
   Result := FTexturedTriangleRenderer;
 end;
 
 function TOGLCScene.GetThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer;
 begin
-  if FThreeColorMVTriangleRenderer = NIL then FThreeColorMVTriangleRenderer := TOGLCThreeColorMVTriangleRenderer.Create(Self);
+  if FThreeColorMVTriangleRenderer = NIL then FThreeColorMVTriangleRenderer := TOGLCThreeColorMVTriangleRenderer.Create(Self, True);
   Result := FThreeColorMVTriangleRenderer;
 end;
 
 function TOGLCScene.GetThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
 begin
-  if FThreeColorTriangleRenderer = NIL then FThreeColorTriangleRenderer := TOGLCThreeColorTriangleRenderer.Create(Self);
+  if FThreeColorTriangleRenderer = NIL then FThreeColorTriangleRenderer := TOGLCThreeColorTriangleRenderer.Create(Self, True);
   Result := FThreeColorTriangleRenderer;
 end;
 
 function TOGLCScene.GetTileRenderer: TOGLCTileRenderer;
 begin
-  if FTileRenderer = NIL then FTileRenderer := TOGLCTileRenderer.Create(Self);
+  if FTileRenderer = NIL then FTileRenderer := TOGLCTileRenderer.Create(Self, False);
   Result := FTileRenderer;
 end;
 
