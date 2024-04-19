@@ -228,7 +228,7 @@ TUIClickableWithBodyShape = class(TUIClickableObject)
 private const MARGIN_BETWEEN_BORDER_AND_CAPTION = 2;
 private
   FChildClippingEnabled: boolean;
-  FClientArea: TUIClipArea;
+  FClientArea: TRect;
   procedure ProcessCallbackSomethingChangeTheSize; virtual;
   procedure ProcessBackGradientColorChange;
   procedure UpdateWidgetSizeAndLayout; virtual;
@@ -257,7 +257,7 @@ public
 
   // Enable clipping (using stencil buffer) when draw the child surfaces. Default is True.
   property ChildClippingEnabled: boolean read FChildClippingEnabled write FChildClippingEnabled;
-  property ClientArea: TUIClipArea read FClientArea;
+  property ClientArea: TRect read FClientArea;
   property AutoSize: boolean read FAutoSize write SetAutoSize;
 end;
 
