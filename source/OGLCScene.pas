@@ -323,7 +323,7 @@ TOGLCScene = class(TOGLCContext)
  private
   procedure UpdateViewPortSize; override;
   procedure Draw;
-  procedure UpDate(const DT:single);
+  procedure UpDate(const aElapsedTime:single);
  private
   // FPS
   FFPSCounter: integer;
@@ -1498,7 +1498,7 @@ begin
  end;   }
 end;
 
-procedure TOGLCScene.UpDate(const DT: single);
+procedure TOGLCScene.UpDate(const aElapsedTime: single);
 var i: integer;
 begin
   // Process 'Surface change layer' request
@@ -1513,22 +1513,21 @@ begin
   Mouse.PrepareBeforeUpdate;
 
   // update Modal Panel or layer
-  if FModalPanelList.OneModalIsVisible then FModalPanelList.Update(DT)
+  if FModalPanelList.OneModalIsVisible then FModalPanelList.Update(aElapsedTime)
   else begin
-  //if not FModalPanelList.Update(ElapsedTime) then begin
     // update camera objects
     for i:=0 to FCameraList.Count-1 do
-      TOGLCCamera(FCameraList.Items[i]).Update(DT);
+      TOGLCCamera(FCameraList.Items[i]).Update(aElapsedTime);
     // update all layers
-    for i:=LayerCount-1 downto 0 do Layer[i].Update(DT);
+    for i:=LayerCount-1 downto 0 do Layer[i].Update(aElapsedTime);
     // update current screen
-    if FCurrentScreen <> NIL then FCurrentScreen.Update(DT);
+    if FCurrentScreen <> NIL then FCurrentScreen.Update(aElapsedTime);
   end;
 
-  Mouse.UpDate(DT);
+  Mouse.UpDate(aElapsedTime);
 
   // Scene global fade
-  FGlobalFadeColor.OnElapse(DT);
+  FGlobalFadeColor.OnElapse(aElapsedTime);
 end;
 
 procedure TOGLCScene.CallBackTimerFPS;
