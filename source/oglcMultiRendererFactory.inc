@@ -1,4 +1,7 @@
 {$ifdef oglcINTERFACE}
+const
+  INITIAL_BUFFER_CAPACITY = 128;
+
 type
 
 TProcOfObject = procedure() of object;
@@ -36,6 +39,7 @@ private
   FShader: TOGLCShader;
   FError: GLenum;
 private
+  FUseIndicesBuffer: boolean;
   FVBO, FVAO, FVIO: GLuint;
   FAttribsArray: array of T;
   FIndexInAttribsArray: ptrint;
@@ -58,10 +62,9 @@ private
   FSetUniformValuesAndTexture: TProcOfObject;
   procedure InitShaderCodeAndCallBack; virtual; abstract;
 public
-DEBUG_USE_INDEX_ARRAY: BOOLEAN;
   // aInitialBufferCapacity is the initial memory space to reserve for the vertex buffer
   // expressed in vertex count.
-  constructor Create(aParentScene: TOGLCScene; aInitialBufferCapacity: ptrint=128);
+  constructor Create(aParentScene: TOGLCScene; aUseIndicesBuffer: boolean);
   destructor Destroy; override;
 
   // Reserve space in the vertex buffer for the specified number of vertices and return a pointer to it.
@@ -391,7 +394,7 @@ private const
    '  out vec2 TexCoords;'#10+
    'void main()'#10+
    '{'#10+
-   '  gl_Position = uMVP*vec4(aVertexAndTextureCoor.x, aVertexAndTextureCoor.y, 0.0, 1.0);'#10+
+   '  gl_Position = uMVP*vec4(aVertexAndTextureCoor.xy, 0.0, 1.0);'#10+
    '  TexCoords = aVertexAndTextureCoor.zw;'#10+
    '}';
 
@@ -438,9 +441,12 @@ public
   procedure Prepare(aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer;
                     const aMVP: TOGLCMatrix; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
 
-  procedure PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-  procedure PushQuadWithCornerOffset(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single;
-                                     aCornerOffset: TQuadParamF);
+  procedure PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
+  procedure PushFrameWithCornerOffset(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single;
+                                      aCornerOffset: TQuadParamF);
+  procedure PushFrameClipped(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single;
+                             const aClipRect: TRectF);
+  procedure PushQuad(const aTexCoord: TQuadCoor; aFlipIndex: integer; const aRect: TRectF);
 end;
 
 
@@ -569,7 +575,7 @@ var err: GLenum;
 begin
   glGenVertexArrays(1, @FVAO);
   glGenBuffers(1, @FVBO);
-  glGenBuffers(1, @FVIO);
+  if FUseIndicesBuffer then glGenBuffers(1, @FVIO);
 
   err := glGetError();
   if (err <> GL_NO_ERROR) and (FError = GL_NO_ERROR) then begin
@@ -581,12 +587,13 @@ end;
 procedure TOGLCGenericPrimitiveRenderer.FreeID;
 begin
   glDeleteBuffers(1, @FVBO);
-  glDeleteBuffers(1, @FVIO);
+  if FUseIndicesBuffer then glDeleteBuffers(1, @FVIO);
   glDeleteVertexArrays(1, @FVAO);
 end;
 
 procedure TOGLCGenericPrimitiveRenderer.SetIndexBufferCapacity(aCount: ptrint);
 begin
+  if not FUseIndicesBuffer then exit;
   if Length(FIndexesArray) = aCount then exit;
 
   SetLength(FIndexesArray, aCount);
@@ -643,16 +650,17 @@ begin
   FIndexInIndexArray := 0;
 end;
 
-constructor TOGLCGenericPrimitiveRenderer.Create(aParentScene: TOGLCScene; aInitialBufferCapacity: ptrint);
+constructor TOGLCGenericPrimitiveRenderer.Create(aParentScene: TOGLCScene; aUseIndicesBuffer: boolean);
 begin
   InitShaderCodeAndCallBack;
   FParentScene := aParentScene;
+  FUseIndicesBuffer := aUseIndicesBuffer;
   FBatch := @FParentScene.FRendererBatch;
   FShader := TOGLCShader.Create(FParentScene, FVertexShaderCode, FFragmentShaderCode);
   FGetUniformLocation();
   CreateID;
-  SetCapacity(aInitialBufferCapacity);
-  SetIndexBufferCapacity(aInitialBufferCapacity);
+  SetCapacity(INITIAL_BUFFER_CAPACITY);
+  if aUseIndicesBuffer then SetIndexBufferCapacity(INITIAL_BUFFER_CAPACITY);
   ResetBufferState;
 end;
 
@@ -744,13 +752,14 @@ begin
     FSetUniformValuesAndTexture();
 
     glBindVertexArray(FVAO);
-if not DEBUG_USE_INDEX_ARRAY then
-    glDrawArrays(GLenum(FBatch^.CurrentPrimitiveType), 0, FIndexInAttribsArray)
-else begin
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FVIO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, SizeOf(TVertexIndex)*FIndexInIndexArray, @FIndexesArray[0], GL_DYNAMIC_DRAW);
-  glDrawElements(GLenum(FBatch^.CurrentPrimitiveType){mode}, FIndexInIndexArray{count}, OPENGL_TYPE_USED_FOR_INDICE{type}, PChar(0)); // element array buffer offset
-end;
+
+    if not FUseIndicesBuffer then
+      glDrawArrays(GLenum(FBatch^.CurrentPrimitiveType), 0, FIndexInAttribsArray)
+    else begin
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, FVIO);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, SizeOf(TVertexIndex)*FIndexInIndexArray, @FIndexesArray[0], GL_DYNAMIC_DRAW);
+      glDrawElements(GLenum(FBatch^.CurrentPrimitiveType){mode}, FIndexInIndexArray{count}, OPENGL_TYPE_USED_FOR_INDICE{type}, PChar(0)); // element array buffer offset
+    end;
     glBindVertexArray(0);
 
     err := glGetError();
@@ -769,7 +778,6 @@ end;
 
 procedure TOGLCSmoothLineRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -902,7 +910,6 @@ end;
 
 procedure TOGLCFastLineRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1033,7 +1040,6 @@ end;
 
 procedure TOGLCThreeColorTriangleRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1145,7 +1151,6 @@ end;
 
 procedure TOGLCThreeColorMVTriangleRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1272,7 +1277,6 @@ end;
 
 procedure TOGLCTexturedTriangleRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1324,7 +1328,7 @@ begin
   FOpacity := aOpacity;
 end;
 
-procedure TOGLCTexturedTriangleRenderer.PushQuad(const aFrameIndex,
+procedure TOGLCTexturedTriangleRenderer.PushFrame(const aFrameIndex,
   aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
 var w, h: single;
     p: Pxyuv;
@@ -1425,7 +1429,7 @@ begin
   end;
 end;
 
-procedure TOGLCTexturedTriangleRenderer.PushQuadWithCornerOffset(const aFrameIndex, aFlipIndex: integer;
+procedure TOGLCTexturedTriangleRenderer.PushFrameWithCornerOffset(const aFrameIndex, aFlipIndex: integer;
   const aXPosOffset, aYPosOffset: single; aCornerOffset: TQuadParamF);
 var w, h: single;
     p: Pxyuv;
@@ -1526,11 +1530,204 @@ begin
   end;
 end;
 
+procedure TOGLCTexturedTriangleRenderer.PushFrameClipped(const aFrameIndex,
+  aFlipIndex: integer; const aXPosOffset, aYPosOffset: single; const aClipRect: TRectF);
+var p: Pxyuv;
+    pIndex: PVertexIndex;
+    tci: PQuadCornerIndexes;
+    texCoord: TQuadCoor;
+    fi: Integer;
+    clippedRect: TRectF;
+    tex: PTexture;
+    currentIndex: Int64;
+begin
+  tex := FBatch^.CurrentTexture;
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
+  texCoord.CopyFrom(tex^.FramesCoord[fi]);
+  clippedRect := RectF(aXPosOffset, aYPosOffset, aXPosOffset+tex^.FrameWidth, aYPosOffset+tex^.FrameHeight);
+  if not CheckAndAdjustF(aClipRect, clippedRect, texCoord) then exit;
+  currentIndex := FIndexInAttribsArray;
+
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(4);
+      with p[0] do begin             // BD
+        u := texCoord[ tci^[0] ].x; // AC
+        v := texCoord[ tci^[0] ].y;
+        x := clippedRect.Left;
+        y := clippedRect.Bottom;
+      end;
+      with p[1] do begin
+        u := texCoord[ tci^[1] ].x;
+        v := texCoord[ tci^[1] ].y;
+        x := clippedRect.Left;
+        y := clippedRect.Top;
+      end;
+      with p[2] do begin
+        u := texCoord[ tci^[2] ].x;
+        v := texCoord[ tci^[2] ].y;
+        x := clippedRect.Right;
+        y := clippedRect.Bottom;
+      end;
+      with p[3] do begin
+        u := texCoord[ tci^[3] ].x;
+        v := texCoord[ tci^[3] ].y;
+        x := clippedRect.Right;
+        y := clippedRect.Top;
+      end;
+    end;
+
+    ptTriangles: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(6);
+      with p[0] do begin  // A           // B   BD
+        u := texCoord[ tci^[0] ].x;     // AC  C
+        v := texCoord[ tci^[0] ].y;
+        x := clippedRect.Left;
+        y := clippedRect.Bottom;
+      end;
+      with p[1] do begin  // B
+        u := texCoord[ tci^[1] ].x;
+        v := texCoord[ tci^[1] ].y;
+        x := clippedRect.Left;
+        y := clippedRect.Top;
+      end;
+      with p[2] do begin  // C
+        u := texCoord[ tci^[2] ].x;
+        v := texCoord[ tci^[2] ].y;
+        x := clippedRect.Right;
+        y := clippedRect.Bottom;
+      end;
+      Move(p[2], p[3], SizeOf(Txyuv)); // C
+      Move(p[1], p[4], SizeOf(Txyuv)); // B
+      with p[5] do begin               // D
+        u := texCoord[ tci^[3] ].x;
+        v := texCoord[ tci^[3] ].y;
+        x := clippedRect.Right;
+        y := clippedRect.Top;
+      end;
+    end;
+  end;
+  // indices
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin           // 24
+      AddPrimitiveRestartIfNeeded;   // 13
+      pIndex := QueryIndex(4);
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+3;
+    end;
+
+    ptTriangles: begin              // B   BD
+      pIndex := QueryIndex(6);      // AC  C
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+2;
+      pIndex[4] := currentIndex+1;
+      pIndex[5] := currentIndex+3;
+    end;
+  end;
+end;
+
+procedure TOGLCTexturedTriangleRenderer.PushQuad(const aTexCoord: TQuadCoor;
+  aFlipIndex: integer; const aRect: TRectF);
+var p: Pxyuv;
+    pIndex: PVertexIndex;
+    tci: PQuadCornerIndexes;
+    currentIndex: Int64;
+begin
+  currentIndex := FIndexInAttribsArray;
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(4);
+      with p[0] do begin             // BD
+        u := aTexCoord[ tci^[0] ].x; // AC
+        v := aTexCoord[ tci^[0] ].y;
+        x := aRect.Left;
+        y := aRect.Bottom;
+      end;
+      with p[1] do begin
+        u := aTexCoord[ tci^[1] ].x;
+        v := aTexCoord[ tci^[1] ].y;
+        x := aRect.Left;
+        y := aRect.Top;
+      end;
+      with p[2] do begin
+        u := aTexCoord[ tci^[2] ].x;
+        v := aTexCoord[ tci^[2] ].y;
+        x := aRect.Right;
+        y := aRect.Bottom;
+      end;
+      with p[3] do begin
+        u := aTexCoord[ tci^[3] ].x;
+        v := aTexCoord[ tci^[3] ].y;
+        x := aRect.Right;
+        y := aRect.Top;
+      end;
+    end;
+
+    ptTriangles: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(6);
+      with p[0] do begin  // A           // B   BD
+        u := aTexCoord[ tci^[0] ].x;     // AC  C
+        v := aTexCoord[ tci^[0] ].y;
+        x := aRect.Left;
+        y := aRect.Bottom;
+      end;
+      with p[1] do begin  // B
+        u := aTexCoord[ tci^[1] ].x;
+        v := aTexCoord[ tci^[1] ].y;
+        x := aRect.Left;
+        y := aRect.Top;
+      end;
+      with p[2] do begin  // C
+        u := aTexCoord[ tci^[2] ].x;
+        v := aTexCoord[ tci^[2] ].y;
+        x := aRect.Right;
+        y := aRect.Bottom;
+      end;
+      Move(p[2], p[3], SizeOf(Txyuv)); // C
+      Move(p[1], p[4], SizeOf(Txyuv)); // B
+      with p[5] do begin               // D
+        u := aTexCoord[ tci^[3] ].x;
+        v := aTexCoord[ tci^[3] ].y;
+        x := aRect.Right;
+        y := aRect.Top;
+      end;
+    end;
+  end;
+  // indices
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin           // 24
+      AddPrimitiveRestartIfNeeded;   // 13
+      pIndex := QueryIndex(4);
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+3;
+    end;
+
+    ptTriangles: begin              // B   BD
+      pIndex := QueryIndex(6);      // AC  C
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+2;
+      pIndex[4] := currentIndex+1;
+      pIndex[5] := currentIndex+3;
+    end;
+  end;
+end;
+
 { TOGLCTexturedMVTriangleRenderer }
 
 procedure TOGLCTexturedMVTriangleRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;

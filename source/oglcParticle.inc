@@ -85,9 +85,6 @@ public
                      const aOpacity: single; const aComputedTint: TColorF);
 end;
 
-var
-  ParticleRenderer: TOGLCParticleRenderer;
-
 type
 { TParticleEmitter }
 TEmitterType = (etPoint, etLine, etRectangle, etCircle, etRing, etInnerCircle, etOuterCircle);
@@ -259,7 +256,6 @@ ArrayofParticleEmitter = array of TParticleEmitter;
 
 procedure TOGLCParticleRenderer.InitShaderCodeAndCallBack;
 begin
-DEBUG_USE_INDEX_ARRAY:=TRUE;
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -493,9 +489,6 @@ begin
   Direction := CreateBoundedFParam(0, 360, TRUE);
   ParticlesPosRelativeToEmitterPos := FALSE;
   SetSize(1, 1);
-
-  if ParticleRenderer = NIL then
-    ParticleRenderer := TOGLCParticleRenderer.Create(aParentScene);
 end;
 
 destructor TParticleEmitter.Destroy;
@@ -692,6 +685,7 @@ var i: integer ;
     computedOpacity: single;
     pivotX, pivotY: single;
     mv: TOGLCMatrix;
+    renderer: TOGLCParticleRenderer;
 begin
   if FParticleParam.Texture = NIL then exit;
   if FParticleCount = 0 then begin
@@ -708,13 +702,10 @@ begin
   {$ENDIF}
 
   FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
-  if ParticlesPosRelativeToEmitterPos then begin
-   PushAndPrepareSceneMV;
-  end;
+  if ParticlesPosRelativeToEmitterPos then PushAndPrepareSceneMV;
 
-//  FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FParticleParam.Texture, 0, FBlendMode);
-
-  ParticleRenderer.Prepare(FParticleParam.Texture, 0, FBlendMode);
+  renderer := FParentScene.ParticleRenderer;
+  renderer.Prepare(FParticleParam.Texture, 0, FBlendMode);
 
   pivotX := FParticleParam.Texture^.FrameWidth*0.5;
   pivotY := FParticleParam.Texture^.FrameHeight*0.5;
@@ -726,7 +717,7 @@ begin
       computedTint.InitFromBGRA(CurrentColor);
       computedTint.a := 1.0;
       computedOpacity := FComputedOpacity*CurrentColor.alpha*OneDiv255;
-      ParticleRenderer.PushQuad(Trunc(FrameIndex), 0, @mv.Matrix, computedOpacity, computedTint);
+      renderer.PushQuad(Trunc(FrameIndex), 0, @mv.Matrix, computedOpacity, computedTint);
       {$IFDEF DEBUG_MODE_ON}
        if xL > X then xL := X;
        if xR < X then xR := X;
@@ -734,7 +725,7 @@ begin
        if yB < Y then yB := Y;
       {$ENDIF}
     end;
-//  ParticleRenderer.Batch_Flush;
+//  renderer.Batch_Flush;
 
   if ParticlesPosRelativeToEmitterPos then PopSceneMV;
 
