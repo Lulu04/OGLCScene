@@ -257,16 +257,16 @@ begin
   InitQuadOffset(0.8);
   for i:=0 to High(FFlakeArray[0]) do
    with FFlakeArray[0][i] do
-     FParentScene.TexturedTriangleRenderer.PushQuadWithCornerOffset(0, 0, xdraw, fy, FQuadOffset);
+     FParentScene.TexturedTriangleRenderer.PushFrameWithCornerOffset(0, 0, xdraw, fy, FQuadOffset);
   // middle
   InitQuadOffset(0.65);
   for i:=0 to High(FFlakeArray[1]) do
    with FFlakeArray[1][i] do
-     FParentScene.TexturedTriangleRenderer.PushQuadWithCornerOffset(0, 0, xdraw, fy, FQuadOffset);
+     FParentScene.TexturedTriangleRenderer.PushFrameWithCornerOffset(0, 0, xdraw, fy, FQuadOffset);
   // normal
   for i:=0 to High(FFlakeArray[2]) do
    with FFlakeArray[2][i] do
-     FParentScene.TexturedTriangleRenderer.PushQuad(0, 0, xdraw, fy);
+     FParentScene.TexturedTriangleRenderer.PushFrame(0, 0, xdraw, fy);
   FParentScene.TexturedTriangleRenderer.Draw;
 
   glDisable(GL_SCISSOR_TEST);

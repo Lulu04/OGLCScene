@@ -14,7 +14,7 @@ VERTEX_SHADER =
  '  out vec2 TexCoords;'#10+
  'void main()'#10+
  '{'#10+
- '  gl_Position = uMVP * vec4(aVertexAndTextureCoor.xy, 0.0, 1.0);'#10+ // no transformation
+ '  gl_Position = uMVP * vec4(aVertexAndTextureCoor.xy, 0.0, 1.0);'#10+
  '  TexCoords = aVertexAndTextureCoor.zw;'#10+
  '}';
 
@@ -29,9 +29,9 @@ FRAGMENT_SHADER =
  'void main()'#10+
  '{'#10+
  '  vec4 col = texture(uTexUnit, TexCoords);'#10+
- '  if (col.a == 0.0) discard;'#10+
  // Tint
  '  float a = col.a*uOpacity;'#10+
+ '  if (a == 0.0) discard;'#10+
  '  float tintAlphaX2 = uTintColor.a*2;'#10+
  '  if (uTintColor.a >= 0.5)'#10+
  '   {'#10+
@@ -50,17 +50,16 @@ private
   FLocTintColor,
   FLocOpacity: GLint;
   FMVP: TOGLCMatrix;
-  FTexture: PTexture;
-  FTextureUnit: integer;
   FTintF: TColorF;
   FOpacity: single;
+  FClipAreaF: TRectF;
   procedure InitShaderCodeAndCallBack; override;
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
 public
   procedure Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aTexture: PTexture; aTextureUnit: integer;
-    const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+    const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte; const aClipAreaF: TRectF);
   procedure PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
 end;
 
@@ -100,8 +99,6 @@ TTileEvent = procedure (Sender: TTileEngine; const TileTopLeftCoor: TPointF; Eve
 
 TTileEngine = class(TSimpleSurfaceWithEffect)
 private
- FRenderToTexture: TOGLCRenderToTexture;
- FClipArea: TUIClipArea;
  FTextureList: TArrayOfTileTexInfo;
  FTextureListOwner: boolean;
  FPTextureList: PArrayOfTileTexInfo;
@@ -177,8 +174,8 @@ public
  function GetGroundType(ATextureIndex, ixFrame, iyFrame: integer): integer; overload;
  procedure ClearCell(ARow, AColumn: integer);
 public
- // set to TRUE if you use a camera to move on the map instead of using PositionOnMap property
- // slowly because all the tiles are drawn even if they are not visible
+ // sets this property to TRUE if you use a camera to move on the map instead of using PositionOnMap property
+ // Slower because all the tiles are drawn even if they are not visible
  ForceTheDrawingOfAllTheTiles: boolean;
 
  // this is virtual position of the top left corner of the view
@@ -275,69 +272,80 @@ end;
 
 procedure TOGLCTileRenderer.SetUniformValuesAndTexture;
 begin
-  glUniform1i(FLocTextureUnit, FTextureUnit);
+  glUniform1i(FLocTextureUnit, FBatch^.CurrentTextureUnit);
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
   glUniform4fv(FLocTintColor, 4, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
-  FParentScene.TexMan.Bind(FTexture, FTextureUnit);
+  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
 procedure TOGLCTileRenderer.Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aTexture: PTexture;
-  aTextureUnit: integer; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
+  aTextureUnit: integer; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte;
+  const aClipAreaF: TRectF);
 var forceFlush: boolean;
 begin
-  forceFlush := not FMVP.EqualTo(aMVP);
+  forceFlush := not FMVP.EqualTo(aMVP) or
+               ((aClipAreaF.Left = FClipAreaF.Left) and
+                (aClipAreaF.Right = FClipAreaF.Right) and
+                (aClipAreaF.Top = FClipAreaF.Top) and
+                (aClipAreaF.Bottom = FClipAreaF.Bottom));
   Batch_CheckIfNeedFlush(Self, aTriangleType, aTexture, aTextureUnit, aBlendMode, forceFlush);
 
   FMVP.CopyFrom(aMVP);
-  FTexture := aTexture;
-  FTextureUnit := aTextureUnit;
   FOpacity := aOpacity;
   FTintF.CopyFrom(aComputedTint);
+  FClipAreaF.Left := aClipAreaF.Left;
+  FClipAreaF.Right := aClipAreaF.Right;
+  FClipAreaF.Top := aClipAreaF.Top;
+  FClipAreaF.Bottom := aClipAreaF.Bottom;
 end;
 
 procedure TOGLCTileRenderer.PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-var w, h, deltax, deltay: single;
+var deltax, deltay: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
+    texCoord: TQuadCoor;
     fi: Integer;
+    clippedRect: TRectF;
+    tex: PTexture;
 begin
   // we inflate each quad of 1/4 pixel to prevents any artifacts
   deltax := 0.25;
   deltay := 0.25;
 
-  fi := EnsureRange(aFrameIndex, 0, FTexture^.FrameCount-1);
-  texCoord := @FTexture^.FramesCoord[fi];
-  w := FTexture^.FrameWidth;
-  h := FTexture^.FrameHeight;
+  tex := FBatch^.CurrentTexture;
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
+  texCoord.CopyFrom(tex^.FramesCoord[fi]);
+  clippedRect := RectF(aXPosOffset, aYPosOffset, aXPosOffset+tex^.FrameWidth, aYPosOffset+tex^.FrameHeight);
+  if not CheckAndAdjustF(FClipAreaF, clippedRect, texCoord) then exit;
+
   case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
       tci := @FLIP_INDEXES[aFlipIndex];
       p := QueryVertex(4);
       with p[0] do begin             // BD
-        u := texCoord^[ tci^[0] ].x; // AC
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset-deltax;
-        y := h + aYPosOffset+deltay;
+        u := texCoord[ tci^[0] ].x; // AC
+        v := texCoord[ tci^[0] ].y;
+        x := clippedRect.Left-deltax;
+        y := clippedRect.Bottom+deltay;
       end;
       with p[1] do begin
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset-deltax;
-        y := aYPosOffset-deltay;
+        u := texCoord[ tci^[1] ].x;
+        v := texCoord[ tci^[1] ].y;
+        x := clippedRect.Left-deltax;
+        y := clippedRect.Top-deltay;
       end;
       with p[2] do begin
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset+deltax;
-        y := h + aYPosOffset+deltay;
+        u := texCoord[ tci^[2] ].x;
+        v := texCoord[ tci^[2] ].y;
+        x := clippedRect.Right+deltax;
+        y := clippedRect.Bottom+deltay;
       end;
       with p[3] do begin
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset+deltax;
-        y := aYPosOffset-deltay;
+        u := texCoord[ tci^[3] ].x;
+        v := texCoord[ tci^[3] ].y;
+        x := clippedRect.Right+deltax;
+        y := clippedRect.Top-deltay;
       end;
     end;
 
@@ -345,30 +353,30 @@ begin
       tci := @FLIP_INDEXES[aFlipIndex];
       p := QueryVertex(6);
       with p[0] do begin  // A           // B   BD
-        u := texCoord^[ tci^[0] ].x;     // AC  C
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset-deltax;
-        y := h + aYPosOffset+deltay;
+        u := texCoord[ tci^[0] ].x;     // AC  C
+        v := texCoord[ tci^[0] ].y;
+        x := clippedRect.Left-deltax;
+        y := clippedRect.Bottom+deltay;
       end;
       with p[1] do begin  // B
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset-deltax;
-        y := aYPosOffset-deltay;
+        u := texCoord[ tci^[1] ].x;
+        v := texCoord[ tci^[1] ].y;
+        x := clippedRect.Left-deltax;
+        y := clippedRect.Top-deltay;
       end;
       with p[2] do begin  // C
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset+deltax;
-        y := h + aYPosOffset+deltay;
+        u := texCoord[ tci^[2] ].x;
+        v := texCoord[ tci^[2] ].y;
+        x := clippedRect.Right+deltax;
+        y := clippedRect.Bottom+deltay;
       end;
       Move(p[2], p[3], SizeOf(Txyuv)); // C
       Move(p[1], p[4], SizeOf(Txyuv)); // B
       with p[5] do begin               // D
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset+deltax;
-        y := aYPosOffset-deltay;
+        u := texCoord[ tci^[3] ].x;
+        v := texCoord[ tci^[3] ].y;
+        x := clippedRect.Right+deltax;
+        y := clippedRect.Top-deltay;
       end;
     end;
   end;
@@ -403,7 +411,6 @@ begin
   FreeAndNil(ScrollSpeed);
   FreeAndNil(PositionOnMap);
   FreeAndNil(MapHoleColor);
-  FreeAndNil(FRenderToTexture);
   inherited Destroy;
 end;
 
@@ -477,36 +484,30 @@ begin
 end;
 
 procedure TTileEngine.ComputeIndexes(APosition: TPointF);
-var v: single;
 begin
   EnsurePositionInMap( {%H-}APosition );
 
-  v := APosition.x / FTileSize.cx;
-  FColumnIndexFirstTile := Trunc(v);
+  FColumnIndexFirstTile := Trunc(APosition.x / FTileSize.cx);
   if APosition.x < 0 then dec(FColumnIndexFirstTile);
-  FXOffsetFirstTile := - (v - FColumnIndexFirstTile) * FTileSize.cx;
+  FXOffsetFirstTile := -(APosition.x - FColumnIndexFirstTile*FTileSize.cx);
 
-  v := APosition.y / FTileSize.cy;
-  FRowIndexFirstTile := Trunc(v);
+  FRowIndexFirstTile := Trunc(APosition.y / FTileSize.cy);
   if APosition.y < 0 then dec(FRowIndexFirstTile);
-  FYOffsetFirstTile := - (v - FRowIndexFirstTile) * FTileSize.cy;
+  FYOffsetFirstTile := -(APosition.y - FRowIndexFirstTile*FTileSize.cy);
 end;
 
 
 procedure TTileEngine.Draw(const aLayerPercentOpacity: single);
 var ixtile, iytile, indexTex, indexFrame: integer;
     ptrTile: PTile;
-    xx, yy, xxx, yyy: single;
-    c: TBGRAPixel;
-    p: TPointF;
-    t, currentTexture: PTexture;
+    xx, yy: single;
+    cHole: TBGRAPixel;
+    currentTex, previousTex: PTexture;
     tileRenderer: TOGLCTileRenderer;
+    clipArea: TRectF;
 begin
   FComputedOpacity := Opacity.Value*OneDiv255*aLayerPercentOpacity;
   if FComputedOpacity = 0 then exit;
-  FComputedTint.InitFromTint(TintMode, Tint.Value);
-
-  tileRenderer := FParentScene.TileRenderer;
 
   // if the data map are empty, we draw a colored square with the hole color
   if (Length(FMap) = 0) or (GetTextureCount = 0) then
@@ -519,168 +520,66 @@ begin
     exit;
   end;
 
+  FComputedTint.InitFromTint(TintMode, Tint.Value);
+  tileRenderer := FParentScene.TileRenderer;
+  clipArea := RectF(0, 0, FWidth, FHeight);
+
   // compute first tile indexes and its offset
-  p := PositionOnMap.Value;
-  ComputeIndexes(p);
+  ComputeIndexes(PositionOnMap.Value);
 
-  FClipArea.Create(Point(Trunc(X.Value), Trunc(Y.Value)), FWidth, FHeight);
+  cHole := MapHoleColor.Value;
+  cHole.alpha := Round(FComputedOpacity*cHole.alpha);
 
+  PushAndPrepareSceneMV;
+  yy := FYOffsetFirstTile;
+  iytile := FRowIndexFirstTile;
+  previousTex := NIL;
 
-{  // try to render with the frame buffer object
-  if (FRenderToTexture <> NIL) and FRenderToTexture.Ready then
-  begin
-    // save the current MV matrix and reset it
-    FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
-    FParentScene.ModelViewMatrix.LoadIdentity;
-    SetBlendMode(FX_BLEND_NORMAL);
-
-    currentTexture := NIL;
-    FRenderToTexture.Bind;
-
-    yy := FYOffsetFirstTile;
-    iytile := FRowIndexFirstTile;
+  repeat
+    xx := FXOffsetFirstTile;
+    ixtile := FColumnIndexFirstTile;
     repeat
-      xx := FXOffsetFirstTile;
-      ixtile := FColumnIndexFirstTile;
-
-      repeat
-        xxx := xx + x.Value;
-        yyy := yy + y.Value;
-        // draw only non clipped tile
-        if not((xxx > FParentScene.Width) or (xxx+TileSize.cx < 0) or
-                (yyy > FParentScene.Height) or (yyy+TileSize.cy < 0)) or
-           ForceTheDrawingOfAllTheTiles then
+      // draw only non clipped tile
+      if ((xx < FParentScene.Width) and (xx+FTileSize.cx > 0) and
+          (yy < FParentScene.Height) and (yy+FTileSize.cy > 0)) or
+         ForceTheDrawingOfAllTheTiles then
+      begin
+        // ensure map data integrity
+        if (ixtile >= 0) or (ixtile < FMapTileCount.cx) or
+           (iytile >= 0) or (iytile < FMapTileCount.cy) then
         begin
-          if (ixtile >= 0) or (ixtile < FMapTileCount.cx) or
-             (iytile >= 0) or (iytile < FMapTileCount.cy) then
-          begin
-            ptrTile := @FMap[iytile,ixtile];
-            if ptrTile^.TextureIndex > -1 then
-            begin
-              indexTex := ptrTile^.TextureIndex;
-              indexFrame := TileEngineIndexFrameToTextureIndexFrame( indexTex, ptrTile^.ixFrame, ptrTile^.iyFrame );
+          ptrTile := @FMap[iytile,ixtile];
+          if ptrTile^.TextureIndex > -1 then begin
+            indexTex := ptrTile^.TextureIndex;
+            indexFrame := TileEngineIndexFrameToTextureIndexFrame(indexTex, ptrTile^.ixFrame, ptrTile^.iyFrame);
 
-              t := GetTexture(indexTex);
-              if currentTexture <> t then begin
-                tileRenderer.Prepare(ptTriangles, FParentScene.MVPMatrix, t, 0);
-                currentTexture := t;
-              end;
-              //t^.Bind;
+            currentTex := GetTexture(indexTex);
+            if currentTex <> previousTex then
+              tileRenderer.Prepare(ptTriangles, FParentScene.MVPMatrix, currentTex, 0, FComputedOpacity, FComputedTint, BlendMode,
+                                   clipArea);
+            previousTex := currentTex;
+            tileRenderer.PushQuad(indexFrame, 0, xx, yy);
+          end else FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
 
-              tileRenderer.PushQuad(indexFrame, 0, xxx, yyy);
-//              FParentScene.TexturedQuadRenderer.DrawTexture(t, indexFrame, 0, xxx, yyy, 0, FComputedOpacity, Tint.Value);
-            end
-            else FillBox( xx + x.Value, yy + y.Value, FTileSize.cx, FTileSize.cy, c );
-            // callback event
-            if (FOnTileEvent <> NIL) and ((ptrTile^.UserEvent <> VALUE_NO_EVENT) or TileMapDesignerModeEnable)
-              then FOnTileEvent(self, PointF(xxx,yyy), ptrTile^.UserEvent);
-          end;
+          // callback event
+          if (FOnTileEvent <> NIL) and ((ptrTile^.UserEvent <> VALUE_NO_EVENT) or TileMapDesignerModeEnable)
+            then FOnTileEvent(self, PointF(xx,yy), ptrTile^.UserEvent);
         end;
+      end;
 
-        xx += FTileSize.cx;
-        inc(ixtile);
-        if FHLoopMode and (ixtile >= FMapTileCount.cx) then ixtile := 0;
-      until xx >= FWidth;
+      xx := xx + FTileSize.cx;
+      inc(ixtile);
+      if FHLoopMode and (ixtile >= FMapTileCount.cx) then ixtile := 0;
+    until xx >= FWidth;
 
-      yy += FTileSize.cy;
-      inc(iytile);
-      if FVLoopMode and (iytile >= FMapTileCount.cy) then iytile := 0;
-    until yy >= FHeight;
-
-    tileRenderer.Draw(True);
-
-    FRenderToTexture.Unbind;
-//    FParentScene.TextMan.UnbindTexture;
-
-    // restore the previous MV matrix and draw the rendered texture
-    FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
-    PushAndPrepareSceneMV;
-    SetBlendMode(FBlendMode);
-    FParentScene.TexturedQuadRenderer.DrawTexture(FRenderToTexture.RenderedTexture, 0, FlipToIndex,
-                                                  FParentScene.MVPMatrix, 0, 0, computedOpacity, Tint.Value);
-    PopSceneMV;
-
-    exit;
-  end;       }
-
-
-
-
-
-
-
-
-
-
-  c := MapHoleColor.Value;
-  c.alpha := Round(FComputedopacity*c.alpha);
-
-// PushAndPrepareMatrix;          <- issue with glScissor
-//  SetBlendMode(FBlendMode);
-
-  if not (TileMapDesignerModeEnable or ForceTheDrawingOfAllTheTiles) then
-  begin
-   glScissor(round(x.Value), round(y.Value), Width, Height);
-   glEnable(GL_SCISSOR_TEST);
-  end;
-
-    yy := FYOffsetFirstTile;
-    iytile := FRowIndexFirstTile;
-
-    repeat
-      xx := FXOffsetFirstTile;
-      ixtile := FColumnIndexFirstTile;
-
-      repeat
-        xxx := xx + x.Value;
-        yyy := yy + y.Value;
-        if not((xxx > FParentScene.Width) or (xxx+TileSize.cx < 0) or
-                (yyy > FParentScene.Height) or (yyy+TileSize.cy < 0)) or
-           ForceTheDrawingOfAllTheTiles then
-        begin
-          // draw only non clipped tile
-          if (ixtile < 0) or (ixtile >= FMapTileCount.cx) or
-             (iytile < 0) or (iytile >= FMapTileCount.cy) then
-            FillBox(FParentScene, xx + x.Value, yy + y.Value, FTileSize.cx, FTileSize.cy, c)
-          else
-          begin
-            ptrTile := @FMap[iytile,ixtile];
-            if ptrTile^.TextureIndex > -1 then
-            begin
-              indexTex := ptrTile^.TextureIndex;
-              indexFrame := TileEngineIndexFrameToTextureIndexFrame(indexTex, ptrTile^.ixFrame, ptrTile^.iyFrame);
-
-              t := GetTexture(indexTex);
-              tileRenderer.Prepare(ptTriangles, FParentScene.MVPMatrix, t, 0, FComputedOpacity, FComputedTint, BlendMode);
-              //t^.Bind;
-              //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);//GL_LINEAR);
-              //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);//GL_LINEAR);
-              tileRenderer.PushQuad(indexFrame, 0, xxx, yyy);
-//tileRenderer.Batch_Flush;
-//              FParentScene.TexturedQuadRenderer.DrawTexture(t, indexFrame, 0, xxx, yyy, 0, FComputedOpacity, computedTint);
-            end
-            else FillBox(FParentScene, xx + x.Value, yy + y.Value, FTileSize.cx, FTileSize.cy, c );
-            // callback event
-            if (FOnTileEvent <> NIL) and ((ptrTile^.UserEvent <> VALUE_NO_EVENT) or TileMapDesignerModeEnable)
-              then FOnTileEvent(self, PointF(xxx,yyy), ptrTile^.UserEvent);
-          end;
-        end;
-
-        xx += FTileSize.cx;
-        inc(ixtile);
-        if FHLoopMode and (ixtile >= FMapTileCount.cx) then ixtile := 0;
-      until xx >= FWidth;
-
-      yy += FTileSize.cy;
-      inc(iytile);
-      if FVLoopMode and (iytile >= FMapTileCount.cy) then iytile := 0;
-    until yy >= FHeight;
-
-    glDisable(GL_SCISSOR_TEST);
+    yy := yy + FTileSize.cy;
+    inc(iytile);
+    if FVLoopMode and (iytile >= FMapTileCount.cy) then iytile := 0;
+  until yy >= FHeight;
 
   if ChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
     else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
-// PopMatrix;
+  PopSceneMV;
 end;
 
 procedure TTileEngine.DoDraw;
@@ -741,15 +640,15 @@ begin
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+{  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT); }
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP); //GL_CLAMP_TO_EDGE );
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP); //GL_CLAMP_TO_EDGE );
 
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // nearest Filtering
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // nearest Filtering
+{  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // nearest Filtering
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // nearest Filtering    }
 
   // tile type to default (neutral=1)
   fc := aTexture^.GetFrameCount;
@@ -1225,9 +1124,6 @@ procedure TTileEngine.SetViewSize(AWidth, AHeight: integer);
 begin
   FWidth := Max(1, AWidth);
   FHeight := Max(1, AHeight);
-
-  if FRenderToTexture <> NIL then FreeAndNil(FRenderToTexture);
-  //FRenderToTexture := TOGLCRenderToTexture.Create(FParentScene, FWidth, FHeight, 1);
 end;
 
 function TTileEngine.GetFirstTileColumnIndex: integer;
