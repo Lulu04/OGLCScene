@@ -35,22 +35,22 @@ TStencilClipping = record
 end;
 
 
-{ TUIClipArea }
-// a software clipping
+// SOFTWARE CLIPPING
 
-TUIClipArea = TRect;
-PUIClipArea = ^TUIClipArea;
+// Check if the specified surface area is visible in the given clipped rectangle.
+//   > return True if at least one part of the surface is visible (the object can be drawn)
+//   > return False if the surface is completely outside.
+// If only a part is visible, the function 'cut' the surface area and its
+// texture coordinates in respect of the clipping area.
+function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
 
-TUIClipAreaHelper = record helper for TUIClipArea
-private
-public
-  // Check if the specified surface is visible in the clip area
-  //   > return True if at least one part of the surface is visible (the object can be drawn)
-  //   > return False if the surface is completely outside.
-  // If only a part is visible, the function 'cut' the surface area and its
-  // texture coordinates in respect of the clipping area.
-  function CheckAndAdjust(var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
-end;
+// Check if the specified surface area is visible in the given clipped rectangle.
+//   > return True if at least one part of the surface is visible (the object can be drawn)
+//   > return False if the surface is completely outside.
+// If only a part is visible, the function 'cut' the surface area and its
+// texture coordinates in respect of the clipping area.
+// TRectF version
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -117,51 +117,111 @@ begin
   IsActive := False;
 end; }
 
-{ TUIClipAreaHelper }
 
-function TUIClipAreaHelper.CheckAndAdjust(var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
-var delta: integer;
+function CheckAndAdjust(const aClipRect: TRect;
+  var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
+var delta, surfaceAreaWidth, surfaceAreaHeight: integer;
   uvHorizontalRange, uvVerticalRange, pc: single;
 begin
-  if (aSurfaceArea.Left > Right) or (aSurfaceArea.Right < Left) or
-     (aSurfaceArea.Top > Bottom) or (aSurfaceArea.Bottom < Top)  then exit(False);
+  surfaceAreaWidth := aSurfaceArea.Width;
+  if surfaceAreaWidth <= 0 then exit(False);
 
-  Result := True;
-  uvHorizontalRange := aTexCoor[cTR].x - aTexCoor[cTL].x;
-  uvVerticalRange := aTexCoor[cBL].y - aTexCoor[cTL].y;
+  surfaceAreaHeight := aSurfaceArea.Height;
+  if surfaceAreaHeight <= 0 then exit(False);
 
-  if aSurfaceArea.Left < Left then begin  //trim the left
-    delta := Left - aSurfaceArea.Left;
-    pc := delta / aSurfaceArea.Width;
-    aSurfaceArea.Left := aSurfaceArea.Left + delta;
-    aTexCoor[cTL].x := aTexCoor[cTL].x + uvHorizontalRange * pc;
-    aTexCoor[cBL].x := aTexCoor[cBL].x + uvHorizontalRange * pc;
-  end;
+  with aClipRect do begin
+    if (aSurfaceArea.Left > Right) or (aSurfaceArea.Right < Left) or
+       (aSurfaceArea.Top > Bottom) or (aSurfaceArea.Bottom < Top)  then exit(False);
 
-  if aSurfaceArea.Right > Right then begin  //trim the right
-    delta := aSurfaceArea.Right - Right;
-    pc := delta / aSurfaceArea.Width;
-    aSurfaceArea.Right := aSurfaceArea.Right - delta;
-    aTexCoor[cTR].x := aTexCoor[cTR].x - uvHorizontalRange * pc;
-    aTexCoor[cBR].x := aTexCoor[cBR].x - uvHorizontalRange * pc;
-  end;
+    Result := True;
+    uvHorizontalRange := aTexCoor[cTR].x - aTexCoor[cTL].x;
+    uvVerticalRange := aTexCoor[cBL].y - aTexCoor[cTL].y;
 
-  if aSurfaceArea.Top < Top then begin  //trim the top
-    delta := Top - aSurfaceArea.Top;
-    pc := delta / aSurfaceArea.Height;
-    aSurfaceArea.Top := aSurfaceArea.Top + delta;
-    aTexCoor[cTL].y := aTexCoor[cTL].y + uvVerticalRange * pc;
-    aTexCoor[cTR].y := aTexCoor[cTR].y + uvVerticalRange * pc;
-  end;
+    if aSurfaceArea.Left < Left then begin  //trim the left
+      delta := Left - aSurfaceArea.Left;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Left := aSurfaceArea.Left + delta;
+      aTexCoor[cTL].x := aTexCoor[cTL].x + uvHorizontalRange * pc;
+      aTexCoor[cBL].x := aTexCoor[cBL].x + uvHorizontalRange * pc;
+    end;
 
-  if aSurfaceArea.Bottom > Bottom then begin  //trim the bottom
-   delta := aSurfaceArea.Bottom - Bottom;
-   pc := delta / aSurfaceArea.Height;
-   aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
-   aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
-   aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+    if aSurfaceArea.Right > Right then begin  //trim the right
+      delta := aSurfaceArea.Right - Right;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Right := aSurfaceArea.Right - delta;
+      aTexCoor[cTR].x := aTexCoor[cTR].x - uvHorizontalRange * pc;
+      aTexCoor[cBR].x := aTexCoor[cBR].x - uvHorizontalRange * pc;
+    end;
+
+    if aSurfaceArea.Top < Top then begin  //trim the top
+      delta := Top - aSurfaceArea.Top;
+      pc := delta / surfaceAreaHeight;
+      aSurfaceArea.Top := aSurfaceArea.Top + delta;
+      aTexCoor[cTL].y := aTexCoor[cTL].y + uvVerticalRange * pc;
+      aTexCoor[cTR].y := aTexCoor[cTR].y + uvVerticalRange * pc;
+    end;
+
+    if aSurfaceArea.Bottom > Bottom then begin  //trim the bottom
+     delta := aSurfaceArea.Bottom - Bottom;
+     pc := delta / surfaceAreaHeight;
+     aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
+     aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
+     aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+    end;
   end;
 end;
+
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean;
+var delta, uvHorizontalRange, uvVerticalRange, pc, surfaceAreaWidth, surfaceAreaHeight: single;
+begin
+  surfaceAreaWidth := aSurfaceArea.Width;
+  if surfaceAreaWidth <= 0 then exit(False);
+
+  surfaceAreaHeight := aSurfaceArea.Height;
+  if surfaceAreaHeight <= 0 then exit(False);
+
+  with aClipRect do begin
+    if (aSurfaceArea.Left > Right) or (aSurfaceArea.Right < Left) or
+       (aSurfaceArea.Top > Bottom) or (aSurfaceArea.Bottom < Top)  then exit(False);
+
+    Result := True;
+    uvHorizontalRange := aTexCoor[cTR].x - aTexCoor[cTL].x;
+    uvVerticalRange := aTexCoor[cBL].y - aTexCoor[cTL].y;
+
+    if aSurfaceArea.Left < Left then begin  //trim the left
+      delta := Left - aSurfaceArea.Left;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Left := aSurfaceArea.Left + delta;
+      aTexCoor[cTL].x := aTexCoor[cTL].x + uvHorizontalRange * pc;
+      aTexCoor[cBL].x := aTexCoor[cBL].x + uvHorizontalRange * pc;
+    end;
+
+    if aSurfaceArea.Right > Right then begin  //trim the right
+      delta := aSurfaceArea.Right - Right;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Right := aSurfaceArea.Right - delta;
+      aTexCoor[cTR].x := aTexCoor[cTR].x - uvHorizontalRange * pc;
+      aTexCoor[cBR].x := aTexCoor[cBR].x - uvHorizontalRange * pc;
+    end;
+
+    if aSurfaceArea.Top < Top then begin  //trim the top
+      delta := Top - aSurfaceArea.Top;
+      pc := delta / surfaceAreaHeight;
+      aSurfaceArea.Top := aSurfaceArea.Top + delta;
+      aTexCoor[cTL].y := aTexCoor[cTL].y + uvVerticalRange * pc;
+      aTexCoor[cTR].y := aTexCoor[cTR].y + uvVerticalRange * pc;
+    end;
+
+    if aSurfaceArea.Bottom > Bottom then begin  //trim the bottom
+     delta := aSurfaceArea.Bottom - Bottom;
+     pc := delta / surfaceAreaHeight;
+     aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
+     aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
+     aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+    end;
+  end;
+end;
+
 
 {$endif oglcIMPLEMENTATION}
 

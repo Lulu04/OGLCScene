@@ -49,10 +49,10 @@ TTexturedFont = class{(TFPHashList)}
   function StringToCharIndexes(const aCaption: string): TTexturedCharIndexes;
   function CharIndexesToSize(const aIndexes: TTexturedCharIndexes): TSize;
   procedure DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer;
-                     const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44;
+                     const aClippingArea: PRect; const aModelViewMatrix: POGLCMatrix44;
                      const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
   procedure DrawChars(const aCharIdx: TTexturedCharIndexes; aX, aY, aFlipIndex: integer;
-                      const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44;
+                      const aClippingArea: PRect; const aModelViewMatrix: POGLCMatrix44;
                       const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
 
   // original size (equal to TBGRABitmap.TextSize())
@@ -908,7 +908,7 @@ begin
     end;
 end;
 
-procedure TTexturedFont.DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer; const aClippingArea: PUIClipArea;
+procedure TTexturedFont.DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer; const aClippingArea: PRect;
   const aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
 var tc: PTexturedChar;
   modelArea: TRect;
@@ -920,14 +920,14 @@ begin
     modelArea := tc^.ModelArea;
     modelArea.Offset(Point(aX, aY));
     texCoor := tc^.Texture^.FramesCoord[0];
-    if (aClippingArea <> NIL) and not aClippingArea^.CheckAndAdjust(modelArea, texCoor) then exit;
+    if (aClippingArea <> NIL) and not CheckAndAdjust(aClippingArea^, modelArea, texCoor) then exit;
     FParentScene.TexturedMVTriangleRenderer.PushQuad3(modelArea, texCoor, aFlipIndex, aModelViewMatrix,
                                                      aOpacity, aComputedTint);
   end;
 end;
 
 procedure TTexturedFont.DrawChars(const aCharIdx: TTexturedCharIndexes; aX, aY, aFlipIndex: integer;
-   const aClippingArea: PUIClipArea; const aModelViewMatrix: POGLCMatrix44; const aOpacity: single;
+   const aClippingArea: PRect; const aModelViewMatrix: POGLCMatrix44; const aOpacity: single;
    const aComputedTint: TColorF; aBlendMode: byte);
 var i, xx, yy: integer;
   tc: PTexturedChar;
@@ -947,7 +947,7 @@ begin
      modelArea := tc^.ModelArea;
      modelArea.Offset(Point(xx, yy));
      texCoor := tc^.Texture^.FramesCoord[0];
-     if aClippingArea <> NIL then flagDraw := aClippingArea^.CheckAndAdjust(modelArea, texCoor)
+     if aClippingArea <> NIL then flagDraw := CheckAndAdjust(aClippingArea^, modelArea, texCoor)
        else flagDraw := True;
      if flagDraw then
        FParentScene.TexturedMVTriangleRenderer.PushQuad3(modelArea, texCoor, aFlipIndex, aModelViewMatrix,
