@@ -100,17 +100,15 @@ procedure TOGLCGlowRenderer.GetUniformLocation;
 begin
   with FShader do
   begin
-    Use;
     FLocMVP := GetUniform('uMVP');
     FLocOpacity := GetUniform('uOpacity');
-    Release;
   end;
 end;
 
 procedure TOGLCGlowRenderer.SetUniformValuesAndTexture;
 begin
-  FShader.SetUniformMatrix4(FLocMVP, @FMVP.Matrix[0,0]);
-  FShader.SetUniform1f(FLocOpacity, FOpacity);
+  glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
+  glUniform1f(FLocOpacity, FOpacity);
   FParentScene.TexMan.UnbindTexture;
 end;
 
