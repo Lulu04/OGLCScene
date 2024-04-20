@@ -57,8 +57,8 @@ object FormMain: TFormMain
       Top = 56
       Width = 234
       Frequency = 20
-      Max = 600
-      Min = -600
+      Max = 1200
+      Min = -1200
       OnChange = TrackBar1Change
       Position = 300
       ShowSelRange = False
