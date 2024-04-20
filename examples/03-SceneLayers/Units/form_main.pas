@@ -19,6 +19,7 @@ type
     Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     Timer1: TTimer;

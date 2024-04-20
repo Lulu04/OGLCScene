@@ -15,12 +15,6 @@ object FormMain: TFormMain
   OnKeyUp = FormKeyUp
   LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 24
-    Height = 96
-    Top = 24
-    Width = 80
-  end
   object Panel1: TPanel
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
@@ -34,7 +28,7 @@ object FormMain: TFormMain
     ClientWidth = 151
     Color = 14737632
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     object RadioButton1: TRadioButton
       Left = 7
       Height = 19
@@ -107,6 +101,27 @@ object FormMain: TFormMain
       OnChange = RadioButton1Change
       State = cbChecked
       TabOrder = 4
+    end
+  end
+  object Panel2: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Panel1
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 306
+    Top = 0
+    Width = 152
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 306
+    ClientWidth = 152
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 24
+      Height = 96
+      Top = 24
+      Width = 80
     end
   end
   object Timer1: TTimer
