@@ -17,10 +17,10 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="33"/>
+      <BuildNr Value="36"/>
       <Language Value="040C"/>
     </VersionInfo>
-    <BuildModes Count="2" Active="Debug">
+    <BuildModes Count="2" Active="Release">
       <Item1 Name="Debug" Default="True"/>
       <Item2 Name="Release">
         <CompilerOptions>
@@ -44,6 +44,7 @@
           <Linking>
             <Debugging>
               <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
             </Debugging>
             <LinkSmart Value="True"/>
             <Options>
@@ -95,7 +96,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="23" Y="13"/>
+        <CursorPos X="30" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -113,9 +114,9 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="5"/>
-        <CursorPos X="41" Y="17"/>
+        <CursorPos X="33" Y="15"/>
         <UsageCount Value="55"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -217,7 +218,6 @@
       <Unit18>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="392"/>
         <CursorPos X="61" Y="405"/>
@@ -232,7 +232,7 @@
         <UsageCount Value="11"/>
       </Unit19>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="Units\u_sprite_def.pas"/>
         <Caret Line="109" Column="16" TopLine="105"/>
@@ -345,6 +345,10 @@
         <Filename Value="Units\u_sprite_def.pas"/>
         <Caret Line="100" Column="13" TopLine="86"/>
       </Position28>
+      <Position29>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="50" Column="49" TopLine="37"/>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
