@@ -17,10 +17,10 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="31"/>
+      <BuildNr Value="33"/>
       <Language Value="040C"/>
     </VersionInfo>
-    <BuildModes Count="2" Active="Debug">
+    <BuildModes Count="2" Active="Release">
       <Item1 Name="Debug" Default="True"/>
       <Item2 Name="Release">
         <CompilerOptions>
@@ -44,6 +44,7 @@
           <Linking>
             <Debugging>
               <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
             </Debugging>
             <LinkSmart Value="True"/>
             <Options>
@@ -94,8 +95,9 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="30" Y="13"/>
+        <CursorPos X="21" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -113,7 +115,6 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="22" Y="15"/>
         <UsageCount Value="53"/>
@@ -218,13 +219,13 @@
       <Unit18>
         <Filename Value="..\..\source\oglcLayer.inc"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="95"/>
-        <CursorPos X="59" Y="108"/>
+        <TopLine Value="56"/>
+        <CursorPos X="12" Y="112"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit18>
     </Units>
-    <JumpHistory Count="12" HistoryIndex="11">
+    <JumpHistory Count="15" HistoryIndex="14">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="73" Column="45" TopLine="61"/>
@@ -273,6 +274,18 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="100" Column="84" TopLine="97"/>
       </Position12>
+      <Position13>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="13" Column="30"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\source\oglcLayer.inc"/>
+        <Caret Line="112" Column="19" TopLine="97"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\source\oglcLayer.inc"/>
+        <Caret Line="492" Column="3" TopLine="485"/>
+      </Position15>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -305,7 +318,7 @@
     </CodeGeneration>
     <Linking>
       <Debugging>
-        <DebugInfoType Value="dsDwarf3"/>
+        <DebugInfoType Value="dsDwarf2Set"/>
         <UseHeaptrc Value="True"/>
         <TrashVariables Value="True"/>
         <UseExternalDbgSyms Value="True"/>
