@@ -62,14 +62,16 @@ begin
   FScene1.Add(FRoad, 0);
   with FRoad do begin
    LoadMapFile(path+'RoadStage3.map', [FtexRoadSheet]);
-   SetViewSize(13*TileSize.cx, FScene1.Height);
-   SetCoordinate((FScene1.Width - Width)*0.5, 0);
+   SetViewSize(13*TileSize.cx, Round(FScene1.Height*1.5));
+   ForceTheDrawingOfAllTheTiles := True;
+   CenterOnScene;
    ScrollSpeed.Value := PointF(0, FScene1.ScaleDesignToScene(300));  // we want scroll only vertically
   end;
 
   FCamera := FScene1.CreateCamera;
   FCamera.AssignToAllLayers;
-  //FCamera.Scale.ChangeTo(PointF(3,3), 5.0, idcSinusoid);
+  FCamera.Scale.ChangeTo(PointF(0.5,0.5), 5.0, idcSinusoid);
+  FCamera.Angle.AddConstant(5);
 
   FScene1.BackgroundColor := BGRA(0,80,0);
 end;
