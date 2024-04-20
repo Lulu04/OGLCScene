@@ -20,6 +20,7 @@ type
     Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     Timer1: TTimer;
     TrackBar1: TTrackBar;
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
@@ -47,7 +48,7 @@ uses screen_demo;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
+  FScene := TOGLCScene.Create(OpenGLControl1, -1);
   FScene.DesignPPI := 96;  // this project was made with a 96ppi monitor
                            // This affect FScene.ScaleDesignToScene() method;
   FScene.LayerCount := LAYER_COUNT;

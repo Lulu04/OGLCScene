@@ -15,12 +15,6 @@ object FormMain: TFormMain
   OnKeyUp = FormKeyUp
   LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 24
-    Height = 80
-    Top = 24
-    Width = 96
-  end
   object Panel1: TPanel
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
@@ -34,7 +28,7 @@ object FormMain: TFormMain
     ClientWidth = 95
     Color = 10526880
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     object TrackBar1: TTrackBar
       AnchorSideLeft.Control = Panel1
       AnchorSideLeft.Side = asrCenter
@@ -107,6 +101,27 @@ object FormMain: TFormMain
       Caption = 'Show origin'
       ParentColor = False
       WordWrap = True
+    end
+  end
+  object Panel2: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Panel1
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 242
+    Top = 0
+    Width = 208
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 242
+    ClientWidth = 208
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 24
+      Height = 80
+      Top = 24
+      Width = 96
     end
   end
   object Timer1: TTimer
