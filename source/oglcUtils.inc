@@ -115,25 +115,15 @@ begin
 end;
 
 function StringToSingle(const aStr: string): single;
-var i, k, integerPart, decimalPart: integer;
-  divisor: double;
+var i: integer;
+  fs: TFormatSettings;
 begin
-  k := Pos('.', aStr);
-  if k = 0 then
-    k := Pos(',', aStr);
-
-  if k = 0 then
-    Result := Single(aStr.ToInteger)
-  else
-  begin
-    integerPart := Copy(aStr, 1, k-1).ToInteger;
-    decimalPart := Copy(aStr, k+1, Length(aStr)-k).ToInteger;
-
-    divisor := 1;
-    for i:=1 to Length(aStr)-k do
-      divisor := divisor*10;
-
-    Result := Single(integerPart+decimalPart/divisor);
+  try
+    fs.DecimalSeparator := '.';
+    Result := StrToFloat(aStr, fs);
+  except
+    fs.DecimalSeparator := ',';
+    Result := StrToFloat(aStr, fs);
   end;
 end;
 
