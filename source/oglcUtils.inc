@@ -116,14 +116,19 @@ end;
 
 function StringToSingle(const aStr: string): single;
 var i: integer;
-  fs: TFormatSettings;
+    err: word;
+    s: string;
 begin
-  try
-    fs.DecimalSeparator := '.';
-    Result := StrToFloat(aStr, fs);
-  except
-    fs.DecimalSeparator := ',';
-    Result := StrToFloat(aStr, fs);
+  Result := 0;
+  Val(aStr, Result, err);
+  if err <> 0 then begin
+    i := Pos(',', aStr);
+    if i = 0 then raise exception.Create('string to single conversion error with "'+aStr+'"')
+      else begin
+        s := aStr;
+        s[i] := '.';
+        Val(s, Result, err);
+      end;
   end;
 end;
 
