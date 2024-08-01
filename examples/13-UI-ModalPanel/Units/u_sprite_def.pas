@@ -135,7 +135,7 @@ begin
   if FScene.KeyState[VK_Left] and (X.Value > 0) then begin
     X.Value := X.Value - 200*AElapsedTime;
   end else
-  if Scene.KeyState[VK_Right] and (RightX < FScene.Width) then begin
+  if FScene.KeyState[VK_Right] and (RightX < FScene.Width) then begin
     X.Value := X.Value + 200*AElapsedTime;
   end;
 end;
