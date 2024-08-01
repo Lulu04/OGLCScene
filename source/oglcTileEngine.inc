@@ -559,7 +559,10 @@ begin
                                    clipArea);
             previousTex := currentTex;
             tileRenderer.PushQuad(indexFrame, 0, xx, yy);
-          end else FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
+          end else begin
+            FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
+            previousTex := NIL;
+          end;
 
           // callback event
           if (FOnTileEvent <> NIL) and ((ptrTile^.UserEvent <> VALUE_NO_EVENT) or TileMapDesignerModeEnable)
