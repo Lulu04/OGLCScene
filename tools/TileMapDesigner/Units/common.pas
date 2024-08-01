@@ -25,9 +25,9 @@ var
 
 FScene: TOGLCScene=NIL;
 
-FWorkingTileEngine: TTileEngine;
+FWorkingTileEngine: TTileEngine=NIL;
 
-FImageBackGround: TBGRABitmap;
+FImageBackGround: TBGRABitmap=NIL;
 
 FEventFont,
 FHintFont: TTexturedFont;
