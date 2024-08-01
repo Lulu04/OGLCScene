@@ -934,11 +934,11 @@ begin
 
   SetLayerCount(0);
   FreeAndNil(FTimerManager);
+  FModalPanelList.Free;  // FreeAndNil(FModalPanelList) NOT WORKING HERE
+  FModalPanelList := NIL;
   FreeAndNil(FTextureManager);
   DestroyRenderers;
 
-  FModalPanelList.Free;  // FreeAndNil(FModalPanelList) NOT WORKING HERE
-  FModalPanelList := NIL;
 
 
   FreeVelocityCurveList;
