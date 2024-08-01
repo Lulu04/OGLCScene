@@ -151,11 +151,11 @@ procedure TModalPanelList.Draw;
 var item: PModalPanelItem;
 begin
   item := FirstItem;
-  if item = NIL then exit;
-  repeat
-    item^.Panel.Draw(1.0);
+  while item <> NIL do begin
+    if item^.Panel.FState = mpsShown then
+      item^.Panel.Draw(1.0);
     item := item^.Next;
-  until item = NIL;
+  end;
 end;
 
 function TModalPanelList.Add(aPanel: TUIModalPanel): PModalPanelItem;
