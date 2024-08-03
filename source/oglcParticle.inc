@@ -511,6 +511,7 @@ j:integer;
 begin
   inherited Update(aElapsedTime);
   if FFreeze then exit;
+  if FParticleParam.Texture = NIL then exit;
 
   // update parameters
   Gravity.OnElapse(aElapsedTime);
