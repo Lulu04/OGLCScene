@@ -34,6 +34,9 @@ function NextPowerOfTwo(aValue: integer): integer;
 // the drawing is centered in the returned bitmap
 function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 
+// return a TBGRABitmap from an SVG file with a size as described in svg file, but adjusted to PPI scene.
+function LoadBitmapFromSVGScaledPPI(aScene: TOGLCScene; const aSVGFilename: string): TBGRABitmap;
+
 // splits each words of a text. #10(line feed) is considered as a line break
 function SplitTextToWordArray(aText: string; aCharSeparator: char=' '): TStringArray;
 
@@ -263,6 +266,21 @@ begin
   finally
     svg.Free;
   end;
+end;
+
+function LoadBitmapFromSVGScaledPPI(aScene: TOGLCScene; const aSVGFilename: string): TBGRABitmap;
+var svg: TBGRASVG;
+  w, h: Integer;
+begin
+ svg := TBGRASVG.Create(aSVGFilename);
+ try
+   w := aScene.ScaleDesignToScene(Round(svg.WidthAsPixel));
+   h := aScene.ScaleDesignToScene(Round(svg.HeightAsPixel));
+   Result := TBGRABitmap.Create(w, h, BGRAPixelTransparent);
+   svg.StretchDraw(Result.Canvas2D, taCenter, tlCenter, 0, 0, w, h);
+ finally
+   svg.Free;
+ end;
 end;
 
 function SplitTextToWordArray(aText: string; aCharSeparator: char): TStringArray;
