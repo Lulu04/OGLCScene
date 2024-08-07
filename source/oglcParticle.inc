@@ -744,6 +744,8 @@ procedure TParticleEmitter.LoadFromFile(const aFilename: string; aAtlas: TOGLCTe
 var F: TStringList;
     i, k, count :integer;
     SplittedText: TStringArray;
+    fileToLoad: String;
+    ima: TBGRABitmap;
 begin
   Clear;
   F := TStringList.Create;
@@ -807,14 +809,46 @@ begin
    if (FParticleParam.Texture <> NIL) and FParticleParam.TextureOwner then
      FParentScene.TexMan.Delete(FParticleParam.Texture);
    if aAtlas = NIL then begin
-     FParticleParam.Texture := FParentScene.TexMan.Add(ExtractFilePath(aFilename) + F.Strings[k+1],
-                                                SplittedText[0].ToInteger, SplittedText[1].ToInteger);
+     // construct the texture from image file
+     fileToLoad := ExtractFilePath(aFilename) + F.Strings[k+1];
+     if LowerCase(ExtractFileExt(fileToLoad)) = '.svg' then begin
+        try
+         ima := LoadBitmapFromSVGScaledPPI(FParentScene, fileToLoad);
+         FParticleParam.Texture := FParentScene.TexMan.Add(ima,
+                                            FParentScene.ScaleDesignToScene(SplittedText[0].ToInteger),
+                                            FParentScene.ScaleDesignToScene(SplittedText[1].ToInteger));
+         ima.Free;
+        except
+          FParentScene.LogError('TParticleEmitter.LoadFromFile: fail to load texture from svg file');
+          FParentScene.LogMess('particle file: '+aFilename, 1);
+          FParentScene.LogMess('texture filename: '+F.Strings[k+1], 1);
+        end;
+
+     end else begin
+       // load bitmap and resize it in respect of monitor PPI
+       try
+         ima := TBGRABitmap.Create(fileToLoad);
+         BGRAReplace(ima, ima.Resample(FParentScene.ScaleDesignToScene(ima.Width),
+                                       FParentScene.ScaleDesignToScene(ima.Height)));
+         FParticleParam.Texture := FParentScene.TexMan.Add(ima,
+                                            FParentScene.ScaleDesignToScene(SplittedText[0].ToInteger),
+                                            FParentScene.ScaleDesignToScene(SplittedText[1].ToInteger));
+         ima.Free;
+       except
+         FParentScene.LogError('TParticleEmitter.LoadFromFile: fail to load texture from file');
+         FParentScene.LogMess('particle file: '+aFilename, 1);
+         FParentScene.LogMess('texture filename: '+F.Strings[k+1], 1);
+       end;
+     end;
+     if FParticleParam.Texture <> NIL then
+       FParticleParam.Texture^.Filename := ExtractFileName(fileToLoad);
      FParticleParam.TextureOwner := True;
    end else begin
+     // retrieves the texture from an atlas
      FParticleParam.Texture := aAtlas.RetrieveTextureByFileName(F.Strings[k+1]);
      FParticleParam.TextureOwner := False;
      if FParticleParam.Texture = NIL then begin
-       FParentScene.LogWarning('TParticleEmitter.LoadFromFile: texture not found in atlas');
+       FParentScene.LogError('TParticleEmitter.LoadFromFile: texture not found in atlas');
        FParentScene.LogMess('particle file: '+aFilename, 1);
        FParentScene.LogMess('texture filename: '+F.Strings[k+1], 1);
      end;
