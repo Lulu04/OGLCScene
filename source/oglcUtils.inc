@@ -69,13 +69,16 @@ function Distance(aPt1, aPt2: TPointF): single;
 function PointFToRectF( p1, p2: TPointF ): TRectF;
 
 // COLLISION TEST
-function CollisionPointVersusCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
-function CollisionPointVersusRectF(const aPt: TPointF; const r: TRectF): boolean;
-function CollisionCircleVersusCircle(const aCenter1: TPointF; const aRadius1: single;
-                                     const aCenter2: TPointF; const aRadius2: single): boolean;
-function CollisionCircleVersusRectF(const aCenter: TPointF; const aRadius: single;
-                                        const r: TRectF): boolean;
-function CollisionRectFVersusRectF(const r1, r2: TRectF): boolean;
+function CollisionPointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
+function CollisionPointRectF(const aPt: TPointF; const r: TRectF): boolean;
+function CollisionCircleCircle(const aCenter1: TPointF; const aRadius1: single;
+                               const aCenter2: TPointF; const aRadius2: single): boolean;
+function CollisionCircleRectF(const aCenter: TPointF; const aRadius: single; const r: TRectF): boolean;
+function CollisionRectFRectF(const r1, r2: TRectF): boolean;
+function CollisionLinePoint(aLinePt1, aLinePt2, aPt: TPointF): boolean;
+function CollisionLineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
+function CollisionLineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
+function CollisionLineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
 
 // return the appropriate GL_COLOR_ATTACHMENTx
 // ie: aIndex=0  returns GL_COLOR_ATTACHMENT0
@@ -387,24 +390,24 @@ begin
  Result.BottomRight:=bottomright;
 end;
 
-function CollisionPointVersusCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
+function CollisionPointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
 begin
   Result := Distance(aPt, aCenter) < aRadius;
 end;
 
-function CollisionPointVersusRectF(const aPt: TPointF; const r: TRectF): boolean;
+function CollisionPointRectF(const aPt: TPointF; const r: TRectF): boolean;
 begin
   Result := (aPt.x >= r.Left) and (aPt.x < r.Right) and
             (aPt.y >= r.Top) and (aPt.y < r.Bottom);
 end;
 
-function CollisionCircleVersusCircle(const aCenter1: TPointF;
+function CollisionCircleCircle(const aCenter1: TPointF;
   const aRadius1: single; const aCenter2: TPointF; const aRadius2: single): boolean;
 begin
   Result := Distance(aCenter1, aCenter2) < aRadius1 + aRadius2;
 end;
 
-function CollisionCircleVersusRectF(const aCenter: TPointF;
+function CollisionCircleRectF(const aCenter: TPointF;
   const aRadius: single; const r: TRectF): boolean;
 var closestX, closestY{, dX, dY}: single;
 begin
@@ -424,10 +427,78 @@ begin
   Result := sqr(dX) + sqr(dY) < sqr(aRadius);  }
 end;
 
-function CollisionRectFVersusRectF(const r1, r2: TRectF): boolean;
+function CollisionRectFRectF(const r1, r2: TRectF): boolean;
 begin
   Result := (r1.Right >= r2.Left) and ( r1.Left <= r2.Right) and
             (r1.Bottom >= r2.Top) and (r1.Top <= r2.Bottom);
+end;
+
+function CollisionLinePoint(aLinePt1, aLinePt2, aPt: TPointF): boolean;
+var d1, d2, lineLen, buffer: single;
+begin
+  // get distance from the point to the two ends of the line
+  d1 := Distance(aPt, aLinePt1);
+  d2 := Distance(aPt, aLinePt2);
+  // get the length of the line
+  lineLen := Distance(aLinePt1, aLinePt2);
+  // since floats are so minutely accurate, add
+  // a little buffer zone that will give collision
+  buffer := 0.1;    // higher # = less accurate
+  // if the two distances are equal to the line's length, the point is on the line!
+  // note we use the buffer here to give a range, rather than one #
+  Result := (d1+d2 >= lineLen-buffer) and (d1+d2 <= lineLen+buffer);
+end;
+
+function CollisionLineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
+var uA, uB, x4_x3, y1_y3, y4_y3, x1_x3, x2_x1, y2_y1: single;
+begin
+  x4_x3 := aLine2Pt2.x - aLine2Pt1.x;
+  y1_y3 := aLine1Pt1.y - aLine2Pt1.y;
+  y4_y3 := aLine2Pt2.y - aLine2Pt1.y;
+  x1_x3 := aLine1Pt1.x - aLine2Pt1.x;
+  x2_x1 := aLine1Pt2.x - aLine1Pt1.x;
+  y2_y1 := aLine1Pt2.y - aLine1Pt1.y;
+  // calculate the distance to intersection point
+  uA := (x4_x3 * y1_y3 - y4_y3 * x1_x3) / (y4_y3 * x2_x1 - x4_x3 * y2_y1);
+  uB := (x2_x1 * y1_y3 - y2_y1 * x1_x3) / (y4_y3 * x2_x1 - x4_x3 * y2_y1);
+
+  // if uA and uB are between 0-1, lines are colliding
+  Result := (uA >= 0) and (uA <= 1) and (uB >= 0) and (uB <= 1);
+end;
+
+// from https://github.com/jeffThompson/CollisionDetection
+function CollisionLineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
+var distX, distY, len, dot, closestX, closestY: single;
+begin
+  // is either end INSIDE the circle? if so, return true immediately
+  if CollisionPointCircle(aLinePt1, aCircleCenter, aRadius) or
+     CollisionPointCircle(aLinePt2, aCircleCenter, aRadius)  then exit(True);
+  // get length of the line
+  distX := aLinePt1.x - aLinePt2.x;
+  distY := aLinePt1.y - aLinePt2.y;
+  len := sqrt((distX*distX) + (distY*distY));
+  // get dot product of the line and circle
+  dot := (((aCircleCenter.x-aLinePt1.x)*(aLinePt2.x-aLinePt1.x)) +
+         ((aCircleCenter.y-aLinePt1.y)*(aLinePt2.y-aLinePt1.y))) / (len*len);
+  // find the closest point on the line
+  closestX := aLinePt1.x + (dot * (aLinePt2.x-aLinePt1.x));
+  closestY := aLinePt1.y + (dot * (aLinePt2.y-aLinePt1.y));
+  // is this point actually on the line segment? if so keep going, but if not, return false
+  if not CollisionLinePoint(aLinePt1, aLinePt2, PointF(closestX,closestY)) then exit(False);
+  // get distance to closest point
+  distX := closestX - aCircleCenter.x;
+  distY := closestY - aCircleCenter.y;
+  Result := sqrt((distX*distX) + (distY*distY)) <= aRadius;
+end;
+
+function CollisionLineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
+begin
+  // check if the line has hit any of the rectangle's sides
+  // uses the Line/Line function
+  Result := CollisionLineLine(aLinePt1, aLinePt2, aRect.TopLeft, PointF(aRect.Left, aRect.Bottom)) or
+            CollisionLineLine(aLinePt1, aLinePt2, PointF(aRect.Right, aRect.Top), aRect.BottomRight) or
+            CollisionLineLine(aLinePt1, aLinePt2, aRect.TopLeft, PointF(aRect.Right, aRect.Top)) or
+            CollisionLineLine(aLinePt1, aLinePt2, PointF(aRect.Left, aRect.Bottom), aRect.BottomRight);
 end;
 
 function IndexToColorAttachment(aIndex: integer): GLenum;

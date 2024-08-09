@@ -999,12 +999,12 @@ end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aPoint: TPointF): boolean;
 begin
-  Result := CollisionPointVersusRectF(aPoint, GetScaledAreaF);
+  Result := CollisionPointRectF(aPoint, GetScaledAreaF);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean;
 begin
-  Result := CollisionRectFVersusRectF(GetScaledAreaF, aSurface.GetScaledAreaF);
+  Result := CollisionRectFRectF(GetScaledAreaF, aSurface.GetScaledAreaF);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: integer): boolean;
@@ -1018,7 +1018,7 @@ begin
 
   if (r.Width <= 0) or (r.Height <= 0) then exit(False);
 
-  Result := CollisionRectFVersusRectF(GetScaledAreaF, r);
+  Result := CollisionRectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean;
@@ -1028,19 +1028,19 @@ begin
   r.Top := aY;
   r.Right := aX + aWidth;
   r.Bottom := aY + aHeight;
-  Result := CollisionRectFVersusRectF(GetScaledAreaF, r);
+  Result := CollisionRectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aRect: TRectF): boolean;
 begin
-  Result := CollisionRectFVersusRectF(GetScaledAreaF, aRect);
+  Result := CollisionRectFRectF(GetScaledAreaF, aRect);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aRect: TRect): boolean;
 var r: TRectF;
 begin
   r := RectF(aRect);
-  Result := CollisionRectFVersusRectF(GetScaledAreaF, r);
+  Result := CollisionRectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.GetChild(aIndex: integer): TSimpleSurfaceWithEffect;
