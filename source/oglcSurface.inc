@@ -153,7 +153,7 @@ private
   function DoAddScenarioToList(aScenario: TScenario): TIDScenario;
 protected
   function FlipToIndex: integer; inline;
-  procedure PushAndPrepareSceneMV; //inline;
+  procedure PushAndPrepareSceneMV; inline;
   procedure PopSceneMV; inline;
   procedure DrawChildSurfacesWithPositiveZOrder(const aLayerPercentOpacity: single); virtual;
   procedure DrawChildSurfacesWithNegativeZOrder(const aLayerPercentOpacity: single); virtual;
@@ -165,7 +165,7 @@ public
 public
   Speed   : TPointFParam;  // the speed of the surface in pixels/sec, on both axis
   Angle   : TBoundedFParam; // the angle to rotate the surface
-  Pivot: TPointF; // percent position of the center rotation. (0,0) mean topleft, (0.5,0.5) mean the center, (1,1) mean bottomright.
+  Pivot   : TPointF; // percent position of the center rotation. (0,0) mean topleft, (0.5,0.5) mean the center, (1,1) mean bottomright.
   Scale   : TPointFParam; // the scale values on both axis. (1,1) means no scaling (default)
   Opacity : TBoundedFParam; // the opacity of the surface, range is [0..255]
   Tint    : TBGRAParam; // the tint applyed to the surface. Alpha channel controls the amount.
@@ -257,6 +257,11 @@ public  // Scenario
   procedure CenterOnSurface(ASurface: TSimpleSurface);
   // Center the surface on its parent
   procedure CenterOnParent;
+public // Matrix transform
+  // Apply transformations (translation, scale, rotation) on a matrix.
+  procedure AddTransformTo(var aMatrix: TOGLCMatrix);
+  // Gives a matrix to transform point from surface space to scene space.
+  function MatrixSurfaceSpaceToScene: TOGLCMatrix;
   // Collision test
   function CollisionTestWith(aPoint: TPointF): boolean; overload;
   function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
@@ -467,10 +472,19 @@ begin
 end;
 
 procedure TSimpleSurfaceWithEffect.PushAndPrepareSceneMV;
-var xx, yy, pivotX, pivotY, ang: single;
 begin
   FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+  AddTransformTo(FParentScene.ModelViewMatrix);
+end;
 
+procedure TSimpleSurfaceWithEffect.PopSceneMV;
+begin
+  FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
+end;
+
+procedure TSimpleSurfaceWithEffect.AddTransformTo(var aMatrix: TOGLCMatrix);
+var xx, yy, pivotX, pivotY, ang: single;
+begin
   if FApplySymmetryWhenFlip then begin
     // we apply a symmetry if a flip H or V is active
     if FParentSurface = FReferenceSurfaceForSymmetry then begin
@@ -492,16 +506,21 @@ begin
       pivotY := Height*(1-Pivot.y);
       ang := -ang;
     end else pivotY := Height*Pivot.y;
-    FParentScene.ModelViewMatrix.AddTransform(xx, yy, Scale.x.Value, Scale.y.Value,
-                                              ang, PivotX, pivotY);
+    aMatrix.AddTransform(xx, yy, Scale.x.Value, Scale.y.Value, ang, PivotX, pivotY);
   end else
-    FParentScene.ModelViewMatrix.AddTransform(X.Value, Y.Value, Scale.x.Value, Scale.y.Value,
-                                              Angle.Value, Width*Pivot.x, Height*Pivot.y);
+    aMatrix.AddTransform(X.Value, Y.Value, Scale.x.Value, Scale.y.Value,
+                         Angle.Value, Width*Pivot.x, Height*Pivot.y);
 end;
 
-procedure TSimpleSurfaceWithEffect.PopSceneMV;
+function TSimpleSurfaceWithEffect.MatrixSurfaceSpaceToScene: TOGLCMatrix;
+  procedure ScanMatrixRecursive(aSurface: TSimpleSurfaceWithEffect; var m: TOGLCMatrix);
+  begin
+    if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m);
+    aSurface.AddTransformTo(m);
+  end;
 begin
-  FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
+  Result.LoadIdentity;
+  ScanMatrixRecursive(Self, Result);
 end;
 
 destructor TSimpleSurfaceWithEffect.Destroy;
@@ -999,12 +1018,12 @@ end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aPoint: TPointF): boolean;
 begin
-  Result := CollisionPointRectF(aPoint, GetScaledAreaF);
+  Result := Collision.PointRectF(aPoint, GetScaledAreaF);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean;
 begin
-  Result := CollisionRectFRectF(GetScaledAreaF, aSurface.GetScaledAreaF);
+  Result := Collision.RectFRectF(GetScaledAreaF, aSurface.GetScaledAreaF);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: integer): boolean;
@@ -1018,7 +1037,7 @@ begin
 
   if (r.Width <= 0) or (r.Height <= 0) then exit(False);
 
-  Result := CollisionRectFRectF(GetScaledAreaF, r);
+  Result := Collision.RectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean;
@@ -1028,19 +1047,19 @@ begin
   r.Top := aY;
   r.Right := aX + aWidth;
   r.Bottom := aY + aHeight;
-  Result := CollisionRectFRectF(GetScaledAreaF, r);
+  Result := Collision.RectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aRect: TRectF): boolean;
 begin
-  Result := CollisionRectFRectF(GetScaledAreaF, aRect);
+  Result := Collision.RectFRectF(GetScaledAreaF, aRect);
 end;
 
 function TSimpleSurfaceWithEffect.CollisionTestWith(aRect: TRect): boolean;
 var r: TRectF;
 begin
   r := RectF(aRect);
-  Result := CollisionRectFRectF(GetScaledAreaF, r);
+  Result := Collision.RectFRectF(GetScaledAreaF, r);
 end;
 
 function TSimpleSurfaceWithEffect.GetChild(aIndex: integer): TSimpleSurfaceWithEffect;
