@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1569"/>
+      <BuildNr Value="1571"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -90,7 +90,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="267">
+    <Units Count="269">
       <Unit0>
         <Filename Value="TileMapDesigner.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -935,8 +935,8 @@
       <Unit113>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="101"/>
-        <CursorPos X="18" Y="118"/>
+        <TopLine Value="13"/>
+        <CursorPos X="29" Y="27"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit113>
@@ -1080,8 +1080,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="810"/>
-        <CursorPos X="40" Y="813"/>
+        <TopLine Value="829"/>
+        <CursorPos X="28" Y="846"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1225,8 +1225,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="105"/>
-        <CursorPos X="50" Y="114"/>
+        <TopLine Value="455"/>
+        <CursorPos X="18" Y="467"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1531,7 +1531,7 @@
       <Unit188>
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="11"/>
         <CursorPos X="6" Y="10"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1957,9 +1957,9 @@
         <Filename Value="Units\umaps.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="41"/>
-        <CursorPos X="27" Y="18"/>
-        <UsageCount Value="161"/>
+        <TopLine Value="282"/>
+        <CursorPos X="19" Y="292"/>
+        <UsageCount Value="162"/>
         <Loaded Value="True"/>
       </Unit236>
       <Unit237>
@@ -1972,7 +1972,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="14"/>
         <CursorPos X="95" Y="20"/>
-        <UsageCount Value="158"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit237>
@@ -2065,7 +2065,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="7"/>
         <CursorPos X="40" Y="15"/>
-        <UsageCount Value="130"/>
+        <UsageCount Value="131"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit249>
@@ -2081,9 +2081,9 @@
         <Filename Value="Units\u_tileset_edit.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="163"/>
-        <CursorPos Y="177"/>
-        <UsageCount Value="115"/>
+        <TopLine Value="485"/>
+        <CursorPos X="2" Y="499"/>
+        <UsageCount Value="116"/>
         <Loaded Value="True"/>
       </Unit251>
       <Unit252>
@@ -2114,7 +2114,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
         <CursorPos X="3" Y="10"/>
-        <UsageCount Value="64"/>
+        <UsageCount Value="65"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit255>
@@ -2130,11 +2130,10 @@
         <ComponentName Value="Form_ToolLayer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="16"/>
-        <CursorPos X="25" Y="29"/>
-        <UsageCount Value="53"/>
+        <CursorPos X="19" Y="30"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit257>
@@ -2157,7 +2156,7 @@
         <Filename Value="..\..\source\oglcTexturedFont.inc"/>
         <EditorIndex Value="7"/>
         <CursorPos X="23" Y="3"/>
-        <UsageCount Value="13"/>
+        <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit260>
       <Unit261>
@@ -2172,7 +2171,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="27"/>
         <CursorPos X="101" Y="41"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit262>
       <Unit263>
@@ -2180,117 +2179,175 @@
         <EditorIndex Value="6"/>
         <TopLine Value="68"/>
         <CursorPos Y="82"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit263>
       <Unit264>
         <Filename Value="C:\lazarus\lcl\include\customcombobox.inc"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="209"/>
         <CursorPos Y="223"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit264>
       <Unit265>
         <Filename Value="..\..\source\OGLCScene.pas"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="826"/>
-        <CursorPos X="13" Y="849"/>
-        <UsageCount Value="10"/>
+        <CursorPos X="12" Y="835"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit265>
       <Unit266>
         <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="14"/>
-        <CursorPos X="38" Y="11"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="540"/>
+        <CursorPos Y="551"/>
+        <UsageCount Value="11"/>
+        <Bookmarks Count="1">
+          <Item0 X="4" Y="564"/>
+        </Bookmarks>
         <Loaded Value="True"/>
       </Unit266>
+      <Unit267>
+        <Filename Value="C:\lazarus\lcl\stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit267>
+      <Unit268>
+        <Filename Value="..\..\source\oglcTexture.inc"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="163"/>
+        <CursorPos X="33" Y="168"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit268>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="UseCThreads"/>
     </OtherDefines>
-    <JumpHistory Count="20" HistoryIndex="19">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\u_tileset_edit.pas"/>
-        <Caret Line="501" TopLine="478"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="561" TopLine="541"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\u_tileset_edit.pas"/>
-        <Caret Line="148" TopLine="134"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="317" TopLine="302"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="202" TopLine="192"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="556" TopLine="543"/>
       </Position3>
       <Position4>
-        <Filename Value="C:\lazarus\lcl\include\customcombobox.inc"/>
-        <Caret Line="223" TopLine="209"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="557" TopLine="543"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="833" TopLine="819"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="558" TopLine="543"/>
       </Position5>
       <Position6>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="680" TopLine="666"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="560" TopLine="543"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="833" Column="2" TopLine="819"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="561" TopLine="543"/>
       </Position7>
       <Position8>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="197" TopLine="183"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="565" TopLine="543"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="960" Column="2" TopLine="945"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="566" TopLine="543"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="821" Column="23" TopLine="809"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="570" TopLine="547"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\common.pas"/>
-        <Caret Line="50" Column="14" TopLine="36"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="571" TopLine="548"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\screen_map.pas"/>
-        <Caret Line="10" Column="6"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="556" TopLine="548"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="189" Column="14" TopLine="175"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="317" TopLine="302"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="193" Column="12" TopLine="173"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="556" TopLine="543"/>
       </Position14>
       <Position15>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="190" Column="16" TopLine="173"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="557" TopLine="543"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="193" Column="19" TopLine="173"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="558" TopLine="543"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="849" Column="13" TopLine="826"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="560" TopLine="543"/>
       </Position17>
       <Position18>
         <Filename Value="..\..\source\oglcTileEngine.inc"/>
-        <Caret Line="11" Column="38"/>
+        <Caret Line="561" TopLine="543"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\u_tool_minimap.pas"/>
-        <Caret Line="10" Column="3"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="565" TopLine="543"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\u_tileset_edit.pas"/>
-        <Caret Line="177" TopLine="163"/>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="566" TopLine="543"/>
       </Position20>
+      <Position21>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="570" TopLine="547"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="571" TopLine="548"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="572" TopLine="549"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="573" TopLine="550"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="543" TopLine="529"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="544" TopLine="529"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="548" TopLine="529"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="551" TopLine="529"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="552" TopLine="529"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <Caret Line="564" Column="4" TopLine="548"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
