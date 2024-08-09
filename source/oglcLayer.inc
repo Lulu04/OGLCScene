@@ -476,7 +476,7 @@ begin
   r.Bottom := aY + aHeight;
 
   for i:=0 to FList.Count-1 do
-    if CollisionRectFRectF(Surface[i].GetScaledAreaF, r) then begin
+    if Collision.RectFRectF(Surface[i].GetScaledAreaF, r) then begin
       Result := Surface[i];
       exit;
     end;
@@ -496,7 +496,7 @@ begin
 
   for i:=0 to FList.Count-1 do begin
     o := Surface[i];
-    if (o <> DontTestSurface) and CollisionRectFRectF(o.GetScaledAreaF, r) then begin
+    if (o <> DontTestSurface) and Collision.RectFRectF(o.GetScaledAreaF, r) then begin
       Result := o;
       exit;
     end;
