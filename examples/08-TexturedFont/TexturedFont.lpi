@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="83"/>
+      <BuildNr Value="85"/>
       <Language Value="040C"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -94,8 +94,10 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="66" Y="8"/>
+        <TopLine Value="23"/>
+        <CursorPos X="53" Y="44"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -113,9 +115,8 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="37" Y="15"/>
+        <CursorPos X="26" Y="11"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -258,7 +259,7 @@
         <Loaded Value="True"/>
       </Unit23>
     </Units>
-    <JumpHistory Count="7" HistoryIndex="6">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="..\..\source\oglcTexturedFont.inc"/>
         <Caret Line="92" Column="19" TopLine="76"/>
@@ -287,6 +288,10 @@
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="124" Column="15" TopLine="97"/>
       </Position7>
+      <Position8>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="22" Column="3" TopLine="30"/>
+      </Position8>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

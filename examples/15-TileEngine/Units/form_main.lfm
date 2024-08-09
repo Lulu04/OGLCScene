@@ -15,26 +15,18 @@ object FormMain: TFormMain
   OnKeyUp = FormKeyUp
   LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 24
-    Height = 96
-    Top = 24
-    Width = 80
-  end
   object Panel1: TPanel
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Left = 128
-    Height = 136
+    Left = 160
+    Height = 147
     Top = 0
-    Width = 246
+    Width = 214
+    Align = alRight
     Anchors = [akTop, akRight]
-    ClientHeight = 136
-    ClientWidth = 246
+    ClientHeight = 147
+    ClientWidth = 214
     Color = 13290186
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     object Label1: TLabel
       Left = 6
       Height = 15
@@ -72,6 +64,23 @@ object FormMain: TFormMain
       Caption = 'Show tile sheet'
       OnChange = TrackBar1Change
       TabOrder = 1
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 147
+    Top = 0
+    Width = 160
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 147
+    ClientWidth = 160
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 24
+      Height = 96
+      Top = 24
+      Width = 80
     end
   end
   object Timer1: TTimer

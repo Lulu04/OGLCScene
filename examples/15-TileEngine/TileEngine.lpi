@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="79"/>
+      <BuildNr Value="81"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Release">
@@ -95,8 +95,9 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="32" Y="13"/>
+        <CursorPos X="15" Y="12"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -114,7 +115,6 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="49" Y="16"/>
         <UsageCount Value="80"/>
@@ -329,7 +329,7 @@
         <UsageCount Value="12"/>
       </Unit33>
     </Units>
-    <JumpHistory Count="15" HistoryIndex="14">
+    <JumpHistory Count="16" HistoryIndex="15">
       <Position1>
         <Filename Value="..\..\source\OGLCScene.pas"/>
         <Caret Line="430" Column="78" TopLine="407"/>
@@ -390,6 +390,10 @@
         <Filename Value="..\..\source\oglcTileEngine.inc"/>
         <Caret Line="145" Column="14" TopLine="120"/>
       </Position15>
+      <Position16>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="13" Column="32"/>
+      </Position16>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

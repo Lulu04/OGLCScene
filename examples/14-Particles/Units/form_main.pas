@@ -18,6 +18,7 @@ type
     CheckBox1: TCheckBox;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     Timer1: TTimer;
     procedure CheckBox1Change(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);

@@ -15,6 +15,7 @@ type
   TFormMain = class(TForm)
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     RadioGroup1: TRadioGroup;
     Timer1: TTimer;
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);

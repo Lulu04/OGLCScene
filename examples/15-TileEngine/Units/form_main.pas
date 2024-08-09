@@ -18,6 +18,7 @@ type
     Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     Timer1: TTimer;
     TrackBar1: TTrackBar;
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
