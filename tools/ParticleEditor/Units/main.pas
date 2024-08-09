@@ -11,22 +11,26 @@ uses
   OpenGLContext,
   common,
   OGLCScene,
-  screen_Home, Frame_CurveEdit, frame_ShowColor;
+  screen_Home, Frame_CurveEdit, frame_ShowColor, Types;
 
 type
+
+  TMouseState = ( msIdle,
+                  msMoveView
+                );
 
   { TForm_Principale }
 
   TForm_Principale = class(TForm)
-    Button1: TButton;
+    BLoadTexture: TButton;
+    BResetZoom: TSpeedButton;
     Button10: TButton;
-    Button11: TButton;
+    BResetSize: TButton;
     Button2: TButton;
-    Button3: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    Button6: TButton;
-    Button7: TButton;
+    BChangeBG: TButton;
+    BShoot: TButton;
+    BResetSpin: TButton;
+    BResetAngularVelocity: TButton;
     Button8: TButton;
     Button9: TButton;
     CheckBox1: TCheckBox;
@@ -80,6 +84,7 @@ type
     Label43: TLabel;
     Label44: TLabel;
     Panel8: TPanel;
+    BCenterView: TSpeedButton;
     SpinCurve: TFrameEditCurve;
     Label37: TLabel;
     Label38: TLabel;
@@ -95,7 +100,6 @@ type
     TBParticleInitialSizeVariation: TTrackBar;
     TBParticleAngularVelocity: TTrackBar;
     TBParticleAngularVelocityVariation: TTrackBar;
-    TBZoom: TTrackBar;
     TB20: TTrackBar;
     VelocityCurve: TFrameEditCurve;
     Label1: TLabel;
@@ -122,8 +126,6 @@ type
     Label29: TLabel;
     Label3: TLabel;
     Label30: TLabel;
-    Label31: TLabel;
-    Label32: TLabel;
     Label33: TLabel;
     Label34: TLabel;
     Label35: TLabel;
@@ -134,17 +136,16 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
-    LBJeux: TListBox;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
+    MIOpen: TMenuItem;
+    MISave: TMenuItem;
+    MISaveAs: TMenuItem;
     MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
+    MIQuit: TMenuItem;
     OD1: TOpenDialog;
     OD2: TOpenDialog;
-    OpenGLControl1: TOpenGLControl;
+    OGL: TOpenGLControl;
     PageControl1: TPageControl;
     PageControl2: TPageControl;
     Panel1: TPanel;
@@ -179,15 +180,16 @@ type
     TBParticleAngle: TTrackBar;
     TBParticleAngleVariation: TTrackBar;
     TB9: TTrackBar;
+    procedure BCenterViewClick(Sender: TObject);
     procedure Button10Click(Sender: TObject);
-    procedure Button11Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure BResetSizeClick(Sender: TObject);
+    procedure BLoadTextureClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
+    procedure BChangeBGClick(Sender: TObject);
+    procedure BShootClick(Sender: TObject);
+    procedure BResetZoomClick(Sender: TObject);
+    procedure BResetSpinClick(Sender: TObject);
+    procedure BResetAngularVelocityClick(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure CBColorModeChange(Sender: TObject);
@@ -206,11 +208,15 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure MenuItem2Click(Sender: TObject);
-    procedure MenuItem3Click(Sender: TObject);
-    procedure MenuItem6Click(Sender: TObject);
-    procedure OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton;
+    procedure MIOpenClick(Sender: TObject);
+    procedure MISaveClick(Sender: TObject);
+    procedure MIQuitClick(Sender: TObject);
+    procedure OGLMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure OGLMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure OGLMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure RB1Change(Sender: TObject);
     procedure SEStartFrameChange(Sender: TObject);
     procedure SE3Change(Sender: TObject);
@@ -223,7 +229,14 @@ type
     procedure TBParticleCountChange(Sender: TObject);
     procedure TBParticleLifeChange(Sender: TObject);
     procedure TBParticleAngleChange(Sender: TObject);
-    procedure TBZoomChange(Sender: TObject);
+  private
+    FMouseState: TMouseState;
+    FClickOrigin, FViewOffset: TPoint;
+    FZoom: single;
+    procedure DoLoopMoveView;
+    function ClientToWord(pt: TPoint): TPointF;
+    function WordToClient(pt: TPointF): TPoint;
+    function MatrixView: TOGLCMatrix;
   private
     FInitializing: boolean;
     procedure UpdateWidgets;
@@ -242,29 +255,36 @@ type
     procedure ProcessColorCurveDelete(aIndex: integer);
     procedure ProcessColorCurvePointDblClick( PointIndex: integer);
     procedure ProcessColorCurveAddPoint(PointIndex: integer; P: TPointF);
+    procedure SetZoom(AValue: single);
   public
     function GetVelocityValue: integer;
     procedure SetVelocityValue(aValue: integer);
     procedure LoadExample;
+
+    property Zoom: single read FZoom write SetZoom;
   end;
 
 var
   Form_Principale: TForm_Principale;
 
 implementation
+uses Math, BGRATransform, Matrix;
+
 {$R *.lfm}
 
 { TForm_Principale }
 
 procedure TForm_Principale.FormCreate(Sender: TObject);
 begin
- FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
+ FScene := TOGLCScene.Create(OGL, 4/3);
  FScene.LayerCount := LAYER_COUNT;
 
  FScene.OnLoadCommonData := @LoadCommonData;
  FScene.OnFreeCommonData := @FreeCommonData;
 
  Application.OnIdle := @ProcessApplicationIdle;
+
+ FZoom := 1.0;
 end;
 
 procedure TForm_Principale.FormDestroy(Sender: TObject);
@@ -286,32 +306,35 @@ begin
  if FModified then begin
   r := MessageDlg('','Do you want save before quit ?', mtWarning, [mbYes,mbNo,mbCancel],'');
   if r=mrCancel then CanClose := FALSE;
-  if r=mrYes then MenuItem3Click(NIL);
+  if r=mrYes then MISaveClick(NIL);
  end;
 end;
 
 // load texture
-procedure TForm_Principale.Button1Click(Sender: TObject);
+procedure TForm_Principale.BLoadTextureClick(Sender: TObject);
 var ima: TBGRABitmap;
+  w, h: integer;
 begin
  if not OD2.Execute then exit;
  if PE.FParticleParam.Texture <> NIL
      then FScene.TexMan.Delete(PE.FParticleParam.Texture);
+ PE.FParticleParam.Texture := NIL;
 
  ima:= TBGRABitmap.Create( OD2.FileName );
- EditFrameWidth.Text:=inttostr( ima.Width );
- EditFrameHeight.Text:=inttostr( ima.Height );
+ w := ima.Width;
+ h := ima.Height;
+ EditFrameWidth.Text := w.ToString;
+ EditFrameHeight.Text := h.ToString;
  ima.Free;
 
- SEStartFrame.Value:=0;
- SEEndFrame.Value:=0;
- PE.FParticleParam.StartFrame:=0;
- PE.FParticleParam.EndFrame:=0;
+ SEStartFrame.Value := 0;
+ SEEndFrame.Value := 0;
+ PE.FParticleParam.StartFrame := 0;
+ PE.FParticleParam.EndFrame := 0;
 
-
- PE.FParticleParam.Texture := FScene.TexMan.Add( OD2.FileName, strtoint(EditFrameWidth.Text), strtoint(EditFrameHeight.Text) );
- Label4.Caption:=ExtractFileName( OD2.FileName );
- SetWindowTitle( TRUE );
+ PE.FParticleParam.Texture := FScene.TexMan.Add(OD2.FileName, w, h);
+ Label4.Caption := ExtractFileName(OD2.FileName);
+ SetWindowTitle(True);
 end;
 
 // Direction -45°
@@ -320,8 +343,14 @@ begin
   TBDirection.Position := TBDirection.Position-45;
 end;
 
+procedure TForm_Principale.BCenterViewClick(Sender: TObject);
+begin
+  FViewOffset := Point(0,0); //FScene.Center.Round;
+  HomeScreen.ApplyViewOffset(FViewOffset);
+end;
+
 // Size reset curve
-procedure TForm_Principale.Button11Click(Sender: TObject);
+procedure TForm_Principale.BResetSizeClick(Sender: TObject);
 begin
   with PE.FParticleParam do begin
    SetLength( ArraySize, 2);
@@ -342,7 +371,7 @@ begin
 end;
 
 // change background color or image
-procedure TForm_Principale.Button3Click(Sender: TObject);
+procedure TForm_Principale.BChangeBGClick(Sender: TObject);
 var p: PTexture;
 begin
  if RB1.Checked then begin
@@ -352,35 +381,36 @@ begin
 
  if RB2.Checked then begin
   if not OPD1.Execute then exit;
-  if FBackgroundImage<>NIL then FBackgroundImage.Kill;
-  p := FScene.TexMan.Add( OPD1.FileName );
-  FBackgroundImage := TSprite.Create( p, TRUE );
-  FScene.Add( FBackgroundImage, LAYER_BACKGROUND);
+  if FBackgroundImage <> NIL then FBackgroundImage.Kill;
+  p := FScene.TexMan.Add(OPD1.FileName);
+  FBackgroundImage := TSprite.Create(p, TRUE);
+  FScene.Add(FBackgroundImage, LAYER_BACKGROUND);
   FBackgroundImage.CenterOnScene;
  end;
 end;
 
 // shoot !
-procedure TForm_Principale.Button4Click(Sender: TObject);
+procedure TForm_Principale.BShootClick(Sender: TObject);
 begin
   PE.Shoot;
 end;
 
 //camera zoom reset
-procedure TForm_Principale.Button5Click(Sender: TObject);
+procedure TForm_Principale.BResetZoomClick(Sender: TObject);
 begin
-  TBZoom.Position := 1000;
+  Zoom := 1.0;
+  HomeScreen.ApplyViewZoom(Zoom);
 end;
 
 // Spin reset
-procedure TForm_Principale.Button6Click(Sender: TObject);
+procedure TForm_Principale.BResetSpinClick(Sender: TObject);
 begin
   TBParticleSpin.Position := 0;
   SetWindowTitle(TRUE);
 end;
 
 //Angular velocity reset
-procedure TForm_Principale.Button7Click(Sender: TObject);
+procedure TForm_Principale.BResetAngularVelocityClick(Sender: TObject);
 begin
   TBParticleAngularVelocity.Position := 0;
   TBParticleAngularVelocityVariation.Position := 0;
@@ -409,7 +439,7 @@ end;
 procedure TForm_Principale.CheckBox1Change(Sender: TObject);
 begin
   PE.LoopMode := CheckBox1.Checked;
-  Button4.Visible := not CheckBox1.Checked;
+  BShoot.Visible := not CheckBox1.Checked;
   Label1.Visible := not CheckBox1.Checked;
   Label10.Visible := not CheckBox1.Checked;
   TBEmitterLife.Visible := not CheckBox1.Checked;
@@ -418,6 +448,7 @@ end;
 
 procedure TForm_Principale.CheckBox2Change(Sender: TObject);
 begin
+  if FInitializing then exit;
   PE.ParticlesPosRelativeToEmitterPos := CheckBox2.Checked;
   SetWindowTitle(True);
 end;
@@ -488,23 +519,23 @@ end;
 
 procedure TForm_Principale.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  FScene.ProcessOnKeyDown(Key, Shift);
+  //FScene.ProcessOnKeyDown(Key, Shift);
 end;
 
 procedure TForm_Principale.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Button4.Visible and (Key = VK_F1)
-    then PE.Shoot
-    else FScene.ProcessOnKeyUp(Key, Shift);
+  if BShoot.Visible and (Key = VK_F1)
+    then PE.Shoot;
+//    else FScene.ProcessOnKeyUp(Key, Shift);
 end;
 
-procedure TForm_Principale.MenuItem2Click(Sender: TObject);
+procedure TForm_Principale.MIOpenClick(Sender: TObject);
 var r: TModalResult;
 begin
   if FModified then begin
    r := MessageDlg('','Do you want save before load another project ?', mtWarning, [mbYes,mbNo,mbCancel],'');
    if r = mrCancel then exit;
-   if r = mrYes then MenuItem3Click(NIL);
+   if r = mrYes then MISaveClick(NIL);
   end;
 
   if not OD1.Execute then exit;
@@ -514,10 +545,10 @@ begin
 end;
 
 // save
-procedure TForm_Principale.MenuItem3Click(Sender: TObject);
+procedure TForm_Principale.MISaveClick(Sender: TObject);
 var s: TStringList;
   t: string;
-  i,Texwidth: integer;
+  i: integer;
 begin
   if not SD1.Execute then exit;
   FProjectName := ExtractFileName( SD1.FileName );
@@ -613,7 +644,6 @@ begin
   s.Add(t);
 
   s.Add('P_Size');
-  TexWidth := strtoint(EditFrameWidth.Text);
   t := FormatFloat('0.00000', TBParticleInitialSize.Position/100)+' '+
        FormatFloat('0.00000', TBParticleInitialSizeVariation.Position/100);
   with PE.FParticleParam do begin
@@ -644,15 +674,82 @@ begin
   SetWindowTitle(False);
 end;
 
-procedure TForm_Principale.MenuItem6Click(Sender: TObject);
+procedure TForm_Principale.MIQuitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TForm_Principale.OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TForm_Principale.OGLMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
-  if (HomeScreen <> NIL) and (PE <> NIL) then
-    PE.SetCoordinate(X,Y);
+  FClickOrigin := Point(X, Y);
+  if (Button = mbLeft) and (FMouseState = msIdle) then DoLoopMoveView;
+end;
+
+procedure TForm_Principale.OGLMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var p: TPointF;
+  r: TRectF;
+begin
+  if (Button = mbRight) and (FMouseState = msIdle) then begin
+    if (HomeScreen <> NIL) and (PE <> NIL) then begin
+
+      p.x := X/FScene.Width;
+      p.y := Y/FScene.Height;
+      r := HomeScreen.FCamera.GetViewRect;
+      p.x := r.Left + r.Width*p.x;// + FViewOffset.x;
+      p.y := r.Top + r.Height*p.y;// + FViewOffset.y;
+
+      Caption := 'Scene: '+FScene.Width.ToString+','+FScene.Height.ToString+
+                 '  FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
+                 '  Zoom = '+FormatFloat('0.00', Zoom)+
+                 '  clicked canvas = ('+X.ToString+','+Y.ToString+')'+
+                 '  clicked transformed = ('+Round(p.x).ToString+','+Round(p.y).ToString+')';
+
+      //PE.SetCoordinate(PointF(FViewOffset.x, FViewOffset.y)+HomeScreen.FCamera.LookAt.Value);//(FViewOffset.x-X, FViewOffset.y-Y);
+
+     //p := HomeScreen.FCamera.ScreenToScene(PointF(X,Y)); // + PointF(FViewOffset)*Zoom;
+
+     //p := PointF(X,Y)+PointF(FViewOffset)*Zoom;
+
+ {    p := ClientToWord(Point(X,Y));
+     p.x := p.x + FScene.Width * 0.5;
+     p.y := p.y + FScene.Height * 0.5;    }
+
+     //p := PointF(FViewOffset);
+     //p := p + PointF(X,Y);
+     //p := p *Zoom;
+
+     PE.SetCoordinate(p);
+    end;
+  end;
+
+  if (Button = mbLeft) and (FMouseState = msMoveView) then
+    FMouseState := msIdle;
+end;
+
+procedure TForm_Principale.OGLMouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var p1, p2, p: TPointF;
+begin
+  p1 := ClientToWord(MousePos);
+
+  if WheelDelta < 0 then
+    Zoom := Zoom - Zoom*0.2
+  else
+    Zoom := Zoom + Zoom*0.2;
+  HomeScreen.ApplyViewZoom(Zoom);
+
+  // moves the view
+{  p2 := ClientToWord(MousePos);
+  p := (p2-p1)*Zoom;
+  FViewOffset := FViewOffset + p.Round;  }
+
+  HomeScreen.ApplyViewOffset(FViewOffset);
+
+  Caption := 'FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
+             '  Zoom = '+FormatFloat('0.00', Zoom);
+
+  Handled := TRUE;
 end;
 
 // radio button 'Color/image' for background
@@ -780,13 +877,50 @@ begin
   SetWindowTitle(True);
 end;
 
-// camera zoom
-procedure TForm_Principale.TBZoomChange(Sender: TObject);
-var s:single;
+procedure TForm_Principale.DoLoopMoveView;
+var current, delta: TPoint;
 begin
-  s := TBZoom.Position*0.001;
-  HomeScreen.FCamera.Scale.Value := PointF(s,s);
-  Label32.Caption := FormatFloat('0.00',s);
+  FMouseState := msMoveView;
+  OGL.Cursor := crSizeAll;
+
+  repeat
+    current := OGL.ScreenToClient(Mouse.CursorPos);
+    delta := current - FClickOrigin;
+    if (delta.x <> 0) or (delta.y <> 0) then begin
+      delta.x := Round(delta.x / FZoom);
+      delta.y := Round(delta.y / FZoom);
+      FViewOffset := FViewOffset - delta;
+      HomeScreen.ApplyViewOffset(FViewOffset);
+
+      FClickOrigin := current;
+      FScene.DoLoop;
+    end;
+    Application.ProcessMessages;
+  until FMouseState = msIdle;
+  OGL.Cursor := crDefault;
+  Caption := 'FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
+             '  Zoom = '+FormatFloat('0.00', Zoom);
+end;
+
+function TForm_Principale.ClientToWord(pt: TPoint): TPointF;
+var mInv: TOGLCMatrix;
+begin
+  mInv.Matrix := InverseMat(MatrixView.Matrix);
+  Result := mInv.Transform(PointF(pt));
+end;
+
+function TForm_Principale.WordToClient(pt: TPointF): TPoint;
+var pf: TPointF;
+begin
+  pf := MatrixView.Transform(pt);
+  Result.x := Trunc(pf.x);
+  Result.y := Trunc(pf.y);
+end;
+
+function TForm_Principale.MatrixView: TOGLCMatrix;
+begin
+  Result.SetAsTranslation(FViewOffset.x, FViewOffset.y);
+  Result.Scale(FZoom, FZoom);
 end;
 
 procedure TForm_Principale.UpdateWidgets;
@@ -852,6 +986,8 @@ begin
   HomeScreen := THomeScreen.Create;
   FScene.RunScreen(HomeScreen);
 
+  FViewOffset := Point(0,0); // FScene.Center.Round;
+
   VelocityCurve.OnCurveChange := @ProcessVelocityCurveChange;
   VelocityCurve.SetLegendMinMax('-200%','+200%');
   VelocityCurve.AddHorizAxis([0.25, 0.5, 0.75]);
@@ -904,7 +1040,7 @@ begin
 end;
 
 procedure TForm_Principale.LoadFile(const aFile: string);
-var i, textWidth: integer;
+var i: integer;
 begin
   PE.LoadFromFile(aFile, NIL);
   PE.CenterOnScene;
@@ -946,6 +1082,9 @@ begin
   end;//case
   CBEmitterTypeChange(NIL);
 
+  // particle pos relative to emitter pos
+  CheckBox2.Checked := PE.ParticlesPosRelativeToEmitterPos;
+
   // emitter gravity
   SE3.Value := Round(PE.Gravity.x.Value);
   SE4.Value := Round(PE.Gravity.y.Value);
@@ -981,7 +1120,6 @@ begin
                        (PE.FParticleParam.ArraySpin[i].Value+2)/4, False);
 
   // particle size
-  textWidth := PE.FParticleParam.Texture^.FrameWidth;
   TBParticleInitialSize.Position := Trunc(PE.FParticleParam.Size*100);
   TBParticleInitialSizeVariation.Position := Trunc(PE.FParticleParam.SizeVariation*100);
   SizeCurve.Clear;
@@ -1009,6 +1147,8 @@ begin
     ColorCurve.AddPoint(PE.FParticleParam.ArrayColor[i].Life,
                         PE.FParticleParam.ArrayColor[i].C.alpha/255, False);
   FrameShowColor1.UpdateColor(PE.FParticleParam.ArrayColor);
+
+  PE.ParticlesPosRelativeToEmitterPos := CheckBox2.Checked;
 
   FInitializing := False;
   SetWindowTitle(False);
@@ -1140,6 +1280,7 @@ end;
 procedure TForm_Principale.ProcessColorCurvePointDblClick(PointIndex: integer);
 var c: TBGRAPixel;
 begin
+  CD1.Color := PE.FParticleParam.ArrayColor[PointIndex].C.ToColor;
   if not CD1.Execute then exit;
   c := ColorToBGRA(CD1.Color);
 
@@ -1170,6 +1311,11 @@ begin
    FrameShowColor1.UpdateColor(ArrayColor);
   end;
   SetWindowTitle(True);
+end;
+
+procedure TForm_Principale.SetZoom(AValue: single);
+begin
+  FZoom := EnsureRange(AValue, 0.1, 5.0);
 end;
 
 function TForm_Principale.GetVelocityValue: integer;

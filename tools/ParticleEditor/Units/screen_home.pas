@@ -27,6 +27,9 @@ public
   FCamera: TOGLCCamera;
   procedure CreateObjects; override;
   procedure FreeObjects; override;
+
+  procedure ApplyViewOffset(const aOffset: TPoint);
+  procedure ApplyViewZoom(aZoom: single);
 end;
 
 var HomeScreen: THomeScreen = NIL;
@@ -56,7 +59,7 @@ begin
   if DrawEmitterShape then begin
     FScene.TexMan.UnbindTexture;
     FScene.BlendMode := FX_BLEND_NORMAL;
-    p := PointF(0,0); //GetXY;
+    p := PointF(0,0);
     c := BGRA(255,0,0);
     case EmitterType of
       etPoint: begin
@@ -110,13 +113,31 @@ begin
  FScene.Add(FBackGroundRainbow, LAYER_BACKGROUND);
 
  FCamera := FScene.CreateCamera;
- FCamera.AssignToLayer(LAYER_PARTICLE);
+ FCamera.AssignToLayer([LAYER_PARTICLE, LAYER_BACKGROUND]);
 end;
 
 procedure THomeScreen.FreeObjects;
 begin
  FScene.ClearAllLayer;
  FScene.OnAfterPaint := NIL;
+end;
+
+procedure THomeScreen.ApplyViewOffset(const aOffset: TPoint);
+begin
+  FCamera.MoveTo(FScene.Center + PointF(aOffset));
+{  PE.SetCoordinate(FScene.Center-PointF(aOffset));
+  FBackGroundRainbow.SetCenterCoordinate(FScene.Center-PointF(aOffset));
+  FBackGroundColor.SetCenterCoordinate(FScene.Center-PointF(aOffset));
+  if FBackgroundImage <> NIL then FBackgroundImage.SetCenterCoordinate(FScene.Center-PointF(aOffset)); }
+end;
+
+procedure THomeScreen.ApplyViewZoom(aZoom: single);
+begin
+  FCamera.Scale.Value := PointF(aZoom, aZoom);
+{  PE.Scale.Value := PointF(aZoom, aZoom);
+  FBackGroundRainbow.Scale.Value := PointF(aZoom, aZoom);
+  FBackGroundColor.Scale.Value := PointF(aZoom, aZoom);
+  if FBackgroundImage <> NIL then FBackgroundImage.Scale.Value := PointF(aZoom, aZoom); }
 end;
 
 end.
