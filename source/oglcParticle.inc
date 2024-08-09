@@ -605,7 +605,8 @@ begin
       FParticles[i].CurrentColor := FParticleParam.ArrayColor[0].C;
       FParticles[i].FColorIndex := 1;
 
-      FParticles[i].CurrentAngle := FParticleParam.StartAngle + random*FParticleParam.StartAngleVariation-FParticleParam.StartAngleVariation*0.5; // random(round(FParticleParam.StartAngleVariation*1000))*0.001;
+      FParticles[i].CurrentAngle := FParticleParam.StartAngle + random(round(FParticleParam.StartAngleVariation*1000))*0.001;
+      //FParticles[i].CurrentAngle := FParticleParam.StartAngle + random*FParticleParam.StartAngleVariation-FParticleParam.StartAngleVariation*0.5; // random(round(FParticleParam.StartAngleVariation*1000))*0.001;
 
       FParticles[i].InitialSpin := FParticleParam.Spin + random*FParticleParam.SpinVariation-FParticleParam.SpinVariation*0.5; // random(round(FParticleParam.SpinVariation*1000))*0.001;
       FParticles[i].FSpinIndex := 1;
@@ -663,11 +664,13 @@ begin
         end;
       end;//case
 
-      FParticles[i].InitialVelocity := FParticleParam.Velocity + random*FParticleParam.VelocityVariation - FParticleParam.VelocityVariation * 0.5; //+ random(round(FParticleParam.VelocityVariation)) - FParticleParam.VelocityVariation * 0.5;
+      FParticles[i].InitialVelocity := FParticleParam.Velocity + random*FParticleParam.VelocityVariation - FParticleParam.VelocityVariation * 0.5;
+      //FParticles[i].InitialVelocity := FParticleParam.Velocity + random(round(FParticleParam.VelocityVariation)) - FParticleParam.VelocityVariation * 0.5;
       FParticles[i].CurrentVelocity := FParticles[i].InitialVelocity + FParticles[i].InitialVelocity * FParticleParam.ArrayVelocity[0].Value;
       FParticles[i].FVelocityIndex := 1;
 
-      FParticles[i].InitialAVelocity := FParticleParam.AVelocity + random*FParticleParam.AVelocityVariation - FParticleParam.AVelocityVariation * 0.5; //+ random( round( FParticleParam.AVelocityVariation)) - FParticleParam.AVelocityVariation * 0.5;
+      FParticles[i].InitialAVelocity := FParticleParam.AVelocity + random * FParticleParam.AVelocityVariation - FParticleParam.AVelocityVariation * 0.5;
+      //FParticles[i].InitialAVelocity := FParticleParam.AVelocity + random*FParticleParam.AVelocityVariation - FParticleParam.AVelocityVariation * 0.5;
       FParticles[i].CurrentAVelocity := FParticles[i].InitialAVelocity + FParticles[i].InitialAVelocity * FParticleParam.ArrayAVelocity[0].Value;
       FParticles[i].FAVelocityIndex := 1;
 
