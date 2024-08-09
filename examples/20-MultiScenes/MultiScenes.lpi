@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="89"/>
+      <BuildNr Value="90"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -94,8 +94,9 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="29" Y="13"/>
+        <CursorPos X="41" Y="20"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -401,7 +402,6 @@
       </Unit43>
       <Unit44>
         <Filename Value="..\..\source\oglcTexturedFont.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="936"/>
         <CursorPos X="37" Y="951"/>

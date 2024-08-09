@@ -1,11 +1,11 @@
 object FormMain: TFormMain
-  Left = 516
+  Left = 392
   Height = 300
   Top = 190
-  Width = 303
+  Width = 427
   Caption = 'Program name'
   ClientHeight = 300
-  ClientWidth = 303
+  ClientWidth = 427
   Color = clBlack
   DefaultMonitor = dmPrimary
   OnCloseQuery = FormCloseQuery
@@ -15,31 +15,22 @@ object FormMain: TFormMain
   OnKeyUp = FormKeyUp
   LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 24
-    Height = 92
-    Top = 24
-    Width = 104
-  end
   object Panel1: TPanel
-    AnchorSideTop.Control = Owner
-    AnchorSideTop.Side = asrCenter
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Left = 120
-    Height = 259
-    Top = 21
-    Width = 183
+    Left = 288
+    Height = 300
+    Top = 0
+    Width = 139
+    Align = alRight
     Anchors = [akTop, akRight]
-    ClientHeight = 259
-    ClientWidth = 183
+    ClientHeight = 300
+    ClientWidth = 139
     Color = 13092807
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     object RadioGroup1: TRadioGroup
-      Left = 7
+      Left = 8
       Height = 221
-      Top = 18
+      Top = 16
       Width = 125
       AutoFill = True
       Caption = 'MultilineText.Align'
@@ -66,6 +57,23 @@ object FormMain: TFormMain
       )
       OnSelectionChanged = RadioGroup1SelectionChanged
       TabOrder = 0
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 300
+    Top = 0
+    Width = 288
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 300
+    ClientWidth = 288
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 24
+      Height = 92
+      Top = 24
+      Width = 104
     end
   end
   object Timer1: TTimer

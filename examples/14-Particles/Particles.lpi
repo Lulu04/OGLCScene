@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="36"/>
+      <BuildNr Value="37"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -94,9 +94,10 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="37"/>
-        <CursorPos Y="50"/>
+        <TopLine Value="38"/>
+        <CursorPos X="52" Y="54"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -114,7 +115,6 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <CursorPos X="42" Y="23"/>
         <UsageCount Value="67"/>
@@ -238,7 +238,7 @@
         <Loaded Value="True"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="45" Column="16" TopLine="23"/>
@@ -355,6 +355,10 @@
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="54" Column="18" TopLine="32"/>
       </Position29>
+      <Position30>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="50" TopLine="37"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

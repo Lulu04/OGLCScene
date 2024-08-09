@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="31"/>
+      <BuildNr Value="32"/>
       <Language Value="040C"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -115,7 +115,7 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="28" Y="15"/>
+        <CursorPos X="26" Y="16"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit3>

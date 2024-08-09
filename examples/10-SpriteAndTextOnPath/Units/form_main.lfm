@@ -15,26 +15,18 @@ object FormMain: TFormMain
   OnKeyUp = FormKeyUp
   LCLVersion = '2.2.6.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 24
-    Height = 92
-    Top = 24
-    Width = 104
-  end
   object Panel1: TPanel
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
     Left = 160
-    Height = 246
+    Height = 277
     Top = 0
     Width = 143
+    Align = alRight
     Anchors = [akTop, akRight]
-    ClientHeight = 246
+    ClientHeight = 277
     ClientWidth = 143
     Color = 13092807
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     object Label1: TLabel
       Left = 10
       Height = 15
@@ -96,6 +88,23 @@ object FormMain: TFormMain
       OnChange = TrackBar1Change
       State = cbChecked
       TabOrder = 3
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 277
+    Top = 0
+    Width = 160
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 277
+    ClientWidth = 160
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 8
+      Height = 92
+      Top = 8
+      Width = 104
     end
   end
   object Timer1: TTimer

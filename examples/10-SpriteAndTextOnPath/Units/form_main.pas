@@ -19,6 +19,7 @@ type
     Label2: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
+    Panel2: TPanel;
     Timer1: TTimer;
     TrackBar1: TTrackBar;
     TrackBar2: TTrackBar;
