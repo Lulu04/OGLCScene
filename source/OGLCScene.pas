@@ -359,7 +359,7 @@ TOGLCScene = class(TOGLCContext)
   FRendererForPostProcessing: TOGLCRenderToTexture;
   FPostProcessingShader: TOGLCPostProcessingFX;   }
  public
-  Collision: TCollisionFactory;
+  Collision: TCollisionFunctions;
   // Aspect ratio can be any value >= 1.0 ex. 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
   // and centered on its parent.
   // If you set aspect ratio to -1 the TOpenGLControl is resized to fit its parent client area.
