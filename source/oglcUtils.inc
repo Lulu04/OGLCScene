@@ -71,9 +71,9 @@ function PointFToRectF( p1, p2: TPointF ): TRectF;
 type
 // COLLISION TEST
 
-{ TCollisionFactory }
+{ TCollisionFunctions }
 
-TCollisionFactory = record
+TCollisionFunctions = record
   function PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
   function PointRectF(const aPt: TPointF; const r: TRectF): boolean;
   function CircleCircle(const aCenter1: TPointF; const aRadius1: single;
@@ -87,7 +87,7 @@ TCollisionFactory = record
 end;
 
 var
-  Collision: TCollisionFactory;
+  Collision: TCollisionFunctions;
 
 {function CollisionPointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
 function CollisionPointRectF(const aPt: TPointF; const r: TRectF): boolean;
@@ -410,24 +410,24 @@ begin
  Result.BottomRight:=bottomright;
 end;
 
-function TCollisionFactory.PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
+function TCollisionFunctions.PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
 begin
   Result := Distance(aPt, aCenter) < aRadius;
 end;
 
-function TCollisionFactory.PointRectF(const aPt: TPointF; const r: TRectF): boolean;
+function TCollisionFunctions.PointRectF(const aPt: TPointF; const r: TRectF): boolean;
 begin
   Result := (aPt.x >= r.Left) and (aPt.x < r.Right) and
             (aPt.y >= r.Top) and (aPt.y < r.Bottom);
 end;
 
-function TCollisionFactory.CircleCircle(const aCenter1: TPointF;
+function TCollisionFunctions.CircleCircle(const aCenter1: TPointF;
   const aRadius1: single; const aCenter2: TPointF; const aRadius2: single): boolean;
 begin
   Result := Distance(aCenter1, aCenter2) < aRadius1 + aRadius2;
 end;
 
-function TCollisionFactory.CircleRectF(const aCenter: TPointF;
+function TCollisionFunctions.CircleRectF(const aCenter: TPointF;
   const aRadius: single; const r: TRectF): boolean;
 var closestX, closestY{, dX, dY}: single;
 begin
@@ -447,13 +447,13 @@ begin
   Result := sqr(dX) + sqr(dY) < sqr(aRadius);  }
 end;
 
-function TCollisionFactory.RectFRectF(const r1, r2: TRectF): boolean;
+function TCollisionFunctions.RectFRectF(const r1, r2: TRectF): boolean;
 begin
   Result := (r1.Right >= r2.Left) and ( r1.Left <= r2.Right) and
             (r1.Bottom >= r2.Top) and (r1.Top <= r2.Bottom);
 end;
 
-function TCollisionFactory.LinePoint(aLinePt1, aLinePt2, aPt: TPointF): boolean;
+function TCollisionFunctions.LinePoint(aLinePt1, aLinePt2, aPt: TPointF): boolean;
 var d1, d2, lineLen, buffer: single;
 begin
   // get distance from the point to the two ends of the line
@@ -469,7 +469,7 @@ begin
   Result := (d1+d2 >= lineLen-buffer) and (d1+d2 <= lineLen+buffer);
 end;
 
-function TCollisionFactory.LineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
+function TCollisionFunctions.LineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
 var uA, uB, x4_x3, y1_y3, y4_y3, x1_x3, x2_x1, y2_y1: single;
 begin
   x4_x3 := aLine2Pt2.x - aLine2Pt1.x;
@@ -487,7 +487,7 @@ begin
 end;
 
 // from https://github.com/jeffThompson/CollisionDetection
-function TCollisionFactory.LineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
+function TCollisionFunctions.LineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
 var distX, distY, len, dot, closestX, closestY: single;
 begin
   // is either end INSIDE the circle? if so, return true immediately
@@ -511,7 +511,7 @@ begin
   Result := sqrt((distX*distX) + (distY*distY)) <= aRadius;
 end;
 
-function TCollisionFactory.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
+function TCollisionFunctions.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
 begin
   // check if the line has hit any of the rectangle's sides
   // uses the Line/Line function
