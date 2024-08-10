@@ -84,6 +84,9 @@ TCollisionFunctions = record
   function LineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
   function LineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
   function LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
+
+  function RectFContainLine(const r: TRectF; aLinePt1, aLinePt2: TPointF): boolean;
+  function CircleContainRectF(const aCenter: TPointF; const aRadius: single; const r: TRectF): boolean;
 end;
 
 var
@@ -519,6 +522,20 @@ begin
             Collision.LineLine(aLinePt1, aLinePt2, PointF(aRect.Right, aRect.Top), aRect.BottomRight) or
             Collision.LineLine(aLinePt1, aLinePt2, aRect.TopLeft, PointF(aRect.Right, aRect.Top)) or
             Collision.LineLine(aLinePt1, aLinePt2, PointF(aRect.Left, aRect.Bottom), aRect.BottomRight);
+end;
+
+function TCollisionFunctions.RectFContainLine(const r: TRectF; aLinePt1, aLinePt2: TPointF): boolean;
+begin
+  Result := PointRectF(aLinePt1, r) and PointRectF(aLinePt2, r);
+end;
+
+function TCollisionFunctions.CircleContainRectF(const aCenter: TPointF;
+  const aRadius: single; const r: TRectF): boolean;
+begin
+  Result := PointCircle(r.TopLeft, aCenter, aRadius) and
+            PointCircle(PointF(r.Right, r.Top), aCenter, aRadius) and
+            PointCircle(r.BottomRight, aCenter, aRadius) and
+            PointCircle(PointF(r.Left, r.Bottom), aCenter, aRadius);
 end;
 
 function IndexToColorAttachment(aIndex: integer): GLenum;
