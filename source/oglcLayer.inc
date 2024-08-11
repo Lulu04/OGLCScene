@@ -65,8 +65,8 @@ private
   FCamera: TOGLCCamera;
 private
   FOnSortCompare: TListSortCompare;
-  FOnBeforePaint,
-  FOnAfterPaint: TOGLCEvent;
+  FOnBeforePaint, FOnAfterPaint,
+  FOnBeforeUpdate, FOnAfterUpdate: TOGLCEvent;
 public
   Constructor Create;
   Destructor Destroy; override;
@@ -127,6 +127,10 @@ public
   // Assign this callback if you want to do some finalizations after the layer is rendered.
   // For example, you can unbind a TOGLCRenderToTexture and render its texture with a specific shader
   property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
+  // Called before layer update.
+  property OnBeforeUpdate: TOGLCEvent read FOnBeforeUpdate write FOnBeforeUpdate;
+  // called at the end of layer update.
+  property OnAfterUpdate: TOGLCEvent read FOnAfterUpdate write FOnAfterUpdate;
 end;
 
 
@@ -286,6 +290,7 @@ end;
 procedure TLayer.Update(const aElapsedTime: single);
 var i: integer;
 begin
+  if FOnBeforeUpdate <> NIL then FOnBeforeUpdate();
   if FFreeze then exit;
   // Do Blink
   with FBlink do
@@ -314,6 +319,8 @@ begin
 
   // sort the surface
   if FOnSortCompare <> NIL then FList.Sort(FOnSortCompare);
+
+  if FOnAfterUpdate <> NIL then FOnAfterUpdate();
 end;
 
 procedure TLayer.Clear;
