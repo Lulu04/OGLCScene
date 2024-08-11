@@ -55,7 +55,6 @@ TTexturedFont = class;
 
 // simple callback
 TOGLCEvent = procedure of object;
-TDelayCallBack = procedure( UserValue: word ) of object;
 
 { in the scene, each surface can play scenarios. A scenario is an external text file
   that contain the actions to execute.
