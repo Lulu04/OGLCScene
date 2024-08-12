@@ -516,6 +516,8 @@ end;
 
 function TCollisionFunctions.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
 begin
+ // check if the rect contain the line
+  if RectFContainLine(aRect, aLinePt1, aLinePt2) then exit(True);
   // check if the line has hit any of the rectangle's sides
   // uses the Line/Line function
   Result := Collision.LineLine(aLinePt1, aLinePt2, aRect.TopLeft, PointF(aRect.Left, aRect.Bottom)) or
