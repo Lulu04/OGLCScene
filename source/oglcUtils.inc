@@ -271,24 +271,27 @@ begin
     FWHFactor := cw/ch;
 
     if (aWidth > -1) and (aHeight > -1) then begin
+      // return a maximized image that fit in the given rectangle (keep aspect ratio).
       Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-      svg.StretchDraw(Result.Canvas2D, 0, 0, Result.Width, Result.Height, True);
+      svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, True);
       exit;
     end;
 
     if (aWidth = -1) and (aHeight = -1) then begin
+      // return an image with original size as described in svg.
       aWidth := Round(cw);
       aHeight := Round(ch);
     end
     else
     if aWidth = -1
-      then aWidth := round(aHeight*FWHFactor)
+      then aWidth := round(aHeight*FWHFactor) // compute width to keep aspect ratio
     else
     if aHeight = -1
-      then aHeight := round(aWidth/FWHFactor);
+      then aHeight := round(aWidth/FWHFactor); // compute height to keep aspect ratio
 
     Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-    svg.StretchDraw(Result.Canvas2D, taCenter, tlCenter, 0, 0, Result.Width, Result.Height);
+   // svg.StretchDraw(Result.Canvas2D, taCenter, tlCenter, 0, 0, Result.Width, Result.Height);
+    svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, False);
   finally
     svg.Free;
   end;
