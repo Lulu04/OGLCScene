@@ -263,6 +263,11 @@ public // Matrix transform
   // Gives a matrix to transform point from surface space to scene space.
   // (surface top left is (0,0))
   function GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
+  // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
+  // and without applying model view matrix.
+  function GetRectAreaInLocalSpace: TRectF;
+  // The rectangular area of the surface expressed in the parent space (TopLeft=X.Value,Y.Value)
+  function GetRectAreaInParentSpace: TRectF;
   // Collision test
   function CollisionTestWith(aPoint: TPointF): boolean; overload;
   function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
@@ -522,6 +527,22 @@ function TSimpleSurfaceWithEffect.GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
 begin
   Result.LoadIdentity;
   ScanMatrixRecursive(Self, Result);
+end;
+
+function TSimpleSurfaceWithEffect.GetRectAreaInLocalSpace: TRectF;
+begin
+  Result.Left := 0;
+  Result.Top := 0;
+  Result.Right := Width;
+  Result.Bottom := Height;
+end;
+
+function TSimpleSurfaceWithEffect.GetRectAreaInParentSpace: TRectF;
+begin
+ Result.Left := X.Value;
+ Result.Top := Y.Value;
+ Result.Right := X.Value + Width;
+ Result.Bottom := Y.Value + Height;
 end;
 
 destructor TSimpleSurfaceWithEffect.Destroy;
