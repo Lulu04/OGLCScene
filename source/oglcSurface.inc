@@ -261,7 +261,8 @@ public // Matrix transform
   // Apply transformations (translation, scale, rotation) on a matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
   // Gives a matrix to transform point from surface space to scene space.
-  function MatrixSurfaceSpaceToScene: TOGLCMatrix;
+  // (surface top left is (0,0))
+  function GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
   // Collision test
   function CollisionTestWith(aPoint: TPointF): boolean; overload;
   function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
@@ -512,7 +513,7 @@ begin
                          Angle.Value, Width*Pivot.x, Height*Pivot.y);
 end;
 
-function TSimpleSurfaceWithEffect.MatrixSurfaceSpaceToScene: TOGLCMatrix;
+function TSimpleSurfaceWithEffect.GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
   procedure ScanMatrixRecursive(aSurface: TSimpleSurfaceWithEffect; var m: TOGLCMatrix);
   begin
     if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m);
