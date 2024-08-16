@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectGroup FileVersion="2">
+    <Targets>
+      <Target FileName="01-HelloWorld\HelloWorld.lpi">
+        <BuildModes>
+          <Mode Name="Debug"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="02-SimpleSprites\SimpleSprite.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="03-SceneLayers\SceneLayers.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="04-ComplexSprite\ComplexSprite.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="05-DeformationGrid\DeformationGrid.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="06-VeryComplexSpriteWithDeformation\VeryComplexSprite.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="07-ElectricalBeam\ElectricalBeam.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="08-TexturedFont\TexturedFont.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="09-TintMode\TintMode.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="10-SpriteAndTextOnPath\SpriteAndTextOnPath.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="11-UI-Elements\UIElements.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="12-UI-Animation\UIAnimation.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="13-UI-ModalPanel\UIModalPanel.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="14-Particles\Particles.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="15-TileEngine\TileEngine.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="16-MessageAndScenario\MessageAndScenario.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="17-VelocityCurve\VelocityCurve.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="18-Camera\Camera.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="19-Collision\Collision.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="20-MultiScenes\MultiScenes.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+    </Targets>
+  </ProjectGroup>
+</CONFIG>
