@@ -170,7 +170,7 @@ begin
     ptCenter := meteor.Center;
     radius := meteor.Width*0.844*0.5;
 
-    if CollisionCircleRectF(ptCenter, radius, r) then begin
+    if FScene.Collision.CircleRectF(ptCenter, radius, r) then begin
       Kill;  // kill the laser
       TMeteor(meteor).Hit; // we are sure there are only TMeteor instance in layer LAYER_METEOR
       exit;
@@ -356,8 +356,8 @@ begin
     ptCenter := meteor.Center;
     radius := meteor.Width*0.844*0.5;
 
-    Result := CollisionCircleRectF(ptCenter, radius, r1);
-    if not Result then Result := CollisionCircleRectF(ptCenter, radius, r2);
+    Result := FScene.Collision.CircleRectF(ptCenter, radius, r1);
+    if not Result then Result := FScene.Collision.CircleRectF(ptCenter, radius, r2);
     if Result then begin
       PostMessage(100); // start animation when ship hurts a meteor
       exit;

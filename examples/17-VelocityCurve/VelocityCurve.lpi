@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="69"/>
+      <BuildNr Value="70"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
       <Item1 Name="Debug" Default="True"/>
@@ -78,7 +78,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="27">
+    <Units Count="3">
       <Unit0>
         <Filename Value="VelocityCurve.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -102,16 +102,6 @@
         <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="Units\windowsscene.pas"/>
-        <ComponentName Value="Window_Scene"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="WindowsScene"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="2" Y="36"/>
-        <UsageCount Value="196"/>
-      </Unit2>
-      <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
@@ -119,203 +109,9 @@
         <CursorPos X="16" Y="63"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="Units\u_common.pas"/>
-        <CursorPos Y="19"/>
-        <UsageCount Value="23"/>
-        <Loaded Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="..\OGLCScene\oglcCamera.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="198"/>
-        <CursorPos X="53" Y="213"/>
-        <UsageCount Value="8"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="..\OGLCScene\OGLCScene.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="863"/>
-        <CursorPos X="32" Y="867"/>
-        <UsageCount Value="9"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="..\OGLCScene\oglcScreenTemplate.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="10"/>
-        <CursorPos X="74" Y="27"/>
-        <UsageCount Value="8"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="C:\home\lulu\fpcupdeluxe\lazarus\lcl\forms.pp"/>
-        <UnitName Value="Forms"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="56"/>
-        <CursorPos X="3" Y="69"/>
-        <UsageCount Value="8"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="..\OGLCScene\oglcTextureAtlas.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="499"/>
-        <CursorPos X="17" Y="513"/>
-        <UsageCount Value="8"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="..\OGLCScene\oglcTexture.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="686"/>
-        <CursorPos X="3" Y="690"/>
-        <UsageCount Value="8"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="..\UnitsCommon\VelocityCurve.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="35" Y="39"/>
-        <UsageCount Value="8"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="..\OGLCScene\oglcVelocityCurve.inc"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos Y="16"/>
-        <UsageCount Value="8"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\win\syswinh.inc"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="30" Y="19"/>
-        <UsageCount Value="8"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="..\..\oglcTextureAtlas.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="591"/>
-        <CursorPos X="3" Y="593"/>
-        <UsageCount Value="9"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="..\..\oglcScreenTemplate.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="23"/>
-        <CursorPos X="13" Y="36"/>
-        <UsageCount Value="9"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="..\..\oglcSurface.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="149"/>
-        <CursorPos X="14" Y="160"/>
-        <UsageCount Value="8"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="..\..\OGLCScene.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="166"/>
-        <CursorPos X="27" Y="189"/>
-        <UsageCount Value="21"/>
-      </Unit17>
-      <Unit18>
-        <Filename Value="..\..\oglcTexturedFont.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="111"/>
-        <CursorPos X="15" Y="126"/>
-        <UsageCount Value="21"/>
-      </Unit18>
-      <Unit19>
-        <Filename Value="..\..\oglcUtils.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="271"/>
-        <CursorPos X="37" Y="290"/>
-        <UsageCount Value="21"/>
-      </Unit19>
-      <Unit20>
-        <Filename Value="..\..\oglcType.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="212"/>
-        <CursorPos X="42" Y="232"/>
-        <UsageCount Value="19"/>
-      </Unit20>
-      <Unit21>
-        <Filename Value="..\..\oglcTexture.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="72"/>
-        <CursorPos X="12" Y="45"/>
-        <UsageCount Value="19"/>
-      </Unit21>
-      <Unit22>
-        <Filename Value="..\..\oglcSpriteTemplate.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="187"/>
-        <CursorPos X="75" Y="205"/>
-        <UsageCount Value="11"/>
-      </Unit22>
-      <Unit23>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="128"/>
-        <CursorPos X="23" Y="139"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit23>
-      <Unit24>
-        <Filename Value="..\..\source\oglcVelocityCurve.inc"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="94"/>
-        <CursorPos X="2" Y="115"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit24>
-      <Unit25>
-        <Filename Value="..\..\source\oglcScreenTemplate.inc"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="15" Y="34"/>
-        <UsageCount Value="10"/>
-      </Unit25>
-      <Unit26>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="116"/>
-        <CursorPos X="52" Y="122"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit26>
+      </Unit2>
     </Units>
-    <JumpHistory Count="8" HistoryIndex="7">
-      <Position1>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="24" TopLine="13"/>
-      </Position1>
-      <Position2>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="43" Column="14" TopLine="34"/>
-      </Position2>
-      <Position3>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="279" Column="58" TopLine="266"/>
-      </Position3>
-      <Position4>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="249" Column="13" TopLine="235"/>
-      </Position4>
-      <Position5>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="168" Column="16" TopLine="161"/>
-      </Position5>
-      <Position6>
-        <Filename Value="..\..\source\oglcVelocityCurve.inc"/>
-        <Caret Line="3" Column="14"/>
-      </Position6>
-      <Position7>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="131" Column="15" TopLine="106"/>
-      </Position7>
-      <Position8>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="541" Column="3" TopLine="539"/>
-      </Position8>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
@@ -359,17 +155,4 @@
       </Options>
     </Linking>
   </CompilerOptions>
-  <Debugging>
-    <Exceptions Count="3">
-      <Item1>
-        <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
-        <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
-        <Name Value="EFOpenError"/>
-      </Item3>
-    </Exceptions>
-  </Debugging>
 </CONFIG>
