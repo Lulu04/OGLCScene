@@ -164,7 +164,7 @@ public
   procedure DoDraw; virtual; abstract;
 public
   Speed   : TPointFParam;  // the speed of the surface in pixels/sec, on both axis
-  Angle   : TBoundedFParam; // the angle to rotate the surface
+  Angle   : TBoundedFParam; // the angle to rotate the surface CW
   Pivot   : TPointF; // percent position of the center rotation. (0,0) mean topleft, (0.5,0.5) mean the center, (1,1) mean bottomright.
   Scale   : TPointFParam; // the scale values on both axis. (1,1) means no scaling (default)
   Opacity : TBoundedFParam; // the opacity of the surface, range is [0..255]

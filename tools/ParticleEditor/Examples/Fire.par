@@ -11,7 +11,7 @@ E_Life
 E_LoopMode
 TRUE
 E_Emission
-170
+116
 E_Gravity
 0 0
 E_Type
@@ -19,10 +19,10 @@ E_Type
 P_ParticlesPositionsRelativeToEmitterPosition
 FALSE
 P_Texture
-particle.png
+sphere_particle.png
 32 32
 P_Frame
-1 1
+0 0
 P_Life
 3,962 0,000
 P_ColorMode
@@ -36,7 +36,7 @@ P_Velocity
 P_AVelocity
 0 0 2 0,00000 0,00000 1,00000 0,00000
 P_Size
-1,25000 0,37500 2 0,00000 1,00000 1,00000 1,00000
+1,25000 0,37000 2 0,00000 1,00000 1,00000 1,00000
 P_StartAngle
 0 0
 P_Spin

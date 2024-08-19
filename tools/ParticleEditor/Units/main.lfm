@@ -24,9 +24,9 @@ object Form_Principale: TForm_Principale
     Height = 330
     Top = 400
     Width = 1024
-    ActivePage = TabSheet7
+    ActivePage = TabSheet10
     Align = alClient
-    TabIndex = 4
+    TabIndex = 7
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'Texture and Frame animation'
@@ -895,9 +895,9 @@ object Form_Principale: TForm_Principale
       Height = 394
       Top = 0
       Width = 368
-      ActivePage = TabSheet4
+      ActivePage = TabSheet1
       Anchors = [akTop, akRight, akBottom]
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 1
       object TabSheet1: TTabSheet
         Caption = 'Emitter'
