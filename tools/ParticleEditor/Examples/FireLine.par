@@ -26,7 +26,7 @@ P_Frame
 P_Life
 1,215 0,000
 P_ColorMode
-0
+1
 P_BlendMode
 1
 P_Color
@@ -38,6 +38,6 @@ P_AVelocity
 P_Size
 0,48000 0,46000 2 0,00000 0,92683 1,00000 0,97561
 P_StartAngle
-0 0
+0 120
 P_Spin
 0 0 2 0,00000 0,01361 1,00000 0,01361
