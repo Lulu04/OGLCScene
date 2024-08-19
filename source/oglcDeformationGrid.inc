@@ -25,7 +25,7 @@ TDeformationGrid = class(TSprite)
 private
   FGridPts: ArrayOfArrayOfDeformedPoint;
   FRowCount, FColumnCount: integer;
-  FShowGrid, FInitialized: boolean;
+  FShowGrid, FGridInitialized: boolean;
   FDeformationType: TDeformationType;
   FTimeCount: single;
   FCellHeight, FCellWidth: single;
@@ -84,7 +84,7 @@ procedure TDeformationGrid.Init;
 begin
   inherited Init;
   FShowGrid := FALSE;
-  FInitialized := False;
+  FGridInitialized := False;
 
   FDeformationType := dtNone;
 
@@ -102,7 +102,7 @@ var ix, iy: integer;
 begin
   inherited Update(aElapsedTime);
   if FFreeze then exit;
-  if (FDeformationType = dtNone) or not FInitialized then exit;
+  if (FDeformationType = dtNone) or not FGridInitialized then exit;
 
   DeformationSpeed.OnElapse(aElapsedTime);
   Amplitude.OnElapse(aElapsedTime);
@@ -215,7 +215,7 @@ var WholeTexCoor, PartTexCoor, ScreenCellCoor: TQuadCoor;
     ix, iy, ixf, iyf: integer;
     pt1, pt2: TPointF;
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   WholeTexCoor := FTexture^.FramesCoord[trunc(FFrame)];
 
   ty := WholeTexCoor[cTL].y;
@@ -301,13 +301,13 @@ begin
       TimeMultiplicator := 1.0;
     end;
    end;
-  FInitialized := True;
+  FGridInitialized := True;
 end;
 
 procedure TDeformationGrid.SetDeformationAmountOnRow(aRowIndex: integer; aDeformationAmount: single);
 var i: integer;
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   for i:=0 to FColumnCount do
     FGridPts[aRowIndex][i].DeformationAmount := aDeformationAmount;
 end;
@@ -315,7 +315,7 @@ end;
 procedure TDeformationGrid.SetDeformationAmountOnColumn(aColIndex: integer; aDeformationAmount: single);
 var i: integer;
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   for i:=0 to FRowCount do
     FGridPts[i][aColIndex].DeformationAmount := aDeformationAmount;
 end;
@@ -323,7 +323,7 @@ end;
 procedure TDeformationGrid.SetTimeMultiplicatorOnRow(aRowIndex: integer; aTimeMultiplicator: single);
 var i: integer;
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   for i:=0 to FColumnCount do
     FGridPts[aRowIndex][i].TimeMultiplicator := aTimeMultiplicator;
 end;
@@ -331,14 +331,14 @@ end;
 procedure TDeformationGrid.SetTimeMultiplicatorOnColumn(aColIndex: integer; aTimeMultiplicator: single);
 var i: integer;
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   for i:=0 to FRowCount do
     FGridPts[i][aColIndex].TimeMultiplicator := aTimeMultiplicator;
 end;
 
 procedure TDeformationGrid.SetDeformationAmountOnAllSide(aDeformationAmount: single);
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   SetDeformationAmountOnRow(0, aDeformationAmount);
   SetDeformationAmountOnRow(FRowCount, aDeformationAmount);
   SetDeformationAmountOnColumn(0, aDeformationAmount);
@@ -347,7 +347,7 @@ end;
 
 procedure TDeformationGrid.SetTimeMultiplicatorOnAllSide(aTimeMultiplicator: single);
 begin
-  if not FInitialized then exit;
+  if not FGridInitialized then exit;
   SetTimeMultiplicatorOnRow(0, aTimeMultiplicator);
   SetTimeMultiplicatorOnRow(FRowCount, aTimeMultiplicator);
   SetTimeMultiplicatorOnColumn(0, aTimeMultiplicator);
