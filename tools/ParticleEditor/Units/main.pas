@@ -51,6 +51,8 @@ type
     Edit8: TEdit;
     Edit9: TEdit;
     FrameShowColor1: TFrameShowColor;
+    Label31: TLabel;
+    Label32: TLabel;
     Label45: TLabel;
     Label46: TLabel;
     Label47: TLabel;
@@ -101,6 +103,7 @@ type
     TBParticleAngularVelocity: TTrackBar;
     TBParticleAngularVelocityVariation: TTrackBar;
     TB20: TTrackBar;
+    Timer1: TTimer;
     VelocityCurve: TFrameEditCurve;
     Label1: TLabel;
     Label10: TLabel;
@@ -229,6 +232,7 @@ type
     procedure TBParticleCountChange(Sender: TObject);
     procedure TBParticleLifeChange(Sender: TObject);
     procedure TBParticleAngleChange(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     FMouseState: TMouseState;
     FClickOrigin, FViewOffset: TPoint;
@@ -692,34 +696,12 @@ var p: TPointF;
 begin
   if (Button = mbRight) and (FMouseState = msIdle) then begin
     if (HomeScreen <> NIL) and (PE <> NIL) then begin
-
       p.x := X/FScene.Width;
       p.y := Y/FScene.Height;
       r := HomeScreen.FCamera.GetViewRect;
-      p.x := r.Left + r.Width*p.x;// + FViewOffset.x;
-      p.y := r.Top + r.Height*p.y;// + FViewOffset.y;
-
-      Caption := 'Scene: '+FScene.Width.ToString+','+FScene.Height.ToString+
-                 '  FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
-                 '  Zoom = '+FormatFloat('0.00', Zoom)+
-                 '  clicked canvas = ('+X.ToString+','+Y.ToString+')'+
-                 '  clicked transformed = ('+Round(p.x).ToString+','+Round(p.y).ToString+')';
-
-      //PE.SetCoordinate(PointF(FViewOffset.x, FViewOffset.y)+HomeScreen.FCamera.LookAt.Value);//(FViewOffset.x-X, FViewOffset.y-Y);
-
-     //p := HomeScreen.FCamera.ScreenToScene(PointF(X,Y)); // + PointF(FViewOffset)*Zoom;
-
-     //p := PointF(X,Y)+PointF(FViewOffset)*Zoom;
-
- {    p := ClientToWord(Point(X,Y));
-     p.x := p.x + FScene.Width * 0.5;
-     p.y := p.y + FScene.Height * 0.5;    }
-
-     //p := PointF(FViewOffset);
-     //p := p + PointF(X,Y);
-     //p := p *Zoom;
-
-     PE.SetCoordinate(p);
+      p.x := r.Left + r.Width*p.x;
+      p.y := r.Top + r.Height*p.y;
+      PE.SetCoordinate(p);
     end;
   end;
 
@@ -730,8 +712,13 @@ end;
 procedure TForm_Principale.OGLMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 var p1, p2, p: TPointF;
+  r: TRectF;
 begin
-  p1 := ClientToWord(MousePos);
+  r := HomeScreen.FCamera.GetViewRect;
+
+  p1.x := r.Left + r.Width*MousePos.x/FScene.Width;
+  p1.y := r.Top + r.Height*MousePos.y/FScene.Height;
+//  p1 := ClientToWord(MousePos);
 
   if WheelDelta < 0 then
     Zoom := Zoom - Zoom*0.2
@@ -740,14 +727,13 @@ begin
   HomeScreen.ApplyViewZoom(Zoom);
 
   // moves the view
-{  p2 := ClientToWord(MousePos);
+  r := HomeScreen.FCamera.GetViewRect;
+  p2.x := r.Left + r.Width*MousePos.x/FScene.Width;
+  p2.y := r.Top + r.Height*MousePos.y/FScene.Height;
   p := (p2-p1)*Zoom;
-  FViewOffset := FViewOffset + p.Round;  }
+  FViewOffset := FViewOffset - p.Round;
 
   HomeScreen.ApplyViewOffset(FViewOffset);
-
-  Caption := 'FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
-             '  Zoom = '+FormatFloat('0.00', Zoom);
 
   Handled := TRUE;
 end;
@@ -875,6 +861,11 @@ begin
   PE.FParticleParam.StartAngle := TBParticleAngle.Position;
   PE.FParticleParam.StartAngleVariation := TBParticleAngleVariation.Position;
   SetWindowTitle(True);
+end;
+
+procedure TForm_Principale.Timer1Timer(Sender: TObject);
+begin
+  if PE <> NIL then Label32.Caption := PE.ParticlesCount.ToString;
 end;
 
 procedure TForm_Principale.DoLoopMoveView;
