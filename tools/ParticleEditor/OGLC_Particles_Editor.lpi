@@ -1257,6 +1257,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Main"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="689"/>
         <CursorPos X="54" Y="701"/>
@@ -2001,10 +2002,9 @@
       </Unit250>
       <Unit251>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="136"/>
-        <CursorPos X="46" Y="151"/>
+        <TopLine Value="177"/>
+        <CursorPos X="42" Y="199"/>
         <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit251>
@@ -2093,44 +2093,44 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="63" Column="23" TopLine="55"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="275" Column="10" TopLine="261"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="200" Column="3" TopLine="195"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="912" Column="17" TopLine="899"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="51" Column="19" TopLine="42"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="240" Column="33" TopLine="230"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="164" Column="3" TopLine="159"/>
+        <Filename Value="Units\main.pas"/>
+        <Caret Line="241" Column="26" TopLine="230"/>
       </Position4>
       <Position5>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="275" Column="10" TopLine="261"/>
+        <Caret Line="721" TopLine="710"/>
       </Position5>
       <Position6>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="912" Column="17" TopLine="899"/>
+        <Caret Line="895" Column="39" TopLine="872"/>
       </Position6>
       <Position7>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="240" Column="33" TopLine="230"/>
+        <Caret Line="241" TopLine="228"/>
       </Position7>
       <Position8>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="241" Column="26" TopLine="230"/>
+        <Caret Line="894" Column="39" TopLine="880"/>
       </Position8>
       <Position9>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="721" TopLine="710"/>
+        <Caret Line="241" Column="26" TopLine="228"/>
       </Position9>
       <Position10>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="895" Column="39" TopLine="872"/>
+        <Caret Line="894" Column="39" TopLine="871"/>
       </Position10>
       <Position11>
         <Filename Value="Units\main.pas"/>
@@ -2138,15 +2138,15 @@
       </Position11>
       <Position12>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="894" Column="39" TopLine="880"/>
+        <Caret Line="893" Column="37" TopLine="879"/>
       </Position12>
       <Position13>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="241" Column="26" TopLine="228"/>
+        <Caret Line="241" Column="24" TopLine="228"/>
       </Position13>
       <Position14>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="894" Column="39" TopLine="871"/>
+        <Caret Line="893" Column="37" TopLine="870"/>
       </Position14>
       <Position15>
         <Filename Value="Units\main.pas"/>
@@ -2154,63 +2154,63 @@
       </Position15>
       <Position16>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="893" Column="37" TopLine="879"/>
+        <Caret Line="892" TopLine="872"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="241" Column="24" TopLine="228"/>
+        <Filename Value="Units\screen_home.pas"/>
+        <Caret Line="31" Column="23" TopLine="13"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="893" Column="37" TopLine="870"/>
+        <Filename Value="Units\screen_home.pas"/>
+        <Caret Line="133" TopLine="109"/>
       </Position18>
       <Position19>
         <Filename Value="Units\main.pas"/>
-        <Caret Line="241" TopLine="228"/>
+        <Caret Line="243" Column="15" TopLine="182"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="892" TopLine="872"/>
+        <Filename Value="..\..\source\oglcCamera.inc"/>
+        <Caret Line="164" Column="30" TopLine="159"/>
       </Position20>
       <Position21>
-        <Filename Value="Units\screen_home.pas"/>
-        <Caret Line="31" Column="23" TopLine="13"/>
+        <Filename Value="..\..\source\oglcCamera.inc"/>
+        <Caret Line="48" Column="12" TopLine="39"/>
       </Position21>
       <Position22>
-        <Filename Value="Units\screen_home.pas"/>
-        <Caret Line="133" TopLine="109"/>
+        <Filename Value="..\..\source\oglcCamera.inc"/>
+        <Caret Line="154" Column="3" TopLine="149"/>
       </Position22>
       <Position23>
-        <Filename Value="Units\main.pas"/>
-        <Caret Line="243" Column="15" TopLine="182"/>
+        <Filename Value="..\..\source\oglcCamera.inc"/>
+        <Caret Line="48" Column="12" TopLine="36"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="164" Column="30" TopLine="159"/>
+        <Caret Line="154" Column="3" TopLine="149"/>
       </Position24>
       <Position25>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="48" Column="12" TopLine="39"/>
+        <Caret Line="46" Column="12" TopLine="36"/>
       </Position25>
       <Position26>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="154" Column="3" TopLine="149"/>
+        <Caret Line="152" TopLine="144"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="48" Column="12" TopLine="36"/>
+        <Caret Line="160" Column="44" TopLine="136"/>
       </Position27>
       <Position28>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="154" Column="3" TopLine="149"/>
+        <Caret Line="63" Column="25" TopLine="45"/>
       </Position28>
       <Position29>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="46" Column="12" TopLine="36"/>
+        <Caret Line="203" Column="3" TopLine="198"/>
       </Position29>
       <Position30>
         <Filename Value="..\..\source\oglcCamera.inc"/>
-        <Caret Line="152" TopLine="144"/>
+        <Caret Line="62" Column="23" TopLine="51"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
