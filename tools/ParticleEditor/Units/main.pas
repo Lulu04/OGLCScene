@@ -693,11 +693,7 @@ var p: TPointF;
 begin
   if (Button = mbRight) and (FMouseState = msIdle) then begin
     if (HomeScreen <> NIL) and (PE <> NIL) then begin
-      p.x := X/FScene.Width;
-      p.y := Y/FScene.Height;
-      r := HomeScreen.FCamera.GetViewRect;
-      p.x := r.Left + r.Width*p.x;
-      p.y := r.Top + r.Height*p.y;
+      p := HomeScreen.FCamera.ControlToWorld(X, Y);
       PE.SetCoordinate(p);
     end;
   end;
@@ -709,12 +705,8 @@ end;
 procedure TForm_Principale.OGLMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 var p1, p2, p: TPointF;
-  r: TRectF;
 begin
-  r := HomeScreen.FCamera.GetViewRect;
-
-  p1.x := r.Left + r.Width*MousePos.x/FScene.Width;
-  p1.y := r.Top + r.Height*MousePos.y/FScene.Height;
+  p1 := HomeScreen.FCamera.ControlToWorld(MousePos.x, MousePos.y);
 
   if WheelDelta < 0 then
     Zoom := Zoom - Zoom*0.2
@@ -723,9 +715,7 @@ begin
   HomeScreen.ApplyViewZoom(Zoom);
 
   // moves the view
-  r := HomeScreen.FCamera.GetViewRect;
-  p2.x := r.Left + r.Width*MousePos.x/FScene.Width;
-  p2.y := r.Top + r.Height*MousePos.y/FScene.Height;
+  p2 := HomeScreen.FCamera.ControlToWorld(MousePos.x, MousePos.y);
   p := (p2-p1)*Zoom;
   FViewOffset := FViewOffset - p.Round;
 

@@ -42,10 +42,10 @@ public
   // gives the distance between a point and the camera lookAt value
   function DistanceToPoint( aPt: TPointF ): single;
 
-  // converts a world point coordinate to screen coordinate relative to camera view
-  function WorldToScreen( aPt: TPointF ): TPointF;
-  // converts a screen coordinates to world coordinates according to camera transformations
-  function ScreenToWorld(aScreenPt: TPoint): TPointF;
+  // converts a world coordinates to TOpenGLCcontrol coordinates according to camera transformations
+  function WorldToControl( aPt: TPointF ): TPoint;
+  // converts a TOpenGLCcontrol coordinates to world coordinates according to camera transformations
+  function ControlToWorld(aX, aY: integer): TPointF;
 
   // return the bounds of the view currently seen by the camera (in scene coordinates)
   function GetViewRect: TRectF;
@@ -143,19 +143,19 @@ begin
   Result := aPt.Distance(LookAt.Value);
 end;
 
-function TOGLCCamera.WorldToScreen(aPt: TPointF): TPointF;
+function TOGLCCamera.WorldToControl(aPt: TPointF): TPoint;
 var r: TRectF;
 begin
   r := GetViewRect;
-  Result.x := aPt.x / r.Width * FParentScene.Width;
-  Result.y := aPt.y / r.Height * FParentScene.Height;
+  Result.x := Round(aPt.x / r.Width * FParentScene.Width);
+  Result.y := Round(aPt.y / r.Height * FParentScene.Height);
 end;
 
-function TOGLCCamera.ScreenToWorld(aScreenPt: TPoint): TPointF;
+function TOGLCCamera.ControlToWorld(aX, aY: integer): TPointF;
 var r: TRectF;
 begin
-  Result.x := aScreenPt.x / FParentScene.Width;
-  Result.y := aScreenPt.y / FParentScene.Height;
+  Result.x := aX / FParentScene.Width;
+  Result.y := aY / FParentScene.Height;
   r := GetViewRect;
   Result.x := r.Left + r.Width * Result.x;
   Result.y := r.Top + r.Height * Result.y;
