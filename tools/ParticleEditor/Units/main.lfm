@@ -1340,6 +1340,30 @@ object Form_Principale: TForm_Principale
               ShowSelRange = False
               TabOrder = 17
             end
+            object Label31: TLabel
+              AnchorSideTop.Control = Panel1
+              AnchorSideRight.Control = Label32
+              Left = 247
+              Height = 15
+              Top = 0
+              Width = 81
+              Anchors = [akTop, akRight]
+              BorderSpacing.Right = 5
+              Caption = 'Particles count:'
+              ParentColor = False
+            end
+            object Label32: TLabel
+              AnchorSideTop.Control = Panel1
+              AnchorSideRight.Control = Panel1
+              AnchorSideRight.Side = asrBottom
+              Left = 333
+              Height = 15
+              Top = 0
+              Width = 6
+              Anchors = [akTop, akRight]
+              Caption = '0'
+              ParentColor = False
+            end
           end
         end
       end
@@ -1520,5 +1544,11 @@ object Form_Principale: TForm_Principale
     Title = 'Open an image'
     Left = 431
     Top = 261
+  end
+  object Timer1: TTimer
+    Interval = 200
+    OnTimer = Timer1Timer
+    Left = 575
+    Top = 64
   end
 end
