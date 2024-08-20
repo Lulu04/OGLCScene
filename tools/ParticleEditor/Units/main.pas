@@ -238,9 +238,6 @@ type
     FClickOrigin, FViewOffset: TPoint;
     FZoom: single;
     procedure DoLoopMoveView;
-    function ClientToWord(pt: TPoint): TPointF;
-    function WordToClient(pt: TPointF): TPoint;
-    function MatrixView: TOGLCMatrix;
   private
     FInitializing: boolean;
     procedure UpdateWidgets;
@@ -272,7 +269,7 @@ var
   Form_Principale: TForm_Principale;
 
 implementation
-uses Math, BGRATransform, Matrix;
+uses Math;
 
 {$R *.lfm}
 
@@ -718,7 +715,6 @@ begin
 
   p1.x := r.Left + r.Width*MousePos.x/FScene.Width;
   p1.y := r.Top + r.Height*MousePos.y/FScene.Height;
-//  p1 := ClientToWord(MousePos);
 
   if WheelDelta < 0 then
     Zoom := Zoom - Zoom*0.2
@@ -891,27 +887,6 @@ begin
   OGL.Cursor := crDefault;
   Caption := 'FViewOffset = '+FViewOffset.x.ToString+','+FViewOffset.y.ToString+
              '  Zoom = '+FormatFloat('0.00', Zoom);
-end;
-
-function TForm_Principale.ClientToWord(pt: TPoint): TPointF;
-var mInv: TOGLCMatrix;
-begin
-  mInv.Matrix := InverseMat(MatrixView.Matrix);
-  Result := mInv.Transform(PointF(pt));
-end;
-
-function TForm_Principale.WordToClient(pt: TPointF): TPoint;
-var pf: TPointF;
-begin
-  pf := MatrixView.Transform(pt);
-  Result.x := Trunc(pf.x);
-  Result.y := Trunc(pf.y);
-end;
-
-function TForm_Principale.MatrixView: TOGLCMatrix;
-begin
-  Result.SetAsTranslation(FViewOffset.x, FViewOffset.y);
-  Result.Scale(FZoom, FZoom);
 end;
 
 procedure TForm_Principale.UpdateWidgets;

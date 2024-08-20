@@ -125,19 +125,11 @@ end;
 procedure THomeScreen.ApplyViewOffset(const aOffset: TPoint);
 begin
   FCamera.MoveTo(FScene.Center + PointF(aOffset));
-{  PE.SetCoordinate(FScene.Center-PointF(aOffset));
-  FBackGroundRainbow.SetCenterCoordinate(FScene.Center-PointF(aOffset));
-  FBackGroundColor.SetCenterCoordinate(FScene.Center-PointF(aOffset));
-  if FBackgroundImage <> NIL then FBackgroundImage.SetCenterCoordinate(FScene.Center-PointF(aOffset)); }
 end;
 
 procedure THomeScreen.ApplyViewZoom(aZoom: single);
 begin
   FCamera.Scale.Value := PointF(aZoom, aZoom);
-{  PE.Scale.Value := PointF(aZoom, aZoom);
-  FBackGroundRainbow.Scale.Value := PointF(aZoom, aZoom);
-  FBackGroundColor.Scale.Value := PointF(aZoom, aZoom);
-  if FBackgroundImage <> NIL then FBackgroundImage.Scale.Value := PointF(aZoom, aZoom); }
 end;
 
 end.
