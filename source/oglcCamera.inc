@@ -37,13 +37,16 @@ end;
 { TOGLCCamera }
 
 TOGLCCamera = class
- FParentScene: TOGLCScene;
- FPreviousModelViewMatrix: TOGLCMatrix;
- // Don't create a TCamera instance directly by TOGLCCamera.Create
- // Use instead TOGLCScene.CreateCamera
- constructor Create;
- destructor Destroy; override;
- procedure Update( const AElapsedTime: single );
+  FParentScene: TOGLCScene;
+  FPreviousModelViewMatrix: TOGLCMatrix;
+  // Don't create a TCamera instance directly by TOGLCCamera.Create
+  // Use instead TOGLCScene.CreateCamera
+  constructor Create;
+  destructor Destroy; override;
+  procedure Update( const AElapsedTime: single );
+private
+  FShakerDeltaX, FShakerDeltaY, FShakerDurationMin, FShakerDurationMax,
+  FShakerTimeReference, FShakerTimeAccu, FShakerComputedX, FShakerComputedY: single;
 protected
   procedure Use;
   procedure Release;
@@ -61,6 +64,10 @@ public
   // reset camera to scene center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
 
+  procedure StartShaker(aDeltaX, aDeltaY, aDuration: single);
+  procedure StartShaker(aDeltaX, aDeltaY, aDurationMin, aDurationMax: single);
+  procedure StopShaker;
+
   // gives the distance between a point and the camera lookAt value
   function DistanceToPoint( aPt: TPointF ): single;
 
@@ -76,7 +83,7 @@ public
   // translate the camera to the center of the target surface
 //  procedure CenterAndZoomOn( aTargetSurface: TSimpleSurfaceWithEffect );
 
-  // return the bounds of the view currently centered by the camera
+  // return the bounds of the view currently seen by the camera
   // the coordinates are relative to the scene
   function GetViewRect: TRectF;
 
@@ -124,9 +131,20 @@ end;
 
 procedure TOGLCCamera.Update(const AElapsedTime: single);
 begin
- LookAt.OnElapse( AElapsedTime );
- Scale.OnElapse( AElapsedTime );
- Angle.OnElapse( AElapsedTime );
+  LookAt.OnElapse(AElapsedTime);
+  Scale.OnElapse(AElapsedTime);
+  Angle.OnElapse(AElapsedTime);
+
+  // update shaker effect
+  if (FShakerDeltaX = 0) and (FShakerDeltaY = 0) then exit;
+  FShakerTimeAccu := FShakerTimeAccu + AElapsedTime;
+  if FShakerTimeAccu >= FShakerTimeReference then begin
+    FShakerTimeAccu := FShakerTimeAccu - FShakerTimeReference;
+    FShakerTimeReference := Random*(FShakerDurationMax-FShakerDurationMin) + FShakerDurationMin;
+    // compute new offset values
+    FShakerComputedX := random*FShakerDeltaX - FShakerDeltaX*0.5;
+    FShakerComputedY := random*FShakerDeltaY - FShakerDeltaY*0.5;
+  end;
 end;
 
 procedure TOGLCCamera.Reset(aDuration: single; aCurve:Word);
@@ -134,6 +152,36 @@ begin
  LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
  Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
  Angle.ChangeTo( 0, aDuration, aCurve );
+end;
+
+procedure TOGLCCamera.StartShaker(aDeltaX, aDeltaY, aDuration: single);
+begin
+  StartShaker(aDeltaX, aDeltaY, aDuration, aDuration);
+end;
+
+procedure TOGLCCamera.StartShaker(aDeltaX, aDeltaY, aDurationMin, aDurationMax: single);
+begin
+  FShakerDeltaX := aDeltaX;
+  FShakerDeltaY := aDeltaY;
+  FShakerDurationMin := aDurationMin;
+  FShakerDurationMax := aDurationMax;
+  FShakerTimeAccu := 0;
+  FShakerTimeReference := Random*(aDurationMax-aDurationMin) + aDurationMin;
+  if (aDeltaX = 0) and (aDeltaY = 0) then begin
+    FShakerComputedX := 0;
+    FShakerComputedY := 0;
+  end else begin
+   FShakerComputedX := Random*aDeltaX - aDeltaX*0.5;
+   FShakerComputedY := Random*aDeltaY - aDeltaY*0.5;
+  end;
+end;
+
+procedure TOGLCCamera.StopShaker;
+begin
+  FShakerDeltaX := 0;
+  FShakerDeltaY := 0;
+  FShakerComputedX := 0;
+  FShakerComputedY := 0;
 end;
 
 function TOGLCCamera.DistanceToPoint(aPt: TPointF): single;
@@ -154,12 +202,21 @@ end;
 function TOGLCCamera.ScreenToScene(aPt: TPointF): TPointF;
 var coefx, coefy: single;
   vr: TRectF;
+  m, mInv: TOGLCMatrix;
 begin
- coefx := aPt.x/FParentScene.Width;
+{ coefx := aPt.x/FParentScene.Width;
  coefy := aPt.y/FParentScene.Height;
  vr := GetViewRect;
  Result.x := vr.Left+vr.Width*coefx;
- Result.y := vr.Top+vr.Height*coefy;
+ Result.y := vr.Top+vr.Height*coefy;  }
+
+ m.LoadIdentity;
+ m.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                FParentScene.Width*0.5, FParentScene.Height*0.5,
+                LookAt.x.Value, LookAt.y.Value);
+//m.Matrix := MultMat(m.Matrix, FParentScene.ProjectionMatrix.Matrix);
+ mInv.Matrix := InverseMat(m.Matrix);
+ Result := mInv.Transform(aPt);
 end;
 
 function TOGLCCamera.GetViewRect: TRectF;
@@ -210,10 +267,9 @@ var tx, ty, sx, sy, a: single;
   doscale, dorotate: boolean;
 begin
  FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
-
- FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+  FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                                            FParentScene.Width*0.5, FParentScene.Height*0.5,
-                                           LookAt.x.Value, LookAt.y.Value);
+                                           LookAt.x.Value+FShakerComputedX, LookAt.y.Value+FShakerComputedY);
 
 { tx := FParentScene.Width*0.5;
  ty := FParentScene.Height*0.5;
