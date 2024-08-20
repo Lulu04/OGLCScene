@@ -115,6 +115,8 @@ public
   function AddTexturedFont(aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont; reintroduce;
   // Draw the string on an image then add it to the atlas.
   function AddString(const aString: string; aFont: TFontDescriptor; aFillTexture: TBGRABitmap): PTexture;
+  // Load the image, if needed resize it according the scene PPI and add it to the atlas.
+  function AddScaledPPI(const aFilename: string): PTexture;
 
   // After a successfull TryToPack, you can call this method to build the whole
   // texture atlas and its sub-textures.
@@ -598,6 +600,14 @@ function TOGLCTextureAtlas.AddString(const aString: string; aFont: TFontDescript
         aFillTexture: TBGRABitmap): PTexture;
 begin
   Result := Add(aFont.StringToBitmap(aString, aFillTexture));
+end;
+
+function TOGLCTextureAtlas.AddScaledPPI(const aFilename: string): PTexture;
+var ima: TBGRABitmap;
+begin
+  ima := LoadBitmapScaledPPI(FParentScene, aFileName);
+  Result := InitFromBitmap(ima, ima.Width, ima.Height);
+  Result^.Filename := ExtractFilename(aFilename);
 end;
 
 procedure TOGLCTextureAtlas.Build(aForceSizePowerOfTwo: boolean; aForceSquare: boolean);
