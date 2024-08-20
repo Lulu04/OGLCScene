@@ -2,7 +2,7 @@
 {
   This file is originaly written by Chris Rorden and modified for OGLCScene.
   You can find the original at
-    https://github.com/neurolabusc/OpenGLCoreTutorials/gl_core_matrix.pas
+    https://github.com/neurolabusc/OpenGLCoreTutorials/blob/master/gl_core_matrix.pas
 }
 
 
@@ -32,10 +32,17 @@ type
     procedure Rotate(const aAngleDeg: single);
 
     function Transform(const aPt: TPointF): TPointF;
+    function Transform(const aRect: TRectF): TRectF;
+
+    function Inverse: TOGLCMatrix;
   end;
   POGLCMatrix = ^TOGLCMatrix;
 
   function MultMat(const m1, m2: TOGLCMatrix44): TOGLCMatrix44;
+  // this one don't work, see the next
+  function InverseMat(const m: TOGLCMatrix44): TOGLCMatrix44;
+  // https://github.com/neurolabusc/Metal-Demos/blob/5ddd15005f7eb9a48620cf74ebd929dc11f83c73/common/VectorMath.pas
+  function InverseMat2(const m: TOGLCMatrix44): TOGLCMatrix44;
 
 type
 
@@ -135,6 +142,70 @@ begin
                      m1[i, 2] * m2[2, j] + m1[i, 3] * m2[3, j];
 end;
 
+function InverseMat(const m: TOGLCMatrix44): TOGLCMatrix44;
+//invert matrix see nifti_mat44_inverse( mat44 R )
+// http://niftilib.sourceforge.net/c_api_html/nifti1__io_8h.html#a36
+var
+   r11,r12,r13,r21,r22,r23,r31,r32,r33,v1,v2,v3 , deti: double;
+begin
+  r11 := m[0,0]; r12 := m[0,1]; r13 := m[0,2];
+  r21 := m[1,0]; r22 := m[1,1]; r23 := m[1,2];
+  r31 := m[2,0]; r32 := m[2,1]; r33 := m[2,2];
+  v1  := m[0,3]; v2  := m[1,3]; v3  := m[2,3];
+  deti := r11*r22*r33-r11*r32*r23-r21*r12*r33
+  +r21*r32*r13+r31*r12*r23-r31*r22*r13 ;
+  if( deti <> 0.0 ) then deti := 1.0 / deti ;
+  Result[0,0] := deti*( r22*r33-r32*r23) ;
+  Result[0,1] := deti*(-r12*r33+r32*r13) ;
+  Result[0,2] := deti*( r12*r23-r22*r13) ;
+  Result[0,3] := deti*(-r12*r23*v3+r12*v2*r33+r22*r13*v3
+                    -r22*v1*r33-r32*r13*v2+r32*v1*r23) ;
+  Result[1,0] := deti*(-r21*r33+r31*r23) ;
+  Result[1,1] := deti*( r11*r33-r31*r13) ;
+  Result[1,2] := deti*(-r11*r23+r21*r13) ;
+  Result[1,3] := deti*( r11*r23*v3-r11*v2*r33-r21*r13*v3
+                    +r21*v1*r33+r31*r13*v2-r31*v1*r23) ;
+  Result[2,0] := deti*( r21*r32-r31*r22) ;
+  Result[2,1] := deti*(-r11*r32+r31*r12) ;
+  Result[2,2] := deti*( r11*r22-r21*r12) ;
+  Result[2,3] := deti*(-r11*r22*v3+r11*r32*v2+r21*r12*v3
+                    -r21*r32*v1-r31*r12*v2+r31*r22*v1) ;
+  Result[3,0] := 0;
+  Result[3,1] := 0;
+  Result[3,2] := 0;
+  Result[3,3] := 1;
+  if (deti = 0.0) then Result[3,3] := 0; // failure flag if deti = 0
+end;
+
+function InverseMat2(const m: TOGLCMatrix44): TOGLCMatrix44;
+var t0, t4, t8, t12, d: single;
+begin
+  t0:=(((m[1,1]*m[2,2]*m[3,3])-(m[1,1]*m[2,3]*m[3,2]))-(m[2,1]*m[1,2]*m[3,3])+(m[2,1]*m[1,3]*m[3,2])+(m[3,1]*m[1,2]*m[2,3]))-(m[3,1]*m[1,3]*m[2,2]);
+  t4:=((((-(m[1,0]*m[2,2]*m[3,3]))+(m[1,0]*m[2,3]*m[3,2])+(m[2,0]*m[1,2]*m[3,3]))-(m[2,0]*m[1,3]*m[3,2]))-(m[3,0]*m[1,2]*m[2,3]))+(m[3,0]*m[1,3]*m[2,2]);
+  t8:=((((m[1,0]*m[2,1]*m[3,3])-(m[1,0]*m[2,3]*m[3,1]))-(m[2,0]*m[1,1]*m[3,3]))+(m[2,0]*m[1,3]*m[3,1])+(m[3,0]*m[1,1]*m[2,3]))-(m[3,0]*m[1,3]*m[2,1]);
+  t12:=((((-(m[1,0]*m[2,1]*m[3,2]))+(m[1,0]*m[2,2]*m[3,1])+(m[2,0]*m[1,1]*m[3,2]))-(m[2,0]*m[1,2]*m[3,1]))-(m[3,0]*m[1,1]*m[2,2]))+(m[3,0]*m[1,2]*m[2,1]);
+  d:=(m[0,0]*t0)+(m[0,1]*t4)+(m[0,2]*t8)+(m[0,3]*t12);
+  if d<>0.0 then begin
+   d:=1.0/d;
+   result[0,0]:=t0*d;
+   result[0,1]:=(((((-(m[0,1]*m[2,2]*m[3,3]))+(m[0,1]*m[2,3]*m[3,2])+(m[2,1]*m[0,2]*m[3,3]))-(m[2,1]*m[0,3]*m[3,2]))-(m[3,1]*m[0,2]*m[2,3]))+(m[3,1]*m[0,3]*m[2,2]))*d;
+   result[0,2]:=(((((m[0,1]*m[1,2]*m[3,3])-(m[0,1]*m[1,3]*m[3,2]))-(m[1,1]*m[0,2]*m[3,3]))+(m[1,1]*m[0,3]*m[3,2])+(m[3,1]*m[0,2]*m[1,3]))-(m[3,1]*m[0,3]*m[1,2]))*d;
+   result[0,3]:=(((((-(m[0,1]*m[1,2]*m[2,3]))+(m[0,1]*m[1,3]*m[2,2])+(m[1,1]*m[0,2]*m[2,3]))-(m[1,1]*m[0,3]*m[2,2]))-(m[2,1]*m[0,2]*m[1,3]))+(m[2,1]*m[0,3]*m[1,2]))*d;
+   result[1,0]:=t4*d;
+   result[1,1]:=((((m[0,0]*m[2,2]*m[3,3])-(m[0,0]*m[2,3]*m[3,2]))-(m[2,0]*m[0,2]*m[3,3])+(m[2,0]*m[0,3]*m[3,2])+(m[3,0]*m[0,2]*m[2,3]))-(m[3,0]*m[0,3]*m[2,2]))*d;
+   result[1,2]:=(((((-(m[0,0]*m[1,2]*m[3,3]))+(m[0,0]*m[1,3]*m[3,2])+(m[1,0]*m[0,2]*m[3,3]))-(m[1,0]*m[0,3]*m[3,2]))-(m[3,0]*m[0,2]*m[1,3]))+(m[3,0]*m[0,3]*m[1,2]))*d;
+   result[1,3]:=(((((m[0,0]*m[1,2]*m[2,3])-(m[0,0]*m[1,3]*m[2,2]))-(m[1,0]*m[0,2]*m[2,3]))+(m[1,0]*m[0,3]*m[2,2])+(m[2,0]*m[0,2]*m[1,3]))-(m[2,0]*m[0,3]*m[1,2]))*d;
+   result[2,0]:=t8*d;
+   result[2,1]:=(((((-(m[0,0]*m[2,1]*m[3,3]))+(m[0,0]*m[2,3]*m[3,1])+(m[2,0]*m[0,1]*m[3,3]))-(m[2,0]*m[0,3]*m[3,1]))-(m[3,0]*m[0,1]*m[2,3]))+(m[3,0]*m[0,3]*m[2,1]))*d;
+   result[2,2]:=(((((m[0,0]*m[1,1]*m[3,3])-(m[0,0]*m[1,3]*m[3,1]))-(m[1,0]*m[0,1]*m[3,3]))+(m[1,0]*m[0,3]*m[3,1])+(m[3,0]*m[0,1]*m[1,3]))-(m[3,0]*m[0,3]*m[1,1]))*d;
+   result[2,3]:=(((((-(m[0,0]*m[1,1]*m[2,3]))+(m[0,0]*m[1,3]*m[2,1])+(m[1,0]*m[0,1]*m[2,3]))-(m[1,0]*m[0,3]*m[2,1]))-(m[2,0]*m[0,1]*m[1,3]))+(m[2,0]*m[0,3]*m[1,1]))*d;
+   result[3,0]:=t12*d;
+   result[3,1]:=(((((m[0,0]*m[2,1]*m[3,2])-(m[0,0]*m[2,2]*m[3,1]))-(m[2,0]*m[0,1]*m[3,2]))+(m[2,0]*m[0,2]*m[3,1])+(m[3,0]*m[0,1]*m[2,2]))-(m[3,0]*m[0,2]*m[2,1]))*d;
+   result[3,2]:=(((((-(m[0,0]*m[1,1]*m[3,2]))+(m[0,0]*m[1,2]*m[3,1])+(m[1,0]*m[0,1]*m[3,2]))-(m[1,0]*m[0,2]*m[3,1]))-(m[3,0]*m[0,1]*m[1,2]))+(m[3,0]*m[0,2]*m[1,1]))*d;
+   result[3,3]:=(((((m[0,0]*m[1,1]*m[2,2])-(m[0,0]*m[1,2]*m[2,1]))-(m[1,0]*m[0,1]*m[2,2]))+(m[1,0]*m[0,2]*m[2,1])+(m[2,0]*m[0,1]*m[1,2]))-(m[2,0]*m[0,2]*m[1,1]))*d;
+  end;
+end;
+
 { TStraightLineEquation }
 
 procedure TStraightLineEquation.InitFrom(const pt1, pt2: TPointF);
@@ -229,9 +300,21 @@ end;
 
 function TOGLCMatrix.Transform(const aPt: TPointF): TPointF;
 begin
-  Result.x:= Matrix[0,0]*aPt.x + Matrix[1,0]*aPt.y + Matrix[3,0];
-  Result.y:= Matrix[0,1]*aPt.x + Matrix[1,1]*aPt.y + Matrix[3,1];
+  Result.x := Matrix[0,0]*aPt.x + Matrix[1,0]*aPt.y + Matrix[3,0];
+  Result.y := Matrix[0,1]*aPt.x + Matrix[1,1]*aPt.y + Matrix[3,1];
 end;
+
+function TOGLCMatrix.Transform(const aRect: TRectF): TRectF;
+begin
+  Result.TopLeft := Transform(aRect.TopLeft);
+  Result.BottomRight := Transform(aRect.BottomRight);
+end;
+
+function TOGLCMatrix.Inverse: TOGLCMatrix;
+begin
+  Result.Matrix := InverseMat2(Self.Matrix);
+end;
+
 
 function TOGLCMatrix.Data: pointer;
 begin
