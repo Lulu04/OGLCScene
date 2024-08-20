@@ -36,6 +36,8 @@ function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer)
 
 // return a TBGRABitmap from an SVG file with a size as described in svg file, but adjusted to PPI scene.
 function LoadBitmapFromSVGScaledPPI(aScene: TOGLCScene; const aSVGFilename: string): TBGRABitmap;
+// Load an image from file and resize it according to scene PPI.
+function LoadBitmapScaledPPI(aScene: TOGLCScene; const aFileName: string): TBGRABitmap;
 
 // splits each words of a text. #10(line feed) is considered as a line break
 function SplitTextToWordArray(aText: string; aCharSeparator: char=' '): TStringArray;
@@ -310,6 +312,16 @@ begin
  finally
    svg.Free;
  end;
+end;
+
+function LoadBitmapScaledPPI(aScene: TOGLCScene; const aFileName: string): TBGRABitmap;
+var w, h: integer;
+begin
+  Result := TBGRABitmap.Create(aFileName);
+  w := aScene.ScaleDesignToScene(Result.Width);
+  h := aScene.ScaleDesignToScene(Result.Height);
+  if (w <> Result.Width) or (h <> Result.Height) then
+    BGRAReplace(Result, Result.Resample(w, h));
 end;
 
 function SplitTextToWordArray(aText: string; aCharSeparator: char): TStringArray;
