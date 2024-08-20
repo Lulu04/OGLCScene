@@ -720,6 +720,7 @@ begin
       mv.AddTransform(X, Y, CurrentSize, CurrentSize, CurrentAngle, pivotX, pivotY);
       computedTint.InitFromBGRA(CurrentColor);
       computedTint.a := 1.0;
+      //computedTint.InitFromTint(TintMode, CurrentColor);
       computedOpacity := FComputedOpacity*CurrentColor.alpha*OneDiv255;
       renderer.PushQuad(Trunc(FrameIndex), 0, @mv.Matrix, computedOpacity, computedTint);
       {$IFDEF DEBUG_MODE_ON}
@@ -729,7 +730,6 @@ begin
        if yB < Y then yB := Y;
       {$ENDIF}
     end;
-//  renderer.Batch_Flush;
 
   if ParticlesPosRelativeToEmitterPos then PopSceneMV;
 
@@ -830,9 +830,7 @@ begin
      end else begin
        // load bitmap and resize it in respect of monitor PPI
        try
-         ima := TBGRABitmap.Create(fileToLoad);
-         BGRAReplace(ima, ima.Resample(FParentScene.ScaleDesignToScene(ima.Width),
-                                       FParentScene.ScaleDesignToScene(ima.Height)));
+         ima := LoadBitmapScaledPPI(FParentScene, fileToLoad);
          FParticleParam.Texture := FParentScene.TexMan.Add(ima,
                                             FParentScene.ScaleDesignToScene(SplittedText[0].ToInteger),
                                             FParentScene.ScaleDesignToScene(SplittedText[1].ToInteger));
@@ -847,7 +845,7 @@ begin
        FParticleParam.Texture^.Filename := ExtractFileName(fileToLoad);
      FParticleParam.TextureOwner := True;
    end else begin
-     // retrieves the texture from an atlas
+     // retrieves the texture from the atlas
      FParticleParam.Texture := aAtlas.RetrieveTextureByFileName(F.Strings[k+1]);
      FParticleParam.TextureOwner := False;
      if FParticleParam.Texture = NIL then begin

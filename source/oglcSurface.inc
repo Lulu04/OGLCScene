@@ -258,10 +258,10 @@ public  // Scenario
   // Center the surface on its parent
   procedure CenterOnParent;
 public // Matrix transform
-  // Apply transformations (translation, scale, rotation) on a matrix.
+  // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
   // Gives a matrix to transform point from surface space to scene space.
-  // (surface top left is (0,0))
+  // (surface space top left is (0,0))
   function GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
   // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
   // and without applying model view matrix.

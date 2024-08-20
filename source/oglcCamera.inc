@@ -37,13 +37,16 @@ end;
 { TOGLCCamera }
 
 TOGLCCamera = class
- FParentScene: TOGLCScene;
- FPreviousModelViewMatrix: TOGLCMatrix;
- // Don't create a TCamera instance directly by TOGLCCamera.Create
- // Use instead TOGLCScene.CreateCamera
- constructor Create;
- destructor Destroy; override;
- procedure Update( const AElapsedTime: single );
+  FParentScene: TOGLCScene;
+  FPreviousModelViewMatrix: TOGLCMatrix;
+  // Don't create a TCamera instance directly by TOGLCCamera.Create
+  // Use instead TOGLCScene.CreateCamera
+  constructor Create;
+  destructor Destroy; override;
+  procedure Update( const AElapsedTime: single );
+private
+  FShakerDeltaX, FShakerDeltaY, FShakerDurationMin, FShakerDurationMax,
+  FShakerTimeReference, FShakerTimeAccu, FShakerComputedX, FShakerComputedY: single;
 protected
   procedure Use;
   procedure Release;
@@ -61,6 +64,10 @@ public
   // reset camera to scene center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
 
+  procedure StartShaker(aDeltaX, aDeltaY, aDuration: single);
+  procedure StartShaker(aDeltaX, aDeltaY, aDurationMin, aDurationMax: single);
+  procedure StopShaker;
+
   // gives the distance between a point and the camera lookAt value
   function DistanceToPoint( aPt: TPointF ): single;
 
@@ -76,7 +83,7 @@ public
   // translate the camera to the center of the target surface
 //  procedure CenterAndZoomOn( aTargetSurface: TSimpleSurfaceWithEffect );
 
-  // return the bounds of the view currently centered by the camera
+  // return the bounds of the view currently seen by the camera
   // the coordinates are relative to the scene
   function GetViewRect: TRectF;
 
@@ -116,104 +123,150 @@ end;
 
 destructor TOGLCCamera.Destroy;
 begin
- FreeAndNil( LookAt );
- FreeAndNil( Scale );
- FreeAndNil( Angle );
- inherited Destroy;
+  FreeAndNil( LookAt );
+  FreeAndNil( Scale );
+  FreeAndNil( Angle );
+  inherited Destroy;
 end;
 
 procedure TOGLCCamera.Update(const AElapsedTime: single);
 begin
- LookAt.OnElapse( AElapsedTime );
- Scale.OnElapse( AElapsedTime );
- Angle.OnElapse( AElapsedTime );
+  LookAt.OnElapse(AElapsedTime);
+  Scale.OnElapse(AElapsedTime);
+  Angle.OnElapse(AElapsedTime);
+
+  // update shaker effect
+  if (FShakerDeltaX = 0) and (FShakerDeltaY = 0) then exit;
+  FShakerTimeAccu := FShakerTimeAccu + AElapsedTime;
+  if FShakerTimeAccu >= FShakerTimeReference then begin
+    FShakerTimeAccu := FShakerTimeAccu - FShakerTimeReference;
+    FShakerTimeReference := Random*(FShakerDurationMax-FShakerDurationMin) + FShakerDurationMin;
+    // compute new offset values
+    FShakerComputedX := random*FShakerDeltaX - FShakerDeltaX*0.5;
+    FShakerComputedY := random*FShakerDeltaY - FShakerDeltaY*0.5;
+  end;
 end;
 
 procedure TOGLCCamera.Reset(aDuration: single; aCurve:Word);
 begin
- LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
- Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
- Angle.ChangeTo( 0, aDuration, aCurve );
+  LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
+  Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
+  Angle.ChangeTo( 0, aDuration, aCurve );
+end;
+
+procedure TOGLCCamera.StartShaker(aDeltaX, aDeltaY, aDuration: single);
+begin
+  StartShaker(aDeltaX, aDeltaY, aDuration, aDuration);
+end;
+
+procedure TOGLCCamera.StartShaker(aDeltaX, aDeltaY, aDurationMin, aDurationMax: single);
+begin
+  FShakerDeltaX := aDeltaX;
+  FShakerDeltaY := aDeltaY;
+  FShakerDurationMin := aDurationMin;
+  FShakerDurationMax := aDurationMax;
+  FShakerTimeAccu := 0;
+  FShakerTimeReference := Random*(aDurationMax-aDurationMin) + aDurationMin;
+  if (aDeltaX = 0) and (aDeltaY = 0) then begin
+    FShakerComputedX := 0;
+    FShakerComputedY := 0;
+  end else begin
+   FShakerComputedX := Random*aDeltaX - aDeltaX*0.5;
+   FShakerComputedY := Random*aDeltaY - aDeltaY*0.5;
+  end;
+end;
+
+procedure TOGLCCamera.StopShaker;
+begin
+  FShakerDeltaX := 0;
+  FShakerDeltaY := 0;
+  FShakerComputedX := 0;
+  FShakerComputedY := 0;
 end;
 
 function TOGLCCamera.DistanceToPoint(aPt: TPointF): single;
 begin
- Result := aPt.Distance(LookAt.Value);
+  Result := aPt.Distance(LookAt.Value);
 end;
 
 function TOGLCCamera.WorldToScreen(aPt: TPointF): TPointF;
 begin
- Result := aPt + LookAt.Value;
+  Result := aPt + LookAt.Value;
 end;
 
 function TOGLCCamera.ScreenToWorld(aPt: TPointF): TPointF;
 begin
- Result := aPt - LookAt.Value;
+  Result := aPt - LookAt.Value;
 end;
 
 function TOGLCCamera.ScreenToScene(aPt: TPointF): TPointF;
 var coefx, coefy: single;
   vr: TRectF;
+  m, mInv: TOGLCMatrix;
 begin
- coefx := aPt.x/FParentScene.Width;
+{ coefx := aPt.x/FParentScene.Width;
  coefy := aPt.y/FParentScene.Height;
  vr := GetViewRect;
  Result.x := vr.Left+vr.Width*coefx;
- Result.y := vr.Top+vr.Height*coefy;
+ Result.y := vr.Top+vr.Height*coefy;  }
+
+  m.LoadIdentity;
+  m.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                 FParentScene.Width*0.5, FParentScene.Height*0.5,
+                 LookAt.x.Value, LookAt.y.Value);
+//m.Matrix := MultMat(m.Matrix, FParentScene.ProjectionMatrix.Matrix);
+  mInv.Matrix := InverseMat(m.Matrix);
+  Result := mInv.Transform(aPt);
 end;
 
 function TOGLCCamera.GetViewRect: TRectF;
 var vieww, viewh: single;
 begin
- vieww := FParentScene.Width/Scale.x.Value;
- viewh := FParentScene.Height/Scale.y.Value;
+  vieww := FParentScene.Width/Scale.x.Value;
+  viewh := FParentScene.Height/Scale.y.Value;
 
- Result.Left := LookAt.x.Value+FParentScene.Width*0.5-vieww*0.5;
- Result.Top := LookAt.y.Value+FParentScene.Height*0.5-viewh*0.5;
- Result.Width := vieww;
- Result.Height:= viewh;
+  Result.Left := LookAt.x.Value+FParentScene.Width*0.5-vieww*0.5;
+  Result.Top := LookAt.y.Value+FParentScene.Height*0.5-viewh*0.5;
+  Result.Right := Result.Left + vieww;
+  Result.Bottom := Result.Top + viewh;
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
 begin
- FParentScene.Layer[aLayerIndex].Camera := self;
+  FParentScene.Layer[aLayerIndex].Camera := self;
 end;
 
 procedure TOGLCCamera.AssignToLayer(const aLayerIndexList: array of integer);
-var
-  i: Integer;
+var i: Integer;
 begin
- with FParentScene do
-  for i:=0 to Length(aLayerIndexList)-1 do
-    AssignToLayer( aLayerIndexList[i] );
+  with FParentScene do
+   for i:=0 to Length(aLayerIndexList)-1 do
+     AssignToLayer( aLayerIndexList[i] );
 end;
 
 procedure TOGLCCamera.AssignToAllLayers;
-var
-  i: Integer;
+var i: Integer;
 begin
   for i:=0 to FParentScene.LayerCount-1 do
     AssignToLayer(i);
 end;
 
 procedure TOGLCCamera.Unassign;
-var
-  i: Integer;
+var i: Integer;
 begin
- for i:=0 to FParentScene.LayerCount-1 do
-   with FParentScene.Layer[i] do
-     if Camera = Self then Camera := NIL;
+  for i:=0 to FParentScene.LayerCount-1 do
+    with FParentScene.Layer[i] do
+      if Camera = Self then Camera := NIL;
 end;
 
 procedure TOGLCCamera.Use;
 var tx, ty, sx, sy, a: single;
   doscale, dorotate: boolean;
 begin
- FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
-
- FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
-                                           FParentScene.Width*0.5, FParentScene.Height*0.5,
-                                           LookAt.x.Value, LookAt.y.Value);
+  FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+   FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                                            FParentScene.Width*0.5, FParentScene.Height*0.5,
+                                            LookAt.x.Value+FShakerComputedX, LookAt.y.Value+FShakerComputedY);
 
 { tx := FParentScene.Width*0.5;
  ty := FParentScene.Height*0.5;
@@ -244,12 +297,12 @@ end;
 
 procedure TOGLCCamera.MoveTo(aPt: TPointF);
 begin
- LookAt.Value := FParentScene.Center-aPt;
+  LookAt.Value := FParentScene.Center-aPt;
 end;
 
 procedure TOGLCCamera.MoveTo(aPt: TPointF; aDuration: single; aCurve: Word);
 begin
- LookAt.ChangeTo( FParentScene.Center-aPt, aDuration, aCurve);
+  LookAt.ChangeTo( FParentScene.Center-aPt, aDuration, aCurve);
 end;
 
 { TScenarioForCamera }
@@ -257,44 +310,44 @@ end;
 procedure TScenarioForCamera.DecodeAction;
 var i: integer;
 begin
- if Length(Actions.Strings[CurrentLine]) = 0 then exit;
- FTemp := Actions.Strings[CurrentLine].Split([' ']);
+  if Length(Actions.Strings[CurrentLine]) = 0 then exit;
+  FTemp := Actions.Strings[CurrentLine].Split([' ']);
 
- case FTemp[0] of
-  acWait : WaitTime := StringToSingle( FTemp[1] );
+  case FTemp[0] of
+   acWait : WaitTime := StringToSingle( FTemp[1] );
 
-  acAngle : FParentCamera.Angle.Value := StringToSingle( FTemp[1] ) ;
-  acRotate : FParentCamera.Angle.AddConstant( StringToSingle( FTemp[1] ) );
-  acRotateTo : FParentCamera.Angle.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
+   acAngle : FParentCamera.Angle.Value := StringToSingle( FTemp[1] ) ;
+   acRotate : FParentCamera.Angle.AddConstant( StringToSingle( FTemp[1] ) );
+   acRotateTo : FParentCamera.Angle.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ),  StringToCurveID( FTemp[3] )  );
 
-  acScale : FParentCamera.Scale.Value := PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[1] ) );
-  acScaleChange : begin
-   FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
-   FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  end;
-  acScaleH : FParentCamera.Scale.x.Value := StringToSingle( FTemp[1] );
-  acScaleHChange : FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acScaleV : FParentCamera.Scale.y.Value := StringToSingle( FTemp[1] );
-  acScaleVChange : FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   acScale : FParentCamera.Scale.Value := PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[1] ) );
+   acScaleChange : begin
+    FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+    FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   end;
+   acScaleH : FParentCamera.Scale.x.Value := StringToSingle( FTemp[1] );
+   acScaleHChange : FParentCamera.Scale.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   acScaleV : FParentCamera.Scale.y.Value := StringToSingle( FTemp[1] );
+   acScaleVChange : FParentCamera.Scale.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
 
-  acMoveTo  : FParentCamera.LookAt.ChangeTo(PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] )), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ));
-  acMoveXTo : FParentCamera.LookAt.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
-  acMoveYTo : FParentCamera.LookAt.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   acMoveTo  : FParentCamera.LookAt.ChangeTo(PointF( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] )), StringToSingle( FTemp[3] ), StringToCurveID( FTemp[4] ));
+   acMoveXTo : FParentCamera.LookAt.x.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
+   acMoveYTo : FParentCamera.LookAt.y.ChangeTo( StringToSingle( FTemp[1] ), StringToSingle( FTemp[2] ), StringToCurveID( FTemp[3] ));
 
-  acCenterOnScene: FParentCamera.LookAt.ChangeTo( FParentCamera.FParentScene.Center,
-                                                  StringToSingle( FTemp[1] ),
-                                                  StringToCurveID( FTemp[2] ));
+   acCenterOnScene: FParentCamera.LookAt.ChangeTo( FParentCamera.FParentScene.Center,
+                                                   StringToSingle( FTemp[1] ),
+                                                   StringToCurveID( FTemp[2] ));
 
-  acLoop : CurrentLine := -1 ;
-  acLabel :;
-  acGotoLabel : begin
-   i := Actions.IndexOf( acLabel + ' ' + FTemp[1] );
-   if i <> -1 then CurrentLine := i - 1;
-  end;
+   acLoop : CurrentLine := -1 ;
+   acLabel :;
+   acGotoLabel : begin
+    i := Actions.IndexOf( acLabel + ' ' + FTemp[1] );
+    if i <> -1 then CurrentLine := i - 1;
+   end;
 
-  else if FScenarioDecodeProc<>NIL then FScenarioDecodeProc(FTemp); //DecodeAdditionnalAction( FTemp );
- end;//case
+   else if FScenarioDecodeProc<>NIL then FScenarioDecodeProc(FTemp); //DecodeAdditionnalAction( FTemp );
+  end;//case
 end;
 
 
