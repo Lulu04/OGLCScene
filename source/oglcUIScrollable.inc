@@ -979,9 +979,11 @@ var W: TStringArray;
       partialWord := '';
        repeat
          ch := FTexturedFont.GetCharByIndex(FWords[j].CharIndexes[k]);
-         if ww + ch^.OriginalCharSize.cx > Area.Width then break;
-         ww := ww + ch^.OriginalCharSize.cx;
-         partialWord := partialWord + ch^.Character;
+         if ch <> NIL then begin
+           if ww + ch^.OriginalCharSize.cx > Area.Width then break;
+           ww := ww + ch^.OriginalCharSize.cx;
+           partialWord := partialWord + ch^.Character;
+         end;
          inc(k);
        until k = Length(FWords[j].CharIndexes);
        // if no letter is placed -> exit
