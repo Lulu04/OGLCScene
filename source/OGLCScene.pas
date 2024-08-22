@@ -198,6 +198,7 @@ TOGLCCamera = class;
 {$I oglcUIModalPanel.inc}
 {$I oglcUtils.inc}
 {$I oglcEnvironment.inc}
+{$I oglcGpuInfo.inc}
 {$undef oglcINTERFACE}
 
 type
@@ -251,6 +252,7 @@ TOGLCContext = class(TLayerList)
   function MakeContextCurrent: boolean;
  public
   App: TApp;
+  Gpu: TGpuInfo;
   constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single); virtual;
   destructor Destroy; override;
 
@@ -859,6 +861,7 @@ end;
 {$I oglcUIModalPanel.inc}
 {$I oglcTexturedFont.inc}
 {$I oglcEnvironment.inc}
+{$I oglcGpuInfo.inc}
 {$undef oglcIMPLEMENTATION}
 
 { TOGLCScene }
@@ -956,7 +959,10 @@ procedure TOGLCScene.CreateLogFile(const aFilename: string; aDeletePrevious: boo
 begin
   FLog := TLog.Create(aFilename, aCallback, aCallbackData);
   if aDeletePrevious then FLog.DeleteLogFile;
-  FLog.Mess('Begin '+ApplicationName+' on platform '+App.OSName, 0, True);
+  FLog.Mess('Renderer: ' + Gpu.RendererName + '    version '+ Gpu.Version);
+  FLog.Mess('Total video ram: ' + Gpu.TotalVideoRamKb.ToString + ' Kb' +
+            '    Free video ram: ' + Gpu.FreeVideoRamKb.ToString + ' Kb');
+  FLog.Mess('Start '+ApplicationName+' on platform '+App.OSName, 0, True);
   FLog.AddEmptyLine;
 end;
 
@@ -1292,6 +1298,7 @@ end;
 procedure TOGLCScene.KillCamera(var aCamera: TOGLCCamera);
 var i: integer;
 begin
+  if aCamera = NIL then exit;
   for i:=0 to LayerCount-1 do
     if Layer[i].Camera = aCamera then Layer[i].Camera := NIL;
   FCameraList.Remove( aCamera );
