@@ -61,11 +61,10 @@ public
   procedure Draw(aResetBufferStateWhenDone: boolean=True); override;
   procedure Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aTexture: PTexture; aTextureUnit: integer;
     const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte; const aClipAreaF: TRectF);
-  procedure PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
+  procedure PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
 end;
 
 
-{ TTileEngine }
 const
 VALUE_NO_EVENT = -1;
 
@@ -314,7 +313,7 @@ begin
   FClipAreaF.Bottom := aClipAreaF.Bottom;
 end;
 
-procedure TOGLCTileRenderer.PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
+procedure TOGLCTileRenderer.PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
 var deltax, deltay: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
@@ -572,7 +571,7 @@ begin
               tileRenderer.Prepare(ptTriangles, FParentScene.MVPMatrix, currentTex, 0, FComputedOpacity, FComputedTint, BlendMode,
                                    clipArea);
             previousTex := currentTex;
-            tileRenderer.PushQuad(indexFrame, 0, xx, yy);
+            tileRenderer.PushFrame(indexFrame, 0, xx, yy);
           end else begin
             FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
             previousTex := NIL;
