@@ -38,7 +38,7 @@ public
   procedure DoDraw; override;
   Destructor Destroy; override;
 public
-  // the idea is to add offsets to the surface corner coordinates to allow deformations.
+  // the idea is to add offsets to the coordinates of the surface corners to allow deformations.
   // CornerOffset contains the offsets in pixels. Initial values are no offset.
   CornerOffset: TQuadParamF;
 end;
@@ -53,7 +53,10 @@ public
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
 public
+  // the idea is to set the center coordinate of the surface from polar coordinate.
+  // Polar coordinates are defined with a distance and an angle, and are relative to a center point.
   // changing the distance and/or angle automatically moves the sprite accordingly
+  // First initialize Polar.Center, then play with Polar.Distance and Polar.Angle
   Polar: TPolarSystemParam;
 end;
 TArrayOfTPolarSprite = array of TPolarSprite;
