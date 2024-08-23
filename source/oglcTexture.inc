@@ -6,7 +6,6 @@ PTexture = ^TTexture;
 TTexture = record
 private
   FParentScene: TOGLCScene;
-  //procedure InitFromBGRABitmap(aIma: TBGRABitmap);
   procedure ComputeOpenGLFramesCoord(aXFrameCount: Integer=1; aYFrameCount: Integer=1);
 public
   ID: GLuint;
@@ -104,41 +103,6 @@ end;
 {$ifdef oglcIMPLEMENTATION}
 
 { TTexture }
-
-{procedure TTexture.InitFromBGRABitmap(aIma: TBGRABitmap);
-var dup: TBGRABitmap;
-  glFormat: GLenum;
-begin
-  dup := aIma.Duplicate;
-
-  if TBGRAPixel_RGBAOrder then
-    {%H-}glFormat := GL_RGBA
-  else
-    {%H-}glFormat := GL_BGRA;
-
-  if dup.LineOrder = riloTopToBottom then
-    dup.VerticalFlip;
-
-  TextureWidth := dup.Width;
-  TextureHeight := dup.Height;
-  FrameWidth := dup.Width;
-  FrameHeight := dup.Height;
-  FrameCount := 1;
-  IDOwner := TRUE;
-
-
-  glGenTextures(1, @ID);
-  Bind;
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dup.Width , dup.Height, 0,
-               glFormat, GL_UNSIGNED_BYTE, dup.Data);
-
-  dup.Free;
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // Linear Filtering
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // Linear Filteringend;
-end; }
 
 procedure TTexture.SetSingleFrame;
 begin
@@ -431,68 +395,6 @@ begin
   end;
 end;
 
-{procedure TTexture.Create(const aFilename: string);
-var ima: TBGRABitmap;
-begin
-  try
-    ima := TBGRABitmap.Create(aFilename);
-    InitFromBGRABitmap(ima);
-    SetSingleFrame;
-    ima.Free;
-  except
-    raise Exception.Create('Texture: can''t load file '+aFilename);
-  end;
-end;
-
-procedure TTexture.Create(const aFilename: string; AFrameWidth, AFrameHeight: integer);
-begin
-  Create(aFilename);
-  SetFrameSize(AFrameWidth, AFrameHeight);
-end;
-
-procedure TTexture.Create(aImage: TBGRABitmap);
-begin
-  InitFromBGRABitmap(aImage);
-  SetSingleFrame;
-end;
-
-procedure TTexture.Create(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer);
-begin
-  Create(aImage);
-  SetFrameSize(AFrameWidth, AFrameHeight);
-end;
-
-procedure TTexture.CreateEmpty(aWidth, aHeight: integer);
-begin
-  TextureWidth := aWidth;
-  TextureHeight := aHeight;
-  FrameWidth := aWidth;
-  FrameHeight := aHeight;
-  FrameCount := 1;
-  IDOwner := TRUE;
-  SetSingleFrame;
-
-  glGenTextures(1, @ID);
-  Bind;
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TextureWidth,
-               TextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NIL);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); // Linear Filtering
-  //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR); // Linear Filtering
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-end;
-
-procedure TTexture.CreateFromSVG(const aSVGFilename: string; aWidth, aHeight: integer);
-var ima: TBGRABitmap;
-begin
-  ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
-  Create(ima);
-  ima.Free;
-end;    }
-
 { TTexturedChar }
 
 function TTexturedChar.ModelArea: TRect;
@@ -695,41 +597,9 @@ begin
 end;
 
 function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect): PTexture;
-//var fw, fh, originX, originY: single;
 begin
   if aTexture = NIL then Raise Exception.Create('aTexture can not be NIL');
-
   Result := aTexture^.GivePart(aRect);
-
-{  New(Result);
-  with Result^ do begin
-    TextureWidth := aRect.Width;
-    TextureHeight := aRect.Height;
-    FrameWidth := aRect.Width;
-    FrameHeight := aRect.Height;
-    FrameCount := 1;
-    ID := aTexture.ID;
-    IDOwner := FALSE;
-
-    fw := FrameWidth/aTexture.TextureWidth;
-    fh := FrameHeight/aTexture.TextureHeight;
-    originY := 1-aRect.Top/aTexture.TextureHeight;
-    originX := aRect.Left/aTexture.TextureWidth;
-
-    SetLength(FramesCoord, FrameCount);
-
-    FramesCoord[ 0, cTL ].X := originX;
-    FramesCoord[ 0, cTL ].Y := originY;
-
-    FramesCoord[ 0, cTR ].X := originX + fw;
-    FramesCoord[ 0, cTR ].Y := originY;
-
-    FramesCoord[ 0, cBR ].X := originX + fw;
-    FramesCoord[ 0, cBR ].Y := originY - fh;
-
-    FramesCoord[ 0, cBL ].X := originX;
-    FramesCoord[ 0, cBL ].Y := originY - fh;
-  end; }
 end;
 
 function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture;

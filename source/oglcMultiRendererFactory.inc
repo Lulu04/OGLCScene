@@ -408,7 +408,6 @@ private const
    'void main()'#10+
    '{'#10+
    '  vec4 col = texture(uTexUnit, TexCoords);'#10+
-//   '  if (col.a == 0.0) discard;'#10+
    // Tint
    '  float a = col.a*uOpacity;'#10+
    '  if (a == 0) discard;'#10+
@@ -484,7 +483,6 @@ private const
    'void main()'#10+
    '{'#10+
    '  vec4 col = texture(uTexUnit, TexCoords);'#10+
-//   '  if (col.a == 0.0) discard;'#10+
    // Tint and opacity
    '  float a = col.a*Opacity;'#10+
    '  if (a == 0) discard;'#10+
@@ -497,7 +495,6 @@ private const
    '  else if (VertexTint.a > 0)'#10+
    '     col = col + VertexTint*tintAlphaX2;'#10+     // mix color
 
-   //'  col = col * (1-VertexTint.a) + VertexTint * VertexTint.a;'#10+
    '  col.a = a;'#10+
    '  FragColor = col;'#10+
    '}' ;
