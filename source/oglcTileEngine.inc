@@ -58,6 +58,7 @@ private
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
 public
+  procedure Draw(aResetBufferStateWhenDone: boolean=True); override;
   procedure Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aTexture: PTexture; aTextureUnit: integer;
     const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte; const aClipAreaF: TRectF);
   procedure PushQuad(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
@@ -279,6 +280,19 @@ begin
   FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
+procedure TOGLCTileRenderer.Draw(aResetBufferStateWhenDone: boolean);
+begin
+  // set no texture filter to avoid artifacts
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+  inherited Draw(aResetBufferStateWhenDone);
+
+  // set texture param to filtered
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+end;
+
 procedure TOGLCTileRenderer.Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aTexture: PTexture;
   aTextureUnit: integer; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte;
   const aClipAreaF: TRectF);
@@ -315,7 +329,7 @@ begin
 
   tex := FBatch^.CurrentTexture;
   fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
-  texCoord.CopyFrom(tex^.FramesCoord[fi]);
+  {%H-}texCoord.CopyFrom(tex^.FramesCoord[fi]);
   clippedRect := RectF(aXPosOffset, aYPosOffset, aXPosOffset+tex^.FrameWidth, aYPosOffset+tex^.FrameHeight);
   if not CheckAndAdjustF(FClipAreaF, clippedRect, texCoord) then exit;
 
