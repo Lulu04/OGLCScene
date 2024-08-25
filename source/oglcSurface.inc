@@ -289,7 +289,7 @@ public
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
   procedure DeleteAllChilds;
-  // Remove the child without killing it.
+  // Remove the child without freeing it.
   procedure RemoveChild(aSurface: TSimpleSurfaceWithEffect);
   // Remove the child dependency and add the surface to the scene. Do nothing if the surface don't have a parent.
   procedure MoveFromChildToScene(aLayer: integer);
