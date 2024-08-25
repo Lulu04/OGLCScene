@@ -421,9 +421,12 @@ end;
 destructor TTileEngine.Destroy;
 begin
   Clear;
-  FreeAndNil(ScrollSpeed);
-  FreeAndNil(PositionOnMap);
-  FreeAndNil(MapHoleColor);
+  ScrollSpeed.Free;
+  ScrollSpeed := NIL;
+  PositionOnMap.Free;
+  PositionOnMap := NIL;
+  MapHoleColor.Free;
+  MapHoleColor := NIL;
   inherited Destroy;
 end;
 

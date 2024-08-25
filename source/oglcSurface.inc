@@ -552,17 +552,24 @@ begin
     TSimpleSurfaceWithEffect(FChilds.Items[0]).Free;
     FChilds.Delete(0);
   end;
-  FreeAndNil(FChilds);
-  FreeAndNil(Speed);
-  FreeAndNil(Angle);
-  FreeAndNil(Opacity);
-  FreeAndNil(Tint);
-  FreeAndNil(Scale);
+  FChilds.Free;
+  FChilds := NIL;
+  Speed.Free;
+  Speed := NIL;
+  Angle.Free;
+  Angle := NIL;
+  Opacity.Free;
+  Opacity := NIL;
+  Tint.Free;
+  Tint := NIL;
+  Scale.Free;
+  Scale := NIL;
 
   for i:=0 to High(FListScenario) do
     FListScenario[i].Free;
 
-  FreeAndNil(FMessageList);
+  FMessageList.Free;
+  FMessageList := NIL;
 
   inherited Destroy;
 end;
@@ -1206,7 +1213,8 @@ end;
 
 destructor TScenario.Destroy;
 begin
-  FreeAndNil(Actions);
+  Actions.Free;
+  Actions := NIL;
 end;
 
 procedure TScenario.Execute(const aElapsedTime: single);
@@ -1361,8 +1369,10 @@ end;
 
 destructor TSimpleSurface.Destroy;
 begin
-  FreeAndNil(X);
-  FreeAndNil(Y);
+  X.Free;
+  X := NIL;
+  Y.Free;
+  Y := NIL;
   inherited Destroy;
 end;
 

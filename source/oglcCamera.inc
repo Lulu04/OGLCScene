@@ -77,9 +77,12 @@ end;
 
 destructor TOGLCCamera.Destroy;
 begin
-  FreeAndNil( LookAt );
-  FreeAndNil( Scale );
-  FreeAndNil( Angle );
+  LookAt.Free;
+  LookAt := NIL;
+  Scale.Free;
+  Scale := NIL;
+  Angle.Free;
+  Angle := NIL;
   inherited Destroy;
 end;
 

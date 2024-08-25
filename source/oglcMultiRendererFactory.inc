@@ -664,7 +664,8 @@ end;
 destructor TOGLCGenericPrimitiveRenderer.Destroy;
 begin
   FreeID;
-  FreeAndNil(FShader);
+  FShader.Free;
+  FShader := NIL;
   FParentScene := NIL;
   inherited Destroy;
 end;

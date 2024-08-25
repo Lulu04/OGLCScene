@@ -260,7 +260,8 @@ end;
 
 destructor TLayer.Destroy;
 begin
-  FreeAndNil(Opacity);
+  Opacity.Free;
+  Opacity := NIL;
   inherited Destroy;
 end;
 
@@ -522,7 +523,8 @@ end;
 
 destructor TLayerList.Destroy;
 begin
-  FreeAndNil(FList);
+  FList.Free;
+  FList := NIL;
   inherited Destroy;
 end;
 
