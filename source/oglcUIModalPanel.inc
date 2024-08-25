@@ -85,7 +85,10 @@ end;
 
 destructor TUIModalPanel.Destroy;
 begin
-  if FSceneDarkness <> NIL then FreeAndNil(FSceneDarkness);
+  if FSceneDarkness <> NIL then begin
+    FSceneDarkness.Free;
+    FSceneDarkness := NIL;
+  end;
   if FState = mpsShown then
     FParentScene.FModalPanelList.DecVisibleCount;
   FParentScene.FModalPanelList.DoDelete(FItemInstance);

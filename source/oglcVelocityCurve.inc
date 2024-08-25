@@ -365,10 +365,14 @@ end;
 
 destructor TQuadParamF.Destroy;
 begin
-  FreeAndNil(TopLeft);
-  FreeAndNil(TopRight);
-  FreeAndNil(BottomRight);
-  FreeAndNil(BottomLeft);
+  TopLeft.Free;
+  TopLeft := NIL;
+  TopRight.Free;
+  TopRight := NIL;
+  BottomRight.Free;
+  BottomRight := NIL;
+  BottomLeft.Free;
+  BottomLeft := NIL;
   inherited Destroy;
 end;
 
@@ -503,10 +507,14 @@ end;
 
 destructor TBGRAParam.Destroy;
 begin
- FreeAndNil( red );
- FreeAndNil( green );
- FreeAndNil( blue );
- FreeAndNil( alpha );
+  red.Free;
+  red := NIL;
+  green.Free;
+  green := NIL;
+  blue.Free;
+  blue := NIL;
+  alpha.Free;
+  alpha := NIL;
  inherited Destroy;
 end;
 
@@ -560,8 +568,10 @@ end;
 
 destructor TPointFParam.Destroy;
 begin
-  FreeAndNil(x);
-  FreeAndNil(y);
+  x.Free;
+  x := NIL;
+  y.Free;
+  y := NIL;
   inherited Destroy;
 end;
 
@@ -878,7 +888,8 @@ end;
 
 destructor TFParam.Destroy;
 begin
-  FreeAndNil(FCurve);
+  FCurve.Free;
+  FCurve := NIL;
   inherited Destroy;
 end;
 
@@ -1491,7 +1502,10 @@ procedure FreeVelocityCurveList;
 begin
   if FVelocityCurveListRefCount > 0 then begin
     dec(FVelocityCurveListRefCount);
-    if FVelocityCurveListRefCount = 0 then FreeAndNil(VelocityCurveList);
+    if FVelocityCurveListRefCount = 0 then begin
+      VelocityCurveList.Free;
+      VelocityCurveList := NIL;
+    end;
   end;
 end;
 
