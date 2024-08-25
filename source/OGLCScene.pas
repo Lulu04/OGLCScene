@@ -1051,6 +1051,7 @@ begin
     glClearColor(FBackgroundColorF.r, FBackgroundColorF.g, FBackgroundColorF.b, FBackgroundColorF.a);
     glClear(GL_COLOR_BUFFER_BIT);
     FOGLC.SwapBuffers;
+    glGetError();
   end;
 
   if FNeedToResizeViewPort then begin
@@ -1181,6 +1182,7 @@ begin
 end;
 
 procedure TOGLCScene.UpdateViewPortSize;
+var err: glEnum;
 begin
   inherited UpdateViewPortSize;
   ProjectionMatrix.Ortho(0, Width, Height, 0, 0.0, 1.0);
@@ -1196,6 +1198,9 @@ begin
 
   MakeContextCurrent;
   glViewport(0, 0, Width, Height);
+  err := glGetError();
+  if err <> GL_NO_ERROR then
+    LogError('TOGLCScene.UpdateViewPortSize: GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
 end;
 
 {procedure TOGLCScene.ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1382,6 +1387,7 @@ end;
 procedure TOGLCScene.Draw;
 var L, i: integer;
     o: TSimpleSurfaceWithEffect;
+    err: glEnum;
 begin
 { if FPostProcessingShader.FFX<>[]
    then FRendererForPostProcessing.Bind;  }
@@ -1405,6 +1411,9 @@ begin
   // Render all Layers
   for L:=LayerCount-1 downto 0 do
     Layer[L].Draw;
+  err := glGetError();
+  if err <> GL_NO_ERROR then
+    LogError('TOGLCScene.Draw: Render LAYERS give GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
 
   // Scene global fade
   if FGlobalFadeColor.Alpha.Value > 0
