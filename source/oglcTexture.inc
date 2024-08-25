@@ -469,7 +469,8 @@ end;
 
 procedure TTextureManager.FinalizeBitmap;
 begin
-  FreeAndNil(FSrcBitmapDuplicated);
+  FSrcBitmapDuplicated.Free;
+  FSrcBitmapDuplicated := NIL;
 end;
 
 function TTextureManager.GetMaxTextureWidth: integer;

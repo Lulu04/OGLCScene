@@ -363,7 +363,8 @@ end;
 
 destructor TSpriteWithElasticCorner.Destroy;
 begin
-  FreeAndNil(CornerOffset);
+  CornerOffset.Free;
+  CornerOffset := NIL;
   inherited Destroy;
 end;
 
@@ -467,10 +468,14 @@ end;
 
 destructor TMultiColorRectangle.Destroy;
 begin
-  FreeAndNil(TopLeftColor);
-  FreeAndNil(TopRightColor);
-  FreeAndNil(BottomRightColor);
-  FreeAndNil(BottomLeftColor);
+  TopLeftColor.Free;
+  TopLeftColor := NIL;
+  TopRightColor.Free;
+  TopRightColor := NIL;
+  BottomRightColor.Free;
+  BottomRightColor := NIL;
+  BottomLeftColor.Free;
+  BottomLeftColor := NIL;
   inherited Destroy;
 end;
 
@@ -772,7 +777,8 @@ end;
 
 destructor TSpriteOnPathToFollow.Destroy;
 begin
-  FreeAndNil(DistanceTraveled);
+  DistanceTraveled.Free;
+  DistanceTraveled := NIL;
   inherited Destroy;
 end;
 
@@ -988,8 +994,10 @@ end;
 
 destructor TOGLCPathDrawing.Destroy;
 begin
-  FreeAndNil(DistanceTraveled);
-  FreeAndNil(LineColor);
+  DistanceTraveled.Free;
+  DistanceTraveled := NIL;
+  LineColor.Free;
+  LineColor := NIL;
   inherited Destroy;
 end;
 

@@ -818,7 +818,8 @@ end;
 
 destructor TUIListBox.Destroy;
 begin
-  FreeAndNil(FItems);
+  FItems.Free;
+  FItems := NIL;
   inherited Destroy;
 end;
 
@@ -946,7 +947,8 @@ end;
 
 procedure TAlignedTextDescriptor.FreeObjects;
 begin
-  FreeAndNil(Tint);
+  Tint.Free;
+  Tint := NIL;
 end;
 
 procedure TAlignedTextDescriptor.DistributeTheWordsOnTheSurface;

@@ -1109,7 +1109,8 @@ end;
 
 destructor TUIScrollBar.Destroy;
 begin
-  FreeAndNil(FInertie);
+  FInertie.Free;
+  FInertie := NIL;
   inherited Destroy;
 end;
 
@@ -2370,13 +2371,15 @@ end;
 
 destructor TMouseManager.Destroy;
 begin
-  FreeAndNil(FSprite);
+  FSprite.Free;
+  FSprite := NIL;
   inherited Destroy;
 end;
 
 procedure TMouseManager.DeleteCursorSprite;
 begin
-  FreeAndNil(FSprite);
+  FSprite.Free;
+  FSprite := NIL;
   SystemMouseCursorVisible := True;
 end;
 

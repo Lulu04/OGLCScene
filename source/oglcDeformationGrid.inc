@@ -75,8 +75,10 @@ end;
 
 destructor TDeformationGrid.Destroy;
 begin
-  FreeAndNil(DeformationSpeed);
-  FreeAndNil(Amplitude);
+  DeformationSpeed.Free;
+  DeformationSpeed := NIL;
+  Amplitude.Free;
+  Amplitude := NIL;
   inherited Destroy;
 end;
 

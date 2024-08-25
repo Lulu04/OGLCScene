@@ -723,7 +723,8 @@ end;
 
 destructor TFreeTextOnPathToFollow.Destroy;
 begin
-  FreeAndNil(DistanceTraveled);
+  DistanceTraveled.Free;
+  DistanceTraveled := NIL;
   inherited Destroy;
 end;
 
@@ -810,9 +811,13 @@ end;
 
 destructor TTexturedFont.Destroy;
 begin
-  if FAtlasOwner then FreeAndNil(FAtlas);
+  if FAtlasOwner then begin
+    FAtlas.Free;
+    FAtlas := NIL;
+  end;
   FTexCharArray := NIL;
-  FreeAndNil(CharSpacingCoeff);
+  CharSpacingCoeff.Free;
+  CharSpacingCoeff := NIL;
   inherited Destroy;
 end;
 

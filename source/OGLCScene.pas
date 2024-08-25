@@ -733,8 +733,10 @@ end;
 
 destructor TOGLCContext.Destroy;
 begin
-  FreeAndNil(FTextureManager);
-  FreeAndNil(FMouseManager);
+  FTextureManager.Free;
+  FTextureManager := NIL;
+  FMouseManager.Free;
+  FMouseManager := NIL;
   inherited Destroy;
 end;
 
@@ -931,15 +933,19 @@ begin
 
   for i:=0 to FCameraList.Count-1 do
    TOGLCCamera(FCameraList.Items[0]).Free;
-  FreeAndNil(FCameraList);
+  FCameraList.Free;
+  FCameraList := NIL;
 
-  FreeAndNil(FGlobalFadeColor);
+  FGlobalFadeColor.Free;
+  FGlobalFadeColor := NIL;
 
   SetLayerCount(0);
-  FreeAndNil(FTimerManager);
+  FTimerManager.Free;
+  FTimerManager := NIL;
   FModalPanelList.Free;  // FreeAndNil(FModalPanelList) NOT WORKING HERE
   FModalPanelList := NIL;
-  FreeAndNil(FTextureManager);
+  FTextureManager.Free;
+  FTextureManager := NIL;
   DestroyRenderers;
 
 
@@ -948,7 +954,8 @@ begin
 
   if FLog <> NIL then begin
     FLog.Add('Peace');
-    FreeAndNil(FLog);
+    FLog.Free;
+    FLog := NIL;
   end;
 
   inherited Destroy;
