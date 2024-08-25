@@ -738,7 +738,7 @@ end;
 procedure TOGLCGenericPrimitiveRenderer.Draw(aResetBufferStateWhenDone: boolean=True);
 var err: GLenum;
 begin
-  if FIndexInAttribsArray > 0 then
+  if (FIndexInAttribsArray > 0) and (FBatch^.CurrentPrimitiveType <> ptNone) then
   begin
     // update buffer
     glBindBuffer(GL_ARRAY_BUFFER, FVBO);
@@ -764,7 +764,8 @@ begin
       FError := err;
       FParentScene.LogError(ClassName+'.Draw(): GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
       FParentScene.LogMess('vertex count '+(FIndexInAttribsArray+1).ToString+
-                           ' index count '+(FIndexInIndexArray+1).ToString);
+                           ' index count '+(FIndexInIndexArray+1).ToString, 1);
+      FParentScene.LogMess('FBatch^.CurrentPrimitiveType='+integer(FBatch^.CurrentPrimitiveType).ToString, 1);
     end;
   end;
 
