@@ -528,7 +528,10 @@ begin
   item := FirstItem;
   if item = NIL then exit;
   repeat
-    FreeAndNil(item^.Bitmap);
+    if item^.Bitmap <> NIL then begin
+      item^.Bitmap.Free;
+      item^.Bitmap := NIL;
+    end;
     item := item^.Next;
   until item = NIL;
 end;
