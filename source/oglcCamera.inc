@@ -44,6 +44,7 @@ public
 
   // converts a world coordinates to TOpenGLCcontrol coordinates according to camera transformations
   function WorldToControl( aPt: TPointF ): TPoint;
+  function WorldToControlF( aPt: TPointF ): TPointF;
   // converts a TOpenGLCcontrol coordinates to world coordinates according to camera transformations
   function ControlToWorld(aX, aY: integer): TPointF;
 
@@ -152,6 +153,14 @@ begin
   r := GetViewRect;
   Result.x := Round(aPt.x / r.Width * FParentScene.Width);
   Result.y := Round(aPt.y / r.Height * FParentScene.Height);
+end;
+
+function TOGLCCamera.WorldToControlF(aPt: TPointF): TPointF;
+var r: TRectF;
+begin
+  r := GetViewRect;
+  Result.x := aPt.x / r.Width * FParentScene.Width;
+  Result.y := aPt.y / r.Height * FParentScene.Height;
 end;
 
 function TOGLCCamera.ControlToWorld(aX, aY: integer): TPointF;
