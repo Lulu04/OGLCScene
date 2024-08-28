@@ -291,7 +291,6 @@ TOGLCScene = class(TOGLCContext)
   FLog: TLog;
   FCurrentScreen,
   FScreenRequested: TScreenTemplate;
-  FIsChangingScreen,
   FDoBlackScreenOnNewScreen: boolean;
  private // renderer batch
   FRendererBatch: TRendererBatchDescriptor;
@@ -900,7 +899,6 @@ begin
   FStencilClipping.InitDefault;
 
   FExecuteDuringLoop := FALSE;
-  FIsChangingScreen := FALSE;
 
   FCurrentScreen := NIL;
   FScreenRequested := NIL;
@@ -1101,7 +1099,6 @@ begin
  if FScreenRequested <> NIL then begin
    Mouse.MousePoolEnabled := False; // disable mouse pooling
 
-   FIsChangingScreen := TRUE;
    if FDoBlackScreenOnNewScreen and
      (FGlobalFadeColor.State = psNO_CHANGE) and
      (FGlobalFadeColor.Value <> BGRABlack)
@@ -1122,9 +1119,7 @@ begin
        FCurrentScreen.ClearMessageList;
        FCurrentScreen.CreateObjects;
        ClearKeysState;
-       if FDoBlackScreenOnNewScreen then
-         ColorFadeOut(FScreenFadeTime);
-       FIsChangingScreen := FALSE;
+       ColorFadeOut(FScreenFadeTime);
        Mouse.MousePoolEnabled := True;
    end;
  end;
@@ -1156,7 +1151,6 @@ end;
 
 procedure TOGLCScene.RunScreen(aScreen: TScreenTemplate; DoBlackScreen: boolean);
 begin
- if FIsChangingScreen then exit;
  FScreenRequested := aScreen;
  FDoBlackScreenOnNewScreen := DoBlackScreen;
 end;
