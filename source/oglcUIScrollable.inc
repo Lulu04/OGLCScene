@@ -45,6 +45,7 @@ public
   procedure DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer; aMousePos: TPoint; var aHandled: Boolean); override;
   procedure Update(const aElapsedTime: single); override;
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect); reintroduce;
+  procedure DeleteAllChilds; override;
   property NeedUpdateScrollBar: boolean read FNeedUpdateScrollBar write FNeedUpdateScrollBar;
   // Return the offset of the top/left corner of the view, according to the scrollbars position.
   // If there is no ScrollBar visible, (0,0) is returned.
@@ -529,6 +530,14 @@ begin
   if ASurface = NIL then exit;
   inherited AddChild(ASurface, 0);
   FNeedUpdateScrollBar := True;
+end;
+
+procedure TUIScrollBox.DeleteAllChilds;
+var i: integer;
+begin
+  for i:=ChildCount-1 downto 0 do
+    if (Childs[i] <> FVScrollBar) and (Childs[i] <> FHScrollBar) then
+      DeleteChild(i);
 end;
 
 { TUIListBoxItemStyleDescriptor }
