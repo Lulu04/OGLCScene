@@ -290,7 +290,7 @@ public
   procedure SetZOrder(aZOrder: integer);
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
-  procedure DeleteAllChilds;
+  procedure DeleteAllChilds; virtual;
   // Remove the child without freeing it.
   procedure RemoveChild(aSurface: TSimpleSurfaceWithEffect);
   // Remove the child dependency and add the surface to the scene. Do nothing if the surface don't have a parent.
@@ -617,7 +617,7 @@ begin
     FSurfaceOrigin += FParentSurface.FSurfaceOrigin;
     FScaleOrigin.x := FScaleOrigin.x*FParentSurface.FScaleOrigin.x;
     FScaleOrigin.y := FScaleOrigin.y*FParentSurface.FScaleOrigin.y;
-  end;
+  end; }
 
   if FEnableProcessMessage then FMessageList.ProcessMessages(aElapsedTime);
 
