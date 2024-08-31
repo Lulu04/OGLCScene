@@ -389,8 +389,12 @@ TOGLCScene = class(TOGLCContext)
 
   // Add a surface to a layer
   procedure Add(aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer=0);
-  procedure Insert(aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0); // insert a surface to a layer
-  procedure RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer); // remove a surface from the layer (but don't free it)
+  // insert a surface to a layer at specified index
+  procedure Insert(aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
+  // remove a surface from the layer, the surface is not freed
+  procedure RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer);
+  // remove a surface from its current layer and add it to the new layer index
+  procedure MoveSurfaceToLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
   function GetSurfaceByIndex(aLayerIndex, aSurfaceIndex: integer): TSimpleSurface;
 
   // Global scene color fade in and out
@@ -1237,6 +1241,24 @@ procedure TOGLCScene.RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect;
   aLayerIndex: integer);
 begin
  Layer[aLayerIndex].Remove(aSurface);
+end;
+
+procedure TOGLCScene.MoveSurfaceToLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
+var i: integer;
+begin
+  if (aNewLayerIndex < 0) or (aNewLayerIndex >= LayerCount) or (aSurface = NIL) then exit;
+  if aSurface.FParentLayer = Layer[aNewLayerIndex] then exit;
+
+  if aSurface.FParentLayer = NIL then begin
+    Add(aSurface, aNewLayerIndex);
+    exit;
+  end;
+
+  // push the 'ChangeLayer' request in list. it will be processed in the next scene update
+  i := Length(FListSurfaceChangeLayer);
+  SetLength(FListSurfaceChangeLayer, i+1);
+  FListSurfaceChangeLayer[i].Surface := aSurface;
+  FListSurfaceChangeLayer[i].NewLayerIndex := aNewLayerIndex;
 end;
 
 function TOGLCScene.GetSurfaceByIndex(aLayerIndex, aSurfaceIndex: integer ): TSimpleSurface;
