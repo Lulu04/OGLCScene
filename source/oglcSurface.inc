@@ -286,6 +286,8 @@ public
   // add a child to the surface.
   // a positive aZOrder means the child is above its parent, a negative aZOrder means the child is below its parent.
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer=0); virtual;
+  // set the ZOrder of the surface. Do nothing if the surface don't have a parent.
+  procedure SetZOrder(aZOrder: integer);
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
   procedure DeleteAllChilds;
@@ -756,6 +758,14 @@ begin
   ASurface.SetParentLayer(FParentLayer);
   ASurface.FZOrderAsChild := aZOrder;
   FChilds.Sort(@CompareSurfaceChildsByZOrder);
+end;
+
+procedure TSimpleSurfaceWithEffect.SetZOrder(aZOrder: integer);
+begin
+  if (ParentSurface = NIL) or (FZOrderAsChild = aZOrder) then exit;
+
+  FZOrderAsChild := aZOrder;
+  ParentSurface.FChilds.Sort(@CompareSurfaceChildsByZOrder);
 end;
 
 procedure TSimpleSurfaceWithEffect.DeleteChild(aIndex: integer);
