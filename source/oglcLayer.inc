@@ -166,7 +166,7 @@ public
   function LayerIndexOf(aLayer: TLayer): integer;
 
   // move a surface on another layer
-  procedure SurfaceChangeLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
+  procedure SurfaceChangeLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer); deprecated 'use TOGLCScene.MoveSurfaceToLayer instead';
 
   procedure AllLayerVisible;
   procedure OnlyThisLayerVisible(const tab: array of integer);
