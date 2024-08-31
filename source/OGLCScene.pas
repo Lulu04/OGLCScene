@@ -104,9 +104,9 @@ const
 
      acScale                = 'Scale'          ; // Scale HVValueF      // [1]= normal size, [0..1[->reduced, ]1..inf[->enlarged
      acScaleChange          = 'ScaleChange'    ; // ScaleChange HVNewValueF DurationF CurveID
-     acScaleH               = 'ScaleH'         ; // ScaleH HValueF      // to set scale value for horizontaly axis
+     acScaleH               = 'ScaleH'         ; // ScaleH HValueF      // to set scale value on horizontaly axis
      acScaleHChange         = 'ScaleHChange'   ; // ScaleHChange HNewValueF DurationF CurveID
-     acScaleV               = 'ScaleV'         ; // ScaleV VValueF      // to set scale value for verticaly axis
+     acScaleV               = 'ScaleV'         ; // ScaleV VValueF      // to set scale value on verticaly axis
      acScaleVChange         = 'ScaleVChange'   ; // ScaleVChange VNewValueF DurationF CurveID
 
 
