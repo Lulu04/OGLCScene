@@ -393,6 +393,7 @@ TOGLCScene = class(TOGLCContext)
   procedure Insert(aSurfaceIndex: integer; aSurface: TSimpleSurfaceWithEffect; aLayerIndex:integer=0);
   // remove a surface from the layer, the surface is not freed
   procedure RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect; aLayerIndex: integer);
+  procedure RemoveSurfaceFromItsLayer(aSurface: TSimpleSurfaceWithEffect);
   // remove a surface from its current layer and add it to the new layer index
   procedure MoveSurfaceToLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
   function GetSurfaceByIndex(aLayerIndex, aSurfaceIndex: integer): TSimpleSurface;
@@ -1241,6 +1242,12 @@ procedure TOGLCScene.RemoveSurfaceFromLayer(aSurface: TSimpleSurfaceWithEffect;
   aLayerIndex: integer);
 begin
  Layer[aLayerIndex].Remove(aSurface);
+end;
+
+procedure TOGLCScene.RemoveSurfaceFromItsLayer(aSurface: TSimpleSurfaceWithEffect);
+begin
+  if aSurface.ParentLayer = NIL then exit;
+  aSurface.ParentLayer.Remove(aSurface);
 end;
 
 procedure TOGLCScene.MoveSurfaceToLayer(aSurface: TSimpleSurfaceWithEffect; aNewLayerIndex: integer);
