@@ -1006,7 +1006,7 @@ begin
   CheckBox1.Checked := PE.LoopMode;
 
   // emitter life
-  TBEmitterLife.Position := Round(PE.EmitterLife)*1000;
+  TBEmitterLife.Position := Round(PE.EmitterLife*1000);
 
   // emitter direction
   TBDirection.Position := Round(PE.Direction.Value);
