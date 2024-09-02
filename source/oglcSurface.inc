@@ -157,6 +157,8 @@ protected
   procedure PopSceneMV; inline;
   procedure DrawChildSurfacesWithPositiveZOrder(const aLayerPercentOpacity: single); virtual;
   procedure DrawChildSurfacesWithNegativeZOrder(const aLayerPercentOpacity: single); virtual;
+  procedure SetFlipH(AValue: boolean); virtual;
+  procedure SetFlipV(AValue: boolean); virtual;
 public
   // called every frames.
   procedure Update(const aElapsedTime: single); override;
@@ -247,9 +249,9 @@ public  // Scenario
   // You can set/get the frame index. Frame index start at 1.
   property Frame: single read FFrame write SetFrame;
   // Flip horizontally
-  property FlipH: boolean read FFlipH write FFlipH;
+  property FlipH: boolean read FFlipH write SetFlipH;
   // Flip vertically
-  property FlipV: boolean read FFlipV write FFlipV;
+  property FlipV: boolean read FFlipV write SetFlipV;
   // utils
   // Center the surface on its parent scene
   procedure CenterOnScene;
@@ -477,6 +479,16 @@ begin
   aScenario.OnDecode := FScenarioAdditionnalDecode;
   aScenario.ID := Result;
   aScenario.CurrentLine := 0;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetFlipV(AValue: boolean);
+begin
+  FFlipV := AValue;
+end;
+
+procedure TSimpleSurfaceWithEffect.SetFlipH(AValue: boolean);
+begin
+  FFlipH := AValue;
 end;
 
 procedure TSimpleSurfaceWithEffect.PushAndPrepareSceneMV;
@@ -795,12 +807,20 @@ end;
 
 procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayer: integer);
 var p: TPointF;
+  m: TOGLCMatrix;
 begin
   if ParentSurface = NIL then exit;
   p := SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
   FParentScene.Add(Self, aLayer);
   SetCoordinate(p);
+
+ { if ParentSurface = NIL then exit;
+  m := GetMatrixSurfaceSpaceToScene;
+  p := m.Transform(PointF(0,0));
+  ParentSurface.RemoveChild(Self);
+  FParentScene.Add(Self, aLayer);
+  SetCoordinate(p); }
 end;
 
 procedure TSimpleSurfaceWithEffect.MoveFromSceneToChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
