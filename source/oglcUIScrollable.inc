@@ -886,7 +886,7 @@ begin
   if FIndexFirstItemSelected = aIndex1 then FIndexFirstItemSelected := aIndex2
     else if FIndexFirstItemSelected = aIndex2 then FIndexFirstItemSelected := aIndex1;
 
-  Move(FItems.Mutable[aIndex1]^, itm, SizeOf(TUIListBoxItem));
+  Move(FItems.Mutable[aIndex1]^, itm{%H-}, SizeOf(TUIListBoxItem));
   Move(FItems.Mutable[aIndex2]^, FItems.Mutable[aIndex1]^, SizeOf(TUIListBoxItem));
   Move(itm, FItems.Mutable[aIndex1]^, SizeOf(TUIListBoxItem));
 end;

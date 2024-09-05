@@ -37,7 +37,7 @@ const GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX = $9048;
 begin
   Result := 0;
   if glGetIntegerv <> NIL then begin
-    FillChar(m[0], Length(m)*SizeOf(GLInt), 0);
+    FillChar({%H-}m[0], Length(m)*SizeOf(GLInt), 0);
     glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, @m[0]);
     glGetIntegerv(TEXTURE_FREE_MEMORY_ATI, @m[0]);
     glGetError();
@@ -53,7 +53,7 @@ const GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX = $9049;
 begin
   Result := 0;
   if glGetIntegerv <> NIL then begin
-    FillChar(m[0], Length(m)*SizeOf(GLInt), 0);
+    FillChar({%H-}m[0], Length(m)*SizeOf(GLInt), 0);
 
     // try with NVidia
     glGetIntegerv(GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, @m[0]);
