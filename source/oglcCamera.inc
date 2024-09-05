@@ -1,6 +1,30 @@
 {$ifdef oglcINTERFACE}
 type
 
+{ TOGLCShakerDescriptor }
+
+TOGLCShakerDescriptor = record
+  Amount: TBoundedFParam;
+  AmplitudeX, AmplitudeY, DurationMin, DurationMax,
+  TimeReference, TimeAccu, ComputedX, ComputedY: single;
+  procedure Create;
+  procedure Free;
+  procedure Update(const AElapsedTime: single);
+  // Start the shaker effect.
+  // aAmplitudeX, aAmplitudeY are in pixel, aRefreshTime in second.
+  // Set aSetAmountTo1 to True to force amount value to be 1.0 (usefull after a fadeout)
+  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single; aSetAmountTo1: boolean=True);
+  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean=True);
+  // Stop the shaker effect
+  procedure Stop;
+  // Fade in the shaker effect.
+  // first call Start() to initialize the wanted shaker amplitude and refresh time
+  procedure FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word=idcLinear);
+  // Fade out the shaker effect. When the fade is done, Amount.Value is equal to 0.0,
+  // don't forget to set it to 1.0 before another call to Start().
+  procedure FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
+end;
+
 
 { TOGLCCamera }
 
@@ -11,10 +35,7 @@ TOGLCCamera = class
   // Use instead TOGLCScene.CreateCamera
   constructor Create;
   destructor Destroy; override;
-  procedure Update( const AElapsedTime: single );
-private
-  FShakerDeltaX, FShakerDeltaY, FShakerDurationMin, FShakerDurationMax,
-  FShakerTimeReference, FShakerTimeAccu, FShakerComputedX, FShakerComputedY: single;
+  procedure Update(const AElapsedTime: single);
 protected
   procedure Use;
   procedure Release;
@@ -26,6 +47,9 @@ public
   Angle: TFParam;
   // Default value is the center of the scene (0.5, 0.5)
   Pivot: TPointF;
+  // Shaker effect
+  // The idea is to add an offset to the camera LookAt to shake the view i.e. to simulate an earthquake.
+  Shaker: TOGLCShakerDescriptor;
 
   // move the camera to the specified location
   procedure MoveTo( aPt: TPointF ); overload;
@@ -33,13 +57,6 @@ public
   procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
   // reset camera to scene center with scale of 1:1 and no rotation, in specified time in seconds
   procedure Reset( aDuration: single; aCurve:Word= idcLinear);
-
-  // the idea is to add an offset to the camera view to shake the view,
-  // i.e. to simulate an earthquake.
-  // aAmplitudeX, aAmplitudeY are in pixel, aDuration in second
-  procedure StartShaker(aAmplitudeX, aAmplitudeY, aDuration: single);
-  procedure StartShaker(aAmplitudeX, aAmplitudeY, aDurationMin, aDurationMax: single);
-  procedure StopShaker;
 
   // gives the distance between a point and the camera lookAt value
   function DistanceToPoint( aPt: TPointF ): single;
@@ -68,6 +85,79 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
+{ TOGLCShakerDescriptor }
+
+procedure TOGLCShakerDescriptor.Create;
+begin
+  Amount := CreateBoundedFParam(0.0, MaxSingle-1, False);
+  Amount.Value := 1.0;
+end;
+
+procedure TOGLCShakerDescriptor.Free;
+begin
+  Amount.Free;
+  Amount := NIL;
+end;
+
+procedure TOGLCShakerDescriptor.Update(const AElapsedTime: single);
+begin
+  Amount.OnElapse(AElapsedTime);
+
+ // update shaker effect
+ if (AmplitudeX = 0) and (AmplitudeY = 0) then exit;
+ TimeAccu := TimeAccu + AElapsedTime;
+ if TimeAccu >= TimeReference then begin
+   TimeAccu := TimeAccu - TimeReference;
+   TimeReference := Random*(DurationMax-DurationMin) + DurationMin;
+   // compute new offset values
+   ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
+   ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
+ end;
+end;
+
+procedure TOGLCShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single;
+  aSetAmountTo1: boolean);
+begin
+  Start(aAmplitudeX, aAmplitudeY, aRefreshTime, aRefreshTime, aSetAmountTo1);
+ end;
+
+procedure TOGLCShakerDescriptor.Start(aAmplitudeX, aAmplitudeY,
+  aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean);
+begin
+  if aSetAmountTo1 then Amount.Value := 1.0;
+  AmplitudeX := aAmplitudeX;
+  AmplitudeY := aAmplitudeY;
+  DurationMin := aRefreshTimeMin;
+  DurationMax := aRefreshTimeMax;
+  TimeAccu := 0;
+  TimeReference := Random*(aRefreshTimeMax - aRefreshTimeMin) + aRefreshTimeMin;
+  if (aAmplitudeX = 0) and (aAmplitudeY = 0) then begin
+    ComputedX := 0;
+    ComputedY := 0;
+  end else begin
+    ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
+    ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
+  end;
+end;
+
+procedure TOGLCShakerDescriptor.FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word);
+begin
+  Amount.ChangeTo(aAmountValue, aFadeDuration, aCurve);
+end;
+
+procedure TOGLCShakerDescriptor.FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
+begin
+  Amount.ChangeTo(0, aFadeDuration, aCurve);
+end;
+
+procedure TOGLCShakerDescriptor.Stop;
+begin
+  AmplitudeX := 0;
+  AmplitudeY := 0;
+  ComputedX := 0;
+  ComputedY := 0;
+end;
+
 { TOGLCCamera }
 
 constructor TOGLCCamera.Create;
@@ -78,6 +168,7 @@ begin
   Angle := TFParam.Create;
   Pivot.x := 0.5;
   Pivot.y := 0.5;
+  Shaker.Create;
 end;
 
 destructor TOGLCCamera.Destroy;
@@ -88,6 +179,7 @@ begin
   Scale := NIL;
   Angle.Free;
   Angle := NIL;
+  Shaker.Free;
   inherited Destroy;
 end;
 
@@ -96,17 +188,7 @@ begin
   LookAt.OnElapse(AElapsedTime);
   Scale.OnElapse(AElapsedTime);
   Angle.OnElapse(AElapsedTime);
-
-  // update shaker effect
-  if (FShakerDeltaX = 0) and (FShakerDeltaY = 0) then exit;
-  FShakerTimeAccu := FShakerTimeAccu + AElapsedTime;
-  if FShakerTimeAccu >= FShakerTimeReference then begin
-    FShakerTimeAccu := FShakerTimeAccu - FShakerTimeReference;
-    FShakerTimeReference := Random*(FShakerDurationMax-FShakerDurationMin) + FShakerDurationMin;
-    // compute new offset values
-    FShakerComputedX := random*FShakerDeltaX - FShakerDeltaX*0.5;
-    FShakerComputedY := random*FShakerDeltaY - FShakerDeltaY*0.5;
-  end;
+  Shaker.Update(AElapsedTime);
 end;
 
 procedure TOGLCCamera.Reset(aDuration: single; aCurve:Word);
@@ -114,36 +196,6 @@ begin
   LookAt.ChangeTo( PointF(0,0), aDuration, aCurve );
   Scale.ChangeTo( PointF(1,1), aDuration, aCurve );
   Angle.ChangeTo( 0, aDuration, aCurve );
-end;
-
-procedure TOGLCCamera.StartShaker(aAmplitudeX, aAmplitudeY, aDuration: single);
-begin
-  StartShaker(aAmplitudeX, aAmplitudeY, aDuration, aDuration);
-end;
-
-procedure TOGLCCamera.StartShaker(aAmplitudeX, aAmplitudeY, aDurationMin, aDurationMax: single);
-begin
-  FShakerDeltaX := aAmplitudeX;
-  FShakerDeltaY := aAmplitudeY;
-  FShakerDurationMin := aDurationMin;
-  FShakerDurationMax := aDurationMax;
-  FShakerTimeAccu := 0;
-  FShakerTimeReference := Random*(aDurationMax-aDurationMin) + aDurationMin;
-  if (aAmplitudeX = 0) and (aAmplitudeY = 0) then begin
-    FShakerComputedX := 0;
-    FShakerComputedY := 0;
-  end else begin
-   FShakerComputedX := Random*aAmplitudeX - aAmplitudeX*0.5;
-   FShakerComputedY := Random*aAmplitudeY - aAmplitudeY*0.5;
-  end;
-end;
-
-procedure TOGLCCamera.StopShaker;
-begin
-  FShakerDeltaX := 0;
-  FShakerDeltaY := 0;
-  FShakerComputedX := 0;
-  FShakerComputedY := 0;
 end;
 
 function TOGLCCamera.DistanceToPoint(aPt: TPointF): single;
@@ -219,7 +271,7 @@ begin
   m.LoadIdentity;
   m.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                  FParentScene.Width*0.5, FParentScene.Height*0.5,
-                 LookAt.x.Value+FShakerComputedX, LookAt.y.Value+FShakerComputedY);
+                 LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
   Result := m.Inverse;
 end;
 
@@ -228,7 +280,7 @@ begin
   FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
   FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                                             FParentScene.Width*Pivot.x, FParentScene.Height*Pivot.y,
-                                            LookAt.x.Value+FShakerComputedX, LookAt.y.Value+FShakerComputedY);
+                                            LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
 end;
 
 procedure TOGLCCamera.Release;
