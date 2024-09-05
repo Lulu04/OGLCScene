@@ -506,7 +506,7 @@ private
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
 public
-  // procedure Draw will use its parent scene MVP matrix
+  // procedure Draw use parent scene MVP matrix
   procedure Prepare(aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer; aBlendMode: byte);
 
 
@@ -521,6 +521,18 @@ public
   procedure PushQuad3(const aModelArea: TRect; const aTexCoor: TQuadCoor; aFlipIndex: integer;
                       aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF); overload;
 end;
+
+
+{ TOGLCNoFilterTextureMVTriangleRenderer }
+
+TOGLCNoFilterTextureMVTriangleRenderer = class(TOGLCTexturedMVTriangleRenderer)
+private
+  procedure InitShaderCodeAndCallBack; override;
+  procedure SetUniformValuesAndTextureCustomized;
+public
+  procedure Draw(aResetBufferStateWhenDone: boolean=True); override;
+end;
+
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -1944,110 +1956,35 @@ begin
     y := aModelArea.Top;
     opacity := aOpacity;
   end;
-
 end;
 
-{procedure TOGLCTexturedMVTriangleRenderer.PushTexturedChar(const aChar: PTexturedChar; aFlipIndex: integer;
-  const aModelViewMatrix: TOGLCMatrix; const aXPosOffset, aYPosOffset, aOpacity: single; const aTint: TBGRAPixel);
-var w, h: single;
-    tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
-    p: Pxyuvtintopacitymatrix;
-    tintF: TColorF;
-    tex: PTexture;
+{ TOGLCNoFilterTextureMVTriangleRenderer }
+
+procedure TOGLCNoFilterTextureMVTriangleRenderer.InitShaderCodeAndCallBack;
 begin
-  tex := aChar^.Texture;
-  texCoord := @tex^.FramesCoord[0];
-  tintF.InitFromBGRA(aTint);
-  tci := @FLIP_INDEXES[aFlipIndex];
-  w := tex^.FrameWidth;
-  h := tex^.FrameHeight;
+  inherited InitShaderCodeAndCallBack;
+  FSetUniformValuesAndTexture := @SetUniformValuesAndTextureCustomized;
+end;
+procedure TOGLCNoFilterTextureMVTriangleRenderer.SetUniformValuesAndTextureCustomized;
+begin
+  glUniform1i(FLocTextureUnit, GLint(FBatch^.CurrentTextureUnit));
+  glUniformMatrix4fv(FLocProjectionMatrix, 1, GL_FALSE, @FParentScene.ProjectionMatrix.Matrix[0,0]);
+  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 
-  case FCurrentPrimitiveType of
-    ptTriangleStrip: begin
-      p := QueryVertex(4);
-      with p[0] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[0] ].x;
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
-        opacity := aOpacity;
-      end;
-      with p[1] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
-        opacity := aOpacity;
-      end;
-      with p[2] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
-        opacity := aOpacity;
-      end;
-      with p[3] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
-        opacity := aOpacity;
-      end;
-    end;
+  // we don't want texture filtering
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+end;
 
-    ptTriangles: begin
-      p := QueryVertex(6);
-      with p[0] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[0] ].x;
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
-        opacity := aOpacity;
-      end;
-      with p[1] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
-        opacity := aOpacity;
-      end;
-      with p[2] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
-        opacity := aOpacity;
-      end;
-      Move(p[2], p[3], SizeOf(Txyuvtintopacitymatrix)); // C
-      Move(p[1], p[4], SizeOf(Txyuvtintopacitymatrix)); // B
-      with p[5] do begin
-        tint.CopyFrom(tintF);
-        mv.CopyFrom(aModelViewMatrix.Matrix);
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
-        opacity := aOpacity;
-      end;
-    end;
+procedure TOGLCNoFilterTextureMVTriangleRenderer.Draw(
+  aResetBufferStateWhenDone: boolean);
+begin
+  inherited Draw(aResetBufferStateWhenDone);
 
-  end;
-end;   }
+  // set 'normal' filtering
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+end;
 
 {$endif oglcIMPLEMENTATION}
 

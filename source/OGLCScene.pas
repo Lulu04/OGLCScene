@@ -306,6 +306,7 @@ TOGLCScene = class(TOGLCContext)
   FThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
   FFastLineRenderer: TOGLCFastLineRenderer;
   FParticleRenderer: TOGLCParticleRenderer;
+  FNoFilterTextureMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
   function GetFastLineRenderer: TOGLCFastLineRenderer;
   function GetGlowRenderer: TOGLCGlowRenderer;
   function GetElectricalBeamRenderer: TOGLCElectricalBeamRenderer;
@@ -316,6 +317,7 @@ TOGLCScene = class(TOGLCContext)
   function GetThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer;
   function GetThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
   function GetTileRenderer: TOGLCTileRenderer;
+  function GetNoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
   procedure CreateRenderers;
   procedure DestroyRenderers;
  private
@@ -442,6 +444,7 @@ TOGLCScene = class(TOGLCContext)
   property ThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer read GetThreeColorMVTriangleRenderer;
   property TexturedTriangleRenderer: TOGLCTexturedTriangleRenderer read GetTexturedTriangleRenderer;
   property TexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer read GetTexturedMVTriangleRenderer;
+  property NoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer read GetNoFilterTexturedMVTriangleRenderer;
 
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
@@ -1173,6 +1176,7 @@ begin
   FreeAndNil(FThreeColorMVTriangleRenderer);
   FreeAndNil(FTexturedMVTriangleRenderer);
   FreeAndNil(FTexturedTriangleRenderer);
+  FreeAndNil(FNoFilterTextureMVTriangleRenderer);
 
   FreeAndNil(FTileRenderer);
   FreeAndNil(FGlowRenderer);
@@ -1723,6 +1727,13 @@ function TOGLCScene.GetTileRenderer: TOGLCTileRenderer;
 begin
   if FTileRenderer = NIL then FTileRenderer := TOGLCTileRenderer.Create(Self, False);
   Result := FTileRenderer;
+end;
+
+function TOGLCScene.GetNoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
+begin
+  if FNoFilterTextureMVTriangleRenderer = NIL then
+    FNoFilterTextureMVTriangleRenderer := TOGLCNoFilterTextureMVTriangleRenderer.Create(Self, True);
+  Result := FNoFilterTextureMVTriangleRenderer;
 end;
 
 procedure TOGLCScene.SetUpdatePeriod(AValue: integer);
