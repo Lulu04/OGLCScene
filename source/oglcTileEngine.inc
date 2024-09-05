@@ -24,7 +24,6 @@ FRAGMENT_SHADER =
  '  uniform sampler2D uTexUnit;'#10+
  '  uniform vec4 uTintColor;'#10+
  '  uniform float uOpacity;'#10+
-// '  layout(location = 1) out vec4 FragColor;'#10+  // location = 1 means output in GL_COLOR_ATTACHMENT1
  '  layout(location = 0) out vec4 FragColor;'#10+
  'void main()'#10+
  '{'#10+
@@ -555,7 +554,7 @@ begin
     xx := FXOffsetFirstTile;
     ixtile := FColumnIndexFirstTile;
     repeat
-      // draw only non clipped tile
+      // draw only visible tiles
       if ((xx < FParentScene.Width) and (xx+FTileSize.cx > 0) and
           (yy < FParentScene.Height) and (yy+FTileSize.cy > 0)) or
          ForceTheDrawingOfAllTheTiles then
