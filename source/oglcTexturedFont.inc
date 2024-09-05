@@ -231,7 +231,6 @@ procedure TAlignedText.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
    flagLastWasLineEnding: boolean;
-debugs: string;
    procedure _NextLine;
    begin
     yy += FTexturedFont.Font.FontHeight;
