@@ -44,6 +44,14 @@ public
 end;
 
 
+{ TTiledSprite }
+// Use this class instead of TSprite to construct a decor. It avoid artifacts at the bounds of
+// the texture when a camera is used to move/zoom the view.
+TTiledSprite = class(TSprite)
+  procedure DoDraw; override;
+end;
+
+
 { TPolarSprite }
 
 TPolarSprite = class(TSprite)
@@ -366,6 +374,19 @@ begin
   CornerOffset.Free;
   CornerOffset := NIL;
   inherited Destroy;
+end;
+
+{ TTiledSprite }
+
+procedure TTiledSprite.DoDraw;
+var fi: integer;
+begin
+  if Texture = NIL then exit;
+
+  fi := EnsureRange(Trunc(Frame), 0, High(FTexture^.FramesCoord));
+  FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, FTexture, 0, BlendMode);
+  FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(FModelArea, FTexture^.FramesCoord[fi], FlipToIndex,
+                                                    NIL, FComputedOpacity, FComputedTint);
 end;
 
 { TShapeOutline }
