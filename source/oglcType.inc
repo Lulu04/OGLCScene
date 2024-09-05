@@ -121,7 +121,6 @@ type
   TLineType = TPrimitiveType.ptLines..TPrimitiveType.ptLineStrip; // GL_LINES..GL_LINE_STRIP;
   TTriangleType = TPrimitiveType.ptTriangles..TPrimitiveType.ptTriangleFan; //  GL_TRIANGLES..GL_TRIANGLE_FAN;
 
-
 type
 TOGLCCorner = (cTL=0,   // top left
                cTR,     // top right
