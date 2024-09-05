@@ -202,14 +202,15 @@ end;
 
 procedure TOGLCImagePacker.InternalInsertSorted(aItem: POGLCImagePackerItem);
 var itemInList: POGLCImagePackerItem;
-  newItemPixelCount: integer;
+  //newItemPixelCount: integer;
 begin
   itemInList := FirstItem;
   if itemInList = NIL then Append(aItem)
   else begin
-    newItemPixelCount := aItem^.PixelsConsumed;
+    //newItemPixelCount := aItem^.PixelsConsumed;
     repeat
-      if newItemPixelCount > itemInList^.PixelsConsumed then begin
+      if Max(aItem^.Bitmap.Width, aItem^.Bitmap.Height) > Max(itemInList^.Bitmap.Width, itemInList^.Bitmap.Height) then begin
+      //if newItemPixelCount > itemInList^.PixelsConsumed then begin
         InsertBefore(aItem, itemInList);
         exit;
       end;
@@ -239,9 +240,6 @@ begin
   item^.ComputedRect.Width := aIma.Width;
   item^.ComputedRect.Height := aIma.Height;
   new(item^.Texture);
- { FillChar(item^.Texture^, SizeOf(TTexture), 0);
-  item^.Texture^.FrameWidth := AFrameWidth;
-  item^.Texture^.FrameHeight := AFrameHeight;  }
   item^.FrameSize.cx := AFrameWidth;
   item^.FrameSize.cy := AFrameHeight;
   InternalInsertSorted(item);
@@ -423,8 +421,10 @@ var item: POGLCImagePackerItem;
 
   function FitInAtlas(aItem: POGLCImagePackerItem; aPt: TPoint): boolean; inline;
   begin
-    Result := (aPt.x+aItem^.Bitmap.Width-1 < FCurrentAtlasSize) and
-              (aPt.y+aItem^.Bitmap.Height-1 < FCurrentAtlasSize);
+//    Result := (aPt.x+aItem^.Bitmap.Width-1 < FCurrentAtlasSize) and
+//              (aPt.y+aItem^.Bitmap.Height-1 < FCurrentAtlasSize);
+    Result := (aPt.x+aItem^.Bitmap.Width-1+FSpacing < FCurrentAtlasSize) and
+              (aPt.y+aItem^.Bitmap.Height-1+FSpacing < FCurrentAtlasSize);
   end;
 
   function ItemOverlapsAnother(aItem: POGLCImagePackerItem; aPt: TPoint;
@@ -476,7 +476,7 @@ var item: POGLCImagePackerItem;
     repeat
       Result := SearchEmptyPlaceOnRow(aItem, y);
       if Result then exit;
-      inc(y); //y := y + 1 + FSpacing;
+      inc(y);
     until y >= FCurrentAtlasSize;
   end;
 
