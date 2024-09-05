@@ -19,11 +19,13 @@ protected
   procedure Use;
   procedure Release;
 public
-  // by default, LookAt is initialized with the center coodinates of its parent scene
-  // use instead MoveTo to easily translate the camera to the target position
+  // By default, LookAt is initialized with the center coordinates of the scene
+  // Use instead MoveTo to easily translate the camera to the target position
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
+  // Default value is the center of the scene (0.5, 0.5)
+  Pivot: TPointF;
 
   // move the camera to the specified location
   procedure MoveTo( aPt: TPointF ); overload;
@@ -74,6 +76,8 @@ begin
   Scale := TPointFParam.Create;
   Scale.Value := PointF(1,1);
   Angle := TFParam.Create;
+  Pivot.x := 0.5;
+  Pivot.y := 0.5;
 end;
 
 destructor TOGLCCamera.Destroy;
@@ -223,7 +227,7 @@ procedure TOGLCCamera.Use;
 begin
   FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
   FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
-                                            FParentScene.Width*0.5, FParentScene.Height*0.5,
+                                            FParentScene.Width*Pivot.x, FParentScene.Height*Pivot.y,
                                             LookAt.x.Value+FShakerComputedX, LookAt.y.Value+FShakerComputedY);
 end;
 
