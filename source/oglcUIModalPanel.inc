@@ -25,7 +25,8 @@ public
   // Show the modal panel: the scene is freezed and darkened.
   procedure ShowModal; virtual;
   // Hide the modal panel: the scene continue normally.
-  procedure Hide; virtual;
+  // if aFree is True, the panel will be freed on the next frame
+  procedure Hide(aFree: boolean); virtual;
 end;
 
 
@@ -48,6 +49,7 @@ public
   procedure Draw;
 
   function Add(aPanel: TUIModalPanel): PModalPanelItem;
+  procedure FreeKilledPanels;
   procedure FreeAll;
   property OneModalIsVisible: boolean read GetOneModalIsVisible;
 end;
@@ -75,9 +77,7 @@ begin
     FSceneDarkness := TMultiColorRectangle.Create(aParentScene.Width, aParentScene.Height);
     FSceneDarkness.ParentScene := aParentScene;
     FSceneDarkness.SetAllColorsTo(BGRA(0,0,0));
-    //AddChild(FSceneDarkness, LAYER_GAMEUI);
-    FSceneDarkness.Opacity.Value := 0;
-    FBGColorOpacity := aBlackOpacity;
+    FSceneDarkness.Opacity.Value := aBlackOpacity;
   end else FSceneDarkness := NIL;
 
   FState := mpsHidden;
@@ -89,9 +89,6 @@ begin
     FSceneDarkness.Free;
     FSceneDarkness := NIL;
   end;
-  if FState = mpsShown then
-    FParentScene.FModalPanelList.DecVisibleCount;
-  FParentScene.FModalPanelList.DoDelete(FItemInstance);
   inherited Destroy;
 end;
 
@@ -99,16 +96,15 @@ procedure TUIModalPanel.ShowModal;
 begin
   if FState = mpsShown then exit;
   FState := mpsShown;
-  if FSceneDarkness <> NIL then FSceneDarkness.Opacity.Value := FBGColorOpacity;
   FParentScene.FModalPanelList.IncVisibleCount;
 end;
 
-procedure TUIModalPanel.Hide;
+procedure TUIModalPanel.Hide(aFree: boolean);
 begin
   if FState = mpsHidden then exit;
   FState := mpsHidden;
-  if FSceneDarkness <> NIL then FSceneDarkness.Opacity.Value := 0;
   FParentScene.FModalPanelList.DecVisibleCount;
+  if aFree then Kill;
 end;
 
 { TModalPanelList }
@@ -153,6 +149,7 @@ end;
 procedure TModalPanelList.Draw;
 var item: PModalPanelItem;
 begin
+  // render all panels
   item := FirstItem;
   while item <> NIL do begin
     if item^.Panel.FState = mpsShown then
@@ -167,13 +164,29 @@ begin
   Result^.Panel := aPanel;
 end;
 
+procedure TModalPanelList.FreeKilledPanels;
+var item, nextItem: PModalPanelItem;
+begin
+  // free modal panels with flag kill
+  item := FirstItem;
+  while item <> NIL do begin
+    nextItem := item^.Next;
+    if item^.Panel.FKill then begin
+      if item^.Panel.FState = mpsShown then DecVisibleCount;
+      item^.Panel.Free;
+      DoDelete(item);
+    end;
+    item := nextItem;
+  end;
+end;
+
 procedure TModalPanelList.FreeAll;
 var item: PModalPanelItem;
 begin
   item := FirstItem;
   while item <> NIL do begin
     item^.Panel.Free;
-    item := FirstItem;
+    item := item^.Next;
   end;
   Clear;
   FVisibleCount := 0;
