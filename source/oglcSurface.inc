@@ -791,8 +791,9 @@ begin
 end;
 
 procedure TSimpleSurfaceWithEffect.DeleteAllChilds;
+var i: integer;
 begin
-  while FChilds.Count > 0 do DeleteChild(0);
+  for i:=FChilds.Count-1 downto 0 do DeleteChild(i);
 end;
 
 procedure TSimpleSurfaceWithEffect.RemoveChild(aSurface: TSimpleSurfaceWithEffect);
