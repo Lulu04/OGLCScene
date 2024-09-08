@@ -332,8 +332,10 @@ end;
 
 function PolarToCartesian(const aCenter: TPointF; const aPoint: TPolarCoor): TPointF;
 begin
-  Result.x := aCenter.x+cos(aPoint.Angle*Deg2Rad)*aPoint.Distance;
-  Result.y := aCenter.y+sin(aPoint.Angle*Deg2Rad)*aPoint.Distance;
+  with aPoint do begin
+    Result.x := aCenter.x+cos(Angle*Deg2Rad)*Distance;
+    Result.y := aCenter.y+sin(Angle*Deg2Rad)*Distance;
+  end;
 end;
 
 { TQuadParamF }
