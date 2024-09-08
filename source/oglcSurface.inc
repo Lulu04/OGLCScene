@@ -172,9 +172,9 @@ public
   Opacity : TBoundedFParam; // the opacity of the surface, range is [0..255]
   Tint    : TBGRAParam; // the tint applyed to the surface. Alpha channel controls the amount.
   TintMode: TTintMode; // Can be tmMixColor or tmReplaceColor. Default value is tmReplaceColor.
-  // Post a message to the surface.
+  // Post a message to the surface itself.
   // The delay allows to process the message only after a lapse of time (in seconds): it's usefull to construct chained animation.
-  // if aDelay is 0, the message is posted immediately and will be processed into the next frame.
+  // if aDelay is 0, the message is posted and will be processed into the next frame.
   // If delay is > 0, the message is posted and will be processed only after the lapse of time expressed by aDelay (in seconds).
   // When a message is ready to be processed, method ProcessMessage is called with the message user value.
   procedure PostMessage(UserValue: TUserMessageValue; aDelay: single=0);
