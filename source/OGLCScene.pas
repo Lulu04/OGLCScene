@@ -1562,6 +1562,7 @@ begin
 
   Mouse.PrepareBeforeUpdate;
 
+  FModalPanelList.FreeKilledPanels;
   // update Modal Panel or layer
   if FModalPanelList.OneModalIsVisible then FModalPanelList.Update(aElapsedTime)
   else begin
