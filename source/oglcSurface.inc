@@ -298,6 +298,8 @@ public
   // Remove the child dependency and add the surface to the scene. Do nothing if the surface don't have a parent.
   procedure MoveFromChildToScene(aLayer: integer);
   procedure MoveFromSceneToChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
+  // If any, remove current child dependency and add the surface as child of another.
+  procedure SetChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
   function IsParentOf(aSurface: TSimpleSurfaceWithEffect): boolean;
   function ChildCount: integer;
   function IsChild(aSurface: TSimpleSurfaceWithEffect): boolean;
@@ -838,6 +840,16 @@ begin
   ParentLayer.Remove(Self);
   aParentSurface.AddChild(Self, aZOrder);
   SetCoordinate(p);
+end;
+
+procedure TSimpleSurfaceWithEffect.SetChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
+begin
+  if ParentSurface = NIL then MoveFromSceneToChildOf(aParentSurface, aZOrder)
+  else begin
+    if aParentSurface = NIL then exit;
+    MoveFromChildToScene(0);
+    MoveFromSceneToChildOf(aParentSurface, aZOrder);
+  end;
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToScene(aPt: TPointF): TPointF;
