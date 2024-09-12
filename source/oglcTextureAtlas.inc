@@ -129,6 +129,9 @@ public
   property Texture: PTexture read GetAtlasTexture;
 end;
 
+// define an alias to TOGLCTextureAtlas with shortest name
+TAtlas = TOGLCTextureAtlas;
+
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 const MAX_ATLAS_SIZE = 16384;
