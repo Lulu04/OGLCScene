@@ -2386,9 +2386,9 @@ end;
 function TMouseManager.IsOver(aGUISurface: TUIClickableObject): boolean;
 var xx, yy: integer;
 begin
-  if (aGUISurface = NIL) or not FMousePoolEnabled then exit(False);
+  if (aGUISurface = NIL) or (aGUISurface.FKill = True) or not FMousePoolEnabled then exit(False);
   if (FSurfaceLockedByMouse <> NIL) and (FSurfaceLockedByMouse <> aGUISurface) then exit(False);
-  if not aGUISurface.MouseInteractionEnabled then exit(False);
+  if not aGUISurface.MouseInteractionEnabled or not aGUISurface.Visible then exit(False);
 
   with aGUISurface do begin
     // we use ScrollOffset because the surface can be a child of a scrollable parent
@@ -2398,7 +2398,7 @@ begin
               (FMousePos.x <= xx+Width) and
               (FMousePos.y >= yy) and
               (FMousePos.y <= yy+Height);
-end;
+  end;
 
   // because a surface can be a child and outside its parent ClientArea
   if Result then
@@ -2487,9 +2487,17 @@ begin
     //if CheckIfPosIsInParentClientArea(FSurfaceLockedByMouse, Point(X,Y)) then
       FSurfaceLockedByMouse.DoOnMouseMove(Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
   end else if FSurfaceUnderMouse <> NIL then begin
+try
       if CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X,Y)) then
         FSurfaceUnderMouse.DoOnMouseMove(Shift, FSurfaceUnderMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceUnderMouse.ScrollOffset);
-    end;
+
+except
+  on E: Exception do begin
+    FParentScene.LogError('TMouseManager.ProcessOnMouseMove: exception occurs "'+E.Message);
+    FParentScene.LogInfo('FSurfaceUnderMouse is '+FSurfaceUnderMouse.ClassName, 1);
+  end;
+end;
+  end;
 end;
 
 procedure TMouseManager.ProcessOnMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
