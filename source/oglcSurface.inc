@@ -782,11 +782,17 @@ end;
 
 procedure TSimpleSurfaceWithEffect.DeleteChild(aIndex: integer);
 begin
-  if (aIndex >= 0) or (aIndex < FChilds.Count) then GetChild(aIndex).Kill;
+  if (aIndex >= 0) or (aIndex < FChilds.Count) then DeleteChild(GetChild(aIndex));
 end;
 
 procedure TSimpleSurfaceWithEffect.DeleteChild(aSurface: TSimpleSurfaceWithEffect);
 begin
+  // remove instance from mouse manager
+  if FParentScene.Mouse.FSurfaceLockedByMouse = aSurface then
+    FParentScene.Mouse.FSurfaceLockedByMouse := NIL;
+  if FParentScene.Mouse.FSurfaceUnderMouse = aSurface then
+    FParentScene.Mouse.FSurfaceUnderMouse := NIL;
+
   aSurface.Kill;
 end;
 
