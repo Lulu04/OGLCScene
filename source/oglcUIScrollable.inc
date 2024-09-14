@@ -475,7 +475,10 @@ begin
           if (FVScrollBar <> NIL) and FVScrollBar.Visible then v := FVScrollBar.Width else v := 0;
           FHScrollBar.SetParams(0, hmin, hmax+v, ClientArea.Width);
         end;
-      end else FVScrollBar.SetParams(FVScrollBar.Position, vmin, vmax+v, ClientArea.Height);
+      end else begin
+        if (FVScrollBar <> NIL) and FVScrollBar.Visible then v := FVScrollBar.Width else v := 0;
+        FVScrollBar.SetParams(FVScrollBar.Position, vmin, vmax+v, ClientArea.Height);
+      end;
     end;
   end;
 end;
