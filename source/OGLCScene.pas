@@ -458,7 +458,9 @@ TOGLCScene = class(TOGLCContext)
 
   function CreateTileEngine(aLayer: integer=0): TTileEngine;
 
-  function CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer=0): TSprite;
+  function CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer=0): TSprite; deprecated 'use AddSprite instead';
+  function AddSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer=0): TSprite; overload;
+  function AddSprite(aTexture: PTexture; aTextureOwner: boolean; aLayerIndex: integer; aX, aY: single): TSprite; overload;
   function Add_FreeText(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TFreeText;
 
   function Add_UILabel(const aCaption: string; aFont: TTexturedFont; aLayer: integer=0): TUILabel;
@@ -1324,6 +1326,19 @@ function TOGLCScene.CreateSprite(aTexture: PTexture; aTextureOwner: boolean; aLa
 begin
   Result := TSprite.Create(aTexture, aTextureOwner);
   Add(Result, aLayer);
+end;
+
+function TOGLCScene.AddSprite(aTexture: PTexture; aTextureOwner: boolean; aLayer: integer): TSprite;
+begin
+  Result := TSprite.Create(aTexture, aTextureOwner);
+  Add(Result, aLayer);
+end;
+
+function TOGLCScene.AddSprite(aTexture: PTexture; aTextureOwner: boolean;
+  aLayerIndex: integer; aX, aY: single): TSprite;
+begin
+  Result := AddSprite(aTexture, aTextureOwner, aLayerIndex);
+  Result.SetCoordinate(aX, aY);
 end;
 
 function TOGLCScene.Add_FreeText(const aCaption: string; aFont: TTexturedFont; aLayer: integer): TFreeText;
