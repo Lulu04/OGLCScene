@@ -168,8 +168,7 @@ end;
 
 TUITextArea = class(TUIClickableAndScrollableWithBodyShape)
 private
-  FIndexFirstLineVisible,
-  FYFirstLineVisible: integer;
+  FIndexFirstLineVisible: integer;
   FNeedFormatText: boolean;
   procedure ProcessCallbackSomethingChangeTheSize; override;
   procedure ProcessEventScrollBarChange(aSurface: TSimpleSurfaceWithEffect); override;
@@ -914,7 +913,6 @@ var fHeight: integer;
 begin
   fHeight := Text.TexturedFont.Font.FontHeight;
   FIndexFirstLineVisible := FVScrollBar.Position div fHeight;
-  FYFirstLineVisible := -FVScrollBar.Position mod fHeight;
 end;
 
 procedure TUITextArea.UpdateWidgetSizeAndLayout;
@@ -947,13 +945,11 @@ begin
 
     Text.Area := ClientArea;
     Text.Area.Width := Text.Area.Width - FVScrollBar.Width;
-    //FIndexFirstLineVisible := FVScrollBar.Position div Text.TexturedFont.Font.FontHeight;
-    //FYFirstLineVisible := -FVScrollBar.Position mod Text.TexturedFont.Font.FontHeight;
+
+    FIndexFirstLineVisible := FVScrollBar.Position div Text.TexturedFont.Font.FontHeight;
   end else begin
     UpdateVScrollBar(needScrollBar, 0, 0);
     FIndexFirstLineVisible := 0;
-    FYFirstLineVisible := 0;
-
     Text.Area := ClientArea;
   end;
   Text.DistributeTheWordsOnTheSurface;
@@ -983,11 +979,11 @@ begin
   minYVisible := ClientArea.Top - Text.FTexturedFont.Font.FontHeight+1;
 
   with Text do
-    for i:=0 to High(FWords) do
-      if FWords[i].LineIndex >= FIndexFirstLineVisible then begin
-        yy := FWords[i].Location.y - yOffset;
+    for i:=0 to High(Words) do
+      if Words[i].LineIndex >= FIndexFirstLineVisible then begin
+        yy := Words[i].Location.y - yOffset;
         if InRange(yy, minYVisible, ClientArea.Bottom) then
-          FTexturedFont.DrawChars(FWords[i].CharIndexes, FWords[i].Location.x, yy, 0, NIL, NIL,
+          FTexturedFont.DrawChars(Words[i].CharIndexes, Words[i].Location.x, yy, 0, NIL, NIL,
                                    FComputedOpacity, computedTint, FBlendMode);
       end;
 
