@@ -377,7 +377,7 @@ begin
 
   for i:=0 to FChilds.Count-1 do begin
     o := TSimpleSurfaceWithEffect(FChilds[i]);
-    if (o is TUIClickableObject) and (o <> FHScrollBar) and (o <> FVScrollBar) then begin
+    if (o <> FHScrollBar) and (o <> FVScrollBar) then begin
       if FHScrollBar <> NIL then begin
         v := Round(o.X.Value);
         if hmin > v then hmin := v;
