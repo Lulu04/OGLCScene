@@ -325,7 +325,7 @@ begin
 end;
 
 function SplitTextToWordArray(aText: string; aCharSeparator: char): TStringArray;
-var i: integer;
+var i, len: integer;
 begin
   Result := NIL;
   if Length(aText) = 0 then exit;
@@ -335,10 +335,11 @@ begin
   aText := StringReplace(aText, #13, #10, [rfReplaceAll{, rfIgnoreCase}]);
 
   // add a aCharSeparator before and after each #10
-  for i:=Length(aText) downTo 1 do
-    if (aText[i] = #10) and (i > 1) then begin
-      Insert(aCharSeparator, aText, i+1);
-      Insert(aCharSeparator, aText, i);
+  len := Length(aText);
+  for i:=len downTo 1 do
+    if aText[i] = #10 then begin
+      if (i < len) and (aText[i+1] <> aCharSeparator) then Insert(aCharSeparator, aText, i+1);
+      if (i > 1) and (aText[i-1] <> aCharSeparator) then Insert(aCharSeparator, aText, i);
     end;
 
   Result := aText.Split([aCharSeparator]);
