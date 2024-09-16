@@ -192,6 +192,8 @@ TOGLCCamera = class;
 {$I oglcTileEngine.inc}
 {$I oglcParticle.inc}
 {$I oglcTexturedFont.inc}
+{$I oglcAlignText.inc}
+{$I oglcFreeText.inc}
 {$I oglcUITheme.inc}
 {$I oglcUI.inc}
 {$I oglcUIScrollable.inc}
@@ -871,6 +873,8 @@ end;
 {$I oglcUIScrollable.inc}
 {$I oglcUIModalPanel.inc}
 {$I oglcTexturedFont.inc}
+{$I oglcAlignText.inc}
+{$I oglcFreeText.inc}
 {$I oglcEnvironment.inc}
 {$I oglcGpuInfo.inc}
 {$undef oglcIMPLEMENTATION}
