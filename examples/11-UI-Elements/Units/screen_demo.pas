@@ -21,8 +21,8 @@ private
   FtexFont: TTexturedFont;
   FtexWarning, FtexChecked, FtexUnchecked: PTexture;
 
-  FLabel1, FLabel2, FLabel3, FLabel4, FLabel5, FLabel6, FLabel7, FLabel8, FLabel9, FLabel10, FLabel11: TUILabel;
-  FButton1, FButtonClear: TUIButton;
+  FLabel1, FLabel2, FLabel3, FLabel4, FLabel5, FLabel6, FLabel7, FLabel9, FLabel10, FLabel11: TUILabel;
+  FButton1, FButton2, FButtonClear: TUIButton;
   FPanel1, FPanel2, FPanel3, FPanel4, FPanel5: TUIPanel;
   FCheckBox1, FCheckBox2: TUICheck;
   FRadio1, FRadio2, FRadio3: TUIRadio;
@@ -54,7 +54,7 @@ end;
 var ScreenDemo: TScreenDemo = NIL;
 
 implementation
-uses Forms, Graphics, form_main;
+uses Forms, Graphics;
 
 { TScreenDemo }
 
@@ -78,6 +78,7 @@ begin
   if Sender = FPanel1 then s := 'Panel1 - clicked';
   if Sender = FCheckBox1 then s := 'CheckBox1 - clicked';
   if Sender = FScrollBar1 then FLabel3.Caption := Format('TUIScrollBar     %d/%d  page size %d', [FScrollBar1.Position, FScrollBar1.Max, FScrollBar1.PageSize]);
+  if Sender = FButton2 then s := 'Clicked!';
 
   if s <> '' then begin
     FTextArea1.Text.Caption := FTextArea1.Text.Caption + #10 + s;
@@ -536,11 +537,11 @@ begin
     FScrollBox1.AddChild(FLabel10);
     FLabel10.SetCoordinate(0, FLabel7.BottomY);
 
-    FLabel8 := TUILabel.Create(FScene, 'You found me!', FtexFont);
-    FLabel8.Tint.Value := BGRA(220,220,220);
-    FScrollBox1.AddChild(FLabel8);
-    FLabel8.SetCoordinate(FScrollBox1.Width*2, FScrollBox1.Height*2);
-
+    FButton2 := TUIButton.Create(FScene, 'You found me!', FtexFont, NIL);
+    FButton2._Label.Tint.Value := BGRA(220,220,220);
+    FScrollBox1.AddChild(FButton2);
+    FButton2.SetCoordinate(FScrollBox1.Width*2, FScrollBox1.Height*2);
+    InitCallbackOn(FButton2);
 end;
 
 procedure TScreenDemo.FreeObjects;
