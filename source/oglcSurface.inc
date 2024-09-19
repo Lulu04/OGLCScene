@@ -120,7 +120,6 @@ protected
   FApplySymmetryWhenFlip: boolean;
   FReferenceSurfaceForSymmetry: TSimpleSurfaceWithEffect;
   FSurfaceOrigin: TPointF;
-  FScaleOrigin: TPointF;
   FZOrderAsChild: integer; // z order in case the surface is a child because child can be below or above its parent surface.
   procedure SetZOrderAsChild(AValue: integer);
   function GetChild(aIndex: integer): TSimpleSurfaceWithEffect;
@@ -624,14 +623,13 @@ procedure TSimpleSurfaceWithEffect.Update(const aElapsedTime: single);
 var Xr,Yr,s,c: single ;
     i, loopLength: integer;
 begin
-  FSurfaceOrigin.x := X.Value;
-  FSurfaceOrigin.y := Y.Value;
-  FScaleOrigin := Scale.Value;
   if FParentSurface <> NIL then begin
-    FSurfaceOrigin += FParentSurface.FSurfaceOrigin;
-    FScaleOrigin.x := FScaleOrigin.x*FParentSurface.FScaleOrigin.x;
-    FScaleOrigin.y := FScaleOrigin.y*FParentSurface.FScaleOrigin.y;
-  end; }
+    FSurfaceOrigin.x := FParentSurface.FSurfaceOrigin.x + X.Value;
+    FSurfaceOrigin.y := FParentSurface.FSurfaceOrigin.y + Y.Value;
+  end else begin
+    FSurfaceOrigin.x := X.Value;
+    FSurfaceOrigin.y := Y.Value;
+  end;
 
   if FEnableProcessMessage then FMessageList.ProcessMessages(aElapsedTime);
 
