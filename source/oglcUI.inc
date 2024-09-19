@@ -2437,7 +2437,7 @@ begin
      (aChild.ParentSurface is TUIClickableWithBodyShape) then begin
     o := TUIClickableObject(aChild);
     p := o.SceneToSurfaceUI(aScenePt);
-    p := o.SurfaceToParentUI(p, NIL) - o.ScrollOffset;
+    p := o.SurfaceToParentUI(p, NIL) {- o.ScrollOffset};
     if not TUIClickableWithBodyShape(aChild.ParentSurface).ClientArea.Contains(p) then Result := False;
   end;
 end;
@@ -2487,16 +2487,8 @@ begin
     //if CheckIfPosIsInParentClientArea(FSurfaceLockedByMouse, Point(X,Y)) then
       FSurfaceLockedByMouse.DoOnMouseMove(Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
   end else if FSurfaceUnderMouse <> NIL then begin
-try
       if CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X,Y)) then
         FSurfaceUnderMouse.DoOnMouseMove(Shift, FSurfaceUnderMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceUnderMouse.ScrollOffset);
-
-except
-  on E: Exception do begin
-    FParentScene.LogError('TMouseManager.ProcessOnMouseMove: exception occurs "'+E.Message);
-    FParentScene.LogInfo('FSurfaceUnderMouse is '+FSurfaceUnderMouse.ClassName, 1);
-  end;
-end;
   end;
 end;
 
