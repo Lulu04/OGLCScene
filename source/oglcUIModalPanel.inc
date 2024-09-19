@@ -13,7 +13,6 @@ private
   FState: ModalPanelState;
   FItemInstance: PModalPanelItem;
   FSceneDarkness: TMultiColorRectangle;
-  FBGColorOpacity: byte;
 public
   procedure Draw(const aLayerPercentOpacity: single);  override;
 public
