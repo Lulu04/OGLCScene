@@ -43,7 +43,7 @@ function LoadBitmapScaledPPI(aScene: TOGLCScene; const aFileName: string): TBGRA
 function SplitTextToWordArray(aText: string; aCharSeparator: char=' '): TStringArray;
 
 // draw a box (without filling) using the current scene MVP matrix.
-procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0); overload;
+procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0); overload;
 procedure DrawBox(const aScene: TOGLCScene; const aRect: TRect; const aColor: TBGRAPixel; w: single=1.0; aOpacity: single=1.0); overload;
 procedure FillBox(const aScene: TOGLCScene; aX, aY, aWidth, aHeight: single; const aFillColor: TBGRAPixel; aOpacity: single=1.0); overload;
 procedure FillBox(const aScene: TOGLCScene; const aRect: TRect; const aFillColor: TBGRAPixel; aOpacity: single=1.0); overload;
@@ -349,9 +349,12 @@ begin
     if Length(Result[i]) = 0 then Delete(Result, i , 1);
 end;
 
-procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; const aColor: TBGRAPixel; w: single; aOpacity: single);
+procedure DrawBox(const aScene: TOGLCScene; const aX, aY, aWidth, aHeight: single; aColor: TBGRAPixel; w: single; aOpacity: single);
 var path: TOGLCPath;
 begin
+  aColor.alpha := Round(aColor.alpha*aOpacity);
+  if aColor.alpha = 0 then exit;
+
   path := NIL;
   path.CreateRect(aX, aY, aWidth, aHeight, True);
   aScene.FastLineRenderer.Prepare(aScene.MVPMatrix, FX_BLEND_NORMAL);
