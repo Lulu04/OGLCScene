@@ -371,14 +371,14 @@ TOGLCScene = class(TOGLCContext)
   Destructor Destroy; override;
 
   procedure CreateLogFile(const aFilename: string; aDeletePrevious: boolean; aCallback: TOGLCLogCallback=NIL; aCallbackData: pointer=NIL);
-  procedure LogEmptyLine(aSeparator: string=''); inline;
-  procedure LogMess(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False); inline;
-  procedure LogInfo(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False); inline;
-  procedure LogWarning(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False); inline;
-  procedure LogError(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False); inline;
-  procedure LogDebug(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False); inline;
-  procedure LogStartMeasuringTime(const aMsg: string; aMarginCount: integer=0); inline;
-  procedure LogStopMeasuringTime(const aMsg: string; aMarginCount: integer=0); inline;
+  procedure LogEmptyLine(aSeparator: string='');
+  procedure LogMess(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False);
+  procedure LogInfo(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False);
+  procedure LogWarning(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False);
+  procedure LogError(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False);
+  procedure LogDebug(const aMsg: string; aMarginCount: integer=0; aShowTime: boolean=False);
+  procedure LogStartMeasuringTime(const aMsg: string; aMarginCount: integer=0);
+  procedure LogStopMeasuringTime(const aMsg: string; aMarginCount: integer=0);
 
   function GetRectArea: TRect;
 

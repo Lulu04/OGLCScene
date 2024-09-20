@@ -21,9 +21,9 @@ type
     function EqualTo(const aMat: TOGLCMatrix): boolean; inline;
     procedure Ortho(left, right, bottom, top, zNear, zFar: single);
 
-    procedure SetAsTranslation(const aX, aY: single); inline;
-    procedure SetAsScaling(const aX, aY: single); inline;
-    procedure SetAsRotation(const aAngleDeg: single); inline; // 2D rotation is around Z axis only
+    procedure SetAsTranslation(const aX, aY: single);
+    procedure SetAsScaling(const aX, aY: single);
+    procedure SetAsRotation(const aAngleDeg: single);  // 2D rotation is around Z axis only
 
     procedure LoadIdentity; inline;
     procedure AddTransform(aXPos, aYPos, aXScale, aYScale, aAngle, aXPivot, aYPivot: single; aXOffset: single=0; aYOffset: single=0);
