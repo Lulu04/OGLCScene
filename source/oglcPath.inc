@@ -138,7 +138,7 @@ end;
 function TOGLCPathHelper.Bounds: TRectF;
 var i: integer;
 begin
-  FillChar(Result, SizeOf(TRectF), $00);
+  FillChar(Result{%H-}, SizeOf(TRectF), $00);
   for i:=0 to High(Self) do
     with Result, Self[i] do begin
     if Left > x then Left := x

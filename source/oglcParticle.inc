@@ -507,7 +507,6 @@ var i, PToCreate, _Spread: integer;
     pc, nc: PPColor;
     ps, ns: PPSingle;
     offsetX, offsetY: single;
-j:integer;
 begin
   inherited Update(aElapsedTime);
   if FFreeze then exit;
