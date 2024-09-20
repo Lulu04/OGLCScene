@@ -171,7 +171,7 @@ private
   FIndexFirstLineVisible: integer;
   FNeedFormatText: boolean;
   procedure ProcessCallbackSomethingChangeTheSize; override;
-  procedure ProcessEventScrollBarChange(aSurface: TSimpleSurfaceWithEffect); override;
+  procedure ProcessEventScrollBarChange({%H-}aSurface: TSimpleSurfaceWithEffect); override;
   procedure UpdateWidgetSizeAndLayout; override;
 public
   procedure DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer; aMousePos: TPoint; var aHandled: Boolean); override;
