@@ -257,6 +257,7 @@ public
 
   // Enable clipping (using stencil buffer) when draw the child surfaces. Default is True.
   property ChildClippingEnabled: boolean read FChildClippingEnabled write FChildClippingEnabled;
+  // The client area of the surface
   property ClientArea: TRect read FClientArea;
   property AutoSize: boolean read FAutoSize write SetAutoSize;
 end;
