@@ -80,7 +80,6 @@ end;
 procedure TAlignedTextDescriptor.DistributeTheWordsOnTheSurface;
 var W: TStringArray;
    iw, j, spaceWidth, xx, yy: Integer;
-   flagLastWasLineEnding: boolean;
    procedure _NextLine;
    begin
     yy += FTexturedFont.Font.FontHeight;
@@ -170,17 +169,12 @@ begin
   FLineCount := 1;
   iw := 0;
   j := 0;
-  flagLastWasLineEnding := False;
   repeat
 
-    if {Words[j].Letters}W[iw] = #10 then begin
-      //if CurrentLineIsEmpty then dec(FLineCount) else flagLastWasLineEnding := True;
-      //if CurrentLineIsEmpty then dec(FLineCount);
-      flagLastWasLineEnding := True;
+    if W[iw] = #10 then begin
       _NextLine;
       inc(iw);
     end else begin
-      flagLastWasLineEnding := False;
       Words[j].Letters := W[iw];
       Words[j].CharIndexes := FTexturedFont.StringToCharIndexes(W[iw]);
       Words[j].Width := FTexturedFont.GetTextWidth(Words[j].Letters);
@@ -203,8 +197,6 @@ begin
     end;
     if xx > DrawingSize.cx then DrawingSize.cx := xx;
   until iw = Length(W);
-
- // if flagLastWasLineEnding then dec(FLineCount);
 
   DrawingSize.cy := FTexturedFont.Font.FontHeight*FLineCount;
 end;

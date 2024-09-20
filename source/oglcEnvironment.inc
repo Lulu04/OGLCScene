@@ -62,7 +62,6 @@ end;
 { TSnow }
 
 TSnow = class(TSimpleSurfaceWithEffect)
-private const MAX_FLAKE = 1000;
 private type
   PFlake = ^TStructFlake;
   TStructFlake = record
