@@ -18,7 +18,7 @@ end;  }
 
 
 
-
+// clipping with OpenGL Stencil Buffer
 // concept from https://stackoverflow.com/questions/7465360/nested-scissor-boxes-with-opengl
 
 
@@ -36,6 +36,12 @@ end;
 
 
 // SOFTWARE CLIPPING
+
+// Check if the specified surface area is visible in the given clipped rectangle.
+//   > return True if at least one part of the surface is visible (the object can be drawn)
+//   > return False if the surface is completely outside.
+// If only a part is visible, the function 'cut' the surface area.
+function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect): boolean;
 
 // Check if the specified surface area is visible in the given clipped rectangle.
 //   > return True if at least one part of the surface is visible (the object can be drawn)
@@ -117,6 +123,43 @@ begin
   IsActive := False;
 end; }
 
+function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect): boolean;
+var delta, surfaceAreaWidth, surfaceAreaHeight: integer;
+  pc: single;
+begin
+  surfaceAreaWidth := aSurfaceArea.Width;
+  if surfaceAreaWidth <= 0 then exit(False);
+
+  surfaceAreaHeight := aSurfaceArea.Height;
+  if surfaceAreaHeight <= 0 then exit(False);
+
+  with aClipRect do begin
+    if (aSurfaceArea.Left > Right) or (aSurfaceArea.Right < Left) or
+       (aSurfaceArea.Top > Bottom) or (aSurfaceArea.Bottom < Top)  then exit(False);
+
+    Result := True;
+
+    if aSurfaceArea.Left < Left then begin  //trim the left
+      delta := Left - aSurfaceArea.Left;
+      aSurfaceArea.Left := aSurfaceArea.Left + delta;
+    end;
+
+    if aSurfaceArea.Right > Right then begin  //trim the right
+      delta := aSurfaceArea.Right - Right;
+      aSurfaceArea.Right := aSurfaceArea.Right - delta;
+    end;
+
+    if aSurfaceArea.Top < Top then begin  //trim the top
+      delta := Top - aSurfaceArea.Top;
+      aSurfaceArea.Top := aSurfaceArea.Top + delta;
+    end;
+
+    if aSurfaceArea.Bottom > Bottom then begin  //trim the bottom
+     delta := aSurfaceArea.Bottom - Bottom;
+     aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
+    end;
+  end;
+end;
 
 function CheckAndAdjust(const aClipRect: TRect;
   var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
