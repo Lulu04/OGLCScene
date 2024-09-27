@@ -49,7 +49,8 @@ public
   procedure SetCursorSprite(aTexture: PTexture; aOwner: boolean);
   procedure DeleteCursorSprite;
 
-  function IsOver(aGUISurface: TUIClickableObject): boolean;
+  function IsOver(aGUISurface: TUIClickableObject): boolean; overload;
+  function IsOver(aRect: TRect): boolean; overload;
 
   property ButtonState[btn: TMouseButton]: boolean read GetButtonState;
 
@@ -127,7 +128,6 @@ public
   procedure DoOnMouseWheel(aShift: TShiftState; aWheelDelta: Integer; aMousePos: TPoint; var aHandled: Boolean); virtual;
 public
   procedure Update(const aElapsedTime: single); override;
-  procedure AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer=0); override;
 public
   constructor Create(aParentScene: TOGLCScene);
 
@@ -244,6 +244,9 @@ protected
   function GetHeight: integer; override;
   procedure DrawBorder(const aComputedTint: TColorF; aOpacity: single);
   procedure DrawBackground(const aComputedTint: TColorF; aOpacity: single);
+  // Return True if the surface is visible on the scene or on its parent.
+  // False if the parent is not visible or the surface is not in the client area of the parent.
+  //function MouseCanInteract: boolean;
 public
   // Allow to control the shape of the widget and give access to Border and Fill objects.
   BodyShape: TBodyShape;
@@ -1595,14 +1598,9 @@ begin
 end;
 
 procedure TUIClickableObject.SetMouseInteractionEnabled(AValue: boolean);
-var i: integer;
 begin
   if FMouseInteractionEnabled = AValue then Exit;
   FMouseInteractionEnabled := AValue;
-
-  for i:=0 to FChilds.Count-1 do
-    if TSimpleSurfaceWithEffect(FChilds[i]) is TUIClickableObject then
-      TUIClickableObject(Childs[i]).MouseInteractionEnabled := AValue;
 end;
 
 procedure TUIClickableObject.DoPositionAnchor;
@@ -1830,37 +1828,41 @@ end;
 
 procedure TUIClickableObject.Update(const aElapsedTime: single);
 var i: integer;
+  allParentHaveMouseInteractionEnabled: boolean;
+  par: TSimpleSurfaceWithEffect;
 begin
   inherited Update(aElapsedTime);
 
   DoPositionAnchor;
-  if not MouseInteractionEnabled then begin
+
+  // check if all parents have MouseInteractionEnabled sets to True
+  allParentHaveMouseInteractionEnabled := True;
+  par := ParentSurface;
+  while par <> NIL do begin
+    if par is TUIClickableObject then
+      allParentHaveMouseInteractionEnabled := allParentHaveMouseInteractionEnabled and TUIClickableObject(par).MouseInteractionEnabled;
+    par := par.ParentSurface;
+  end;
+
+  if not MouseInteractionEnabled or not allParentHaveMouseInteractionEnabled then begin
     if FMouseEntered then begin
       DoOnMouseLeave;
       FMouseEntered := False;
     end;
+    if FParentScene.Mouse.FSurfaceUnderMouse = Self then FParentScene.Mouse.FSurfaceUnderMouse := NIL;
+    if FParentScene.Mouse.FSurfaceLockedByMouse = Self then FParentScene.Mouse.FSurfaceLockedByMouse := NIL;
     exit;
   end;
 
-
-  if FFreeze or not FVisible or
-    (FParentScene.Mouse.SurfaceUnder <> NIL) or
-    (Opacity.Value = 0) then exit;
+  if FFreeze or not FVisible or (Opacity.Value = 0) or
+    (FParentScene.Mouse.SurfaceUnder <> NIL) then exit;
 
   // first check mouse on childs
-  for i:=ChildCount-1 downto 0 do begin
+  for i:=ChildCount-1 downto 0 do
    if Childs[i] is TUIClickableObject then
      TUIClickableObject(Childs[i]).CheckMouseEnterOrLeave;
-  end;
 
   CheckMouseEnterOrLeave;
-end;
-
-procedure TUIClickableObject.AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer);
-begin
-  inherited AddChild(ASurface, aZOrder);
-  if ASurface is TUIClickableObject then
-    TUIClickableObject(ASurface).MouseInteractionEnabled := MouseInteractionEnabled;
 end;
 
 constructor TUIClickableObject.Create(aParentScene: TOGLCScene);
@@ -2178,6 +2180,27 @@ begin
   BodyShape.DrawBackground(aComputedTint, aOpacity, True);
 end;
 
+{function TUIClickableWithBodyShape.MouseCanInteract: boolean;
+var par: TUIClickableWithBodyShape;
+begin
+  if ParentSurface = NIL then begin
+    // there is no parent: mouse can interact if the surface is visible on the scene
+    Result := (RightX > 0) and (X.Value < ParentScene.Width) and
+              (BottomY > 0) and (Y.Value < ParentScene.Height);
+    exit;
+  end;
+
+  // if the parent don't have clipping, childs are all visible
+  if not (ParentSurface is TUIClickableWithBodyShape) then exit(True);
+
+  par := TUIClickableWithBodyShape(ParentSurface);
+
+  // if the parent don't apply clipping, childs are all visible
+  if not par.ChildClippingEnabled then exit(True);
+
+  Result := par.MouseCanInteract and ClientArea.IntersectsWith(par.ClientArea);
+end; }
+
 procedure TUIClickableWithBodyShape.Draw(const aLayerPercentOpacity: single);
 var clippingWasActive: Boolean;
 begin
@@ -2386,11 +2409,36 @@ end;
 
 function TMouseManager.IsOver(aGUISurface: TUIClickableObject): boolean;
 var xx, yy: integer;
+  r, rpar: TRect;
+  par: TSimpleSurfaceWithEffect;
 begin
   if (aGUISurface = NIL) or (aGUISurface.FKill = True) or not FMousePoolEnabled then exit(False);
   if (FSurfaceLockedByMouse <> NIL) and (FSurfaceLockedByMouse <> aGUISurface) then exit(False);
   if not aGUISurface.MouseInteractionEnabled or not aGUISurface.Visible then exit(False);
+  if aGUISurface.Opacity.Value = 0 then exit(False);
 
+  xx := Round(aGUISurface.FSurfaceOrigin.x) + aGUISurface.ScrollOffset.x;
+  yy := Round(aGUISurface.FSurfaceOrigin.y) + aGUISurface.ScrollOffset.y;
+  r := Rect(xx, yy, xx+aGUISurface.Width, yy+aGUISurface.Height);
+  par := aGUISurface.ParentSurface;
+  while par <> NIL do begin
+    xx := Round(par.FSurfaceOrigin.x);
+    yy := Round(par.FSurfaceOrigin.y);
+    if (par is TUIClickableWithBodyShape) and TUIClickableWithBodyShape(par).ChildClippingEnabled then begin
+      xx := xx + TUIClickableWithBodyShape(par).ScrollOffset.x;
+      yy := yy + TUIClickableWithBodyShape(par).ScrollOffset.y;
+      rpar := Rect(xx, yy, xx+par.Width, yy+par.Height);
+      if not CheckAndAdjust(rpar, r) then exit(False);
+    end;
+    par := par.ParentSurface;
+  end;
+
+  Result := (FMousePos.x >= r.Left) and (FMousePos.x <= r.Right) and
+            (FMousePos.y >= r.Top) and (FMousePos.y <= r.Bottom);
+
+
+
+ {
   with aGUISurface do begin
     // we use ScrollOffset because the surface can be a child of a scrollable parent
     xx := Round(aGUISurface.FSurfaceOrigin.x) + ScrollOffset.x;
@@ -2399,13 +2447,22 @@ begin
               (FMousePos.x <= xx+Width) and
               (FMousePos.y >= yy) and
               (FMousePos.y <= yy+Height);
-  end;
+  end;  }
 
   // because a surface can be a child and outside its parent ClientArea
-  if Result then
-    Result := CheckIfPosIsInParentClientArea(aGUISurface, FMousePos);
+//  if Result then
+//    Result := CheckIfPosIsInParentClientArea(aGUISurface, FMousePos);
 
-  if Result then FSurfaceUnderMouse := aGUISurface;
+  if Result then
+    FSurfaceUnderMouse := aGUISurface;
+end;
+
+function TMouseManager.IsOver(aRect: TRect): boolean;
+begin
+  Result := (FMousePos.x >= aRect.Left) and
+            (FMousePos.x <= aRect.Right) and
+            (FMousePos.y >= aRect.Top) and
+            (FMousePos.y <= aRect.Bottom);
 end;
 
 procedure TMouseManager.SetSystemMouseCursorVisible(AValue: boolean);
@@ -2435,11 +2492,12 @@ begin
   Result := True;
   if (aChild is TUIClickableObject) and
      (aChild.ParentSurface <> NIL) and
-     (aChild.ParentSurface is TUIClickableWithBodyShape) then begin
+     (aChild.ParentSurface is TUIClickableWithBodyShape) and
+     TUIClickableWithBodyShape(aChild.ParentSurface).ChildClippingEnabled then begin
     o := TUIClickableObject(aChild);
     p := o.SceneToSurfaceUI(aScenePt);
     p := o.SurfaceToParentUI(p, NIL) {- o.ScrollOffset};
-    if not TUIClickableWithBodyShape(aChild.ParentSurface).ClientArea.Contains(p) then Result := False;
+    Result := TUIClickableWithBodyShape(aChild.ParentSurface).ClientArea.Contains(p);
   end;
 end;
 
@@ -2450,8 +2508,6 @@ begin
   FMousePos.y := Y;
 
   if FSurfaceLockedByMouse <> NIL then begin
-    //if not CheckIfPosIsInParentClientArea(FSurfaceLockedByMouse, Point(X, Y)) then exit;
-
     FSurfaceLockedByMouse.DoOnMouseDown(Button, Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
 
   end else if FSurfaceUnderMouse <> NIL then begin
@@ -2469,7 +2525,6 @@ begin
   FMousePos.y := Y;
 
   if FSurfaceLockedByMouse <> NIL then begin
-    //if not CheckIfPosIsInParentClientArea(FSurfaceLockedByMouse, Point(X, Y)) then exit;
     FSurfaceLockedByMouse.DoOnMouseUp(Button, Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset);
     FSurfaceLockedByMouse := NIL;
   end else if FSurfaceUnderMouse <> NIL then begin
@@ -2485,7 +2540,6 @@ begin
   FMousePos.y := Y;
 
   if FSurfaceLockedByMouse <> NIL then begin
-    //if CheckIfPosIsInParentClientArea(FSurfaceLockedByMouse, Point(X,Y)) then
       FSurfaceLockedByMouse.DoOnMouseMove(Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
   end else if FSurfaceUnderMouse <> NIL then begin
       if CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X,Y)) then

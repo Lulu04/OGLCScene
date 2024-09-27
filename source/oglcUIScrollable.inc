@@ -454,17 +454,15 @@ procedure TUIScrollBox.Update(const aElapsedTime: single);
 var i: integer;
   o: TSimpleSurfaceWithEffect;
   p: TPoint;
-  nestedScrollableParent: boolean;
 begin
   p := ClientArea.TopLeft - GetViewOffset;
-  nestedScrollableParent := HaveScrollableParent;
+  p := p + ScrollOffset;
 
-  // set or add scroll offset on childs
+  // set scroll offset on childs
   for i:=0 to ChildCount-1 do begin
     o := Childs[i];
     if (o is TUIClickableObject) and (o <> FHScrollBar) and (o <> FVScrollBar) then
-      if nestedScrollableParent then TUIClickableObject(o).ScrollOffset := TUIClickableObject(o).ScrollOffset + p
-        else TUIClickableObject(o).ScrollOffset := p;
+      TUIClickableObject(o).ScrollOffset := p;
   end;
 
   inherited Update(aElapsedTime);
