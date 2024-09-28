@@ -231,10 +231,12 @@ TOGLCContext = class(TLayerList)
   FKeyPressed: array[0..255] of boolean;
   FKeyPressedCount: integer;
   FLastKeyDown: Byte;
+  FLastUTF8CharEntered: string;
   FMouseManager: TMouseManager;
   FTextureManager: TTextureManager;
   FTimerManager: TTimerManager;
   function GetKeyToString(index: byte): string;
+  function GetLastUTF8CharEntered: string;
   function GetMouseButtonState(btn: TMouseButton): boolean;
   function GetUserPressAKey: boolean;
   procedure ProcessOnResize(Sender:TObject);
@@ -262,7 +264,7 @@ TOGLCContext = class(TLayerList)
   procedure ProcessOnKeyDown(var Key: Word; Shift: TShiftState);
   // must be called from main windows to ensure keyboard input
   procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
-  // must be called from main windows to ensure keyboard input
+  // must be called from main windows to ensure keyboard UTF8Char input
   procedure ProcessOnUTF8KeyPress(var UTF8Key: TUTF8Char);
 
   procedure ClearKeysState;
@@ -275,6 +277,10 @@ TOGLCContext = class(TLayerList)
   property KeyPressed[index: byte]: boolean read GetKeyPressed;
   // Index is a LCLType.VK_xx key code. Return a string representation of the key
   property KeyToString[index: byte]: string read GetKeyToString;
+  // Return the last UTF8 character entered by player since the last call of this property.
+  // Empty string is returned if the player haven't pressed a key that generate a displayable character.
+  // Reading this property reset it to an empty string.
+  property LastUTF8CharEntered: string read GetLastUTF8CharEntered;
 
   property MouseButtonState[btn: TMouseButton]: boolean read GetMouseButtonState;
 
@@ -613,6 +619,12 @@ begin
   end;
 end;
 
+function TOGLCContext.GetLastUTF8CharEntered: string;
+begin
+  Result := FLastUTF8CharEntered;
+  FLastUTF8CharEntered := '';
+end;
+
 function TOGLCContext.GetUserPressAKey: boolean;
 begin
   Result := FKeyPressedCount > 0;
@@ -779,8 +791,6 @@ begin
 
     if not FKeyState[byte(Key)] then inc(FKeyPressedCount);
     FKeyState[byte(Key)] := TRUE;
-    //FLastKeyDown := byte(Key);
-    Key := 0;
   end;
 end;
 
@@ -812,13 +822,13 @@ begin
       dec(FKeyPressedCount);
     end;
     FKeyState[byte(Key)] := FALSE;
-    Key := 0;
   end;
 if FKeyPressedCount < 0 then raise exception.create('FKeyPressedCount is < 0');
 end;
 
 procedure TOGLCContext.ProcessOnUTF8KeyPress(var UTF8Key: TUTF8Char);
 begin
+  FLastUTF8CharEntered := UTF8Key;
   UTF8Key := '';
 end;
 
