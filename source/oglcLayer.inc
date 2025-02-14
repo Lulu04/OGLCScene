@@ -115,7 +115,7 @@ public
   property Freeze : boolean read FFreeze write FFreeze;
   // Set the layer visible or not
   property Visible : boolean read FVisible write FVisible;
-  // don't use this method directly. Use instead TOGLCCamera.AssignToLayer method to assign
+  // don't use this property directly. Use instead TOGLCCamera.AssignToLayer method to assign
   // a camera view to the layer
   property Camera: TOGLCCamera read FCamera write FCamera;
   // specify a function to sort the surfaces on this layer
