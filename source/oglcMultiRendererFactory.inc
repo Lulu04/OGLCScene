@@ -419,8 +419,6 @@ private const
    '   }'#10+
    '  else if (uTintColor.a > 0)'#10+
    '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
-
-   //'  col = col * (1-uTintColor.a) + uTintColor * uTintColor.a;'#10+
    '  col.a = a;'#10+
    '  FragColor = col;'#10+
    '}' ;
