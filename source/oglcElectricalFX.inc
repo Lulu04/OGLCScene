@@ -106,7 +106,7 @@ public
   Constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
 
-procedure debugVertices;
+  procedure debugVertices;
 
   // Sets the beam target point expressed in scene coordinates.
   // The origin of the beam is the surface coordinates.
