@@ -23,12 +23,9 @@ UI elements with customized colors
   
 Workshop screen in game Little Red Riding Hood
 ![Workshop screen in game Little Red Riding Hood](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/GameLittleRedRidingHood.png)
-
-# To do
-- Render to texture don't work.
   
 # Credits
-A large part of the code of the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
+A large part of the code in the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
 Matrix computation located in file 'gl_core_matrix.inc' was originaly written by Chris Rorden and modified for the use in OGLCScene. The file 'glcorearb.pas' was also written by Chris Rorden. Thanks !
 You can find the original at https://github.com/neurolabusc/OpenGLCoreTutorials/gl_core_matrix.pas
