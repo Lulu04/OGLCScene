@@ -168,7 +168,8 @@ private const
      'if (uTintColor.a > 0.5)'#10+
      ' {'#10+
      '   tintAlphaX2 = tintAlphaX2-1;'#10+
-     '   col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace mode
+     //'   col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace mode
+     '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace mode
      ' }'#10+
      'else if (uTintColor.a > 0)'#10+
      '   col = col + uTintColor*tintAlphaX2;'#10+     // mix mode
@@ -286,7 +287,8 @@ private const
    '  if (uTintColor.a >= 0.5)'#10+
    '   {'#10+
    '     tintAlphaX2 = tintAlphaX2-1;'#10+
-   '     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
+   //'     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
+   '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace mode
    '   }'#10+
    '  else if (uTintColor.a > 0)'#10+
    '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
@@ -356,10 +358,11 @@ private const
    '  if (Tint.a >= 0.5)'#10+
    '   {'#10+
    '     tintAlphaX2 = tintAlphaX2-1;'#10+
-   '     col = col * (1-tintAlphaX2) + Tint * tintAlphaX2;'#10+  // replace color
+   //'     col = col * (1-tintAlphaX2) + Tint * tintAlphaX2;'#10+  // replace mode
+   '     col = mix(col, Tint, tintAlphaX2);'#10+ // replace mode
    '   }'#10+
    '  else if (Tint.a > 0)'#10+
-   '     col = col + Tint*tintAlphaX2;'#10+     // mix color
+   '     col = col + Tint*tintAlphaX2;'#10+     // mix mode
 
    //'  col = col * (1-Tint.a) + Tint * Tint.a;'#10+
    '  col.a = a;'#10+
@@ -415,10 +418,11 @@ private const
    '  if (uTintColor.a >= 0.5)'#10+
    '   {'#10+
    '     tintAlphaX2 = tintAlphaX2-1;'#10+
-   '     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
+   //'     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace mode
+   '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace mode
    '   }'#10+
    '  else if (uTintColor.a > 0)'#10+
-   '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
+   '     col = col + uTintColor*tintAlphaX2;'#10+     // mix mode
    '  col.a = a;'#10+
    '  FragColor = col;'#10+
    '}' ;
@@ -488,10 +492,11 @@ private const
    '  if (VertexTint.a > 0.5)'#10+
    '   {'#10+
    '     tintAlphaX2 = tintAlphaX2-1;'#10+
-   '     col = col * (1-tintAlphaX2) + VertexTint * tintAlphaX2;'#10+  // replace color
+   //'     col = col * (1-tintAlphaX2) + VertexTint * tintAlphaX2;'#10+  // replace mode
+   '     col = mix(col, VertexTint, tintAlphaX2);'#10+ // replace mode
    '   }'#10+
    '  else if (VertexTint.a > 0)'#10+
-   '     col = col + VertexTint*tintAlphaX2;'#10+     // mix color
+   '     col = col + VertexTint*tintAlphaX2;'#10+     // mix mode
 
    '  col.a = a;'#10+
    '  FragColor = col;'#10+
