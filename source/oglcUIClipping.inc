@@ -125,7 +125,6 @@ end; }
 
 function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect): boolean;
 var delta, surfaceAreaWidth, surfaceAreaHeight: integer;
-  pc: single;
 begin
   surfaceAreaWidth := aSurfaceArea.Width;
   if surfaceAreaWidth <= 0 then exit(False);
