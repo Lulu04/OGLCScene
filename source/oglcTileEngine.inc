@@ -35,7 +35,8 @@ FRAGMENT_SHADER =
  '  if (uTintColor.a >= 0.5)'#10+
  '   {'#10+
  '     tintAlphaX2 = tintAlphaX2-1;'#10+
- '     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
+ //'     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
+ '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace color
  '   }'#10+
  '  else if (uTintColor.a > 0)'#10+
  '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
@@ -273,7 +274,7 @@ procedure TOGLCTileRenderer.SetUniformValuesAndTexture;
 begin
   glUniform1i(FLocTextureUnit, FBatch^.CurrentTextureUnit);
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
-  glUniform4fv(FLocTintColor, 4, @FTintF);
+  glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;

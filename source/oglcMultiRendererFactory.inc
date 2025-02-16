@@ -817,8 +817,7 @@ end;
 procedure TOGLCSmoothLineRenderer.SetUniformValuesAndTexture;
 begin
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
-  //glUniform4fv(FLocTintColor, 4, @FTintF);  // don't work... ?
-  glUniform4f(FLocTintColor, FTintF.r, FTintF.g, FTintF.b, FTintF.a);
+  glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   FParentScene.TexMan.UnbindTexture;
 end;
@@ -1079,8 +1078,7 @@ end;
 procedure TOGLCThreeColorTriangleRenderer.SetUniformValuesAndTexture;
 begin
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
-  //glUniform4fv(FLocTintColor, 4, @FTintF);  // don't work... ?
-  glUniform4f(FLocTintColor, FTintF.r, FTintF.g, FTintF.b, FTintF.a);
+  glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   FParentScene.TexMan.UnbindTexture;
 end;
@@ -1316,7 +1314,7 @@ procedure TOGLCTexturedTriangleRenderer.SetUniformValuesAndTexture;
 begin
   glUniform1i(FLocTextureUnit, FBatch^.CurrentTextureUnit);
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
-  glUniform4fv(FLocTintColor, 4, @FTintF);
+  glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
