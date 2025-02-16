@@ -814,20 +814,12 @@ end;
 
 procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayer: integer);
 var p: TPointF;
-  m: TOGLCMatrix;
 begin
   if ParentSurface = NIL then exit;
   p := SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
   FParentScene.Add(Self, aLayer);
   SetCoordinate(p);
-
- { if ParentSurface = NIL then exit;
-  m := GetMatrixSurfaceSpaceToScene;
-  p := m.Transform(PointF(0,0));
-  ParentSurface.RemoveChild(Self);
-  FParentScene.Add(Self, aLayer);
-  SetCoordinate(p); }
 end;
 
 procedure TSimpleSurfaceWithEffect.MoveFromSceneToChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
