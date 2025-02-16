@@ -35,11 +35,11 @@ FRAGMENT_SHADER =
  '  if (uTintColor.a >= 0.5)'#10+
  '   {'#10+
  '     tintAlphaX2 = tintAlphaX2-1;'#10+
- //'     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
- '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace color
+ //'     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace mode
+ '     col = mix(col, uTintColor, tintAlphaX2);'#10+ // replace mode
  '   }'#10+
  '  else if (uTintColor.a > 0)'#10+
- '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
+ '     col = col + uTintColor*tintAlphaX2;'#10+     // mix mode
 
  '  col.a = a;'#10+
  '  FragColor = col;'#10+
