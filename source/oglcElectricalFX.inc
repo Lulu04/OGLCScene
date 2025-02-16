@@ -163,8 +163,7 @@ end;
 procedure TOGLCElectricalBeamRenderer.SetUniformValuesAndTexture;
 begin
   glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
-  //glUniform4fv(FLocTintColor, 4, @FTintF);  // don't work... ?
-  glUniform4f(FLocTintColor, FTintF.r, FTintF.g, FTintF.b, FTintF.a);
+  glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   glUniform4f(FLocBeamColor, FBeamColorF.r, FBeamColorF.g, FBeamColorF.b, FBeamColorF.a);
   glUniform4f(FLocHaloColor, FHaloColorF.r, FHaloColorF.g, FHaloColorF.b, FHaloColorF.a);
