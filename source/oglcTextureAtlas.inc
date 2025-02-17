@@ -96,8 +96,6 @@ public
 end;
 
 
-TAtlasFileFormat = (affText);
-
 { TOGLCTextureAtlas }
 
 TOGLCTextureAtlas = class(TOGLCImagePacker)
@@ -106,8 +104,6 @@ private
   FAtlasTexture: PTexture;
   function GetAtlasTexture: PTexture;
   function SavePackedImage(const aFilename: string): boolean;
-  function SaveAtlasAsText(const aFilename: string): boolean;
-  function LoadAtlasAsText(const aFilename: string): boolean;
 public
   constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
@@ -124,8 +120,6 @@ public
 
   function RetrieveTextureByFileName(const aFilename: string): PTexture;
 
-  function SaveAtlasTo(const aFilename: string; aFormat: TAtlasFileFormat): boolean;
-  function LoadAtlas(const aFilename: string): boolean;
   property Texture: PTexture read GetAtlasTexture;
 end;
 
@@ -559,31 +553,6 @@ begin
   Result := FAtlasTexture;
 end;
 
-function TOGLCTextureAtlas.SaveAtlasAsText(const aFilename: string): boolean;
-var t: TStringlist;
-begin
-  if not SavePackedImage(aFilename) then exit(False);
-
-  Result := True;
-  t := TStringlist.Create;
-  try
-    t.Add('[TEXTURE ATLAS]');
-    try
-      t.SaveToFile(ChangeFileExt(aFilename, '.txt'));
-    except
-      Result := False;
-    end;
-  finally
-    t.Free;
-  end;
-end;
-
-function TOGLCTextureAtlas.LoadAtlasAsText(const aFilename: string): boolean;
-begin
-  // to do
-  Result := False;
-end;
-
 constructor TOGLCTextureAtlas.Create(aParentScene: TOGLCScene);
 begin
   Inherited Create;
@@ -652,22 +621,6 @@ begin
     item := item^.Next;
   until item = NIL;
   Result := NIL;
-end;
-
-function TOGLCTextureAtlas.SaveAtlasTo(const aFilename: string; aFormat: TAtlasFileFormat): boolean;
-begin
-  Result := False;
-  case aFormat of
-    affText: Result := SaveAtlasAsText(aFilename);
-  end;
-end;
-
-function TOGLCTextureAtlas.LoadAtlas(const aFilename: string): boolean;
-begin
-  Result := False;
-  case ExtractFileExt(aFilename) of
-    '.txt': Result := LoadAtlasAsText(aFilename);
-  end;
 end;
 
 
