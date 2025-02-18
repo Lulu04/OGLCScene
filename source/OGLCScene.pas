@@ -299,7 +299,7 @@ TOGLCScene = class(TOGLCContext)
   FLog: TLog;
   FCurrentScreen,
   FScreenRequested: TScreenTemplate;
-  FDoBlackScreenOnNewScreen: boolean;
+  FFadeBlackColorOnNewScreen: boolean;
  private // renderer batch
   FRendererBatch: TRendererBatchDescriptor;
   FCurrentShaderIDInUse: GLuint;
@@ -393,7 +393,7 @@ TOGLCScene = class(TOGLCContext)
   procedure DoLoop;
   procedure ExecuteDuring( aTimeInSecond:single ); Deprecated;
 
-  procedure RunScreen(aScreen: TScreenTemplate; DoBlackScreen: boolean=TRUE);
+  procedure RunScreen(aScreen: TScreenTemplate; aFadeWithBlackColor: boolean=TRUE);
   property CurrentScreen: TScreenTemplate read FCurrentScreen;
   property ScreenFadeTime: single read FScreenFadeTime write FScreenFadeTime;
 
@@ -1123,7 +1123,7 @@ begin
  if FScreenRequested <> NIL then begin
    Mouse.MousePoolEnabled := False; // disable mouse pooling
 
-   if FDoBlackScreenOnNewScreen and
+   if FFadeBlackColorOnNewScreen and
      (FGlobalFadeColor.State = psNO_CHANGE) and
      (FGlobalFadeColor.Value <> BGRABlack)
      then ColorFadeIn(BGRABlack, FScreenFadeTime);
@@ -1173,10 +1173,10 @@ begin
  FExecuteDuringLoop := FALSE;
 end;
 
-procedure TOGLCScene.RunScreen(aScreen: TScreenTemplate; DoBlackScreen: boolean);
+procedure TOGLCScene.RunScreen(aScreen: TScreenTemplate; aFadeWithBlackColor: boolean);
 begin
  FScreenRequested := aScreen;
- FDoBlackScreenOnNewScreen := DoBlackScreen;
+ FFadeBlackColorOnNewScreen := aFadeWithBlackColor;
 end;
 
 procedure TOGLCScene.CreateRenderers;
