@@ -244,8 +244,7 @@ TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
                              pfSepia,            // color effect
                              pfSharpen,          // accentuates edges
                              pfBlur,             // a simple blur effect with 3 selectable levels
-                             pfUnderWater,       // simulates deformations that can be seen under water
-                             pfLightBlur);
+                             pfUnderWater);      // simulates deformations that can be seen under water
 TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
 
 POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
@@ -259,7 +258,6 @@ private const
   fxbmSharpen=$10;
   fxbmBlur=$20;
   fxbmUnderWater=$40;
-  fxbmLightBlur=$80;
 private
   FFX: TOGLCPostProcessingFX;
   procedure ComputeFXBitMask;
@@ -331,7 +329,6 @@ begin
   if pfSharpen in FFX then FXBitMask := FXBitMask or fxbmSharpen;
   if pfBlur in FFX then FXBitMask := FXBitMask or fxbmBlur;
   if pfUnderWater in FFX then FXBitMask := FXBitMask or fxbmUnderWater;
-  if pfLightBlur in FFX then FXBitMask := FXBitMask or fxbmLightBlur;
 end;
 
 procedure TOGLCPostProcessingParameters.InitDefault;
