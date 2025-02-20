@@ -4,9 +4,9 @@
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
 # Support
 - Only 2D !
-- Use OpenGL 3.3 to render graphics.
+- Use OpenGL 3.3 core to render graphics.
 - Renderers with batch system to improve performance. Use vertex and index buffers.
-- A scene is made of one or several layers that contains any kind of surfaces (sprites or others).
+- A scene is made of one or several layers. A layer contains surfaces (sprites and other).
 - Post-processing effects can be activated independently for each layer.
 - Multi screens architecture to separates the different parts of the game.
 - Sprites and other kind of surfaces have self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
@@ -15,6 +15,7 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Surfaces can have nested childs organized hierarchically behind or forward their parent.
 - UI with Button, Label, Image, Panel, CheckBox, RadioButton, ScrollBar, ProgressBar, ListBox, ScrollBox, TextArea.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
+- Camera effects.
 - Particle engine and its tool 'Particles Editor' to make your own particle effects.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
 - Log file.
