@@ -639,16 +639,15 @@ procedure TOGLCPostProcessingEngine.ApplyFX(aParams: POGLCPostProcessingParamete
 var newBitMask: GLuint;
     paramChange: boolean;
     ct: TColorF;
-    procedure CopyParams;
+    procedure CopyAndSendParamsToRenderer;
     begin
-      with aParams^ do FComputedTint.InitFromTint(TintMode, Tint);
+      FCurrentFXBitMask := newBitMask;
+      FComputedTint.InitFromTint(aParams^.TintMode, aParams^.Tint);
       FUnderWaterAmplitude := aParams^.FUnderWaterAmplitude;
       FUnderWaterTimeMultiplicator := aParams^.FUnderWaterTimeMultiplicator;
       FUnderWaterDensity := aParams^.FUnderWaterDensity;
       FBlurAmount := aParams^.FBlurAmount;
-    end;
-    procedure SendParamsToRenderer;
-    begin
+
       with FParentScene.TexturedTriangleRendererWithFX do begin
         SetFXBitMask(FCurrentFXBitMask);
         SetUnderWaterParams(Self.FUnderWaterAmplitude, Self.FUnderWaterDensity, Self.FUnderWaterTimeMultiplicator);
@@ -686,9 +685,7 @@ begin
       // stops the rendering into a texture and draw it
       Draw;
       // restart the rendering into a texture
-      FCurrentFXBitMask := newBitMask;
-      CopyParams;           à supprimer
-      SendParamsToRenderer;
+      CopyAndSendParamsToRenderer;
       FRenderToTexture.Bind;
       FRenderToTexture.ClearBuffers;
       FIsActive := True;
@@ -698,9 +695,7 @@ begin
       // flush an eventual remains in the batch renderer process
       FParentScene.FTexturedMVTriangleRenderer.Batch_Flush;
       // start the rendering into a texture
-      FCurrentFXBitMask := newBitMask;
-      CopyParams;
-      SendParamsToRenderer;
+      CopyAndSendParamsToRenderer;
       FRenderToTexture.Bind;
       FRenderToTexture.ClearBuffers;
       FIsActive := True;
