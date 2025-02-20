@@ -174,14 +174,14 @@ TOGLCCamera = class;
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
-// {$I oglcShaderFXPostProcessing.inc}
-{$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcMultiRendererFactory.inc}
+{$I oglcRenderToTexture.inc}
+{$I oglcPostProcessing.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcSpriteEffect.inc}
 {$I oglcElectricalFX.inc}
@@ -315,6 +315,7 @@ TOGLCScene = class(TOGLCContext)
   FFastLineRenderer: TOGLCFastLineRenderer;
   FParticleRenderer: TOGLCParticleRenderer;
   FNoFilterTextureMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
+  FTexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX;
   function GetFastLineRenderer: TOGLCFastLineRenderer;
   function GetGlowRenderer: TOGLCGlowRenderer;
   function GetElectricalBeamRenderer: TOGLCElectricalBeamRenderer;
@@ -322,6 +323,7 @@ TOGLCScene = class(TOGLCContext)
   function GetSmoothLineRenderer: TOGLCSmoothLineRenderer;
   function GetTexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer;
   function GetTexturedTriangleRenderer: TOGLCTexturedTriangleRenderer;
+  function GetTexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX;
   function GetThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer;
   function GetThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
   function GetTileRenderer: TOGLCTileRenderer;
@@ -365,11 +367,15 @@ TOGLCScene = class(TOGLCContext)
   FBlendIsEnabled: boolean;
   FCurrentBlendMode: byte;
   procedure SetBlendMode(AValue: byte);
-{ public
-  FRendererForPostProcessing: TOGLCRenderToTexture;
-  FPostProcessingShader: TOGLCPostProcessingFX;   }
+ private
+  FPostProcessingEngine: TOGLCPostProcessingEngine;
  public
+  // Post processing effects can be applyed on layers.
+  // this property offers a bunch of tools to facilitate post-processing control.
+  PostProcessing: TOGLCPostProcessingUtils;
+  // This property offers a bunch of functions to test collision between different shapes.
   Collision: TCollisionFunctions;
+
   // Aspect ratio can be any value >= 1.0 ex. 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
   // and centered on its parent.
   // If you set aspect ratio to -1 the TOpenGLControl is resized to fit its parent client area.
@@ -453,6 +459,7 @@ TOGLCScene = class(TOGLCContext)
   property TexturedTriangleRenderer: TOGLCTexturedTriangleRenderer read GetTexturedTriangleRenderer;
   property TexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer read GetTexturedMVTriangleRenderer;
   property NoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer read GetNoFilterTexturedMVTriangleRenderer;
+  property TexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX read GetTexturedTriangleRendererWithFX;
 
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
@@ -860,13 +867,13 @@ end;
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
-// {$I oglcShaderFXPostProcessing.inc}
-{$I oglcRenderToTexture.inc}
 {$I oglcLayer.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
 {$I oglcMultiRendererFactory.inc}
+{$I oglcPostProcessing.inc}
+{$I oglcRenderToTexture.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcSpriteEffect.inc}
@@ -936,6 +943,8 @@ begin
   FModalPanelList := TModalPanelList.Create;
 
   FCurrentBlendMode := $FF;
+
+  PostProcessing.FParentScene := Self;
 end;
 
 destructor TOGLCScene.Destroy;
@@ -950,8 +959,8 @@ begin
   if FOnFreeCommonData <> NIL then FOnFreeCommonData;
   FCommonDataLoaded := FALSE;
 
-{ if FRendererForPostProcessing<>NIL then FRendererForPostProcessing.Free;
- FPostProcessingShader.Free;  }
+  FPostProcessingEngine.Free;
+  FPostProcessingEngine := NIL;
 
   for i:=0 to FCameraList.Count-1 do
    TOGLCCamera(FCameraList.Items[0]).Free;
@@ -991,7 +1000,7 @@ begin
   FLog.Mess('Renderer: ' + Gpu.RendererName + '    version '+ Gpu.Version);
   FLog.Mess('Total video ram: ' + Gpu.TotalVideoRamKb.ToString + ' Kb' +
             '    Free video ram: ' + Gpu.FreeVideoRamKb.ToString + ' Kb');
-  FLog.Mess('Start '+ApplicationName+' on platform '+App.OSName, 0, True);
+  FLog.Mess('Start application "'+ApplicationName+'" on platform '+App.OSName, 0, True);
   FLog.AddEmptyLine;
 end;
 
@@ -1061,11 +1070,7 @@ begin
 
     FGLInitialized := TRUE;
 
-{   FRendererForPostProcessing:= TOGLCRenderToTexture.Create(Self, GetSceneWidth, GetSceneHeight, 0);
-   if not FRendererForPostProcessing.Ready
-     then Showmessage('FBO for scene post processing not ready !...');
-   FPostProcessingShader:= TOGLCPostProcessingFX.Create;
-   FPostProcessingShader.SetParam(FRendererForPostProcessing.RenderedTexture, 0);  }
+    FPostProcessingEngine := TOGLCPostProcessingEngine.Create(Self);
 
     FTickOriginUpdate := GetTickCount64;
     FTickAccu := 0;
@@ -1193,6 +1198,7 @@ begin
   FreeAndNil(FTexturedMVTriangleRenderer);
   FreeAndNil(FTexturedTriangleRenderer);
   FreeAndNil(FNoFilterTextureMVTriangleRenderer);
+  FreeAndNil(FTexturedTriangleRendererWithFX);
 
   FreeAndNil(FTileRenderer);
   FreeAndNil(FGlowRenderer);
@@ -1445,8 +1451,9 @@ var L, i: integer;
     o: TSimpleSurfaceWithEffect;
     err: glEnum;
 begin
-{ if FPostProcessingShader.FFX<>[]
-   then FRendererForPostProcessing.Bind;  }
+  // set background color
+  glClearColor(FBackgroundColorF.r, FBackgroundColorF.g, FBackgroundColorF.b, FBackgroundColorF.a);
+  glClear(GL_COLOR_BUFFER_BIT or GL_STENCIL_BUFFER_BIT);
 
   // delete all surface with FKill=true
   for L:=0 to LayerCount-1 do
@@ -1458,9 +1465,6 @@ begin
       end;
     end;
 
-  glClearColor(FBackgroundColorF.r, FBackgroundColorF.g, FBackgroundColorF.b, FBackgroundColorF.a);
-  glClear(GL_COLOR_BUFFER_BIT or GL_STENCIL_BUFFER_BIT);
-
   // Before paint CallBack
   if Assigned(FOnBeforePaint) then FOnBeforePaint;
 
@@ -1470,6 +1474,11 @@ begin
   err := glGetError();
   if err <> GL_NO_ERROR then
     LogError('TOGLCScene.Draw: Render LAYERS give GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
+
+  // render an eventual remains in the batch renderer process
+  FTexturedMVTriangleRenderer.Batch_Flush;
+  // flush the post processing engine
+  FPostProcessingEngine.Flush;
 
   // Scene global fade
   if FGlobalFadeColor.Alpha.Value > 0
@@ -1490,91 +1499,6 @@ begin
 
   // render an eventual remains in the batch renderer process
   FTexturedMVTriangleRenderer.Batch_Flush;
-
-{ if FPostProcessingShader.FFX<>[] then begin
-   // draw post-processing frame buffer on screen
-  FRendererForPostProcessing.Unbind;
-
-   SetBlendMode(FX_BLEND_NORMAL);
-   //DrawTexture( FRendererForPostProcessing.RenderedTexture, 0, 0, 0, 0, 255, BGRA(0,0,0,0));
-  FPostProcessingShader.SetParam(FRendererForPostProcessing.RenderedTexture, 0);
-  FPostProcessingShader.Use;
-  glActiveTexture(GL_TEXTURE0);
-  TextMan.BindTexture( FRendererForPostProcessing.RenderedTexture, 0 );
-
-  glBegin( GL_TRIANGLE_STRIP );
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
-    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
-    glVertex2f( 0,0 );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
-    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
-    glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-  glEnd;
-
-
-
-{
-  glBegin( GL_TRIANGLES );
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
-   glVertex2f( 0,0 );
-
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
-   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
-
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
-   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
-   glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
-   glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-
-   glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
-   //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
-   glVertex2f( 0,0 );
-
-  glEnd;
-}
-
-
-{
-  glBegin( GL_QUADS );
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][0].y, 1.0);
-    glVertex2f( 0,0 );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][1].y, 1.0);
-    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,0 );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][2].y, 1.0);
-    glVertex2f( FRendererForPostProcessing.RenderedTexture^.TextureWidth,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-
-    glTexCoord2fv( @FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3] );
-    //glColor3f(FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].x, FRendererForPostProcessing.RenderedTexture^.FramesCoord[0][3].y, 1.0);
-    glVertex2f( 0,FRendererForPostProcessing.RenderedTexture^.TextureHeight );
-  glEnd;
-}
-
-  FPostProcessingShader.Release;
-//  glActiveTexture(GL_TEXTURE0);
- end;   }
 end;
 
 procedure TOGLCScene.UpDate(const aElapsedTime: single);
@@ -1739,6 +1663,12 @@ function TOGLCScene.GetTexturedTriangleRenderer: TOGLCTexturedTriangleRenderer;
 begin
   if FTexturedTriangleRenderer = NIL then FTexturedTriangleRenderer := TOGLCTexturedTriangleRenderer.Create(Self, True);
   Result := FTexturedTriangleRenderer;
+end;
+
+function TOGLCScene.GetTexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX;
+begin
+  if FTexturedTriangleRendererWithFX = NIL then FTexturedTriangleRendererWithFX := TOGLCTexturedTriangleRendererWithFX.Create(Self, True);
+  Result := FTexturedTriangleRendererWithFX
 end;
 
 function TOGLCScene.GetThreeColorMVTriangleRenderer: TOGLCThreeColorMVTriangleRenderer;

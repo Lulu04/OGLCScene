@@ -1,41 +1,42 @@
 {$ifdef oglcINTERFACE}
 type
-// TODO: don't work
-// avoid class var to keep multi scenes possible
 
 { TOGLCRenderToTexture }
 
 TOGLCRenderToTexture = class
-private type
-  TOGLCDataToSave = packed record
-    FrameBufferIsValid: boolean;
-    FrameBufferID: GLuint;
-    ViewPortSize: TSize;
-  end;
-private
-  class var FStack: TOGLCDataToSave;
-  class var FCount: integer;
 private
   FParentScene: TOGLCScene;
-  FOldStack: TOGLCDataToSave;
-  FFBO: GLuint;
+  FFBO, FDepthAndStencilName: GLuint;
   FRenderedTexture: PTexture;
-  FReady: boolean;
-  FColorAttachment: GLenum;
+  FReady, FIsBound: boolean;
+  FColorAttachment,
+  FColorAttachmentIndex: GLenum;
+  FUseDepthAndStencil: boolean;
+  FClearBitField: GLbitfield;
+  FClearColorF: TColorF;
+  function GetClearColor: TBGRAPixel;
+  procedure SetClearColor(AValue: TBGRAPixel);
 public
   // aColorAttachmentIndex is an array thats contains the index of the wanted ColorAttachment
   // IE: if you want to render in the ColorAttachment0 then set aColorAttachmentIndexes to 0
   // must be [0..n], n depending of the video driver.
-  Constructor Create(aParentScene: TOGLCScene; aWidth, aHeight, aColorAttachmentIndex: integer);
-  Destructor destroy; override;
+  // Set aUseDepthAndStencil to True if you need a depth and/or stencil buffer.
+  constructor Create(aParentScene: TOGLCScene; aWidth, aHeight, aColorAttachmentIndex: integer; aUseDepthAndStencil: boolean=False);
+  destructor Destroy; override;
 
-  // Enable the FBO
+  // Enable render to texture
   procedure Bind;
-  // Disable the FBO
+  // Clear the opengl color buffer and eventually the depth/stencil buffer
+  procedure ClearBuffers;
+  // Disable render to texture.
+  // If different, don't forget to re-initialize the size of the openGL viewport with glViewport().
   procedure Unbind;
 
- // TRUE if the RenderToTexture object has been correctly created
+ // TRUE if the RenderToTexture object is correctly created
  property Ready: boolean read FReady;
+ // The color used to erase the texture. Default is transparent color (0,0,0,0)
+ property ClearColor: TBGRAPixel read GetClearColor write SetClearColor;
+ // The output texture
  property RenderedTexture: PTexture read FRenderedTexture;
 end;
 
@@ -43,98 +44,117 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
+function TOGLCRenderToTexture.GetClearColor: TBGRAPixel;
+begin
+  Result := FClearColorF.ToBGRA;
+end;
 
-constructor TOGLCRenderToTexture.Create(aParentScene: TOGLCScene; aWidth, aHeight, aColorAttachmentIndex: integer);
-// var db: GLEnum;
+procedure TOGLCRenderToTexture.SetClearColor(AValue: TBGRAPixel);
+begin
+  FClearColorF.InitFromBGRA(AValue);
+end;
+
+constructor TOGLCRenderToTexture.Create(aParentScene: TOGLCScene; aWidth,
+  aHeight, aColorAttachmentIndex: integer; aUseDepthAndStencil: boolean);
+var err: GLenum;
 begin
   FParentScene := aParentScene;
- if FCount=0 then begin
-   FStack.ViewPortSize.cx := aParentScene.Width;
-   FStack.ViewPortSize.cy := aParentScene.Height;
- end;
- inc(FCount);
 
- if aColorAttachmentIndex >= ColorAttachmentCount
-   then Raise Exception.Create ('TRenderToTexture.Create: you ask for a ColorAttachment='+
-                       aColorAttachmentIndex.ToString+' but it must be between [0..'+(ColorAttachmentCount-1).ToString+'] !');
- FColorAttachment := IndexToColorAttachment(aColorAttachmentIndex);
+  if aColorAttachmentIndex >= ColorAttachmentCount
+    then Raise Exception.Create ('TRenderToTexture.Create: you ask for a ColorAttachment='+
+                        aColorAttachmentIndex.ToString+' but it must be between [0..'+(ColorAttachmentCount-1).ToString+'] !');
+  FColorAttachment := GL_COLOR_ATTACHMENT0 + aColorAttachmentIndex;
+  FColorAttachmentIndex := aColorAttachmentIndex;
 
- glGenFramebuffers(1, @FFBO);
- glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
+  err := glGetError();
+  glGenFramebuffers(1, @FFBO);
+  glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
 
- FRenderedTexture := FParentScene.TexMan.AddEmpty(aWidth, aHeight);
+  FRenderedTexture := FParentScene.TexMan.AddEmpty(aWidth, aHeight);
 // TextureManager.BindTexture( FRenderedTexture );
 // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
- FParentScene.TexMan.UnbindTexture;
+  FParentScene.TexMan.UnbindTexture;
 
+  glFramebufferTexture2D(GL_FRAMEBUFFER, FColorAttachment, GL_TEXTURE_2D, FRenderedTexture^.ID, 0);
 
- glFramebufferTexture2D(GL_FRAMEBUFFER, FColorAttachment, GL_TEXTURE_2D, FRenderedTexture^.ID, 0);
+  glDrawBuffers(1, @FColorAttachment);
 
-// glFramebufferTexture(GL_FRAMEBUFFER, FColorAttachment, FRenderedTexture.ID, 0);
+  FUseDepthAndStencil := aUseDepthAndStencil;
+  FClearBitField := GL_COLOR_BUFFER_BIT;
+  if aUseDepthAndStencil then begin
+    FClearBitField := FClearBitField or GL_STENCIL_BUFFER_BIT;
+    glGenRenderbuffers(1, @FDepthAndStencilName);
+    glBindRenderbuffer(GL_RENDERBUFFER, FDepthAndStencilName);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, aWidth, aHeight);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthAndStencilName);
+  end;
 
-// db := (GL_COLOR_ATTACHMENT0);
- // Set the list of draw buffers.
-// GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
- glDrawBuffers(1, @FColorAttachment);
+  FReady := glCheckFramebufferStatus(GL_FRAMEBUFFER) = GL_FRAMEBUFFER_COMPLETE;
+  if not FReady then begin
+    FParentScene.LogError('TOGLCRenderToTexture.Create('+aWidth.ToString+', '+aHeight.ToString+', '+aColorAttachmentIndex.ToString+
+                          ') frame buffer not ready');
+  end;
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
- FReady := glCheckFramebufferStatus(GL_FRAMEBUFFER) = GL_FRAMEBUFFER_COMPLETE;
- if not FReady then raise Exception.Create('Erreur de create de FBO');
+  err := glGetError();
+  if err <> GL_NO_ERROR then begin
+    FParentScene.LogError('TOGLCRenderToTexture.Create generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
+  end;
 
- if FStack.FrameBufferIsValid
-   then glBindFramebuffer(GL_FRAMEBUFFER, FStack.FrameBufferID)
-   else glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  FClearColorF.InitFromBGRA(BGRA(0,0,0,0));
 end;
 
-destructor TOGLCRenderToTexture.destroy;
+destructor TOGLCRenderToTexture.Destroy;
 begin
- glDeleteFramebuffers(1, @FFBO);
- FParentScene.TexMan.Delete(FRenderedTexture);
- inherited destroy;
+  glDeleteFramebuffers(1, @FFBO);
+  if FUseDepthAndStencil then
+    glDeleteRenderbuffers(1, @FDepthAndStencilName);
+  FParentScene.TexMan.Delete(FRenderedTexture);
+  inherited Destroy;
 end;
 
 procedure TOGLCRenderToTexture.Bind;
+var err: GLenum;
 begin
- Move(FStack, FOldStack, SizeOf(TOGLCDataToSave));
- glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
- glViewport(0, 0, FRenderedTexture^.TextureWidth, FRenderedTexture^.TextureHeight);
+  if not Ready or FIsBound then exit;
+  FIsBound := True;
 
- FParentScene.TexMan.Bind(FRenderedTexture, FColorAttachment);
+  glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
+  glViewport(0, 0, FRenderedTexture^.TextureWidth, FRenderedTexture^.TextureHeight);
 
-  glClearColor(0.0, 1.0, 0.0, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  FParentScene.TexMan.Bind(FRenderedTexture, FColorAttachmentIndex);
 
+  err := glGetError();
+  if err <> GL_NO_ERROR then
+    FParentScene.LogError('TOGLCRenderToTexture.Bind generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
+end;
 
- with FStack do begin
-  FrameBufferIsValid := TRUE;
-  FrameBufferID := FFBO;
-  ViewPortSize.cx := FRenderedTexture^.TextureWidth;
-  ViewPortSize.cy := FRenderedTexture^.TextureHeight;
- end;
+procedure TOGLCRenderToTexture.ClearBuffers;
+begin
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClear(FClearBitField);
 end;
 
 procedure TOGLCRenderToTexture.Unbind;
+var err: GLenum;
 begin
- if FOldStack.FrameBufferIsValid
-   then glBindFramebuffer(GL_FRAMEBUFFER, FOldStack.FrameBufferID)
-   else glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  if not Ready or not FIsBound then exit;
+  FIsBound := False;
 
- glActiveTexture(GL_TEXTURE0+FColorAttachment);
- glBindTexture(GL_TEXTURE_2D, 0);
- glActiveTexture(GL_TEXTURE0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
- glViewport(0, 0, FOldStack.ViewPortSize.cx, FOldStack.ViewPortSize.cy);
+  glActiveTexture(GL_TEXTURE0+FColorAttachmentIndex);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glActiveTexture(GL_TEXTURE0);
 
- Move(FOldStack, FStack, SizeOf(TOGLCDataToSave));
+  err := glGetError();
+  if err <> GL_NO_ERROR then
+    FParentScene.LogError('TOGLCRenderToTexture.Unbind generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
 end;
-
-
-
-
-
-
 
 {$endif oglcIMPLEMENTATION}
 

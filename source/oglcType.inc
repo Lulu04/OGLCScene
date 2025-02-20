@@ -233,6 +233,60 @@ TTexturedCharIndexes = array of integer;
 TOGLCLinePosition = (lpMiddle,   // A line of 6 pixels width will have 3 pixel outside and 3 inside.
                      lpInside);  // The line is inside.
 
+
+///////////////////
+// POST PROCESSING
+type
+// available effects applicable on each layer
+TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
+                             pfColorInversion,   // inverts rgb component: new red = 1-red
+                             pfGrayscale,        // changes colors to gray scale
+                             pfSepia,            // color effect
+                             pfSharpen,          // accentuates edges
+                             pfBlur,             // a simple blur effect with 3 selectable levels
+                             pfUnderWater,       // simulates deformations that can be seen under water
+                             pfLightBlur);
+TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
+
+POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
+TOGLCPostProcessingParameters = record
+private const
+  // FX bit mask
+  fxbmTint=$01;
+  fxbmColorInversion=$02;
+  fxbmGrayscale=$04;
+  fxbmSepia=$08;
+  fxbmSharpen=$10;
+  fxbmBlur=$20;
+  fxbmUnderWater=$40;
+  fxbmLightBlur=$80;
+private
+  FFX: TOGLCPostProcessingFX;
+  procedure ComputeFXBitMask;
+  procedure InitDefault;
+private
+  FXBitMask: GLuint;
+  FUnderWaterAmplitude, FUnderWaterDensity, FUnderWaterTimeMultiplicator: single;
+  FBlurAmount: GLint;
+public
+  // default is tmReplaceColor
+  TintMode: TTintMode;
+  // the color used by pfTint effect
+  Tint: TBGRAPixel;
+  procedure Enable(aFXs: TOGLCPostProcessingFX);
+  procedure Disable(aFXs: TOGLCPostProcessingFX);
+  procedure DisableAll;
+
+  // aAmplitude: the waves amplitude [1..100]   default is 10
+  // aDensity: the waves density [1..100]    default value is 25
+  // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
+  procedure SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
+
+  // aAmount range is 1 soft   .....    4 full
+  procedure SetBlurParams(aAmount: integer);
+end;
+
+
 type
 ///////////////////////
 // Generic chained list
@@ -264,6 +318,63 @@ end;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
+
+{ TOGLCPostProcessingParameters }
+
+procedure TOGLCPostProcessingParameters.ComputeFXBitMask;
+begin
+  FXBitMask := 0;
+  if pfTint in FFX then FXBitMask := FXBitMask or fxbmTint;
+  if pfColorInversion in FFX then FXBitMask := FXBitMask or fxbmColorInversion;
+  if pfGrayscale in FFX then FXBitMask := FXBitMask or fxbmGrayscale;
+  if pfSepia in FFX then FXBitMask := FXBitMask or fxbmSepia;
+  if pfSharpen in FFX then FXBitMask := FXBitMask or fxbmSharpen;
+  if pfBlur in FFX then FXBitMask := FXBitMask or fxbmBlur;
+  if pfUnderWater in FFX then FXBitMask := FXBitMask or fxbmUnderWater;
+  if pfLightBlur in FFX then FXBitMask := FXBitMask or fxbmLightBlur;
+end;
+
+procedure TOGLCPostProcessingParameters.InitDefault;
+begin
+  FFX := [];
+  ComputeFXBitMask;
+  Tint := BGRA(0,0,0,0);
+  TintMode := tmReplaceColor;
+
+  SetUnderWaterParams(10, 25, 1.0);
+  SetBlurParams(4);
+end;
+
+procedure TOGLCPostProcessingParameters.Enable(aFXs: TOGLCPostProcessingFX);
+begin
+  FFX := FFX + aFXs;
+  ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingParameters.Disable(aFXs: TOGLCPostProcessingFX);
+begin
+  FFX := FFX - aFXs;
+  ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingParameters.DisableAll;
+begin
+  FFX := [];
+  ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingParameters.SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
+begin
+  FUnderWaterAmplitude := EnsureRange(aAmplitude, 1, 100) * 0.001; // 0.1 to 0.001
+  FUnderWaterDensity := EnsureRange(aDensity, 1, 1000);
+  if aTimeMultiplicator < 0.1 then FUnderWaterTimeMultiplicator := 0.1
+    else FUnderWaterTimeMultiplicator := aTimeMultiplicator;
+end;
+
+procedure TOGLCPostProcessingParameters.SetBlurParams(aAmount: integer);
+begin
+  FBlurAmount := EnsureRange(aAmount, 1, 4);
+end;
 
 { TFontGradient }
 
