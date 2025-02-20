@@ -28,33 +28,6 @@ TOGLCShader = class
   property ID: GLuint read FProgramID;
 end;
 
-
-{ TVertexLayout }
-PVertexLayout = ^TVertexLayout;
-TVertexLayout = packed record
-private const MAX_ATTRIBUTES = 8;
-private type
-  TAttribute = packed record
-    Location: GLint;
-    _Type: GLenum;
-    Size: GLint;
-    Normalized: GLboolean;
-    Stride: GLsizei;
-    PointerOffset: PGLvoid;
-  end;
-private
-  FProgramID: GLuint;
-  FAttributes: array of TAttribute;
-  FStride, FAttributeCount: integer;
-  function GetAttributes(index: integer): TAttribute;
-public
-  function Init(aShader: TOGLCShader): PVertexLayout;
-  function AddFloatAttribute(const aAttribName: string; aFloatCount: Integer; aNormalized: Boolean): PVertexLayout;
-  function Count: integer;
-  property Attributes[index: integer]: TAttribute read GetAttributes; default;
-end;
-
-
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
@@ -185,53 +158,6 @@ procedure TOGLCShader.SetUniformMatrix4(AUniform: GLint; AValue: PGLfloat);
 begin
   glUniformMatrix4fv(AUniform, 1, GL_FALSE, AValue);
 end;
-
-{ TVertexLayout }
-
-function TVertexLayout.GetAttributes(index: integer): TAttribute;
-begin
-  Result := FAttributes[index];
-end;
-
-function TVertexLayout.Init(aShader: TOGLCShader): PVertexLayout;
-begin
-  FProgramID := aShader.ID;
-  FAttributes := NIL;
-  FStride := 0;
-  FAttributeCount := 0;
-  Result := @Self;
-end;
-
-function TVertexLayout.AddFloatAttribute(const aAttribName: string; aFloatCount: Integer; aNormalized: Boolean): PVertexLayout;
-var loc: GLint;
-begin
-  if (FAttributeCount = MAX_ATTRIBUTES) then
-    raise Exception.Create('Too many attributes in vertex layout');
-
-  loc := glGetAttribLocation(FProgramID, PChar(aAttribName));
-  if loc < 0 then
-    raise Exception.CreateFmt('Attribute "%s" not found in shader', [aAttribName]);
-
-  SetLength(FAttributes, FAttributeCount+1);
-  with FAttributes[FAttributeCount] do
-  begin
-    Location := loc;
-    Size := GLint(aFloatCount);
-    _Type := GL_FLOAT;
-    if aNormalized then Normalized := GL_TRUE
-      else Normalized := GL_FALSE;
-    PointerOffset := PChar(FStride);
-  end;
-  inc(FAttributeCount);
-  FStride := FStride + aFloatCount * SizeOf(single);
-  Result := @Self;
-end;
-
-function TVertexLayout.Count: integer;
-begin
-  Result := Length(FAttributes);
-end;
-
 
 {$endif oglcIMPLEMENTATION}
 
