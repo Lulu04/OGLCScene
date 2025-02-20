@@ -29,20 +29,12 @@ private const
    '  uniform float uUnderWaterAmplitude = 0.01;'#10+ //   original 0.01     acceptable range: 0.1 to 0.001
    '  uniform float uUnderWaterDensity = 25.0;'#10+  // original 25    range is [1..100]
    '  uniform float uUnderWaterSpeed = 1.0;'#10+ // slow 0.1  1.0 normal   +++
-   '  uniform int uBlurAmount = 3;'#10+         // 1, 2,  3
-//   '  uniform int uBlurDivisor = 30;'#10+       // 4, 18, 30
+   '  uniform int uBlurAmount = 3;'#10+         // 1, 2, 3, 4
    'void main()'#10+
    '{'#10+
    '  vec4 col = texture(uTexUnit, TexCoords);'#10+
-   '  float a = col.a*uOpacity;'#10+
-//   '  if (a == 0) discard;'#10+
-'  if (a == 0) a=a+0.0001;'#10+
    '  int flags = uFXFlag;'#10+
    '  vec2 texCoords = TexCoords;'#10+
-   // light blur
-   ' if (flags >= 0x80){'#10+
-   '  flags -= 0x80;'#10+
-   ' }'#10+
    // under water effect created by OmarShehata https://www.shadertoy.com/view/4tG3WR
    ' if (flags >= 0x40){'#10+
    '  flags -= 0x40;'#10+
@@ -52,8 +44,6 @@ private const
    '  uv.y += cos(X+Y)*uUnderWaterAmplitude*cos(Y);'#10+
    '  uv.x += sin(X-Y)*uUnderWaterAmplitude*sin(Y);'#10+
    '  col = texture(uTexUnit, uv);'#10+
-   '  a = col.a*uOpacity;'#10+
-//   '  if (a == 0) discard;'#10+
    '  texCoords = uv;'#10+
    ' }'#10+
    // blur
@@ -123,14 +113,11 @@ private const
    '  if (uTintColor.a >= 0.5)'#10+
    '   {'#10+
    '     tintAlphaX2 = tintAlphaX2-1;'#10+
-//   '     col = col * (1-tintAlphaX2) + uTintColor * tintAlphaX2;'#10+  // replace color
    '     col = mix(col, uTintColor, tintAlphaX2);'#10+  // replace color
    '   }'#10+
    '  else if (uTintColor.a > 0)'#10+
    '     col = col + uTintColor*tintAlphaX2;'#10+     // mix color
    ' }'#10+
-
-//   '  col.a = a;'#10+
    '  col.a = col.a*uOpacity;'#10+
    '  if (col.a == 0) discard;'#10+
    '  FragColor = col;'#10+
@@ -191,7 +178,7 @@ public
 end;
 
 { TOGLCPostProcessingUtils }
-// this record groups a bunch of convenient procedure to ease the control of the post-processing effects
+// this record groups a bunch of convenient procedures to ease the control of the post-processing effects
 // from the TOGLCScene.PostProcessing property.
 TOGLCPostProcessingUtils = record
 private
