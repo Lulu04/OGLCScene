@@ -74,7 +74,7 @@ type
 // COLLISION TEST
 
 { TCollisionFunctions }
-
+// This record offers a bunch of functions to test collision between different shapes.
 TCollisionFunctions = record
   function PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
   function PointRectF(const aPt: TPointF; const r: TRectF): boolean;
