@@ -75,6 +75,8 @@ public
   procedure Clear; override;
 public
   Opacity: TBoundedFParam;
+  PostProcessing: TOGLCPostProcessingParameters;
+
   procedure KillAll;
   // Blink  aNumberOfBlink=-1 for infinite blink
   procedure Blink(aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single);
@@ -256,6 +258,7 @@ begin
   FVisible := TRUE;
   Opacity := CreateBoundedFParam(0, 255);
   Opacity.Value := 255;
+  PostProcessing.InitDefault;
 end;
 
 destructor TLayer.Destroy;
@@ -270,6 +273,11 @@ var i: integer;
     computedOpacity: single;
 begin
   if not FVisible then exit;
+
+  // post processing
+//  if PostProcessing.FXBitMask <> 0 then
+  if FParentScene.FPostProcessingEngine.FRenderToTexture <> NIL then
+    FParentScene.FPostProcessingEngine.ApplyFX(@PostProcessing);
 
   // Before paint CallBack
   if Assigned(FOnBeforePaint) then FOnBeforePaint;
