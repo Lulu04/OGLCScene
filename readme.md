@@ -6,13 +6,15 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Only 2D !
 - Use OpenGL 3.3 to render graphics.
 - Renderers with batch system to improve performance. Use vertex and index buffers.
-- Multi layers architecture.
+- A scene is made of one or several layers that contains any kind of surfaces (sprites or others).
+- Post-processing effects can be activated independently for each layer.
 - Multi screens architecture to separates the different parts of the game.
-- Sprites and other kind of surface with self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
+- Sprites and other kind of surfaces have self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
+- All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
+- Messages system to synchronize surfaces between them: usefull to create multiple animations running in parallel.
+- Surfaces can have nested childs organized hierarchically behind or forward their parent.
 - UI with Button, Label, Image, Panel, CheckBox, RadioButton, ScrollBar, ProgressBar, ListBox, ScrollBox, TextArea.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
-- All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
-- Messages system to synchronize surfaces between them.
 - Particle engine and its tool 'Particles Editor' to make your own particle effects.
 - Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your tiled maps.
 - Log file.
