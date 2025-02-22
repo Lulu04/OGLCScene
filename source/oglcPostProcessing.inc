@@ -30,11 +30,77 @@ private const
    '  uniform float uUnderWaterDensity = 25.0;'#10+  // original 25    range is [1..100]
    '  uniform float uUnderWaterSpeed = 1.0;'#10+ // slow 0.1  1.0 normal   +++
    '  uniform int uBlurAmount = 3;'#10+         // 1, 2, 3, 4
+   '  uniform float uPixelizeAmount = 0.5;'#10+  // 0.01 to 1.0
+   '  uniform vec2 uShockWaveCenter=vec2(0.5,0.5);'#10+ // center of the shock
+   '  uniform vec4 uShockWaveParams=vec4(10.0, 0.8, 0.1, 0.3);'#10+ // 10.0, 0.8, 0.1(ring width),  1.0(timeMultiplicator)
+   '  uniform vec4 uShockWaveColor=vec4(1.0,0.0,0.8,0.2);'#10+
+   ' float Random1f(float x){'#10+
+   '    return fract(sin(x)*1.0);'#10+
+   ' }'#10+
+   ' float random(vec2 st) {'#10+
+   '   return fract(sin(dot(st.xy,'#10+
+   '                        vec2(12.9898,78.233)))*'#10+
+   '       43758.5453123);'#10+
+   '}'#10+
    'void main()'#10+
    '{'#10+
    '  vec4 col = texture(uTexUnit, TexCoords);'#10+
    '  int flags = uFXFlag;'#10+
    '  vec2 texCoords = TexCoords;'#10+
+   // ShockWave from https://www.geeks3d.com/20091116/shader-library-2d-shockwave-post-processing-filter-glsl/
+   // modified with color and time adjustment
+   ' if (flags >= 0x200){'#10+
+   '   flags -= 0x200;'#10+
+   '   vec2 uv = texCoords;'#10+
+   '   float halfTime = uTime*uShockWaveParams.w;'#10+
+   '   float distance = distance(texCoords, uShockWaveCenter);'#10+
+   '   if ( (distance <= (halfTime + uShockWaveParams.z)) &&'#10+
+   '       (distance >= (halfTime - uShockWaveParams.z)) )'#10+
+   '   {'#10+
+   '    float diff = (distance - halfTime);'#10+
+   '    float powDiff = 1.0 - pow(abs(diff*uShockWaveParams.x),'#10+
+   '                                uShockWaveParams.y);'#10+
+   '    float diffTime = diff  * powDiff;'#10+
+   '    vec2 diffUV = normalize(texCoords - uShockWaveCenter);'#10+
+   '    texCoords = texCoords + (diffUV * diffTime);'#10+
+   '    col = texture2D(uTexUnit, texCoords);'#10+
+   '    col += vec4(uShockWaveColor.rgb,uShockWaveColor.a-distance);'#10+
+   '   }'#10+
+   ' }'#10+
+   // Dream Vision from https://www.geeks3d.com/20091112/shader-library-dream-vision-post-processing-filter-glsl/
+   ' if (flags >= 0x100){'#10+
+   '   flags -= 0x100;'#10+
+   '   vec4 c = col;'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.001);'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.003);'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.005);'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.007);'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.009);'#10+
+   '   c += texture2D(uTexUnit, texCoords+0.011);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.001);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.003);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.005);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.007);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.009);'#10+
+   '   c += texture2D(uTexUnit, texCoords-0.011);'#10+
+   '   c.rgb = vec3((c.r+c.g+c.b)/3.0);'#10+
+   '   c = c / 9.5;'#10+
+   '   col = c;'#10+
+   ' }'#10+
+   // pixelize
+   ' if (flags >= 0x80){'#10+
+   '   flags -= 0x80;'#10+
+   '   vec2 pixelizeDelta = vec2(uPixelizeAmount*uTexWidth, uPixelizeAmount*uTexHeight);'#10+
+   '   vec2 texCoords = round(texCoords * pixelizeDelta) / pixelizeDelta;'#10+
+   '   float dx = 1.0f/(pixelizeDelta.x*5.0f);'#10+
+   '   float dy = 1.0f/(pixelizeDelta.y*5.0f);'#10+
+   '   texCoords -= vec2(dx*2.5, dy*2.5);'#10+      // avoid image shift
+   '   vec4 sum1 = vec4(0,0,0,0);'#10+
+   '   for(int i = 0; i < 5; i++)'#10+
+   '	   for(int j = 0; j < 5; j++)'#10+
+   '		sum1 += texture2D(uTexUnit, texCoords.xy + vec2(i * dx, j * dy));'#10+
+   '   col = vec4(sum1/25);'#10+
+   ' }'#10+
    // under water effect created by OmarShehata https://www.shadertoy.com/view/4tG3WR
    ' if (flags >= 0x40){'#10+
    '  flags -= 0x40;'#10+
@@ -131,13 +197,21 @@ private
   FLocTexWidth, FLocTexHeight,
   FLocTime,
   FLocUnderWaterAmplitude, FLocUnderWaterDensity, FLocUnderWaterSpeedCoeff,
-  FLocBlurAmount: GLint;
+  FLocBlurAmount,
+  FLocPixelizeAmount,
+  FLocShockWaveCenter, FLocShockWaveParams, FLocShockWaveColor: GLint;
   FMVP: TOGLCMatrix;
   FTintF: TColorF;
   FOpacity: single;
   FFXBitMask, FTexWidth, FTexHeight: GLuint;
   FUnderWaterAmplitude, FUnderWaterDensity, FUnderWaterTimeMultiplicator: single;
+  FShockWaveCenterU, FShockWaveCenterV,
+  FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator: single;
+  FShockWaveColorF: TColorF;
+
   FBlurAmount: GLint;
+  FPixelizeAmount: single;
+  FTimeOrigin: QWord;
   procedure InitShaderCodeAndCallBack; override;
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
@@ -148,9 +222,12 @@ public
 
   procedure PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
 
+  procedure ResetTime;
   procedure SetFXBitMask(const aFXBitMask: GLuint);
+  procedure SetPixelizeParams(aAmount: single);
   procedure SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
   procedure SetBlurParams(aAmount: integer);
+  procedure SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TColorF);
   procedure SetTintValue(const aComputedTint: TColorF);
 end;
 
@@ -164,6 +241,9 @@ private
   FComputedTint: TColorF;
   FUnderWaterAmplitude, FUnderWaterDensity, FUnderWaterTimeMultiplicator: single;
   FBlurAmount: GLint;
+  FPixelizeAmount: single;
+  FShockWaveCenterU, FShockWaveCenterV, FShockWaveTimeMultiplicator: single;
+  FShockWaveColorF: TColorF;
   FIsActive: boolean;
   procedure CreateTargetTexture;
   procedure FreeTargetTexture;
@@ -195,14 +275,14 @@ public
   procedure Flush;
 
   // Enable post-processing FX on one or several the layers.
-  procedure EnableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TIntegerArray);
+  procedure EnableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TArrayOfInteger);
   // Enable post-processing FX on a range of layers.
   procedure EnableFXOnLayerRange(aFXs: TOGLCPostProcessingFX; aFirstLayer, aLastLayer: integer);
   // Enable post-processing FX on all layers.
   procedure EnableFXOnAllLayers(aFXs: TOGLCPostProcessingFX);
 
   // Disable post-processing FX on one or several the layers.
-  procedure DisableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TIntegerArray);
+  procedure DisableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TArrayOfInteger);
   // Disable post-processing FX on a range of layers.
   procedure DisableFXOnLayerRange(aFXs: TOGLCPostProcessingFX; aFirstLayer, aLastLayer: integer);
   // Disable post-processing FX on all layers.
@@ -214,24 +294,40 @@ public
   // aAmplitude: the waves amplitude [1..100]
   // aDensity: the waves density [1..100]
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
-  procedure SetUnderWaterParamsOnLayers(aAmplitude, aDensity, aTimeMultiplicator: single; const aLayers: TIntegerArray);
+  procedure SetUnderWaterParamsOnLayers(aAmplitude, aDensity, aTimeMultiplicator: single; const aLayers: TArrayOfInteger);
   // aAmplitude: the waves amplitude [1..100]
   // aDensity: the waves density [1..100]
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
   procedure SetUnderWaterParamsOnLayerRange(aAmplitude, aDensity, aTimeMultiplicator: single; aFirstLayer, aLastLayer: integer);
   // aAmplitude: the waves amplitude [1..100]
   // aDensity: the waves density [1..100]
-  // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
+  // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 1.0
   procedure SetUnderWaterParamsOnAllLayers(aAmplitude, aDensity, aTimeMultiplicator: single);
 
   // aAmount range is 1 soft   .....    4 full
-  procedure SetBlurParamsOnLayers(aAmount: integer; const aLayers: TIntegerArray);
+  procedure SetBlurParamsOnLayers(aAmount: integer; const aLayers: TArrayOfInteger);
   // aAmount range is 1 soft   .....    4 full
   procedure SetBlurParamsOnLayerRange(aAmount: integer; aFirstLayer, aLastLayer: integer);
   // aAmount range is 1 soft   .....    4 full
   procedure SetBlurParamsOnAllLayers(aAmount: integer);
 
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
+  // aColor is the tint color of the wave. Default is transparent
+  procedure SetShockWaveParamsOnLayers(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel;
+                                       const aLayers: TArrayOfInteger);
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
+  // aColor is the tint color of the wave. Default is transparent
+  procedure SetShockWaveParamsOnLayerRange(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel;
+                                           aFirstLayer, aLastLayer: integer);
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
+  // aColor is the tint color of the wave. Default is transparent
+  procedure SetShockWaveParamsOnAllLayers(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
 
+  // reset the time variable to 0 in the post-processing shader. Needed before starting the ShockWave effect.
+  procedure ResetTimeVariable;
 end;
 
 {$endif oglcINTERFACE}
@@ -254,7 +350,7 @@ begin
   FParentScene.FPostProcessingEngine.Flush;
 end;
 
-procedure TOGLCPostProcessingUtils.EnableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TIntegerArray);
+procedure TOGLCPostProcessingUtils.EnableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TArrayOfInteger);
 var i: integer;
 begin
   if Length(aLayers) = 0 then exit;
@@ -281,7 +377,7 @@ begin
     FParentScene.Layer[i].PostProcessing.Enable(aFXs);
 end;
 
-procedure TOGLCPostProcessingUtils.DisableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TIntegerArray);
+procedure TOGLCPostProcessingUtils.DisableFXOnLayers(aFXs: TOGLCPostProcessingFX; const aLayers: TArrayOfInteger);
 var i: integer;
 begin
   if Length(aLayers) = 0 then exit;
@@ -316,7 +412,7 @@ begin
 end;
 
 procedure TOGLCPostProcessingUtils.SetUnderWaterParamsOnLayers(aAmplitude,
-  aDensity, aTimeMultiplicator: single; const aLayers: TIntegerArray);
+  aDensity, aTimeMultiplicator: single; const aLayers: TArrayOfInteger);
 var i: integer;
 begin
   if Length(aLayers) = 0 then exit;
@@ -345,7 +441,7 @@ begin
     FParentScene.Layer[i].PostProcessing.SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator);
 end;
 
-procedure TOGLCPostProcessingUtils.SetBlurParamsOnLayers(aAmount: integer; const aLayers: TIntegerArray);
+procedure TOGLCPostProcessingUtils.SetBlurParamsOnLayers(aAmount: integer; const aLayers: TArrayOfInteger);
 var i: integer;
 begin
   if Length(aLayers) = 0 then exit;
@@ -373,6 +469,43 @@ begin
     FParentScene.Layer[i].PostProcessing.SetBlurParams(aAmount);
 end;
 
+procedure TOGLCPostProcessingUtils.SetShockWaveParamsOnLayers(aCenterU,
+  aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel;
+  const aLayers: TArrayOfInteger);
+var i: integer;
+begin
+  if Length(aLayers) = 0 then exit;
+  for i in aLayers do
+    FParentScene.Layer[i].PostProcessing.SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator, aColor);
+end;
+
+procedure TOGLCPostProcessingUtils.SetShockWaveParamsOnLayerRange(aCenterU,
+  aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel; aFirstLayer,
+  aLastLayer: integer);
+var i: integer;
+begin
+  if aLastLayer < aFirstLayer then begin
+    i := aLastLayer;
+    aLastLayer := aFirstLayer;
+    aFirstLayer := i;
+  end;
+  for i:=aFirstLayer to aLastLayer do
+    FParentScene.Layer[i].PostProcessing.SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator, aColor);
+end;
+
+procedure TOGLCPostProcessingUtils.SetShockWaveParamsOnAllLayers(aCenterU,
+  aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
+var i: integer;
+begin
+  for i:=0 to FParentScene.LayerCount-1 do
+    FParentScene.Layer[i].PostProcessing.SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator, aColor);
+end;
+
+procedure TOGLCPostProcessingUtils.ResetTimeVariable;
+begin
+  FParentScene.TexturedTriangleRendererWithFX.ResetTime;
+end;
+
 { TOGLCTexturedTriangleRendererWithFX }
 
 procedure TOGLCTexturedTriangleRendererWithFX.InitShaderCodeAndCallBack;
@@ -382,6 +515,8 @@ begin
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
   FGetUniformLocation := @GetUniformLocation;
   FSetUniformValuesAndTexture := @SetUniformValuesAndTexture;
+
+  ResetTime;
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.DefineVertexAttribPointer;
@@ -407,6 +542,11 @@ begin
    FLocUnderWaterDensity := GetUniform('uUnderWaterDensity');
    FLocUnderWaterSpeedCoeff := GetUniform('uUnderWaterSpeed');
    FLocBlurAmount := GetUniform('uBlurAmount');
+   FLocPixelizeAmount := GetUniform('uPixelizeAmount');
+   FLocShockWaveCenter := GetUniform('uShockWaveCenter');
+   FLocShockWaveParams := GetUniform('uShockWaveParams');
+   FLocShockWaveColor := GetUniform('uShockWaveColor');
+
    Release;
  end;
 end;
@@ -420,11 +560,15 @@ begin
   glUniform1i(FLocFXFlags, FFXBitMask);
   glUniform1i(FLocTexWidth, FTexWidth);
   glUniform1i(FLocTexHeight, FTexHeight);
-  glUniform1f(FLocTime, GetTickCount64*0.001);
+  glUniform1f(FLocTime, (GetTickCount64-FTimeOrigin)*0.001);
   glUniform1f(FLocUnderWaterAmplitude, FUnderWaterAmplitude);
   glUniform1f(FLocUnderWaterDensity, FUnderWaterDensity);
   glUniform1f(FLocUnderWaterSpeedCoeff, FUnderWaterTimeMultiplicator);
   glUniform1i(FLocBlurAmount, FBlurAmount);
+  glUniform1f(FLocPixelizeAmount, FPixelizeAmount);
+  glUniform2f(FLocShockWaveCenter, FShockWaveCenterU, FShockWaveCenterV);
+  glUniform4f(FLocShockWaveParams, FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator);
+  glUniform4fv(FLocShockWaveColor, 1, @FShockWaveColorF);
   FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
@@ -551,9 +695,20 @@ begin
   end;
 end;
 
+procedure TOGLCTexturedTriangleRendererWithFX.ResetTime;
+begin
+  FTimeOrigin := GetTickCount64;
+end;
+
 procedure TOGLCTexturedTriangleRendererWithFX.SetFXBitMask(const aFXBitMask: GLuint);
 begin
   FFXBitMask := aFXBitMask;
+end;
+
+procedure TOGLCTexturedTriangleRendererWithFX.SetPixelizeParams(aAmount: single);
+begin
+  aAmount := 1-(aAmount*0.7+0.2);
+  FPixelizeAmount := aAmount*aAmount*aAmount;
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
@@ -566,6 +721,17 @@ end;
 procedure TOGLCTexturedTriangleRendererWithFX.SetBlurParams(aAmount: integer);
 begin
   FBlurAmount := aAmount;
+end;
+
+procedure TOGLCTexturedTriangleRendererWithFX.SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TColorF);
+begin
+  FShockWaveCenterU := aCenterU;
+  FShockWaveCenterV := aCenterV;
+  FShockWaveTimeMultiplicator := aTimeMultiplicator;
+  FShockWaveColorF.CopyFrom(aColor);
+  FShockWaveParam1 := 10.0;
+  FShockWaveParam2 := 0.8;
+  FShockWaveParam3 := 0.1;      // ring width (?)
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.SetTintValue(const aComputedTint: TColorF);
@@ -614,6 +780,7 @@ begin
   FUnderWaterDensity := 25;
   FUnderWaterTimeMultiplicator := 1.0;
   FBlurAmount := 4;
+  FPixelizeAmount := 0.5;
 end;
 
 destructor TOGLCPostProcessingEngine.Destroy;
@@ -634,12 +801,19 @@ var newBitMask: GLuint;
       FUnderWaterTimeMultiplicator := aParams^.FUnderWaterTimeMultiplicator;
       FUnderWaterDensity := aParams^.FUnderWaterDensity;
       FBlurAmount := aParams^.FBlurAmount;
+      FPixelizeAmount := aParams^.FPixelizeAmount;
+      FShockWaveCenterU := aParams^.FShockWaveCenterU;
+      FShockWaveCenterV := aParams^.FShockWaveCenterV;
+      FShockWaveTimeMultiplicator := aParams^.FShockWaveTimeMultiplicator;
+      FShockWaveColorF.CopyFrom(aParams^.FShockWaveColorF);
 
       with FParentScene.TexturedTriangleRendererWithFX do begin
         SetFXBitMask(FCurrentFXBitMask);
         SetUnderWaterParams(Self.FUnderWaterAmplitude, Self.FUnderWaterDensity, Self.FUnderWaterTimeMultiplicator);
         SetBlurParams(Self.FBlurAmount);
+        SetPixelizeParams(Self.FPixelizeAmount);
         SetTintValue(Self.FComputedTint);
+        SetShockWaveParams(Self.FShockWaveCenterU, Self.FShockWaveCenterV, Self.FShockWaveTimeMultiplicator, Self.FShockWaveColorF);
       end;
     end;
 
@@ -649,11 +823,14 @@ begin
   newBitMask := aParams^.FXBitMask;
 
   with aParams^ do begin
-    paramChange := (FXBitMask and fxbmUnderWater = fxbmUnderWater) and
+    paramChange := (FXBitMask and fxbmPixelize = fxbmPixelize) and
+                   (FPixelizeAmount <> Self.FPixelizeAmount)
+                   or
+                   (FXBitMask and fxbmUnderWater = fxbmUnderWater) and
                    ((FUnderWaterAmplitude <> Self.FUnderWaterAmplitude) or
                     (FUnderWaterDensity <> Self.FUnderWaterDensity) or
-                    (FUnderWaterTimeMultiplicator <> Self.FUnderWaterTimeMultiplicator));
-    paramChange := paramChange or
+                    (FUnderWaterTimeMultiplicator <> Self.FUnderWaterTimeMultiplicator))
+                   or
                    ((FXBitMask and fxbmBlur = fxbmBlur) and
                     (FBlurAmount <> Self.FBlurAmount));
     if FXBitMask and fxbmTint = fxbmTint then begin

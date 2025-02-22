@@ -1,6 +1,8 @@
 {$ifdef oglcINTERFACE}
 type
 
+TArrayOfInteger = array of integer;
+
 TTintMode = (tmMixColor,       // Tint color is mixed with the actual fragment color.
              tmReplaceColor);  // Tint color replace the actual fragment color.
 
@@ -244,10 +246,16 @@ TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
                              pfSepia,            // color effect
                              pfSharpen,          // accentuates edges
                              pfBlur,             // a simple blur effect with 3 selectable levels
-                             pfUnderWater);      // simulates deformations that can be seen under water
+                             pfUnderWater,       // simulates deformations that can be seen under water
+                             pfPixelize,         // pixel effect
+                             pfDreamVision,      // color effect like in a dream
+                             pfShockWave);       // a wave effect to simulate a shock
 TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
 
 POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
+
+{ TOGLCPostProcessingParameters }
+
 TOGLCPostProcessingParameters = record
 private const
   // FX bit mask
@@ -258,6 +266,9 @@ private const
   fxbmSharpen=$10;
   fxbmBlur=$20;
   fxbmUnderWater=$40;
+  fxbmPixelize=$80;
+  fxbmDreamVision=$100;
+  fxbmShockWave=$200;
 private
   FFX: TOGLCPostProcessingFX;
   procedure ComputeFXBitMask;
@@ -266,6 +277,9 @@ private
   FXBitMask: GLuint;
   FUnderWaterAmplitude, FUnderWaterDensity, FUnderWaterTimeMultiplicator: single;
   FBlurAmount: GLint;
+  FPixelizeAmount: GLfloat;
+  FShockWaveCenterU, FShockWaveCenterV, FShockWaveTimeMultiplicator: single;
+  FShockWaveColorF: TColorF;
 public
   // default is tmReplaceColor
   TintMode: TTintMode;
@@ -282,6 +296,15 @@ public
 
   // aAmount range is 1 soft   .....    4 full
   procedure SetBlurParams(aAmount: integer);
+
+  // aAmount range is 0.01 to 1.0
+  procedure SetPixelizeParams(aAmount: single);
+
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]
+  // (0 is left or top, 0.5 is middle, 1 is right or bottom)  Default is 0.5, 0.5
+  // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast) Default is 0.3
+  // aColor is the tint color of the wave. Default is transparent
+  procedure SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
 end;
 
 
@@ -329,6 +352,9 @@ begin
   if pfSharpen in FFX then FXBitMask := FXBitMask or fxbmSharpen;
   if pfBlur in FFX then FXBitMask := FXBitMask or fxbmBlur;
   if pfUnderWater in FFX then FXBitMask := FXBitMask or fxbmUnderWater;
+  if pfPixelize in FFX then FXBitMask := FXBitMask or fxbmPixelize;
+  if pfDreamVision in FFX then FXBitMask := FXBitMask or fxbmDreamVision;
+  if pfShockWave in FFX then FXBitMask := FXBitMask or fxbmShockWave;
 end;
 
 procedure TOGLCPostProcessingParameters.InitDefault;
@@ -340,6 +366,8 @@ begin
 
   SetUnderWaterParams(10, 25, 1.0);
   SetBlurParams(4);
+  SetPixelizeParams(0.5);
+  SetShockWaveParams(0.5, 0.5, 0.3, BGRA(0,0,0,0));
 end;
 
 procedure TOGLCPostProcessingParameters.Enable(aFXs: TOGLCPostProcessingFX);
@@ -371,6 +399,20 @@ end;
 procedure TOGLCPostProcessingParameters.SetBlurParams(aAmount: integer);
 begin
   FBlurAmount := EnsureRange(aAmount, 1, 4);
+end;
+
+procedure TOGLCPostProcessingParameters.SetPixelizeParams(aAmount: single);
+begin
+  FPixelizeAmount := EnsureRange(aAmount, 0.01, 1.0);
+end;
+
+procedure TOGLCPostProcessingParameters.SetShockWaveParams(aCenterU, aCenterV,
+  aTimeMultiplicator: single; const aColor: TBGRAPixel);
+begin
+  FShockWaveCenterU := EnsureRange(aCenterU, 0, 1);
+  FShockWaveCenterV := EnsureRange(aCenterV, 0, 1);
+  FShockWaveTimeMultiplicator := Max(aTimeMultiplicator, 0.01);
+  FShockWaveColorF.InitFromBGRA(aColor);
 end;
 
 { TFontGradient }
