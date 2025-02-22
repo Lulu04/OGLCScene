@@ -95,7 +95,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="28" Y="13"/>
+        <CursorPos X="16" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -104,8 +104,8 @@
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="42" Y="17"/>
-        <UsageCount Value="146"/>
+        <CursorPos X="37" Y="17"/>
+        <UsageCount Value="151"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -113,24 +113,23 @@
         <EditorIndex Value="4"/>
         <TopLine Value="360"/>
         <CursorPos Y="375"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="59"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\source\oglcPostProcessing.inc"/>
         <EditorIndex Value="6"/>
         <TopLine Value="250"/>
-        <CursorPos X="35" Y="263"/>
-        <UsageCount Value="56"/>
+        <CursorPos X="36" Y="263"/>
+        <UsageCount Value="59"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcType.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="230"/>
-        <CursorPos X="55" Y="252"/>
-        <UsageCount Value="56"/>
+        <CursorPos X="26" Y="240"/>
+        <UsageCount Value="59"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -138,12 +137,12 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="86"/>
         <CursorPos X="52" Y="101"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="0"/>
       </Unit6>
       <Unit7>
         <Filename Value="Units\u_common.pas"/>
-        <CursorPos X="14" Y="13"/>
-        <UsageCount Value="56"/>
+        <CursorPos X="9" Y="13"/>
+        <UsageCount Value="59"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -151,13 +150,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="269"/>
         <CursorPos Y="297"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="28"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\source\oglcRenderToTexture.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <CursorPos X="31" Y="4"/>
-        <UsageCount Value="48"/>
+        <CursorPos X="25" Y="4"/>
+        <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -165,40 +165,40 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="563"/>
         <CursorPos Y="581"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="26"/>
       </Unit10>
       <Unit11>
         <Filename Value="..\..\source\oglcShader.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos Y="54"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\..\source\oglcUI.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="31"/>
         <CursorPos X="13" Y="44"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="11"/>
       </Unit12>
       <Unit13>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\objpas.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="33"/>
         <CursorPos X="8" Y="48"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="9"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\source\gl_core_matrix.inc"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\source\oglcUtils.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="63"/>
         <CursorPos X="15" Y="77"/>
-        <UsageCount Value="5"/>
+        <UsageCount Value="4"/>
       </Unit15>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
