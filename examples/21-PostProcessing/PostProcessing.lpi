@@ -126,9 +126,10 @@
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcType.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="230"/>
-        <CursorPos X="25" Y="240"/>
+        <CursorPos X="55" Y="252"/>
         <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit5>
@@ -141,7 +142,6 @@
       </Unit6>
       <Unit7>
         <Filename Value="Units\u_common.pas"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="14" Y="13"/>
         <UsageCount Value="56"/>
         <Loaded Value="True"/>

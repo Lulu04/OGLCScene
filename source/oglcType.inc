@@ -245,11 +245,11 @@ TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
                              pfGrayscale,        // changes colors to gray scale
                              pfSepia,            // color effect
                              pfSharpen,          // accentuates edges
-                             pfBlur,             // a simple blur effect with 3 selectable levels
-                             pfUnderWater,       // simulates deformations that can be seen under water
+                             pfBlur,             // a simple blur effect with 4 selectable levels
+                             pfUnderWater,       // simulates under water deformations
                              pfPixelize,         // pixel effect
                              pfDreamVision,      // color effect like in a dream
-                             pfShockWave);       // a wave effect to simulate a shock
+                             pfShockWave);       // an effect to simulate a shock wave
 TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
 
 POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
