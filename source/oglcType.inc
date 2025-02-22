@@ -301,7 +301,7 @@ public
   procedure SetPixelizeParams(aAmount: single);
 
   // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]
-  // (0 is left or top, 0.5 is middle, 1 is right or bottom)  Default is 0.5, 0.5
+  // aCenterV sets to 0 mean the bottom of the screen (openGL coordinates system). Default value is 0.5
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast) Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);

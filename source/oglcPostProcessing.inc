@@ -311,17 +311,20 @@ public
   // aAmount range is 1 soft   .....    4 full
   procedure SetBlurParamsOnAllLayers(aAmount: integer);
 
-  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]
+  // aCenterV sets to 0 mean the bottom of the screen (openGL coordinates system). Default value is 0.5
   // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParamsOnLayers(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel;
                                        const aLayers: TArrayOfInteger);
-  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]
+  // aCenterV sets to 0 mean the bottom of the screen (openGL coordinates system). Default value is 0.5
   // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParamsOnLayerRange(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel;
                                            aFirstLayer, aLastLayer: integer);
-  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]  Default value is 0.5
+  // aCenterU, aCenterV are the coordinates of the center of the wave, expressed in range [0..1]
+  // aCenterV sets to 0 mean the bottom of the screen (openGL coordinates system). Default value is 0.5
   // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParamsOnAllLayers(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
