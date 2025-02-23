@@ -122,7 +122,7 @@ begin
   FScene.PostProcessing.SetShockWaveParamsOnLayers(0.5, 0.5, 0.3, BGRA(255,0,255,51), [LAYER_STARS]);
   // or
   // FScene.Layer[LAYER_STARS].PostProcessing.SetShockWaveParams(0.5, 0.5, 0.3, BGRA(255,0,255,51));
-  // this is the same! (because in this case only 1 layer is targeted)
+  // this is the same! (because in our case only 1 layer is targeted)
 end;
 
 procedure TScreenDemo.FreeObjects;
