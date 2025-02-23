@@ -60,45 +60,47 @@ var err: GLenum;
 begin
   FParentScene := aParentScene;
 
-  if aColorAttachmentIndex >= ColorAttachmentCount
-    then Raise Exception.Create ('TRenderToTexture.Create: you ask for a ColorAttachment='+
-                        aColorAttachmentIndex.ToString+' but it must be between [0..'+(ColorAttachmentCount-1).ToString+'] !');
-  FColorAttachment := GL_COLOR_ATTACHMENT0 + aColorAttachmentIndex;
-  FColorAttachmentIndex := aColorAttachmentIndex;
+  if aColorAttachmentIndex >= ColorAttachmentCount then begin
+    FParentScene.LogError('TRenderToTexture.Create: parameter aColorAttachmentIndex('+aColorAttachmentIndex.ToString+') is out of bound.');
+    FParentScene.LogInfo('Max index is '+(ColorAttachmentCount-1).ToString, 2);
+    FReady := False;
+  end else begin
+    FColorAttachment := GL_COLOR_ATTACHMENT0 + aColorAttachmentIndex;
+    FColorAttachmentIndex := aColorAttachmentIndex;
 
-  err := glGetError();
-  glGenFramebuffers(1, @FFBO);
-  glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
+    err := glGetError();
+    glGenFramebuffers(1, @FFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, FFBO);
 
-  FRenderedTexture := FParentScene.TexMan.AddEmpty(aWidth, aHeight);
-// TextureManager.BindTexture( FRenderedTexture );
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  FParentScene.TexMan.UnbindTexture;
+    FRenderedTexture := FParentScene.TexMan.AddEmpty(aWidth, aHeight);
+  // TextureManager.BindTexture( FRenderedTexture );
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    FParentScene.TexMan.UnbindTexture;
 
-  glFramebufferTexture2D(GL_FRAMEBUFFER, FColorAttachment, GL_TEXTURE_2D, FRenderedTexture^.ID, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, FColorAttachment, GL_TEXTURE_2D, FRenderedTexture^.ID, 0);
 
-  glDrawBuffers(1, @FColorAttachment);
+    glDrawBuffers(1, @FColorAttachment);
 
-  FUseDepthAndStencil := aUseDepthAndStencil;
-  FClearBitField := GL_COLOR_BUFFER_BIT;
-  if aUseDepthAndStencil then begin
-    FClearBitField := FClearBitField or GL_STENCIL_BUFFER_BIT;
-    glGenRenderbuffers(1, @FDepthAndStencilName);
-    glBindRenderbuffer(GL_RENDERBUFFER, FDepthAndStencilName);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, aWidth, aHeight);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthAndStencilName);
+    FUseDepthAndStencil := aUseDepthAndStencil;
+    FClearBitField := GL_COLOR_BUFFER_BIT;
+    if aUseDepthAndStencil then begin
+      FClearBitField := FClearBitField or GL_STENCIL_BUFFER_BIT;
+      glGenRenderbuffers(1, @FDepthAndStencilName);
+      glBindRenderbuffer(GL_RENDERBUFFER, FDepthAndStencilName);
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, aWidth, aHeight);
+      glBindRenderbuffer(GL_RENDERBUFFER, 0);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthAndStencilName);
+    end;
+
+    FReady := glCheckFramebufferStatus(GL_FRAMEBUFFER) = GL_FRAMEBUFFER_COMPLETE;
+    if not FReady then
+      FParentScene.LogError('TOGLCRenderToTexture.Create('+aWidth.ToString+', '+aHeight.ToString+', '+aColorAttachmentIndex.ToString+
+                            ') frame buffer status is not complete.');
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
   end;
-
-  FReady := glCheckFramebufferStatus(GL_FRAMEBUFFER) = GL_FRAMEBUFFER_COMPLETE;
-  if not FReady then begin
-    FParentScene.LogError('TOGLCRenderToTexture.Create('+aWidth.ToString+', '+aHeight.ToString+', '+aColorAttachmentIndex.ToString+
-                          ') frame buffer not ready');
-  end;
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   err := glGetError();
   if err <> GL_NO_ERROR then begin
