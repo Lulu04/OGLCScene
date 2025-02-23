@@ -105,13 +105,7 @@ function CollisionLineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF):
 function CollisionLineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
 function CollisionLineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;  }
 
-// return the appropriate GL_COLOR_ATTACHMENTx
-// ie: aIndex=0  returns GL_COLOR_ATTACHMENT0
-//     aIndex=8  returns GL_COLOR_ATTACHMENT8
-// aIndex [0..15]
-function IndexToColorAttachment( aIndex: integer ): GLenum;
 // return the total color attachment available on your system
-// the max value will be the returned value minus 1.
 function ColorAttachmentCount: GLint;
 
 const
@@ -557,11 +551,6 @@ begin
             PointCircle(PointF(r.Right, r.Top), aCenter, aRadius) and
             PointCircle(r.BottomRight, aCenter, aRadius) and
             PointCircle(PointF(r.Left, r.Bottom), aCenter, aRadius);
-end;
-
-function IndexToColorAttachment(aIndex: integer): GLenum;
-begin
- Result := GL_COLOR_ATTACHMENT0+aIndex;
 end;
 
 function ColorAttachmentCount: GLint;
