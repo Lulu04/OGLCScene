@@ -17,8 +17,8 @@ private
   function GetClearColor: TBGRAPixel;
   procedure SetClearColor(AValue: TBGRAPixel);
 public
-  // aColorAttachmentIndex is an array thats contains the index of the wanted ColorAttachment
-  // IE: if you want to render in the ColorAttachment0 then set aColorAttachmentIndexes to 0
+  // aColorAttachmentIndex contains the index of the wanted ColorAttachment
+  // IE: if you want to render in GL_COLOR_ATTACHMENT0, sets aColorAttachmentIndex to 0
   // must be [0..n], n depending of the video driver.
   // Set aUseDepthAndStencil to True if you need a depth and/or stencil buffer.
   constructor Create(aParentScene: TOGLCScene; aWidth, aHeight, aColorAttachmentIndex: integer; aUseDepthAndStencil: boolean=False);
