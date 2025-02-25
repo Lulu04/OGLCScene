@@ -15,12 +15,18 @@ type
   TFormMain = class(TForm)
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
+    CheckBox3: TCheckBox;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
     OpenGLControl1: TOpenGLControl;
     Panel1: TPanel;
     Panel2: TPanel;
     BStartShockWave: TSpeedButton;
+    TBThreshold: TTrackBar;
+    TBIntensity: TTrackBar;
     Timer1: TTimer;
     TBPixelize: TTrackBar;
     procedure CheckBox1Change(Sender: TObject);
@@ -77,10 +83,13 @@ procedure TFormMain.CheckBox1Change(Sender: TObject);
 begin
   if ScreenDemo = NIL then exit;
 
-  if Sender = CheckBox1 then
+  if Sender = CheckBox1 then begin
+    TBPixelize.Enabled := CheckBox1.Checked;
+    Label3.Enabled := CheckBox1.Checked;
     if CheckBox1.Checked
-      then FScene.Layer[LAYER_SHIP].PostProcessing.Enable([pfPixelize])  //
+      then FScene.Layer[LAYER_SHIP].PostProcessing.Enable([pfPixelize])
       else FScene.Layer[LAYER_SHIP].PostProcessing.Disable([pfPixelize]);
+  end;
 
   if Sender = TBPixelize then begin
     FScene.Layer[LAYER_SHIP].PostProcessing.SetPixelizeParams(TBPixelize.Position*0.01);
@@ -91,6 +100,22 @@ begin
       then begin
         FScene.PostProcessing.EnableFXOnAllLayers([pfDreamVision])
       end else FScene.PostProcessing.DisableFXOnAllLayers([pfDreamVision]);
+
+  if Sender = CheckBox3 then begin
+    TBThreshold.Enabled := CheckBox3.Checked;
+    TBIntensity.Enabled := CheckBox3.Checked;
+    Label4.Enabled := CheckBox3.Checked;
+    Label5.Enabled := CheckBox3.Checked;
+    if CheckBox3.Checked
+      then FScene.PostProcessing.EnableFXOnAllLayers([pfBloom])
+      else FScene.PostProcessing.DisableFXOnAllLayers([pfBloom]);
+  end;
+
+  if (Sender = TBThreshold) or (Sender = TBIntensity) then begin
+    Label4.Caption := 'threshold '+FormatFloat('0.0', TBThreshold.Position*0.01);
+    Label5.Caption := 'intensity '+FormatFloat('0.0', TBIntensity.Position*0.01);
+    FScene.PostProcessing.SetBloomParamsOnAllLayers(TBThreshold.Position*0.01, TBIntensity.Position*0.01);
+  end;
 
   if Sender = BStartShockWave then begin
     // because the ShockWave effect need time counted from zero -> we have to reset the shader time variable.

@@ -249,7 +249,8 @@ TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
                              pfUnderWater,       // simulates under water deformations
                              pfPixelize,         // pixel effect
                              pfDreamVision,      // color effect like in a dream
-                             pfShockWave);       // an effect to simulate a shock wave
+                             pfShockWave,        // an effect to simulate a shock wave
+                             pfBloom);           // makes bright areas of the scene appear to glow
 TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
 
 POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
@@ -269,6 +270,7 @@ private const
   fxbmPixelize=$80;
   fxbmDreamVision=$100;
   fxbmShockWave=$200;
+  fxbmBloom=$400;
 private
   FFX: TOGLCPostProcessingFX;
   procedure ComputeFXBitMask;
@@ -280,6 +282,7 @@ private
   FPixelizeAmount: GLfloat;
   FShockWaveCenterU, FShockWaveCenterV, FShockWaveTimeMultiplicator: single;
   FShockWaveColorF: TColorF;
+  FBloomThreshold, FBloomIntensity: single;
 public
   // default is tmReplaceColor
   TintMode: TTintMode;
@@ -305,6 +308,11 @@ public
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast) Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
+
+  // aThreshold range is [0..1] default value is 0.5
+  // if the luminosity of a pixel is greater than this threshold the blur is applied
+  // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
+  procedure SetBloomParams(aThreshold, aIntensity: single);
 end;
 
 
@@ -355,6 +363,7 @@ begin
   if pfPixelize in FFX then FXBitMask := FXBitMask or fxbmPixelize;
   if pfDreamVision in FFX then FXBitMask := FXBitMask or fxbmDreamVision;
   if pfShockWave in FFX then FXBitMask := FXBitMask or fxbmShockWave;
+  if pfBloom in FFX then FXBitMask := FXBitMask or fxbmBloom;
 end;
 
 procedure TOGLCPostProcessingParameters.InitDefault;
@@ -368,6 +377,7 @@ begin
   SetBlurParams(4);
   SetPixelizeParams(0.5);
   SetShockWaveParams(0.5, 0.5, 0.3, BGRA(0,0,0,0));
+  SetBloomParams(0.5, 1.0);
 end;
 
 procedure TOGLCPostProcessingParameters.Enable(aFXs: TOGLCPostProcessingFX);
@@ -413,6 +423,12 @@ begin
   FShockWaveCenterV := EnsureRange(aCenterV, 0, 1);
   FShockWaveTimeMultiplicator := Max(aTimeMultiplicator, 0.01);
   FShockWaveColorF.InitFromBGRA(aColor);
+end;
+
+procedure TOGLCPostProcessingParameters.SetBloomParams(aThreshold, aIntensity: single);
+begin
+  FBloomThreshold := EnsureRange(aThreshold, 0, 1);
+  FBloomIntensity := Max(0.01, aIntensity);
 end;
 
 { TFontGradient }
