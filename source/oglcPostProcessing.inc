@@ -34,6 +34,7 @@ private const
    '  uniform vec2 uShockWaveCenter=vec2(0.5,0.5);'#10+ // center of the shock
    '  uniform vec4 uShockWaveParams=vec4(10.0, 0.8, 0.1, 0.3);'#10+ // 10.0, 0.8, 0.1(ring width),  1.0(timeMultiplicator)
    '  uniform vec4 uShockWaveColor=vec4(1.0,0.0,0.8,0.2);'#10+
+   '  uniform vec2 uBloomThresholdIntensity=vec2(0.5, 1.8);'#10+
    ' float Random1f(float x){'#10+
    '    return fract(sin(x)*1.0);'#10+
    ' }'#10+
@@ -47,6 +48,25 @@ private const
    '  vec4 col = texture(uTexUnit, TexCoords);'#10+
    '  int flags = uFXFlag;'#10+
    '  vec2 texCoords = TexCoords;'#10+
+   // Bloom effect from https://glsl.site/post/post-processing-effects-with-shaders/
+   // (modified version)
+   ' if (flags >= 0x400){'#10+
+   '   flags -= 0x400;'#10+
+   //'   if (dot(col.rgb, vec3(0.299, 0.587, 0.114)) > uBloomThresholdIntensity.x) bloom = col.rgb;'#10+
+   '   if (dot(col.rgb, vec3(0.299, 0.587, 0.114)) > uBloomThresholdIntensity.x)'#10+
+   '   {'#10+
+   '     vec3 blurred = vec3(0.0);'#10+
+   '     float blurRadius = 1.0 / float(uTexWidth);'#10+ // vec2(float(uTexWidth), float(uTexHeight)).xy;'#10+
+   '     for (float x = -2.0; x <= 2.0; x += 1.0) {'#10+
+   '       for (float y = -2.0; y <= 2.0; y += 1.0) {'#10+
+   '           blurred += texture(uTexUnit, texCoords + vec2(x, y) * blurRadius).rgb;'#10+
+   '       }'#10+
+   '     }'#10+
+   '     blurred /= 25.0;'#10+
+   '     col.rgb += blurred * uBloomThresholdIntensity.y;'#10+
+   '     col.a = 1.0;'#10+
+   '   }'#10+
+   ' }'#10+
    // ShockWave from https://www.geeks3d.com/20091116/shader-library-2d-shockwave-post-processing-filter-glsl/
    // modified with color and time adjustment
    ' if (flags >= 0x200){'#10+
@@ -122,7 +142,7 @@ private const
    '   for(int i = -uBlurAmount; i < uBlurAmount; i++)'#10+
    '	   for(int j = -uBlurAmount;j < uBlurAmount; j++)'#10+
    '		sum += texture2D(uTexUnit, texCoords.xy + vec2(i * dx, j * dy)).rgb;'#10+
-   '   col = vec4(vec3(sum/BlurDivisor[uBlurAmount-1]), col.a);'#10+
+   '   col = vec4(vec3(sum/BlurDivisor[uBlurAmount-1]), 1.0);'#10+
    ' }'#10+
    // sharpen
    ' if (flags >= 0x10){'#10+
@@ -199,7 +219,8 @@ private
   FLocUnderWaterAmplitude, FLocUnderWaterDensity, FLocUnderWaterSpeedCoeff,
   FLocBlurAmount,
   FLocPixelizeAmount,
-  FLocShockWaveCenter, FLocShockWaveParams, FLocShockWaveColor: GLint;
+  FLocShockWaveCenter, FLocShockWaveParams, FLocShockWaveColor,
+  FLocBloomParams: GLint;
   FMVP: TOGLCMatrix;
   FTintF: TColorF;
   FOpacity: single;
@@ -208,6 +229,7 @@ private
   FShockWaveCenterU, FShockWaveCenterV,
   FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator: single;
   FShockWaveColorF: TColorF;
+  FBloomThreshold, FBloomIntensity: single;
 
   FBlurAmount: GLint;
   FPixelizeAmount: single;
@@ -228,6 +250,7 @@ public
   procedure SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
   procedure SetBlurParams(aAmount: integer);
   procedure SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TColorF);
+  procedure SetBloomParams(aThreshold, aIntensity: single);
   procedure SetTintValue(const aComputedTint: TColorF);
 end;
 
@@ -244,6 +267,7 @@ private
   FPixelizeAmount: single;
   FShockWaveCenterU, FShockWaveCenterV, FShockWaveTimeMultiplicator: single;
   FShockWaveColorF: TColorF;
+  FBloomThreshold, FBloomIntensity: single;
   FIsActive: boolean;
   procedure CreateTargetTexture;
   procedure FreeTargetTexture;
@@ -328,6 +352,21 @@ public
   // aTimeMultiplicator must be >0    <1 slow,  1=normal speed,  >1 fast,    Default is 0.3
   // aColor is the tint color of the wave. Default is transparent
   procedure SetShockWaveParamsOnAllLayers(aCenterU, aCenterV, aTimeMultiplicator: single; const aColor: TBGRAPixel);
+
+
+  // aThreshold range is [0..1] default value is 0.5
+  // if the luminosity of a pixel is greater than this threshold the blur is applied
+  // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
+  procedure SetBloomParamsOnLayers(aThreshold, aIntensity: single; const aLayers: TArrayOfInteger);
+  // aThreshold range is [0..1] default value is 0.5
+  // if the luminosity of a pixel is greater than this threshold the blur is applied
+  // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
+  procedure SetBloomParamsOnLayerRange(aThreshold, aIntensity: single; aFirstLayer, aLastLayer: integer);
+  // aThreshold range is [0..1] default value is 0.5
+  // if the luminosity of a pixel is greater than this threshold the blur is applied
+  // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
+  procedure SetBloomParamsOnAllLayers(aThreshold, aIntensity: single);
+
 
   // reset the time variable to 0 in the post-processing shader. Needed before starting the ShockWave effect.
   procedure ResetTimeVariable;
@@ -504,6 +543,35 @@ begin
     FParentScene.Layer[i].PostProcessing.SetShockWaveParams(aCenterU, aCenterV, aTimeMultiplicator, aColor);
 end;
 
+procedure TOGLCPostProcessingUtils.SetBloomParamsOnLayers(aThreshold,
+  aIntensity: single; const aLayers: TArrayOfInteger);
+var i: integer;
+begin
+  if Length(aLayers) = 0 then exit;
+  for i in aLayers do
+    FParentScene.Layer[i].PostProcessing.SetBloomParams(aThreshold, aIntensity);
+end;
+
+procedure TOGLCPostProcessingUtils.SetBloomParamsOnLayerRange(aThreshold,
+  aIntensity: single; aFirstLayer, aLastLayer: integer);
+var i: integer;
+begin
+  if aLastLayer < aFirstLayer then begin
+    i := aLastLayer;
+    aLastLayer := aFirstLayer;
+    aFirstLayer := i;
+  end;
+  for i:=aFirstLayer to aLastLayer do
+    FParentScene.Layer[i].PostProcessing.SetBloomParams(aThreshold, aIntensity);
+end;
+
+procedure TOGLCPostProcessingUtils.SetBloomParamsOnAllLayers(aThreshold, aIntensity: single);
+var i: integer;
+begin
+  for i:=0 to FParentScene.LayerCount-1 do
+    FParentScene.Layer[i].PostProcessing.SetBloomParams(aThreshold, aIntensity);
+end;
+
 procedure TOGLCPostProcessingUtils.ResetTimeVariable;
 begin
   FParentScene.TexturedTriangleRendererWithFX.ResetTime;
@@ -529,6 +597,7 @@ begin
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.GetUniformLocation;
+var err: GLenum;
 begin
  with FShader do
  begin
@@ -549,9 +618,13 @@ begin
    FLocShockWaveCenter := GetUniform('uShockWaveCenter');
    FLocShockWaveParams := GetUniform('uShockWaveParams');
    FLocShockWaveColor := GetUniform('uShockWaveColor');
+   FLocBloomParams := GetUniform('uBloomThresholdIntensity');
 
    Release;
  end;
+ err := glGetError();
+  if err <> GL_NO_ERROR then
+    FParentScene.LogError(ClassName+'.GetUniformLocation generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.SetUniformValuesAndTexture;
@@ -572,6 +645,7 @@ begin
   glUniform2f(FLocShockWaveCenter, FShockWaveCenterU, FShockWaveCenterV);
   glUniform4f(FLocShockWaveParams, FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator);
   glUniform4fv(FLocShockWaveColor, 1, @FShockWaveColorF);
+  glUniform2f(FLocBloomParams, FBloomThreshold, FBloomIntensity);
   FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
 end;
 
@@ -737,6 +811,12 @@ begin
   FShockWaveParam3 := 0.1;      // ring width (?)
 end;
 
+procedure TOGLCTexturedTriangleRendererWithFX.SetBloomParams(aThreshold, aIntensity: single);
+begin
+  FBloomThreshold := aThreshold;
+  FBloomIntensity := aIntensity;
+end;
+
 procedure TOGLCTexturedTriangleRendererWithFX.SetTintValue(const aComputedTint: TColorF);
 begin
   FTintF.CopyFrom(aComputedTint);
@@ -809,6 +889,8 @@ var newBitMask: GLuint;
       FShockWaveCenterV := aParams^.FShockWaveCenterV;
       FShockWaveTimeMultiplicator := aParams^.FShockWaveTimeMultiplicator;
       FShockWaveColorF.CopyFrom(aParams^.FShockWaveColorF);
+      FBloomThreshold := aParams^.FBloomThreshold;
+      FBloomIntensity := aParams^.FBloomIntensity;
 
       with FParentScene.TexturedTriangleRendererWithFX do begin
         SetFXBitMask(FCurrentFXBitMask);
@@ -817,6 +899,7 @@ var newBitMask: GLuint;
         SetPixelizeParams(Self.FPixelizeAmount);
         SetTintValue(Self.FComputedTint);
         SetShockWaveParams(Self.FShockWaveCenterU, Self.FShockWaveCenterV, Self.FShockWaveTimeMultiplicator, Self.FShockWaveColorF);
+        SetBloomParams(Self.FBloomThreshold, Self.FBloomIntensity);
       end;
     end;
 
@@ -826,16 +909,21 @@ begin
   newBitMask := aParams^.FXBitMask;
 
   with aParams^ do begin
-    paramChange := (FXBitMask and fxbmPixelize = fxbmPixelize) and
-                   (FPixelizeAmount <> Self.FPixelizeAmount)
+    paramChange := ((FXBitMask and fxbmPixelize = fxbmPixelize) and
+                   (FPixelizeAmount <> Self.FPixelizeAmount))
                    or
-                   (FXBitMask and fxbmUnderWater = fxbmUnderWater) and
+                   ((FXBitMask and fxbmUnderWater = fxbmUnderWater) and
                    ((FUnderWaterAmplitude <> Self.FUnderWaterAmplitude) or
                     (FUnderWaterDensity <> Self.FUnderWaterDensity) or
-                    (FUnderWaterTimeMultiplicator <> Self.FUnderWaterTimeMultiplicator))
+                    (FUnderWaterTimeMultiplicator <> Self.FUnderWaterTimeMultiplicator)))
                    or
                    ((FXBitMask and fxbmBlur = fxbmBlur) and
-                    (FBlurAmount <> Self.FBlurAmount));
+                    (FBlurAmount <> Self.FBlurAmount))
+                   or
+                   ((FXBitMask and fxbmBloom = fxbmBloom) and
+                   ((FBloomThreshold <> Self.FBloomThreshold) or
+                    (FBloomIntensity <> Self.FBloomIntensity)));
+
     if FXBitMask and fxbmTint = fxbmTint then begin
       with aParams^ do ct.InitFromTint(TintMode, Tint);
       paramChange := paramChange or
