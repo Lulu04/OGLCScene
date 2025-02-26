@@ -546,6 +546,7 @@ procedure TRendererBase.Batch_CheckIfNeedFlush(aNewRenderer: TRendererBase; aPri
                    aNewTexture: PTexture; aTextureUnit: integer; aNewBlendMode: byte; aExtraTest: boolean);
 var needFlush: boolean;
 begin
+  needFlush := True;
   if FBatch^.CurrentRenderer <> NIL then
     if aExtraTest then Batch_Flush
     else begin
