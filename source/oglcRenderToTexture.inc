@@ -149,9 +149,10 @@ begin
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  glActiveTexture(GL_TEXTURE0+FColorAttachmentIndex);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glActiveTexture(GL_TEXTURE0);
+  FParentScene.TexMan.UnbindTexture;
+//  glActiveTexture(GL_TEXTURE0+FColorAttachmentIndex);
+//  glBindTexture(GL_TEXTURE_2D, 0);
+//  glActiveTexture(GL_TEXTURE0);
 
   err := glGetError();
   if err <> GL_NO_ERROR then
