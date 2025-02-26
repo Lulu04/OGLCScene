@@ -180,7 +180,8 @@ TOGLCCamera = class;
 {$I oglcCamera.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcMultiRendererFactory.inc}
-{$I oglcRenderToTexture.inc}
+{$I oglcRendererToTexture.inc}
+{$I oglcShaderToTextureTemplate.inc}
 {$I oglcPostProcessing.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcSpriteEffect.inc}
@@ -873,7 +874,8 @@ end;
 {$I oglcCamera.inc}
 {$I oglcMultiRendererFactory.inc}
 {$I oglcPostProcessing.inc}
-{$I oglcRenderToTexture.inc}
+{$I oglcRendererToTexture.inc}
+{$I oglcShaderToTextureTemplate.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcSpriteEffect.inc}
