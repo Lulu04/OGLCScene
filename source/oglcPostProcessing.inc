@@ -138,11 +138,11 @@ private const
    '   const int BlurDivisor[4] = int[](4, 18, 30, 60);'#10+
    '   float dx = 1.0f/uTexWidth;'#10+ //step on x
    '   float dy = 1.0f/uTexHeight;'#10+ //step on y
-   '   vec3 sum = vec3(0,0,0);'#10+
+   '   vec4 sum = vec4(0.0,0.0,0.0,0.0);'#10+
    '   for(int i = -uBlurAmount; i < uBlurAmount; i++)'#10+
    '	   for(int j = -uBlurAmount;j < uBlurAmount; j++)'#10+
-   '		sum += texture2D(uTexUnit, texCoords.xy + vec2(i * dx, j * dy)).rgb;'#10+
-   '   col = vec4(vec3(sum/BlurDivisor[uBlurAmount-1]), 1.0);'#10+
+   '		sum += texture2D(uTexUnit, texCoords.xy + vec2(i * dx, j * dy));'#10+
+   '   col = sum/BlurDivisor[uBlurAmount-1];'#10+
    ' }'#10+
    // sharpen
    ' if (flags >= 0x10){'#10+
