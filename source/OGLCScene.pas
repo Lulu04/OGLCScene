@@ -35,7 +35,7 @@ unit OGLCScene;
                          // comment to use fpc header GL and GLExt
 
 // Compiling in debug mode raise exception when a shader compilation error occurs.
-// In Release mode, shader compilation error only add a message in the scene log file.
+// In release mode, shader compilation error only add a message in the scene log file.
 {$ifopt D+}
   {$define SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR}
 {$endif}
