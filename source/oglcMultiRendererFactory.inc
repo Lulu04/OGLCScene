@@ -53,7 +53,7 @@ private
   procedure FreeID;
   procedure SetCapacity(aCount: ptrint);
   procedure ResetBufferState;
-private
+protected
   FVertexShaderCode,
   FFragmentShaderCode: PChar;
   FDefineVertexAttribPointer,
