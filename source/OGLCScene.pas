@@ -27,9 +27,18 @@ unit OGLCScene;
 {$modeswitch TypeHelpers}
 
 
-//{$DEFINE DEBUG_MODE_ON}  // enable to draw a red rectangle around all surfaces.
-{$define USE_glcorearb}  // enable to use the glcorearb.pas header for OpenGL written by Chris Rorden.
+//{$define DEBUG_MODE_ON}  // uncomment to draw a red rectangle around all surfaces.
 
+//{$define SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR} // uncomment to raise exception when a shader don't compile
+
+{$define USE_glcorearb}  // uncomment to use the glcorearb.pas header for OpenGL written by Chris Rorden.
+                         // comment to use fpc header GL and GLExt
+
+// Compiling in debug mode raise exception when a shader compilation error occurs.
+// In Release mode, shader compilation error only add a message in the scene log file.
+{$ifopt D+}
+  {$define SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR}
+{$endif}
 
 {$ifdef USE_glcorearb}
   {$MACRO ON}
