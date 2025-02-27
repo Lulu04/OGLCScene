@@ -292,6 +292,8 @@ public
   procedure Disable(aFXs: TOGLCPostProcessingFX);
   procedure DisableAll;
 
+  procedure SetTintParams(aTintMode: TTintMode; const aTint: TBGRAPixel);
+
   // aAmplitude: the waves amplitude [1..100]   default is 10
   // aDensity: the waves density [1..100]    default value is 25
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
@@ -396,6 +398,12 @@ procedure TOGLCPostProcessingParameters.DisableAll;
 begin
   FFX := [];
   ComputeFXBitMask;
+end;
+
+procedure TOGLCPostProcessingParameters.SetTintParams(aTintMode: TTintMode; const aTint: TBGRAPixel);
+begin
+  TintMode := aTintMode;
+  Tint := aTint;
 end;
 
 procedure TOGLCPostProcessingParameters.SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);

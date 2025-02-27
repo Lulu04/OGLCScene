@@ -315,6 +315,10 @@ public
   // Disable all post-processing FX on all layers.
   procedure DisableAllFXOnAllLayers;
 
+  procedure SetTintParamsOnLayers(aTintMode: TTintMode; const aTint: TBGRAPixel; const aLayers: TArrayOfInteger);
+  procedure SetTintParamsOnLayerRange(aTintMode: TTintMode; const aTint: TBGRAPixel; aFirstLayer, aLastLayer: integer);
+  procedure SetTintParamsOnAllLayers(aTintMode: TTintMode; const aTint: TBGRAPixel);
+
   // aAmplitude: the waves amplitude [1..100]
   // aDensity: the waves density [1..100]
   // aTimeMultiplicator mini is 0.1 (slow)  -->  1.0 normal speed(default)  --->  greater than 1.0 (fast)
@@ -451,6 +455,36 @@ var i: integer;
 begin
   for i:=0 to FParentScene.LayerCount-1 do
     FParentScene.Layer[i].PostProcessing.DisableAll;
+end;
+
+procedure TOGLCPostProcessingUtils.SetTintParamsOnLayers(aTintMode: TTintMode;
+  const aTint: TBGRAPixel; const aLayers: TArrayOfInteger);
+var i: integer;
+begin
+  if Length(aLayers) = 0 then exit;
+  for i in aLayers do
+    FParentScene.Layer[i].PostProcessing.SetTintParams(aTintMode, aTint);
+end;
+
+procedure TOGLCPostProcessingUtils.SetTintParamsOnLayerRange(
+  aTintMode: TTintMode; const aTint: TBGRAPixel; aFirstLayer, aLastLayer: integer);
+var i: integer;
+begin
+  if aLastLayer < aFirstLayer then begin
+    i := aLastLayer;
+    aLastLayer := aFirstLayer;
+    aFirstLayer := i;
+  end;
+  for i:=aFirstLayer to aLastLayer do
+    FParentScene.Layer[i].PostProcessing.SetTintParams(aTintMode, aTint);
+end;
+
+procedure TOGLCPostProcessingUtils.SetTintParamsOnAllLayers(
+  aTintMode: TTintMode; const aTint: TBGRAPixel);
+var i: integer;
+begin
+  for i:=0 to FParentScene.LayerCount-1 do
+    FParentScene.Layer[i].PostProcessing.SetTintParams(aTintMode, aTint);
 end;
 
 procedure TOGLCPostProcessingUtils.SetUnderWaterParamsOnLayers(aAmplitude,
