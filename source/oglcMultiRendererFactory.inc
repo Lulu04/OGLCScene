@@ -183,7 +183,9 @@ private
   FMVP: TOGLCMatrix;
   FTintF: TColorF;
   FOpacity: single;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -239,7 +241,9 @@ private const
 private
   FLocMVP: GLuint;
   FMVP: TOGLCMatrix;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -303,7 +307,9 @@ private
   FMVP: TOGLCMatrix;
   FTintF: TColorF;
   FOpacity: single;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -371,7 +377,9 @@ private const
 private
   FLocProjectionMatrix: GLint;
   FProjectionMatrix: TOGLCMatrix;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -433,7 +441,9 @@ private
   FMVP: TOGLCMatrix;
   FTintF: TColorF;
   FOpacity: single;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -503,7 +513,9 @@ private const
 private
   FLocProjectionMatrix,
   FLocTextureUnit: GLint;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
@@ -528,8 +540,9 @@ end;
 { TOGLCNoFilterTextureMVTriangleRenderer }
 
 TOGLCNoFilterTextureMVTriangleRenderer = class(TOGLCTexturedMVTriangleRenderer)
-private
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure SetUniformValuesAndTextureCustomized;
 public
   procedure Draw(aResetBufferStateWhenDone: boolean=True); override;

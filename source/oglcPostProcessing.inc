@@ -234,7 +234,9 @@ private
   FBlurAmount: GLint;
   FPixelizeAmount: single;
   FTimeOrigin: QWord;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
