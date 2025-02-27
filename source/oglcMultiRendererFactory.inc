@@ -4,7 +4,6 @@ const
 
 type
 
-TProcOfObject = procedure() of object;
 TRendererBase = class;
 
 TRendererBatchDescriptor = record

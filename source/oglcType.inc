@@ -2,6 +2,7 @@
 type
 
 TArrayOfInteger = array of integer;
+TProcOfObject = procedure() of object;
 
 TTintMode = (tmMixColor,       // Tint color is mixed with the actual fragment color.
              tmReplaceColor);  // Tint color replace the actual fragment color.
