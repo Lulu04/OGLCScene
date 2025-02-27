@@ -62,7 +62,9 @@ private
   FBeamColorF, FHaloColorF,
   FTintF: TColorF;
   FThreshold, FHaloAttenuation, FOpacity: single;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;

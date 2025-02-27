@@ -53,7 +53,9 @@ private
   FTintF: TColorF;
   FOpacity: single;
   FClipAreaF: TRectF;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;

@@ -74,7 +74,9 @@ private
   FTexture: PTexture;
   FTextureUnit: integer;
   FProjectionMatrix: TOGLCMatrix;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;

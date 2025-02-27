@@ -33,7 +33,9 @@ private
   FLocOpacity: GLint;
   FMVP: TOGLCMatrix;
   FOpacity: single;
+protected
   procedure InitShaderCodeAndCallBack; override;
+private
   procedure DefineVertexAttribPointer;
   procedure GetUniformLocation;
   procedure SetUniformValuesAndTexture;
