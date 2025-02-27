@@ -669,7 +669,7 @@ begin
   FParentScene := aParentScene;
   FUseIndicesBuffer := aUseIndicesBuffer;
   FBatch := @FParentScene.FRendererBatch;
-  FShader := TOGLCShader.Create(FParentScene, FVertexShaderCode, FFragmentShaderCode);
+  FShader.Compile(FParentScene, FVertexShaderCode, FFragmentShaderCode);
   FGetUniformLocation();
   CreateID;
   SetCapacity(INITIAL_BUFFER_CAPACITY);
@@ -680,8 +680,7 @@ end;
 destructor TOGLCGenericPrimitiveRenderer.Destroy;
 begin
   FreeID;
-  FShader.Free;
-  FShader := NIL;
+  FShader.FreeID;
   FParentScene := NIL;
   inherited Destroy;
 end;

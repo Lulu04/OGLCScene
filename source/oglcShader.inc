@@ -3,28 +3,24 @@ type
 
 { TOGLCShader }
 
-TOGLCShader = class
+TOGLCShader = record
  private
   FParentScene: TOGLCScene;
-  FProgramID,
-  FFragmentID,
-  FVertexID: GLuint;
-  procedure NotifyGetUniformError(const s: string); inline;
-  protected
-  function GetUniform(const AName: string): GLint;
-  procedure SetUniform1f(AUniform: GLint; AValue: single);
-  procedure SetUniform2f(AUniform: GLint; AValue1, AValue2: single);
-  procedure SetUniform3f(AUniform: GLint; AValue1, AValue2, AValue3: single);
-  procedure SetUniform4f(AUniform: GLint; AValue1, AValue2, AValue3, AValue4: single);
-  procedure SetUniform1i(AUniform: GLint; AValue: GLint);
-  procedure SetUniformMatrix4(AUniform: GLint; AValue: PGLfloat);
+  FProgramID: GLuint;
  public
-  constructor Create(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
-  destructor Destroy; override;
+  procedure Compile(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
+  procedure FreeID;
 
+  // activates the shader
   procedure Use;
+  // deactivates the shader
   procedure Release;
+  // use this method to retrieve the location of a uniform.
+  // an error message is logged in the parent scene in case of failure.
+  function GetUniform(const AName: string): GLint;
+  // return True if no error append in the compile process.
   function Ready: boolean;
+  // the GL id of the shader
   property ID: GLuint read FProgramID;
 end;
 
@@ -33,14 +29,9 @@ end;
 
 { TOGLCShader }
 
-procedure TOGLCShader.NotifyGetUniformError(const s: string); inline;
-begin
-  raise Exception.Create('GetUniform error on '+s);
-end;
-
-constructor TOGLCShader.Create(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
-var R : GLint ;
-    code:string;
+procedure TOGLCShader.Compile(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
+var R: GLint;
+    FFragmentID, FVertexID: GLuint;
   procedure NotifyError(aPrg: GLUint; const aPrefix: string);
   var log_length: GLint=0;
       logBuf: TBytes;
@@ -53,38 +44,49 @@ var R : GLint ;
       glGetShaderInfoLog(aPrg, log_length, @log_length, @logBuf[0]);
       msg := TEncoding.ANSI.GetAnsiString(logBuf);
     end;
+    FParentScene.LogError('TOGLCShader.Compile: an error occured'+LineEnding+aPrefix+' '+msg);
+    FParentScene.LogEmptyLine();
+    {$ifdef SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR}
     raise Exception.Create(aPrefix+' '+msg);
+    {$endif}
   end;
 begin
   FParentScene := aParentScene;
   FProgramID := 0;
-  FVertexID := 0;
-  FFragmentID := 0;
+
   if (Length(AVertexCodeSource) = 0) and
      (Length(AFragmentCodeSource) = 0)
     then exit;
 
   FProgramID := glCreateProgram();
 
-  if Length(AVertexCodeSource) > 0 then begin
-    FVertexID := glCreateShader(GL_VERTEX_SHADER);
-    code := AVertexCodeSource;
-    glShaderSource(FVertexID, 1, @code, NIL);
-    glCompileShader(FVertexID);
-    glGetShaderiv(FVertexID, GL_COMPILE_STATUS, @R);
-    if R = GL_FALSE then NotifyError(FVertexID, 'VERTEX SHADER');
-    glAttachShader( FProgramID, FVertexID );
-  end;
+  if FProgramID = 0 then exit;
 
-  if Length(AFragmentCodeSource) > 0 then begin
-    FFragmentID := glCreateShader( GL_FRAGMENT_SHADER);
-    code := AFragmentCodeSource;
-    glShaderSource(FFragmentID, 1, @code, NIL);
-    glCompileShader(FFragmentID );
-    glGetShaderiv(FFragmentID, GL_COMPILE_STATUS, @R);
-    if R = GL_FALSE then NotifyError(FFragmentID, 'FRAGMENT SHADER');
-    glAttachShader(FProgramID, FFragmentID);
-  end;
+  FVertexID := glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(FVertexID, 1, @AVertexCodeSource, NIL);
+  glCompileShader(FVertexID);
+  glGetShaderiv(FVertexID, GL_COMPILE_STATUS, @R);
+  if R = GL_FALSE then begin
+    NotifyError(FVertexID, 'VERTEX SHADER');
+    glDeleteShader(FVertexID);
+    glDeleteProgram(FProgramID);
+    FProgramID := 0;
+  end else glAttachShader(FProgramID, FVertexID);
+
+  if FProgramID = 0 then exit;
+
+  FFragmentID := glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(FFragmentID, 1, @AFragmentCodeSource, NIL);
+  glCompileShader(FFragmentID);
+  glGetShaderiv(FFragmentID, GL_COMPILE_STATUS, @R);
+  if R = GL_FALSE then begin
+    NotifyError(FFragmentID, 'FRAGMENT SHADER');
+    glDeleteShader(FFragmentID);
+    glDeleteProgram(FProgramID);
+    FProgramID := 0;
+  end else glAttachShader(FProgramID, FFragmentID);
+
+  if FProgramID = 0 then exit;
 
   glLinkProgram(FProgramID);
   glGetProgramiv(FProgramID, GL_LINK_STATUS, @R);
@@ -93,14 +95,14 @@ begin
   glValidateProgram(FProgramID);
   if FFragmentID <> 0 then glDeleteShader(FFragmentID);
   if FVertexID <> 0 then glDeleteShader(FVertexID);
+
+  glGetError();
 end;
 
-destructor TOGLCShader.Destroy;
+procedure TOGLCShader.FreeID;
 begin
-  if FFragmentID <> 0 then glDeleteShader(FFragmentID);
-  if FVertexID <> 0 then glDeleteShader(FVertexID);
   if FProgramID <> 0 then glDeleteProgram(FProgramID);
-  inherited Destroy;
+  FProgramID := 0;
 end;
 
 procedure TOGLCShader.Use;
@@ -126,37 +128,8 @@ end;
 function TOGLCShader.GetUniform(const AName: string): GLint;
 begin
   Result := glGetUniformLocation(FProgramID, PChar(AName));
-  if Result = -1 then NotifyGetUniformError(AName);
-end;
-
-procedure TOGLCShader.SetUniform1f(AUniform: GLint; AValue: single);
-begin
- glUniform1f(AUniform, AValue);
-end;
-
-procedure TOGLCShader.SetUniform2f(AUniform: GLint; AValue1, AValue2: single);
-begin
-  glUniform2f(AUniform, AValue1, AValue2);
-end;
-
-procedure TOGLCShader.SetUniform3f(AUniform: GLint; AValue1, AValue2, AValue3: single);
-begin
-  glUniform3f(AUniform, AValue1, AValue2, AValue3);
-end;
-
-procedure TOGLCShader.SetUniform4f(AUniform: GLint; AValue1, AValue2, AValue3, AValue4: single);
-begin
-  glUniform4f(AUniform, AValue1, AValue2, AValue3, AValue4);
-end;
-
-procedure TOGLCShader.SetUniform1i(AUniform: GLint; AValue: GLint);
-begin
-  glUniform1i(AUniform, AValue);
-end;
-
-procedure TOGLCShader.SetUniformMatrix4(AUniform: GLint; AValue: PGLfloat);
-begin
-  glUniformMatrix4fv(AUniform, 1, GL_FALSE, AValue);
+  if Result = -1 then
+    FParentScene.LogError('glGetUniformLocation error: '''+AName+''' not found');
 end;
 
 {$endif oglcIMPLEMENTATION}
