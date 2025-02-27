@@ -31,6 +31,12 @@ type
 
 //-------------------------------
 // types for vertex attributes
+Txy = packed record
+  x, y: single; // vertex coordinates
+end;
+Pxy = ^Txy;
+TArrayOfxy = array of Txy;
+
 Txyuv = packed record
   x, y: single; // vertex coordinates
   u, v: single; // texture coordinates
