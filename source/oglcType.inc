@@ -13,6 +13,16 @@ type
 { TColorF }
 
 TColorF = packed record
+private
+  function GetAlphaByte: byte;
+  function GetBlueByte: byte;
+  function GetGreenByte: byte;
+  function GetRedByte: byte;
+  procedure SetAlphaByte(AValue: byte);
+  procedure SetBlueByte(AValue: byte);
+  procedure SetGreenByte(AValue: byte);
+  procedure SetRedByte(AValue: byte);
+public
   r,g,b,a : single;
   procedure SetAsTransparent;
   procedure Init(aR, aG, aB, aA: byte); overload;
@@ -24,6 +34,10 @@ TColorF = packed record
   function ToBGRA: TBGRAPixel;
   procedure MultByFactor(aV: single);
   function EqualTo(const c: TColorF): boolean;
+  property RedByte: byte read GetRedByte write SetRedByte;
+  property GreenByte: byte read GetGreenByte write SetGreenByte;
+  property BlueByte: byte read GetBlueByte write SetBlueByte;
+  property AlphaByte: byte read GetAlphaByte write SetAlphaByte;
 end;
 TQuadColorF = array[0..3] of TColorF;
 
@@ -845,6 +859,46 @@ begin
 end;
 
 { TColorF }
+
+function TColorF.GetAlphaByte: byte;
+begin
+  Result := Round(a*255);
+end;
+
+function TColorF.GetBlueByte: byte;
+begin
+  Result := Round(b*255);
+end;
+
+function TColorF.GetGreenByte: byte;
+begin
+  Result := Round(g*255);
+end;
+
+function TColorF.GetRedByte: byte;
+begin
+  Result := Round(r*255);
+end;
+
+procedure TColorF.SetAlphaByte(AValue: byte);
+begin
+  a := AValue/255;
+end;
+
+procedure TColorF.SetBlueByte(AValue: byte);
+begin
+  b := AValue/255;
+end;
+
+procedure TColorF.SetGreenByte(AValue: byte);
+begin
+  g := AValue/255;
+end;
+
+procedure TColorF.SetRedByte(AValue: byte);
+begin
+  r := AValue/255;
+end;
 
 procedure TColorF.SetAsTransparent;
 begin
