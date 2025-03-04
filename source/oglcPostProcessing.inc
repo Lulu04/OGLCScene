@@ -1,9 +1,9 @@
 {$ifdef oglcINTERFACE}
 type
 
-{ TOGLCTexturedTriangleRendererWithFX }
+{ TOGLCBaseRendererForPostProcessing }
 
-TOGLCTexturedTriangleRendererWithFX = class(specialize TOGLCGenericPrimitiveRenderer<Txyuv>)
+TOGLCBaseRendererForPostProcessing = class(specialize TOGLCGenericPrimitiveRenderer<Txyuv>)
 private const
   VERTEX_SHADER =
    '#version 330 core'#10+
@@ -15,17 +15,69 @@ private const
    '  gl_Position = uMVP*vec4(aVertexAndTextureCoor.xy, 0.0, 1.0);'#10+
    '  TexCoords = aVertexAndTextureCoor.zw;'#10+
    '}';
+{ Your fragment shader is defined in descendant class and must contain
+   - "in vec2 TexCoords;" to receive the texture coordinates from the vertex shader.
+   - "uniform sampler2D uTexUnit;" to receive the color attachment index.
+   - "uniform vec2 uTexSize;" to receive the texture size.
+   - "uniform float uTime;" to receive the time in seconds
+}
 
+{
+in your descendant class, override InitShaderCodeAndCallBack and:
+   - initialize:
+      - FFragmentShaderCode := PChar(the_name_of_the_fragment_code_constant);
+      - FGetFragmentUniformLocation with the adress of the procedure where you get
+                                    the fragment shader uniform location (see NOTE1)
+      - FSetFragmentUniformValues with the adress of the procedure where you initialize
+                                  the fragment uniform values (see NOTE2)
+
+NOTE1: in this procedure, don't retrieve the uniform's location of "uMVP", "uTexUnit", "uTexSize", "uTime".
+       It is done internally.
+NOTE2: in this procedure, don't initialize uniforms "uMVP", "uTexUnit", "uTexSize" and "uTime".
+       It is done internally.
+}
+private
+  FLocMVP, FLocTexUnit, FLocTexSize, FLocTime: GLint;
+  FTimeOrigin: QWord;
+  procedure DefineVertexAttribPointer;
+  procedure GetUniformLocation;
+  procedure SetUniformValuesAndTexture;
+private
+  FTexWidth, FTexHeight: integer;
+  FOpacity: single;
+protected
+  FMVP: TOGLCMatrix;
+  FGetFragmentUniformLocation,
+  FSetFragmentUniformValues: TProcOfObject;
+public
+  constructor Create(aParentScene: TOGLCScene; aUseIndicesBuffer: boolean); reintroduce;
+
+  procedure Prepare(aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer;
+                    const aMVP: TOGLCMatrix; const aOpacity: single; aBlendMode: byte);
+
+  procedure PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
+
+  // reset time to zero.
+  procedure ResetTime;
+
+  property Shader: TOGLCShader read FShader;
+end;
+
+{ TOGLCTexturedTriangleRendererWithFX }
+
+TOGLCTexturedTriangleRendererWithFX = class(TOGLCBaseRendererForPostProcessing)
+private const
   FRAGMENT_SHADER =
    '#version 330 core'#10+
    '  out vec4 FragColor;'#10+
-   '  in vec2 TexCoords;'#10+
-   '  uniform sampler2D uTexUnit;'#10+
+   '  in vec2 TexCoords;'#10+            // required
+   '  uniform sampler2D uTexUnit;'#10+   // required
+   '  uniform float uTime;'#10+          // required
+   '  uniform vec2 uTexSize;'#10+        // required
+
    '  uniform vec4 uTintColor;'#10+
    '  uniform float uOpacity;'#10+
    '  uniform int uFXFlag;'#10+
-   '  uniform int uTexWidth, uTexHeight;'#10+
-   '  uniform float uTime;'#10+
    '  uniform float uUnderWaterAmplitude = 0.01;'#10+ //   original 0.01     acceptable range: 0.1 to 0.001
    '  uniform float uUnderWaterDensity = 25.0;'#10+  // original 25    range is [1..100]
    '  uniform float uUnderWaterSpeed = 1.0;'#10+ // slow 0.1  1.0 normal   +++
@@ -56,7 +108,7 @@ private const
    '   if (dot(col.rgb, vec3(0.299, 0.587, 0.114)) > uBloomThresholdIntensity.x)'#10+
    '   {'#10+
    '     vec3 blurred = vec3(0.0);'#10+
-   '     float blurRadius = 1.0 / float(uTexWidth);'#10+ // vec2(float(uTexWidth), float(uTexHeight)).xy;'#10+
+   '     float blurRadius = 1.0 / uTexSize.x;'#10+
    '     for (float x = -2.0; x <= 2.0; x += 1.0) {'#10+
    '       for (float y = -2.0; y <= 2.0; y += 1.0) {'#10+
    '           blurred += texture(uTexUnit, texCoords + vec2(x, y) * blurRadius).rgb;'#10+
@@ -110,7 +162,7 @@ private const
    // pixelize
    ' if (flags >= 0x80){'#10+
    '   flags -= 0x80;'#10+
-   '   vec2 pixelizeDelta = vec2(uPixelizeAmount*uTexWidth, uPixelizeAmount*uTexHeight);'#10+
+   '   vec2 pixelizeDelta = vec2(uPixelizeAmount)*uTexSize;'#10+
    '   vec2 texCoords = round(texCoords * pixelizeDelta) / pixelizeDelta;'#10+
    '   float dx = 1.0f/(pixelizeDelta.x*5.0f);'#10+
    '   float dy = 1.0f/(pixelizeDelta.y*5.0f);'#10+
@@ -136,8 +188,8 @@ private const
    ' if (flags >= 0x20){'#10+
    '   flags -= 0x20;'#10+
    '   const int BlurDivisor[4] = int[](4, 18, 30, 60);'#10+
-   '   float dx = 1.0f/uTexWidth;'#10+ //step on x
-   '   float dy = 1.0f/uTexHeight;'#10+ //step on y
+   '   float dx = 1.0f/uTexSize.x;'#10+ //step on x
+   '   float dy = 1.0f/uTexSize.y;'#10+ //step on y
    '   vec4 sum = vec4(0.0,0.0,0.0,0.0);'#10+
    '   for(int i = -uBlurAmount; i < uBlurAmount; i++)'#10+
    '	   for(int j = -uBlurAmount;j < uBlurAmount; j++)'#10+
@@ -152,8 +204,8 @@ private const
    '    -1,  9, -1,'#10+
    '   -1, -1, -1'#10+
    '   );'#10+
-   '   float dx = 1.0f/uTexWidth;//step on x'#10+
-   '   float dy = 1.0f/uTexHeight;//step on y'#10+
+   '   float dx = 1.0f/uTexSize.x;//step on x'#10+
+   '   float dy = 1.0f/uTexSize.y;//step on y'#10+
    '   vec2 offsets[9] = vec2[]('#10+
    '   vec2(-dx,  dy),'#10+ // top-left
    '   vec2( 0.0f,    dy),'#10+ // top-center
@@ -209,22 +261,16 @@ private const
    '  FragColor = col;'#10+
    '}' ;
 private
-  FLocMVP,
-  FLocTextureUnit,
   FLocTintColor,
   FLocOpacity,
   FLocFXFlags,
-  FLocTexWidth, FLocTexHeight,
-  FLocTime,
   FLocUnderWaterAmplitude, FLocUnderWaterDensity, FLocUnderWaterSpeedCoeff,
   FLocBlurAmount,
   FLocPixelizeAmount,
   FLocShockWaveCenter, FLocShockWaveParams, FLocShockWaveColor,
   FLocBloomParams: GLint;
-  FMVP: TOGLCMatrix;
   FTintF: TColorF;
-  FOpacity: single;
-  FFXBitMask, FTexWidth, FTexHeight: GLuint;
+  FFXBitMask: GLuint;
   FUnderWaterAmplitude, FUnderWaterDensity, FUnderWaterTimeMultiplicator: single;
   FShockWaveCenterU, FShockWaveCenterV,
   FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator: single;
@@ -233,20 +279,12 @@ private
 
   FBlurAmount: GLint;
   FPixelizeAmount: single;
-  FTimeOrigin: QWord;
 protected
   procedure InitShaderCodeAndCallBack; override;
 private
-  procedure DefineVertexAttribPointer;
-  procedure GetUniformLocation;
-  procedure SetUniformValuesAndTexture;
+  procedure GetFragmentUniformLocation;
+  procedure SetFragmentUniformValues;
 public
-  procedure Prepare(aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer;
-                    const aMVP: TOGLCMatrix; const aOpacity: single; aBlendMode: byte);
-
-  procedure PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-
-  procedure ResetTime;
   procedure SetFXBitMask(const aFXBitMask: GLuint);
   procedure SetPixelizeParams(aAmount: single);
   procedure SetUnderWaterParams(aAmplitude, aDensity, aTimeMultiplicator: single);
@@ -271,6 +309,7 @@ private
   FShockWaveColorF: TColorF;
   FBloomThreshold, FBloomIntensity: single;
   FIsActive: boolean;
+  FUserRenderer: TOGLCBaseRendererForPostProcessing;
   procedure CreateTargetTexture;
   procedure FreeTargetTexture;
   procedure Draw;
@@ -281,6 +320,8 @@ public
 
   procedure ApplyFX(aParams: POGLCPostProcessingParameters);
   procedure Flush;
+
+  property UserRenderer: TOGLCBaseRendererForPostProcessing read FUserRenderer write FUserRenderer;
 end;
 
 { TOGLCPostProcessingUtils }
@@ -291,12 +332,14 @@ private
   FParentScene: TOGLCScene;
 public
   // You must call this method before using post-processing effect.
-  // It reserve some memory in video ram for a temporary texture.
+  // It reserve some memory in video ram for post processing engine.
   // The best place to call this method is inside TScreenTemplate.CreateObjects
-  procedure CreateTargetTexture;
-  // Free the memory for temporary texture.
+  procedure StartEngine;
+  // Free memory for post processing engine, and for each layer:
+  //   - disable effects previously enabled
+  //   - reset effect's parameters to their default values.
   // The best place to call this method is inside TScreenTemplate.FreeObjects
-  procedure FreeTargetTexture;
+  procedure StopEngine;
   // Force the target texture to be rendered.
   procedure Flush;
 
@@ -381,16 +424,210 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
+{ TOGLCBaseRendererForPostProcessing }
+
+procedure TOGLCBaseRendererForPostProcessing.DefineVertexAttribPointer;
+begin
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuv), PChar(0));
+  glEnableVertexAttribArray(0);
+end;
+
+procedure TOGLCBaseRendererForPostProcessing.GetUniformLocation;
+var err: GLenum;
+begin
+  with FShader do begin
+    Use;
+    FLocMVP := GetUniform('uMVP');
+    FLocTexUnit := GetUniform('uTexUnit');
+    FLocTexSize := GetUniform('uTexSize');
+    FLocTime := GetUniform('uTime');
+    FGetFragmentUniformLocation();
+    Release;
+  end;
+  err := glGetError();
+   if err <> GL_NO_ERROR then
+     FParentScene.LogError(ClassName+'.GetUniformLocation generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
+end;
+
+procedure TOGLCBaseRendererForPostProcessing.SetUniformValuesAndTexture;
+begin
+  glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
+  glUniform1i(FLocTexUnit, FBatch^.CurrentTextureUnit);
+  with FBatch^.CurrentTexture^ do
+    glUniform2f(FLocTexSize, single(TextureWidth), single(TextureHeight));
+  glUniform1f(FLocTime, (GetTickCount64-FTimeOrigin)*0.001);
+
+  FSetFragmentUniformValues();
+
+  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
+end;
+
+constructor TOGLCBaseRendererForPostProcessing.Create(aParentScene: TOGLCScene; aUseIndicesBuffer: boolean);
+begin
+  // use default vertex shader
+  FVertexShaderCode := PChar(VERTEX_SHADER);
+
+  // use default callback
+  FDefineVertexAttribPointer := @DefineVertexAttribPointer;
+  FGetUniformLocation := @GetUniformLocation;
+  FSetUniformValuesAndTexture := @SetUniformValuesAndTexture;
+
+  inherited Create(aParentScene, aUseIndicesBuffer);
+
+  // initiate FLocMVP
+  with FShader do begin
+    Use;
+    FLocMVP := GetUniform('uMVP');
+    Release;
+  end;
+
+  ResetTime;
+end;
+
+procedure TOGLCBaseRendererForPostProcessing.Prepare(
+  aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer;
+  const aMVP: TOGLCMatrix; const aOpacity: single; aBlendMode: byte);
+var forceFlush: boolean;
+begin
+  forceFlush := not FMVP.EqualTo(aMVP) or
+                (FOpacity <> aOpacity);
+  if aTexture <> NIL then
+    forceFlush := forceFlush or (aTexture^.TextureWidth <> FTexWidth)
+                             or (aTexture^.TextureHeight <> FTexHeight);
+
+  Batch_CheckIfNeedFlush(Self, aTriangleType, aTexture, aTextureUnit, aBlendMode, forceFlush);
+
+  FBatch^.CurrentTextureUnit := aTextureUnit;
+  FMVP.CopyFrom(aMVP);
+  FOpacity := aOpacity;
+  if aTexture <> NIL then begin
+    FTexWidth := aTexture^.TextureWidth;
+    FTexHeight := aTexture^.TextureHeight;
+  end;
+end;
+
+procedure TOGLCBaseRendererForPostProcessing.PushFrame(const aFrameIndex,
+  aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
+var w, h: single;
+    p: Pxyuv;
+    pIndex: PVertexIndex;
+    tci: PQuadCornerIndexes;
+    texCoord: PQuadCoor;
+    fi: Integer;
+    currentIndex: Int64;
+    tex: PTexture;
+begin
+  tex := FBatch^.CurrentTexture;
+  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
+  texCoord := @tex^.FramesCoord[fi];
+  w := tex^.FrameWidth;
+  h := tex^.FrameHeight;
+  currentIndex := FIndexInAttribsArray;
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(4);
+      with p[0] do begin             // BD
+        u := texCoord^[ tci^[0] ].x; // AC
+        v := texCoord^[ tci^[0] ].y;
+        x := aXPosOffset;
+        y := h + aYPosOffset;
+      end;
+      with p[1] do begin
+        u := texCoord^[ tci^[1] ].x;
+        v := texCoord^[ tci^[1] ].y;
+        x := aXPosOffset;
+        y := aYPosOffset;
+      end;
+      with p[2] do begin
+        u := texCoord^[ tci^[2] ].x;
+        v := texCoord^[ tci^[2] ].y;
+        x := w + aXPosOffset;
+        y := h + aYPosOffset;
+      end;
+      with p[3] do begin
+        u := texCoord^[ tci^[3] ].x;
+        v := texCoord^[ tci^[3] ].y;
+        x := w + aXPosOffset;
+        y := aYPosOffset;
+      end;
+    end;
+
+    ptTriangles: begin
+      tci := @FLIP_INDEXES[aFlipIndex];
+      p := QueryVertex(6);
+      with p[0] do begin  // A           // B   BD
+        u := texCoord^[ tci^[0] ].x;     // AC  C
+        v := texCoord^[ tci^[0] ].y;
+        x := aXPosOffset;
+        y := h + aYPosOffset;
+      end;
+      with p[1] do begin  // B
+        u := texCoord^[ tci^[1] ].x;
+        v := texCoord^[ tci^[1] ].y;
+        x := aXPosOffset;
+        y := aYPosOffset;
+      end;
+      with p[2] do begin  // C
+        u := texCoord^[ tci^[2] ].x;
+        v := texCoord^[ tci^[2] ].y;
+        x := w + aXPosOffset;
+        y := h + aYPosOffset;
+      end;
+      Move(p[2], p[3], SizeOf(Txyuv)); // C
+      Move(p[1], p[4], SizeOf(Txyuv)); // B
+      with p[5] do begin               // D
+        u := texCoord^[ tci^[3] ].x;
+        v := texCoord^[ tci^[3] ].y;
+        x := w + aXPosOffset;
+        y := aYPosOffset;
+      end;
+    end;
+  end;
+  // indices
+  case FBatch^.CurrentPrimitiveType of
+    ptTriangleStrip: begin           // 24
+      AddPrimitiveRestartIfNeeded;   // 13
+      pIndex := QueryIndex(4);
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+3;
+    end;
+
+    ptTriangles: begin              // B   BD
+      pIndex := QueryIndex(6);      // AC  C
+      pIndex[0] := currentIndex;
+      pIndex[1] := currentIndex+1;
+      pIndex[2] := currentIndex+2;
+      pIndex[3] := currentIndex+2;
+      pIndex[4] := currentIndex+1;
+      pIndex[5] := currentIndex+3;
+    end;
+  end;
+end;
+
+procedure TOGLCBaseRendererForPostProcessing.ResetTime;
+begin
+  FTimeOrigin := GetTickCount64;
+end;
+
 { TOGLCPostProcessingUtils }
 
-procedure TOGLCPostProcessingUtils.CreateTargetTexture;
+procedure TOGLCPostProcessingUtils.StartEngine;
 begin
   FParentScene.FPostProcessingEngine.CreateTargetTexture;
 end;
 
-procedure TOGLCPostProcessingUtils.FreeTargetTexture;
+procedure TOGLCPostProcessingUtils.StopEngine;
+var i: integer;
 begin
   FParentScene.FPostProcessingEngine.FreeTargetTexture;
+
+  for i:=0 to FParentScene.LayerCount-1 do begin
+    FParentScene.Layer[i].PostProcessing.DisableAll;
+    FParentScene.Layer[i].PostProcessing.InitDefault;
+  end;
 end;
 
 procedure TOGLCPostProcessingUtils.Flush;
@@ -617,62 +854,34 @@ end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.InitShaderCodeAndCallBack;
 begin
-  FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
-  FDefineVertexAttribPointer := @DefineVertexAttribPointer;
-  FGetUniformLocation := @GetUniformLocation;
-  FSetUniformValuesAndTexture := @SetUniformValuesAndTexture;
-
-  ResetTime;
+  FGetFragmentUniformLocation := @GetFragmentUniformLocation;
+  FSetFragmentUniformValues := @SetFragmentUniformValues;
 end;
 
-procedure TOGLCTexturedTriangleRendererWithFX.DefineVertexAttribPointer;
+procedure TOGLCTexturedTriangleRendererWithFX.GetFragmentUniformLocation;
 begin
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuv), PChar(0));
-  glEnableVertexAttribArray(0);
+  with FShader do begin
+    FLocTintColor := GetUniform('uTintColor');
+    FLocOpacity := GetUniform('uOpacity');
+    FLocFXFlags := GetUniform('uFXFlag');
+    FLocUnderWaterAmplitude := GetUniform('uUnderWaterAmplitude');
+    FLocUnderWaterDensity := GetUniform('uUnderWaterDensity');
+    FLocUnderWaterSpeedCoeff := GetUniform('uUnderWaterSpeed');
+    FLocBlurAmount := GetUniform('uBlurAmount');
+    FLocPixelizeAmount := GetUniform('uPixelizeAmount');
+    FLocShockWaveCenter := GetUniform('uShockWaveCenter');
+    FLocShockWaveParams := GetUniform('uShockWaveParams');
+    FLocShockWaveColor := GetUniform('uShockWaveColor');
+    FLocBloomParams := GetUniform('uBloomThresholdIntensity');
+  end;
 end;
 
-procedure TOGLCTexturedTriangleRendererWithFX.GetUniformLocation;
-var err: GLenum;
+procedure TOGLCTexturedTriangleRendererWithFX.SetFragmentUniformValues;
 begin
- with FShader do
- begin
-   Use;
-   FLocMVP := GetUniform('uMVP');
-   FLocTextureUnit := GetUniform('uTexUnit');
-   FLocTintColor := GetUniform('uTintColor');
-   FLocOpacity := GetUniform('uOpacity');
-   FLocFXFlags := GetUniform('uFXFlag');
-   FLocTexWidth := GetUniform('uTexWidth');
-   FLocTexHeight := GetUniform('uTexHeight');
-   FLocTime := GetUniform('uTime');
-   FLocUnderWaterAmplitude := GetUniform('uUnderWaterAmplitude');
-   FLocUnderWaterDensity := GetUniform('uUnderWaterDensity');
-   FLocUnderWaterSpeedCoeff := GetUniform('uUnderWaterSpeed');
-   FLocBlurAmount := GetUniform('uBlurAmount');
-   FLocPixelizeAmount := GetUniform('uPixelizeAmount');
-   FLocShockWaveCenter := GetUniform('uShockWaveCenter');
-   FLocShockWaveParams := GetUniform('uShockWaveParams');
-   FLocShockWaveColor := GetUniform('uShockWaveColor');
-   FLocBloomParams := GetUniform('uBloomThresholdIntensity');
-
-   Release;
- end;
- err := glGetError();
-  if err <> GL_NO_ERROR then
-    FParentScene.LogError(ClassName+'.GetUniformLocation generate a GL ERROR $'+IntToHex(err, 4)+' '+GLErrorToString(err));
-end;
-
-procedure TOGLCTexturedTriangleRendererWithFX.SetUniformValuesAndTexture;
-begin
-  glUniform1i(FLocTextureUnit, FBatch^.CurrentTextureUnit);
-  glUniformMatrix4fv(FLocMVP, 1, GL_FALSE, @FMVP.Matrix[0,0]);
   glUniform4fv(FLocTintColor, 1, @FTintF);
   glUniform1f(FLocOpacity, FOpacity);
   glUniform1i(FLocFXFlags, FFXBitMask);
-  glUniform1i(FLocTexWidth, FTexWidth);
-  glUniform1i(FLocTexHeight, FTexHeight);
-  glUniform1f(FLocTime, (GetTickCount64-FTimeOrigin)*0.001);
   glUniform1f(FLocUnderWaterAmplitude, FUnderWaterAmplitude);
   glUniform1f(FLocUnderWaterDensity, FUnderWaterDensity);
   glUniform1f(FLocUnderWaterSpeedCoeff, FUnderWaterTimeMultiplicator);
@@ -682,135 +891,6 @@ begin
   glUniform4f(FLocShockWaveParams, FShockWaveParam1, FShockWaveParam2, FShockWaveParam3, FShockWaveTimeMultiplicator);
   glUniform4fv(FLocShockWaveColor, 1, @FShockWaveColorF);
   glUniform2f(FLocBloomParams, FBloomThreshold, FBloomIntensity);
-  FParentScene.TexMan.Bind(FBatch^.CurrentTexture, FBatch^.CurrentTextureUnit);
-end;
-
-procedure TOGLCTexturedTriangleRendererWithFX.Prepare(aTriangleType: TTriangleType;
-  aTexture: PTexture; aTextureUnit: integer; const aMVP: TOGLCMatrix;
-  const aOpacity: single; aBlendMode: byte);
-var forceFlush: boolean;
-begin
-  forceFlush := not FMVP.EqualTo(aMVP) or
-                (FOpacity <> aOpacity);
-  if aTexture <> NIL then
-    forceFlush := forceFlush or (aTexture^.TextureWidth <> FTexWidth)
-                             or (aTexture^.TextureHeight <> FTexHeight);
-
-  Batch_CheckIfNeedFlush(Self, aTriangleType, aTexture, aTextureUnit, aBlendMode, forceFlush);
-
-  FBatch^.CurrentTextureUnit := aTextureUnit;
-  FMVP.CopyFrom(aMVP);
-  FOpacity := aOpacity;
-  if aTexture <> NIL then begin
-    FTexWidth := aTexture^.TextureWidth;
-    FTexHeight := aTexture^.TextureHeight;
-  end;
-end;
-
-procedure TOGLCTexturedTriangleRendererWithFX.PushFrame(const aFrameIndex,
-  aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-var w, h: single;
-    p: Pxyuv;
-    pIndex: PVertexIndex;
-    tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
-    fi: Integer;
-    currentIndex: Int64;
-    tex: PTexture;
-begin
-  tex := FBatch^.CurrentTexture;
-  fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
-  texCoord := @tex^.FramesCoord[fi];
-  w := tex^.FrameWidth;
-  h := tex^.FrameHeight;
-  currentIndex := FIndexInAttribsArray;
-  case FBatch^.CurrentPrimitiveType of
-    ptTriangleStrip: begin
-      tci := @FLIP_INDEXES[aFlipIndex];
-      p := QueryVertex(4);
-      with p[0] do begin             // BD
-        u := texCoord^[ tci^[0] ].x; // AC
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
-      end;
-      with p[1] do begin
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
-      end;
-      with p[2] do begin
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
-      end;
-      with p[3] do begin
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
-      end;
-    end;
-
-    ptTriangles: begin
-      tci := @FLIP_INDEXES[aFlipIndex];
-      p := QueryVertex(6);
-      with p[0] do begin  // A           // B   BD
-        u := texCoord^[ tci^[0] ].x;     // AC  C
-        v := texCoord^[ tci^[0] ].y;
-        x := aXPosOffset;
-        y := h + aYPosOffset;
-      end;
-      with p[1] do begin  // B
-        u := texCoord^[ tci^[1] ].x;
-        v := texCoord^[ tci^[1] ].y;
-        x := aXPosOffset;
-        y := aYPosOffset;
-      end;
-      with p[2] do begin  // C
-        u := texCoord^[ tci^[2] ].x;
-        v := texCoord^[ tci^[2] ].y;
-        x := w + aXPosOffset;
-        y := h + aYPosOffset;
-      end;
-      Move(p[2], p[3], SizeOf(Txyuv)); // C
-      Move(p[1], p[4], SizeOf(Txyuv)); // B
-      with p[5] do begin               // D
-        u := texCoord^[ tci^[3] ].x;
-        v := texCoord^[ tci^[3] ].y;
-        x := w + aXPosOffset;
-        y := aYPosOffset;
-      end;
-    end;
-  end;
-  // indices
-  case FBatch^.CurrentPrimitiveType of
-    ptTriangleStrip: begin           // 24
-      AddPrimitiveRestartIfNeeded;   // 13
-      pIndex := QueryIndex(4);
-      pIndex[0] := currentIndex;
-      pIndex[1] := currentIndex+1;
-      pIndex[2] := currentIndex+2;
-      pIndex[3] := currentIndex+3;
-    end;
-
-    ptTriangles: begin              // B   BD
-      pIndex := QueryIndex(6);      // AC  C
-      pIndex[0] := currentIndex;
-      pIndex[1] := currentIndex+1;
-      pIndex[2] := currentIndex+2;
-      pIndex[3] := currentIndex+2;
-      pIndex[4] := currentIndex+1;
-      pIndex[5] := currentIndex+3;
-    end;
-  end;
-end;
-
-procedure TOGLCTexturedTriangleRendererWithFX.ResetTime;
-begin
-  FTimeOrigin := GetTickCount64;
 end;
 
 procedure TOGLCTexturedTriangleRendererWithFX.SetFXBitMask(const aFXBitMask: GLuint);
@@ -881,11 +961,21 @@ begin
   FRenderToTexture.Unbind;
   glViewport(0, 0, FParentScene.Width, FParentScene.Height);
 
-  FParentScene.TexturedTriangleRendererWithFX.Prepare(ptTriangleStrip,
-                                  FRenderToTexture.RenderedTexture, 0,
-                                  FParentScene.ProjectionMatrix, 1.0, FX_BLEND_NORMAL);
-  FParentScene.TexturedTriangleRendererWithFX.PushFrame(0, 0, 0, 0);
-  FParentScene.TexturedTriangleRendererWithFX.Batch_Flush;
+  if (FCurrentFXBitMask = TOGLCPostProcessingParameters.fxbmUserRenderer) and
+    (FUserRenderer <> NIL) then begin
+    FUserRenderer.Prepare(ptTriangleStrip, FRenderToTexture.RenderedTexture, 0,
+                          FParentScene.ProjectionMatrix, 1.0, FX_BLEND_NORMAL);
+    FUserRenderer.PushFrame(0, 0, 0, 0);
+    FUserRenderer.Batch_Flush;
+  end
+  else
+  begin
+    FParentScene.TexturedTriangleRendererWithFX.Prepare(ptTriangleStrip,
+                                    FRenderToTexture.RenderedTexture, 0,
+                                    FParentScene.ProjectionMatrix, 1.0, FX_BLEND_NORMAL);
+    FParentScene.TexturedTriangleRendererWithFX.PushFrame(0, 0, 0, 0);
+    FParentScene.TexturedTriangleRendererWithFX.Batch_Flush;
+  end;
 end;
 
 constructor TOGLCPostProcessingEngine.Create(aParentScene: TOGLCScene);
@@ -927,6 +1017,7 @@ var newBitMask: GLuint;
       FShockWaveColorF.CopyFrom(aParams^.FShockWaveColorF);
       FBloomThreshold := aParams^.FBloomThreshold;
       FBloomIntensity := aParams^.FBloomIntensity;
+      FUserRenderer := aParams^.FUserRenderer;
 
       with FParentScene.TexturedTriangleRendererWithFX do begin
         SetFXBitMask(FCurrentFXBitMask);
