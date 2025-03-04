@@ -27,6 +27,7 @@ private
   procedure AddPrimitiveRestart; virtual; abstract;
 public
   procedure Draw(aEmptyBufferWhenDone: boolean=True); virtual; abstract;
+  property ParentScene: TOGLCScene read FParentScene;
 end;
 
 
