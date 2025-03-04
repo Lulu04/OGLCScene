@@ -261,23 +261,25 @@ TOGLCLinePosition = (lpMiddle,   // A line of 6 pixels width will have 3 pixel o
 // POST PROCESSING
 type
 // available effects applicable on each layer
-TOGLCPostProcessingFXEnum = (pfTint,             // apply tint
-                             pfColorInversion,   // inverts rgb component: new red = 1-red
-                             pfGrayscale,        // changes colors to gray scale
-                             pfSepia,            // color effect
-                             pfSharpen,          // accentuates edges
-                             pfBlur,             // a simple blur effect with 4 selectable levels
-                             pfUnderWater,       // simulates under water deformations
-                             pfPixelize,         // pixel effect
-                             pfDreamVision,      // color effect like in a dream
-                             pfShockWave,        // an effect to simulate a shock wave
-                             pfBloom);           // makes bright areas of the scene appear to glow
+TOGLCPostProcessingFXEnum = (ppTint,             // apply tint
+                             ppColorInversion,   // inverts rgb component: new red = 1-red
+                             ppGrayscale,        // changes colors to gray scale
+                             ppSepia,            // color effect
+                             ppSharpen,          // accentuates edges
+                             ppBlur,             // a simple blur effect with 4 selectable levels
+                             ppUnderWater,       // simulates under water deformations
+                             ppPixelize,         // pixel effect
+                             ppDreamVision,      // color effect like in a dream
+                             ppShockWave,        // an effect to simulate a shock wave
+                             ppBloom,            // makes bright areas of the scene appear to glow
+                             ppCustomRenderer);  // to select a custom renderer. All other effects will be ignored
 TOGLCPostProcessingFX = set of TOGLCPostProcessingFXEnum;
 
-POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
+TOGLCBaseRendererForPostProcessing = class;
 
 { TOGLCPostProcessingParameters }
 
+POGLCPostProcessingParameters = ^TOGLCPostProcessingParameters;
 TOGLCPostProcessingParameters = record
 private const
   // FX bit mask
@@ -292,6 +294,7 @@ private const
   fxbmDreamVision=$100;
   fxbmShockWave=$200;
   fxbmBloom=$400;
+  fxbmUserRenderer=$800;
 private
   FFX: TOGLCPostProcessingFX;
   procedure ComputeFXBitMask;
@@ -304,6 +307,7 @@ private
   FShockWaveCenterU, FShockWaveCenterV, FShockWaveTimeMultiplicator: single;
   FShockWaveColorF: TColorF;
   FBloomThreshold, FBloomIntensity: single;
+  FUserRenderer: TOGLCBaseRendererForPostProcessing;
 public
   // default is tmReplaceColor
   TintMode: TTintMode;
@@ -336,6 +340,9 @@ public
   // if the luminosity of a pixel is greater than this threshold the blur is applied
   // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
   procedure SetBloomParams(aThreshold, aIntensity: single);
+
+  // specify a custom renderer to use when the effect 'pfUserRenderer' is enabled.
+  procedure UseCustomRenderer(aUserRenderer: TOGLCBaseRendererForPostProcessing);
 end;
 
 
@@ -375,18 +382,24 @@ end;
 
 procedure TOGLCPostProcessingParameters.ComputeFXBitMask;
 begin
+  // ppCustomRenderer ignore all others effects
+  if ppCustomRenderer in FFX then begin
+    FXBitMask := fxbmUserRenderer;
+    exit;
+  end;
+
   FXBitMask := 0;
-  if pfTint in FFX then FXBitMask := FXBitMask or fxbmTint;
-  if pfColorInversion in FFX then FXBitMask := FXBitMask or fxbmColorInversion;
-  if pfGrayscale in FFX then FXBitMask := FXBitMask or fxbmGrayscale;
-  if pfSepia in FFX then FXBitMask := FXBitMask or fxbmSepia;
-  if pfSharpen in FFX then FXBitMask := FXBitMask or fxbmSharpen;
-  if pfBlur in FFX then FXBitMask := FXBitMask or fxbmBlur;
-  if pfUnderWater in FFX then FXBitMask := FXBitMask or fxbmUnderWater;
-  if pfPixelize in FFX then FXBitMask := FXBitMask or fxbmPixelize;
-  if pfDreamVision in FFX then FXBitMask := FXBitMask or fxbmDreamVision;
-  if pfShockWave in FFX then FXBitMask := FXBitMask or fxbmShockWave;
-  if pfBloom in FFX then FXBitMask := FXBitMask or fxbmBloom;
+  if ppTint in FFX then FXBitMask := FXBitMask or fxbmTint;
+  if ppColorInversion in FFX then FXBitMask := FXBitMask or fxbmColorInversion;
+  if ppGrayscale in FFX then FXBitMask := FXBitMask or fxbmGrayscale;
+  if ppSepia in FFX then FXBitMask := FXBitMask or fxbmSepia;
+  if ppSharpen in FFX then FXBitMask := FXBitMask or fxbmSharpen;
+  if ppBlur in FFX then FXBitMask := FXBitMask or fxbmBlur;
+  if ppUnderWater in FFX then FXBitMask := FXBitMask or fxbmUnderWater;
+  if ppPixelize in FFX then FXBitMask := FXBitMask or fxbmPixelize;
+  if ppDreamVision in FFX then FXBitMask := FXBitMask or fxbmDreamVision;
+  if ppShockWave in FFX then FXBitMask := FXBitMask or fxbmShockWave;
+  if ppBloom in FFX then FXBitMask := FXBitMask or fxbmBloom;
 end;
 
 procedure TOGLCPostProcessingParameters.InitDefault;
@@ -401,6 +414,7 @@ begin
   SetPixelizeParams(0.5);
   SetShockWaveParams(0.5, 0.5, 0.3, BGRA(0,0,0,0));
   SetBloomParams(0.5, 1.0);
+  FUserRenderer := NIL;
 end;
 
 procedure TOGLCPostProcessingParameters.Enable(aFXs: TOGLCPostProcessingFX);
@@ -458,6 +472,11 @@ procedure TOGLCPostProcessingParameters.SetBloomParams(aThreshold, aIntensity: s
 begin
   FBloomThreshold := EnsureRange(aThreshold, 0, 1);
   FBloomIntensity := Max(0.01, aIntensity);
+end;
+
+procedure TOGLCPostProcessingParameters.UseCustomRenderer(aUserRenderer: TOGLCBaseRendererForPostProcessing);
+begin
+  FUserRenderer := aUserRenderer;
 end;
 
 { TFontGradient }
