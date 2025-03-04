@@ -1,10 +1,10 @@
 {$ifdef oglcINTERFACE}
 type
 
-{ TOGLCSurfaceWithProceduralShader }
+{ TOGLCBaseSurfaceWithProceduralShader }
 // a surface with a procedural shader that draws an image in a texture.
-// the texture is then used in a sprite.
-TOGLCSurfaceWithProceduralShader = class(TSimpleSurfaceWithEffect)
+// then the texture is used in a sprite.
+TOGLCBaseSurfaceWithProceduralShader = class(TSimpleSurfaceWithEffect)
 private
   FRendererToTexture: TOGLCRenderToTexture;
   FReady: boolean;
@@ -198,9 +198,9 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
-{ TOGLCSurfaceWithProceduralShader }
+{ TOGLCBaseSurfaceWithProceduralShader }
 
-procedure TOGLCSurfaceWithProceduralShader.CreateID;
+procedure TOGLCBaseSurfaceWithProceduralShader.CreateID;
 var err: GLenum;
 begin
   if not FReady then exit;
@@ -215,19 +215,19 @@ begin
   end;
 end;
 
-procedure TOGLCSurfaceWithProceduralShader.FreeID;
+procedure TOGLCBaseSurfaceWithProceduralShader.FreeID;
 begin
   glDeleteBuffers(1, @FVBO);
   glDeleteVertexArrays(1, @FVAO);
   glGetError();
 end;
 
-function TOGLCSurfaceWithProceduralShader.GetRenderedTexture: PTexture;
+function TOGLCBaseSurfaceWithProceduralShader.GetRenderedTexture: PTexture;
 begin
   Result := FRendererToTexture.RenderedTexture;
 end;
 
-procedure TOGLCSurfaceWithProceduralShader.InitStaticVertexAttribs;
+procedure TOGLCBaseSurfaceWithProceduralShader.InitStaticVertexAttribs;
 var p: Pxy;
   err: GLenum;
 begin
@@ -282,17 +282,17 @@ begin
   end;
 end;
 
-function TOGLCSurfaceWithProceduralShader.GetWidth: integer;
+function TOGLCBaseSurfaceWithProceduralShader.GetWidth: integer;
 begin
   Result := FWidth;
 end;
 
-function TOGLCSurfaceWithProceduralShader.GetHeight: integer;
+function TOGLCBaseSurfaceWithProceduralShader.GetHeight: integer;
 begin
   Result := FHeight;
 end;
 
-constructor TOGLCSurfaceWithProceduralShader.Create(aParentScene: TOGLCScene;
+constructor TOGLCBaseSurfaceWithProceduralShader.Create(aParentScene: TOGLCScene;
   aWidth, aHeight: integer; const aVertexCodeSource,
   aFragmentCodeSource: string; aColorAttachmentIndex: integer);
 begin
@@ -319,7 +319,7 @@ begin
   InitStaticVertexAttribs;
 end;
 
-destructor TOGLCSurfaceWithProceduralShader.Destroy;
+destructor TOGLCBaseSurfaceWithProceduralShader.Destroy;
 begin
   FRendererToTexture.Free;
   FRendererToTexture := NIL;
@@ -329,7 +329,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TOGLCSurfaceWithProceduralShader.Update(const aElapsedTime: single);
+procedure TOGLCBaseSurfaceWithProceduralShader.Update(const aElapsedTime: single);
 var err: GLenum;
 begin
   inherited Update(aElapsedTime);
@@ -368,7 +368,7 @@ begin
   end;
 end;
 
-procedure TOGLCSurfaceWithProceduralShader.DoDraw;
+procedure TOGLCBaseSurfaceWithProceduralShader.DoDraw;
 begin
   if not FReady then exit;
 
