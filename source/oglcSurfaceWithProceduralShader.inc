@@ -214,7 +214,9 @@ begin
   if not FRefreshOneTime and not FRefreshContinuously then exit;
   FRefreshOneTime := False;
 
-  FTimeAccu := FTimeAccu + aElapsedTime;
+  // time moves only if we want continuous animation
+  if FRefreshContinuously then
+    FTimeAccu := FTimeAccu + aElapsedTime;
 
   // flush the batch renderer process
   FParentScene.TexturedMVTriangleRenderer.Batch_Flush;
