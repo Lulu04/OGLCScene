@@ -7,7 +7,7 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Use OpenGL 3.3 core to render graphics.
 - Renderers with batch system to improve performance. Use vertex and index buffers.
 - A scene is made of one or several layers. A layer contains surfaces (sprites and other).
-- Post-processing effects can be activated independently for each layer.
+- 11 built-in post-processing effects can be activated independently on each layer. You can easily integrate your own custom post-processing effects.
 - Multi screens architecture to separates the different parts of the game.
 - Sprites and other kind of surfaces have self-managed effects like tint, opacity, moves, angle... Each effect support velocity curve with 15 predefined curves (Linear, Sinusoid, StartFastEndSlow, StartSlowEndFast, Bouncy, SingleRebound,...)
 - All kind of surface that can be displayed have scenario (script) support: they can execute scenarios written in external files or programmatically in order to perform actions on the surface: 48 commands available for Rotation, Moves, Scale, Blink, Tint, Opacity, Frame Animation, Flip, Loop, Goto, Label declaration, Wait and Send Message.
