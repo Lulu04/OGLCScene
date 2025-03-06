@@ -374,7 +374,7 @@ end;
 
 procedure TProperties.Add(const aPropertyName: string; aValue: single);
 begin
-  AddProp(aPropertyName, FormatFloatWithDot('0.000', aValue));
+  AddProp(aPropertyName, FormatFloatWithDot('0.0000', aValue));
 end;
 
 function TProperties.ReplaceValue(const aPropertyName, aValue: string): boolean;
