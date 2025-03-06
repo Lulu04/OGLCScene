@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <Title Value="PlanetDesigner"/>
+      <ResourceType Value="res"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <BuildNr Value="35"/>
+      <Language Value="040C"/>
+    </VersionInfo>
+    <BuildModes Count="2" Active="Debug">
+      <Item1 Name="Debug" Default="True"/>
+      <Item2 Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="PlanetDesigner"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="Units;..\..\source"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+              <VariablesInRegisters Value="True"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item2>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="4">
+      <Item1>
+        <PackageName Value="LazOpenGLContext"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LazUtils"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
+    </RequiredPackages>
+    <Units Count="29">
+      <Unit0>
+        <Filename Value="PlanetDesigner.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="45" Y="12"/>
+        <UsageCount Value="200"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Units\form_main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="154"/>
+        <CursorPos X="38" Y="168"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="31"/>
+        <CursorPos X="35" Y="45"/>
+        <UsageCount Value="204"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="666"/>
+        <CursorPos X="3" Y="671"/>
+        <UsageCount Value="95"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\source\oglcPostProcessing.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="289"/>
+        <CursorPos X="45" Y="301"/>
+        <UsageCount Value="57"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\source\oglcType.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="35"/>
+        <CursorPos Y="48"/>
+        <UsageCount Value="90"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Units\u_common.pas"/>
+        <CursorPos Y="15"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\source\oglcLayer.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="269"/>
+        <CursorPos Y="297"/>
+        <UsageCount Value="18"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\source\oglcRenderToTexture.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="42" Y="6"/>
+        <UsageCount Value="42"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\source\oglcMultiRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1372"/>
+        <CursorPos X="44" Y="1382"/>
+        <UsageCount Value="19"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\source\oglcShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos Y="50"/>
+        <UsageCount Value="43"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\source\oglcUI.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="13" Y="44"/>
+        <UsageCount Value="1"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="u_ProceduralPlanet"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="817"/>
+        <CursorPos X="3" Y="821"/>
+        <UsageCount Value="149"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\source\oglcSurfaceWithProceduralShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="47" Y="9"/>
+        <UsageCount Value="67"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\source\oglcAppSaveUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="366"/>
+        <CursorPos X="51" Y="377"/>
+        <UsageCount Value="15"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Units\u_presets.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="5" Y="14"/>
+        <UsageCount Value="49"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="Units\u_export_to_string.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormCopyToClipboard"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="89"/>
+        <CursorPos X="29" Y="100"/>
+        <UsageCount Value="81"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="Units\u_presetmanager.pas"/>
+        <ComponentName Value="PresetManager"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="15" Y="60"/>
+        <UsageCount Value="40"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="279"/>
+        <CursorPos X="35" Y="293"/>
+        <UsageCount Value="11"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2041"/>
+        <CursorPos X="25" Y="2049"/>
+        <UsageCount Value="7"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\lcl\buttons.pp"/>
+        <UnitName Value="Buttons"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="37" Y="321"/>
+        <UsageCount Value="6"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="C:\lazarus\lcl\lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos X="3" Y="45"/>
+        <UsageCount Value="6"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="C:\lazarus\lcl\clipbrd.pp"/>
+        <UnitName Value="Clipbrd"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="205"/>
+        <CursorPos X="3" Y="262"/>
+        <UsageCount Value="11"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="Units\form_importfromforum.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormImportPreset"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="45"/>
+        <CursorPos X="26" Y="58"/>
+        <UsageCount Value="51"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="46"/>
+        <CursorPos Y="62"/>
+        <UsageCount Value="8"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="..\..\source\oglcGlow.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="220"/>
+        <UsageCount Value="12"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="34" Y="313"/>
+        <UsageCount Value="11"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="69"/>
+        <CursorPos X="10" Y="82"/>
+        <UsageCount Value="8"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\source\oglcUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="133"/>
+        <CursorPos X="3" Y="136"/>
+        <UsageCount Value="8"/>
+      </Unit28>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="169" TopLine="153"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="170" TopLine="154"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="171" TopLine="155"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="172" TopLine="156"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="88" Column="19" TopLine="71"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\form_importfromforum.pas"/>
+        <Caret Line="58" Column="26" TopLine="45"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="34" Column="12" TopLine="19"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <Caret Line="256" Column="24" TopLine="238"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="258" Column="15" TopLine="245"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="811" Column="3" TopLine="808"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="258" Column="13" TopLine="245"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="811" Column="3" TopLine="808"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="260" Column="15" TopLine="245"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="819" Column="3" TopLine="815"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="260" Column="18" TopLine="247"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="829" Column="17" TopLine="817"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="262" Column="15" TopLine="247"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="836" TopLine="822"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="267" Column="2" TopLine="253"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="176" Column="26" TopLine="158"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="170" Column="10" TopLine="156"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="107" Column="64" TopLine="92"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="174" Column="9" TopLine="161"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="45" Column="35" TopLine="31"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="260" Column="45" TopLine="246"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="164" TopLine="155"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="166" TopLine="155"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="169" TopLine="155"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="178" Column="35" TopLine="155"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="169" TopLine="164"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="PlanetDesigner"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="Units;..\..\source"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <VariablesInRegisters Value="True"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+        <UseHeaptrc Value="True"/>
+        <TrashVariables Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+</CONFIG>

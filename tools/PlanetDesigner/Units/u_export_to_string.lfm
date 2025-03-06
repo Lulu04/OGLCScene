@@ -1,0 +1,108 @@
+object FormCopyToClipboard: TFormCopyToClipboard
+  Left = 352
+  Height = 363
+  Top = 237
+  Width = 718
+  Caption = 'Copy params to clipboard'
+  ClientHeight = 363
+  ClientWidth = 718
+  OnShow = FormShow
+  LCLVersion = '3.8.0.0'
+  object Memo1: TMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = RadioButton1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = SpeedButton1
+    Left = 5
+    Height = 204
+    Top = 117
+    Width = 708
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 5
+    BorderSpacing.Bottom = 10
+    Lines.Strings = (
+      'Memo1'
+    )
+    ReadOnly = True
+    TabOrder = 0
+  end
+  object SpeedButton1: TSpeedButton
+    AnchorSideLeft.Control = Owner
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 295
+    Height = 27
+    Top = 331
+    Width = 129
+    Anchors = [akLeft, akBottom]
+    BorderSpacing.Bottom = 5
+    Caption = 'Close'
+    OnClick = SpeedButton1Click
+  end
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Label2
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 5
+    Height = 45
+    Top = 25
+    Width = 708
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 5
+    Caption = '1) add the unit u_ProceduralPlanet to your game/app,'#13#10'2) somewhere paste this string as constant string, rename it according to your need,'#13#10'3) create a TProceduralPlanet instance in your scene and call TProceduralPlanet.LoadFromString(PLANET_PARAM).'
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object RadioButton1: TRadioButton
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Side = asrBottom
+    Left = 65
+    Height = 19
+    Top = 88
+    Width = 146
+    BorderSpacing.Left = 65
+    Caption = 'Export FreePascal code'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 2
+    OnChange = RadioButton1Change
+  end
+  object RadioButton2: TRadioButton
+    AnchorSideLeft.Control = RadioButton1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = RadioButton1
+    Left = 251
+    Height = 19
+    Top = 88
+    Width = 249
+    BorderSpacing.Left = 40
+    Caption = 'Export to share on the FPC/Lazarus forum'
+    Checked = True
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 1
+    TabStop = True
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 5
+    Height = 15
+    Top = 0
+    Width = 236
+    BorderSpacing.Left = 5
+    Caption = 'The string below is copied in the clipboard.'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+end
