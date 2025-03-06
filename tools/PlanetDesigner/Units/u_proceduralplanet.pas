@@ -206,7 +206,7 @@ public
   procedure Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix;
                     const aOpacity: single; aBlendMode: byte;
                     const aParams: TPlanetParams; aTimeAccu: single);
-  procedure PushQuad(const aX, aY: single; const aWidth, aHeight: integer; aFlipIndex: integer);
+  procedure PushQuad(const aWidth, aHeight: integer; aFlipIndex: integer);
 end;
 
 
@@ -539,22 +539,21 @@ begin
   Move(aParams, FParams, SizeOf(TPlanetParams));
 end;
 
-procedure TOGLCPlanetRenderer.PushQuad(const aX, aY: single; const aWidth,
-  aHeight: integer; aFlipIndex: integer);
+procedure TOGLCPlanetRenderer.PushQuad(const aWidth, aHeight: integer; aFlipIndex: integer);
 var area, texCoords: TQuadCoor;
   tci: PQuadCornerIndexes;
     p: Pxyuv;
     pIndex: PVertexIndex;
     currentIndex: TVertexIndex;
 begin
-  area[cBL].x := aX;
-  area[cBL].y := aHeight + aY;
-  area[cTL].x := aX;
-  area[cTL].y := aY;
-  area[cBR].x := aWidth + aX;
-  area[cBR].y := aHeight + aY;
-  area[cTR].x := aWidth + aX;
-  area[cTR].y := aY;
+  area[cBL].x := 0;
+  area[cBL].y := aHeight;
+  area[cTL].x := 0;
+  area[cTL].y := 0;
+  area[cBR].x := aWidth;
+  area[cBR].y := aHeight;
+  area[cTR].x := aWidth;
+  area[cTR].y := 0;
 
   texCoords[cBL].x := 0;
   texCoords[cBL].y := 0;
@@ -812,7 +811,7 @@ procedure TOGLCSpritePlanet.DoDraw;
 begin
   FPlanetRenderer.Prepare(ptTriangleStrip, FParentScene.MVPMatrix, FComputedOpacity, FBlendMode,
                           FParams, FTimeAccu);
-  FPlanetRenderer.PushQuad(0, 0, FWidth, FHeight, FlipToIndex);
+  FPlanetRenderer.PushQuad(FWidth, FHeight, FlipToIndex);
 end;
 
 constructor TOGLCSpritePlanet.Create(aParentScene: TOGLCScene;
