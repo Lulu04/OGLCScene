@@ -21,6 +21,7 @@ TRendererBase = class
 private
   FParentScene: TOGLCScene;
   FBatch: PRendererBatchDescriptor;
+protected
   procedure Batch_CheckIfNeedFlush(aNewRenderer: TRendererBase; aPrimitiveType: TPrimitiveType;
                                    aNewTexture: PTexture; aTextureUnit: integer; aNewBlendMode: byte; aExtraTest: boolean);
   procedure Batch_Flush;
@@ -28,6 +29,7 @@ private
 public
   procedure Draw(aEmptyBufferWhenDone: boolean=True); virtual; abstract;
   property ParentScene: TOGLCScene read FParentScene;
+  property Batch: PRendererBatchDescriptor read FBatch;
 end;
 
 
@@ -47,8 +49,9 @@ private
   FIndexesArray: TArrayOfVertexIndex;
   FIndexInIndexArray: ptrint;
   procedure SetIndexBufferCapacity(aCount: ptrint);
-  procedure AddPrimitiveRestart; override;
   procedure AddPrimitiveRestartIfNeeded;
+protected
+  procedure AddPrimitiveRestart; override;
 private
   procedure CreateID;
   procedure FreeID;
@@ -82,6 +85,7 @@ public
   // Draw all primitives in the buffer and empty it.
   procedure Draw(aResetBufferStateWhenDone: boolean=True); override;
 
+  property Shader: TOGLCShader read FShader;
   property VertexCount: ptrint read FIndexInAttribsArray;
   property ErrorStatus: GLenum read FError;
 end;
