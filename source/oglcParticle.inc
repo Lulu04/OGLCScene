@@ -735,7 +735,7 @@ begin
   if ParticlesPosRelativeToEmitterPos then PopSceneMV;
 
   {$IFDEF DEBUG_MODE_ON}
-    SetBlendMode(FX_BLEND_NORMAL);
+    FParentScene.BlendMode := FX_BLEND_NORMAL;
     DrawBox(FParentScene, xL, yT, xR-xL, yB-yT, BGRA(255,0,0));
   {$ENDIF}
 end;
