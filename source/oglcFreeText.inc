@@ -113,11 +113,17 @@ public
 public
   constructor Create(aParentScene: TOGLCScene; aFont: TTexturedFont; aWidth, aHeight: integer);
   destructor Destroy; override;
+
   // Redefine the size of the area where the text is displayed.
   procedure SetSize(aWidth, aHeight: integer);
+
+  // Adjust the size of the surface to the real size of the formatted text
+  // Call this method AFTER initializing the Caption, TexturedFont and Align
+  procedure AdjustSize;
+
   property Caption: string read GetCaption write SetCaption;
   property TexturedFont: TTexturedFont read GetTexturedFont write SetTexturedFont;
-  // default is taCenterCenter
+  // default is taTopLeft
   property Align: TOGLCAlignment read GetAlign write SetAlign;
   property DrawingRect: TRect read GetDrawingRect; // real size of the text area
 end;
@@ -153,6 +159,7 @@ end;
 procedure TFreeTextAligned.SetCaption(AValue: string);
 begin
   FAlignedTextDescriptor.Caption := AValue;
+
 end;
 
 procedure TFreeTextAligned.SetTexturedFont(AValue: TTexturedFont);
@@ -188,7 +195,7 @@ begin
   inherited Create;
   FParentScene := aParentScene;
   FAlignedTextDescriptor.InitDefault;
-  FAlignedTextDescriptor.Align := taCenterCenter;
+  FAlignedTextDescriptor.Align := taTopLeft;
   FAlignedTextDescriptor.TexturedFont := aFont;
   FAlignedTextDescriptor.Area := Rect(0, 0, aWidth, aHeight);
 end;
@@ -203,6 +210,11 @@ procedure TFreeTextAligned.SetSize(aWidth, aHeight: integer);
 begin
   FAlignedTextDescriptor.Area := Rect(0, 0, aWidth, aHeight);
   FAlignedTextDescriptor.ForceDistributeWordsAndAlign;
+end;
+
+procedure TFreeTextAligned.AdjustSize;
+begin
+  SetSize(DrawingRect.Width, DrawingRect.Height);
 end;
 
 function TFreeTextAligned.GetCaption: string;

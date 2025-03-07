@@ -49,7 +49,7 @@ private
   FFreighter: TSprite; // the sprite for the freighter
 
   FPanelStatus: TPanelStatus; // a panel to show informations to the player
-  FExplanation: TAlignedText; // to contains the explanation text
+  FExplanation: TFreeTextAligned; // to contains the explanation text
 
   FCamera: TOGLCCamera;
   FGameState: TGameState;
@@ -185,19 +185,21 @@ begin
   FPanelStatus := TPanelStatus.Create(FtexFont);
 
   // explanation text
-  FExplanation := TAlignedText.Create(FScene, FtexFont, Round(FScene.Width*0.8), FScene.Height div 3);
+  FExplanation := TFreeTextAligned.Create(FScene, FtexFont, Round(FScene.Width*0.8), FScene.Height div 3);
   FScene.Add(FExplanation, LAYER_GUI);
+  FExplanation.Align := taTopCenter;
   FExplanation.Caption := 'Press ''SPACE'' to deploy/retract the arm to harvest the meteor.'#10+
                           'Press ''C'' to reach the freighter to transfert the cargo.'#10+
-                          'The camera follow the ship and zoom to show the other objects near the chip.';
-  FExplanation.Tint.Value := BGRA(255,255,150);
+                          'The camera follow the ship and zoom to show the other objects.'#10;
+  FExplanation.AdjustSize;
+  FExplanation.Tint.Value := BGRA(255,255,255);
   FExplanation.Opacity.Value := 200;
   FExplanation.CenterX := FScene.Center.x;
   FExplanation.BottomY := FScene.Height;
 
-  // camera creation
+  // we create a camera that affects only the layer LAYER_SHIP and LAYER_BACK
   FCamera := FScene.CreateCamera;
-  FCamera.AssignToLayer([LAYER_SHIP, LAYER_BACK]); // the camera affects this two layer, not LAYER_GUI
+  FCamera.AssignToLayer([LAYER_SHIP, LAYER_BACK]);
 
   FGameState := gsWaitNearMeteor;
 end;
@@ -269,9 +271,8 @@ begin
 
   end;//case
 
-  // camera follow the ship
-  FCamera.MoveTo(FShip.Center, 0.1, idcSinusoid);
-
+  // we update the camera position to follow the ship
+  FCamera.MoveTo(FShip.Center);
 end;
 
 procedure TScreenDemo.ProcessMessage(UserValue: TUserMessageValue);
