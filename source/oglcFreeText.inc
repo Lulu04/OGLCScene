@@ -91,8 +91,8 @@ end;
 
 
 { TFreeTextAligned }
-// Draws a text in a specified rectangular area with horizontal and vertical align.
-// The text can be multiline: use #10 to separate the lines. Ex: 'line 1'#10'line 2'
+// Draws a text in a specified rectangular area with horizontal align (left, center or right).
+// The text can be multiline: use #10 to separate the lines.
 // Instead of TUITextArea, the text is not clipped and mouse can't interact with it.
 TFreeTextAligned = class(TSimpleSurfaceWithEffect)
 private
@@ -123,9 +123,11 @@ public
 
   property Caption: string read GetCaption write SetCaption;
   property TexturedFont: TTexturedFont read GetTexturedFont write SetTexturedFont;
+  // The alignment of the text. Use only taTopLeft, taTopCenter and taTopRight.
   // default is taTopLeft
   property Align: TOGLCAlignment read GetAlign write SetAlign;
-  property DrawingRect: TRect read GetDrawingRect; // real size of the text area
+  // The real size of the used rectangle after formatted the text.
+  property DrawingRect: TRect read GetDrawingRect;
 end;
 
 TAlignedText = TFreeTextAligned deprecated 'use TFreeTextAligned instead';
