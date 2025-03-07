@@ -71,12 +71,12 @@ end;
 
 type
 { TOGLCGlow }
-// this surface display a circular
+// this surface display a colored glow that can be used to add light effects on your scene.
 TOGLCGlow = class(TSimpleSurfaceWithEffect)
 private const
   MIN_ATTENUATION_VALUE = 0.1;
   MAX_ATTENUATION_VALUE = 100.0;
-  DEFAULT_ATTENUATION_VALUE = 0.97;
+  DEFAULT_ATTENUATION_VALUE = 0.895;
 private
   FWidth, FHeight: integer;
   function GetAttenuationValue: single;
