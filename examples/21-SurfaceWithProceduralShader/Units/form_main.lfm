@@ -1,0 +1,24 @@
+object FormMain: TFormMain
+  Left = 343
+  Height = 162
+  Top = 14
+  Width = 189
+  Caption = 'OGLCScene - Surface with procedural shader demo'
+  ClientHeight = 162
+  ClientWidth = 189
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  Position = poScreenCenter
+  LCLVersion = '3.8.0.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 24
+    Height = 96
+    Top = 24
+    Width = 80
+  end
+end
