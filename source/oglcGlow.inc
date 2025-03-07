@@ -3,24 +3,27 @@ type
 
 { TOGLCGlowRenderer }
 
-TOGLCGlowRenderer = class(specialize TOGLCGenericPrimitiveRenderer<Txyuvattenuationopacitycolor>)
+TOGLCGlowRenderer = class(specialize TOGLCGenericPrimitiveRenderer<Txyuvattenuationopacitycolorx2>)
 private const
 GLOW_VERTEX_SHADER_CORE =
   '#version 330 core'#10+
   '  layout(location = 0) in vec4 aVertexAndUVCoor;'#10+
   '  layout(location = 1) in vec2 aAttenuationAndOpacity;'#10+
   '  layout(location = 2) in vec4 aVertexColor;'#10+
+  '  layout(location = 3) in vec4 aTint;'#10+
   '  uniform mat4 uMVP;'#10+
   '  out vec4 VertexColor;'#10+
   '  out vec2 UVCoords;'#10+
   '  flat out float Attenuation;'#10+
   '  flat out float Opacity;'#10+
+  '  flat out vec4 Tint;'#10+
   'void main() {'#10+
   '  gl_Position = uMVP*vec4(aVertexAndUVCoor.xy, 0.0, 1.0);'#10+
   '  UVCoords = aVertexAndUVCoor.zw;'#10+
   '  VertexColor = aVertexColor;'#10+
   '  Attenuation = aAttenuationAndOpacity.x;'#10+
   '  Opacity = aAttenuationAndOpacity.y;'#10+
+  '  Tint = aTint;'#10+
   '}';
 GLOW_FRAGMENT_SHADER_CORE =
  '#version 330 core'#10+
@@ -29,11 +32,25 @@ GLOW_FRAGMENT_SHADER_CORE =
  '  in vec2 UVCoords;'#10+
  '  flat in float Attenuation;'#10+
  '  flat in float Opacity;'#10+
+ '  flat in vec4 Tint;'#10+
  'void main() {'#10+
  '  float dist = 1.0-clamp(distance(UVCoords, vec2(0.5,0.5))*2.0, 0.0, 1.0);'#10+
  '  dist = sqrt(pow(dist, Attenuation))*Opacity;'#10+ //modified easeInCirc  https://easings.net/
  '  if (dist == 0.0) discard;'#10+
- '  FragColor = vec4( VertexColor.rgb, dist);'#10+
+ '  vec4 col = vec4( VertexColor.rgb, dist);'#10+
+
+ // Tint and opacity
+  '  float tintAlphaX2 = Tint.a*2;'#10+
+ '  if (Tint.a >= 0.5)'#10+
+ '   {'#10+
+ '     tintAlphaX2 = tintAlphaX2-1;'#10+
+ '     col = mix(col, Tint, tintAlphaX2);'#10+ // replace mode
+ '   }'#10+
+ '  else if (Tint.a > 0)'#10+
+ '     col = col + Tint*tintAlphaX2;'#10+     // mix mode
+ '  col.a = dist;'#10+
+
+ '  FragColor = col;'#10+
  '}';
 private
   FLocMVP: GLint;
@@ -46,13 +63,15 @@ private
   procedure SetUniformValuesAndTexture;
 public
   procedure Prepare(aTriangleType: TTriangleType; const aMVP: TOGLCMatrix; aBlendMode: byte);
-  procedure PushQuad(aWidth, aHeight, aFlipIndex: integer; aAttenuation, aOpacity: single; const aColor: TColorF);
+  procedure PushQuad(aWidth, aHeight, aFlipIndex: integer; aAttenuation, aOpacity: single;
+                     const aComputedTint: TColorF;
+                     const aTopLeftColor, aTopRightColor, aBottomRightColor, aBottomLeftColor: TBGRAPixel);
 end;
 
 
 type
 { TOGLCGlow }
-
+// this surface display a circular
 TOGLCGlow = class(TSimpleSurfaceWithEffect)
 private const
   MIN_ATTENUATION_VALUE = 0.1;
@@ -68,15 +87,25 @@ public
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
 public
+  TopLeftColor,
+  TopRightColor,
+  BottomRightColor,
+  BottomLeftColor: TBGRAPixel;
   // range [0..1]
   Power: TBoundedFParam;
   // use Tint to change the glow color at run time (TintMode is set to tmMixColor, don't change it)
   Constructor Create(aParentScene: TOGLCScene; aRadiusX, aRadiusY: single; aColor: TBGRAPixel; aBlendMode: byte=FX_BLEND_ADD);
   Destructor Destroy; override;
-  // to sets the surface dimension
+  // to sets the rectangular dimension that contain the light effect
   procedure SetSize(aWidth, aHeight: integer);
-  // to sets the surface dimension from the glow radius
+  // to sets the surface dimension with the glow radius
   procedure SetRadius(aRadiusX, aRadiusY: single);
+
+  procedure SetAllColorsTo(AColor: TBGRAPixel);
+  procedure SetLeftColors(AColor: TBGRAPixel);
+  procedure SetRightColors(AColor: TBGRAPixel);
+  procedure SetTopColors(AColor: TBGRAPixel);
+  procedure SetBottomColors(AColor: TBGRAPixel);
 end;
 
 {$endif oglcINTERFACE}
@@ -96,14 +125,17 @@ end;
 procedure TOGLCGlowRenderer.DefineVertexAttribPointer;
 begin
   // xy uv = 4 float
-  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolor), NIL);
+  glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolorx2), NIL);
   glEnableVertexAttribArray(0);
   // attenuation opacity = 2 float
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolor), PChar(sizeof(single)*4));
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolorx2), PChar(sizeof(single)*4));
   glEnableVertexAttribArray(1);
   // color = 4 float
-  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolor), PChar(sizeof(single)*6));
+  glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolorx2), PChar(sizeof(single)*6));
   glEnableVertexAttribArray(2);
+  // tint = 4 float
+  glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Txyuvattenuationopacitycolorx2), PChar(sizeof(single)*10));
+  glEnableVertexAttribArray(3);
 end;
 
 procedure TOGLCGlowRenderer.GetUniformLocation;
@@ -127,10 +159,11 @@ begin
 end;
 
 procedure TOGLCGlowRenderer.PushQuad(aWidth, aHeight, aFlipIndex: integer;
-  aAttenuation, aOpacity: single; const aColor: TColorF);
+  aAttenuation, aOpacity: single; const aComputedTint: TColorF; const aTopLeftColor, aTopRightColor,
+  aBottomRightColor, aBottomLeftColor: TBGRAPixel);
 var area, texCoords: TQuadCoor;
   tci: PQuadCornerIndexes;
-    p: Pxyuvattenuationopacitycolor;
+    p: Pxyuvattenuationopacitycolorx2;
     pIndex: PVertexIndex;
     currentIndex: TVertexIndex;
 begin
@@ -184,7 +217,8 @@ begin
     v := texCoords[ tci^[0] ].y;
     attenuation := aAttenuation;
     opacity := aOpacity;
-    c.CopyFrom(aColor);
+    color.InitFromBGRA(aBottomLeftColor);
+    tint.CopyFrom(aComputedTint);
   end;
   with p[1] do begin
     x := area[cTL].x;
@@ -193,7 +227,8 @@ begin
     v := texCoords[ tci^[1] ].y;
     attenuation := aAttenuation;
     opacity := aOpacity;
-    c.CopyFrom(aColor);
+    color.InitFromBGRA(aTopLeftColor);
+    tint.CopyFrom(aComputedTint);
   end;
   with p[2] do begin
     x := area[cBR].x;
@@ -202,7 +237,8 @@ begin
     v := texCoords[ tci^[2] ].y;
     attenuation := aAttenuation;
     opacity := aOpacity;
-    c.CopyFrom(aColor);
+    color.InitFromBGRA(aBottomRightColor);
+    tint.CopyFrom(aComputedTint);
   end;
   with p[3] do begin
     x := area[cTR].x;
@@ -211,7 +247,8 @@ begin
     v := texCoords[ tci^[3] ].y;
     attenuation := aAttenuation;
     opacity := aOpacity;
-    c.CopyFrom(aColor);
+    color.InitFromBGRA(aTopRightColor);
+    tint.CopyFrom(aComputedTint);
   end;
 end;
 
@@ -244,7 +281,9 @@ procedure TOGLCGlow.DoDraw;
 begin
   FParentScene.GlowRenderer.Prepare(ptTriangleStrip, FParentScene.MVPMatrix, FBlendMode);
   FParentScene.GlowRenderer.PushQuad(FWidth, FHeight, FlipToIndex, GetAttenuationValue,
-                                     FComputedOpacity, FComputedTint);
+                                     FComputedOpacity,
+                                     FComputedTint,
+                                     TopLeftColor, TopRightColor, BottomRightColor, BottomLeftColor);
 end;
 
 constructor TOGLCGlow.Create(aParentScene: TOGLCScene; aRadiusX,
@@ -253,13 +292,10 @@ begin
   inherited Create;
   FParentScene := aParentScene;
   SetRadius(aRadiusX, aRadiusY);
+  SetAllColorsTo(aColor);
 
   Power := CreateBoundedFParam(0.0, 1.0);
   Power.Value := DEFAULT_ATTENUATION_VALUE;
-
-  TintMode := tmMixColor;
-  Tint.Value := aColor;
-
   FBlendMode := aBlendMode;
 end;
 
@@ -279,6 +315,38 @@ procedure TOGLCGlow.SetRadius(aRadiusX, aRadiusY: single);
 begin
   FWidth := Round(aRadiusX * 2.0);
   FHeight := Round(aRadiusY * 2.0);
+end;
+
+procedure TOGLCGlow.SetAllColorsTo(AColor: TBGRAPixel);
+begin
+  TopLeftColor := AColor;
+  TopRightColor := AColor;
+  BottomRightColor := AColor;
+  BottomLeftColor := AColor;
+end;
+
+procedure TOGLCGlow.SetLeftColors(AColor: TBGRAPixel);
+begin
+  TopLeftColor := AColor;
+  BottomLeftColor := AColor;
+end;
+
+procedure TOGLCGlow.SetRightColors(AColor: TBGRAPixel);
+begin
+  TopRightColor := AColor;
+  BottomRightColor := AColor;
+end;
+
+procedure TOGLCGlow.SetTopColors(AColor: TBGRAPixel);
+begin
+  TopLeftColor := AColor;
+  TopRightColor := AColor;
+end;
+
+procedure TOGLCGlow.SetBottomColors(AColor: TBGRAPixel);
+begin
+  BottomRightColor := AColor;
+  BottomLeftColor := AColor;
 end;
 
 {$endif oglcIMPLEMENTATION}
