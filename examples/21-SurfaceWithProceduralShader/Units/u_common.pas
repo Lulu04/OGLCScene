@@ -12,8 +12,8 @@ const
 
 // LAYER
    LAYER_COUNT = 2;
-     LAYER_SHIP  = 0;
-     LAYER_STARS = 1;
+     LAYER_UI   = 0;
+     LAYER_SPRITE = 1;
 
 
 var

@@ -1,4 +1,4 @@
-program PostProcessing;
+program SurfaceWithProceduralShader;
 
 {$mode objfpc}{$H+}
 
@@ -7,9 +7,8 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazopenglcontext, OGLCScene,
-  u_common,
-  form_main, screen_demo;
+  Forms, lazopenglcontext, OGLCScene, u_common, form_main, screen_demo,
+  u_MySurfaceWithGradient;
 
 {$R *.res}
 
