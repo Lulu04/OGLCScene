@@ -122,6 +122,24 @@
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
+      <Target FileName="21-SurfaceWithProceduralShader\SurfaceWithProceduralShader.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="22-PostProcessing\PostProcessing.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="23-CustomPostProcessing\CustomPostProcessing.lpi">
+        <BuildModes>
+          <Mode Name="Debug" Compile="True"/>
+          <Mode Name="Release"/>
+        </BuildModes>
+      </Target>
     </Targets>
   </ProjectGroup>
 </CONFIG>
