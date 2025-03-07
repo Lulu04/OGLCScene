@@ -739,7 +739,7 @@ begin
     else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
 
   {$IFDEF DEBUG_MODE_ON}
-    SetBlendMode(FX_BLEND_NORMAL);
+    FParentScene.BlendMode := FX_BLEND_NORMAL;
     DrawBox(FParentScene, 0, 0, Width, Height, BGRA(255,0,0));
   {$ENDIF}
 
