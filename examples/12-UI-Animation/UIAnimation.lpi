@@ -15,9 +15,8 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="33"/>
+      <BuildNr Value="34"/>
       <Language Value="040C"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -79,14 +78,13 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="5">
       <Unit0>
         <Filename Value="UIAnimation.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <CursorPos X="96" Y="11"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -96,7 +94,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="34" Y="14"/>
+        <CursorPos Y="14"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -106,7 +104,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="4"/>
-        <CursorPos X="37" Y="15"/>
+        <CursorPos X="41" Y="17"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -114,12 +112,22 @@
         <Filename Value="Units\u_button_def.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="44" Y="14"/>
+        <CursorPos X="21" Y="14"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="Units\u_common.pas"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit4>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="11" Column="8" TopLine="4"/>
+      </Position1>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

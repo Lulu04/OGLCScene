@@ -15,9 +15,8 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="91"/>
+      <BuildNr Value="92"/>
       <Language Value="0809"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -83,10 +82,9 @@
       <Unit0>
         <Filename Value="MultiScenes.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <CursorPos X="49" Y="14"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -96,7 +94,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="41" Y="20"/>
+        <CursorPos X="20" Y="20"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -105,8 +103,7 @@
         <Filename Value="Units\screen_scene1.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="50"/>
-        <CursorPos X="27" Y="66"/>
+        <CursorPos X="24" Y="15"/>
         <UsageCount Value="83"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -121,7 +118,7 @@
         <Filename Value="Units\screen_scene2.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="25" Y="15"/>
+        <CursorPos X="17" Y="15"/>
         <UsageCount Value="37"/>
         <Loaded Value="True"/>
       </Unit4>

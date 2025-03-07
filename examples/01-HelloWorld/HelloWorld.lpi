@@ -15,7 +15,6 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
       <BuildNr Value="33"/>
       <Language Value="040C"/>
@@ -83,8 +82,9 @@
       <Unit0>
         <Filename Value="HelloWorld.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <CursorPos X="32" Y="14"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -95,7 +95,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="30" Y="15"/>
+        <CursorPos X="16" Y="15"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -114,7 +114,7 @@
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="27" Y="15"/>
+        <CursorPos X="16" Y="15"/>
         <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -188,7 +188,6 @@
       </Unit13>
       <Unit14>
         <Filename Value="..\19-Collision\Units\u_sprite_def.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="345"/>
         <CursorPos X="52" Y="360"/>
