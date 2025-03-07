@@ -2511,7 +2511,7 @@ begin
     FSurfaceLockedByMouse.DoOnMouseDown(Button, Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
 
   end else if FSurfaceUnderMouse <> NIL then begin
-    if not CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X, Y)) then exit;
+//    if not CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X, Y)) then exit;
 
     FSurfaceUnderMouse.DoOnMouseDown(Button, Shift, FSurfaceUnderMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceUnderMouse.ScrollOffset);
     FSurfaceLockedByMouse := FSurfaceUnderMouse;
@@ -2528,7 +2528,7 @@ begin
     FSurfaceLockedByMouse.DoOnMouseUp(Button, Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset);
     FSurfaceLockedByMouse := NIL;
   end else if FSurfaceUnderMouse <> NIL then begin
-    if not CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X, Y)) then exit;
+//    if not CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X, Y)) then exit;
 
     FSurfaceUnderMouse.DoOnMouseUp(Button, Shift, FSurfaceUnderMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceUnderMouse.ScrollOffset)
   end else if FOnClickOnScene <> NIL then FOnClickOnScene(Button, Shift, X, Y);
@@ -2542,7 +2542,7 @@ begin
   if FSurfaceLockedByMouse <> NIL then begin
       FSurfaceLockedByMouse.DoOnMouseMove(Shift, FSurfaceLockedByMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceLockedByMouse.ScrollOffset)
   end else if FSurfaceUnderMouse <> NIL then begin
-      if CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X,Y)) then
+//      if CheckIfPosIsInParentClientArea(FSurfaceUnderMouse, Point(X,Y)) then
         FSurfaceUnderMouse.DoOnMouseMove(Shift, FSurfaceUnderMouse.SceneToSurfaceUI(Point(X, Y))-FSurfaceUnderMouse.ScrollOffset);
   end;
 end;
