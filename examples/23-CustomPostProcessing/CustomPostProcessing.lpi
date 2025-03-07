@@ -83,10 +83,9 @@
       <Unit0>
         <Filename Value="CustomPostProcessing.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="53" Y="12"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -94,6 +93,7 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="5"/>
         <CursorPos X="40" Y="16"/>
@@ -105,13 +105,13 @@
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="32" Y="12"/>
+        <CursorPos X="23" Y="16"/>
         <UsageCount Value="166"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\source\OGLCScene.pas"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="369"/>
         <CursorPos X="2" Y="385"/>
         <UsageCount Value="66"/>
@@ -119,7 +119,7 @@
       </Unit3>
       <Unit4>
         <Filename Value="..\..\source\oglcPostProcessing.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="325"/>
         <CursorPos X="33" Y="337"/>
         <UsageCount Value="66"/>
@@ -127,9 +127,9 @@
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcType.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="251"/>
-        <CursorPos X="27" Y="275"/>
+        <CursorPos X="29" Y="277"/>
         <UsageCount Value="66"/>
         <Loaded Value="True"/>
       </Unit5>
@@ -203,7 +203,6 @@
         <Filename Value="Units\u_mypostprocessingrenderer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="u_MyPostProcessingRenderer"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos X="12" Y="31"/>
         <UsageCount Value="33"/>

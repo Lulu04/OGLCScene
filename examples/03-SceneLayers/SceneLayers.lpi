@@ -15,9 +15,8 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="35"/>
+      <BuildNr Value="36"/>
       <Language Value="040C"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -80,14 +79,13 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="SceneLayers.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="32" Y="14"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -95,9 +93,8 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="24" Y="11"/>
+        <CursorPos X="5" Y="11"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -105,13 +102,24 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="22" Y="15"/>
+        <CursorPos X="42" Y="17"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="Units\u_common.pas"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="11" Column="6"/>
+      </Position1>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

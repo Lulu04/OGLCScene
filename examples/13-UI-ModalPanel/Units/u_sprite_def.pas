@@ -34,7 +34,7 @@ private
 public
   constructor Create(aFont: TTexturedFont);
   procedure ShowModal; override;
-  procedure Hide; override;
+  procedure Hide(aFree: boolean); override;
 end;
 
 function PPIScale(aValue: integer): integer;
@@ -62,10 +62,10 @@ end;
 procedure TInGamePausePanel.ProcessButtonClick(Sender: TSimpleSurfaceWithEffect);
 begin
   if Sender = BResumeGame then begin
-    Hide;
+    Hide(False);
   end else
   if Sender = BExitGame then begin
-    Hide;
+    Hide(False);
     FormMain.Close;
   end;
 end;
@@ -108,11 +108,11 @@ begin
   inherited ShowModal;
 end;
 
-procedure TInGamePausePanel.Hide;
+procedure TInGamePausePanel.Hide(aFree: boolean);
 begin
   // the mouse pointer is hidden
   FScene.Mouse.SystemMouseCursorVisible := False;
-  inherited Hide;
+  inherited Hide(aFree);
 end;
 
 { TShip }

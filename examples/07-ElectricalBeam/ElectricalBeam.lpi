@@ -15,9 +15,8 @@
     </i18n>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="33"/>
+      <BuildNr Value="34"/>
       <Language Value="040C"/>
     </VersionInfo>
     <BuildModes Count="2" Active="Debug">
@@ -79,14 +78,13 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="ElectricalBeam.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="32" Y="14"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="4"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -95,7 +93,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="25" Y="13"/>
+        <CursorPos X="16" Y="13"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -105,12 +103,22 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="19" Y="6"/>
+        <CursorPos X="40" Y="17"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="Units\u_common.pas"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="11" Column="6"/>
+      </Position1>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>

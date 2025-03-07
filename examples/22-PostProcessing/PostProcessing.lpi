@@ -83,10 +83,9 @@
       <Unit0>
         <Filename Value="PostProcessing.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="4"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\form_main.pas"/>
@@ -94,10 +93,8 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="104"/>
-        <CursorPos X="72" Y="122"/>
+        <CursorPos X="32" Y="15"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -112,15 +109,16 @@
       </Unit2>
       <Unit3>
         <Filename Value="..\..\source\OGLCScene.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="360"/>
-        <CursorPos Y="375"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="370"/>
+        <CursorPos Y="385"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\source\oglcPostProcessing.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="318"/>
         <CursorPos X="27" Y="337"/>
         <UsageCount Value="60"/>
@@ -128,9 +126,9 @@
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcType.inc"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="240"/>
-        <CursorPos X="22" Y="253"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="252"/>
+        <CursorPos X="23" Y="263"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit5>

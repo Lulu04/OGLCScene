@@ -1,8 +1,6 @@
 program DeformationGrid;
 
 {$mode objfpc}{$H+}
-{$DEFINE ProgrammePrincipal}
-
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}

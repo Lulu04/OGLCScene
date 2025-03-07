@@ -1,8 +1,6 @@
 program TexturedFont;
 
 {$mode objfpc}{$H+}
-{$DEFINE ProgrammePrincipal}
-
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}

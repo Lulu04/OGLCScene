@@ -1,8 +1,6 @@
 program TintMode;
 
 {$mode objfpc}{$H+}
-{$DEFINE ProgrammePrincipal}
-
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
