@@ -104,10 +104,13 @@ procedure TFormCopyToClipboard.RadioButton1Change(Sender: TObject);
 begin
   if RadioButton1.Checked then begin
     ShowAsPascalCode;
-    Label1.Visible := True;
+    Label1.Caption := '1) add the unit u_ProceduralPlanet to your game/app,'+LineEnding+
+           '2) somewhere paste this string as constant, rename it according to your need,'+LineEnding+
+           '3) create a TProceduralPlanet instance in your scene and call TProceduralPlanet.LoadFromString(...).';
   end else begin
     ShowToShareOnForum;
-    Label1.Visible := False;
+    Label1.Caption := 'Go to the FPC/Lazarus forum, open the right thread and paste it into your message to share.'+Lineending+
+         'Note: the string is already encapsulated between [code=pascal][/code] tags.';
   end;
 end;
 
