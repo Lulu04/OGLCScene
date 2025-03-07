@@ -66,12 +66,13 @@ Pxycolor = ^Txycolor;
 TArrayOfxycolor = array of Txycolor;
 
 // used by Glow shader
-Txyattenuationcolor = packed record
+Txyuvattenuationopacitycolor = packed record
   x, y: single;        // vertex coordinates
-  attenuation: single; // attenuation
+  u, v: single;        // uv coordinates
+  attenuation, opacity: single;
   c: TColorF;          // color
 end;
-Pxyattenuationcolor = ^Txyattenuationcolor;
+Pxyuvattenuationopacitycolor = ^Txyuvattenuationopacitycolor;
 
 // used by Line Renderer
 TLineVertexAttributes = packed record
