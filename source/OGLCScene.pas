@@ -1640,7 +1640,7 @@ end;
 
 function TOGLCScene.GetGlowRenderer: TOGLCGlowRenderer;
 begin
-  if FGlowRenderer = NIL then FGlowRenderer := TOGLCGlowRenderer.Create(Self, False);
+  if FGlowRenderer = NIL then FGlowRenderer := TOGLCGlowRenderer.Create(Self, True);
   Result := FGlowRenderer;
 end;
 
