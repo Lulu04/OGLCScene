@@ -58,7 +58,6 @@ type
     Label8: TLabel;
     Label9: TLabel;
     OpenGLControl1: TOpenGLControl;
-    Panel1: TPanel;
     Panel2: TPanel;
     BSwapGroundColor: TSpeedButton;
     RBCloudsBlendAdd: TRadioButton;
@@ -67,6 +66,7 @@ type
     BPreset: TSpeedButton;
     BImportFromForum: TSpeedButton;
     BDefaultRotationSpeed: TSpeedButton;
+    ScrollBox1: TScrollBox;
     TBCloudsColDistrib: TTrackBar;
     TBCloudsChange: TTrackBar;
     TBGroundAmount: TTrackBar;
