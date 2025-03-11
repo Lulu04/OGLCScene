@@ -286,8 +286,10 @@ public // Matrix transform
 public
   // add a child to the surface.
   // a positive aZOrder means the child is above its parent, a negative aZOrder means the child is below its parent.
+  // The drawing order is: ...-3 -2 -1 parent 0 1 2 3...
   procedure AddChild(ASurface: TSimpleSurfaceWithEffect; aZOrder: integer=0); virtual;
   // set the ZOrder of the surface. Do nothing if the surface don't have a parent.
+  // The drawing order is: ...-3 -2 -1 parent 0 1 2 3...
   procedure SetZOrder(aZOrder: integer);
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
@@ -307,6 +309,7 @@ public
   property ChildsUseParentOpacity: boolean read FChildsUseParentOpacity write FChildsUseParentOpacity; // default is True
   // if this surface is a child, you can change its Z order.
   // a positive value means the surface is above its parent, a negative value means the surface is below its parent.
+  // The drawing order is: ...-3 -2 -1 parent 0 1 2 3...
   // ZOrderAsChild is ignored if the surface is not a child of another.
   property ZOrderAsChild: integer read FZOrderAsChild write SetZOrderAsChild;
   // if this surface is a child, sets this property to True to apply an horizontal and/or vertical symmetry
