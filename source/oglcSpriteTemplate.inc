@@ -102,6 +102,23 @@ public
   property Antialiasing: boolean read FAntialiasing write FAntialiasing;
 end;
 
+
+{ TGradientRectangle }
+// this surface display a rectangular area filled with gradient colors.
+TGradientRectangle = class(TSimpleSurfaceWithEffect)
+protected
+  FWidth, FHeight: integer;
+  function GetWidth: integer; override;
+  function GetHeight: integer; override;
+public
+  procedure DoDraw; override;
+public
+  // First initialize the colors of the gradient then call SetSize()
+  Gradient: TGradientDescriptor;
+  // First initialize the colors of the gradient then call SetSize()
+  procedure SetSize(aWidth, aHeight: integer);
+end;
+
 { TMultiColorRectangle }
 
 TMultiColorRectangle = class(TSimpleSurfaceWithEffect)
@@ -467,6 +484,34 @@ begin
   LineColor := aLineColor;
   LinePosition := aLinePosition;
   Antialiasing := aAntialiasing;
+end;
+
+
+{ TGradientRectangle }
+
+function TGradientRectangle.GetWidth: integer;
+begin
+  Result := FWidth;
+end;
+
+function TGradientRectangle.GetHeight: integer;
+begin
+  Result := FHeight;
+end;
+
+procedure TGradientRectangle.DoDraw;
+begin
+  if Length(Gradient.Vertices) > 0 then begin
+    FParentScene.ThreeColorTriangleRenderer.Prepare(ptTriangleStrip, FParentScene.MVPMatrix, FComputedOpacity, FComputedTint, FBlendMode);
+    FParentScene.ThreeColorTriangleRenderer.PushGradient(@Gradient);
+  end;
+end;
+
+procedure TGradientRectangle.SetSize(aWidth, aHeight: integer);
+begin
+  FWidth := aWidth;
+  FHeight := aHeight;
+  Gradient.ComputeVerticesAndIndices(aWidth, aHeight);
 end;
 
 { TMultiColorRectangle }
