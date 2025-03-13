@@ -416,6 +416,12 @@ public
   // aIntensity is the intensity of the computed blureed color. range is > 0.  default is 1.0
   procedure SetBloomParamsOnAllLayers(aThreshold, aIntensity: single);
 
+  // specify a custom renderer to use when the effect 'pfUserRenderer' is enabled.
+  procedure UseCustomRendererOnLayers(aUserRenderer: TOGLCBaseRendererForPostProcessing; const aLayers: TArrayOfInteger);
+  // specify a custom renderer to use when the effect 'pfUserRenderer' is enabled.
+  procedure UseCustomRendererOnLayerRange(aUserRenderer: TOGLCBaseRendererForPostProcessing; aFirstLayer, aLastLayer: integer);
+  // specify a custom renderer to use when the effect 'pfUserRenderer' is enabled.
+  procedure UseCustomRendererOnAllLayers(aUserRenderer: TOGLCBaseRendererForPostProcessing);
 
   // reset the time variable to 0 in the post-processing shader. Needed before starting the ShockWave effect.
   procedure ResetTimeVariable;
@@ -843,6 +849,36 @@ var i: integer;
 begin
   for i:=0 to FParentScene.LayerCount-1 do
     FParentScene.Layer[i].PostProcessing.SetBloomParams(aThreshold, aIntensity);
+end;
+
+procedure TOGLCPostProcessingUtils.UseCustomRendererOnLayers(
+  aUserRenderer: TOGLCBaseRendererForPostProcessing; const aLayers: TArrayOfInteger);
+var i: integer;
+begin
+  if Length(aLayers) = 0 then exit;
+  for i in aLayers do
+    FParentScene.Layer[i].PostProcessing.UseCustomRenderer(aUserRenderer);
+end;
+
+procedure TOGLCPostProcessingUtils.UseCustomRendererOnLayerRange(
+  aUserRenderer: TOGLCBaseRendererForPostProcessing; aFirstLayer, aLastLayer: integer);
+var i: integer;
+begin
+  if aLastLayer < aFirstLayer then begin
+    i := aLastLayer;
+    aLastLayer := aFirstLayer;
+    aFirstLayer := i;
+  end;
+  for i:=aFirstLayer to aLastLayer do
+    FParentScene.Layer[i].PostProcessing.UseCustomRenderer(aUserRenderer);
+end;
+
+procedure TOGLCPostProcessingUtils.UseCustomRendererOnAllLayers(
+  aUserRenderer: TOGLCBaseRendererForPostProcessing);
+var i: integer;
+begin
+  for i:=0 to FParentScene.LayerCount-1 do
+    FParentScene.Layer[i].PostProcessing.UseCustomRenderer(aUserRenderer);
 end;
 
 procedure TOGLCPostProcessingUtils.ResetTimeVariable;
