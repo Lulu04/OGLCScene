@@ -70,16 +70,21 @@ public
   // return the bounds of the view currently seen by the camera (in scene coordinates)
   function GetViewRect: TRectF;
 
-  // the camera will be used by the specified layer, given by its index
-  // if another camera was assigned on this layer, the new one replace it
+  // Assign the camera to the layer specified by its index.
+  // All previous assigned camera is replaced by the new one.
   procedure AssignToLayer( aLayerIndex: integer ); overload;
-  // the camera will be used to several layers, given by their indexes
+  // Assign the camera to several layers specified by their indexes
+  // All previous assigned camera is replaced by the new one.
   procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
+  // Assign the camera to the layers specified by a range index.
+  // All previous assigned camera is replaced by the new one.
+  procedure AssignToLayerRange(aFirstLayerIndex, aLastLayerIndex: integer);
   // the camera will be used by all layers
   procedure AssignToAllLayers;
   // The camera will no longer be used by any layer
   procedure Unassign;
 
+  function GetTransformMatrix: TOGLCMatrix;
   function GetInverseTransformMatrix: TOGLCMatrix;
 end;
 {$endif oglcINTERFACE}
@@ -247,7 +252,19 @@ var i: Integer;
 begin
   with FParentScene do
    for i:=0 to Length(aLayerIndexList)-1 do
-     AssignToLayer( aLayerIndexList[i] );
+     AssignToLayer(aLayerIndexList[i]);
+end;
+
+procedure TOGLCCamera.AssignToLayerRange(aFirstLayerIndex, aLastLayerIndex: integer);
+var i: integer;
+begin
+  if aFirstLayerIndex > aLastLayerIndex then begin
+    i := aLastLayerIndex;
+    aLastLayerIndex := aFirstLayerIndex;
+    aFirstLayerIndex := i;
+  end;
+  for i:=aFirstLayerIndex to aLastLayerIndex do
+    AssignToLayer(i);
 end;
 
 procedure TOGLCCamera.AssignToAllLayers;
@@ -265,13 +282,18 @@ begin
       if Camera = Self then Camera := NIL;
 end;
 
+function TOGLCCamera.GetTransformMatrix: TOGLCMatrix;
+begin
+  Result.LoadIdentity;
+  Result.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                      FParentScene.Width*0.5, FParentScene.Height*0.5,
+                      LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
+end;
+
 function TOGLCCamera.GetInverseTransformMatrix: TOGLCMatrix;
 var m: TOGLCMatrix;
 begin
-  m.LoadIdentity;
-  m.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
-                 FParentScene.Width*0.5, FParentScene.Height*0.5,
-                 LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
+  m := GetTransformMatrix;
   Result := m.Inverse;
 end;
 
