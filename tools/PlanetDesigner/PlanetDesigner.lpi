@@ -79,7 +79,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="29">
+    <Units Count="30">
       <Unit0>
         <Filename Value="PlanetDesigner.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -93,7 +93,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="154"/>
         <CursorPos X="55" Y="169"/>
@@ -113,8 +112,8 @@
       <Unit3>
         <Filename Value="..\..\source\OGLCScene.pas"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="182"/>
-        <CursorPos X="19" Y="193"/>
+        <TopLine Value="164"/>
+        <CursorPos X="11" Y="175"/>
         <UsageCount Value="96"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -184,6 +183,7 @@
       </Unit12>
       <Unit13>
         <Filename Value="..\..\source\oglcSurfaceWithProceduralShader.inc"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
         <TopLine Value="4"/>
         <CursorPos X="47" Y="4"/>
@@ -315,127 +315,133 @@
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="..\..\source\oglcVersion.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="24" Y="3"/>
+        <UsageCount Value="10"/>
+      </Unit29>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="811" Column="3" TopLine="808"/>
+        <Caret Line="260" Column="15" TopLine="245"/>
       </Position1>
       <Position2>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="260" Column="15" TopLine="245"/>
+        <Caret Line="819" Column="3" TopLine="815"/>
       </Position2>
       <Position3>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="819" Column="3" TopLine="815"/>
+        <Caret Line="260" Column="18" TopLine="247"/>
       </Position3>
       <Position4>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="260" Column="18" TopLine="247"/>
+        <Caret Line="829" Column="17" TopLine="817"/>
       </Position4>
       <Position5>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="829" Column="17" TopLine="817"/>
+        <Caret Line="262" Column="15" TopLine="247"/>
       </Position5>
       <Position6>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="262" Column="15" TopLine="247"/>
+        <Caret Line="836" TopLine="822"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="836" TopLine="822"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="267" Column="2" TopLine="253"/>
       </Position7>
       <Position8>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="267" Column="2" TopLine="253"/>
+        <Caret Line="176" Column="26" TopLine="158"/>
       </Position8>
       <Position9>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="176" Column="26" TopLine="158"/>
+        <Caret Line="170" Column="10" TopLine="156"/>
       </Position9>
       <Position10>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="170" Column="10" TopLine="156"/>
+        <Caret Line="107" Column="64" TopLine="92"/>
       </Position10>
       <Position11>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="107" Column="64" TopLine="92"/>
+        <Caret Line="174" Column="9" TopLine="161"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="174" Column="9" TopLine="161"/>
-      </Position12>
-      <Position13>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="45" Column="35" TopLine="31"/>
-      </Position13>
-      <Position14>
+      </Position12>
+      <Position13>
         <Filename Value="Units\u_proceduralplanet.pas"/>
         <Caret Line="260" Column="45" TopLine="246"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="164" TopLine="155"/>
       </Position14>
       <Position15>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="164" TopLine="155"/>
+        <Caret Line="166" TopLine="155"/>
       </Position15>
       <Position16>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="166" TopLine="155"/>
+        <Caret Line="169" TopLine="155"/>
       </Position16>
       <Position17>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="169" TopLine="155"/>
+        <Caret Line="178" Column="35" TopLine="155"/>
       </Position17>
       <Position18>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="178" Column="35" TopLine="155"/>
+        <Caret Line="169" TopLine="164"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="169" TopLine="164"/>
-      </Position19>
-      <Position20>
         <Filename Value="..\..\source\OGLCScene.pas"/>
         <Caret Line="193" Column="19" TopLine="182"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\u_proceduralplanet.pas"/>
+        <Caret Line="257" Column="15" TopLine="236"/>
       </Position20>
       <Position21>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="257" Column="15" TopLine="236"/>
+        <Caret Line="209" Column="15" TopLine="191"/>
       </Position21>
       <Position22>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="209" Column="15" TopLine="191"/>
+        <Caret Line="547" Column="35" TopLine="529"/>
       </Position22>
       <Position23>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="547" Column="35" TopLine="529"/>
+        <Caret Line="209" Column="22" TopLine="196"/>
       </Position23>
       <Position24>
         <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="209" Column="22" TopLine="196"/>
+        <Caret Line="542" Column="53" TopLine="541"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\u_proceduralplanet.pas"/>
-        <Caret Line="542" Column="53" TopLine="541"/>
-      </Position25>
-      <Position26>
         <Filename Value="Units\u_export_to_string.pas"/>
         <Caret Line="109" Column="111" TopLine="89"/>
-      </Position26>
-      <Position27>
+      </Position25>
+      <Position26>
         <Filename Value="Units\form_importfromforum.pas"/>
         <Caret Line="55" Column="29" TopLine="39"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="163" Column="6" TopLine="154"/>
       </Position27>
       <Position28>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="163" Column="6" TopLine="154"/>
+        <Caret Line="164" Column="6" TopLine="155"/>
       </Position28>
       <Position29>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="164" Column="6" TopLine="155"/>
+        <Caret Line="163" Column="6" TopLine="154"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="163" Column="6" TopLine="154"/>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <Caret Line="175" Column="11" TopLine="164"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
