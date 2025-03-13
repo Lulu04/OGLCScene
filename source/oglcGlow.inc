@@ -93,7 +93,6 @@ public
   BottomLeftColor: TBGRAPixel;
   // range [0..1]
   Power: TBoundedFParam;
-  // use Tint to change the glow color at run time (TintMode is set to tmMixColor, don't change it)
   Constructor Create(aParentScene: TOGLCScene; aRadiusX, aRadiusY: single; aColor: TBGRAPixel; aBlendMode: byte=FX_BLEND_ADD);
   Destructor Destroy; override;
   // to sets the rectangular dimension that contain the light effect
