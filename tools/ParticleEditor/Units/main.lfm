@@ -5,7 +5,7 @@ object Form_Principale: TForm_Principale
   Width = 1024
   BorderIcons = [biSystemMenu]
   Caption = 'OGLC Particles Editor'
-  ClientHeight = 730
+  ClientHeight = 750
   ClientWidth = 1024
   Color = clNone
   DefaultMonitor = dmPrimary
@@ -18,10 +18,10 @@ object Form_Principale: TForm_Principale
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   Position = poDesktopCenter
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   object PageControl1: TPageControl
     Left = 0
-    Height = 330
+    Height = 350
     Top = 400
     Width = 1024
     ActivePage = TabSheet10
@@ -30,18 +30,19 @@ object Form_Principale: TForm_Principale
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'Texture and Frame animation'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel2: TPanel
         Left = 0
-        Height = 302
+        Height = 322
         Top = 0
         Width = 1016
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 302
+        ClientHeight = 322
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label5: TLabel
@@ -82,9 +83,9 @@ object Form_Principale: TForm_Principale
           Top = 96
           Width = 78
           NumbersOnly = True
-          OnEditingDone = EditFrameWidthEditingDone
           TabOrder = 0
           Text = '32'
+          OnEditingDone = EditFrameWidthEditingDone
         end
         object EditFrameHeight: TEdit
           Left = 336
@@ -92,9 +93,9 @@ object Form_Principale: TForm_Principale
           Top = 130
           Width = 78
           NumbersOnly = True
-          OnEditingDone = EditFrameWidthEditingDone
           TabOrder = 1
           Text = '32'
+          OnEditingDone = EditFrameWidthEditingDone
         end
         object SEStartFrame: TSpinEdit
           Left = 104
@@ -139,8 +140,8 @@ object Form_Principale: TForm_Principale
           Top = 8
           Width = 83
           Caption = 'Browse...'
-          OnClick = BLoadTextureClick
           TabOrder = 4
+          OnClick = BLoadTextureClick
         end
         object Label52: TLabel
           Left = 96
@@ -156,18 +157,19 @@ object Form_Principale: TForm_Principale
     end
     object TabSheet3: TTabSheet
       Caption = 'Particles count and Life'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel4: TPanel
         Left = 0
-        Height = 302
+        Height = 322
         Top = 0
         Width = 1016
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 302
+        ClientHeight = 322
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label17: TLabel
@@ -258,18 +260,19 @@ object Form_Principale: TForm_Principale
     end
     object TabSheet5: TTabSheet
       Caption = 'Start Angle'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel5: TPanel
         Left = 0
-        Height = 302
+        Height = 322
         Top = 0
         Width = 1016
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 302
+        ClientHeight = 322
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label21: TLabel
@@ -332,7 +335,7 @@ object Form_Principale: TForm_Principale
     end
     object TabSheet6: TTabSheet
       Caption = 'Velocity'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       inline VelocityCurve: TFrameEditCurve
         AnchorSideLeft.Control = Panel6
@@ -342,15 +345,15 @@ object Form_Principale: TForm_Principale
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = TabSheet6
         AnchorSideBottom.Side = asrBottom
-        Height = 198
+        Height = 218
         Top = 104
         Width = 1016
         Anchors = [akTop, akLeft, akRight, akBottom]
-        ClientHeight = 198
+        ClientHeight = 218
         ClientWidth = 1016
         ParentColor = True
         inherited PB: TPaintBox
-          Height = 198
+          Height = 218
           Width = 1016
         end
       end
@@ -363,6 +366,7 @@ object Form_Principale: TForm_Principale
         ClientHeight = 104
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 1
         object Label33: TLabel
@@ -425,45 +429,45 @@ object Form_Principale: TForm_Principale
           Left = 312
           Height = 19
           Top = 1
-          Width = 32
+          Width = 30
           Caption = 'x1'
           Checked = True
-          OnChange = TBParticleVelocityChange
           TabOrder = 3
           TabStop = True
+          OnChange = TBParticleVelocityChange
         end
         object RB31: TRadioButton
           Left = 360
           Height = 19
           Top = 1
-          Width = 32
+          Width = 30
           Caption = 'x2'
-          OnChange = TBParticleVelocityChange
           TabOrder = 2
+          OnChange = TBParticleVelocityChange
         end
         object RB32: TRadioButton
           Left = 408
           Height = 19
           Top = 1
-          Width = 32
+          Width = 30
           Caption = 'x5'
-          OnChange = TBParticleVelocityChange
           TabOrder = 4
+          OnChange = TBParticleVelocityChange
         end
         object RB33: TRadioButton
           Left = 456
           Height = 19
           Top = 1
-          Width = 38
+          Width = 36
           Caption = 'x10'
-          OnChange = TBParticleVelocityChange
           TabOrder = 5
+          OnChange = TBParticleVelocityChange
         end
       end
     end
     object TabSheet7: TTabSheet
       Caption = 'Angular Velocity'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel9: TPanel
         Left = 0
@@ -474,6 +478,7 @@ object Form_Principale: TForm_Principale
         ClientHeight = 104
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label45: TLabel
@@ -539,8 +544,8 @@ object Form_Principale: TForm_Principale
           Top = 6
           Width = 34
           Caption = 'zero'
-          OnClick = BResetAngularVelocityClick
           TabOrder = 2
+          OnClick = BResetAngularVelocityClick
         end
       end
       inline AngularVelocityCurve: TFrameEditCurve
@@ -551,32 +556,32 @@ object Form_Principale: TForm_Principale
         AnchorSideRight.Side = asrBottom
         AnchorSideBottom.Control = TabSheet7
         AnchorSideBottom.Side = asrBottom
-        Height = 198
+        Height = 218
         Top = 104
         Width = 1016
         Anchors = [akTop, akLeft, akRight, akBottom]
-        ClientHeight = 198
+        ClientHeight = 218
         ClientWidth = 1016
         TabOrder = 1
         inherited PB: TPaintBox
-          Height = 198
+          Height = 218
           Width = 1016
         end
       end
     end
     object TabSheet8: TTabSheet
       Caption = 'Size'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       inline SizeCurve: TFrameEditCurve
-        Height = 214
+        Height = 234
         Top = 88
         Width = 1016
         Align = alClient
-        ClientHeight = 214
+        ClientHeight = 234
         ClientWidth = 1016
         inherited PB: TPaintBox
-          Height = 214
+          Height = 234
           Width = 1016
         end
       end
@@ -590,6 +595,7 @@ object Form_Principale: TForm_Principale
         ClientHeight = 88
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 1
         object Label41: TLabel
@@ -655,14 +661,14 @@ object Form_Principale: TForm_Principale
           Top = 68
           Width = 35
           Caption = 'Reset'
-          OnClick = BResetSizeClick
           TabOrder = 2
+          OnClick = BResetSizeClick
         end
       end
     end
     object TabSheet9: TTabSheet
       Caption = 'Spin'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel7: TPanel
         Left = 0
@@ -673,6 +679,7 @@ object Form_Principale: TForm_Principale
         ClientHeight = 104
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label37: TLabel
@@ -738,27 +745,27 @@ object Form_Principale: TForm_Principale
           Top = 6
           Width = 34
           Caption = 'reset'
-          OnClick = BResetSpinClick
           TabOrder = 2
+          OnClick = BResetSpinClick
         end
       end
       inline SpinCurve: TFrameEditCurve
-        Height = 198
+        Height = 218
         Top = 104
         Width = 1016
         Align = alClient
-        ClientHeight = 198
+        ClientHeight = 218
         ClientWidth = 1016
         TabOrder = 1
         inherited PB: TPaintBox
-          Height = 198
+          Height = 218
           Width = 1016
         end
       end
     end
     object TabSheet10: TTabSheet
       Caption = 'Color'
-      ClientHeight = 302
+      ClientHeight = 322
       ClientWidth = 1016
       object Panel10: TPanel
         Left = 0
@@ -770,6 +777,7 @@ object Form_Principale: TForm_Principale
         ClientHeight = 72
         ClientWidth = 1016
         Color = 8755354
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Label49: TLabel
@@ -799,10 +807,10 @@ object Form_Principale: TForm_Principale
             'Mix'
             'Replace'
           )
-          OnChange = CBColorModeChange
           Style = csDropDownList
           TabOrder = 0
           Text = 'Mix'
+          OnChange = CBColorModeChange
         end
         object CBBlend: TComboBox
           Left = 232
@@ -817,10 +825,10 @@ object Form_Principale: TForm_Principale
             'Mult'
             'No Blend'
           )
-          OnChange = CBColorModeChange
           Style = csDropDownList
           TabOrder = 1
           Text = 'Normal'
+          OnChange = CBColorModeChange
         end
         object Label51: TLabel
           Left = 805
@@ -836,6 +844,7 @@ object Form_Principale: TForm_Principale
           Width = 1016
           ClientHeight = 24
           ClientWidth = 1016
+          ParentBackground = False
           TabOrder = 2
           inherited PB: TPaintBox
             Height = 24
@@ -844,15 +853,15 @@ object Form_Principale: TForm_Principale
         end
       end
       inline ColorCurve: TFrameEditCurve
-        Height = 230
+        Height = 250
         Top = 72
         Width = 1016
         Align = alClient
-        ClientHeight = 230
+        ClientHeight = 250
         ClientWidth = 1016
         TabOrder = 1
         inherited PB: TPaintBox
-          Height = 230
+          Height = 250
           Width = 1016
         end
       end
@@ -868,6 +877,7 @@ object Form_Principale: TForm_Principale
     ClientHeight = 394
     ClientWidth = 1024
     Color = 1447446
+    ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object OGL: TOpenGLControl
@@ -920,6 +930,7 @@ object Form_Principale: TForm_Principale
           Anchors = [akTop, akLeft, akRight, akBottom]
           ClientHeight = 362
           ClientWidth = 339
+          ParentBackground = False
           TabOrder = 0
           object Panel1: TPanel
             Left = 0
@@ -930,6 +941,7 @@ object Form_Principale: TForm_Principale
             ClientHeight = 412
             ClientWidth = 339
             Color = 8755354
+            ParentBackground = False
             ParentColor = False
             TabOrder = 0
             object Label9: TLabel
@@ -956,19 +968,19 @@ object Form_Principale: TForm_Principale
                 'InnerCircle'
                 'OuterCircle'
               )
-              OnChange = CBEmitterTypeChange
               Style = csDropDownList
               TabOrder = 0
               Text = 'Point'
+              OnChange = CBEmitterTypeChange
             end
             object CheckBox1: TCheckBox
               Left = 9
               Height = 19
               Top = 8
-              Width = 60
+              Width = 58
               Caption = 'Looped'
-              OnChange = CheckBox1Change
               TabOrder = 1
+              OnChange = CheckBox1Change
             end
             object Label1: TLabel
               Left = 16
@@ -1061,8 +1073,8 @@ object Form_Principale: TForm_Principale
               Top = 376
               Width = 178
               Caption = 'Refresh all particles'
-              OnClick = Button2Click
               TabOrder = 5
+              OnClick = Button2Click
             end
             object Label27: TLabel
               Left = 248
@@ -1106,8 +1118,8 @@ object Form_Principale: TForm_Principale
               Top = 24
               Width = 71
               Caption = 'Shoot ! (F1)'
-              OnClick = BShootClick
               TabOrder = 6
+              OnClick = BShootClick
             end
             object SE3: TSpinEdit
               Left = 70
@@ -1137,6 +1149,7 @@ object Form_Principale: TForm_Principale
               ClientHeight = 72
               ClientWidth = 184
               Color = 6847357
+              ParentBackground = False
               ParentColor = False
               TabOrder = 9
               Visible = False
@@ -1162,9 +1175,9 @@ object Form_Principale: TForm_Principale
                 Top = 40
                 Width = 78
                 NumbersOnly = True
-                OnEditingDone = Edit3EditingDone
                 TabOrder = 0
                 Text = '100'
+                OnEditingDone = Edit3EditingDone
               end
               object Edit3: TEdit
                 Left = 88
@@ -1172,9 +1185,9 @@ object Form_Principale: TForm_Principale
                 Top = 8
                 Width = 78
                 NumbersOnly = True
-                OnEditingDone = Edit3EditingDone
                 TabOrder = 1
                 Text = '100'
+                OnEditingDone = Edit3EditingDone
               end
             end
             object Panel12: TPanel
@@ -1185,6 +1198,7 @@ object Form_Principale: TForm_Principale
               ClientHeight = 72
               ClientWidth = 184
               Color = 6847357
+              ParentBackground = False
               ParentColor = False
               TabOrder = 10
               Visible = False
@@ -1202,9 +1216,9 @@ object Form_Principale: TForm_Principale
                 Top = 24
                 Width = 78
                 NumbersOnly = True
-                OnEditingDone = Edit5EditingDone
                 TabOrder = 0
                 Text = '100'
+                OnEditingDone = Edit5EditingDone
               end
             end
             object Panel13: TPanel
@@ -1215,6 +1229,7 @@ object Form_Principale: TForm_Principale
               ClientHeight = 72
               ClientWidth = 184
               Color = 6847357
+              ParentBackground = False
               ParentColor = False
               TabOrder = 11
               Visible = False
@@ -1232,9 +1247,9 @@ object Form_Principale: TForm_Principale
                 Top = 24
                 Width = 78
                 NumbersOnly = True
-                OnEditingDone = Edit7EditingDone
                 TabOrder = 0
                 Text = '100'
+                OnEditingDone = Edit7EditingDone
               end
             end
             object Panel14: TPanel
@@ -1245,6 +1260,7 @@ object Form_Principale: TForm_Principale
               ClientHeight = 72
               ClientWidth = 184
               Color = 6847357
+              ParentBackground = False
               ParentColor = False
               TabOrder = 12
               Visible = False
@@ -1279,9 +1295,9 @@ object Form_Principale: TForm_Principale
                 Top = 8
                 Width = 78
                 NumbersOnly = True
-                OnEditingDone = Edit9EditingDone
                 TabOrder = 1
                 Text = '80'
+                OnEditingDone = Edit9EditingDone
               end
             end
             object Button8: TButton
@@ -1290,8 +1306,8 @@ object Form_Principale: TForm_Principale
               Top = 168
               Width = 40
               Caption = '180°'
-              OnClick = Button8Click
               TabOrder = 13
+              OnClick = Button8Click
             end
             object Button9: TButton
               Left = 265
@@ -1299,8 +1315,8 @@ object Form_Principale: TForm_Principale
               Top = 168
               Width = 31
               Caption = '+45°'
-              OnClick = Button9Click
               TabOrder = 14
+              OnClick = Button9Click
             end
             object Button10: TButton
               Left = 159
@@ -1308,17 +1324,17 @@ object Form_Principale: TForm_Principale
               Top = 168
               Width = 31
               Caption = '-45°'
-              OnClick = Button10Click
               TabOrder = 15
+              OnClick = Button10Click
             end
             object CheckBox2: TCheckBox
               Left = 6
               Height = 19
               Top = 312
-              Width = 276
+              Width = 274
               Caption = 'Particles positions are relative to emitter position'
-              OnChange = CheckBox2Change
               TabOrder = 16
+              OnChange = CheckBox2Change
             end
             object Label55: TLabel
               Left = 16
@@ -1381,25 +1397,26 @@ object Form_Principale: TForm_Principale
           ClientHeight = 366
           ClientWidth = 360
           Color = 8755354
+          ParentBackground = False
           ParentColor = False
           TabOrder = 0
           object RB1: TRadioButton
             Left = 40
             Height = 19
             Top = 40
-            Width = 49
+            Width = 47
             Caption = 'Color'
-            OnChange = RB1Change
             TabOrder = 2
+            OnChange = RB1Change
           end
           object RB2: TRadioButton
             Left = 40
             Height = 19
             Top = 64
-            Width = 53
+            Width = 51
             Caption = 'Image'
-            OnChange = RB1Change
             TabOrder = 1
+            OnChange = RB1Change
           end
           object BChangeBG: TButton
             Left = 104
@@ -1407,8 +1424,8 @@ object Form_Principale: TForm_Principale
             Top = 48
             Width = 76
             Caption = 'Change...'
-            OnClick = BChangeBGClick
             TabOrder = 3
+            OnClick = BChangeBGClick
           end
           object Label26: TLabel
             Left = 16
@@ -1422,23 +1439,23 @@ object Form_Principale: TForm_Principale
             Left = 40
             Height = 19
             Top = 92
-            Width = 66
+            Width = 64
             Caption = 'Rainbow'
             Checked = True
-            OnChange = RB1Change
             TabOrder = 0
             TabStop = True
+            OnChange = RB1Change
           end
           object CheckBox3: TCheckBox
             Left = 15
             Height = 19
             Top = 232
-            Width = 124
+            Width = 122
             Caption = 'Show emitter shape'
             Checked = True
-            OnChange = CheckBox3Change
             State = cbChecked
             TabOrder = 4
+            OnChange = CheckBox3Change
           end
           object BCenterView: TSpeedButton
             Left = 248

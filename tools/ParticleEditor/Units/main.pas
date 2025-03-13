@@ -235,7 +235,8 @@ type
     procedure Timer1Timer(Sender: TObject);
   private
     FMouseState: TMouseState;
-    FClickOrigin, FViewOffset: TPoint;
+    FClickOrigin: TPoint;
+    FViewOffset: TPointF;
     FZoom: single;
     procedure DoLoopMoveView;
   private
@@ -346,7 +347,7 @@ end;
 
 procedure TForm_Principale.BCenterViewClick(Sender: TObject);
 begin
-  FViewOffset := Point(0,0); //FScene.Center.Round;
+  FViewOffset := PointF(0,0); //FScene.Center.Round;
   HomeScreen.ApplyViewOffset(FViewOffset);
 end;
 
@@ -717,7 +718,7 @@ begin
   // moves the view
   p2 := HomeScreen.FCamera.ControlToWorld(MousePos.x, MousePos.y);
   p := (p2-p1)*Zoom;
-  FViewOffset := FViewOffset - p.Round;
+  FViewOffset := FViewOffset - p;
 
   HomeScreen.ApplyViewOffset(FViewOffset);
 
@@ -866,7 +867,7 @@ begin
     if (delta.x <> 0) or (delta.y <> 0) then begin
       delta.x := Round(delta.x / FZoom);
       delta.y := Round(delta.y / FZoom);
-      FViewOffset := FViewOffset - delta;
+      FViewOffset := FViewOffset - PointF(delta);
       HomeScreen.ApplyViewOffset(FViewOffset);
 
       FClickOrigin := current;
@@ -942,7 +943,7 @@ begin
   HomeScreen := THomeScreen.Create;
   FScene.RunScreen(HomeScreen);
 
-  FViewOffset := Point(0,0); // FScene.Center.Round;
+  FViewOffset := PointF(0,0); // FScene.Center.Round;
 
   VelocityCurve.OnCurveChange := @ProcessVelocityCurveChange;
   VelocityCurve.SetLegendMinMax('-200%','+200%');

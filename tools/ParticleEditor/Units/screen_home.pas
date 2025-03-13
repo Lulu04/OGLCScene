@@ -28,7 +28,7 @@ public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
 
-  procedure ApplyViewOffset(const aOffset: TPoint);
+  procedure ApplyViewOffset(const aOffset: TPointF);
   procedure ApplyViewZoom(aZoom: single);
 end;
 
@@ -122,9 +122,9 @@ begin
  FScene.OnAfterPaint := NIL;
 end;
 
-procedure THomeScreen.ApplyViewOffset(const aOffset: TPoint);
+procedure THomeScreen.ApplyViewOffset(const aOffset: TPointF);
 begin
-  FCamera.MoveTo(FScene.Center + PointF(aOffset));
+  FCamera.MoveTo(FScene.Center + aOffset);
 end;
 
 procedure THomeScreen.ApplyViewZoom(aZoom: single);
