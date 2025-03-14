@@ -67,7 +67,7 @@ begin
   formated := 'const PLANET_'+UpperCase(FormMain.GetLastSelectedPresetNameWithoutSpace)+' ='+LineEnding;
   while i <= Length(packedParams) do begin
     formated := formated +'          '''+GetNext80Characters+'''';
-    if i < Length(packedParams) then formated := formated + '+LineEnding+'+LineEnding
+    if i < Length(packedParams) then formated := formated + '+'+LineEnding
       else formated := formated + ';';
   end;
 
