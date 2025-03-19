@@ -88,9 +88,9 @@ begin
 
   if Sender is TRadioButton then begin
     if RadioButton1.Checked then
-      FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_TOP)
+      ScreenDemo.Ship.MoveToLayer(LAYER_TOP)
     else
-      FScene.SurfaceChangeLayer(ScreenDemo.Ship, LAYER_BACK);
+      ScreenDemo.Ship.MoveToLayer(LAYER_BACK)
   end;
 
   if Sender = TrackBar1 then begin

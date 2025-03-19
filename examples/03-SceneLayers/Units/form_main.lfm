@@ -13,7 +13,7 @@ object FormMain: TFormMain
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   WindowState = wsMaximized
   object Panel1: TPanel
     AnchorSideTop.Control = Owner
@@ -27,24 +27,25 @@ object FormMain: TFormMain
     ClientHeight = 280
     ClientWidth = 151
     Color = 14737632
+    ParentBackground = False
     ParentColor = False
     TabOrder = 0
     object RadioButton1: TRadioButton
       Left = 7
       Height = 19
       Top = 104
-      Width = 135
+      Width = 133
       Caption = 'Ship is on LAYER_TOP'
       Checked = True
-      OnChange = RadioButton1Change
       TabOrder = 1
       TabStop = True
+      OnChange = RadioButton1Change
     end
     object RadioButton2: TRadioButton
       Left = 7
       Height = 19
       Top = 128
-      Width = 143
+      Width = 141
       Caption = 'Ship is on LAYER_BACK'
       TabOrder = 0
     end
@@ -86,21 +87,21 @@ object FormMain: TFormMain
       Left = 7
       Height = 19
       Top = 226
-      Width = 121
+      Width = 119
       Caption = 'Freeze middle layer'
-      OnChange = RadioButton1Change
       TabOrder = 3
+      OnChange = RadioButton1Change
     end
     object CheckBox2: TCheckBox
       Left = 8
       Height = 19
       Top = 254
-      Width = 121
+      Width = 119
       Caption = 'Middle layer visible'
       Checked = True
-      OnChange = RadioButton1Change
       State = cbChecked
       TabOrder = 4
+      OnChange = RadioButton1Change
     end
   end
   object Panel2: TPanel
@@ -116,6 +117,7 @@ object FormMain: TFormMain
     Anchors = [akTop, akLeft, akRight, akBottom]
     ClientHeight = 306
     ClientWidth = 152
+    ParentBackground = False
     TabOrder = 1
     object OpenGLControl1: TOpenGLControl
       Left = 24
