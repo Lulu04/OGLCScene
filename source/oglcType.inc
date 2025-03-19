@@ -158,6 +158,9 @@ PQuadCornerIndexes = ^TQuadCornerIndexes;
 // quad definition for texture coordinates or other quadrilateral area
 TQuadCoor = array[TOGLCCorner] of TPointF;
 PQuadCoor = ^TQuadCoor;
+const
+NoFlipQuadUV: TQuadCoor=((x:0.0; y:1.0), (x:1.0; y:1.0), (x:1.0; y:0.0), (x:0.0; y:0.0));
+type
 
 { TQuadCoorHelper }
 
