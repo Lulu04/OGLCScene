@@ -68,6 +68,9 @@ procedure Distribute(aArea, aItemSize, aItemCount: integer; out aMargin, aDelta:
 
 function Distance(aPt1, aPt2: TPointF): single;
 
+// Return the angle/s computed from the specified speed value.
+function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
+
 function PointFToRectF( p1, p2: TPointF ): TRectF;
 
 type
@@ -411,6 +414,11 @@ end;
 function Distance(aPt1, aPt2: TPointF): single;
 begin
  Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
+end;
+
+function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
+begin
+  Result := 360*aSpeed/(3.14159*aWheelRadius);
 end;
 
 function PointFToRectF(p1, p2: TPointF): TRectF;
