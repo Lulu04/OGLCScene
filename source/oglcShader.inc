@@ -7,8 +7,9 @@ TOGLCShader = record
  private
   FParentScene: TOGLCScene;
   FProgramID: GLuint;
+  FShaderName: string;
  public
-  procedure Compile(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
+  procedure Compile(aParentScene: TOGLCScene; const aShaderName, aVertexCodeSource, aFragmentCodeSource: string);
   procedure FreeID;
 
   // activates the shader
@@ -29,7 +30,8 @@ end;
 
 { TOGLCShader }
 
-procedure TOGLCShader.Compile(aParentScene: TOGLCScene; const AVertexCodeSource, AFragmentCodeSource: string);
+procedure TOGLCShader.Compile(aParentScene: TOGLCScene; const aShaderName,
+  aVertexCodeSource, aFragmentCodeSource: string);
 var R: GLint;
     FFragmentID, FVertexID: GLuint;
   procedure NotifyError(aPrg: GLUint; const aPrefix: string);
@@ -44,13 +46,14 @@ var R: GLint;
       glGetShaderInfoLog(aPrg, log_length, @log_length, @logBuf[0]);
       msg := TEncoding.ANSI.GetAnsiString(logBuf);
     end;
-    FParentScene.LogError('TOGLCShader.Compile: an error occured'+LineEnding+aPrefix+' '+msg);
+    FParentScene.LogError('TOGLCShader.Compile('+FShaderName+'): an error occured'+LineEnding+aPrefix+' '+msg);
     FParentScene.LogEmptyLine();
     {$ifdef SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR}
-    raise Exception.Create(aPrefix+' '+msg);
+    raise Exception.Create(FShaderName+' '+aPrefix+' '+msg);
     {$endif}
   end;
 begin
+  FShaderName := aShaderName;
   FParentScene := aParentScene;
   FProgramID := 0;
 
@@ -129,7 +132,7 @@ function TOGLCShader.GetUniform(const AName: string): GLint;
 begin
   Result := glGetUniformLocation(FProgramID, PChar(AName));
   if Result = -1 then
-    FParentScene.LogError('glGetUniformLocation error: '''+AName+''' not found');
+    FParentScene.LogError(FShaderName + ' glGetUniformLocation error: '''+AName+''' not found');
 end;
 
 {$endif oglcIMPLEMENTATION}

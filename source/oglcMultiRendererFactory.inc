@@ -58,6 +58,7 @@ private
   procedure SetCapacity(aCount: ptrint);
   procedure ResetBufferState;
 protected
+  FShaderName: string;
   FVertexShaderCode,
   FFragmentShaderCode: PChar;
   FDefineVertexAttribPointer,
@@ -686,7 +687,7 @@ begin
   FParentScene := aParentScene;
   FUseIndicesBuffer := aUseIndicesBuffer;
   FBatch := @FParentScene.FRendererBatch;
-  FShader.Compile(FParentScene, FVertexShaderCode, FFragmentShaderCode);
+  FShader.Compile(FParentScene, FShaderName, FVertexShaderCode, FFragmentShaderCode);
   FGetUniformLocation();
   CreateID;
   SetCapacity(INITIAL_BUFFER_CAPACITY);
@@ -809,6 +810,7 @@ end;
 
 procedure TOGLCSmoothLineRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCSmoothLineRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -940,6 +942,7 @@ end;
 
 procedure TOGLCFastLineRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCFastLineRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1070,6 +1073,7 @@ end;
 
 procedure TOGLCThreeColorTriangleRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCThreeColorTriangleRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1180,6 +1184,7 @@ end;
 
 procedure TOGLCThreeColorMVTriangleRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCThreeColorMVTriangleRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1306,6 +1311,7 @@ end;
 
 procedure TOGLCTexturedTriangleRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCTexturedTriangleRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
@@ -1757,6 +1763,7 @@ end;
 
 procedure TOGLCTexturedMVTriangleRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCTexturedMVTriangleRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;
