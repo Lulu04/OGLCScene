@@ -19,11 +19,13 @@ type
   private
     FImage,
     FBackground: TBGRABitmap;
+    FShowAlpha: boolean;
     procedure DrawBackGroundImage;
   public
     procedure EraseBackground({%H-}DC: HDC); override;
     procedure FreeData;
     procedure UpdateColor(P: array of TPColor);
+    property ShowAlpha: boolean read FShowAlpha write FShowAlpha;
   end;
 
 implementation
@@ -119,16 +121,16 @@ begin
    r := cprevious.red;
    g := cprevious.green;
    b := cprevious.blue;
-  // a := cprevious.alpha;
-   a:=255;
+   a := cprevious.alpha;
 
    for xx:=xbegin to xend do begin
+    if not FShowAlpha then a:=255;
    // FImage.DrawVertLine( xx, 0, FImage.Height, cprevious );
     FImage.DrawVertLine( xx, 0, FImage.Height, BGRA(round(r),round(g),round(b),round(a)));
     r+=dr;
     g+=dg;
     b+=db;
-   // a+=da;
+    a+=da;
    end;
 
    txt := BGRAPixelToHex(cprevious);

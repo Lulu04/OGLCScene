@@ -40,6 +40,7 @@ type
     CBEmitterType: TComboBox;
     CBColorMode: TComboBox;
     CBBlend: TComboBox;
+    CheckBox4: TCheckBox;
     EditFrameWidth: TEdit;
     EditFrameHeight: TEdit;
     Edit3: TEdit;
@@ -433,6 +434,12 @@ end;
 // Color mode/Blend
 procedure TForm_Principale.CBColorModeChange(Sender: TObject);
 begin
+  if Sender = CheckBox4 then begin
+    FrameShowColor1.ShowAlpha := CheckBox4.Checked;
+    FrameShowColor1.UpdateColor(PE.FParticleParam.ArrayColor);
+    exit;
+  end;
+
   PE.TintMode := TTintMode(CBColorMode.ItemIndex);
   PE.BlendMode := CBBlend.ItemIndex;
   SetWindowTitle(True);
@@ -690,7 +697,6 @@ end;
 
 procedure TForm_Principale.OGLMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var p: TPointF;
-  r: TRectF;
 begin
   if (Button = mbRight) and (FMouseState = msIdle) then begin
     if (HomeScreen <> NIL) and (PE <> NIL) then begin
@@ -717,7 +723,7 @@ begin
 
   // moves the view
   p2 := HomeScreen.FCamera.ControlToWorld(MousePos.x, MousePos.y);
-  p := (p2-p1)*Zoom;
+  p := p2 - p1;
   FViewOffset := FViewOffset - p;
 
   HomeScreen.ApplyViewOffset(FViewOffset);
