@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <Title Value="CloudDesigner"/>
+      <ResourceType Value="res"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <BuildNr Value="35"/>
+      <Language Value="040C"/>
+    </VersionInfo>
+    <BuildModes Count="2" Active="Debug">
+      <Item1 Name="Debug" Default="True"/>
+      <Item2 Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="CloudDesigner"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="Units;..\..\source"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+              <VariablesInRegisters Value="True"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item2>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="4">
+      <Item1>
+        <PackageName Value="LazOpenGLContext"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LazUtils"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
+    </RequiredPackages>
+    <Units Count="29">
+      <Unit0>
+        <Filename Value="CloudDesigner.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="45" Y="12"/>
+        <UsageCount Value="200"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Units\form_main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="88"/>
+        <CursorPos X="30" Y="105"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="44"/>
+        <CursorPos X="27" Y="59"/>
+        <UsageCount Value="204"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="174"/>
+        <CursorPos X="18" Y="196"/>
+        <UsageCount Value="99"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\source\oglcPostProcessing.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="289"/>
+        <CursorPos X="45" Y="301"/>
+        <UsageCount Value="55"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\source\oglcType.inc"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="148"/>
+        <CursorPos X="13" Y="162"/>
+        <UsageCount Value="92"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Units\u_common.pas"/>
+        <CursorPos Y="15"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\source\oglcLayer.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="269"/>
+        <CursorPos Y="297"/>
+        <UsageCount Value="16"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\source\oglcRenderToTexture.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="42" Y="6"/>
+        <UsageCount Value="40"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\source\oglcMultiRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="682"/>
+        <CursorPos X="3" Y="685"/>
+        <UsageCount Value="17"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\source\oglcShader.inc"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="36"/>
+        <CursorPos Y="50"/>
+        <UsageCount Value="53"/>
+        <Loaded Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="102"/>
+        <CursorPos X="33" Y="119"/>
+        <UsageCount Value="172"/>
+        <Loaded Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\source\oglcSurfaceWithProceduralShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="47" Y="4"/>
+        <UsageCount Value="66"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\source\oglcAppSaveUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="366"/>
+        <CursorPos X="51" Y="377"/>
+        <UsageCount Value="13"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="Units\u_presets.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="5" Y="14"/>
+        <UsageCount Value="47"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Units\u_export_to_string.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormCopyToClipboard"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="92"/>
+        <CursorPos X="61" Y="107"/>
+        <UsageCount Value="104"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="Units\u_presetmanager.pas"/>
+        <ComponentName Value="PresetManager"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="15" Y="60"/>
+        <UsageCount Value="51"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="279"/>
+        <CursorPos X="35" Y="293"/>
+        <UsageCount Value="9"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2041"/>
+        <CursorPos X="25" Y="2049"/>
+        <UsageCount Value="5"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\lcl\buttons.pp"/>
+        <UnitName Value="Buttons"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="37" Y="321"/>
+        <UsageCount Value="4"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\lcl\lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos X="3" Y="45"/>
+        <UsageCount Value="4"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="C:\lazarus\lcl\clipbrd.pp"/>
+        <UnitName Value="Clipbrd"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="205"/>
+        <CursorPos X="3" Y="262"/>
+        <UsageCount Value="9"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="Units\form_importfromforum.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormImportPreset"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="44"/>
+        <CursorPos X="25" Y="39"/>
+        <UsageCount Value="74"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="46"/>
+        <CursorPos Y="62"/>
+        <UsageCount Value="6"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="..\..\source\oglcGlow.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="220"/>
+        <UsageCount Value="10"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="8"/>
+        <CursorPos X="26" Y="10"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="69"/>
+        <CursorPos X="10" Y="82"/>
+        <UsageCount Value="6"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="..\..\source\oglcUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="133"/>
+        <CursorPos Y="151"/>
+        <UsageCount Value="14"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\source\oglcVersion.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="24" Y="3"/>
+        <UsageCount Value="8"/>
+      </Unit28>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="509" TopLine="504"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="143" Column="21" TopLine="136"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="34" Column="17" TopLine="13"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="291" Column="33" TopLine="271"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="34" Column="19" TopLine="12"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="269" Column="58" TopLine="254"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="32" Column="19" TopLine="11"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="270" Column="2" TopLine="251"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="166" Column="26" TopLine="148"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="299" Column="30" TopLine="289"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="212" Column="54" TopLine="196"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="175" Column="13" TopLine="163"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="168" Column="26" TopLine="150"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="169" Column="64" TopLine="151"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="172" Column="64" TopLine="154"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="163" Column="10" TopLine="154"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="166" Column="10" TopLine="157"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="179" Column="70" TopLine="157"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="182" Column="70" TopLine="160"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="144" Column="27" TopLine="134"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="345" TopLine="342"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="161" Column="18" TopLine="160"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="452" Column="60" TopLine="433"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="171" Column="20" TopLine="152"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="502" Column="83" TopLine="480"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="162" Column="18" TopLine="158"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="34" Column="18" TopLine="13"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="180" Column="25" TopLine="164"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="212" Column="53" TopLine="200"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\u_proceduralcloud.pas"/>
+        <Caret Line="175" Column="13" TopLine="163"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="CloudDesigner"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="Units;..\..\source"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <VariablesInRegisters Value="True"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+        <UseHeaptrc Value="True"/>
+        <TrashVariables Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+</CONFIG>

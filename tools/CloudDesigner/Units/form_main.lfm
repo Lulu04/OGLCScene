@@ -1,0 +1,566 @@
+object FormMain: TFormMain
+  Left = 334
+  Height = 857
+  Top = 71
+  Width = 769
+  Caption = 'OGLCScene - Planet designer'
+  ClientHeight = 857
+  ClientWidth = 769
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  Position = poScreenCenter
+  LCLVersion = '3.8.0.0'
+  WindowState = wsMaximized
+  object Panel2: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = ScrollBox1
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 857
+    Top = 0
+    Width = 504
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 857
+    ClientWidth = 504
+    Color = clBlack
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object OpenGLControl1: TOpenGLControl
+      Left = 24
+      Height = 96
+      Top = 24
+      Width = 80
+      OnMouseWheel = OpenGLControl1MouseWheel
+    end
+  end
+  object ScrollBox1: TScrollBox
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 504
+    Height = 857
+    Top = 0
+    Width = 265
+    HorzScrollBar.Page = 147
+    VertScrollBar.Page = 744
+    Anchors = [akTop, akRight, akBottom]
+    ClientHeight = 853
+    ClientWidth = 261
+    Color = 7697781
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object BImportFromForum: TSpeedButton
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = ScrollBox1
+      Left = 5
+      Height = 19
+      Hint = 'Import a preset copied from the FPC/Lazarus forum.'#13#10'1) select and copy the preset posted on the forum,'#13#10'2) click this button'#13#10'3) in the window, paste the content of the clipboard in the memo then click ok,'#13#10'4) if all is right, the new preset is added to the list and the planet is displayed.'
+      Top = 0
+      Width = 105
+      AutoSize = True
+      BorderSpacing.Left = 5
+      Caption = 'Import from forum'
+      OnClick = BExportClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BPreset: TSpeedButton
+      AnchorSideTop.Control = ScrollBox1
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 208
+      Height = 19
+      Hint = 'Allow to store your settings in a preset or recall it.'#13#10'Preset manager open a window where you can delete, arrange, rename or update your presets.'
+      Top = 0
+      Width = 48
+      Anchors = [akTop, akRight]
+      AutoSize = True
+      BorderSpacing.Right = 5
+      Caption = 'PRESETS'
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object Label3: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label20
+      Left = 5
+      Height = 15
+      Top = 56
+      Width = 76
+      BorderSpacing.Left = 5
+      Caption = 'Clouds color 1'
+      ParentColor = False
+    end
+    object Label20: TLabel
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 204
+      Height = 15
+      Top = 56
+      Width = 47
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 10
+      BorderSpacing.Right = 10
+      Caption = 'CLOUDS'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object CBCloudsColor1: TColorButton
+      AnchorSideLeft.Control = Label3
+      AnchorSideTop.Control = Label3
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 28
+      Top = 71
+      Width = 142
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = clWhite
+      OnColorChanged = TBCloudsFragmentationChange
+    end
+    object Label4: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 696
+      Width = 79
+      Anchors = [akLeft]
+      BorderSpacing.Left = 5
+      Caption = 'Clouds opacity'
+      ParentColor = False
+    end
+    object Label5: TLabel
+      AnchorSideLeft.Control = Label4
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label4
+      AnchorSideTop.Side = asrCenter
+      Left = 94
+      Height = 15
+      Top = 696
+      Width = 21
+      BorderSpacing.Left = 10
+      Caption = '229'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object TBCloudsOpacity: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label4
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 33
+      Top = 711
+      Width = 256
+      Frequency = 10
+      Max = 255
+      OnChange = TBCloudsFragmentationChange
+      Position = 229
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 0
+    end
+    object Label1: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBDensity
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 180
+      Width = 78
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 10
+      Caption = 'Fragmentation'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      AnchorSideLeft.Control = Label1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label1
+      AnchorSideTop.Side = asrCenter
+      Left = 93
+      Height = 15
+      Top = 180
+      Width = 17
+      BorderSpacing.Left = 10
+      Caption = '5.0'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object TBCloudsFragmentation: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 34
+      Top = 195
+      Width = 256
+      Frequency = 10
+      Max = 200
+      Min = 10
+      OnChange = TBCloudsFragmentationChange
+      Position = 50
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 1
+    end
+    object Label25: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBCloudsFragmentation
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 239
+      Width = 115
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 10
+      Caption = 'Atmospheric changes'
+      ParentColor = False
+    end
+    object Label26: TLabel
+      AnchorSideLeft.Control = Label25
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label25
+      AnchorSideTop.Side = asrCenter
+      Left = 130
+      Height = 15
+      Top = 239
+      Width = 17
+      BorderSpacing.Left = 10
+      Caption = '0.0'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object TBCloudsChange: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label25
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 33
+      Top = 254
+      Width = 256
+      Frequency = 10
+      Max = 200
+      OnChange = TBCloudsFragmentationChange
+      Position = 0
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 2
+    end
+    object Label33: TLabel
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 170
+      Height = 15
+      Top = 544
+      Width = 81
+      Anchors = [akRight]
+      BorderSpacing.Top = 20
+      BorderSpacing.Right = 10
+      Caption = 'TRANSLATION'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object FSEHTranslation: TFloatSpinEdit
+      AnchorSideLeft.Control = Label6
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label6
+      AnchorSideTop.Side = asrCenter
+      Left = 65
+      Height = 23
+      Top = 555
+      Width = 75
+      BorderSpacing.Left = 5
+      DecimalPlaces = 4
+      Font.Style = [fsBold]
+      Increment = 0.01
+      MaxValue = 10000
+      MinValue = -10000
+      OnChange = TBCloudsFragmentationChange
+      ParentFont = False
+      TabOrder = 3
+    end
+    object BExport: TSpeedButton
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = FSEHTranslation
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Side = asrBottom
+      Left = 31
+      Height = 31
+      Hint = 'Copy the planet''s parameters into the clipboard'#13#10'to allow you to paste it in your Pascal game or to share on Fpc/Lazarus forum'
+      Top = 600
+      Width = 199
+      Anchors = [akLeft]
+      BorderSpacing.Top = 35
+      BorderSpacing.Bottom = 10
+      Caption = 'Export to clipboard'
+      OnClick = BExportClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object Label6: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label33
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 559
+      Width = 55
+      BorderSpacing.Left = 5
+      Caption = 'Horizontal'
+    end
+    object Label8: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = CBAddRelief
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 128
+      Width = 39
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 10
+      Caption = 'Density'
+    end
+    object TBDensity: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label8
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 27
+      Top = 143
+      Width = 256
+      Frequency = 10
+      Max = 100
+      Min = 1
+      OnChange = TBCloudsFragmentationChange
+      Position = 50
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 4
+    end
+    object CBAddRelief: TCheckBox
+      AnchorSideLeft.Control = CBCloudsColor1
+      AnchorSideTop.Control = CBCloudsColor1
+      AnchorSideTop.Side = asrBottom
+      Left = 10
+      Height = 19
+      Top = 99
+      Width = 69
+      BorderSpacing.Left = 5
+      Caption = 'Add relief'
+      TabOrder = 5
+      OnChange = TBCloudsFragmentationChange
+    end
+    object Label7: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBCloudsChange
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 297
+      Width = 49
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 10
+      Caption = 'Fade TOP'
+      ParentColor = False
+    end
+    object TBFadeTop: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label7
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 34
+      Top = 312
+      Width = 256
+      Frequency = 10
+      Max = 200
+      OnChange = TBCloudsFragmentationChange
+      Position = 0
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 6
+    end
+    object Label9: TLabel
+      AnchorSideLeft.Control = Label7
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label7
+      Left = 64
+      Height = 15
+      Top = 297
+      Width = 7
+      BorderSpacing.Left = 10
+      Caption = '0'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label10: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBFadeTop
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 351
+      Width = 74
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 5
+      Caption = 'Fade BOTTOM'
+      ParentColor = False
+    end
+    object Label11: TLabel
+      AnchorSideLeft.Control = Label10
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label10
+      Left = 89
+      Height = 15
+      Top = 351
+      Width = 7
+      BorderSpacing.Left = 10
+      Caption = '0'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object TBFadeBottom: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label10
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 34
+      Top = 366
+      Width = 256
+      Frequency = 10
+      Max = 200
+      OnChange = TBCloudsFragmentationChange
+      Position = 0
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 7
+    end
+    object Label12: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBFadeBottom
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 405
+      Width = 61
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 5
+      Caption = 'Fade RIGHT'
+      ParentColor = False
+    end
+    object Label13: TLabel
+      AnchorSideLeft.Control = Label12
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label12
+      Left = 76
+      Height = 15
+      Top = 405
+      Width = 7
+      BorderSpacing.Left = 10
+      Caption = '0'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object TBFadeRight: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label12
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 34
+      Top = 420
+      Width = 256
+      Frequency = 10
+      Max = 200
+      OnChange = TBCloudsFragmentationChange
+      Position = 0
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 8
+    end
+    object Label14: TLabel
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = TBFadeRight
+      AnchorSideTop.Side = asrBottom
+      Left = 5
+      Height = 15
+      Top = 459
+      Width = 52
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 5
+      Caption = 'Fade LEFT'
+      ParentColor = False
+    end
+    object Label15: TLabel
+      AnchorSideLeft.Control = Label14
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label14
+      Left = 67
+      Height = 15
+      Top = 459
+      Width = 7
+      BorderSpacing.Left = 10
+      Caption = '0'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object TBFadeLeft: TTrackBar
+      AnchorSideLeft.Control = ScrollBox1
+      AnchorSideTop.Control = Label14
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = ScrollBox1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 34
+      Top = 474
+      Width = 256
+      Frequency = 10
+      Max = 200
+      OnChange = TBCloudsFragmentationChange
+      Position = 0
+      ShowSelRange = False
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 9
+    end
+  end
+end
