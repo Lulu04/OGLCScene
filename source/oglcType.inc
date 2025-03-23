@@ -65,16 +65,6 @@ end;
 Pxycolor = ^Txycolor;
 TArrayOfxycolor = array of Txycolor;
 
-// used by Glow shader
-Txyuvattenuationopacitycolorx2 = packed record
-  x, y: single;        // vertex coordinates
-  u, v: single;        // uv coordinates
-  attenuation, opacity: single;
-  color,               // color of the vertex
-  tint: TColorF;       // the computed tint of the surface
-end;
-Pxyuvattenuationopacitycolorx2 = ^Txyuvattenuationopacitycolorx2;
-
 // used by Line Renderer
 TLineVertexAttributes = packed record
   x, y: single;               // vertex coordinates
