@@ -191,6 +191,9 @@ public // utils to convert coordinates
   function ScreenToSurface(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
+public // transformation matrix
+  function GetMatrix: TOGLCMatrix;
+  function GetInverseMatrix: TOGLCMatrix;
 public  // utils for scaled surface
   function GetScaledArea: TRect;
   property ScaledAreaF: TRectF read GetScaledAreaF write SetScaledAreaF;
@@ -294,13 +297,17 @@ public
   procedure DeleteChild(aIndex: integer); overload;
   procedure DeleteChild(aSurface: TSimpleSurfaceWithEffect); overload;
   procedure DeleteAllChilds; virtual;
-  // Remove the child without freeing it.
+  // Remove the child without freeing it. Its coordinates are not modified.
   procedure RemoveChild(aSurface: TSimpleSurfaceWithEffect);
   // Remove the child dependency and add the surface to the scene. Do nothing if the surface don't have a parent.
-  procedure MoveFromChildToScene(aLayer: integer);
+  procedure MoveFromChildToScene(aLayerIndex: integer);
+  // Remove the surface (self) from its layer and add it as child of the specified one.
   procedure MoveFromSceneToChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
   // If any, remove current child dependency and add the surface as child of another.
   procedure SetChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
+  // Before, the surface can be a child of another or on another layer.
+  // After, the surface is no more a child and it's added to the specified layer.
+  procedure MoveToLayer(aLayerIndex: integer);
   function IsParentOf(aSurface: TSimpleSurfaceWithEffect): boolean;
   function ChildCount: integer;
   function IsChild(aSurface: TSimpleSurfaceWithEffect): boolean;
@@ -806,22 +813,22 @@ begin
 end;
 
 procedure TSimpleSurfaceWithEffect.RemoveChild(aSurface: TSimpleSurfaceWithEffect);
-var p: TPointF;
+//var p: TPointF;
 begin
-  p := SurfaceToScene(PointF(0,0));
+//  p := SurfaceToScene(PointF(0,0));
   FChilds.Remove(aSurface);
   aSurface.FParentSurface := NIL;
-  aSurface.SetCoordinate(p);
-  aSurface.FSurfaceOrigin := p;
+//  aSurface.SetCoordinate(p);
+//  aSurface.FSurfaceOrigin := p;
 end;
 
-procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayer: integer);
+procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayerIndex: integer);
 var p: TPointF;
 begin
   if ParentSurface = NIL then exit;
   p := SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
-  FParentScene.Add(Self, aLayer);
+  FParentScene.Add(Self, aLayerIndex);
   SetCoordinate(p);
 end;
 
@@ -829,6 +836,7 @@ procedure TSimpleSurfaceWithEffect.MoveFromSceneToChildOf(aParentSurface: TSimpl
 var p: TPointF;
 begin
   if aParentSurface = NIL then exit;
+
   p := aParentSurface.SceneToSurface(GetXY);
   ParentLayer.Remove(Self);
   aParentSurface.AddChild(Self, aZOrder);
@@ -837,32 +845,64 @@ end;
 
 procedure TSimpleSurfaceWithEffect.SetChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
 begin
+  if aParentSurface = NIL then exit;
+
+  if ParentSurface = aParentSurface then SetZOrder(aZOrder)
+  else
   if ParentSurface = NIL then MoveFromSceneToChildOf(aParentSurface, aZOrder)
   else begin
-    if aParentSurface = NIL then exit;
     MoveFromChildToScene(0);
     MoveFromSceneToChildOf(aParentSurface, aZOrder);
   end;
 end;
 
-function TSimpleSurfaceWithEffect.SurfaceToScene(aPt: TPointF): TPointF;
+procedure TSimpleSurfaceWithEffect.MoveToLayer(aLayerIndex: integer);
 begin
-  Result := FSurfaceOrigin + aPt;
+  // Before, the surface can be a child of another or on another layer.
+  // After, the surface is no more a child and it's added to the specified layer.
+  if ParentSurface <> NIL then
+    MoveFromChildToScene(aLayerIndex)
+  else begin
+    if ParentLayer <> NIL then
+      ParentLayer.Remove(Self);
+    FParentScene.Add(Self, aLayerIndex)
+  end;
+end;
+
+function TSimpleSurfaceWithEffect.SurfaceToScene(aPt: TPointF): TPointF;
+var s: TSimpleSurfaceWithEffect;
+begin
+  //Result := FSurfaceOrigin + aPt;
+  s := Self;
+  Result := aPt;
+  repeat
+    Result := s.GetMatrix.Transform(Result);
+    s := s.ParentSurface;
+  until s = NIL;
 end;
 
 function TSimpleSurfaceWithEffect.SceneToSurface(aPt: TPointF): TPointF;
+var s: TSimpleSurfaceWithEffect;
 begin
-  Result := aPt - FSurfaceOrigin;
+  //Result := aPt - FSurfaceOrigin;
+  s := Self;
+  Result := aPt;
+  repeat
+    Result := s.GetInverseMatrix.Transform(Result);
+    s := s.ParentSurface;
+  until s = NIL;
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToScreen(aPt: TPointF): TPointF;
 begin
-  Result := FParentScene.TopLeft + FSurfaceOrigin + aPt;
+  //Result := FParentScene.TopLeft + FSurfaceOrigin + aPt;
+  Result := FParentScene.TopLeft + SurfaceToScene(aPt);
 end;
 
 function TSimpleSurfaceWithEffect.ScreenToSurface(aPt: TPointF): TPointF;
 begin
-  Result := aPt - FParentScene.TopLeft - FSurfaceOrigin;
+  //Result := aPt - FParentScene.TopLeft - FSurfaceOrigin;
+  Result := SceneToSurface(aPt - FParentScene.TopLeft);
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect): TPointF;
@@ -875,7 +915,8 @@ begin
   if aParent <> NIL then begin
     s := self;
     repeat
-      Result := Result + s.GetXY;
+      //Result := Result + s.GetXY;
+      Result := s.GetMatrix.Transform(Result);
       s := s.FParentSurface;
     until s = aParent;
   end;
@@ -891,10 +932,22 @@ begin
   if aParent <> NIL then begin
     s := self;
     repeat
-      Result := Result - s.GetXY;
+      //Result := Result - s.GetXY;
+      Result := s.GetInverseMatrix.Transform(Result);
       s := s.FParentSurface;
     until s = aParent;
   end;
+end;
+
+function TSimpleSurfaceWithEffect.GetMatrix: TOGLCMatrix;
+begin
+  Result.LoadIdentity;
+  AddTransformTo(Result);
+end;
+
+function TSimpleSurfaceWithEffect.GetInverseMatrix: TOGLCMatrix;
+begin
+  Result := GetMatrix.Inverse;
 end;
 
 function TSimpleSurfaceWithEffect.IsParentOf(aSurface: TSimpleSurfaceWithEffect ): boolean;
