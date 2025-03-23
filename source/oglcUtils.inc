@@ -28,7 +28,7 @@ function NextPowerOfTwo(aValue: integer): integer;
 
 // return a TBGRABitmap from an SVG file.
 // aWidth and aHeight = -1 => return an image with original size as described in svg.
-// aWidth and aHeight <> -1 => return a maximized image that fit in the given rectangle (keep aspect ratio).
+// aWidth and aHeight <> -1 => return a streched image that fit in the given rectangle (don't keep aspect ratio).
 // Only aImageWidth = '-1' => returned image width is computed from aHeight to keep aspect ratio.
 // Only aImageHeight = '-1' => returned image height is computed from aWidth to keep aspect ratio.
 // the drawing is centered in the returned bitmap
@@ -270,9 +270,9 @@ begin
     FWHFactor := cw/ch;
 
     if (aWidth > -1) and (aHeight > -1) then begin
-      // return a maximized image that fit in the given rectangle (keep aspect ratio).
+      // return a streched image that fit in the given rectangle (don't keep aspect ratio).
       Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-      svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, True);
+      svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, False);
       exit;
     end;
 
