@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1571"/>
+      <BuildNr Value="1572"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -94,7 +94,7 @@
       <Unit0>
         <Filename Value="TileMapDesigner.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="16"/>
+        <EditorIndex Value="15"/>
         <CursorPos X="35" Y="12"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1079,7 +1079,7 @@
         <ComponentName Value="Form_Main"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="829"/>
         <CursorPos X="28" Y="846"/>
         <UsageCount Value="200"/>
@@ -1531,7 +1531,7 @@
       <Unit188>
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="10"/>
         <CursorPos X="6" Y="10"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1539,7 +1539,7 @@
       <Unit189>
         <Filename Value="Units\tileset_manager.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="205"/>
         <CursorPos X="3" Y="229"/>
         <UsageCount Value="206"/>
@@ -1552,6 +1552,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="uAskTileSize"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
         <WindowIndex Value="2"/>
         <CursorPos X="11" Y="11"/>
@@ -1909,7 +1910,7 @@
         <ComponentName Value="Form_Save"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="101"/>
         <CursorPos Y="124"/>
         <UsageCount Value="202"/>
@@ -1956,7 +1957,7 @@
       <Unit236>
         <Filename Value="Units\umaps.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="282"/>
         <CursorPos X="19" Y="292"/>
         <UsageCount Value="162"/>
@@ -2154,7 +2155,7 @@
       </Unit259>
       <Unit260>
         <Filename Value="..\..\source\oglcTexturedFont.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <CursorPos X="23" Y="3"/>
         <UsageCount Value="14"/>
         <Loaded Value="True"/>
@@ -2176,11 +2177,10 @@
       </Unit262>
       <Unit263>
         <Filename Value="..\..\source\oglcRenderToTexture.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="68"/>
         <CursorPos Y="82"/>
         <UsageCount Value="13"/>
-        <Loaded Value="True"/>
       </Unit263>
       <Unit264>
         <Filename Value="C:\lazarus\lcl\include\customcombobox.inc"/>
@@ -2191,7 +2191,7 @@
       </Unit264>
       <Unit265>
         <Filename Value="..\..\source\OGLCScene.pas"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="826"/>
         <CursorPos X="12" Y="835"/>
         <UsageCount Value="11"/>
@@ -2200,7 +2200,7 @@
       <Unit266>
         <Filename Value="..\..\source\oglcTileEngine.inc"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="540"/>
         <CursorPos Y="551"/>
         <UsageCount Value="11"/>
@@ -2217,7 +2217,7 @@
       </Unit267>
       <Unit268>
         <Filename Value="..\..\source\oglcTexture.inc"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="163"/>
         <CursorPos X="33" Y="168"/>
         <UsageCount Value="11"/>
