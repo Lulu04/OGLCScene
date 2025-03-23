@@ -1,0 +1,2 @@
+Waterfall~Color|r,0,g,0,b,255,a,255|Fragmentation|12.9000|Transformation|1.0000|Relief|true|Density|0.5900|TranslationSpeed|0.2000|ThresholdTop|0.1901|ThresholdBottom|0.1901|ThresholdRight|0.0001|ThresholdLeft|0.0001
+Clouds~Color|r,255,g,255,b,255,a,255|Fragmentation|3.0000|Transformation|0.1650|Relief|false|Density|0.5200|TranslationSpeed|-0.0200|ThresholdTop|0.4651|ThresholdBottom|0.0001|ThresholdRight|0.0001|ThresholdLeft|0.0001
