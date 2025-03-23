@@ -258,6 +258,7 @@ ArrayofParticleEmitter = array of TParticleEmitter;
 
 procedure TOGLCParticleRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCParticleRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;

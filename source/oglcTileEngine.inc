@@ -246,6 +246,7 @@ end;
 
 procedure TOGLCTileRenderer.InitShaderCodeAndCallBack;
 begin
+  FShaderName := 'TOGLCTileRenderer';
   FVertexShaderCode := PChar(VERTEX_SHADER);
   FFragmentShaderCode := PChar(FRAGMENT_SHADER);
   FDefineVertexAttribPointer := @DefineVertexAttribPointer;

@@ -181,7 +181,7 @@ begin
   if not FRendererToTexture.Ready then
     FParentScene.LogError(ClassName+'.Create: FRendererToTexture instance not ready');
 
-  Shader.Compile(FRendererToTexture.FParentScene, aVertexCode, aFragmentCode);
+  Shader.Compile(FRendererToTexture.FParentScene, ClassName, aVertexCode, aFragmentCode);
   if not Shader.Ready then
     FParentScene.LogError(ClassName+'.Create: Shader instance not ready');
 
