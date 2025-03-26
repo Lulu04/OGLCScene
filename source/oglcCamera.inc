@@ -27,6 +27,80 @@ TOGLCShakerDescriptor = record
 end;
 
 
+{ TSmoothFollow }
+// allow to change coordinates with smooth movement.
+{TSmoothFollow = record
+private type TTargetMode = (_fmNone, _fmSurface, _fmPoint);
+private
+  FFollowMode: TTargetMode;
+  FMovesAmount: single;
+public
+  TargetSurface: TSimpleSurfaceWithEffect;
+  TargetSurfaceOffset: TPointF;
+  TargetPoint: TPointF;
+  // default value is 0.05 corresponds to a smooth movement.
+  // Decrease to smooth the movement, increase for a rougher movement.
+  Speed: single;
+  procedure InitDefault;
+  procedure Update(var aCurrentPos: TPointF; const AElapsedTime: single);
+  // Ask to follow a surface.
+  procedure SetTargetSurface(aSurface: TSimpleSurfaceWithEffect); overload;
+  // Ask to follow a surface. The offset is applied to the surface position.
+  procedure SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aOffset: TPointF); overload;
+  // Ask to follow the center of a surface.
+  procedure SetTargetSurfaceCenter(aSurface: TSimpleSurfaceWithEffect);
+  // Ask to move to the specified point.
+  procedure SetTargetPoint(aPt: TPointF);
+  // Stops the following
+  procedure CancelTargeting;
+end; }
+
+{ TOGLCCameraAutoFollow }
+
+TOGLCCameraAutoFollow = record
+private type TCameraTargetMode = (_ctmNone, _ctmSurface, _ctmPoint);
+private
+  FParentScene: TOGLCScene;
+  FParentCamera: TOGLCCamera;
+  FSmoothPointF: TSmoothPointF;
+  FTargetMode: TCameraTargetMode;
+  FTargetSurface: TSimpleSurfaceWithEffect;
+  FTargetSurfaceOffset: TPointF;
+  FTargetPoint: TPointF;
+  function GetSpeed: single;
+  function GetTargetSurface: TSimpleSurfaceWithEffect;
+  procedure Reset; // sets all parameters to their default values.
+  procedure Init(aParentScene: TOGLCScene; aParentCamera: TOGLCCamera);
+  procedure SetSpeed(AValue: single);
+  procedure Update(const AElapsedTime: single);
+  function ApplyBoundsOnPoint(aPt: TPointF): TPointF;
+public
+  // Use this property to initialize the bounds of the camera.
+  Bounds: TRectF;
+
+  // Ask the camera to follow a surface.
+  // if aMoveImmediately is True the camera moves immediately to the target and continue to follow it.
+  procedure SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean=False); overload;
+  // Ask the camera to follow a surface. The offset is applied to the surface position.
+  // if aMoveImmediately is True the camera moves immediately to the target and continue to follow it.
+  procedure SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aOffset: TPointF; aMoveImmediately: boolean=False); overload;
+  // Ask to follow the center of a surface.
+  // if aMoveImmediately is True the camera moves immediately to the center target and continue to follow it.
+  procedure SetTargetSurfaceCenter(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean=False);
+  // Ask the camera to move to the specified point.
+  // if aMoveImmediately is True the camera moves immediately to the target and stay fixed on it.
+  procedure SetTargetPoint(aPt: TPointF; aMoveImmediately: boolean=False);
+
+  // Stops the following
+  procedure CancelTargeting;
+
+  // default value is 0.05 corresponds to a smooth movement.
+  // Decrease to smooth the movement, increase for a rougher movement
+  property Speed: single read GetSpeed write SetSpeed;
+  property TargetSurface: TSimpleSurfaceWithEffect read GetTargetSurface;
+end;
+
+
 { TOGLCCamera }
 
 TOGLCCamera = class
@@ -93,6 +167,9 @@ public
 
   function GetTransformMatrix: TOGLCMatrix;
   function GetInverseTransformMatrix: TOGLCMatrix;
+
+public // camera can follow a surface
+  AutoFollow: TOGLCCameraAutoFollow;
 end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -170,6 +247,180 @@ begin
   ComputedY := 0;
 end;
 
+{ TSmoothFollow }
+{
+procedure TSmoothFollow.InitDefault;
+begin
+  TargetSurface := NIL;
+  TargetSurfaceOffset := PointF(0,0);
+  FMovesAmount := 0;
+  Speed := 0.05;
+  FFollowMode := _fmNone;
+end;
+
+procedure TSmoothFollow.Update(var aCurrentPos: TPointF; const AElapsedTime: single);
+var targetPos, delta: TPointF;
+  deltaIsZero: boolean;
+begin
+  case FFollowMode of
+    _fmNone: exit;
+    _fmSurface: begin
+      if TargetSurface = NIL then exit;
+      targetPos := TargetSurface.SurfaceToScene(TargetSurfaceOffset);
+    end;
+    _fmPoint: targetPos := TargetPoint;
+  end;
+
+  delta := targetPos - aCurrentPos;
+
+  deltaIsZero := (delta.x = 0) and (delta.y = 0);
+  if deltaIsZero
+    then FMovesAmount := Max(FMovesAmount-AElapsedTime*Speed, 0.0) // decelerates
+    else FMovesAmount := Min(FMovesAmount+AElapsedTime*Speed, 1.0); // accelerates
+
+  if (FMovesAmount <> 0) and not deltaIsZero then
+    aCurrentPos := aCurrentPos + delta * FMovesAmount;
+end;
+
+procedure TSmoothFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect);
+begin
+  SetTargetSurface(aSurface, PointF(0,0));
+end;
+
+procedure TSmoothFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aOffset: TPointF);
+begin
+  TargetSurface := aSurface;
+  TargetSurfaceOffset := aOffset;
+  if aSurface <> NIL
+    then FFollowMode := _fmSurface
+    else FFollowMode := _fmNone;
+  FMovesAmount := 0;
+end;
+
+procedure TSmoothFollow.SetTargetSurfaceCenter(aSurface: TSimpleSurfaceWithEffect);
+begin
+  SetTargetSurface(aSurface, PointF(aSurface.Width*0.5, aSurface.Height*0.5));
+end;
+
+procedure TSmoothFollow.SetTargetPoint(aPt: TPointF);
+begin
+  TargetPoint := aPt;
+  FFollowMode := _fmPoint;
+  TargetSurface := NIL;
+end;
+
+procedure TSmoothFollow.CancelTargeting;
+begin
+  FFollowMode :=_fmNone;
+  TargetSurface := NIL;
+end;    }
+
+{ TOGLCCameraAutoFollow }
+
+procedure TOGLCCameraAutoFollow.Init(aParentScene: TOGLCScene; aParentCamera: TOGLCCamera);
+begin
+  FParentScene := aParentScene;
+  FParentCamera := aParentCamera;
+  Reset;
+end;
+
+procedure TOGLCCameraAutoFollow.SetSpeed(AValue: single);
+begin
+  FSmoothPointF.Speed := AValue;
+end;
+
+procedure TOGLCCameraAutoFollow.Update(const AElapsedTime: single);
+var cameraPos, targetPos: TPointF;
+begin
+  case FTargetMode of
+    _ctmNone: exit;
+    _ctmSurface: begin
+      if FTargetSurface = NIL then exit;
+      targetPos := FTargetSurface.SurfaceToScene(FTargetSurfaceOffset);
+    end;
+    _ctmPoint: targetPos := FTargetPoint;
+  end;
+
+  //Move() = LookAt.Value := FParentScene.Center-aPt;
+  cameraPos := FParentScene.Center - FParentCamera.LookAt.Value;
+
+  FSmoothPointF.Update(cameraPos, targetPos, AElapsedTime);
+
+  // apply bounds
+  cameraPos.x := EnsureRange(cameraPos.x, Bounds.Left, Bounds.Right);
+  cameraPos.y := EnsureRange(cameraPos.y, Bounds.Top, Bounds.Bottom);
+
+  FParentCamera.LookAt.Value := FParentScene.Center - cameraPos;
+end;
+
+function TOGLCCameraAutoFollow.ApplyBoundsOnPoint(aPt: TPointF): TPointF;
+begin
+  Result.x := EnsureRange(aPt.x, Bounds.Left, Bounds.Right);
+  Result.y := EnsureRange(aPt.y, Bounds.Top, Bounds.Bottom);
+end;
+
+procedure TOGLCCameraAutoFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean);
+begin
+  SetTargetSurface(aSurface, PointF(0,0), aMoveImmediately);
+end;
+
+procedure TOGLCCameraAutoFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect;
+  aOffset: TPointF; aMoveImmediately: boolean);
+begin
+  if aSurface = NIL then
+    CancelTargeting
+  else begin
+    if aMoveImmediately then
+      FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToScene(aOffset)));
+    FTargetSurface := aSurface;
+    FTargetSurfaceOffset := aOffset;
+    if aSurface <> NIL
+      then FTargetMode := _ctmSurface
+      else FTargetMode := _ctmNone;
+    FSmoothPointF.MovesAmount := 0.0;
+  end;
+end;
+
+procedure TOGLCCameraAutoFollow.SetTargetSurfaceCenter(
+  aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean);
+begin
+  SetTargetSurface(aSurface, PointF(aSurface.Width*0.5, aSurface.Height*0.5), aMoveImmediately);
+end;
+
+procedure TOGLCCameraAutoFollow.SetTargetPoint(aPt: TPointF; aMoveImmediately: boolean);
+begin
+  if aMoveImmediately then
+    FParentCamera.MoveTo(ApplyBoundsOnPoint(aPt));
+
+  FTargetPoint := aPt;
+  FTargetMode := _ctmPoint;
+  FTargetSurface := NIL;
+end;
+
+procedure TOGLCCameraAutoFollow.CancelTargeting;
+begin
+  FTargetMode :=_ctmNone;
+  FTargetSurface := NIL;
+end;
+
+procedure TOGLCCameraAutoFollow.Reset;
+begin
+  FSmoothPointF.InitDefault;
+  FSmoothPointF.Speed := 0.05;
+  Bounds := RectF(FParentScene.Width*0.5, FParentScene.Height*0.5,
+                  FParentScene.Width*0.5, FParentScene.Height*0.5);
+end;
+
+function TOGLCCameraAutoFollow.GetSpeed: single;
+begin
+  Result := FSmoothPointF.Speed;
+end;
+
+function TOGLCCameraAutoFollow.GetTargetSurface: TSimpleSurfaceWithEffect;
+begin
+  Result := FTargetSurface;
+end;
+
 { TOGLCCamera }
 
 constructor TOGLCCamera.Create;
@@ -181,6 +432,7 @@ begin
   Pivot.x := 0.5;
   Pivot.y := 0.5;
   Shaker.Create;
+  // AutoFollow.Init() is called from TOGLCScene.CreateCamera
 end;
 
 destructor TOGLCCamera.Destroy;
@@ -201,6 +453,7 @@ begin
   Scale.OnElapse(AElapsedTime);
   Angle.OnElapse(AElapsedTime);
   Shaker.Update(AElapsedTime);
+  AutoFollow.Update(AElapsedTime);
 end;
 
 procedure TOGLCCamera.Reset(aDuration: single; aCurve:Word);
@@ -320,11 +573,13 @@ end;
 procedure TOGLCCamera.MoveTo(aPt: TPointF);
 begin
   LookAt.Value := FParentScene.Center-aPt;
+  AutoFollow.SetTargetSurface(NIL);
 end;
 
 procedure TOGLCCamera.MoveTo(aPt: TPointF; aDuration: single; aCurve: Word);
 begin
-  LookAt.ChangeTo( FParentScene.Center-aPt, aDuration, aCurve);
+  LookAt.ChangeTo(FParentScene.Center-aPt, aDuration, aCurve);
+  AutoFollow.SetTargetSurface(NIL);
 end;
 
 
