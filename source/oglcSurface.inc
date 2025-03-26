@@ -324,6 +324,8 @@ public
   // Don't sets this property to True if the surface is not a child of another surface.
   // NOTE: If you change the parent FlipH/FlipV property, you must change it also on the concerned childs by yourself.
   property ApplySymmetryWhenFlip: boolean read FApplySymmetryWhenFlip write FApplySymmetryWhenFlip;
+public  // convenient function
+  function CreateSpriteChild(aTexture: PTexture; aOwner: boolean=False; aZOrder: integer=0): TSprite;
 end;
 
 {$endif oglcINTERFACE}
@@ -1202,6 +1204,13 @@ begin
   for i:=0 to FChilds.Count-1 do
     if TSimpleSurfaceWithEffect(FChilds.Items[i]) = aSurface then exit(True);
   Result := False;
+end;
+
+function TSimpleSurfaceWithEffect.CreateSpriteChild(aTexture: PTexture;
+  aOwner: boolean; aZOrder: integer): TSprite;
+begin
+  Result := TSprite.Create(aTexture, aOwner);
+  AddChild(Result, aZOrder);
 end;
 
 function TSimpleSurfaceWithEffect.AddScenarioFromFile(const aFilename: string): TIDScenario;
