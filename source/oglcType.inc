@@ -340,6 +340,28 @@ public
   procedure UseCustomRenderer(aUserRenderer: TOGLCBaseRendererForPostProcessing);
 end;
 
+type
+//////////////////////////
+
+{ TSmoothPointF }
+// this module allow to change smoothly coordinates (TPointF) from its current value to a wanted value.
+// see oglccamera.inc for an example
+TSmoothPointF = record
+  MovesAmount: single;
+  Speed: single;  // default is 0.05
+  procedure InitDefault;
+  procedure Update(var aCurrentPos: TPointF; const aWantedPos: TPointF; aElapsedTime: single);
+end;
+
+{ TSmoothSingle }
+// this module allow to smoothly change a quantity (single) from its current value to a wanted value.
+TSmoothSingle = record
+  MovesAmount: single;
+  Speed: single;  // default is 0.05
+  procedure InitDefault;
+  procedure Update(var aCurrent: single; const aWanted: single; aElapsedTime: single);
+end;
+
 
 type
 ///////////////////////
@@ -372,6 +394,48 @@ end;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
+
+{ TSmoothPointF }
+
+procedure TSmoothPointF.InitDefault;
+begin
+  MovesAmount := 0.0;
+  Speed := 0.05;
+end;
+
+procedure TSmoothPointF.Update(var aCurrentPos: TPointF; const aWantedPos: TPointF; aElapsedTime: single);
+var delta: TPointF;
+  deltaIsZero: boolean;
+begin
+  delta := aWantedPos - aCurrentPos;
+
+  deltaIsZero := (delta.x = 0) and (delta.y = 0);
+  if deltaIsZero
+    then MovesAmount := Max(MovesAmount-AElapsedTime*Speed, 0.0) // decelerates
+    else MovesAmount := Min(MovesAmount+AElapsedTime*Speed, 1.0); // accelerates
+
+  if (MovesAmount <> 0) and not deltaIsZero then
+    aCurrentPos := aCurrentPos + delta * MovesAmount;
+end;
+
+{ TSmoothSingle }
+
+procedure TSmoothSingle.InitDefault;
+begin
+  MovesAmount := 0.0;
+  Speed := 0.05;
+end;
+
+procedure TSmoothSingle.Update(var aCurrent: single; const aWanted: single; aElapsedTime: single);
+var delta: single;
+begin
+  delta := aWanted - aCurrent;
+  if delta = 0.0
+    then MovesAmount := Max(MovesAmount-AElapsedTime*Speed, 0.0) // decelerates
+    else MovesAmount := Min(MovesAmount+AElapsedTime*Speed, 1.0); // accelerates
+  if (MovesAmount <> 0) and (delta <> 0.0) then
+    aCurrent := aCurrent + delta * MovesAmount;
+end;
 
 { TOGLCPostProcessingParameters }
 
