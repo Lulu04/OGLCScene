@@ -105,7 +105,7 @@ end;
 
 TOGLCCamera = class
   FParentScene: TOGLCScene;
-  FPreviousModelViewMatrix: TOGLCMatrix;
+  FPreviousSceneModelViewMatrix: TOGLCMatrix;
   // Don't create a TCamera instance directly by TOGLCCamera.Create
   // Use instead TOGLCScene.CreateCamera
   constructor Create;
@@ -559,7 +559,7 @@ end;
 
 procedure TOGLCCamera.Use;
 begin
-  FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+  FPreviousSceneModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
   FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                                             FParentScene.Width*Pivot.x, FParentScene.Height*Pivot.y,
                                             LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
@@ -567,7 +567,7 @@ end;
 
 procedure TOGLCCamera.Release;
 begin
-  FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
+  FParentScene.ModelViewMatrix.CopyFrom(FPreviousSceneModelViewMatrix);
 end;
 
 procedure TOGLCCamera.MoveTo(aPt: TPointF);
