@@ -1345,6 +1345,7 @@ function TOGLCScene.CreateCamera: TOGLCCamera;
 begin
   Result := TOGLCCamera.Create;
   Result.FParentScene := self;
+  Result.AutoFollow.Init(Self, Result);
   FCameraList.Add(Result);
 end;
 
