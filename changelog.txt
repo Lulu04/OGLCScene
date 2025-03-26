@@ -1,0 +1,25 @@
+Version 1.2 - 2025
+> added camera AutoFollow feature: camera can now moves smoothly to a fixed point or follow a surface.
+> added TSmoothPointF and TSmoothSingle: allow to change value smoothly for variable TPointF or single.
+> fixed wrong formula in function LinearSpeedToAngleRotation().
+> fix missing condition check to SetChildOf() function.
+> added new surface type: TGradientRectangle, allow multi color gradient vertically or horizontally.
+> TOGLCGlow have now 4 colors. The Tint property is now separated.
+> added new surface type: TOGLCSpotLight, like TOGLCGlow but in one direction.
+> added convenient function for create a child TSprite in any surface.
+
+Version 1.1 - Mars 8 2025
+> In the Planet Designer, the parameter's panel is replaced by a Scrollbox to allow small screen to display all the parameters.
+
+Version 1.0 - Mars 7 2025
+> added tool Planet Designer.
+> added tool cloud designer.
+> LoadBitmapFromSVG can now load a svg image with different aspect ratio than the original file.
+> now shader have a name. This name is used to produce log error message when a shader cause a compilation error.
+> fixed wrong size on TFreeTextAligned.
+> added rendering to texture capability.
+> added post-processing capability with some built-in effects. Custom post-processing effects are also possible.
+> added procedural shader capability
+> refactor code for TOGLCShader: before it was a class now it is a record.
+> added Rendering to texture and Post-Processing on layers.
+> optimization in fragment shaders using mix() function.
