@@ -1,4 +1,5 @@
 Version 1.2 - 2025
+> code in function TOGLCCamera.WorldToControl() and ControlToWorld() now use matrix to transform the point.
 > added camera AutoFollow feature: camera can now moves smoothly to a fixed point or follow a surface.
 > added TSmoothPointF and TSmoothSingle: allow to change value smoothly for variable TPointF or single.
 > fixed wrong formula in function LinearSpeedToAngleRotation().
