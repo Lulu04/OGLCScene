@@ -469,37 +469,65 @@ begin
 end;
 
 function TOGLCCamera.WorldToControl(aPt: TPointF): TPoint;
-var r: TRectF;
+//var r: TRectF;
 begin
-  r := GetViewRect;
+{  r := GetViewRect;
   Result.x := Round(aPt.x / r.Width * FParentScene.Width);
-  Result.y := Round(aPt.y / r.Height * FParentScene.Height);
+  Result.y := Round(aPt.y / r.Height * FParentScene.Height); }
+  Result := GetTransformMatrix.Transform(aPt).Round;
 end;
 
 function TOGLCCamera.WorldToControlF(aPt: TPointF): TPointF;
-var r: TRectF;
+//var r: TRectF;
 begin
-  r := GetViewRect;
+{  r := GetViewRect;
   Result.x := aPt.x / r.Width * FParentScene.Width;
-  Result.y := aPt.y / r.Height * FParentScene.Height;
+  Result.y := aPt.y / r.Height * FParentScene.Height; }
+  Result := GetTransformMatrix.Transform(aPt);
 end;
 
 function TOGLCCamera.ControlToWorld(aX, aY: integer): TPointF;
-var r: TRectF;
+//var r: TRectF;
 begin
-  Result.x := aX / FParentScene.Width;
+{  Result.x := aX / FParentScene.Width;
   Result.y := aY / FParentScene.Height;
   r := GetViewRect;
   Result.x := r.Left + r.Width * Result.x;
-  Result.y := r.Top + r.Height * Result.y;
+  Result.y := r.Top + r.Height * Result.y; }
+  Result := GetInverseTransformMatrix.Transform(PointF(aX, aY));
 end;
 
 function TOGLCCamera.GetViewRect: TRectF;
 var m: TOGLCMatrix;
+{  tl,tr,bl,br, mini, maxi: TPointF;
+  function GetMin(const v1, v2: single): single; inline;
+  begin
+    if v1 < v2 then Result := v1 else Result := v2;
+  end;
+  function GetMax(const v1, v2: single): single; inline;
+  begin
+    if v1 > v2 then Result := v1 else Result := v2;
+  end;  }
 begin
   m := GetInverseTransformMatrix;
   Result.TopLeft := m.Transform(PointF(0, 0));
   Result.BottomRight := m.Transform(PointF(FParentScene.Width, FParentScene.Height));
+
+  // the version above take in acount the rotation
+{  tl := m.Transform(PointF(0, 0));
+  tr := m.Transform(PointF(FParentScene.Width, 0));
+  bl := m.Transform(PointF(0, FParentScene.Height));
+  br := m.Transform(PointF(FParentScene.Width, FParentScene.Height));
+
+  mini := PointF(GetMin(tl.x, GetMin(tr.x, GetMin(bl.x, br.x))),
+                 GetMin(tl.y, GetMin(tr.y, GetMin(bl.y, br.y))));
+  maxi := PointF(GetMax(tl.x, GetMax(tr.x, GetMax(bl.x, br.x))),
+                 GetMax(tl.y, GetMax(tr.y, GetMax(bl.y, br.y))));
+
+  Result.Left := mini.x;
+  Result.Top := mini.y;
+  Result.Right := maxi.x;
+  Result.Bottom := maxi.y; }
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
