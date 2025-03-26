@@ -418,7 +418,10 @@ end;
 
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 begin
-  Result := 360*aSpeed/(3.14159*aWheelRadius);
+  if aWheelRadius <> 0 then
+    Result := 360*aSpeed/(6.28318*aWheelRadius)   // 2*PI*R
+  else
+    Result :=0;
 end;
 
 function PointFToRectF(p1, p2: TPointF): TRectF;
