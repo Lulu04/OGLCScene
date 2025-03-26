@@ -111,7 +111,7 @@ TGlowBase = class(TSimpleSurfaceWithEffect)
 private const
   MIN_ATTENUATION_VALUE = 0.1;
   MAX_ATTENUATION_VALUE = 100.0;
-  GLOW_DEFAULT_ATTENUATION_VALUE = 0.945;
+  GLOW_DEFAULT_ATTENUATION_VALUE = 0.930; //0.945;
   SPOTLIGHT_DEFAULT_ATTENUATION_VALUE = 0.97;
 private
   FWidth, FHeight: integer;
@@ -123,6 +123,7 @@ public
   procedure Update(const aElapsedTime: single); override;
 public
   // range [0..1]
+  // for glow default value is 0.930, for spotlight default value is 0.97
   Power: TBoundedFParam;
   constructor Create;
   destructor Destroy; override;
