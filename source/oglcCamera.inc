@@ -4,6 +4,7 @@ type
 { TOGLCShakerDescriptor }
 
 TOGLCShakerDescriptor = record
+  // range [0..1]
   Amount: TBoundedFParam;
   AmplitudeX, AmplitudeY, DurationMin, DurationMax,
   TimeReference, TimeAccu, ComputedX, ComputedY: single;
@@ -40,30 +41,36 @@ protected
   procedure Use;
   procedure Release;
 public
-  // By default, LookAt is initialized with the center coordinates of the scene
-  // Use instead MoveTo to easily translate the camera to the target position
+  // By default, LookAt is initialized to (0,0) which means the center of the scene.
+  // Use instead MoveTo() to easily translate the camera to a target position
   LookAt: TPointFParam;
   Scale: TPointFParam;
   Angle: TFParam;
   // Default value is the center of the scene (0.5, 0.5)
   Pivot: TPointF;
   // Shaker effect
-  // The idea is to add an offset to the camera LookAt to shake the view i.e. to simulate an earthquake.
+  // The idea is to add periodicaly an offset to the camera LookAt to shake
+  // the view, for example, to simulate an earthquake.
   Shaker: TOGLCShakerDescriptor;
 
-  // move the camera to the specified location
-  procedure MoveTo( aPt: TPointF ); overload;
-  // move the camera to the specified location
-  procedure MoveTo( aPt: TPointF; aDuration: single; aCurve:Word= idcLinear ); overload;
+  // move the camera immediatly to the specified location.
+  // the center of the scene is (Scene.Width*0.5, Scene.Height*0.5).
+  // Deactivate the AutoFollow feature.
+  procedure MoveTo(aPt: TPointF); overload;
+  // move the camera to the specified location.
+  // the center of the scene is (Scene.Width*0.5, Scene.Height*0.5).
+  // Deactivate the AutoFollow feature.
+  procedure MoveTo(aPt: TPointF; aDuration: single; aCurve:Word= idcLinear); overload;
+
   // reset camera to scene center with scale of 1:1 and no rotation, in specified time in seconds
-  procedure Reset( aDuration: single; aCurve:Word= idcLinear);
+  procedure Reset(aDuration: single; aCurve:Word= idcLinear);
 
   // gives the distance between a point and the camera lookAt value
-  function DistanceToPoint( aPt: TPointF ): single;
+  function DistanceToPoint(aPt: TPointF): single;
 
   // converts a world coordinates to TOpenGLCcontrol coordinates according to camera transformations
-  function WorldToControl( aPt: TPointF ): TPoint;
-  function WorldToControlF( aPt: TPointF ): TPointF;
+  function WorldToControl(aPt: TPointF): TPoint;
+  function WorldToControlF(aPt: TPointF): TPointF;
   // converts a TOpenGLCcontrol coordinates to world coordinates according to camera transformations
   function ControlToWorld(aX, aY: integer): TPointF;
 
@@ -72,10 +79,10 @@ public
 
   // Assign the camera to the layer specified by its index.
   // All previous assigned camera is replaced by the new one.
-  procedure AssignToLayer( aLayerIndex: integer ); overload;
+  procedure AssignToLayer(aLayerIndex: integer); overload;
   // Assign the camera to several layers specified by their indexes
   // All previous assigned camera is replaced by the new one.
-  procedure AssignToLayer( const aLayerIndexList: array of integer ); overload;
+  procedure AssignToLayer(const aLayerIndexList: array of integer); overload;
   // Assign the camera to the layers specified by a range index.
   // All previous assigned camera is replaced by the new one.
   procedure AssignToLayerRange(aFirstLayerIndex, aLastLayerIndex: integer);
