@@ -851,8 +851,11 @@ begin
 
   if ParentSurface = aParentSurface then SetZOrder(aZOrder)
   else
-  if ParentSurface = NIL then MoveFromSceneToChildOf(aParentSurface, aZOrder)
-  else begin
+  if ParentSurface = NIL then begin
+    if ParentLayer <> NIL
+      then MoveFromSceneToChildOf(aParentSurface, aZOrder)
+      else aParentSurface.AddChild(Self, aZOrder);
+  end else begin
     MoveFromChildToScene(0);
     MoveFromSceneToChildOf(aParentSurface, aZOrder);
   end;
