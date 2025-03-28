@@ -23,7 +23,7 @@ unit glcorearb;
 
 interface
 
-uses {$IFDEF Windows} Windows, {$ENDIF} dynlibs, SysUtils, math;
+uses {$IFDEF Windows} Windows, {$ENDIF} dynlibs, SysUtils;
 (*
 ** Copyright (c) 2013-2014 The Khronos Group Inc.
 **
@@ -3104,11 +3104,8 @@ begin
 end;
 
 procedure LoadOpenGL(const dll: String);
-var
-  MethodName: string = '';
   function GetGLProcAddress(Lib: PtrInt; ProcName: PChar): Pointer;
   begin
-    MethodName:=ProcName;
     Result:=GetProcAddress(Lib, ProcName);
   end;
 begin
