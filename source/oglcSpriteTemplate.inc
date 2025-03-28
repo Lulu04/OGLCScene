@@ -68,7 +68,7 @@ public
   Polar: TPolarSystemParam;
 end;
 TArrayOfTPolarSprite = array of TPolarSprite;
-
+TArrayOfArrayOfTPolarSprite = array of TArrayOfTPolarSprite;
 
 { TShapeOutline }
 
