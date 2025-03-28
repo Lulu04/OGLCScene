@@ -119,18 +119,22 @@ public
   procedure SetSize(aWidth, aHeight: integer);
 end;
 
-{ TMultiColorRectangle }
+{ TQuad4Color }
 
-TMultiColorRectangle = class(TSimpleSurfaceWithEffect)
+TQuad4Color = class(TSimpleSurfaceWithEffect)
 private
   FQuadCornerColors: TQuadColorF;
   FModelArea: TQuadCoor;
+  procedure CreateColorObjects;
 protected
   FWidth, FHeight: integer;
   function GetWidth: integer; override;
   function GetHeight: integer; override;
 public
+  // construct the quad as rectangular area
   Constructor Create(aWidth, aHeight: integer);
+  // construct the quad as quadrilateral area (must be convex)
+  Constructor Create(const aQuad: TQuadCoor);
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
@@ -139,7 +143,10 @@ public
   TopRightColor,
   BottomRightColor,
   BottomLeftColor: TBGRAParam;
-  procedure SetSize(aWidth, aHeight: integer);
+  // Set the shape as rectangular area
+  procedure SetSize(aWidth, aHeight: integer); overload;
+  // Set the shape as a quadrilateral area
+  procedure SetSize(const aQuad: TQuadCoor); overload;
 
   procedure SetAllColorsTo(AColor: TBGRAPixel);
   procedure SetLeftColors(AColor: TBGRAPixel);
@@ -147,6 +154,7 @@ public
   procedure SetTopColors(AColor: TBGRAPixel);
   procedure SetBottomColors(AColor: TBGRAPixel);
 end;
+TMultiColorRectangle = TQuad4Color deprecated 'use TQuad4Color instead';
 
 
 { TSpriteContainer }
@@ -514,25 +522,23 @@ begin
   Gradient.ComputeVerticesAndIndices(aWidth, aHeight);
 end;
 
-{ TMultiColorRectangle }
+{ TQuad4Color }
 
-constructor TMultiColorRectangle.Create(aWidth, aHeight: integer);
+constructor TQuad4Color.Create(aWidth, aHeight: integer);
 begin
   inherited Create;
   SetSize(aWidth, aHeight);
-
-  TopLeftColor := TBGRAParam.Create;
-  TopRightColor := TBGRAParam.Create;
-  BottomRightColor := TBGRAParam.Create;
-  BottomLeftColor := TBGRAParam.Create;
-
-  TopLeftColor.Value := BGRA(255,0,0);
-  TopRightColor.Value := BGRA(0,255,0);
-  BottomRightColor.Value := BGRA(0,0,255);
-  BottomLeftColor.Value := BGRA(255,255,0);
+  CreateColorObjects;
 end;
 
-destructor TMultiColorRectangle.Destroy;
+constructor TQuad4Color.Create(const aQuad: TQuadCoor);
+begin
+  inherited Create;
+  SetSize(aQuad);
+  CreateColorObjects;
+end;
+
+destructor TQuad4Color.Destroy;
 begin
   TopLeftColor.Free;
   TopLeftColor := NIL;
@@ -545,17 +551,30 @@ begin
   inherited Destroy;
 end;
 
-function TMultiColorRectangle.GetWidth: integer;
+procedure TQuad4Color.CreateColorObjects;
+begin
+  TopLeftColor := TBGRAParam.Create;
+  TopRightColor := TBGRAParam.Create;
+  BottomRightColor := TBGRAParam.Create;
+  BottomLeftColor := TBGRAParam.Create;
+
+  TopLeftColor.Value := BGRA(255,0,0);
+  TopRightColor.Value := BGRA(0,255,0);
+  BottomRightColor.Value := BGRA(0,0,255);
+  BottomLeftColor.Value := BGRA(255,255,0);
+end;
+
+function TQuad4Color.GetWidth: integer;
 begin
   Result := FWidth;
 end;
 
-function TMultiColorRectangle.GetHeight: integer;
+function TQuad4Color.GetHeight: integer;
 begin
   Result := FHeight;
 end;
 
-procedure TMultiColorRectangle.Update(const aElapsedTime: single);
+procedure TQuad4Color.Update(const aElapsedTime: single);
 begin
   inherited Update(aElapsedTime);
   if not FFreeze then begin
@@ -566,7 +585,7 @@ begin
   end;
 end;
 
-procedure TMultiColorRectangle.DoDraw;
+procedure TQuad4Color.DoDraw;
 begin
   // put the colors in a array to allow flip
   FQuadCornerColors[0].InitFromBGRA(TopLeftColor.Value);
@@ -578,14 +597,19 @@ begin
   FParentScene.ThreeColorMVTriangleRenderer.PushQuad(FModelArea, FQuadCornerColors, FlipToIndex, NIL, FComputedOpacity, FComputedTint);
 end;
 
-procedure TMultiColorRectangle.SetSize(aWidth, aHeight: integer);
+procedure TQuad4Color.SetSize(aWidth, aHeight: integer);
 begin
   FWidth := aWidth;
   FHeight := aHeight;
   FModelArea.SetAsRectangle(aWidth, aHeight);
 end;
 
-procedure TMultiColorRectangle.SetAllColorsTo(AColor: TBGRAPixel);
+procedure TQuad4Color.SetSize(const aQuad: TQuadCoor);
+begin
+  FModelArea.CopyFrom(aQuad);
+end;
+
+procedure TQuad4Color.SetAllColorsTo(AColor: TBGRAPixel);
 begin
   TopLeftColor.Value := AColor;
   TopRightColor.Value := AColor;
@@ -593,25 +617,25 @@ begin
   BottomLeftColor.Value := AColor;
 end;
 
-procedure TMultiColorRectangle.SetLeftColors(AColor: TBGRAPixel);
+procedure TQuad4Color.SetLeftColors(AColor: TBGRAPixel);
 begin
   TopLeftColor.Value := AColor;
   BottomLeftColor.Value := AColor;
 end;
 
-procedure TMultiColorRectangle.SetRightColors(AColor: TBGRAPixel);
+procedure TQuad4Color.SetRightColors(AColor: TBGRAPixel);
 begin
   TopRightColor.Value := AColor;
   BottomRightColor.Value := AColor;
 end;
 
-procedure TMultiColorRectangle.SetTopColors(AColor: TBGRAPixel);
+procedure TQuad4Color.SetTopColors(AColor: TBGRAPixel);
 begin
   TopLeftColor.Value := AColor;
   TopRightColor.Value := AColor;
 end;
 
-procedure TMultiColorRectangle.SetBottomColors(AColor: TBGRAPixel);
+procedure TQuad4Color.SetBottomColors(AColor: TBGRAPixel);
 begin
   BottomRightColor.Value := AColor;
   BottomLeftColor.Value := AColor;
