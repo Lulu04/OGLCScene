@@ -12,7 +12,7 @@ private type ModalPanelState = (mpsShown, mpsHidden);
 private
   FState: ModalPanelState;
   FItemInstance: PModalPanelItem;
-  FSceneDarkness: TMultiColorRectangle;
+  FSceneDarkness: TQuad4Color;
 public
   procedure Draw(const aLayerPercentOpacity: single);  override;
 public
@@ -73,7 +73,7 @@ begin
   FItemInstance := FParentScene.FModalPanelList.Add(Self);
 
   if aBlackOpacity > 0 then begin
-    FSceneDarkness := TMultiColorRectangle.Create(aParentScene.Width, aParentScene.Height);
+    FSceneDarkness := TQuad4Color.Create(aParentScene.Width, aParentScene.Height);
     FSceneDarkness.ParentScene := aParentScene;
     FSceneDarkness.SetAllColorsTo(BGRA(0,0,0));
     FSceneDarkness.Opacity.Value := aBlackOpacity;
