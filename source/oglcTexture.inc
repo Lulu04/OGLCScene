@@ -15,8 +15,11 @@ public
   TextureHeight: integer;
   FrameWidth: integer;
   FrameHeight: integer;
-  FrameCount: integer;
+  FrameCount: integer; // = 1 minimum = length(FramesCoord)
   FramesCoord: array of TQuadCoor;  // [0] is whole texture, [1] is first frame, [2] is second frame, ...
+
+  // convert a texture pixel coordinates into its UV equivalent
+  function XYToUV(aPt: TPointF): TPointF;
 
   procedure SetSingleFrame;
   procedure SetFrameSize(AFrameWidth, AFrameHeight: integer);
@@ -24,9 +27,6 @@ public
 
   procedure TakePartOf(aTexture: PTexture; aRect: TRect); overload;
   procedure TakePartOf(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer); overload;
-
-  function GivePart(aRect: TRect): PTexture; overload;
-  function GivePart(aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture; overload;
 
   procedure Bind(aTextureUnitIndex: integer=0);
   procedure Unbind;
@@ -79,11 +79,6 @@ public
   procedure Replace(ATexture: PTexture; aImage: TBGRABitmap); overload;
 
   procedure Delete(var aTexture: PTexture);
-
-  // return a part of a texture.
-  function GivePart(aTexture: PTexture; aRect: TRect): PTexture;
-  // return part of a texture with multiple frames.
-  function GivePart(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture;
 
   // Select the OpenGL texture unit and bind the texture (only if necessary)
   procedure Bind(ATexture: PTexture; aTextureUnitIndex: integer=0);
@@ -177,12 +172,18 @@ begin
     end;
 end;
 
+function TTexture.XYToUV(aPt: TPointF): TPointF;
+begin
+  Result.x := aPt.x / FrameWidth + FramesCoord[0,cBL].x;
+  Result.y := 1.0 - aPt.y / FrameHeight + FramesCoord[0,cBL].y;
+end;
+
 procedure TTexture.TakePartOf(aTexture: PTexture; aRect: TRect);
-var fw, fh, originX, originY: single;
+var fw, fh, originU, originV: single;
 begin
   FParentScene := aTexture^.FParentScene;
-  TextureWidth := aRect.Width;
-  TextureHeight := aRect.Height;
+  TextureWidth := aTexture^.TextureWidth; // aRect.Width;
+  TextureHeight := aTexture^.TextureHeight; // aRect.Height;
   FrameWidth := aRect.Width;
   FrameHeight := aRect.Height;
   FrameCount := 1;
@@ -191,57 +192,22 @@ begin
 
   fw := aTexture^.FrameWidth/aTexture^.TextureWidth;
   fh := aTexture^.FrameHeight/aTexture^.TextureHeight;
-  originY := 1-aRect.Top/aTexture^.TextureHeight;    // + 1-TexCoor[0]
-  originX := aRect.Left/aTexture^.TextureWidth;      // + TexCoor[0]
+  originU := aRect.Left/aTexture^.TextureWidth;      // + TexCoor[0]
+  originV := 1-aRect.Top/aTexture^.TextureHeight;    // + 1-TexCoor[0]
 
   SetLength(FramesCoord, 1);
 
-  FramesCoord[ 0, cTL ].X := originX;
-  FramesCoord[ 0, cTL ].Y := originY;
+  FramesCoord[ 0, cTL ].X := originU;
+  FramesCoord[ 0, cTL ].Y := originV;
 
-  FramesCoord[ 0, cTR ].X := originX + fw;
-  FramesCoord[ 0, cTR ].Y := originY;
+  FramesCoord[ 0, cTR ].X := originU + fw;
+  FramesCoord[ 0, cTR ].Y := originV;
 
-  FramesCoord[ 0, cBR ].X := originX + fw;
-  FramesCoord[ 0, cBR ].Y := originY - fh;
+  FramesCoord[ 0, cBR ].X := originU + fw;
+  FramesCoord[ 0, cBR ].Y := originV - fh;
 
-  FramesCoord[ 0, cBL ].X := originX;
-  FramesCoord[ 0, cBL ].Y := originY - fh;
-end;
-
-function TTexture.GivePart(aRect: TRect): PTexture;
-var fw, fh, originX, originY: single;
-begin
-  new(Result);
-
-  Result^.FParentScene := FParentScene;
-  Result^.TextureWidth := aRect.Width;
-  Result^.TextureHeight := aRect.Height;
-  Result^.FrameWidth := aRect.Width;
-  Result^.FrameHeight := aRect.Height;
-  Result^.FrameCount := 1;
-  Result^.ID := ID;
-  Result^.IDOwner := FALSE;
-  Result^.Filename := '';
-
-  fw := Self.FrameWidth/Result^.TextureWidth;
-  fh := Self.FrameHeight/Result^.TextureHeight;
-  originY := 1-aRect.Top/Result^.TextureHeight;    // + 1-TexCoor[0]
-  originX := aRect.Left/Result^.TextureWidth;      // + TexCoor[0]
-
-  SetLength(Result^.FramesCoord, 1);
-
-  Result^.FramesCoord[ 0, cTL ].X := originX;
-  Result^.FramesCoord[ 0, cTL ].Y := originY;
-
-  Result^.FramesCoord[ 0, cTR ].X := originX + fw;
-  Result^.FramesCoord[ 0, cTR ].Y := originY;
-
-  Result^.FramesCoord[ 0, cBR ].X := originX + fw;
-  Result^.FramesCoord[ 0, cBR ].Y := originY - fh;
-
-  Result^.FramesCoord[ 0, cBL ].X := originX;
-  Result^.FramesCoord[ 0, cBL ].Y := originY - fh;
+  FramesCoord[ 0, cBL ].X := originU;
+  FramesCoord[ 0, cBL ].Y := originV - fh;
 end;
 
 procedure TTexture.TakePartOf(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer);
@@ -253,8 +219,8 @@ begin
      then Raise Exception.Create('Rect size don''t match AFrame size');
 
   FParentScene := aTexture^.FParentScene;
-  TextureWidth := aRect.Width;
-  TextureHeight := aRect.Height;
+  TextureWidth := aTexture^.TextureWidth; // aRect.Width;
+  TextureHeight := aTexture^.TextureHeight; // aRect.Height;
   ID := aTexture^.ID;
   IDOwner := FALSE;
 
@@ -303,72 +269,6 @@ begin
 
       FramesCoord[ i, cBL ].X := fx;
       FramesCoord[ i, cBL ].Y := fy - fh;
-
-      inc( i );
-    end;
-end;
-
-function TTexture.GivePart(aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture;
-var originX, originY, fw, fh, fx, fy: single;
- fcx, fcy, i, ix, iy: integer;
-begin
-  if (aRect.Width mod AFrameWidth <> 0) or
-     (aRect.Height mod AFrameHeight <> 0)
-     then Raise Exception.Create('Rect size don''t match AFrame size');
-  new(Result);
-
-  Result^.FParentScene := FParentScene;
-  Result^.TextureWidth := aRect.Width;
-  Result^.TextureHeight := aRect.Height;
-  Result^.ID := ID;
-  Result^.IDOwner := FALSE;
-  Result^.Filename := '';
-
-  Result^.FrameWidth := AFrameWidth;
-  Result^.FrameHeight := AFrameHeight;
-
-  fcx := aRect.Width div AFrameWidth;
-  fcy := aRect.Height div AFrameHeight;
-  Result^.FrameCount := fcx*fcy;
-  if Result^.FrameCount > 1 then inc(Result^.FrameCount); // because frame[0] is whole texture
-  SetLength(Result^.FramesCoord, Result^.FrameCount);
-
-  fw := AFrameWidth/Self.TextureWidth;
-  fh := AFrameHeight/Self.TextureHeight;
-  originY := 1-aRect.Top/Self.TextureHeight;
-  originX := aRect.Left/Self.TextureWidth;
-
-  Result^.FramesCoord[ 0, cTL ].X := originX;
-  Result^.FramesCoord[ 0, cTL ].Y := originY;
-
-  Result^.FramesCoord[ 0, cTR ].X := originX + fw;
-  Result^.FramesCoord[ 0, cTR ].Y := originY;
-
-  Result^.FramesCoord[ 0, cBR ].X := originX + fw;
-  Result^.FramesCoord[ 0, cBR ].Y := originY - fh;
-
-  Result^.FramesCoord[ 0, cBL ].X := originX;
-  Result^.FramesCoord[ 0, cBL ].Y := originY - fh;
-  if Result^.FrameCount = 1 then exit;
-
-  i := 1;
-  for iy := 0 to fcy-1 do
-   for ix := 0 to fcx-1 do
-    begin
-      fy := originY - fh * iy;
-      fx := originX + ix * fw;
-
-      Result^.FramesCoord[ i, cTL ].X := fx;
-      Result^.FramesCoord[ i, cTL ].Y := fy;
-
-      Result^.FramesCoord[ i, cTR ].X := fx + fw;
-      Result^.FramesCoord[ i, cTR ].Y := fy;
-
-      Result^.FramesCoord[ i, cBR ].X := fx + fw;
-      Result^.FramesCoord[ i, cBR ].Y := fy - fh;
-
-      Result^.FramesCoord[ i, cBL ].X := fx;
-      Result^.FramesCoord[ i, cBL ].Y := fy - fh;
 
       inc( i );
     end;
@@ -595,22 +495,6 @@ begin
   SetLength(aTexture^.FramesCoord, 0);
   Dispose(aTexture);
   aTexture := NIL;
-end;
-
-function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect): PTexture;
-begin
-  if aTexture = NIL then Raise Exception.Create('aTexture can not be NIL');
-  Result := aTexture^.GivePart(aRect);
-end;
-
-function TTextureManager.GivePart(aTexture: PTexture; aRect: TRect; AFrameWidth, AFrameHeight: integer): PTexture;
-begin
-  if (aRect.Width mod AFrameWidth <> 0) or
-     (aRect.Height mod AFrameHeight <> 0)
-     then Raise Exception.Create('Texture Manager: aRect size don''t match with (AFrameWidth,AFrameHeight)...');
-  if aTexture = NIL then Raise Exception.Create('aTexture can not be NIL');
-
-  Result := aTexture^.GivePart(aRect, AFrameWidth, AFrameHeight);
 end;
 
 procedure TTextureManager.Bind(ATexture: PTexture; aTextureUnitIndex: integer);
