@@ -171,6 +171,17 @@ public
   Opacity : TBoundedFParam; // the opacity of the surface, range is [0..255]
   Tint    : TBGRAParam; // the tint applyed to the surface. Alpha channel controls the amount.
   TintMode: TTintMode; // Can be tmMixColor or tmReplaceColor. Default value is tmReplaceColor.
+  // To flip horizontally the surface
+  property FlipH: boolean read FFlipH write SetFlipH;
+  // To flip vertically the surface
+  property FlipV: boolean read FFlipV write SetFlipV;
+  // All the surface properties that change throught time (like Tint, Angle, Scale, X, Y...)
+  // are freezed if you sets this property to True.
+  property Freeze: boolean read FFreeze write FFreeze ;  // set to TRUE to stop all variations on surface ( move, opacity change, scale change, etc...)
+  // You can change the blend mode for this surface.
+  // Possible value are: FX_BLEND_NORMAL, FX_BLEND_ADD, FX_BLEND_MULT, FX_NOBLEND
+  property BlendMode: byte read FBlendMode write FBlendMode;
+public // messages
   // Post a message to the surface itself.
   // The delay allows to process the message only after a lapse of time (in seconds): it's usefull to construct chained animation.
   // if aDelay is 0, the message is posted and will be processed into the next frame.
@@ -242,7 +253,7 @@ public  // Scenario
   function ScenarioIsPlaying(aID: TIDScenario): boolean;
   // set a callbak proc to decode custom additionnal actions.
   procedure SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
-  // Frame animation
+public // Frame animation
   // You can set the range of frame index to use to animate the surface.
   // A texture frame start from 1 because 0 means the whole texture.
   procedure SetFrameLoopBounds(AStartFrameIndex, AEndFrameIndex: integer);
@@ -250,11 +261,7 @@ public  // Scenario
   procedure FrameAddPerSecond(ADeltaFramePerSecond: single);
   // You can set/get the frame index. Frame index start at 1.
   property Frame: single read FFrame write SetFrame;
-  // Flip horizontally
-  property FlipH: boolean read FFlipH write SetFlipH;
-  // Flip vertically
-  property FlipV: boolean read FFlipV write SetFlipV;
-  // utils
+public // utils
   // Center the surface on its parent scene
   procedure CenterOnScene;
   // Center the surface on another surface
@@ -272,6 +279,7 @@ public // Matrix transform
   function GetRectAreaInLocalSpace: TRectF;
   // The rectangular area of the surface expressed in the parent space (TopLeft=X.Value,Y.Value)
   function GetRectAreaInParentSpace: TRectF;
+public // Collision
   // Collision test
   function CollisionTestWith(aPoint: TPointF): boolean; overload;
   function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
@@ -279,14 +287,7 @@ public // Matrix transform
   function CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean; overload;
   function CollisionTestWith(aRect: TRectF): boolean; overload;
   function CollisionTestWith(aRect: TRect): boolean; overload;
-
-  // All the surface properties that change throught time (like Tint, Angle, Scale, X, Y...)
-  // are freezed if you sets this property to True.
-  property Freeze: boolean read FFreeze write FFreeze ;  // set to TRUE to stop all variations on surface ( move, opacity change, scale change, etc...)
-  // You can change the blend mode for this surface.
-  // Possible value are: FX_BLEND_NORMAL, FX_BLEND_ADD, FX_BLEND_MULT, FX_NOBLEND
-  property BlendMode: byte read FBlendMode write FBlendMode;
-public
+public // Childs
   // add a child to the surface.
   // a positive aZOrder means the child is above its parent, a negative aZOrder means the child is below its parent.
   // The drawing order is: ...-3 -2 -1 parent 0 1 2 3...
