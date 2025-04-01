@@ -150,6 +150,8 @@ private
   FScenarioAdditionnalDecode: TScenarioDecode;
   function GetScenario(aID: TIDScenario): TScenario;
   function DoAddScenarioToList(aScenario: TScenario): TIDScenario;
+private
+  FCollisionBody: TOGLCCollisionBody;
 protected
   function FlipToIndex: integer; inline;
   procedure PushAndPrepareSceneMV; inline;
@@ -286,6 +288,7 @@ public // Collision
   function CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean; overload;
   function CollisionTestWith(aRect: TRectF): boolean; overload;
   function CollisionTestWith(aRect: TRect): boolean; overload;
+  property CollisionBody: TOGLCCollisionBody read FCollisionBody;
 public // Childs
   // add a child to the surface.
   // a positive aZOrder means the child is above its parent, a negative aZOrder means the child is below its parent.
@@ -386,6 +389,8 @@ begin
 
   FMessageList := TMessageList.Create(@ProcessMessage);
   FEnableProcessMessage:=TRUE;
+
+  FCollisionBody := TOGLCCollisionBody.Create(Self);
 end;
 
 procedure TSimpleSurfaceWithEffect.SetFrame(AValue: single);
@@ -600,6 +605,9 @@ begin
 
   FMessageList.Free;
   FMessageList := NIL;
+
+  FCollisionBody.Free;
+  FCollisionBody := NIL;
 
   inherited Destroy;
 end;
