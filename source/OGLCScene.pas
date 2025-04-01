@@ -186,6 +186,7 @@ TOGLCCamera = class;
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
 {$I oglcLayer.inc}
+{$I oglcCollisionBody.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
@@ -881,6 +882,7 @@ end;
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
 {$I oglcLayer.inc}
+{$I oglcCollisionBody.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
@@ -1166,17 +1168,6 @@ begin
        Mouse.MousePoolEnabled := True;
    end;
  end;
-
-{ // compute pause to achieve the wanted frame rate
- Application.ProcessMessages;
- if FUpdatePeriod > 0 then begin
-   delta := GetTickCount64 - FTickOriginFrame;
-   if (delta > 0) and (delta < Trunc(1000/FUpdatePeriod)) then begin            //FMonitorRefreshPeriod
-     delta := Trunc(1000/FUpdatePeriod)-delta;
-     sleep(delta);
-   end;
- end;
- FTickOriginFrame := GetTickCount64;  }
 end;
 
 procedure TOGLCScene.ExecuteDuring(aTimeInSecond: single);
