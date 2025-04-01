@@ -167,6 +167,7 @@ public
 
   function GetTransformMatrix: TOGLCMatrix;
   function GetInverseTransformMatrix: TOGLCMatrix;
+  procedure AddTransformTo(var aMatrix: TOGLCMatrix);
 
 public // camera can follow a surface
   AutoFollow: TOGLCCameraAutoFollow;
@@ -583,6 +584,13 @@ var m: TOGLCMatrix;
 begin
   m := GetTransformMatrix;
   Result := m.Inverse;
+end;
+
+procedure TOGLCCamera.AddTransformTo(var aMatrix: TOGLCMatrix);
+begin
+  aMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
+                       FParentScene.Width*0.5, FParentScene.Height*0.5,
+                       LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
 end;
 
 procedure TOGLCCamera.Use;
