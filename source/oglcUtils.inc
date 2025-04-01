@@ -18,7 +18,7 @@ function AdjustLineEnding(const aText: string): string;
 
 function BGRAPixelToHex(aColor: TBGRAPixel): string;
 function HexToBGRAPixel(const s: string): TBGRAPixel;
-function PercentColor(const aColor : TBGRAPixel ;aPercent:single) :TBGRAPixel;
+function PercentColor(const aColor : TBGRAPixel; aPercent:single) :TBGRAPixel;
 
 // returns a time formated string HH:MM:SS.xx
 // if aShowFractionalPart is set to FALSE the .xx part is removed
@@ -71,6 +71,7 @@ type
 
 { TCollisionFunctions }
 // This record offers a bunch of functions to test collision between different shapes.
+// TRectF is used for non rotated rectangle. Use polygon for rotated shape.
 TCollisionFunctions = record
   function PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
   function PointRectF(const aPt: TPointF; const r: TRectF): boolean;
@@ -85,21 +86,17 @@ TCollisionFunctions = record
 
   function RectFContainLine(const r: TRectF; aLinePt1, aLinePt2: TPointF): boolean;
   function CircleContainRectF(const aCenter: TPointF; const aRadius: single; const r: TRectF): boolean;
+
+  // from https://jeffreythompson.org/collision-detection/poly-point.php  and next page
+  function PolygonPoint(const aPts: ArrayOfTPointF; const aPt: TPointF): boolean;
+  function PolygonLine(const aPts: ArrayOfTPointF; const aLinePt1, aLinePt2: TPointF): boolean;
+  function PolygonCircle(const aPts: ArrayOfTPointF; const aCenter: TPointF; const aRadius: single): boolean;
+  function PolygonRectF(const aPts: ArrayOfTPointF; r: TRectF): boolean;
+  function PolygonPolygon(const aPts1, aPts2: ArrayOfTPointF): boolean;
 end;
 
 var
   Collision: TCollisionFunctions;
-
-{function CollisionPointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
-function CollisionPointRectF(const aPt: TPointF; const r: TRectF): boolean;
-function CollisionCircleCircle(const aCenter1: TPointF; const aRadius1: single;
-                               const aCenter2: TPointF; const aRadius2: single): boolean;
-function CollisionCircleRectF(const aCenter: TPointF; const aRadius: single; const r: TRectF): boolean;
-function CollisionRectFRectF(const r1, r2: TRectF): boolean;
-function CollisionLinePoint(aLinePt1, aLinePt2, aPt: TPointF): boolean;
-function CollisionLineLine(aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2: TPointF): boolean;
-function CollisionLineCircle(aLinePt1, aLinePt2, aCircleCenter: TPointF; aRadius: single): boolean;
-function CollisionLineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;  }
 
 // return the total color attachment available on your system
 function ColorAttachmentCount: GLint;
@@ -430,7 +427,7 @@ end;
 
 function TCollisionFunctions.CircleRectF(const aCenter: TPointF;
   const aRadius: single; const r: TRectF): boolean;
-var closestX, closestY{, dX, dY}: single;
+var closestX, closestY: single;
 begin
   closestX := aCenter.x;
   if closestX <= r.Left then closestX := r.Left
@@ -441,11 +438,6 @@ begin
     else if closestY > r.Bottom then closestY := r.Bottom;
 
   Result := Distance(PointF(closestX, closestY), aCenter) < aRadius;
-
-{  dX := aCenter.x - closestX;
-  dY := aCenter.y - closestY;
-
-  Result := sqr(dX) + sqr(dY) < sqr(aRadius);  }
 end;
 
 function TCollisionFunctions.RectFRectF(const r1, r2: TRectF): boolean;
@@ -514,8 +506,8 @@ end;
 
 function TCollisionFunctions.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
 begin
- // check if the rect contain the line
-  if RectFContainLine(aRect, aLinePt1, aLinePt2) then exit(True);
+  // check if the rect contain the line
+  if PointRectF(aLinePt1, aRect) then exit(True);
   // check if the line has hit any of the rectangle's sides
   // uses the Line/Line function
   Result := Collision.LineLine(aLinePt1, aLinePt2, aRect.TopLeft, PointF(aRect.Left, aRect.Bottom)) or
@@ -536,6 +528,74 @@ begin
             PointCircle(PointF(r.Right, r.Top), aCenter, aRadius) and
             PointCircle(r.BottomRight, aCenter, aRadius) and
             PointCircle(PointF(r.Left, r.Bottom), aCenter, aRadius);
+end;
+
+function TCollisionFunctions.PolygonPoint(const aPts: ArrayOfTPointF; const aPt: TPointF): boolean;
+var next, current: integer;
+  vc, vn: TPointF;
+begin
+  Result := False;
+  for current :=0 to High(aPts) do begin
+    next := current + 1;
+    if next = Length(aPts) then next := 0;
+    vc := aPts[current];
+    vn := aPts[next];
+    if ((vc.y > aPt.y) <> (vn.y > aPt.y)) and (aPt.x < (vn.x-vc.x) * (aPt.y-vc.y) / (vn.y-vc.y) + vc.x)
+      then Result := not Result;
+  end;
+end;
+
+function TCollisionFunctions.PolygonLine(const aPts: ArrayOfTPointF;
+  const aLinePt1, aLinePt2: TPointF): boolean;
+var current: integer;
+begin
+  current := 0;
+  while current < High(aPts)-1 do begin
+    if LineLine(aPts[current], aPts[current+1], aLinePt1, aLinePt2) then exit(True);
+    inc(current, 2);
+  end;
+  // optional: check if line is inside the polygon
+  Result := PolygonPoint(aPts, aLinePt1);
+end;
+
+function TCollisionFunctions.PolygonCircle(const aPts: ArrayOfTPointF;
+  const aCenter: TPointF; const aRadius: single): boolean;
+var current: integer;
+begin
+  current := 0;
+  while current < High(aPts)-1 do begin
+    if LineCircle(aPts[current], aPts[current+1], aCenter, aRadius) then exit(True);
+    inc(current, 2);
+  end;
+  // optional:
+  if PolygonPoint(aPts, aCenter) then exit(True); // check if the circle is inside the polygon
+  Result := PointCircle(aPts[0], aCenter, aRadius); // check if the polygon is inside the circle
+end;
+
+function TCollisionFunctions.PolygonRectF(const aPts: ArrayOfTPointF; r: TRectF): boolean;
+var current: integer;
+begin
+  current := 0;
+  while current < High(aPts)-1 do begin
+    if LineRectF(aPts[current], aPts[current+1], r) then exit(True);
+    inc(current, 2);
+  end;
+  // optional:
+  if PolygonPoint(aPts, r.TopLeft) then exit(True); // check if the rectangle is inside the polygon
+  Result := PointRectF(aPts[0], r); // check if the polygon is inside the rectangle
+end;
+
+function TCollisionFunctions.PolygonPolygon(const aPts1, aPts2: ArrayOfTPointF): boolean;
+var current: integer;
+begin
+  current := 0;
+  while current < High(aPts1)-1 do begin
+    if PolygonLine(aPts2, aPts1[current], aPts1[current+1]) then exit(True);
+    inc(current, 2);
+  end;
+  // optional:
+  if PolygonPoint(aPts1, aPts2[0]) then exit(True); // check if the polygon2 is inside polygon1
+  Result := PolygonPoint(aPts2, aPts1[0]); // check if the polygon1 is inside polygon2
 end;
 
 function ColorAttachmentCount: GLint;
