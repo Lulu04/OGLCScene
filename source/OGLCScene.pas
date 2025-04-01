@@ -175,6 +175,7 @@ TOGLCCamera = class;
 {$I oglcVersion.inc}
 {$I oglcLogFile.inc}
 {$I oglcVelocityCurve.inc}
+{$I oglcMath.inc}
 {$I gl_core_matrix.inc}
 {$I oglcType.inc}
 {$I oglcAppSaveUtils.inc}
@@ -869,6 +870,7 @@ end;
 {$define oglcIMPLEMENTATION}
 {$I oglcLogFile.inc}
 {$I oglcVelocityCurve.inc}
+{$I oglcMath.inc}
 {$I gl_core_matrix.inc}
 {$I oglcType.inc}
 {$I oglcAppSaveUtils.inc}
