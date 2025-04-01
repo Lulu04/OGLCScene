@@ -77,6 +77,10 @@ function Distance(aPt1, aPt2: TPointF): single;
 // Return the angle/s computed from the specified speed value.
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 
+// reproduce the GLSL smoothstep function
+function SmoothStep(aEdgeMin, aEdgeMax, aValue: single): single;
+// reproduce the GLSL mix function
+function Mix(aValue1, aValue2, a: single): single;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -198,6 +202,17 @@ begin
     Result := 360*aSpeed/(6.28318*aWheelRadius)   // 2*PI*R
   else
     Result :=0;
+end;
+
+function SmoothStep(aEdgeMin, aEdgeMax, aValue: single): single;
+begin
+  Result := EnsureRange((aValue - aEdgeMin) / (aEdgeMax - aEdgeMin), 0.0, 1.0);
+  Result := Result * Result * (3.0 - 2.0 * Result);
+end;
+
+function Mix(aValue1, aValue2, a: single): single;
+begin
+  Result := x*(1−a) + y*a;
 end;
 
 { TQuadCoorHelper }
