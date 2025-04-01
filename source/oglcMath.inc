@@ -80,7 +80,7 @@ function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 // reproduce the GLSL smoothstep function
 function SmoothStep(aEdgeMin, aEdgeMax, aValue: single): single;
 // reproduce the GLSL mix function
-function Mix(aValue1, aValue2, a: single): single;
+function Mix(x, y, a: single): single;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -210,9 +210,9 @@ begin
   Result := Result * Result * (3.0 - 2.0 * Result);
 end;
 
-function Mix(aValue1, aValue2, a: single): single;
+function Mix(x, y, a: single): single;
 begin
-  Result := x*(1−a) + y*a;
+  Result := x * (1 - a) + y * a;
 end;
 
 { TQuadCoorHelper }
