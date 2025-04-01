@@ -37,16 +37,18 @@ private
   procedure ProcessOnMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 protected
   FSprite: TSprite;
+  FClickPointOffset: TPointF; // in pixel
   FParentScene: TOGLCScene;
   FMousePos: TPoint;
   procedure PrepareBeforeUpdate;
   procedure UpDate(const AElapsedTime: single);
   procedure Draw;
 public
-  ClickPointOffset: TPointF; // (0;0)=Top/Left  (0.5;0.5)= Center  (0;1)=Bottom/Left ...
   constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
-  procedure SetCursorSprite(aTexture: PTexture; aOwner: boolean);
+
+  procedure SetCursorSprite(aSprite: TSprite; aClickPointOffset: TPointF); overload;
+  procedure SetCursorSprite(aTexture: PTexture; aTextureOwner: boolean; aClickPointOffset: TPointF); overload;
   procedure DeleteCursorSprite;
 
   function IsOver(aGUISurface: TUIClickableObject): boolean; overload;
@@ -2564,8 +2566,8 @@ begin
 
   if FSprite = NIL then exit;
   FSprite.Update(AElapsedTime);
-  FSprite.X.Value := FMousePos.x-ClickPointOffset.x*FSprite.Width;
-  FSprite.Y.Value := FMousePos.y-ClickPointOffset.y*FSprite.Height;
+  FSprite.X.Value := FMousePos.x - FClickPointOffset.x;
+  FSprite.Y.Value := FMousePos.y - FClickPointOffset.y;
 end;
 
 procedure TMouseManager.Draw;
@@ -2581,14 +2583,20 @@ begin
 end;
 
 
-procedure TMouseManager.SetCursorSprite(aTexture: PTexture; aOwner: boolean);
+procedure TMouseManager.SetCursorSprite(aSprite: TSprite; aClickPointOffset: TPointF);
 begin
   DeleteCursorSprite;
-  FSprite := TSprite.Create(aTexture, aOwner);
+  FSprite := aSprite;
   FSprite.SetParentLayer(FParentScene.Layer[0]);
   FSprite.SetParentScene(FParentScene);
+  FClickPointOffset := aClickPointOffset;
 
   SystemMouseCursorVisible := False;
+end;
+
+procedure TMouseManager.SetCursorSprite(aTexture: PTexture; aTextureOwner: boolean; aClickPointOffset: TPointF);
+begin
+  SetCursorSprite(TSprite.Create(aTexture, aTextureOwner), aClickPointOffset);
 end;
 
 {$endif oglcIMPLEMENTATION}
