@@ -24,6 +24,8 @@ TOGLCPathHelper = type helper for TOGLCPath
 
   procedure ForceTopLeftToOrigin;
   procedure Scale(aValue: single);
+  procedure FlipHorizontally;
+  procedure FlipVertically;
 end;
 
 
@@ -187,6 +189,32 @@ var i: integer;
 begin
   for i:=0 to High(Self) do
     Self[i] := PointF(Self[i].x*aValue, Self[i].y*aValue);
+end;
+
+procedure TOGLCPathHelper.FlipHorizontally;
+var i: integer;
+  r: TRectF;
+  pivot, delta: single;
+begin
+  r := Bounds;
+  pivot := r.Width*0.5;
+  for i:=0 to High(Self) do begin
+    delta := pivot - Self[i].x;
+    Self[i].x := pivot + delta;
+  end;
+end;
+
+procedure TOGLCPathHelper.FlipVertically;
+var i: integer;
+  r: TRectF;
+  pivot, delta: single;
+begin
+  r := Bounds;
+  pivot := r.Height*0.5;
+  for i:=0 to High(Self) do begin
+    delta := pivot - Self[i].y;
+    Self[i].y := pivot + delta;
+  end;
 end;
 
 {$endif oglcIMPLEMENTATION}
