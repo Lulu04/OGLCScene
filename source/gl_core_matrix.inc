@@ -7,79 +7,44 @@
 
 
 type
-  TOGLCMatrix44 = packed array [0..3, 0..3] of single;
-  POGLCMatrix44 = ^TOGLCMatrix44;
+TOGLCMatrix44 = packed array [0..3, 0..3] of single;
+POGLCMatrix44 = ^TOGLCMatrix44;
 
-  { TOGLCMatrix }
+{ TOGLCMatrix }
 
-  TOGLCMatrix = record
-    Matrix: TOGLCMatrix44;
-    function Data: pointer; inline;
-    procedure CopyFrom(const aMat: TOGLCMatrix44); inline;
-    procedure CopyFrom(const aMat: POGLCMatrix44); inline;
-    procedure CopyFrom(const aMat: TOGLCMatrix); inline;
-    function EqualTo(const aMat: TOGLCMatrix): boolean; inline;
-    procedure Ortho(left, right, bottom, top, zNear, zFar: single);
+TOGLCMatrix = record
+  Matrix: TOGLCMatrix44;
+  function Data: pointer; inline;
+  procedure CopyFrom(const aMat: TOGLCMatrix44); inline;
+  procedure CopyFrom(const aMat: POGLCMatrix44); inline;
+  procedure CopyFrom(const aMat: TOGLCMatrix); inline;
+  function EqualTo(const aMat: TOGLCMatrix): boolean; inline;
+  procedure Ortho(left, right, bottom, top, zNear, zFar: single);
 
-    procedure SetAsTranslation(const aX, aY: single);
-    procedure SetAsScaling(const aX, aY: single);
-    procedure SetAsRotation(const aAngleDeg: single);  // 2D rotation is around Z axis only
+  procedure SetAsTranslation(const aX, aY: single);
+  procedure SetAsScaling(const aX, aY: single);
+  procedure SetAsRotation(const aAngleDeg: single);  // 2D rotation is around Z axis only
 
-    procedure LoadIdentity; inline;
-    procedure AddTransform(aXPos, aYPos, aXScale, aYScale, aAngle, aXPivot, aYPivot: single; aXOffset: single=0; aYOffset: single=0);
-    procedure Translate(const aX, aY: single);
-    procedure Scale(const aX, aY: single);
-    procedure Rotate(const aAngleDeg: single);
+  procedure LoadIdentity; inline;
+  procedure AddTransform(aXPos, aYPos, aXScale, aYScale, aAngle, aXPivot, aYPivot: single; aXOffset: single=0; aYOffset: single=0);
+  procedure Translate(const aX, aY: single);
+  procedure Scale(const aX, aY: single);
+  procedure Rotate(const aAngleDeg: single);
 
-    function Transform(const aPt: TPointF): TPointF;
-    function Transform(const aRect: TRectF): TRectF;
+  function Transform(const aPt: TPointF): TPointF; overload; inline;
+  function Transform(const aRect: TRectF): TRectF; overload;
+  function Transform(const aQuad: TQuadCoor): TQuadCoor; overload;
+  function Transform(const aPts: ArrayOfTPointF): ArrayOfTPointF; overload;
 
-    function Inverse: TOGLCMatrix;
-  end;
-  POGLCMatrix = ^TOGLCMatrix;
+  function Inverse: TOGLCMatrix;
+end;
+POGLCMatrix = ^TOGLCMatrix;
 
-  function MultMat(const m1, m2: TOGLCMatrix44): TOGLCMatrix44;
-  // this one don't work, see the next
-  function InverseMat(const m: TOGLCMatrix44): TOGLCMatrix44;
-  // https://github.com/neurolabusc/Metal-Demos/blob/5ddd15005f7eb9a48620cf74ebd929dc11f83c73/common/VectorMath.pas
-  function InverseMat2(const m: TOGLCMatrix44): TOGLCMatrix44;
-
-type
-
-  { TStraightLineEquation }
-
-  TStraightLineEquation = record
-    a, b,           // y = a*x + b
-    c: single;      // for vertical straight line ( for all y, x = c)
-    IsVertical: boolean;
-    procedure InitFrom(const pt1, pt2: TPointF); inline;
-    function IsParallelWith(const aLine: TStraightLineEquation): boolean; inline;
-    function ComputeIntersectionPoint(const aLine: TStraightLineEquation): TPointF; inline;
-    // returns the angle in degree between this line and another
-    function ComputeAngle(const aLine: TStraightLineEquation): single;
-  end;
-
-  TQuadF = array[0..3] of TPointF;
-
-
-//   q0                   q1    ￪        antialiasing is done here
-//   |                    |    width1
-//  pt1<------line------>pt2
-//   |                    |    width2
-//   q3                   q2    ￬        antialiasing is done here
-function LineSegmentToQuadF_PosMiddle(const pt1, pt2: TPointF; const aWidth1, aWidth2: single): TQuadF;
-
-
-//  pt1<------line------>pt2    ￪
-//   |                    |   width1 small value to allow antialising
-//   q0                   q1
-//   |                    |   width2
-//   q3                   q2    ￬
-function LineSegmentToQuadF_PosInside(const pt1, pt2: TPointF; const aWidth1, aWidth2: single): TQuadF;
-
-// Q1 right side is modified and Q2 left side is modified
-procedure AdjustCornerOnConsecutiveQuadF(var Q1, Q2: TQuadF);
-
+function MultMat(const m1, m2: TOGLCMatrix44): TOGLCMatrix44;
+// this one don't work, see the next
+function InverseMat(const m: TOGLCMatrix44): TOGLCMatrix44;
+// https://github.com/neurolabusc/Metal-Demos/blob/5ddd15005f7eb9a48620cf74ebd929dc11f83c73/common/VectorMath.pas
+function InverseMat2(const m: TOGLCMatrix44): TOGLCMatrix44;
 
 {$endif oglcINTERFACE}
 
@@ -206,97 +171,6 @@ begin
   end;
 end;
 
-{ TStraightLineEquation }
-
-procedure TStraightLineEquation.InitFrom(const pt1, pt2: TPointF);
-begin
-  IsVertical := pt1.x = pt2.x;
-
-  if not IsVertical then begin
-    a := (pt2.y - pt1.y) / (pt2.x - pt1.x);  // F(x)=ax+b
-    b := pt1.y - pt1.x*a;
-  end else c := pt1.x; // for all y values, one have the same x
-end;
-
-function TStraightLineEquation.IsParallelWith(const aLine: TStraightLineEquation): boolean;
-begin
-  //Result := (IsVertical and aLine.IsVertical) or (a = aLine.a);
-  Result := IsVertical and aLine.IsVertical;
-  if not Result then Result := a = aLine.a;
-end;
-
-function TStraightLineEquation.ComputeIntersectionPoint(const aLine: TStraightLineEquation): TPointF;
-begin
-  if IsVertical and aLine.IsVertical then
-    raise exception.create('both lines are vertical (parallel), intersection doesn''t exists')
-
-  else if not IsVertical and not aLine.IsVertical then begin
-    if a = aLine.a then raise exception.create('both lines are parallel, intersection doesn''t exists');
-    Result.x := (aLine.b - b) / (a - aLine.a);
-    Result.y := a * Result.x + b;
-
-  end else if IsVertical then begin
-    Result.x := c;
-    Result.y := aLine.a * c + aLine.b;
-  end else begin
-    Result.x := aLine.c;
-    Result.y := a * aLine.c + b;
-  end;
-end;
-
-function TStraightLineEquation.ComputeAngle(const aLine: TStraightLineEquation): single;
-begin
-  if IsParallelWith(aLine) then Result := 0
-    else Result := ArcTan((a-aLine.a)/(1+a*aLine.a))*rad2deg;
-end;
-
-function LineSegmentToQuadF_PosMiddle(const pt1, pt2: TPointF; const aWidth1, aWidth2: single): TQuadF;
-var v, vv, normal: TPointF;
-begin
-  v := pt2-pt1;                     //   q0                   q1    ￪     ̂̌
-  v.Normalize;                      //   |                    |    width1
-  vv := v * aWidth1;                //  pt1.......line.......pt2
-  normal := PointF(vv.y, -vv.x);   //   |                    |    width2
-  Result[0] := pt1 + normal;        //   q3                   q2    ￬
-  Result[1] := pt2 + normal;
-  vv := v * aWidth2;
-  normal := PointF(-vv.y, vv.x);
-  Result[2] := pt2 + normal;
-  Result[3] := pt1 + normal;
-end;
-
-function LineSegmentToQuadF_PosInside(const pt1, pt2: TPointF; const aWidth1, aWidth2: single): TQuadF;
-var v, vv, normal: TPointF;
-begin
-  v := pt2-pt1;
-  v.Normalize;
-  vv := v * aWidth1;
-  normal := PointF(vv.y, -vv.x);
-  Result[0] := pt1 + normal;
-  Result[1] := pt2 + normal;
-  vv := v * aWidth2;
-  normal := PointF(vv.y, -vv.x);
-  Result[2] := Result[1] + normal;
-  Result[3] := Result[0] + normal;
-end;
-
-procedure AdjustCornerOnConsecutiveQuadF(var Q1, Q2: TQuadF);
-var F1, F2: TStraightLineEquation;
-begin
-  F1.InitFrom(Q1[0], Q1[1]);
-  F2.InitFrom(Q2[0], Q2[1]);
-  if not F1.IsParallelWith(F2) then begin
-    Q1[1] := F1.ComputeIntersectionPoint(F2);
-    Q2[0] := Q1[1];
-  end;
-
-  F1.InitFrom(Q1[3], Q1[2]);
-  F2.InitFrom(Q2[3], Q2[2]);
-  if not F1.IsParallelWith(F2) then begin
-    Q1[2] := F1.ComputeIntersectionPoint(F2);
-    Q2[3] := Q1[2];
-  end;
-end;
 
 function TOGLCMatrix.Transform(const aPt: TPointF): TPointF;
 begin
@@ -308,6 +182,23 @@ function TOGLCMatrix.Transform(const aRect: TRectF): TRectF;
 begin
   Result.TopLeft := Transform(aRect.TopLeft);
   Result.BottomRight := Transform(aRect.BottomRight);
+end;
+
+function TOGLCMatrix.Transform(const aQuad: TQuadCoor): TQuadCoor;
+begin
+  Result[cTL] := Transform(aQuad[cTL]);
+  Result[cTR] := Transform(aQuad[cTR]);
+  Result[cBL] := Transform(aQuad[cBL]);
+  Result[cBR] := Transform(aQuad[cBR]);
+end;
+
+function TOGLCMatrix.Transform(const aPts: ArrayOfTPointF): ArrayOfTPointF;
+var i: integer;
+begin
+  Result := NIL;
+  SetLength(Result, Length(aPts));
+  for i:=0 to High(aPts) do
+    Result[i] := Transform(aPts[i]);
 end;
 
 function TOGLCMatrix.Inverse: TOGLCMatrix;
