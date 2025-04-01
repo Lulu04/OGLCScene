@@ -1486,10 +1486,6 @@ begin
   // flush the post processing engine
   FPostProcessingEngine.Flush;
 
-  // Scene global fade
-  if FGlobalFadeColor.Alpha.Value > 0
-    then FillBox(Self, 0, 0, GetViewPortWidth, GetViewPortHeight, FGlobalFadeColor.Value);
-
   // After paint CallBack
   if Assigned (FOnAfterPaint) then FOnAfterPaint;
 
@@ -1502,6 +1498,10 @@ begin
   // Render mouse cursor
   ModelViewMatrix.LoadIdentity;
   Mouse.Draw;
+
+  // Scene global fade
+  if FGlobalFadeColor.Alpha.Value > 0
+    then FillBox(Self, 0, 0, GetViewPortWidth, GetViewPortHeight, FGlobalFadeColor.Value);
 
   // render an eventual remains in the batch renderer process
   FTexturedMVTriangleRenderer.Batch_Flush;
