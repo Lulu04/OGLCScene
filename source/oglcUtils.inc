@@ -24,8 +24,6 @@ function PercentColor(const aColor : TBGRAPixel ;aPercent:single) :TBGRAPixel;
 // if aShowFractionalPart is set to FALSE the .xx part is removed
 function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
 
-function NextPowerOfTwo(aValue: integer): integer;
-
 // return a TBGRABitmap from an SVG file.
 // aWidth and aHeight = -1 => return an image with original size as described in svg.
 // aWidth and aHeight <> -1 => return a streched image that fit in the given rectangle (don't keep aspect ratio).
@@ -65,11 +63,6 @@ function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEf
 //     aMargin: the computed margin between childs
 //     aDelta: the computed delta to add to separate childs
 procedure Distribute(aArea, aItemSize, aItemCount: integer; out aMargin, aDelta: single);
-
-function Distance(aPt1, aPt2: TPointF): single;
-
-// Return the angle/s computed from the specified speed value.
-function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 
 function PointFToRectF( p1, p2: TPointF ): TRectF;
 
@@ -252,12 +245,6 @@ begin
      else Result+='.'+inttostr(t);
 end;
 
-function NextPowerOfTwo(aValue: integer): integer;
-begin
-  Result := 1;
-  while Result < aValue do Result := Result shl 1;
-end;
-
 function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 var svg: TBGRASVG;
   FWHFactor, cw, ch: single;
@@ -409,19 +396,6 @@ begin
     aMargin := delta/(aItemCount+1);
     aDelta := aItemSize + aMargin;
   end;
-end;
-
-function Distance(aPt1, aPt2: TPointF): single;
-begin
- Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
-end;
-
-function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
-begin
-  if aWheelRadius <> 0 then
-    Result := 360*aSpeed/(6.28318*aWheelRadius)   // 2*PI*R
-  else
-    Result :=0;
 end;
 
 function PointFToRectF(p1, p2: TPointF): TRectF;

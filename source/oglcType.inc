@@ -136,39 +136,7 @@ type
   TLineType = TPrimitiveType.ptLines..TPrimitiveType.ptLineStrip; // GL_LINES..GL_LINE_STRIP;
   TTriangleType = TPrimitiveType.ptTriangles..TPrimitiveType.ptTriangleFan; //  GL_TRIANGLES..GL_TRIANGLE_FAN;
 
-type
-TOGLCCorner = (cTL=0,   // top left
-               cTR,     // top right
-               cBR,     // bottom right
-               cBL);    // bottom left
-POGLCCorner = ^TOGLCCorner;
-TQuadCornerIndexes = array[ 0..3 ] of TOGLCCorner;
-PQuadCornerIndexes = ^TQuadCornerIndexes;
 
-// quad definition for texture coordinates or other quadrilateral area
-TQuadCoor = array[TOGLCCorner] of TPointF;
-PQuadCoor = ^TQuadCoor;
-const
-NoFlipQuadUV: TQuadCoor=((x:0.0; y:1.0), (x:1.0; y:1.0), (x:1.0; y:0.0), (x:0.0; y:0.0));
-type
-
-{ TQuadCoorHelper }
-
-TQuadCoorHelper = type helper for TQuadCoor
-  procedure SetAsEmpty; inline;
-  procedure SetAsRectangle(aWidth, aHeight: single); inline;
-  procedure SetAsRectangle(aX, aY, aWidth, aHeight: single); inline;
-  procedure CopyFrom(const aQuad: TQuadCoor); inline;
-  procedure AddOffset(const aOffsets: TQuadParamF); inline;
-  procedure Translate(dx, dy: single);
-end;
-
-// indexes to flip a texture
-const FLIP_INDEXES: array[ 0..3 ] of TQuadCornerIndexes = (
-               (cBL, cTL, cBR, cTR), // normal
-               (cBR, cTR, cBL, cTL), // flip H
-               (cTL, cBL, cTR, cBR), // flip V
-               (cTR, cBR, cTL, cBL));// flip HV
 
 
 
@@ -884,56 +852,6 @@ end;
 procedure TOGLCGList.Clear;
 begin
   while FInstance0^.Next <> NIL do DoDelete(FInstance0^.Next);
-end;
-
-{ TQuadCoorHelper }
-
-procedure TQuadCoorHelper.SetAsEmpty;
-begin
-  FillChar(Self, SizeOf(TPointF)*4, 0);
-end;
-
-procedure TQuadCoorHelper.SetAsRectangle(aWidth, aHeight: single);
-begin
-  FillChar(Self, SizeOf(TPointF)*4, 0);
-  Self[cTL] := PointF(0, 0);
-  Self[cTR].x := aWidth;
-  Self[cBR].x := aWidth;
-  Self[cBR].y := aHeight;
-  Self[cBL].y := aHeight;
-end;
-
-procedure TQuadCoorHelper.SetAsRectangle(aX, aY, aWidth, aHeight: single);
-begin
-  Self[cTL].x := aX;
-  Self[cTL].y := aY;
-  Self[cTR].x := aX+aWidth;
-  Self[cTR].y := aY;
-  Self[cBR].x := aX+aWidth;
-  Self[cBR].y := aY+aHeight;
-  Self[cBL].x := aX;
-  Self[cBL].y := aY+aHeight;
-end;
-
-procedure TQuadCoorHelper.CopyFrom(const aQuad: TQuadCoor);
-begin
-  Move(aQuad, Self, SizeOf(TQuadCoor));
-end;
-
-procedure TQuadCoorHelper.AddOffset(const aOffsets: TQuadParamF);
-begin
-  Self[cTL] := Self[cTL] + aOffsets.TopLeft.Value;
-  Self[cTR] := Self[cTR] + aOffsets.TopRight.Value;
-  Self[cBR] := Self[cBR] + aOffsets.BottomRight.Value;
-  Self[cBL] := Self[cBL] + aOffsets.BottomLeft.Value;
-end;
-
-procedure TQuadCoorHelper.Translate(dx, dy: single);
-begin
-  Self[cTL].x := Self[cTL].x + dx;  Self[cTL].y := Self[cTL].y + dy;
-  Self[cTR].x := Self[cTR].x + dx;  Self[cTR].y := Self[cTR].y + dy;
-  Self[cBR].x := Self[cBR].x + dx;  Self[cBR].y := Self[cBR].y + dy;
-  Self[cBL].x := Self[cBL].x + dx;  Self[cBL].y := Self[cBL].y + dy;
 end;
 
 { TColorF }
