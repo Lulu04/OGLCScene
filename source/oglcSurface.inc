@@ -271,9 +271,8 @@ public // utils
 public // Matrix transform
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
-  // Gives a matrix to transform point from surface space to scene space.
-  // (surface space top left is (0,0))
-  function GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
+  // Gives a matrix to transform surface coordinates to world coordinates.
+  function GetMatrixSurfaceToWorld: TOGLCMatrix;
   // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
   // and without applying model view matrix.
   function GetRectAreaInLocalSpace: TRectF;
@@ -546,10 +545,13 @@ begin
                          Angle.Value, Width*Pivot.x, Height*Pivot.y);
 end;
 
-function TSimpleSurfaceWithEffect.GetMatrixSurfaceSpaceToScene: TOGLCMatrix;
+function TSimpleSurfaceWithEffect.GetMatrixSurfaceToWorld: TOGLCMatrix;
   procedure ScanMatrixRecursive(aSurface: TSimpleSurfaceWithEffect; var m: TOGLCMatrix);
   begin
-    if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m);
+    if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m)
+    else if (aSurface.ParentLayer <> NIL) and (aSurface.ParentLayer.Camera <> NIL) then
+          aSurface.ParentLayer.Camera.AddTransformTo(m); // we add first the layer camera transformation
+
     aSurface.AddTransformTo(m);
   end;
 begin
