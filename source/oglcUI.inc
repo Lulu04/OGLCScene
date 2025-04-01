@@ -2402,13 +2402,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TMouseManager.DeleteCursorSprite;
-begin
-  FSprite.Free;
-  FSprite := NIL;
-  SystemMouseCursorVisible := True;
-end;
-
 function TMouseManager.IsOver(aGUISurface: TUIClickableObject): boolean;
 var xx, yy: integer;
   r, rpar: TRect;
@@ -2587,8 +2580,7 @@ procedure TMouseManager.SetCursorSprite(aSprite: TSprite; aClickPointOffset: TPo
 begin
   DeleteCursorSprite;
   FSprite := aSprite;
-  FSprite.SetParentLayer(FParentScene.Layer[0]);
-  FSprite.SetParentScene(FParentScene);
+  FSprite.ParentScene := FParentScene;
   FClickPointOffset := aClickPointOffset;
 
   SystemMouseCursorVisible := False;
@@ -2597,6 +2589,13 @@ end;
 procedure TMouseManager.SetCursorSprite(aTexture: PTexture; aTextureOwner: boolean; aClickPointOffset: TPointF);
 begin
   SetCursorSprite(TSprite.Create(aTexture, aTextureOwner), aClickPointOffset);
+end;
+
+procedure TMouseManager.DeleteCursorSprite;
+begin
+  FSprite.Free;
+  FSprite := NIL;
+  SystemMouseCursorVisible := True;
 end;
 
 {$endif oglcIMPLEMENTATION}
