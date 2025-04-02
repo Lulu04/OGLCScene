@@ -196,7 +196,7 @@ TOGLCCamera = class;
 {$I oglcSurfaceWithProceduralShader.inc}
 {$I oglcPostProcessing.inc}
 {$I oglcSpriteTemplate.inc}
-{$I oglcSpriteEffect.inc}
+{$I oglcFXExplodeTexture.inc}
 {$I oglcElectricalFX.inc}
 {$I oglcGlow.inc}
 {$I oglcDeformationGrid.inc}
@@ -892,7 +892,7 @@ end;
 {$I oglcSurfaceWithProceduralShader.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcSpriteTemplate.inc}
-{$I oglcSpriteEffect.inc}
+{$I oglcFXExplodeTexture.inc}
 {$I oglcElectricalFX.inc}
 {$I oglcGlow.inc}
 {$I oglcDeformationGrid.inc}
