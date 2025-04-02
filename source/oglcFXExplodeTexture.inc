@@ -8,7 +8,7 @@
    aLayerIndex: if <> -1, each created sprite will be added to this layer
    aTexture: texture used to perform the effect. Can be a part of another.
    aRowCount, aColumCount: defines the number of divisions of the texture
-   aCenter: coordinate of the center of the explosion
+   aCenter: coordinate of the center of the explosion in world coordinates
    aCenterVariation: variation applyed randomly to distribute the sprite around the center
    AScaleValue: scale value applyed on each piece
    aAngleMin, aAngleMax: a constant rotation is added to each part, randomly calculated from this range
@@ -39,7 +39,7 @@ function ExplodeTexture(aScene: TOGLCScene; aLayerIndex: integer;
    aZOrder: the child Z order for the created sprites.
    aTexture: texture used to perform the effect. Can be a part of another.
    aRowCount, aColumCount: defines the number of divisions of the texture
-   aCenter: coordinate of the center of the explosion
+   aCenter: coordinate of the center of the explosion in surface coordinates.
    aCenterVariation: variation applyed randomly to distribute the sprite around the center
    AScaleValue: scale value applyed on each piece
    aAngleMin, aAngleMax: a constant rotation is added to each part, randomly calculated from this range
