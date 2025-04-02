@@ -1,7 +1,7 @@
 Version 1.2 - 2025
 > added two procedure to TOGLCPath: FlipHorizontaly and FlipVerticaly.
 > new property for surface: CollisionBody. It allow to describe the collision area for a surface by associating one or several primitive shape: point, line, circle, rectangle, polygon. This primitive shapes are then used to check a collision between another surface. 
-> fixed and improved function ExplodeTexture(). It allow to make an explosion effect with a texture. The principe is: a grid is applyed on the texture to divide it in sub-textures associated to a TPolarSprite.
+> fixed and improved function ExplodeTexture(). It allow to make an explosion effect with a texture. The principe is: the texture is divided in rectangular sub-textures associated to a TPolarSprite.
 > TQuad4Color replace TMultiColorRectangle (the last is now deprecated). TQuad4Color can be a rectangle or any convex quadrilateral with a different color for each vertex. 
 > code in function TOGLCCamera.WorldToControl() and ControlToWorld() now use matrix to transform the point.
 > added camera AutoFollow feature: camera can now moves smoothly to a fixed point or follow a surface.
