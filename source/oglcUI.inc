@@ -2557,15 +2557,16 @@ procedure TMouseManager.UpDate(const AElapsedTime: single);
 begin
   FMousePos := FParentScene.GetMouseCoorOnViewPort;
 
-  if FSprite = NIL then exit;
-  FSprite.Update(AElapsedTime);
-  FSprite.X.Value := FMousePos.x - FClickPointOffset.x;
-  FSprite.Y.Value := FMousePos.y - FClickPointOffset.y;
+  if FSprite <> NIL then begin
+    FSprite.Update(AElapsedTime);
+    FSprite.X.Value := FMousePos.x - FClickPointOffset.x;
+    FSprite.Y.Value := FMousePos.y - FClickPointOffset.y;
+  end;
 end;
 
 procedure TMouseManager.Draw;
 begin
-  if FSprite <> NIL then FSprite.Draw(1.0);
+  if (FSprite <> NIL) and FSprite.Visible then FSprite.Draw(1.0);
 end;
 
 constructor TMouseManager.Create(aParentScene: TOGLCScene);
