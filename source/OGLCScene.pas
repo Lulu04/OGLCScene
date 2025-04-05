@@ -29,8 +29,6 @@ unit OGLCScene;
 
 //{$define DEBUG_MODE_ON}  // uncomment to draw a red rectangle around all surfaces.
 
-//{$define SHADER_RAISE_EXCEPTION_ON_COMPILATION_ERROR} // uncomment to raise exception when a shader don't compile
-
 {$define USE_glcorearb}  // uncomment to use the glcorearb.pas header for OpenGL written by Chris Rorden.
                          // comment to use fpc header GL and GLExt
 
