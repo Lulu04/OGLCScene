@@ -411,6 +411,9 @@ TOGLCScene = class(TOGLCContext)
   procedure ExecuteDuring( aTimeInSecond:single ); Deprecated;
 
   procedure RunScreen(aScreen: TScreenTemplate; aFadeWithBlackColor: boolean=TRUE);
+  // the requested screen after a call to RunScreen()
+  property RequestedScreen: TScreenTemplate read FScreenRequested;
+  // the current running screen
   property CurrentScreen: TScreenTemplate read FCurrentScreen;
   property ScreenFadeTime: single read FScreenFadeTime write FScreenFadeTime;
 
