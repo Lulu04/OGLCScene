@@ -195,6 +195,7 @@ TOGLCCamera = class;
 {$I oglcPostProcessing.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcFXExplodeTexture.inc}
+{$I oglcFXScrolledSprite.inc}
 {$I oglcElectricalFX.inc}
 {$I oglcGlow.inc}
 {$I oglcDeformationGrid.inc}
@@ -327,6 +328,7 @@ TOGLCScene = class(TOGLCContext)
   FParticleRenderer: TOGLCParticleRenderer;
   FNoFilterTextureMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
   FTexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX;
+  FScrollableTextureRenderer: TOGLCScrollableTextureRenderer;
   function GetFastLineRenderer: TOGLCFastLineRenderer;
   function GetGlowRenderer: TOGLCGlowRenderer;
   function GetElectricalBeamRenderer: TOGLCElectricalBeamRenderer;
@@ -339,6 +341,7 @@ TOGLCScene = class(TOGLCContext)
   function GetThreeColorTriangleRenderer: TOGLCThreeColorTriangleRenderer;
   function GetTileRenderer: TOGLCTileRenderer;
   function GetNoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer;
+  function GetScrollableTextureRenderer: TOGLCScrollableTextureRenderer;
   procedure CreateRenderers;
   procedure DestroyRenderers;
  private
@@ -474,7 +477,7 @@ TOGLCScene = class(TOGLCContext)
   property TexturedMVTriangleRenderer: TOGLCTexturedMVTriangleRenderer read GetTexturedMVTriangleRenderer;
   property NoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer read GetNoFilterTexturedMVTriangleRenderer;
   property TexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX read GetTexturedTriangleRendererWithFX;
-
+  property ScrollableTextureRenderer: TOGLCScrollableTextureRenderer read GetScrollableTextureRenderer;
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
   function CreateTexturedFont(aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
@@ -894,6 +897,7 @@ end;
 {$I oglcBorderAndFill.inc}
 {$I oglcSpriteTemplate.inc}
 {$I oglcFXExplodeTexture.inc}
+{$I oglcFXScrolledSprite.inc}
 {$I oglcElectricalFX.inc}
 {$I oglcGlow.inc}
 {$I oglcDeformationGrid.inc}
@@ -1205,6 +1209,7 @@ begin
   FreeAndNil(FTexturedTriangleRenderer);
   FreeAndNil(FNoFilterTextureMVTriangleRenderer);
   FreeAndNil(FTexturedTriangleRendererWithFX);
+  FreeAndNil(FScrollableTextureRenderer);
 
   FreeAndNil(FTileRenderer);
   FreeAndNil(FGlowRenderer);
@@ -1701,6 +1706,13 @@ begin
   if FNoFilterTextureMVTriangleRenderer = NIL then
     FNoFilterTextureMVTriangleRenderer := TOGLCNoFilterTextureMVTriangleRenderer.Create(Self, True);
   Result := FNoFilterTextureMVTriangleRenderer;
+end;
+
+function TOGLCScene.GetScrollableTextureRenderer: TOGLCScrollableTextureRenderer;
+begin
+  if FScrollableTextureRenderer = NIL then
+    FScrollableTextureRenderer := TOGLCScrollableTextureRenderer.Create(Self, True);
+  Result := FScrollableTextureRenderer;
 end;
 
 procedure TOGLCScene.SetUpdatePeriod(AValue: integer);
