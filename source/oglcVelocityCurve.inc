@@ -172,6 +172,30 @@ type
   end;
 
 
+  { TBoundedPointFParam }
+
+  TBoundedPointFParam = class(TCustomParam)
+  private
+    function GetState: TParamState;
+  protected
+    function GetValue: TPointF;
+    procedure SetValue(AValue: TPointF);
+  public
+    x, y: TBoundedFParam;
+    constructor Create;
+    destructor Destroy; override;
+    // if Loop is set to TRUE, value can loop between bounds (usefull for i.e. [0..360] angle)
+    // if it's set to FALSE, value is clamped to MinValue and MaxValue.
+    procedure SetBoundary(aMin, aMax: TPointF; aLoop: boolean = False);
+    // return True if the value have changed
+    procedure OnElapse(const AElapsedSec: single); override;
+    property Value: TPointF read GetValue write SetValue;
+    property State: TParamState read GetState;
+  end;
+  function CreateBoundedPointFParam(const Min, Max: TPointF; Loop: boolean = False): TBoundedPointFParam;
+
+type
+
   // Polar coordinates represented by an angle in degree and a distance
   TPolarCoor = record
     Distance,
@@ -300,6 +324,12 @@ begin
   Result := TBoundedFParam.Create;
   Result.SetBoundary(Min, Max);
   Result.Loop := Loop;
+end;
+
+function CreateBoundedPointFParam(const Min, Max: TPointF; Loop: boolean): TBoundedPointFParam;
+begin
+  Result := TBoundedPointFParam.Create;
+  Result.SetBoundary(Min, Max, Loop);
 end;
 
 function PolarCoor(aDistance, aAngle: single): TPolarCoor;
@@ -587,6 +617,58 @@ procedure TPointFParam.ChangeTo(aNewValue: TPointF; aSeconds: single; aCurveID: 
 begin
   x.ChangeTo(aNewValue.x, aSeconds, aCurveID);
   y.ChangeTo(aNewValue.y, aSeconds, aCurveID);
+end;
+
+{ TBoundedPointFParam }
+
+function TBoundedPointFParam.GetState: TParamState;
+begin
+  if (x.State = psNO_CHANGE) and (y.State = psNO_CHANGE) then
+    Result := psNO_CHANGE
+  else if (x.State = psADD_CONSTANT) and (y.State = psADD_CONSTANT) then
+    Result := psADD_CONSTANT
+  else if (x.State = psUSE_CURVE) and (y.State = psUSE_CURVE) then
+    Result := psUSE_CURVE
+  else
+    Result := psCHANGING;
+end;
+
+function TBoundedPointFParam.GetValue: TPointF;
+begin
+  Result := PointF(x.Value, y.Value);
+end;
+
+procedure TBoundedPointFParam.SetValue(AValue: TPointF);
+begin
+  x.Value := AValue.x;
+  y.Value := AValue.y;
+end;
+
+constructor TBoundedPointFParam.Create;
+begin
+  x := TBoundedFParam.Create;
+  y := TBoundedFParam.Create;
+end;
+
+destructor TBoundedPointFParam.Destroy;
+begin
+  x.Free;
+  x := NIL;
+  y.Free;
+  y := NIL;
+  inherited Destroy;
+end;
+
+procedure TBoundedPointFParam.SetBoundary(aMin, aMax: TPointF; aLoop: boolean);
+begin
+  x.SetBoundary(Min(aMin.x, aMax.x), Max(aMin.x, aMax.x), aLoop);
+  y.SetBoundary(Min(aMin.y, aMax.y), Max(aMin.y, aMax.y), aLoop);
+end;
+
+procedure TBoundedPointFParam.OnElapse(const AElapsedSec: single);
+begin
+  x.OnElapse(AElapsedSec);
+  y.OnElapse(AElapsedSec);
 end;
 
 { TDataCurve }
