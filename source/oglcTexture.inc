@@ -193,13 +193,13 @@ end;
 function TTexture.GetTopLeftCoor(aFrameIndex: integer): TPointF;
 begin
   Result.x := FramesCoord[aFrameIndex,cTL].x * TextureWidth;
-  Result.y := FramesCoord[aFrameIndex,cTL].y * TextureHeight;    /////////////
+  Result.y := (1.0 - FramesCoord[aFrameIndex,cTL].y) * TextureHeight;
 end;
 
 function TTexture.GetBottomRightCoor(aFrameIndex: integer): TPointF;
 begin
   Result.x := FramesCoord[aFrameIndex,cBR].x * TextureWidth;
-  Result.y := FramesCoord[aFrameIndex,cBR].y * TextureHeight;
+  Result.y := (1.0 - FramesCoord[aFrameIndex,cBR].y) * TextureHeight;
 end;
 
 function TTexture.GetRect(aFrameIndex: integer): TRect;
