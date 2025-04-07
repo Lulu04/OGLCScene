@@ -84,8 +84,7 @@ begin
  cellw := aTexture^.FrameWidth/aColumCount;
  cellh := aTexture^.FrameHeight/aRowCount;
 
- TP := PointF(aTexture^.TextureWidth*aTexture^.FramesCoord[0][cTL].x,
-              aTexture^.TextureHeight*(1.0-aTexture^.FramesCoord[0][cTR].y));
+ TP := aTexture^.GetTopLeftCoor(0);
 
  for ro:=0 to aRowCount-1 do
    for co:=0 to aColumCount-1 do begin
@@ -134,8 +133,7 @@ begin
  cellw := aTexture^.FrameWidth/aColumCount;
  cellh := aTexture^.FrameHeight/aRowCount;
 
- TP := PointF(aTexture^.TextureWidth*aTexture^.FramesCoord[0][cTL].x,
-              aTexture^.TextureHeight*(1.0-aTexture^.FramesCoord[0][cTR].y));
+ TP := aTexture^.GetTopLeftCoor(0);
 
  for ro:=0 to aRowCount-1 do
    for co:=0 to aColumCount-1 do begin
