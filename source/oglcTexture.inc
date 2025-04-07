@@ -1,4 +1,10 @@
 {$ifdef oglcINTERFACE}
+{
+  Textures can be atlas that contains several sub-textures
+  Sub-texture is a part of another texture, it share the same OpenGL ID than its parent.
+  A texture or a sub-texture can be splitted in several frames.
+  Frames are several images to represent an image animation.
+}
 type
 
 { TTexture }
@@ -16,10 +22,16 @@ public
   FrameWidth: integer;
   FrameHeight: integer;
   FrameCount: integer; // = 1 minimum = length(FramesCoord)
-  FramesCoord: array of TQuadCoor;  // [0] is whole texture, [1] is first frame, [2] is second frame, ...
+  FramesCoord: array of TQuadCoor;  // [0] is whole texture or sub-texture, [1] is first frame, [2] is second frame, ...
 
   // convert a texture pixel coordinates into its UV equivalent
-  function XYToUV(aPt: TPointF): TPointF;
+  // texture coordinates (0,0) is the top/left of the (sub-)texture. (local space)
+  function FrameXYToUV(aPt: TPointF; aFrameIndex: integer=0): TPointF;
+  // the returned point is relative to the Top/Left of the WHOLE texture
+  function GetTopLeftCoor(aFrameIndex: integer): TPointF;
+  function GetBottomRightCoor(aFrameIndex: integer): TPointF;
+  // the returned rectangle is relative to the Top/Left of the WHOLE texture
+  function GetRect(aFrameIndex: integer): TRect;
 
   procedure SetSingleFrame;
   procedure SetFrameSize(AFrameWidth, AFrameHeight: integer);
@@ -172,28 +184,46 @@ begin
     end;
 end;
 
-function TTexture.XYToUV(aPt: TPointF): TPointF;
+function TTexture.FrameXYToUV(aPt: TPointF; aFrameIndex: integer): TPointF;
 begin
-  Result.x := aPt.x / FrameWidth + FramesCoord[0,cBL].x;
-  Result.y := 1.0 - aPt.y / FrameHeight + FramesCoord[0,cBL].y;
+  Result.x := aPt.x / FrameWidth + FramesCoord[aFrameIndex,cBL].x;
+  Result.y := aPt.y / FrameHeight + FramesCoord[aFrameIndex,cBL].y;
+end;
+
+function TTexture.GetTopLeftCoor(aFrameIndex: integer): TPointF;
+begin
+  Result.x := FramesCoord[aFrameIndex,cTL].x * TextureWidth;
+  Result.y := FramesCoord[aFrameIndex,cTL].y * TextureHeight;    /////////////
+end;
+
+function TTexture.GetBottomRightCoor(aFrameIndex: integer): TPointF;
+begin
+  Result.x := FramesCoord[aFrameIndex,cBR].x * TextureWidth;
+  Result.y := FramesCoord[aFrameIndex,cBR].y * TextureHeight;
+end;
+
+function TTexture.GetRect(aFrameIndex: integer): TRect;
+begin
+  Result.TopLeft := GetTopLeftCoor(aFrameIndex).Round;
+  Result.BottomRight := GetBottomRightCoor(aFrameIndex).Round;
 end;
 
 procedure TTexture.TakePartOf(aTexture: PTexture; aRect: TRect);
 var fw, fh, originU, originV: single;
 begin
   FParentScene := aTexture^.FParentScene;
-  TextureWidth := aTexture^.TextureWidth; // aRect.Width;
-  TextureHeight := aTexture^.TextureHeight; // aRect.Height;
+  TextureWidth := aTexture^.TextureWidth;
+  TextureHeight := aTexture^.TextureHeight;
   FrameWidth := aRect.Width;
   FrameHeight := aRect.Height;
   FrameCount := 1;
   ID := aTexture^.ID;
   IDOwner := FALSE;
 
-  fw := aTexture^.FrameWidth/aTexture^.TextureWidth;
-  fh := aTexture^.FrameHeight/aTexture^.TextureHeight;
-  originU := aRect.Left/aTexture^.TextureWidth;      // + TexCoor[0]
-  originV := 1-aRect.Top/aTexture^.TextureHeight;    // + 1-TexCoor[0]
+  fw := aRect.Width / aTexture^.TextureWidth;
+  fh := aRect.Height / aTexture^.TextureHeight;
+  originU := aRect.Left / aTexture^.TextureWidth;
+  originV := 1 - aRect.Top / aTexture^.TextureHeight;
 
   SetLength(FramesCoord, 1);
 
@@ -219,8 +249,8 @@ begin
      then Raise Exception.Create('Rect size don''t match AFrame size');
 
   FParentScene := aTexture^.FParentScene;
-  TextureWidth := aTexture^.TextureWidth; // aRect.Width;
-  TextureHeight := aTexture^.TextureHeight; // aRect.Height;
+  TextureWidth := aTexture^.TextureWidth;
+  TextureHeight := aTexture^.TextureHeight;
   ID := aTexture^.ID;
   IDOwner := FALSE;
 
@@ -233,10 +263,10 @@ begin
   if FrameCount > 1 then inc(FrameCount); // because frame[0] is whole texture
   SetLength(FramesCoord, FrameCount);
 
-  fw := AFrameWidth/aTexture^.TextureWidth;
-  fh := AFrameHeight/aTexture^.TextureHeight;
-  originY := 1-aRect.Top/aTexture^.TextureHeight;
-  originX := aRect.Left/aTexture^.TextureWidth;
+  fw := AFrameWidth / aTexture^.TextureWidth;
+  fh := AFrameHeight / aTexture^.TextureHeight;
+  originY := 1 - aRect.Top / aTexture^.TextureHeight;
+  originX := aRect.Left / aTexture^.TextureWidth;
 
   FramesCoord[ 0, cTL ].X := originX;
   FramesCoord[ 0, cTL ].Y := originY;
