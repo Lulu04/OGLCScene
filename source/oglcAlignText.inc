@@ -157,6 +157,7 @@ begin
   if not FReadyToRender then exit;
 
   W := SplitTextToWordArray(FCaption, ' ');
+  if Length(w) = 0 then exit;
   // compute the number of word except #10
   xx := 0;
   for j:=0 to High(W) do if W[j] <> #10 then inc(xx);
