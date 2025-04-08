@@ -535,6 +535,7 @@ var next, current: integer;
   vc, vn: TPointF;
 begin
   Result := False;
+  if Length(aPts) = 0 then exit;
   for current :=0 to High(aPts) do begin
     next := current + 1;
     if next = Length(aPts) then next := 0;
@@ -549,6 +550,7 @@ function TCollisionFunctions.PolygonLine(const aPts: ArrayOfTPointF;
   const aLinePt1, aLinePt2: TPointF): boolean;
 var current: integer;
 begin
+  if Length(aPts) = 0 then exit(False);
   current := 0;
   while current < High(aPts)-1 do begin
     if LineLine(aPts[current], aPts[current+1], aLinePt1, aLinePt2) then exit(True);
@@ -562,6 +564,7 @@ function TCollisionFunctions.PolygonCircle(const aPts: ArrayOfTPointF;
   const aCenter: TPointF; const aRadius: single): boolean;
 var current: integer;
 begin
+ if Length(aPts) = 0 then exit(False);
   current := 0;
   while current < High(aPts)-1 do begin
     if LineCircle(aPts[current], aPts[current+1], aCenter, aRadius) then exit(True);
@@ -575,6 +578,7 @@ end;
 function TCollisionFunctions.PolygonRectF(const aPts: ArrayOfTPointF; r: TRectF): boolean;
 var current: integer;
 begin
+  if Length(aPts) = 0 then exit(False);
   current := 0;
   while current < High(aPts)-1 do begin
     if LineRectF(aPts[current], aPts[current+1], r) then exit(True);
@@ -588,6 +592,7 @@ end;
 function TCollisionFunctions.PolygonPolygon(const aPts1, aPts2: ArrayOfTPointF): boolean;
 var current: integer;
 begin
+  if (Length(aPts1) = 0)  or (Length(aPts2) = 0) then exit(False);
   current := 0;
   while current < High(aPts1)-1 do begin
     if PolygonLine(aPts2, aPts1[current], aPts1[current+1]) then exit(True);
