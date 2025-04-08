@@ -1,4 +1,7 @@
 Version 1.2 - 2025
+> different unicode charset are defined to easily retrieve the characters used by a language. They are grouped in property TOGLCScene.Charsets.
+> added ReplaceScenario function: now the content of a scenario can be replaced. Scenario error generates log messages.
+> new surface type TScrollableSprite: it display a texture and can scroll it.
 > added two procedure to TOGLCPath: FlipHorizontaly and FlipVerticaly.
 > new property for surface: CollisionBody. It allow to describe the collision area for a surface by associating one or several primitive shape: point, line, circle, rectangle, polygon. This primitive shapes are then used to check a collision between another surface. 
 > fixed and improved function ExplodeTexture(). It allow to make an explosion effect with a texture. The principe is: the texture is divided in rectangular sub-textures associated to a TPolarSprite.
@@ -8,6 +11,7 @@ Version 1.2 - 2025
 > added TSmoothPointF and TSmoothSingle: allow to change value smoothly for variable TPointF or single.
 > fixed wrong formula in function LinearSpeedToAngleRotation().
 > fix missing condition check to SetChildOf() function.
+> fix a bug in TTexture.TakePartOf() function. Now the returned texture have the right UV coordinates.
 > added new surface type: TGradientRectangle, allow multi color gradient vertically or horizontally.
 > TOGLCGlow have now 4 colors. The Tint property is now separated.
 > added new surface type: TOGLCSpotLight, like TOGLCGlow but in one direction.
