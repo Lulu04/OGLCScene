@@ -250,6 +250,8 @@ public  // Scenario
   procedure PlayScenario(aID: TIDScenario; aFromBeginning: boolean=TRUE);
   function AddAndPlayScenarioFromFile(const aFilename: string): TIDScenario;
   function AddAndPlayScenario(const aLines: string): TIDScenario;
+  procedure ReplaceScenario(aID: TIDScenario; const aLines: string);
+  procedure ReplaceScenarioFromFile(aID: TIDScenario; const aFilename: string);
   procedure StopScenario(aID: TIDScenario);
   procedure StopAllScenario;
   function ScenarioIsPlaying(aID: TIDScenario): boolean;
@@ -1271,6 +1273,26 @@ begin
   PlayScenario(Result);
 end;
 
+procedure TSimpleSurfaceWithEffect.ReplaceScenario(aID: TIDScenario; const aLines: string);
+var s: TScenario;
+begin
+  s := GetScenario(aID);
+  if s <> NIL then begin
+    s.FIsRunning := FALSE;
+    s.InitWith(aLines);
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.ReplaceScenarioFromFile(aID: TIDScenario; const aFilename: string);
+var s: TScenario;
+begin
+  s := GetScenario(aID);
+  if s <> NIL then begin
+    s.FIsRunning := FALSE;
+    s.LoadFromFile(aFilename);
+  end;
+end;
+
 procedure TSimpleSurfaceWithEffect.StopScenario(aID: TIDScenario);
 var s: TScenario;
 begin
@@ -1354,7 +1376,11 @@ end;
 procedure TScenario.LoadFromFile(const aFilename: string);
 begin
  Actions.Clear;
- Actions.LoadFromFile(aFilename);
+ try
+   Actions.LoadFromFile(aFilename);
+ except
+   ParentSurface.ParentScene.LogError('TScenario.LoadFromFile: error while loading scenario file "'+aFilename+'"');
+ end;
 end;
 
 procedure TScenario.DecodeAction;
@@ -1451,7 +1477,10 @@ begin
   else if FScenarioDecodeProc <> NIL then FScenarioDecodeProc(FTemp);
  end;//case
  except
-   FRunError := True;
+   On E :Exception do begin
+      ParentSurface.ParentScene.LogError('TScenario.DecodeAction: an exception occurs: "'+E.Message+'"');
+      FRunError := True;
+    end;
  end;
 end;
 
