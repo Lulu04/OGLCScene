@@ -173,6 +173,7 @@ TOGLCCamera = class;
 {$I oglcVersion.inc}
 {$I oglcLogFile.inc}
 {$I oglcVelocityCurve.inc}
+{$I oglcCharset.inc}
 {$I oglcMath.inc}
 {$I gl_core_matrix.inc}
 {$I oglcType.inc}
@@ -389,6 +390,9 @@ TOGLCScene = class(TOGLCContext)
   PostProcessing: TOGLCPostProcessingUtils;
   // This property offers a bunch of functions to test collision between different shapes.
   Collision: TCollisionFunctions;
+  // This property offers a bunch of charset that you can use while creating your font texture.
+  // Use one or add several charset to match your language.
+  Charsets: TOGLCCharsets;
 
   // Aspect ratio can be any value >= 1.0 ex. 4/3, 16/9. The TOpenGLControl is resized to respect the aspect ratio
   // and centered on its parent.
@@ -875,6 +879,7 @@ end;
 {$define oglcIMPLEMENTATION}
 {$I oglcLogFile.inc}
 {$I oglcVelocityCurve.inc}
+{$I oglcCharset.inc}
 {$I oglcMath.inc}
 {$I gl_core_matrix.inc}
 {$I oglcType.inc}
