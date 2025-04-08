@@ -169,9 +169,10 @@ end;
 
 function TOGLCCollisionBody.CheckCollisionWith(const aBodyItem: TOGLCBodyItem): boolean;
 var item: TOGLCBodyItem;
-  i: integer;
+  i: SizeUInt;
 begin
   Result := False;
+  if FItems.Size = 0 then exit;
   // sets the matrix
   //FSurfaceToWordMatrix.CopyFrom(FParentSurface.GetMatrixSurfaceSpaceToScene);
 
