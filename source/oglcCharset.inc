@@ -13,8 +13,9 @@ private
   procedure AddRange(var charset: string; start, stop: QWord);
 public
 const
+  NUMBER='0123456789';
   ASCII_SYMBOL='!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~';
-  SIMPLELATIN=' 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  SIMPLELATIN=NUMBER+' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   LATIN1_SUPPLEMENT_1='ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ';
   LATIN1_SUPPLEMENT_2=' ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿';
 
