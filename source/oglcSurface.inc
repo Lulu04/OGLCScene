@@ -121,8 +121,7 @@ protected
   FReferenceSurfaceForSymmetry: TSimpleSurfaceWithEffect;
   FSurfaceOrigin: TPointF;
   FZOrderAsChild: integer; // z order in case the surface is a child because child can be below or above its parent surface.
-  procedure SetZOrderAsChild(AValue: integer);
-  function GetChild(aIndex: integer): TSimpleSurfaceWithEffect;
+   function GetChild(aIndex: integer): TSimpleSurfaceWithEffect;
   procedure SetParentSurface(aSurface: TSimpleSurfaceWithEffect);
   procedure SetParentScene( aScene: TOGLCScene ); virtual;
   procedure SetParentLayer( aLayer: TLayer );
@@ -323,7 +322,7 @@ public // Childs
   // a positive value means the surface is above its parent, a negative value means the surface is below its parent.
   // The drawing order is: ...-3 -2 -1 parent 0 1 2 3...
   // ZOrderAsChild is ignored if the surface is not a child of another.
-  property ZOrderAsChild: integer read FZOrderAsChild write SetZOrderAsChild;
+  property ZOrderAsChild: integer read FZOrderAsChild write SetZOrder;
   // if this surface is a child, sets this property to True to apply an horizontal and/or vertical symmetry
   // on its coordinates when its parent is flipped.
   // Don't sets this property to True if the surface is not a child of another surface.
@@ -436,13 +435,6 @@ end;
 procedure TSimpleSurfaceWithEffect.SetScaledY(AValue: single);
 begin
   CenterY := AValue + GetScaledHeight*0.5;
-end;
-
-procedure TSimpleSurfaceWithEffect.SetZOrderAsChild(AValue: integer);
-begin
-  if FZOrderAsChild = AValue then Exit;
-  FZOrderAsChild := AValue;
-  FChilds.Sort(@CompareSurfaceChildsByZOrder);
 end;
 
 function TSimpleSurfaceWithEffect.GetScaledAreaF: TRectF;
