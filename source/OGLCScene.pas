@@ -273,6 +273,10 @@ TOGLCContext = class(TLayerList)
   constructor Create(aOGLContext: TOpenGLControl; aAspectRatio: single); virtual;
   destructor Destroy; override;
 
+  // Allow to change the scene aspect ratio at runtime.
+  // Warning: the coordinates of the existing surfaces on the scene are not modified.
+  procedure ChangeAspectRatioTo(aAspectRatio: single);
+
   // must be called from main windows to ensure keyboard input
   procedure ProcessOnKeyDown(var Key: Word; Shift: TShiftState);
   // must be called from main windows to ensure keyboard input
@@ -789,6 +793,12 @@ begin
   FMouseManager.Free;
   FMouseManager := NIL;
   inherited Destroy;
+end;
+
+procedure TOGLCContext.ChangeAspectRatioTo(aAspectRatio: single);
+begin
+  FAspectRatio := aAspectRatio;
+  UpdateViewPortSize;
 end;
 
 function TOGLCContext.MakeContextCurrent: boolean;
