@@ -1,4 +1,5 @@
 Version 1.2 - 2025
+> scene aspect ratio can be changed at runtime calling MyScene.ChangeAspectRatioTo(...). NOTE: the coordinates of existing surface on the scene are not modified. It is recommended to call this function at the beginning of screen.CreateObjects.
 > different unicode charset are defined to easily retrieve the characters used by a language. They are grouped in property TOGLCScene.Charsets.
 > added ReplaceScenario function: now the content of a scenario can be replaced. Scenario error generates log messages.
 > new surface type TScrollableSprite: it display a texture and can scroll it.
