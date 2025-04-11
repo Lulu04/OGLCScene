@@ -93,6 +93,8 @@ TCollisionFunctions = record
   function PolygonCircle(const aPts: ArrayOfTPointF; const aCenter: TPointF; const aRadius: single): boolean;
   function PolygonRectF(const aPts: ArrayOfTPointF; r: TRectF): boolean;
   function PolygonPolygon(const aPts1, aPts2: ArrayOfTPointF): boolean;
+private
+  function DistanceSqr(aPt1, aPt2: TPointF): single;
 end;
 
 var
@@ -410,7 +412,7 @@ end;
 
 function TCollisionFunctions.PointCircle(const aPt, aCenter: TPointF; const aRadius: single): boolean;
 begin
-  Result := Distance(aPt, aCenter) < aRadius;
+  Result := DistanceSqr(aPt, aCenter) < Sqr(aRadius);
 end;
 
 function TCollisionFunctions.PointRectF(const aPt: TPointF; const r: TRectF): boolean;
@@ -422,7 +424,7 @@ end;
 function TCollisionFunctions.CircleCircle(const aCenter1: TPointF;
   const aRadius1: single; const aCenter2: TPointF; const aRadius2: single): boolean;
 begin
-  Result := Distance(aCenter1, aCenter2) < aRadius1 + aRadius2;
+  Result := DistanceSqr(aCenter1, aCenter2) < Sqr(aRadius1 + aRadius2);
 end;
 
 function TCollisionFunctions.CircleRectF(const aCenter: TPointF;
@@ -437,7 +439,7 @@ begin
   if closestY < r.Top then closestY := r.Top
     else if closestY > r.Bottom then closestY := r.Bottom;
 
-  Result := Distance(PointF(closestX, closestY), aCenter) < aRadius;
+  Result := DistanceSqr(PointF(closestX, closestY), aCenter) < Sqr(aRadius);
 end;
 
 function TCollisionFunctions.RectFRectF(const r1, r2: TRectF): boolean;
@@ -501,7 +503,7 @@ begin
   // get distance to closest point
   distX := closestX - aCircleCenter.x;
   distY := closestY - aCircleCenter.y;
-  Result := sqrt((distX*distX) + (distY*distY)) <= aRadius;
+  Result := (distX*distX) + (distY*distY)) <= qr(aRadius);
 end;
 
 function TCollisionFunctions.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
@@ -601,6 +603,11 @@ begin
   // optional:
   if PolygonPoint(aPts1, aPts2[0]) then exit(True); // check if the polygon2 is inside polygon1
   Result := PolygonPoint(aPts2, aPts1[0]); // check if the polygon1 is inside polygon2
+end;
+
+function TCollisionFunctions.DistanceSqr(aPt1, aPt2: TPointF): single;
+begin
+  Result := sqr(aPt2.x-aPt1.x) + sqr(aPt2.y-aPt1.y);
 end;
 
 function ColorAttachmentCount: GLint;
