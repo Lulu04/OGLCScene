@@ -503,7 +503,7 @@ begin
   // get distance to closest point
   distX := closestX - aCircleCenter.x;
   distY := closestY - aCircleCenter.y;
-  Result := (distX*distX) + (distY*distY)) <= qr(aRadius);
+  Result := (distX*distX) + (distY*distY) <= Sqr(aRadius);
 end;
 
 function TCollisionFunctions.LineRectF(aLinePt1, aLinePt2: TPointF; aRect: TRectF): boolean;
