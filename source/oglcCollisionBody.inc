@@ -12,11 +12,6 @@ TOGLCBodyItemType = (_btRect, _btCircle, _btLine, _btPoint, _btPolygon);
 
 TOGLCBodyItem = packed record
  BodyType: TOGLCBodyItemType;
-{ case TOGLCBodyItemType of
-   _btRect: (rect: TRectF);
-   _btCircle: (center: TPointF; radius: single);
-   _btLine: (pt1, pt2: TPointF);
-   _btPoint: (pt: TPointF);   }
   rect: TRectF;      //_btRect
   center: TPointF; radius: single;  //_btCircle
   pt1, pt2: TPointF; //_btLine
