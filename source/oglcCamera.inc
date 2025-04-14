@@ -147,6 +147,7 @@ public
   function WorldToControlF(aPt: TPointF): TPointF;
   // converts a TOpenGLCcontrol coordinates to world coordinates according to camera transformations
   function ControlToWorld(aX, aY: integer): TPointF;
+  function ControlToWorld(aPt: TPointF): TPointF;
 
   // return the bounds of the view currently seen by the camera (in scene coordinates)
   function GetViewRect: TRectF;
@@ -496,6 +497,11 @@ begin
   Result.x := r.Left + r.Width * Result.x;
   Result.y := r.Top + r.Height * Result.y; }
   Result := GetInverseTransformMatrix.Transform(PointF(aX, aY));
+end;
+
+function TOGLCCamera.ControlToWorld(aPt: TPointF): TPointF;
+begin
+  Result := GetInverseTransformMatrix.Transform(aPt);
 end;
 
 function TOGLCCamera.GetViewRect: TRectF;
