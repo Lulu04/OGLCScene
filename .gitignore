@@ -7,7 +7,6 @@
 lib/
 backup/
 .DS_Store
-Tools/GameHelper/
 examples/Data/atlas.png
 *.odg
 project_template/Binary/atlas.png
