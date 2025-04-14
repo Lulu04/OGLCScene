@@ -271,11 +271,13 @@ public // utils
   procedure CenterOnSurface(ASurface: TSimpleSurface);
   // Center the surface on its parent
   procedure CenterOnParent;
-public // Matrix transform
+public // Local <-> World
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
   // Gives a matrix to transform surface coordinates to world coordinates.
   function GetMatrixSurfaceToWorld: TOGLCMatrix;
+  // Returns the rectangular area that contains the transformed surface.
+  function GetRectAreaInWorldSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF;
   // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
   // and without applying model view matrix.
   function GetRectAreaInLocalSpace: TRectF;
@@ -556,6 +558,39 @@ function TSimpleSurfaceWithEffect.GetMatrixSurfaceToWorld: TOGLCMatrix;
 begin
   Result.LoadIdentity;
   ScanMatrixRecursive(Self, Result);
+end;
+
+function TSimpleSurfaceWithEffect.GetRectAreaInWorldSpace(
+  aGiveRectThatContainRotatedBounds: boolean): TRectF;
+var tl,tr,bl,br, mini, maxi: TPointF;
+    m: TOGLCMatrix;
+  function GetMin(const v1, v2: single): single; inline;
+  begin
+    if v1 < v2 then Result := v1 else Result := v2;
+  end;
+  function GetMax(const v1, v2: single): single; inline;
+  begin
+    if v1 > v2 then Result := v1 else Result := v2;
+  end;
+begin
+  if aGiveRectThatContainRotatedBounds then begin
+    m := GetMatrixSurfaceToWorld;
+    tl := m.Transform(PointF(0, 0));
+    tr := m.Transform(PointF(Width, 0));
+    br := m.Transform(PointF(Width, Height));
+    bl := m.Transform(PointF(0, Height));
+
+    mini := PointF(GetMin(tl.x, GetMin(tr.x, GetMin(bl.x, br.x))),
+                   GetMin(tl.y, GetMin(tr.y, GetMin(bl.y, br.y))));
+    maxi := PointF(GetMax(tl.x, GetMax(tr.x, GetMax(bl.x, br.x))),
+                   GetMax(tl.y, GetMax(tr.y, GetMax(bl.y, br.y))));
+
+    Result.Left := mini.x;
+    Result.Top := mini.y;
+    Result.Right := maxi.x;
+    Result.Bottom := maxi.y;
+  end
+  else Result := GetMatrixSurfaceToWorld.Transform(GetRectAreaInLocalSpace);
 end;
 
 function TSimpleSurfaceWithEffect.GetRectAreaInLocalSpace: TRectF;
