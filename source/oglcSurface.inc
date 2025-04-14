@@ -267,8 +267,6 @@ public // utils
 public // Local <-> World
   function SurfaceToScene(aPt: TPointF): TPointF;
   function SceneToSurface(aPt: TPointF): TPointF;
-  function SurfaceToScreen(aPt: TPointF): TPointF;
-  function ScreenToSurface(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
@@ -935,18 +933,6 @@ begin
     Result := s.GetInverseMatrix.Transform(Result);
     s := s.ParentSurface;
   until s = NIL;
-end;
-
-function TSimpleSurfaceWithEffect.SurfaceToScreen(aPt: TPointF): TPointF;
-begin
-  //Result := FParentScene.TopLeft + FSurfaceOrigin + aPt;
-  Result := FParentScene.TopLeft + SurfaceToScene(aPt);
-end;
-
-function TSimpleSurfaceWithEffect.ScreenToSurface(aPt: TPointF): TPointF;
-begin
-  //Result := aPt - FParentScene.TopLeft - FSurfaceOrigin;
-  Result := SceneToSurface(aPt - FParentScene.TopLeft);
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect): TPointF;
