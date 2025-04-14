@@ -196,13 +196,6 @@ public // messages
   // Enable or disable messages processing. Messages can always be posted.
   property ProcessMessageEnabled: boolean read FEnableProcessMessage write FEnableProcessMessage;
 
-public // utils to convert coordinates
-  function SurfaceToScene(aPt: TPointF): TPointF;
-  function SceneToSurface(aPt: TPointF): TPointF;
-  function SurfaceToScreen(aPt: TPointF): TPointF;
-  function ScreenToSurface(aPt: TPointF): TPointF;
-  function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
-  function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
 public // transformation matrix
   function GetMatrix: TOGLCMatrix;
   function GetInverseMatrix: TOGLCMatrix;
@@ -272,6 +265,12 @@ public // utils
   // Center the surface on its parent
   procedure CenterOnParent;
 public // Local <-> World
+  function SurfaceToScene(aPt: TPointF): TPointF;
+  function SceneToSurface(aPt: TPointF): TPointF;
+  function SurfaceToScreen(aPt: TPointF): TPointF;
+  function ScreenToSurface(aPt: TPointF): TPointF;
+  function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
+  function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
   // Gives a matrix to transform surface coordinates to world coordinates.
