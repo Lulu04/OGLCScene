@@ -1,4 +1,5 @@
 Version 1.2 - 2025
+> new tool Game Helper that offer a graphic interface to facilitate the creation of complex sprite. The created sprite can be exported to a pascal unit. This tool is not yet complete, but can still be used for simple cases.
 > scene aspect ratio can be changed at runtime calling MyScene.ChangeAspectRatioTo(...). NOTE: the coordinates of existing surface on the scene are not modified. It is recommended to call this function at the beginning of screen.CreateObjects.
 > different unicode charset are defined to easily retrieve the characters used by a language. They are grouped in property TOGLCScene.Charsets.
 > added ReplaceScenario function: now the content of a scenario can be replaced. Scenario error generates log messages.
