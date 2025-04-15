@@ -6,7 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls, ComCtrls,
-  StdCtrls, Menus, OpenGLContext, OGLCScene, u_common, Types;
+  StdCtrls, Menus, OpenGLContext,
+  OGLCScene, u_common, Types,
+  frame_tool_spritebuilder,
+  frame_tool_spritebank;
 
 {
  RIGHT MOUSE button: Move view
@@ -26,7 +29,10 @@ type
     ImageList1: TImageList;
     Label1: TLabel;
     Label3: TLabel;
+    Notebook1: TNotebook;
     OGL: TOpenGLControl;
+    PageSpriteBuilder: TPage;
+    PageBank: TPage;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
@@ -34,6 +40,9 @@ type
     Panel5: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
+    BSpriteBank: TSpeedButton;
+    BSpriteBuilder: TSpeedButton;
+    Panel8: TPanel;
     ToolBar1: TToolBar;
     BNewScreen: TToolButton;
     BLoadScreen: TToolButton;
@@ -43,6 +52,7 @@ type
     procedure BLoadScreenClick(Sender: TObject);
     procedure BNewScreenClick(Sender: TObject);
     procedure BSaveScreenClick(Sender: TObject);
+    procedure BSpriteBankClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -56,23 +66,25 @@ type
     procedure OGLMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
-{    FMouseState: TMouseState;
-    FClickOrigin: TPoint;
-    procedure DoLoopMoveView; }
   private
     procedure LoadCommonData;
     procedure FreeCommonData;
     procedure ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
   public
     procedure UpdateWidgets;
+
+    procedure ShowPageSpriteBank;
   end;
 
 var
   FormMain: TFormMain;
+  FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder;
+  FrameToolsSpriteBank: TFrameToolSpriteBank;
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
-  u_spritebank, u_ui_handle, BGRABitmap, BGRABitmapTypes;
+  u_spritebank, u_ui_handle, u_screen_spritebank,
+  BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
 
 { TFormMain }
@@ -92,6 +104,15 @@ begin
   FScene.OnFreeCommonData := @FreeCommonData;
 
   Application.OnIdle := @ProcessApplicationIdle;
+
+  FrameToolsSpriteBuilder := TFrameToolsSpriteBuilder.Create(Self);
+  FrameToolsSpriteBuilder.Parent := Panel8;
+  FrameToolsSpriteBuilder.Align := alClient;
+
+  FrameToolsSpriteBank := TFrameToolSpriteBank.Create(Self);
+  FrameToolsSpriteBank.Parent := PageBank;
+  FrameToolsSpriteBank.Align := alClient;
+
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -115,6 +136,22 @@ procedure TFormMain.BSaveScreenClick(Sender: TObject);
 begin
   Project.Save;
   if Project.IsReady then AppPref.LastProjectFilename := Project.Filename;
+end;
+
+procedure TFormMain.BSpriteBankClick(Sender: TObject);
+begin
+  if Sender = BSpriteBank then begin
+    FScene.RunScreen(ScreenSpriteBank);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
+    FrameToolsSpriteBank.OnShow;
+  end;
+
+  if Sender = BSpriteBuilder then begin
+    FScene.RunScreen(ScreenSpriteBuilder);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
+    FrameToolsSpriteBuilder.OnShow;
+    //FormToolsBuilder.Show;
+  end;
 end;
 
 procedure TFormMain.BLoadScreenClick(Sender: TObject);
@@ -168,8 +205,17 @@ end;
 
 procedure TFormMain.LoadCommonData;
 begin
+  // create the root container
+  FContainer := TSpriteContainer.Create(FScene);
+  FScene.Add(FContainer, LAYER_SPRITEBUILDER);
+  FContainer.CenterOnScene;
+  FContainer.ShowOrigin := True;
+
   ScreenSpriteBuilder := TScreenSpriteBuilder.Create;
   ScreenSpriteBuilder.Initialize;
+
+  ScreenSpriteBank := TScreenSpriteBank.Create;
+  ScreenSpriteBank.Initialize;
 
   UIHandle.InitDefault;
   UIHandle.TargetLayer := LAYER_UI;
@@ -181,11 +227,12 @@ begin
   if AppPref.LastProjectFilename <> ''
     then Project.Load(AppPref.LastProjectFilename);
 
-  FScene.RunScreen(ScreenSpriteBuilder);
+  ShowPageSpriteBank;
 end;
 
 procedure TFormMain.FreeCommonData;
 begin
+  FScene.ClearAllLayer;
   UIHandle.FreeAtlas;
 
   SpriteBank.Free;
@@ -193,6 +240,9 @@ begin
 
   ScreenSpriteBuilder.Finalize;
   FreeAndNil(ScreenSpriteBuilder);
+
+  ScreenSpriteBank.Finalize;
+  FreeAndNil(ScreenSpriteBank);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
@@ -204,6 +254,13 @@ end;
 procedure TFormMain.UpdateWidgets;
 begin
 
+end;
+
+procedure TFormMain.ShowPageSpriteBank;
+begin
+  Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
+  FrameToolsSpriteBank.OnShow;
+  FScene.RunScreen(ScreenSpriteBank);
 end;
 
 

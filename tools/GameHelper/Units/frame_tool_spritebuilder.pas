@@ -1,4 +1,4 @@
-unit form_tool_spritebuilder;
+unit frame_tool_spritebuilder;
 
 {$mode ObjFPC}{$H+}
 
@@ -6,21 +6,29 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  ExtCtrls, StdCtrls, Buttons, Spin, BGRABitmapTypes,
+  ExtCtrls, StdCtrls, Buttons, Spin,
+  BGRABitmapTypes,
   OGLCScene,
   u_surface_list, u_texture_list, Types,
   u_screen_spritebuilder;
 
 type
 
-  { TFormTools }
+  { TFrameToolsSpriteBuilder }
 
-  TFormTools = class(TForm)
-    CheckBox1: TCheckBox;
+  TFrameToolsSpriteBuilder = class(TFrame)
+    BAddTexture: TSpeedButton;
+    BAddToSpriteBank: TSpeedButton;
+    BChooseImageFile: TSpeedButton;
+    BDeleteTexture: TSpeedButton;
+    BNewChild: TSpeedButton;
+    BUpdateTexture: TSpeedButton;
+    CBChildParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
-    CBChildParent: TComboBox;
+    CheckBox1: TCheckBox;
     Edit1: TEdit;
+    Edit2: TEdit;
     Edit5: TEdit;
     Label1: TLabel;
     Label10: TLabel;
@@ -35,6 +43,7 @@ type
     Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
+    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -43,12 +52,15 @@ type
     Label9: TLabel;
     LBTextureNames: TListBox;
     OD1: TOpenDialog;
+    PageChilds: TTabSheet;
+    PageTextures: TTabSheet;
     Panel1: TPanel;
+    Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
+    Panel5: TPanel;
     PC1: TPageControl;
-    PageTextures: TTabSheet;
-    PageChilds: TTabSheet;
+    SE1: TSpinEdit;
     SE10: TSpinEdit;
     SE11: TSpinEdit;
     SE12: TSpinEdit;
@@ -58,22 +70,17 @@ type
     SE5: TFloatSpinEdit;
     SE6: TFloatSpinEdit;
     SE7: TFloatSpinEdit;
-    BNewChild: TSpeedButton;
-    BAddTexture: TSpeedButton;
-    BChooseImageFile: TSpeedButton;
-    BUpdateTexture: TSpeedButton;
-    SE1: TSpinEdit;
     SE8: TSpinEdit;
     SE9: TSpinEdit;
-    BDeleteTexture: TSpeedButton;
-    BAddToSpriteBank: TSpeedButton;
+    BNew: TSpeedButton;
+    procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
+    procedure BNewChildClick(Sender: TObject);
+    procedure BNewClick(Sender: TObject);
     procedure CBChildParentDrawItem(Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
-    procedure CBTexturesSelect(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure LBChildsMouseUp(Sender: TObject; Button: TMouseButton;
+    procedure LBTextureNamesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
   private
@@ -99,24 +106,137 @@ type
     procedure UpdateValuesToWorkingSurface;
     function Textures: TTextureList;
     function Surfaces: TSpriteBuilderSurfaceList;
+    procedure DoClearAll;
   public
+    procedure OnShow;
     procedure FillListBoxTextureNames;
-
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
   end;
 
-var
-  FormTools: TFormTools;
-
 implementation
-
-uses form_main, u_project, u_common, u_utils, LCLType;
-
+uses form_main, u_project, u_common, u_utils, u_spritebank, LCLType;
 {$R *.lfm}
 
-{ TFormTools }
+{ TFrameToolsSpriteBuilder }
 
-procedure TFormTools.UpdateTextureWidgetState;
+procedure TFrameToolsSpriteBuilder.BChooseImageFileClick(Sender: TObject);
+begin
+  if Sender = BChooseImageFile then begin
+    if not OD1.Execute then exit;
+    Label2.Caption := OD1.FileName;
+    Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
+    UpdateTextureWidgetState;
+  end;
+
+  if Sender = BUpdateTexture then begin
+    Textures.Update(Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
+                    CheckBox1.Checked, SE11.Value, SE12.Value);
+    Label2.Caption := '';
+    UpdateTextureWidgetState;
+    Project.SetModified;
+  end;
+
+  if Sender = BAddTexture then
+    DoAddTexture;
+
+  if Sender = BDeleteTexture then
+    DoDeleteTexture;
+end;
+
+procedure TFrameToolsSpriteBuilder.BNewChildClick(Sender: TObject);
+begin
+  if Sender = BNewChild then begin
+    DoAddNewChild;
+    ShowSelectionData(NIL);
+  end;
+end;
+
+procedure TFrameToolsSpriteBuilder.BNewClick(Sender: TObject);
+begin
+  if QuestionDlg('Warning', 'if you continue, the modification will be lost',
+             mtWarning, [mrOk, 'Continue', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+  DoClearAll;
+end;
+
+procedure TFrameToolsSpriteBuilder.BAddToSpriteBankClick(Sender: TObject);
+var o: PSpriteBankItem;
+begin
+  if Trim(Edit2.Text) = ''then exit;
+  if Textures.Size = 0 then exit;
+  if Surfaces.Size = 0 then exit;
+
+  o := SpriteBank.AddEmpty;
+  o^.name := Trim(Edit2.Text);
+  o^.textures := Textures.SaveToString;
+  o^.surfaces := Surfaces.SaveToString;
+
+  DoClearAll;
+  FormMain.ShowPageSpriteBank;
+end;
+
+procedure TFrameToolsSpriteBuilder.CBChildParentDrawItem(Control: TWinControl;
+  Index: Integer; ARect: TRect; State: TOwnerDrawState);
+var s: string;
+begin
+  with CBChildParent.Canvas do begin
+    if odSelected in State then
+      Brush.Color := clHighLight;
+    Brush.Style := bsSolid;
+    FillRect(ARect);
+
+    Brush.Style := bsClear;
+    if Index = 0 then s := 'root'
+      else s := Surfaces.GetItemByID(CBChildParent.Items.Strings[Index].ToInteger)^.name;
+    TextOut(ARect.Left, ARect.Top, s);
+  end;
+end;
+
+procedure TFrameToolsSpriteBuilder.CBChildTypeSelect(Sender: TObject);
+var texItem: PTextureItem;
+begin
+  if FInitializingWidget then exit;
+  //if FWorkingChild = NIL then exit;
+
+  if Sender = CBTextures then begin
+    if Edit5.Text = '' then begin
+      texItem := Textures.GetItemByName(CBTextures.Text);
+      if texItem <> NIL then
+        Edit5.Text := ChangeFileExt(ExtractFilename(texItem^.filename), '');
+    end;
+  end;
+
+  if FWorkingChild <> NIL then DoUpdateChild;
+end;
+
+procedure TFrameToolsSpriteBuilder.LBTextureNamesMouseUp(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var lb: TListBox;
+begin
+  lb := Sender as TListBox;
+  lb.ItemIndex := lb.GetIndexAtXY(X, Y);
+end;
+
+procedure TFrameToolsSpriteBuilder.LBTextureNamesSelectionChange(
+  Sender: TObject; User: boolean);
+var i: integer;
+  p: PTextureItem;
+begin
+  i := LBTextureNames.ItemIndex;
+  if i = -1 then Label2.Caption := ''
+  else begin
+    p := Textures.Mutable[i];
+    Label2.Caption := p^.filename;
+    Edit1.Text := p^.name;
+    SE9.Value := p^.width;
+    SE10.Value := p^.height;
+    CheckBox1.Checked := p^.isMultiFrame;
+    SE11.Value := p^.frameWidth;
+    SE12.Value := p^.frameHeight;
+  end;
+  UpdateTextureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.UpdateTextureWidgetState;
 var siz: TSize;
 begin
   if not FileExists(Label2.Caption) then begin
@@ -149,7 +269,7 @@ begin
   SE12.Enabled := CheckBox1.Checked;
 end;
 
-procedure TFormTools.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
+procedure TFrameToolsSpriteBuilder.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
 var i: integer;
 begin
   i := -1;
@@ -163,7 +283,7 @@ begin
   CBChildType.ItemIndex := i;
 end;
 
-function TFormTools.CBToClassType: classOfSimpleSurfaceWithEffect;
+function TFrameToolsSpriteBuilder.CBToClassType: classOfSimpleSurfaceWithEffect;
 begin
   case CBChildType.ItemIndex of
     0: Result := TSpriteContainer;
@@ -173,30 +293,30 @@ begin
   end;
 end;
 
-procedure TFormTools.TexturenameToCB(aName: string);
+procedure TFrameToolsSpriteBuilder.TexturenameToCB(aName: string);
 begin
   CBTextures.ItemIndex := Textures.GetItemIndexByName(aName);
 end;
 
-function TFormTools.CBToTextureName: string;
+function TFrameToolsSpriteBuilder.CBToTextureName: string;
 begin
   if CBTextures.ItemIndex = -1 then Result := ''
     else Result := CBTextures.Items.Strings[CBTextures.ItemIndex];
 end;
 
-procedure TFormTools.ParentIDToCB(aID: integer);
+procedure TFrameToolsSpriteBuilder.ParentIDToCB(aID: integer);
 begin
   if aID = -1 then CBChildParent.ItemIndex := 0
     else CBChildParent.ItemIndex := CBChildParent.Items.IndexOf(aID.ToString);
 end;
 
-function TFormTools.CBToParentID: integer;
+function TFrameToolsSpriteBuilder.CBToParentID: integer;
 begin
   if CBChildParent.ItemIndex = 0 then Result := -1
     else Result := CBChildParent.Items.Strings[CBChildParent.ItemIndex].ToInteger;
 end;
 
-function TFormTools.CheckChildWidgets: boolean;
+function TFrameToolsSpriteBuilder.CheckChildWidgets: boolean;
 begin
   Result := (CBChildType.ItemIndex <> -1) and
             (CBTextures.ItemIndex <> -1) and
@@ -204,7 +324,7 @@ begin
             (CBChildParent.ItemIndex <> -1);
 end;
 
-procedure TFormTools.DoAddNewChild;
+procedure TFrameToolsSpriteBuilder.DoAddNewChild;
 begin
   if not CheckChildWidgets then exit;
   if Surfaces.NameExists(Trim(Edit5.Text)) then begin
@@ -215,22 +335,12 @@ begin
   FWorkingChild := Surfaces.AddEmpty;
   DoUpdateChild;
 
-{  FWorkingChild^.classtype := CBToClassType;
-  FWorkingChild^.textureName := CBToTextureName;
-  FWorkingChild^.name := Trim(Edit5.Text);
-  FWorkingChild^.parentID := CBToParentID;
-
-  FWorkingChild^.CreateSurface;
-  FWorkingChild^.SetChildDependency;
-
-  UpdateValuesToWorkingSurface;  }
-
   CBChildParent.Items.Add(FWorkingChild^.ID.ToString);
   FWorkingChild := NIL;
   Project.SetModified;
 end;
 
-procedure TFormTools.DoUpdateChild;
+procedure TFrameToolsSpriteBuilder.DoUpdateChild;
 var recreateSurface: Boolean;
 begin
   if FWorkingChild = NIL then exit;
@@ -262,7 +372,7 @@ begin
   UpdateValuesToWorkingSurface;
 end;
 
-function TFormTools.LBToTextureName: string;
+function TFrameToolsSpriteBuilder.LBToTextureName: string;
 var i: Integer;
 begin
   Result := '';
@@ -271,7 +381,7 @@ begin
   Result := LBTextureNames.Items.Strings[i];
 end;
 
-function TFormTools.CheckTextureWidgets: boolean;
+function TFrameToolsSpriteBuilder.CheckTextureWidgets: boolean;
 begin
   Result := FileExists(Label2.Caption) and
             (Trim(Edit1.Text) <> '') and
@@ -281,7 +391,7 @@ begin
     Result := Result and (SE11.Value <> 0) and (SE12.Value <> 0);
 end;
 
-procedure TFormTools.DoAddTexture;
+procedure TFrameToolsSpriteBuilder.DoAddTexture;
 var texName: string;
 begin
   if not CheckTextureWidgets then exit;
@@ -296,23 +406,23 @@ begin
   Project.SetModified;
 end;
 
-procedure TFormTools.DoDeleteTexture;
-var textureName: string;
-begin
-  textureName := LBToTextureName;
-  if textureName = '' then exit;
+procedure TFrameToolsSpriteBuilder.DoDeleteTexture;
+  var textureName: string;
+  begin
+    textureName := LBToTextureName;
+    if textureName = '' then exit;
 
-  // check if the texture is used by a surface
-  if Surfaces.TextureNameisUsedByASurface(textureName) then begin
-    ShowMessage('This texture is used by a surface, you can not delete it');
-    exit;
+    // check if the texture is used by a surface
+    if Surfaces.TextureNameisUsedByASurface(textureName) then begin
+      ShowMessage('This texture is used by a surface, you can not delete it');
+      exit;
+    end;
+
+    Textures.DeleteByName(textureName);
+    LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
   end;
 
-  Textures.DeleteByName(textureName);
-  LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
-end;
-
-procedure TFormTools.UpdateValuesToWorkingSurface;
+procedure TFrameToolsSpriteBuilder.UpdateValuesToWorkingSurface;
 begin
   if FWorkingChild = NIL then exit;
 
@@ -327,17 +437,47 @@ begin
   end;
 end;
 
-function TFormTools.Textures: TTextureList;
+function TFrameToolsSpriteBuilder.Textures: TTextureList;
 begin
   Result := ScreenSpriteBuilder.Textures;
 end;
 
-function TFormTools.Surfaces: TSpriteBuilderSurfaceList;
+function TFrameToolsSpriteBuilder.Surfaces: TSpriteBuilderSurfaceList;
 begin
   Result := ScreenSpriteBuilder.Surfaces;
 end;
 
-procedure TFormTools.FillListBoxTextureNames;
+procedure TFrameToolsSpriteBuilder.DoClearAll;
+begin
+  FWorkingChild := NIL;
+  FInitializingWidget := True;
+
+  Surfaces.Clear;
+  Textures.Clear;
+
+  CBTextures.Clear;
+  Edit5.Text := '';
+  Surfaces.FillComboBox(CBChildParent);
+  Edit2.Text := '';
+
+  LBTextureNames.Clear;
+  Label2.Caption := '';
+  Edit1.Text := '';
+  CheckBox1.Checked := False;
+
+  PC1.PageIndex := PC1.IndexOf(PageTextures);
+  FInitializingWidget := False;
+end;
+
+procedure TFrameToolsSpriteBuilder.OnShow;
+begin
+  FillListBoxTextureNames;
+  Surfaces.FillComboBox(CBChildParent);
+  Textures.FillComboBox(CBTextures);
+  ShowSelectionData(NIL);
+end;
+
+procedure TFrameToolsSpriteBuilder.FillListBoxTextureNames;
 begin
   Textures.FillListBox(LBTextureNames);
   Label2.Caption := '';
@@ -348,7 +488,7 @@ begin
   SE12.Value := 0;
 end;
 
-procedure TFormTools.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
+procedure TFrameToolsSpriteBuilder.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 begin
   FInitializingWidget := True;
   FWorkingChild := NIL;
@@ -412,108 +552,6 @@ begin
   end;
 
   FInitializingWidget := False;
-end;
-
-procedure TFormTools.BChooseImageFileClick(Sender: TObject);
-begin
-  if Sender = BChooseImageFile then begin
-    if not OD1.Execute then exit;
-    Label2.Caption := OD1.FileName;
-    Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BUpdateTexture then begin
-    Textures.Update(Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
-                    CheckBox1.Checked, SE11.Value, SE12.Value);
-    Label2.Caption := '';
-    UpdateTextureWidgetState;
-    Project.SetModified;
-  end;
-
-  if Sender = BAddTexture then
-    DoAddTexture;
-
-  if Sender = BDeleteTexture then
-    DoDeleteTexture;
-end;
-
-procedure TFormTools.CBChildParentDrawItem(Control: TWinControl;
-  Index: Integer; ARect: TRect; State: TOwnerDrawState);
-var s: string;
-begin
-  with CBChildParent.Canvas do begin
-    if odSelected in State then
-      Brush.Color := clHighLight;
-    Brush.Style := bsSolid;
-    FillRect(ARect);
-
-    Brush.Style := bsClear;
-    if Index = 0 then s := 'root'
-      else s := Surfaces.GetItemByID(CBChildParent.Items.Strings[Index].ToInteger)^.name;
-    TextOut(ARect.Left, ARect.Top, s);
-  end;
-end;
-
-procedure TFormTools.CBChildTypeSelect(Sender: TObject);
-var texItem: PTextureItem;
-begin
-  if FInitializingWidget then exit;
-  //if FWorkingChild = NIL then exit;
-
-  if Sender = CBTextures then begin
-    if Edit5.Text = '' then begin
-      texItem := Textures.GetItemByName(CBTextures.Text);
-      if texItem <> NIL then
-        Edit5.Text := ChangeFileExt(ExtractFilename(texItem^.filename), '');
-    end;
-  end;
-
-  if FWorkingChild <> NIL then DoUpdateChild;
-end;
-
-procedure TFormTools.CBTexturesSelect(Sender: TObject);
-begin
-  if Sender = BNewChild then begin
-    DoAddNewChild;
-    ShowSelectionData(NIL);
-  end;
-end;
-
-procedure TFormTools.FormShow(Sender: TObject);
-begin
-  Left := FormMain.Width-Width;
-  FillListBoxTextureNames;
-  Surfaces.FillComboBox(CBChildParent);
-  Textures.FillComboBox(CBTextures);
-  ShowSelectionData(NIL);
-end;
-
-procedure TFormTools.LBChildsMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-var lb: TListBox;
-begin
-  lb := Sender as TListBox;
-  lb.ItemIndex := lb.GetIndexAtXY(X, Y);
-end;
-
-procedure TFormTools.LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
-var i: integer;
-  p: PTextureItem;
-begin
-  i := LBTextureNames.ItemIndex;
-  if i = -1 then Label2.Caption := ''
-  else begin
-    p := Textures.Mutable[i];
-    Label2.Caption := p^.filename;
-    Edit1.Text := p^.name;
-    SE9.Value := p^.width;
-    SE10.Value := p^.height;
-    CheckBox1.Checked := p^.isMultiFrame;
-    SE11.Value := p^.frameWidth;
-    SE12.Value := p^.frameHeight;
-  end;
-  UpdateTextureWidgetState;
 end;
 
 end.

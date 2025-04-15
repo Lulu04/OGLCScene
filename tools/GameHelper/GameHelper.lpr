@@ -10,9 +10,10 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, lazopenglcontext, OGLCScene, u_common, form_main,
-  u_screen_spritebuilder, u_project, u_texture_list, form_tool_spritebuilder,
+  u_screen_spritebuilder, u_project, u_texture_list,
   u_app_pref, Dialogs, u_surface_list, u_utils, u_screen_template, u_spritebank,
-  u_ui_handle;
+  u_ui_handle, u_screen_spritebank, frame_tool_spritebuilder,
+frame_tool_spritebank;
 
 {$R *.res}
 
@@ -24,7 +25,6 @@ begin
     else AppPref.Load;
 
   Application.CreateForm(TFormMain, FormMain);
-  Application.CreateForm(TFormTools, FormTools);
   Application.Run;
 
   AppPref.Free;

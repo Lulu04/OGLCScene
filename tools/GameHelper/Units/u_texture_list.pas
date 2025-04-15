@@ -36,6 +36,7 @@ private
                     aFrameWidth, aFrameHeight: integer);
 public
   destructor Destroy; override;
+  procedure Clear; reintroduce;
   procedure Add(const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
                     aFrameWidth, aFrameHeight: integer);
   procedure Update(const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
@@ -47,6 +48,8 @@ public
 
   procedure DeleteByName(const aName: string);
 
+  function SaveToString: string;
+  procedure LoadFromString(const s: string);
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
 
@@ -130,10 +133,17 @@ end;
 destructor TTextureList.Destroy;
 var i: SizeUInt;
 begin
+  Clear;
+  inherited Destroy;
+end;
+
+procedure TTextureList.Clear;
+var i: SizeUInt;
+begin
   if Size > 0 then
     for i:=0 to Size-1 do
       FScene.TexMan.Delete(Mutable[i]^.texture);
-  inherited Destroy;
+  inherited Clear;
 end;
 
 procedure TTextureList.Add(const aFilename, aName: string; aWidth, aHeight: integer;
@@ -207,23 +217,20 @@ begin
   Erase(i);
 end;
 
-const SPRITE_BUILDER_TEXTURES_SECTION = '[SPRITE_BUILDER_TEXTURES]';
-
-procedure TTextureList.SaveTo(t: TStringList);
+function TTextureList.SaveToString: string;
 var prop: TProperties;
   i: SizeUInt;
 begin
-  t.Add(SPRITE_BUILDER_TEXTURES_SECTION);
+  Result := '';
   prop.Init('|');
   prop.Add('Count', Integer(Size));
   if Size > 0 then
     for i:=0 to Size-1 do
       prop.Add('Item'+i.ToString, Mutable[i]^.SaveToString);
-
-  t.Add(prop.PackedProperty);
+  Result := prop.PackedProperty;
 end;
 
-procedure TTextureList.LoadFrom(t: TStringList);
+procedure TTextureList.LoadFromString(const s: string);
 var prop: TProperties;
   i: SizeUInt;
   c: integer;
@@ -231,19 +238,35 @@ var prop: TProperties;
   o: TTextureItem;
 begin
   Clear;
-  if prop.SplitFrom(t, SPRITE_BUILDER_TEXTURES_SECTION, '|') then begin
-    c := 0;
-    s1 := '';
-    prop.IntegerValueOf('Count', c, 0);
-    if c = 0 then exit;
-FScene.LogDebug('Loading '+c.ToString+' textures');
-    for i:=0 to c-1 do
-      if prop.StringValueOf('Item'+i.ToString, s1, '') then begin
-        o.LoadFromString(s1);
-        o.CreateTexture;
-        PushBack(o);
-      end;
-  end;
+  prop.Split(s, '|');
+  c := 0;
+  s1 := '';
+  prop.IntegerValueOf('Count', c, 0);
+  if c = 0 then exit;
+
+  for i:=0 to c-1 do
+    if prop.StringValueOf('Item'+i.ToString, s1, '') then begin
+      o.LoadFromString(s1);
+      o.CreateTexture;
+      PushBack(o);
+    end;
+end;
+
+const SPRITE_BUILDER_TEXTURES_SECTION = '[SPRITE_BUILDER_TEXTURES]';
+
+procedure TTextureList.SaveTo(t: TStringList);
+begin
+  t.Add(SPRITE_BUILDER_TEXTURES_SECTION);
+  t.Add(SaveToString);
+end;
+
+procedure TTextureList.LoadFrom(t: TStringList);
+var k: integer;
+begin
+  Clear;
+  k := t.IndexOf(SPRITE_BUILDER_TEXTURES_SECTION);
+  if (k = -1) or (k = t.Count-1) then exit;
+  LoadFromString(t.Strings[k+1]);
 end;
 
 procedure TTextureList.FillComboBox(aCB: TComboBox);

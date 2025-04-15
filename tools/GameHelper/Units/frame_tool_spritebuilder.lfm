@@ -1,26 +1,20 @@
-object FormTools: TFormTools
-  Left = 876
-  Height = 600
-  Top = 174
+object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
+  Left = 0
+  Height = 720
+  Top = 0
   Width = 293
-  BorderIcons = []
-  Caption = 'Sprite builder'
-  ClientHeight = 600
+  ClientHeight = 720
   ClientWidth = 293
-  Color = clGray
-  Font.Color = clBlack
-  FormStyle = fsSystemStayOnTop
-  OnShow = FormShow
-  LCLVersion = '3.8.0.0'
+  TabOrder = 0
+  DesignLeft = 776
+  DesignTop = 60
   object PC1: TPageControl
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 600
+    Height = 536
     Top = 0
     Width = 293
     ActivePage = PageChilds
@@ -29,17 +23,19 @@ object FormTools: TFormTools
     TabOrder = 0
     object PageChilds: TTabSheet
       Caption = 'Childs'
-      ClientHeight = 572
+      ClientHeight = 508
       ClientWidth = 285
       object Panel1: TPanel
         Left = 0
-        Height = 572
+        Height = 508
         Top = 0
         Width = 285
         Align = alClient
-        ClientHeight = 572
+        ClientHeight = 508
         ClientWidth = 285
+        Color = 8289918
         ParentBackground = False
+        ParentColor = False
         TabOrder = 0
         object CBChildType: TComboBox
           AnchorSideLeft.Control = Label17
@@ -72,7 +68,7 @@ object FormTools: TFormTools
           Width = 30
           Images = FormMain.ImageList1
           ImageIndex = 4
-          OnClick = CBTexturesSelect
+          OnClick = BNewChildClick
         end
         object Label4: TLabel
           Left = 16
@@ -121,7 +117,6 @@ object FormTools: TFormTools
           Style = csOwnerDrawFixed
           TabOrder = 2
           OnDrawItem = CBChildParentDrawItem
-          OnSelect = CBChildTypeSelect
         end
         object Label10: TLabel
           AnchorSideRight.Control = Label4
@@ -143,7 +138,6 @@ object FormTools: TFormTools
           Width = 167
           Anchors = [akLeft, akBottom]
           TabOrder = 3
-          OnChange = CBChildTypeSelect
         end
         object Label17: TLabel
           AnchorSideRight.Control = Label4
@@ -239,7 +233,6 @@ object FormTools: TFormTools
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = -1000000
-            OnChange = CBChildTypeSelect
             TabOrder = 0
           end
           object SE2: TSpinEdit
@@ -254,7 +247,6 @@ object FormTools: TFormTools
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = -1000000
-            OnChange = CBChildTypeSelect
             TabOrder = 1
           end
           object Label14: TLabel
@@ -283,7 +275,6 @@ object FormTools: TFormTools
             BorderSpacing.Left = 10
             DecimalPlaces = 3
             Increment = 0.01
-            OnChange = CBChildTypeSelect
             TabOrder = 2
             Value = 0.5
           end
@@ -299,7 +290,6 @@ object FormTools: TFormTools
             BorderSpacing.Left = 10
             DecimalPlaces = 3
             Increment = 0.01
-            OnChange = CBChildTypeSelect
             TabOrder = 3
             Value = 0.5
           end
@@ -331,7 +321,6 @@ object FormTools: TFormTools
             Increment = 0.1
             MaxValue = 100000
             MinValue = 0.001
-            OnChange = CBChildTypeSelect
             TabOrder = 4
             Value = 1
           end
@@ -349,7 +338,6 @@ object FormTools: TFormTools
             Increment = 0.05
             MaxValue = 100000
             MinValue = 0.001
-            OnChange = CBChildTypeSelect
             TabOrder = 5
             Value = 1
           end
@@ -378,7 +366,6 @@ object FormTools: TFormTools
             Increment = 0.5
             MaxValue = 360
             MinValue = -360
-            OnChange = CBChildTypeSelect
             TabOrder = 6
           end
           object Label18: TLabel
@@ -407,32 +394,71 @@ object FormTools: TFormTools
             BorderSpacing.Left = 7
             MaxValue = 10000
             MinValue = -10000
-            OnChange = CBChildTypeSelect
             TabOrder = 7
           end
         end
-        object BAddToSpriteBank: TSpeedButton
+        object Panel2: TPanel
           AnchorSideLeft.Control = Panel1
-          AnchorSideLeft.Side = asrCenter
-          Left = 42
-          Height = 30
-          Top = 534
-          Width = 200
-          Caption = 'Add the sprite to Sprite Bank'
+          AnchorSideTop.Control = Panel4
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Left = 1
+          Height = 103
+          Top = 354
+          Width = 283
+          Anchors = [akTop, akLeft, akRight]
+          BorderSpacing.Top = 10
+          ClientHeight = 103
+          ClientWidth = 283
+          Color = 6908265
+          ParentBackground = False
+          ParentColor = False
+          TabOrder = 5
+          object BAddToSpriteBank: TSpeedButton
+            AnchorSideLeft.Control = Panel2
+            AnchorSideLeft.Side = asrCenter
+            Left = 41
+            Height = 30
+            Top = 64
+            Width = 200
+            Caption = 'Add to Sprite Bank'
+            OnClick = BAddToSpriteBankClick
+          end
+          object Label3: TLabel
+            Left = 12
+            Height = 15
+            Top = 12
+            Width = 101
+            Caption = 'Name of the sprite:'
+          end
+          object Edit2: TEdit
+            AnchorSideLeft.Control = Label3
+            AnchorSideTop.Control = Label3
+            AnchorSideTop.Side = asrBottom
+            Left = 17
+            Height = 23
+            Top = 27
+            Width = 255
+            BorderSpacing.Left = 5
+            TabOrder = 0
+          end
         end
       end
     end
     object PageTextures: TTabSheet
       Caption = 'Textures'
-      ClientHeight = 572
+      ClientHeight = 508
       ClientWidth = 285
       object Panel3: TPanel
+        AnchorSideBottom.Control = PageTextures
+        AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 572
+        Height = 508
         Top = 0
         Width = 285
         Align = alClient
-        ClientHeight = 572
+        ClientHeight = 508
         ClientWidth = 285
         ParentBackground = False
         TabOrder = 0
@@ -451,12 +477,12 @@ object FormTools: TFormTools
           BorderSpacing.Right = 2
           ItemHeight = 0
           TabOrder = 0
-          OnMouseUp = LBChildsMouseUp
+          OnMouseUp = LBTextureNamesMouseUp
           OnSelectionChange = LBTextureNamesSelectionChange
         end
         object BAddTexture: TSpeedButton
           Cursor = crHandPoint
-          Left = 256
+          Left = 168
           Height = 28
           Top = 360
           Width = 28
@@ -533,7 +559,7 @@ object FormTools: TFormTools
           AnchorSideTop.Control = CBTextures
           AnchorSideTop.Side = asrCenter
           Cursor = crHandPoint
-          Left = 200
+          Left = 240
           Height = 28
           Top = 360
           Width = 28
@@ -563,10 +589,13 @@ object FormTools: TFormTools
           Enabled = False
         end
         object Label8: TLabel
+          AnchorSideRight.Control = Label7
+          AnchorSideRight.Side = asrBottom
+          AnchorSideBottom.Control = SE12
           AnchorSideBottom.Side = asrBottom
-          Left = -67
+          Left = 14
           Height = 15
-          Top = 416
+          Top = 475
           Width = 68
           Anchors = [akRight, akBottom]
           Caption = 'frame height'
@@ -661,15 +690,44 @@ object FormTools: TFormTools
           AutoSize = True
           Images = FormMain.ImageList1
           ImageIndex = 5
-          OnClick = BChooseImageFileClick
         end
       end
+    end
+  end
+  object Panel5: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = PC1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 184
+    Top = 536
+    Width = 293
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 184
+    ClientWidth = 293
+    Color = 6118749
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object BNew: TSpeedButton
+      Cursor = crHandPoint
+      Left = 32
+      Height = 19
+      Top = 32
+      Width = 74
+      Caption = 'NEW'
+      OnClick = BNewClick
     end
   end
   object OD1: TOpenDialog
     Title = 'Open image file'
     Filter = 'All files|*.*|Image files|*.svg;*.png;*.jpg;*.bmp'
-    Left = 328
-    Top = 32
+    Left = 184
+    Top = 40
   end
 end

@@ -211,9 +211,9 @@ begin
   if Pivot <> NIL then Pivot.Kill;
   Pivot := NIL;
   for i in TOGLCCorner do begin
-    RotateHandle[i].Kill;
+    if RotateHandle[i] <> NIL then RotateHandle[i].Kill;
     RotateHandle[i] := NIL;
-    SelectedHandle[i].Kill;
+    if SelectedHandle[i] <> NIL then SelectedHandle[i].Kill;
     SelectedHandle[i] := NIL;
   end;
   IsVisible := False;

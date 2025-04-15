@@ -63,11 +63,9 @@ public
 end;
 
 var ScreenSpriteBuilder: TScreenSpriteBuilder;
-    FContainer: TSpriteContainer;
 
 implementation
-uses LCLType, Forms, Controls, u_project, u_app_pref, form_main,
-  form_tool_spritebuilder, u_ui_handle;
+uses LCLType, Forms, Controls, u_project, u_app_pref, form_main;
 
 { TSpriteBuilderSurfaceList }
 
@@ -110,7 +108,7 @@ begin
       end;
   end;
 
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
@@ -126,7 +124,7 @@ begin
     FSelected[i]^.Selected := False;
   FSelected := NIL;
 
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.AddOffsetCoordinateToSelection(aOffset: TPointF);
@@ -136,7 +134,7 @@ begin
   for i:=0 to High(FSelected) do
     FSelected[i]^.surface.MoveRelative(aOffset, 0);
 
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.AddOffsetToPivotOnSelection(aOffset: TPointF);
@@ -146,7 +144,7 @@ begin
   for i:=0 to High(FSelected) do
     FSelected[i]^.AddOffsetToPivot(aOffset);
 
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.SaveCurrentAngleBeforeRotationOnSelection;
@@ -166,7 +164,7 @@ begin
     FSelected[i]^.ComputeAngle(aReferencePoint, aUseIncrement);
 
   UpdateHandlePositionOnSelected;
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.DeleteSelection;
@@ -179,7 +177,7 @@ begin
   end;
   FSelected := NIL;
 
-  FormTools.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
   Project.SetModified;
 end;
 
@@ -303,7 +301,6 @@ end;
 
 procedure TScreenSpriteBuilder.ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var items: ArrayOfPSurfaceDescriptor;
-    p: single;
 begin
   inherited ProcessMouseDown(Button, Shift, X, Y);
 
@@ -430,22 +427,18 @@ end;
 procedure TScreenSpriteBuilder.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_SPRITEBUILDER]);
+  FContainer.MoveToLayer(LAYER_SPRITEBUILDER);
 end;
 
 procedure TScreenSpriteBuilder.FreeObjects;
 begin
+  SelectNone;
 end;
 
 procedure TScreenSpriteBuilder.Initialize;
 begin
   FTextures := TTextureList.Create;
   FSurfaces := TSpriteBuilderSurfaceList.Create;
-
-  // create the root container
-  FContainer := TSpriteContainer.Create(FScene);
-  FScene.Add(FContainer, LAYER_SPRITEBUILDER);
-  FContainer.CenterOnScene;
-  FContainer.ShowOrigin := True;
 
   // camera
   CreateCamera([LAYER_SPRITEBUILDER]);
