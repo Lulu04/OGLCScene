@@ -1,0 +1,129 @@
+object FrameToolSpriteBank: TFrameToolSpriteBank
+  Left = 0
+  Height = 443
+  Top = 0
+  Width = 319
+  ClientHeight = 443
+  ClientWidth = 319
+  TabOrder = 0
+  DesignLeft = 661
+  DesignTop = 272
+  object Panel1: TPanel
+    Left = 0
+    Height = 443
+    Top = 0
+    Width = 319
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 443
+    ClientWidth = 319
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object LB: TListBox
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 3
+      Height = 200
+      Top = 3
+      Width = 313
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 3
+      BorderSpacing.Top = 3
+      BorderSpacing.Right = 3
+      ItemHeight = 0
+      TabOrder = 0
+      OnMouseUp = LBMouseUp
+      OnSelectionChange = LBSelectionChange
+    end
+    object SpeedButton1: TSpeedButton
+      Left = 152
+      Height = 32
+      Top = 208
+      Width = 162
+      Caption = 'Edit in Sprite Builder'
+    end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Panel1
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 171
+      Top = 272
+      Width = 319
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BevelOuter = bvNone
+      ClientHeight = 171
+      ClientWidth = 319
+      Color = 6579300
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 1
+      object BExportToPascalUnit: TSpeedButton
+        Left = 64
+        Height = 30
+        Top = 104
+        Width = 197
+        Caption = 'Export sprite to Pascal unit'
+        Images = FormMain.ImageList1
+        ImageIndex = 8
+        OnClick = BExportToPascalUnitClick
+      end
+      object Label1: TLabel
+        AnchorSideLeft.Control = Panel2
+        Left = 5
+        Height = 15
+        Top = 8
+        Width = 63
+        BorderSpacing.Left = 5
+        Caption = 'Class name:'
+      end
+      object Edit1: TEdit
+        AnchorSideLeft.Control = Label1
+        AnchorSideTop.Control = Label1
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = Panel2
+        AnchorSideRight.Side = asrBottom
+        Left = 5
+        Height = 23
+        Top = 23
+        Width = 309
+        Anchors = [akTop, akLeft, akRight]
+        BorderSpacing.Right = 5
+        TabOrder = 0
+        Text = 'Edit1'
+      end
+      object Label2: TLabel
+        Left = 8
+        Height = 15
+        Top = 52
+        Width = 80
+        Caption = 'Root surface is:'
+      end
+      object CBRootSurface: TComboBox
+        AnchorSideLeft.Control = Label2
+        AnchorSideTop.Control = Label2
+        AnchorSideTop.Side = asrBottom
+        Left = 8
+        Height = 21
+        Top = 67
+        Width = 265
+        ItemHeight = 15
+        Style = csOwnerDrawFixed
+        TabOrder = 1
+        OnDrawItem = CBRootSurfaceDrawItem
+      end
+    end
+  end
+  object SD1: TSaveDialog
+    Filter = 'pascal unit|*.pas|all files|*.*'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 14
+    Top = 395
+  end
+end

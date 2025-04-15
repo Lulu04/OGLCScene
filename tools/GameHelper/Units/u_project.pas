@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,
   project_util,
-  OGLCScene, form_tool_spritebuilder;
+  OGLCScene;
 
 var
   LayerNames: TStringArray;
@@ -165,10 +165,9 @@ end;
 procedure TProject.OnProjectReadyChange(aState: boolean);
 begin
   if IsReady then begin
-    FormTools.FillListBoxTextureNames;
-    FormTools.Show;
+    FrameToolsSpriteBuilder.FillListBoxTextureNames;
+    FormMain.ShowPageSpriteBank;
   end else begin
-    FormTools.Hide;
   end;
 end;
 

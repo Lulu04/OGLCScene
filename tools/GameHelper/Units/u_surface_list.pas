@@ -40,7 +40,8 @@ public
   procedure KillSurface;
   procedure CreateSurface;
   procedure SetChildDependency;
-  procedure SetValues; // sets x, y, pivot,...
+  procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,...
+  procedure DuplicateValuesToTemporaryVariables;
 
   function IsOverRotateHandle(aWorldPt: TPointF): boolean;
   function IsOverPivotHandle(aWorldPt: TPointF): boolean;
@@ -191,7 +192,7 @@ begin
   end;
 end;
 
-procedure TSurfaceDescriptor.SetValues;
+procedure TSurfaceDescriptor.SetValuesFromTemporaryVariables;
 begin
   surface.X.Value := x;
   surface.Y.Value := y;
@@ -200,6 +201,18 @@ begin
   surface.Scale.x.Value := scaleX;
   surface.Scale.y.Value := scaleY;
   surface.Angle.Value := angle;
+end;
+
+procedure TSurfaceDescriptor.DuplicateValuesToTemporaryVariables;
+begin
+  pivotX := surface.Pivot.x;
+  pivotY := surface.Pivot.y;
+  angle := surface.Angle.Value;
+  x := surface.X.Value;
+  y := surface.Y.Value;
+  scaleX := surface.Scale.X.Value;
+  scaleY := surface.Scale.Y.Value;
+  zOrder := surface.ZOrderAsChild;
 end;
 
 function TSurfaceDescriptor.IsOverRotateHandle(aWorldPt: TPointF): boolean;
@@ -333,7 +346,11 @@ begin
 end;
 
 procedure TSurfaceList.Clear;
+var i: SizeUInt;
 begin
+  if Size > 0 then
+    for i:=0 to Size-1 do
+      Mutable[i]^.KillSurface;
   inherited Clear;
   FID := 0;
 end;
@@ -490,7 +507,7 @@ begin
   for i:=0 to Size-1 do
     with Mutable[i]^ do begin
       CreateSurface;
-      SetValues;
+      SetValuesFromTemporaryVariables;
     end;
 
   // create the childs dependencies
@@ -519,7 +536,7 @@ procedure TSurfaceList.FillComboBox(aCB: TComboBox);
 var i: SizeUInt;
 begin
   aCB.Clear;
-  aCB.Items.Add('Root');
+  aCB.Items.Add('Root sprite container');
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aCB.Items.Add(Mutable[i]^.id.ToString);
