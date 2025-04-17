@@ -105,11 +105,11 @@ begin
  PE := TParticleEmitterWithEmitterShape.Create;
  Form_Principale.LoadExample;
 
- FBackGroundColor := TMultiColorRectangle.Create(FScene.Width, FScene.Height);
+ FBackGroundColor := TQuad4Color.Create(FScene.Width, FScene.Height);
  FBackGroundColor.SetAllColorsTo(BGRA(80,80,80));
  FScene.Add(FBackGroundColor, LAYER_BACKGROUND);
 
- FBackGroundRainbow := TMultiColorRectangle.Create(FScene.Width, FScene.Height);
+ FBackGroundRainbow := TQuad4Color.Create(FScene.Width, FScene.Height);
  FScene.Add(FBackGroundRainbow, LAYER_BACKGROUND);
 
  FCamera := FScene.CreateCamera;

@@ -68,6 +68,7 @@ type
     Label56: TLabel;
     Label57: TLabel;
     OPD1: TOpenPictureDialog;
+    OD3: TOpenDialog;
     Panel10: TPanel;
     Panel11: TPanel;
     Panel12: TPanel;
@@ -383,9 +384,11 @@ begin
  end;
 
  if RB2.Checked then begin
-  if not OPD1.Execute then exit;
+  if not OD3.Execute then exit;
   if FBackgroundImage <> NIL then FBackgroundImage.Kill;
-  p := FScene.TexMan.Add(OPD1.FileName);
+  if LowerCase(ExtractFileExt(OD3.FileName)) = '.svg'
+    then p := FScene.TexMan.AddFromSVG(OD3.FileName, -1, -1)
+    else p := FScene.TexMan.Add(OD3.FileName);
   FBackgroundImage := TSprite.Create(p, TRUE);
   FScene.Add(FBackgroundImage, LAYER_BACKGROUND);
   FBackgroundImage.CenterOnScene;

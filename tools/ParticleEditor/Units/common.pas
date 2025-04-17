@@ -22,7 +22,7 @@ FScene: TOGLCScene;
 //FPEngineLocked: boolean = FALSE;
 
 FBackGroundRainbow,
-FBackGroundColor : TMultiColorRectangle;
+FBackGroundColor : TQuad4Color;
 FBackgroundImage : TSprite = NIL;
 
 FModified: boolean = FALSE;
