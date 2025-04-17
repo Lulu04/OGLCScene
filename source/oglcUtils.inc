@@ -275,7 +275,6 @@ begin
       then aHeight := round(aWidth/FWHFactor); // compute height to keep aspect ratio
 
     Result := TBGRABitmap.Create(aWidth, aHeight, BGRAPixelTransparent);
-   // svg.StretchDraw(Result.Canvas2D, taCenter, tlCenter, 0, 0, Result.Width, Result.Height);
     svg.StretchDraw(Result.Canvas2D, 0, 0, aWidth, aHeight, False);
   finally
     svg.Free;
