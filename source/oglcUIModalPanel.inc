@@ -73,8 +73,8 @@ begin
   FItemInstance := FParentScene.FModalPanelList.Add(Self);
 
   if aBlackOpacity > 0 then begin
-    FSceneDarkness := TQuad4Color.Create(aParentScene.Width, aParentScene.Height);
-    FSceneDarkness.ParentScene := aParentScene;
+    FSceneDarkness := TQuad4Color.Create(aParentScene);
+    FSceneDarkness.SetSize(aParentScene.Width, aParentScene.Height);
     FSceneDarkness.SetAllColorsTo(BGRA(0,0,0));
     FSceneDarkness.Opacity.Value := aBlackOpacity;
   end else FSceneDarkness := NIL;

@@ -113,9 +113,10 @@ protected
 public
   procedure DoDraw; override;
 public
-  // First initialize the colors of the gradient then call SetSize()
+  // First initialize the gradient then call SetSize()
   Gradient: TGradientDescriptor;
-  // First initialize the colors of the gradient then call SetSize()
+  constructor Create(aParentScene: TOGLCScene);
+  // First initialize the gradient then call SetSize()
   procedure SetSize(aWidth, aHeight: integer);
 end;
 
@@ -131,10 +132,11 @@ protected
   function GetWidth: integer; override;
   function GetHeight: integer; override;
 public
+  constructor Create(aParentScene: TOGLCScene);
   // construct the quad as rectangular area
-  Constructor Create(aWidth, aHeight: integer);
+  Constructor Create(aWidth, aHeight: integer); deprecated 'use Create instead then SetSize()';
   // construct the quad as quadrilateral area (must be convex)
-  Constructor Create(const aQuad: TQuadCoor);
+  Constructor Create(const aQuad: TQuadCoor); deprecated 'use Create instead then SetSize()';
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
@@ -515,6 +517,12 @@ begin
   end;
 end;
 
+constructor TGradientRectangle.Create(aParentScene: TOGLCScene);
+begin
+  inherited Create;
+  FParentScene := aParentScene;
+end;
+
 procedure TGradientRectangle.SetSize(aWidth, aHeight: integer);
 begin
   FWidth := aWidth;
@@ -572,6 +580,13 @@ end;
 function TQuad4Color.GetHeight: integer;
 begin
   Result := FHeight;
+end;
+
+constructor TQuad4Color.Create(aParentScene: TOGLCScene);
+begin
+  inherited Create;
+  FParentScene := aParentScene;
+  CreateColorObjects;
 end;
 
 procedure TQuad4Color.Update(const aElapsedTime: single);
