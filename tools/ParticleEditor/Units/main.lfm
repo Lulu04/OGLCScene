@@ -914,9 +914,9 @@ object Form_Principale: TForm_Principale
       Height = 394
       Top = 0
       Width = 368
-      ActivePage = TabSheet1
+      ActivePage = TabSheet4
       Anchors = [akTop, akRight, akBottom]
-      TabIndex = 0
+      TabIndex = 1
       TabOrder = 1
       object TabSheet1: TTabSheet
         Caption = 'Emitter'
@@ -1534,7 +1534,7 @@ object Form_Principale: TForm_Principale
   end
   object OD2: TOpenDialog
     Title = 'Open a texture'
-    Filter = 'Image file|*.png;*.bmp;*.svg|All files|*.*'
+    Filter = 'Image file|*.png;*.bmp;*.svg;*.jpg|All files|*.*'
     Left = 592
     Top = 344
   end
@@ -1568,6 +1568,7 @@ object Form_Principale: TForm_Principale
   end
   object OPD1: TOpenPictureDialog
     Title = 'Open an image'
+    Filter = 'SVG files|*.svg|PNG Files (*.png)|*.png|JPEG Files (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Graphique (*.png;*.xpm;*.bmp;*.cur;*.ico;*.icns;*.jpeg;*.jpg;*.jpe;*.jfif;*.tif;*.tiff;*.gif;*.pbm;*.pgm;*.ppm;*.gif;*.apng)|*.png;*.xpm;*.bmp;*.cur;*.ico;*.icns;*.jpeg;*.jpg;*.jpe;*.jfif;*.tif;*.tiff;*.gif;*.pbm;*.pgm;*.ppm;*.gif;*.apng|Pixmap Files (*.xpm)|*.xpm|Bitmap Files (*.bmp)|*.bmp|Cursor Files (*.cur)|*.cur|Icon Files (*.ico)|*.ico|macOS Icon Files (*.icns)|*.icns|Tagged Image File Format Files (*.tif;*.tiff)|*.tif;*.tiff|Graphics Interchange Format Files (*.gif)|*.gif|Portable Pixmap Files (*.pbm;*.pgm;*.ppm)|*.pbm;*.pgm;*.ppm|Tous les fichiers (*.*)|*.*'
     Left = 431
     Top = 261
   end
@@ -1576,5 +1577,10 @@ object Form_Principale: TForm_Principale
     OnTimer = Timer1Timer
     Left = 575
     Top = 64
+  end
+  object OD3: TOpenDialog
+    Filter = 'SVG files|*.svg|PNG Files (*.png)|*.png|JPEG Files (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Pixmap Files (*.xpm)|*.xpm|Bitmap Files (*.bmp)|*.bmp|Cursor Files (*.cur)|*.cur|Icon Files (*.ico)|*.ico|macOS Icon Files (*.icns)|*.icns|Tous les fichiers (*.*)|*.*'
+    Left = 301
+    Top = 271
   end
 end
