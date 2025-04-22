@@ -913,27 +913,29 @@ begin
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToScene(aPt: TPointF): TPointF;
-var s: TSimpleSurfaceWithEffect;
+//var s: TSimpleSurfaceWithEffect;
 begin
-  //Result := FSurfaceOrigin + aPt;
-  s := Self;
+{  s := Self;
   Result := aPt;
   repeat
     Result := s.GetMatrix.Transform(Result);
     s := s.ParentSurface;
-  until s = NIL;
+  until s = NIL;     }
+
+  Result := GetMatrixSurfaceToWorld.Transform(aPt);
 end;
 
 function TSimpleSurfaceWithEffect.SceneToSurface(aPt: TPointF): TPointF;
-var s: TSimpleSurfaceWithEffect;
+//var s: TSimpleSurfaceWithEffect;
 begin
-  //Result := aPt - FSurfaceOrigin;
-  s := Self;
+{  s := Self;
   Result := aPt;
   repeat
     Result := s.GetInverseMatrix.Transform(Result);
     s := s.ParentSurface;
-  until s = NIL;
+  until s = NIL;      }
+
+  Result := GetMatrixSurfaceToWorld.Inverse.Transform(aPt);
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect): TPointF;
