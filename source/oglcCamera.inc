@@ -74,6 +74,7 @@ private
   procedure SetSpeed(AValue: single);
   procedure Update(const AElapsedTime: single);
   function ApplyBoundsOnPoint(aPt: TPointF): TPointF;
+  function InternalSurfaceToScene(aSurface: TSimpleSurfaceWithEffect; aPt: TPointF): TPointF;
 public
   // Use this property to initialize the bounds of the camera.
   Bounds: TRectF;
@@ -338,7 +339,7 @@ begin
     _ctmNone: exit;
     _ctmSurface: begin
       if FTargetSurface = NIL then exit;
-      targetPos := FTargetSurface.SurfaceToScene(FTargetSurfaceOffset);
+      targetPos := InternalSurfaceToScene(FTargetSurface, FTargetSurfaceOffset);
     end;
     _ctmPoint: targetPos := FTargetPoint;
   end;
@@ -361,6 +362,18 @@ begin
   Result.y := EnsureRange(aPt.y, Bounds.Top, Bounds.Bottom);
 end;
 
+function TOGLCCameraAutoFollow.InternalSurfaceToScene(
+  aSurface: TSimpleSurfaceWithEffect; aPt: TPointF): TPointF;
+var s: TSimpleSurfaceWithEffect;
+begin
+  s := aSurface;
+  Result := aPt;
+  repeat
+    Result := s.GetMatrix.Transform(Result);
+    s := s.ParentSurface;
+  until s = NIL
+end;
+
 procedure TOGLCCameraAutoFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean);
 begin
   SetTargetSurface(aSurface, PointF(0,0), aMoveImmediately);
@@ -373,7 +386,7 @@ begin
     CancelTargeting
   else begin
     if aMoveImmediately then
-      FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToScene(aOffset)));
+      FParentCamera.MoveTo(ApplyBoundsOnPoint(InternalSurfaceToScene(aSurface, aOffset)));
     FTargetSurface := aSurface;
     FTargetSurfaceOffset := aOffset;
     if aSurface <> NIL
