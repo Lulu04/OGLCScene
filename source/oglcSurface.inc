@@ -272,6 +272,7 @@ public // Local <-> World
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
   // Gives a matrix to transform surface coordinates to world coordinates.
+  // Take in acount the camera assigned to the parent layer of the surface.
   function GetMatrixSurfaceToWorld: TOGLCMatrix;
   // Returns the rectangular area that contains the transformed surface.
   function GetRectAreaInWorldSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF;
