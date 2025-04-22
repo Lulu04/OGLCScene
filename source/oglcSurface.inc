@@ -283,12 +283,12 @@ public // Local <-> World
   function GetRectAreaInParentSpace: TRectF;
 public // Collision
   // Collision test
-  function CollisionTestWith(aPoint: TPointF): boolean; overload;
-  function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
-  function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: integer): boolean; overload;
-  function CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean; overload;
-  function CollisionTestWith(aRect: TRectF): boolean; overload;
-  function CollisionTestWith(aRect: TRect): boolean; overload;
+  function CollisionTestWith(aPoint: TPointF): boolean; overload; deprecated 'use property CollisionBody instead';
+  function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload; deprecated 'use property CollisionBody instead';
+  function CollisionTestWith(aSurface: TSimpleSurfaceWithEffect; HTolerance, VTolerance: integer): boolean; overload; deprecated 'use property CollisionBody instead';
+  function CollisionTestWith(const aX, aY, aWidth, aHeight: single): boolean; overload; deprecated 'use property CollisionBody instead';
+  function CollisionTestWith(aRect: TRectF): boolean; overload; deprecated 'use property CollisionBody instead';
+  function CollisionTestWith(aRect: TRect): boolean; overload; deprecated 'use property CollisionBody instead';
   property CollisionBody: TOGLCCollisionBody read FCollisionBody;
 public // Childs
   // add a child to the surface.
