@@ -1070,6 +1070,7 @@ end;
 function TParticleEmitter.ParticlesCollisionTestWith( aSurface: TSimpleSurfaceWithEffect): boolean;
 var i: Integer;
 begin
+ raise exception.create('code not yet accuracy');
  Result := FALSE;
  for i:=0 to length(FParticles)-1 do begin
   if FParticles[i].CurrentLife > 0
