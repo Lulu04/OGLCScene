@@ -74,16 +74,20 @@ type
     procedure UpdateWidgets;
 
     procedure ShowPageSpriteBank;
+    procedure ShowPageSpriteBuilder;
+
+    procedure EditSpriteInSpriteBank(const aName: string);
   end;
 
 var
   FormMain: TFormMain;
+
   FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder;
   FrameToolsSpriteBank: TFrameToolSpriteBank;
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
-  u_spritebank, u_ui_handle, u_screen_spritebank,
+  u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas, u_datamodule,
   BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
 
@@ -182,10 +186,13 @@ begin
 end;
 
 procedure TFormMain.OGLMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+var p: TPoint;
 begin
-  Label1.Caption := 'X:'+X.ToString+'  Y:'+Y.ToString;
-
   if (FScene = NIL) or (FScene.CurrentScreen = NIL) then exit;
+
+  p := TCustomScreenTemplate(FScene.CurrentScreen).TransformCoor(PointF(X, Y)).Truncate;
+  Label1.Caption := 'X:'+p.x.ToString+'  Y:'+p.y.ToString;
+
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessMouseMove(Shift, X, Y);
 end;
 
@@ -205,11 +212,8 @@ end;
 
 procedure TFormMain.LoadCommonData;
 begin
-  // create the root container
-  FContainer := TSpriteContainer.Create(FScene);
-  FScene.Add(FContainer, LAYER_SPRITEBUILDER);
-  FContainer.CenterOnScene;
-  FContainer.ShowOrigin := True;
+  UIAtlas.InitDefault;
+  UIAtlas.CreateAtlas;
 
   ScreenSpriteBuilder := TScreenSpriteBuilder.Create;
   ScreenSpriteBuilder.Initialize;
@@ -219,7 +223,6 @@ begin
 
   UIHandle.InitDefault;
   UIHandle.TargetLayer := LAYER_UI;
-  UIHandle.CreateAtlas;
 
   SpriteBank := TSpriteBank.Create;
 
@@ -232,8 +235,9 @@ end;
 
 procedure TFormMain.FreeCommonData;
 begin
+  FScene.Mouse.DeleteCursorSprite;
   FScene.ClearAllLayer;
-  UIHandle.FreeAtlas;
+  UIAtlas.FreeAtlas;
 
   SpriteBank.Free;
   SpriteBank := NIL;
@@ -261,6 +265,19 @@ begin
   Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
   FrameToolsSpriteBank.OnShow;
   FScene.RunScreen(ScreenSpriteBank);
+end;
+
+procedure TFormMain.ShowPageSpriteBuilder;
+begin
+  Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
+  FrameToolsSpriteBuilder.OnShow;
+  FScene.RunScreen(ScreenSpriteBuilder);
+end;
+
+procedure TFormMain.EditSpriteInSpriteBank(const aName: string);
+begin
+  FrameToolsSpriteBuilder.EditSpriteInSpriteBank(aName);
+  ShowPageSpriteBuilder;
 end;
 
 

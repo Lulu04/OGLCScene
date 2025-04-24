@@ -28,6 +28,8 @@ PSpriteBankItem = ^TSpriteBankItem;
 
 TSpriteBank = class(specialize TVector<TSpriteBankItem>)
   function AddEmpty: PSpriteBankItem;
+  function SpriteNameExists(const aName: string): boolean;
+  function GetItemByName(const aName: string): PSpriteBankItem;
 
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
@@ -67,6 +69,23 @@ begin
   o.InitDefault;
   PushBack(o);
   Result := Mutable[Size-1];
+end;
+
+function TSpriteBank.SpriteNameExists(const aName: string): boolean;
+begin
+  Result := GetItemByName(aName) <> NIL;
+end;
+
+function TSpriteBank.GetItemByName(const aName: string): PSpriteBankItem;
+var i: SizeUInt;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.name = aName then begin
+      Result := Mutable[i];
+      exit;
+    end;
 end;
 
 procedure TSpriteBank.SaveTo(t: TStringList);

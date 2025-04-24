@@ -93,7 +93,7 @@ end;
 
 constructor TProject.Create;
 begin
-  inherited Create('.screen');
+  inherited Create('.oglc');
   SetFormCaption(FormMain, 'Game Helper');
   AddFilterToDialogs('Game helper files', '*.oglc');
   AddFilterToDialogs('All file', '*.*');

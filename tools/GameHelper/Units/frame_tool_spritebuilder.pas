@@ -20,10 +20,13 @@ type
     BAddTexture: TSpeedButton;
     BAddToSpriteBank: TSpeedButton;
     BChooseImageFile: TSpeedButton;
+    BRectangle: TSpeedButton;
     BDeleteTexture: TSpeedButton;
+    BCircle: TSpeedButton;
     BNewChild: TSpeedButton;
+    BPolygon: TSpeedButton;
     BUpdateTexture: TSpeedButton;
-    CBChildParent: TComboBox;
+    CBParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
     CheckBox1: TCheckBox;
@@ -40,9 +43,12 @@ type
     Label16: TLabel;
     Label17: TLabel;
     Label18: TLabel;
+    Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
+    Label22: TLabel;
+    Label23: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -59,12 +65,13 @@ type
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
+    Panel6: TPanel;
     PC1: TPageControl;
-    SE1: TSpinEdit;
+    SE1: TFloatSpinEdit;
     SE10: TSpinEdit;
     SE11: TSpinEdit;
     SE12: TSpinEdit;
-    SE2: TSpinEdit;
+    SE2: TFloatSpinEdit;
     SE3: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
     SE5: TFloatSpinEdit;
@@ -73,19 +80,28 @@ type
     SE8: TSpinEdit;
     SE9: TSpinEdit;
     BNew: TSpeedButton;
+    PageCollisionBody: TTabSheet;
+    BLine: TSpeedButton;
+    BSelect: TSpeedButton;
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
+    procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BNewClick(Sender: TObject);
-    procedure CBChildParentDrawItem(Control: TWinControl; Index: Integer;
+    procedure CBParentDrawItem(Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
     procedure LBTextureNamesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
-  private
+    procedure PC1Change(Sender: TObject);
+  private // textures
     FInitializingWidget: boolean;
     procedure UpdateTextureWidgetState;
+    function LBToTextureName: string;
+    function CheckTextureWidgets: boolean;
+    procedure DoAddTexture;
+    procedure DoDeleteTexture;
   private // childs
     procedure ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
     function CBToClassType: classOfSimpleSurfaceWithEffect;
@@ -94,27 +110,31 @@ type
     procedure ParentIDToCB(aID: integer);
     function CBToParentID: integer;
     function CheckChildWidgets: boolean;
-    procedure DoAddNewChild;
+    function DoAddNewChild: boolean;
     procedure DoUpdateChild;
-  private // textures
-    function LBToTextureName: string;
-    function CheckTextureWidgets: boolean;
-    procedure DoAddTexture;
-    procedure DoDeleteTexture;
+
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
     function Textures: TTextureList;
     function Surfaces: TSpriteBuilderSurfaceList;
     procedure DoClearAll;
+  private // collision shape
+
   public
     procedure OnShow;
     procedure FillListBoxTextureNames;
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
+
+    procedure EditSpriteInSpriteBank(const aName: string);
+
+    function SelectedTabIsChild: boolean;
+    function SelectedTabIsCollisionBody: boolean;
   end;
 
 implementation
-uses form_main, u_project, u_common, u_utils, u_spritebank, LCLType;
+uses form_main, u_project, u_common, u_utils, u_spritebank, u_screen_template,
+  LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -143,12 +163,36 @@ begin
     DoDeleteTexture;
 end;
 
+procedure TFrameToolsSpriteBuilder.BLineClick(Sender: TObject);
+begin
+  if Sender = BSelect then begin
+    ScreenSpriteBuilder.MouseState := msIdle;
+  end;
+
+  if Sender = BLine then begin
+    ScreenSpriteBuilder.MouseState := msToolLine;
+  end;
+
+  if Sender = BCircle then begin
+    ScreenSpriteBuilder.MouseState := msToolCircle;
+  end;
+
+  if Sender = BRectangle then begin
+    ScreenSpriteBuilder.MouseState := msToolRectangle;
+  end;
+
+  if Sender = BPolygon then begin
+    ScreenSpriteBuilder.MouseState := msToolPolygon;
+  end;
+end;
+
 procedure TFrameToolsSpriteBuilder.BNewChildClick(Sender: TObject);
 begin
   if Sender = BNewChild then begin
-    DoAddNewChild;
-    ShowSelectionData(NIL);
+    if DoAddNewChild then
+      ShowSelectionData(NIL);
   end;
+
 end;
 
 procedure TFrameToolsSpriteBuilder.BNewClick(Sender: TObject);
@@ -160,13 +204,23 @@ end;
 
 procedure TFrameToolsSpriteBuilder.BAddToSpriteBankClick(Sender: TObject);
 var o: PSpriteBankItem;
+  nam: string;
 begin
-  if Trim(Edit2.Text) = ''then exit;
+  nam := Trim(Edit2.Text);
+  if nam = '' then exit;
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
+  if not Surfaces.RootIsDefined then exit;
 
-  o := SpriteBank.AddEmpty;
-  o^.name := Trim(Edit2.Text);
+  o := SpriteBank.GetItemByName(nam);
+  if o <> NIL then
+    if QuestionDlg('','a sprite named "'+nam+'" already exists in the bank.'+LineEnding+
+                'Would you like to replace it ?',
+                mtWarning, [mbOk, 'Replace', mbCancel, 'Cancel'],0) = mrCancel then exit;
+
+  if o = NIL then o := SpriteBank.AddEmpty;
+
+  o^.name := nam;
   o^.textures := Textures.SaveToString;
   o^.surfaces := Surfaces.SaveToString;
 
@@ -174,19 +228,18 @@ begin
   FormMain.ShowPageSpriteBank;
 end;
 
-procedure TFrameToolsSpriteBuilder.CBChildParentDrawItem(Control: TWinControl;
+procedure TFrameToolsSpriteBuilder.CBParentDrawItem(Control: TWinControl;
   Index: Integer; ARect: TRect; State: TOwnerDrawState);
 var s: string;
 begin
-  with CBChildParent.Canvas do begin
+  with CBParent.Canvas do begin
     if odSelected in State then
       Brush.Color := clHighLight;
     Brush.Style := bsSolid;
     FillRect(ARect);
 
     Brush.Style := bsClear;
-    if Index = 0 then s := 'root'
-      else s := Surfaces.GetItemByID(CBChildParent.Items.Strings[Index].ToInteger)^.name;
+    s := Surfaces.GetItemByID(CBParent.Items.Strings[Index].ToInteger)^.name;
     TextOut(ARect.Left, ARect.Top, s);
   end;
 end;
@@ -195,7 +248,6 @@ procedure TFrameToolsSpriteBuilder.CBChildTypeSelect(Sender: TObject);
 var texItem: PTextureItem;
 begin
   if FInitializingWidget then exit;
-  //if FWorkingChild = NIL then exit;
 
   if Sender = CBTextures then begin
     if Edit5.Text = '' then begin
@@ -236,6 +288,17 @@ begin
   UpdateTextureWidgetState;
 end;
 
+procedure TFrameToolsSpriteBuilder.PC1Change(Sender: TObject);
+begin
+  ScreenSpriteBuilder.SelectNone;
+  ScreenSpriteBuilder.MouseState := msIdle;
+
+  // interdire la selection des éléments du sprite
+  // et autoriser la sélection des shapes de collision
+  FScene.Layer[LAYER_COLLISION_BODY].Visible := SelectedTabIsCollisionBody;
+
+end;
+
 procedure TFrameToolsSpriteBuilder.UpdateTextureWidgetState;
 var siz: TSize;
 begin
@@ -272,24 +335,25 @@ end;
 procedure TFrameToolsSpriteBuilder.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
 var i: integer;
 begin
-  i := -1;
-  if aClass = TSpriteContainer then i := 0
-  else
-  if aClass = TSprite then i := 1
-  else
-  if aClass = TDeformationGrid then i := 2
-  else
-  raise exception.create('forgot to implement!');
+  i := CBChildType.Items.IndexOf(aClass.ClassName);
+  if i = -1 then raise exception.create('forgot to implement '+aClass.ClassName+' !');
   CBChildType.ItemIndex := i;
 end;
 
 function TFrameToolsSpriteBuilder.CBToClassType: classOfSimpleSurfaceWithEffect;
 begin
-  case CBChildType.ItemIndex of
-    0: Result := TSpriteContainer;
-    1: Result := TSprite;
-    2: Result := TDeformationGrid;
-    else raise exception.create('forgot to implement!');
+  case CBChildType.Items.Strings[CBChildType.ItemIndex] of
+    'TSprite': Result := TSprite;
+    'TSpriteWithElasticCorner': Result := TSpriteWithElasticCorner;
+    'TTiledSprite': Result := TTiledSprite;
+    'TPolarSprite': Result := TPolarSprite;
+    'TScrollableSprite': Result := TScrollableSprite;
+    'TShapeOutline': Result := TShapeOutline;
+    'TGradientRectangle': Result := TGradientRectangle;
+    'TQuad4Color': Result := TQuad4Color;
+    'TSpriteContainer': Result := TSpriteContainer;
+    'TDeformationGrid': Result := TDeformationGrid;
+      else raise exception.create('forgot to implement!');
   end;
 end;
 
@@ -306,26 +370,31 @@ end;
 
 procedure TFrameToolsSpriteBuilder.ParentIDToCB(aID: integer);
 begin
-  if aID = -1 then CBChildParent.ItemIndex := 0
-    else CBChildParent.ItemIndex := CBChildParent.Items.IndexOf(aID.ToString);
+  CBParent.ItemIndex := CBParent.Items.IndexOf(aID.ToString);
 end;
 
 function TFrameToolsSpriteBuilder.CBToParentID: integer;
 begin
-  if CBChildParent.ItemIndex = 0 then Result := -1
-    else Result := CBChildParent.Items.Strings[CBChildParent.ItemIndex].ToInteger;
+  if CBParent.ItemIndex = -1 then Result := -1
+    else Result := CBParent.Items.Strings[CBParent.ItemIndex].ToInteger;
 end;
 
 function TFrameToolsSpriteBuilder.CheckChildWidgets: boolean;
+var definingRoot: boolean;
 begin
+  definingRoot := Surfaces.Size = 0;
+
   Result := (CBChildType.ItemIndex <> -1) and
-            (CBTextures.ItemIndex <> -1) and
-            (Trim(Edit5.Text) <> '') and
-            (CBChildParent.ItemIndex <> -1);
+            (Trim(Edit5.Text) <> '');
+
+  if not definingRoot then
+    Result := Result and (CBTextures.ItemIndex <> -1) and
+                         (CBParent.ItemIndex <> -1);
 end;
 
-procedure TFrameToolsSpriteBuilder.DoAddNewChild;
+function TFrameToolsSpriteBuilder.DoAddNewChild: boolean;
 begin
+  Result := False;
   if not CheckChildWidgets then exit;
   if Surfaces.NameExists(Trim(Edit5.Text)) then begin
     ShowMessage('Duplicate name "'+Trim(Edit5.Text)+'"');
@@ -335,9 +404,10 @@ begin
   FWorkingChild := Surfaces.AddEmpty;
   DoUpdateChild;
 
-  CBChildParent.Items.Add(FWorkingChild^.ID.ToString);
+  CBParent.Items.Add(FWorkingChild^.ID.ToString);
   FWorkingChild := NIL;
   Project.SetModified;
+  Result := True;
 end;
 
 procedure TFrameToolsSpriteBuilder.DoUpdateChild;
@@ -435,6 +505,7 @@ begin
     Angle.Value := SE7.Value;
     SetZOrder(SE8.Value);
   end;
+  FWorkingChild^.UpdateHandlePosition;
 end;
 
 function TFrameToolsSpriteBuilder.Textures: TTextureList;
@@ -457,7 +528,7 @@ begin
 
   CBTextures.Clear;
   Edit5.Text := '';
-  Surfaces.FillComboBox(CBChildParent);
+  Surfaces.FillComboBox(CBParent);
   Edit2.Text := '';
 
   LBTextureNames.Clear;
@@ -472,9 +543,10 @@ end;
 procedure TFrameToolsSpriteBuilder.OnShow;
 begin
   FillListBoxTextureNames;
-  Surfaces.FillComboBox(CBChildParent);
+  Surfaces.FillComboBox(CBParent);
   Textures.FillComboBox(CBTextures);
   ShowSelectionData(NIL);
+  PC1.PageIndex := PC1.IndexOf(PageChilds);
 end;
 
 procedure TFrameToolsSpriteBuilder.FillListBoxTextureNames;
@@ -493,9 +565,10 @@ begin
   FInitializingWidget := True;
   FWorkingChild := NIL;
 
+  Label20.Visible := Surfaces.Size = 0;
+
   if Length(aSelected) = 1 then begin
     // 1 selected -> we can edit its parameters
-    Label20.Visible := False;
     FWorkingChild := aSelected[0];
     with FWorkingChild^ do begin
       ClassTypeToCB(classtype);
@@ -513,32 +586,30 @@ begin
     CBChildType.Enabled := True;
     CBTextures.Enabled := True;
     Edit5.Enabled := True;
-    CBChildParent.Enabled := True;
+    CBParent.Enabled := True;
     Panel4.Visible := True;
     BNewChild.Enabled := False;
   end
   else
   if Length(aSelected) > 1 then begin
     // several selected -> we can not edit the parameters
-    Label20.Visible := True;  // show 'multiple'
     CBChildType.Enabled := False;
     CBTextures.Enabled := False;
     Edit5.Enabled := False;
-    CBChildParent.Enabled := False;
+    CBParent.Enabled := False;
     CBChildType.ItemIndex := -1;
     CBTextures.ItemIndex := -1;
     Edit5.Text := '';
-    CBChildParent.ItemIndex := -1;
+    CBParent.ItemIndex := -1;
     Panel4.Visible := False;
     BNewChild.Enabled := False;
   end
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
-    Label20.Visible := False;
     CBChildType.ItemIndex := -1;
     CBTextures.ItemIndex := -1;
     Edit5.Text := '';
-    CBChildParent.ItemIndex := -1;
+    CBParent.ItemIndex := -1;
     Panel4.Visible := True;
     SE1.Value := 0;
     SE2.Value := 0;
@@ -552,6 +623,27 @@ begin
   end;
 
   FInitializingWidget := False;
+end;
+
+procedure TFrameToolsSpriteBuilder.EditSpriteInSpriteBank(const aName: string);
+var o: PSpriteBankItem;
+begin
+  o := SpriteBank.GetItemByName(aName);
+  if o = NIL then exit;
+
+  Textures.LoadFromString(o^.textures);
+  Surfaces.LoadFromString(o^.surfaces);
+  Edit2.Text := o^.name;
+end;
+
+function TFrameToolsSpriteBuilder.SelectedTabIsChild: boolean;
+begin
+  Result := PC1.PageIndex = PC1.IndexOf(PageChilds);
+end;
+
+function TFrameToolsSpriteBuilder.SelectedTabIsCollisionBody: boolean;
+begin
+  Result := PC1.PageIndex = PC1.IndexOf(PageCollisionBody);
 end;
 
 end.

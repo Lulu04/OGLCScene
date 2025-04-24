@@ -12,9 +12,15 @@ uses
 type
 
 TMouseState = ( msIdle,
+
+                // sprite builder surface child
                 msOverSurface,
                 msMouseDownOnSurface,
                 msMovingSelection,
+
+                msOverScaleHandle,
+                msMouseDownOnScaleHandle,
+                msScalingSelection,
 
                 msOverRotateHandle,
                 msMouseDownOnRotateHandle,
@@ -22,7 +28,30 @@ TMouseState = ( msIdle,
 
                 msOverPivot,
                 msMouseDownOnPivot,
-                msMovePivotOnSelection
+                msMovePivotOnSelection,
+
+                // sprite builder collision body
+                msOverNode,
+                msMouseDownOnNode,
+                msMovingNode,
+
+                msToolLine,
+                msMouseDownOnToolLine,
+                msCreatingLine,
+
+                msToolCircle,
+                msMouseDownOnToolCircle,
+                msCreatingCircle,
+
+                msToolRectangle,
+                msMouseDownOnToolRectangle,
+                msCreatingRectangle,
+
+                msToolPolygon,
+                msMouseDownOnToolPolygon,
+                msCreatingPolygon,
+                msWaitingForNextPolygonNode,
+                msEnterPressedOnPolygonCreation
               );
 
 { TCustomScreenTemplate }
@@ -57,6 +86,7 @@ public // layers
   // show only the specified layers and hide the other
   procedure ShowLayers(const aLayerIndexList: array of integer);
 public // mouse and keyboardinteraction on view
+  function TransformCoor(aControlPt: TPointF): TPointF;
   property MouseState: TMouseState read FMouseState write SetMouseState;
   property ClickOrigin: TPointF read FClickOrigin write FClickOrigin;
   property SpacePressed: boolean read FSpacePressed;
@@ -66,7 +96,7 @@ public
 end;
 
 implementation
-uses LCLType, Controls, Math, u_common, form_main;
+uses LCLType, Controls, Math, u_common, form_main, u_ui_atlas;
 
 { TCustomScreenTemplate }
 
@@ -83,22 +113,46 @@ begin
 end;
 
 procedure TCustomScreenTemplate.SetMouseState(AValue: TMouseState);
+var tex: PTexture;
 begin
-  if FMouseState=AValue then Exit;
+  if FMouseState = AValue then Exit;
   FMouseState := AValue;
   case FMouseState of
-    msIdle: FormMain.OGL.Cursor := crDefault;
+    msIdle: tex := texMouseNormal; // FormMain.OGL.Cursor := crDefault;
 
-    msOverSurface: FormMain.OGL.Cursor := crHandPoint;
-    msMouseDownOnSurface: FormMain.OGL.Cursor := crHandPoint;
-    msMovingSelection: FormMain.OGL.Cursor := crHandPoint;
+    msOverSurface: tex := texMouseOverSurface;
+    msMouseDownOnSurface: tex := texMouseOverSurface;
+    msMovingSelection: tex := texMouseOverSurface;
 
-    msOverRotateHandle: FormMain.OGL.Cursor := crHelp;
-    msRotatingSelection: FormMain.OGL.Cursor := crHelp;
+    msOverRotateHandle: tex := texMouseRotateSurface;
+    msRotatingSelection: tex := texMouseRotateSurface;
 
-    msOverPivot: FormMain.OGL.Cursor := crDrag;
-    msMovePivotOnSelection: FormMain.OGL.Cursor := crDrag;
+    msOverPivot: tex := texMouseOverPivot;
+    msMovePivotOnSelection: tex := texMouseOverPivot;
+
+    msOverScaleHandle: tex := texMouseScaleSurface;
+    msMouseDownOnScaleHandle: tex := texMouseScaleSurface;
+    msScalingSelection: tex := texMouseScaleSurface;
+
+    msOverNode: tex := texMouseOverNode;
+    msMouseDownOnNode, msMovingNode: tex := texMouseMovingNode;
+
+    msToolLine,
+    msCreatingLine: tex := texMouseToolLine;
+
+    msToolCircle,
+    msCreatingCircle: tex := texMouseToolCircle;
+
+    msToolRectangle,
+    msCreatingRectangle: tex := texMouseToolRectangle;
+
+    msToolPolygon,
+    msCreatingPolygon: tex := texMouseToolPolygon;
+    msWaitingForNextPolygonNode: tex := texMouseAddNode;
+    else tex := texMouseNormal;
   end;
+
+  FScene.Mouse.SetCursorSprite(tex, False, PointF(0,0));
 end;
 
 procedure TCustomScreenTemplate.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -136,6 +190,8 @@ procedure TCustomScreenTemplate.ProcessMouseWheel(Shift: TShiftState;
 var p1, p2, p: TPointF;
   amount: single;
 begin
+  if Handled then exit;
+
   if Shift = [] then begin
     // scroll vertically
     amount := FCamera.GetViewRect.Height*0.1;
@@ -164,7 +220,7 @@ begin
     ViewOffset := ViewOffset - p;
   end;
 
-  Handled := TRUE;
+  Handled := True;
 end;
 
 procedure TCustomScreenTemplate.CreateCamera(
@@ -172,7 +228,8 @@ procedure TCustomScreenTemplate.CreateCamera(
 begin
   FCamera := FScene.CreateCamera;
   FCamera.AssignToLayer(aLayerIndexList);
-  FViewOffset := PointF(0,0);
+  FCamera.MoveTo(PointF(0,0));
+  FViewOffset := -FCamera.LookAt.Value;
   Zoom := 1.0;
 end;
 
@@ -194,6 +251,13 @@ begin
   for i:=0 to LAYER_COUNT-1 do
     if IndexInArray(i) then FScene.Layer[i].Opacity.ChangeTo(255, 0.5)
       else FScene.Layer[i].Opacity.ChangeTo(0, 0.5);
+end;
+
+function TCustomScreenTemplate.TransformCoor(aControlPt: TPointF): TPointF;
+begin
+  if FCamera <> NIL
+    then Result := FCamera.ControlToWorld(aControlPt)
+    else Result := aControlPt;
 end;
 
 procedure TCustomScreenTemplate.AddToSpriteBank;

@@ -1,21 +1,21 @@
 object FrameToolSpriteBank: TFrameToolSpriteBank
   Left = 0
-  Height = 443
+  Height = 384
   Top = 0
   Width = 319
-  ClientHeight = 443
+  ClientHeight = 384
   ClientWidth = 319
   TabOrder = 0
   DesignLeft = 661
   DesignTop = 272
   object Panel1: TPanel
     Left = 0
-    Height = 443
+    Height = 384
     Top = 0
     Width = 319
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 443
+    ClientHeight = 384
     ClientWidth = 319
     Color = 8289918
     ParentBackground = False
@@ -39,12 +39,13 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       OnMouseUp = LBMouseUp
       OnSelectionChange = LBSelectionChange
     end
-    object SpeedButton1: TSpeedButton
+    object BEdit: TSpeedButton
       Left = 152
       Height = 32
       Top = 208
       Width = 162
       Caption = 'Edit in Sprite Builder'
+      OnClick = BEditClick
     end
     object Panel2: TPanel
       AnchorSideLeft.Control = Panel1
@@ -53,12 +54,12 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideBottom.Control = Panel1
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 171
+      Height = 112
       Top = 272
       Width = 319
       Anchors = [akTop, akLeft, akRight, akBottom]
       BevelOuter = bvNone
-      ClientHeight = 171
+      ClientHeight = 112
       ClientWidth = 319
       Color = 6579300
       ParentBackground = False
@@ -67,7 +68,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       object BExportToPascalUnit: TSpeedButton
         Left = 64
         Height = 30
-        Top = 104
+        Top = 64
         Width = 197
         Caption = 'Export sprite to Pascal unit'
         Images = FormMain.ImageList1
@@ -97,26 +98,6 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
         BorderSpacing.Right = 5
         TabOrder = 0
         Text = 'Edit1'
-      end
-      object Label2: TLabel
-        Left = 8
-        Height = 15
-        Top = 52
-        Width = 80
-        Caption = 'Root surface is:'
-      end
-      object CBRootSurface: TComboBox
-        AnchorSideLeft.Control = Label2
-        AnchorSideTop.Control = Label2
-        AnchorSideTop.Side = asrBottom
-        Left = 8
-        Height = 21
-        Top = 67
-        Width = 265
-        ItemHeight = 15
-        Style = csOwnerDrawFixed
-        TabOrder = 1
-        OnDrawItem = CBRootSurfaceDrawItem
       end
     end
   end

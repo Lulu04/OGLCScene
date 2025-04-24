@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="18.717813"
-   height="14.44145"
-   viewBox="0 0 4.9524214 3.820967"
+   width="14.999993"
+   height="15.000034"
+   viewBox="0 0 3.9687481 3.9687591"
    version="1.1"
    id="svg1"
    xml:space="preserve"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
-   sodipodi:docname="ArrowH.svg"
+   sodipodi:docname="PathNodeSelected.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#1c1c1c"
      inkscape:document-units="px"
-     inkscape:zoom="11.313708"
-     inkscape:cx="14.672466"
-     inkscape:cy="7.866563"
+     inkscape:zoom="7.9999999"
+     inkscape:cx="19.125"
+     inkscape:cy="18.25"
      inkscape:window-width="1280"
      inkscape:window-height="961"
      inkscape:window-x="-8"
@@ -35,8 +35,8 @@
      showgrid="false"><inkscape:page
        x="0"
        y="0"
-       width="4.9524212"
-       height="3.820967"
+       width="3.9687481"
+       height="3.9687591"
        id="page1"
        margin="0"
        bleed="0" /></sodipodi:namedview><defs
@@ -44,7 +44,19 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Layer 2"
-     transform="translate(-100.2882,-165.20906)"><path
-       id="path1"
-       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-width:0.200025;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.835294"
-       d="m 102.05523,165.45449 -1.62719,1.66505 1.62719,1.66505 v -0.69617 -0.11527 h 1.41834 v 0.11527 0.69617 l 1.62721,-1.66505 -1.62721,-1.66505 v 0.69552 0.1159 h -1.41834 v -0.1159 z" /></g></svg>
+     transform="translate(-87.841141,-161.83162)"><rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.175846;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:0.501961"
+       id="rect3"
+       width="2.6458333"
+       height="2.6458333"
+       x="88.50985"
+       y="162.50008"
+       inkscape:export-filename="PathPointSelected.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" /><path
+       id="rect2"
+       style="fill-rule:evenodd;stroke:#ffffff;stroke-width:0.199309;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       d="m 87.940795,161.93127 v 3.76945 h 3.769439 v -3.76945 z m 0.752754,0.75286 h 2.263929 v 2.26424 h -2.263929 z"
+       inkscape:export-filename="PathPoint.svg"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" /></g></svg>

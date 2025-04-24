@@ -13,6 +13,7 @@ function ScaleH(AValue: integer): integer;
 
 function GetDataFolder: string;
 function GetHandleFolder: string;
+function GetCursorFolder: string;
 
 
 type
@@ -62,6 +63,11 @@ end;
 function GetHandleFolder: string;
 begin
   Result := GetDataFolder+'Handle'+DirectorySeparator;
+end;
+
+function GetCursorFolder: string;
+begin
+  Result := GetDataFolder+'Cursor'+DirectorySeparator;
 end;
 
 { TAppPref }
