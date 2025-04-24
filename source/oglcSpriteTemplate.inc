@@ -478,9 +478,7 @@ end;
 procedure TShapeOutline.SetShapeCustom(aX, aY: single; aPath: TOGLCPath);
 var r: TRectF;
 begin
-  FPath := NIL;
-  SetLength(FPath, Length(aPath));
-  Move(aPath[0], FPath[0], Length(aPath));
+  FPath := Copy(aPath, 0, Length(aPath));
   r := FPath.Bounds;
   FWidth := Round(r.Width);
   FHeight := Round(r.Height);
