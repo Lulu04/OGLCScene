@@ -64,7 +64,6 @@ end;
 procedure TScreenSpriteBank.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_SPRITEBANK]);
-  FContainer.MoveToLayer(LAYER_SPRITEBANK);
 end;
 
 procedure TScreenSpriteBank.FreeObjects;
@@ -75,6 +74,7 @@ procedure TScreenSpriteBank.Initialize;
 begin
   FTextures := TTextureList.Create;
   FSurfaces := TSpriteBankSurfaceList.Create;
+  FSurfaces.WorkingLayer := LAYER_SPRITEBANK;
 
   // camera
   CreateCamera([LAYER_SPRITEBANK]);

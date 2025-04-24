@@ -13,20 +13,16 @@ type
   { TFrameToolSpriteBank }
 
   TFrameToolSpriteBank = class(TFrame)
-    CBRootSurface: TComboBox;
     Edit1: TEdit;
     Label1: TLabel;
-    Label2: TLabel;
     LB: TListBox;
     Panel1: TPanel;
     Panel2: TPanel;
     SD1: TSaveDialog;
-    SpeedButton1: TSpeedButton;
+    BEdit: TSpeedButton;
     BExportToPascalUnit: TSpeedButton;
-    procedure CBRootSurfaceDrawItem(Control: TWinControl; Index: Integer;
-      ARect: TRect; State: TOwnerDrawState);
-    procedure LBMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
+    procedure BEditClick(Sender: TObject);
+    procedure LBMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; User: boolean);
     procedure BExportToPascalUnitClick(Sender: TObject);
   private
@@ -41,7 +37,7 @@ type
 
 implementation
 
-uses LCLType, Graphics, u_spritebank, u_common, OGLCScene;
+uses LCLType, Graphics, u_spritebank, u_common, form_main, OGLCScene;
 
 {$R *.lfm}
 
@@ -51,7 +47,6 @@ procedure TFrameToolSpriteBank.LBSelectionChange(Sender: TObject; User: boolean)
 var i: integer;
 begin
   ShowSprite(LB.ItemIndex);
-  ScreenSpriteBank.Surfaces.FillComboBox(CBRootSurface);
 
   i := LB.ItemIndex;
   if i = -1 then Edit1.Text := ''
@@ -62,28 +57,20 @@ procedure TFrameToolSpriteBank.BExportToPascalUnitClick(Sender: TObject);
 var t: TStringlist;
   i: integer;
   s, sw, sh: string;
-  rootSurfaceItem, current: PSurfaceDescriptor;
+  rootItem, current: PSurfaceDescriptor;
   function GetClassName: string;
   begin
-    Result := Edit1.Text;
-  end;
-  function GetRootSurface: TSimpleSurfaceWithEffect;
-  var item: PSurfaceDescriptor;
-  begin
-    if CBRootSurface.ItemIndex = 0 then Result := FContainer
-      else begin
-        item := Surfaces.GetItemByID(CBRootSurface.Items.Strings[CBRootSurface.ItemIndex].ToInteger);
-        Result := item^.surface;
-      end;
+    Result := Trim(Edit1.Text);
   end;
   function GetClassType: string;
   begin
-    Result := GetRootSurface.ClassName;
+    Result := rootItem^.surface.ClassName;
   end;
 
 begin
   if LB.ItemIndex = -1 then exit;
-  if CBRootSurface.ItemIndex = -1 then exit;
+  rootItem := Surfaces.GetRootItem;
+
   s := Trim(Edit1.Text);
   if Length(s) < 2 then exit;
   if s[1] <> 'T' then s := 'T'+s;
@@ -118,15 +105,11 @@ begin
   t.AddText(s);
 
   // child variables declaration
-  rootSurfaceItem := NIL;
-  if CBRootSurface.ItemIndex > 0 then
-    rootSurfaceItem := Surfaces.GetItemByID(CBRootSurface.Items.Strings[CBRootSurface.ItemIndex].ToInteger);
   t.Add('private');
   s := '';
   for i:=0 to Surfaces.Size-1 do begin
     current := Surfaces.Mutable[i];
-    if CBRootSurface.ItemIndex > 0 then
-      if current = rootSurfaceItem then continue;
+    if current = rootItem then continue;
     s := s + '  '+current^.name+': '+current^.classtype.ClassName+';';
     if i < Surfaces.Size-1 then s := s +#10;
   end;
@@ -182,25 +165,36 @@ begin
     'TSpriteContainer': begin
       s := '  inherited Create(FScene);';
     end;
-    'TSprite': begin
-      s := '  inherited Create('+rootSurfaceItem^.textureName + ', False);';
+    'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite',
+    'TPolarSprite', 'TScrollableSprite': begin
+      s := '  inherited Create('+rootItem^.textureName + ', False);';
+    end;
+    'TShapeOutline': begin
+      s := '  inherited Create(FScene);';
+    end;
+    'TGradientRectangle': begin
+      s := '  inherited Create(FScene);';
+    end;
+    'TQuad4Color': begin
+      s := '  inherited Create(FScene);'#10+
+           '  SetSize(...);';
     end;
     'TDeformationGrid': begin
-      s := '  inherited Create('+rootSurfaceItem^.textureName + ', False);';
+      s := '  inherited Create('+rootItem^.textureName + ', False);';
     end;
     else raise exception.create('forgot to implement!');
   end;
   t.Add(s);
   t.AddText('  if aLayerIndex <> -1 then'#10+
             '    FScene.Add(Self, aLayerIndex);'#10);
-  if rootSurfaceItem <> NIL then
-    t.AddText('  SetCoordinate('+FormatFloatWithDot('0.00', rootSurfaceItem^.x)+', '+
-                                 FormatFloatWithDot('0.00', rootSurfaceItem^.y)+');'#10+
-              '  Pivot := PointF('+FormatFloatWithDot('0.00', rootSurfaceItem^.pivotX)+', '+
-                                   FormatFloatWithDot('0.00', rootSurfaceItem^.pivotY)+');'#10+
-              '  Angle.Value := '+FormatFloatWithDot('0.00', rootSurfaceItem^.angle)+';'#10+
-              '  Scale.Value := PointF('+FormatFloatWithDot('0.00', rootSurfaceItem^.scaleX)+', '+
-                                         FormatFloatWithDot('0.00', rootSurfaceItem^.scaleY)+');'#10#10)
+  if rootItem <> NIL then
+    t.AddText('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
+                                 FormatFloatWithDot('0.00', rootItem^.y)+');'#10+
+              '  Pivot := PointF('+FormatFloatWithDot('0.00', rootItem^.pivotX)+', '+
+                                   FormatFloatWithDot('0.00', rootItem^.pivotY)+');'#10+
+              '  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';'#10+
+              '  Scale.Value := PointF('+FormatFloatWithDot('0.00', rootItem^.scaleX)+', '+
+                                         FormatFloatWithDot('0.00', rootItem^.scaleY)+');'#10#10)
   else t.Add('');
 
   // creating childs
@@ -209,7 +203,7 @@ begin
     // copy values to variable
     current^.DuplicateValuesToTemporaryVariables;
 
-    if (rootSurfaceItem <> NIL) and (current = rootSurfaceItem) then continue;
+    if (rootItem <> NIL) and (current = rootItem) then continue;
 
     if current^.classtype = TSpriteContainer then begin
       s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
@@ -223,11 +217,11 @@ begin
     end else raise exception.create('forgot to implement!');
     t.Add(s);
     // set child dependency and values
-    if rootSurfaceItem = NIL then begin
+    if rootItem = NIL then begin
       if current^.parentID = -1 then s := 'Self'
         else s := Surfaces.GetItemByID(current^.parentID)^.name;
     end else begin
-      if current^.parentID = rootSurfaceItem^.id then s := 'Self'
+      if current^.parentID = rootItem^.id then s := 'Self'
         else s := Surfaces.GetItemByID(current^.parentID)^.name;
     end;
     t.AddText('  with '+current^.name+' do begin'#10+
@@ -259,21 +253,10 @@ begin
   LB.ItemIndex := LB.GetIndexAtXY(X, Y);
 end;
 
-procedure TFrameToolSpriteBank.CBRootSurfaceDrawItem(Control: TWinControl;
-  Index: Integer; ARect: TRect; State: TOwnerDrawState);
-var s: string;
+procedure TFrameToolSpriteBank.BEditClick(Sender: TObject);
 begin
-  with CBRootSurface.Canvas do begin
-    if odSelected in State then
-      Brush.Color := clHighLight;
-    Brush.Style := bsSolid;
-    FillRect(ARect);
-
-    Brush.Style := bsClear;
-    if Index = 0 then s := 'TSpriteContainer'
-      else s := Surfaces.GetItemByID(CBRootSurface.Items.Strings[Index].ToInteger)^.name;
-    TextOut(ARect.Left, ARect.Top, s);
-  end;
+  if LB.ItemIndex = -1 then exit;
+  FormMain.EditSpriteInSpriteBank(LB.Items.Strings[LB.ItemIndex]);
 end;
 
 procedure TFrameToolSpriteBank.FillLB;

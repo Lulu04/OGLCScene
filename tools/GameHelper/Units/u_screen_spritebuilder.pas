@@ -9,7 +9,8 @@ uses
   BGRABitmap, BGRABitmapTypes,
   OGLCScene,
   u_common, u_screen_template,
-  u_surface_list, u_texture_list;
+  u_surface_list, u_texture_list, u_ui_handle,
+  u_collisionbody_list;
 
 type
 
@@ -27,21 +28,47 @@ private
   FSurfaces: TSpriteBuilderSurfaceList;
 private
   FSelected: ArrayOfPSurfaceDescriptor;
+  FScaleHandleType: TScaleHandle;
   function GetSelectedCount: integer;
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
+  function AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean; overload;
+  function AlreadySelected(item: PSurfaceDescriptor): boolean; overload;
   procedure AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
-  procedure SelectNone;
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF);
   procedure AddOffsetToPivotOnSelection(aOffset: TPointF);
   procedure SaveCurrentAngleBeforeRotationOnSelection;
-  procedure RotateSelection(aReferencePoint: TPointF; aUseIncrement: boolean);
+  procedure RotateSelection(aPreviousReferencePoint, aReferencePoint: TPointF; aUseIncrement: boolean);
+  procedure SaveCurrentScaleValueBeforeScalingSelection;
+  procedure ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean);
   procedure DeleteSelection;
   procedure UpdateHandlePositionOnSelected;
   function MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
+  function MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
 private
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
+private
+  procedure ProcessMouseUpForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseDownForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseMoveForChild(Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseWheelForChild(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+  procedure ProcessKeyUpForChild(var Key: Word; Shift: TShiftState);
+private // collision body
+  FBodyList: TBodyItemList;
+  FWorkingBody: PBodyItem;
+  FWorkingNode: PUINodeHandle;
+  procedure SelectNoCollisionBody;
+  procedure LoopCreateLine;
+  procedure LoopCreateCircle;
+  procedure LoopCreateRectangle;
+  procedure LoopCreatePolygon;
+  procedure LoopMoveNode;
+  procedure ProcessMouseUpForCollisionBody(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseDownForCollisionBody(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseMoveForCollisionBody(Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseWheelForCollisionBody(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+  procedure ProcessKeyUpForCollisionBody(var Key: Word; Shift: TShiftState);
 public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -51,6 +78,7 @@ public
 public // selection
   procedure SetPivotOnSelection;
   procedure LoopRotateSelection;
+  procedure LoopScaleSelection;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -58,14 +86,16 @@ public
   procedure Initialize;
   procedure Finalize;
 
+  procedure SelectNone;
   property Textures: TTextureList read FTextures;
   property Surfaces: TSpriteBuilderSurfaceList read FSurfaces;
+  property Bodies: TBodyItemList read FBodyList;
 end;
 
 var ScreenSpriteBuilder: TScreenSpriteBuilder;
 
 implementation
-uses LCLType, Forms, Controls, u_project, u_app_pref, form_main;
+uses LCLType, Forms, Dialogs, Controls, u_project, u_app_pref, form_main;
 
 { TSpriteBuilderSurfaceList }
 
@@ -83,16 +113,6 @@ end;
 
 procedure TScreenSpriteBuilder.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
 var i: integer;
-    function alreadyExists(item: PSurfaceDescriptor): boolean;
-    var j: integer;
-    begin
-      for j:=0 to High(FSelected) do
-        if FSelected[j] = item then begin
-          Result := True;
-          exit;
-        end;
-      Result := False;
-    end;
 begin
   if Length(aItems) = 0 then exit;
 
@@ -102,13 +122,32 @@ begin
   if FSelected = NIL then FSelected := aItems
   else begin
     for i:=0 to High(aItems) do
-      if not alreadyExists(aItems[i]) then begin
+      if not AlreadySelected(aItems[i]) then begin
         SetLength(FSelected, Length(FSelected)+1);
         FSelected[High(FSelected)] := aItems[i];
       end;
   end;
 
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+end;
+
+function TScreenSpriteBuilder.AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean;
+var i: integer;
+begin
+  if Length(aItems) = 0 then exit(False);
+  if Length(FSelected) < Length(aItems) then exit(False);
+
+  for i:=0 to High(aItems) do
+    if not AlreadySelected(aItems[i]) then exit(False);
+  Result := True;
+end;
+
+function TScreenSpriteBuilder.AlreadySelected(item: PSurfaceDescriptor): boolean;
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do
+    if FSelected[i] = item then exit(True);
+  Result := False;
 end;
 
 procedure TScreenSpriteBuilder.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
@@ -155,13 +194,31 @@ begin
     FSelected[i]^.SaveCurrentAngleBeforeRotation;
 end;
 
-procedure TScreenSpriteBuilder.RotateSelection(aReferencePoint: TPointF;
-  aUseIncrement: boolean);
+procedure TScreenSpriteBuilder.RotateSelection(aPreviousReferencePoint,
+  aReferencePoint: TPointF; aUseIncrement: boolean);
 var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
-    FSelected[i]^.ComputeAngle(aReferencePoint, aUseIncrement);
+    FSelected[i]^.ComputeAngle(aPreviousReferencePoint, aReferencePoint, aUseIncrement);
+
+  UpdateHandlePositionOnSelected;
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+end;
+
+procedure TScreenSpriteBuilder.SaveCurrentScaleValueBeforeScalingSelection;
+var i: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.SaveCurrentScaleValueBeforeScaling;
+end;
+
+procedure TScreenSpriteBuilder.ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean);
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.ComputeScale(FScaleHandleType, aDelta, aKeepAspectRatio);
 
   UpdateHandlePositionOnSelected;
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
@@ -171,6 +228,14 @@ procedure TScreenSpriteBuilder.DeleteSelection;
 var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
+
+  // we can not delete the root if it have child
+  for i:=0 to High(FSelected) do
+    if FSelected[i]^.IsRoot and (Surfaces.Size > 1) then begin
+      ShowMessage('You can not delete the root because there are childs attached to it');
+      exit;
+    end;
+
   for i:=0 to High(FSelected) do begin
     FSelected[i]^.KillSurface;
     Surfaces.Erase(Surfaces.GetItemIndexByID(FSelected[i]^.id));
@@ -203,6 +268,15 @@ begin
   Result := False;
   for i:=0 to High(FSelected) do
     if FSelected[i]^.IsOverRotateHandle(aWorldPt) then
+      Exit(True);
+end;
+
+function TScreenSpriteBuilder.MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
+var i: integer;
+begin
+  Result := False;
+  for i:=0 to High(FSelected) do
+    if FSelected[i]^.IsOverScaleHandle(aWorldPt, FScaleHandleType) then
       Exit(True);
 end;
 
@@ -249,17 +323,13 @@ begin
   until MouseState <> msMovePivotOnSelection;
 end;
 
-procedure TScreenSpriteBuilder.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TScreenSpriteBuilder.ProcessMouseUpForChild(Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 var items: ArrayOfPSurfaceDescriptor;
 begin
-  inherited ProcessMouseUp(Button, Shift, X, Y);
-
   items := Surfaces.GetItemsAt(X, Y);
   case MouseState of
-    msIdle: begin
-      SelectNone;
-      MouseState := msIdle;
-    end;
+    msIdle: SelectNone;
 
     msMouseDownOnSurface: begin
       // item selection
@@ -292,18 +362,17 @@ begin
       if items = NIL then MouseState := msIdle
         else MouseState := msOverSurface;
 
+    msScalingSelection: MouseState := msIdle;
     msRotatingSelection: MouseState := msIdle;
 
     msMovePivotOnSelection: MouseState := msOverPivot;
   end;//case
-
 end;
 
-procedure TScreenSpriteBuilder.ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TScreenSpriteBuilder.ProcessMouseDownForChild(Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 var items: ArrayOfPSurfaceDescriptor;
 begin
-  inherited ProcessMouseDown(Button, Shift, X, Y);
-
   items := Surfaces.GetItemsAt(X, Y);
   ClickOrigin := PointF(X, Y);
   case MouseState of
@@ -314,22 +383,25 @@ begin
     end;
 
     msOverSurface: MouseState := msMouseDownOnSurface;
+    msOverScaleHandle: MouseState := msMouseDownOnScaleHandle;
     msOverRotateHandle: MouseState := msMouseDownOnRotateHandle;
     msOverPivot: MouseState := msMouseDownOnPivot;
 
   end;//case
 end;
 
-procedure TScreenSpriteBuilder.ProcessMouseMove(Shift: TShiftState; X, Y: Integer);
+procedure TScreenSpriteBuilder.ProcessMouseMoveForChild(Shift: TShiftState; X, Y: Integer);
 var items: ArrayOfPSurfaceDescriptor;
     thresholdDone: boolean;
 begin
-  inherited ProcessMouseMove(Shift, X, Y);
-
   items := Surfaces.GetItemsAt(X, Y);
   thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
   case MouseState of
     msIdle: begin
+      // mouse is over scale handle ?
+      if MouseIsOverScaleHandle(PointF(X,Y)) then
+        MouseState := msOverScaleHandle
+      else
       // mouse is over rotate handle ?
       if MouseIsOverRotateHandle(PointF(X,Y)) then
         MouseState := msOverRotateHandle
@@ -341,17 +413,45 @@ begin
     msOverSurface:
       if items = NIL then mouseState := msIdle
       else begin
+        // mouse is over scale handle ?
+        if MouseIsOverScaleHandle(PointF(X,Y)) then
+          MouseState := msOverScaleHandle
+        else
+        // mouse is over rotate handle ?
+        if MouseIsOverRotateHandle(PointF(X,Y)) then
+          MouseState := msOverRotateHandle
+        else
         // mouse is over pivot handle ? (only one selected)
         if MouseIsOverPivotHandle(PointF(X,Y)) then
-          MouseState := msOverPivot
-        else;
+          MouseState := msOverPivot;
       end;
 
     msMouseDownOnSurface: begin
       if items <> NIL then begin
-        if thresholdDone then
+        if thresholdDone then begin
+          if GetSelectedCount = 0 then AddToSelected([items[0]])
+          else begin
+            if not AlreadySelected([items[0]]) then begin
+              if not (ssShift in Shift) then SelectNone;
+              AddToSelected([items[0]]);
+            end;
+          end;
           LoopMoveSelection;
+        end;
       end else MouseState := msIdle;
+    end;
+
+    msOverScaleHandle: begin
+      if not MouseIsOverRotateHandle(PointF(X,Y)) then
+        if items = NIL then MouseState := msIdle
+          else MouseState := msOverSurface;
+    end;
+
+    msMouseDownOnScaleHandle: begin
+      if thresholdDone then begin
+        ClickOrigin := PointF(X,Y);
+        LoopScaleSelection;
+      end;
     end;
 
     msOverRotateHandle: begin
@@ -381,19 +481,357 @@ begin
   end;
 end;
 
-procedure TScreenSpriteBuilder.ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
+procedure TScreenSpriteBuilder.ProcessMouseWheelForChild(Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
-  inherited ProcessOnKeyUp(Key, Shift);
+  UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenSpriteBuilder.ProcessKeyUpForChild(var Key: Word; Shift: TShiftState);
+begin
   case Key of
     VK_DELETE: DeleteSelection;
   end;
 end;
 
+procedure TScreenSpriteBuilder.SelectNoCollisionBody;
+begin
+  Bodies.UnselectAllNodes;
+end;
+
+procedure TScreenSpriteBuilder.LoopCreateLine;
+var item: PBodyItem;
+  current, delta: TPointF;
+  firstTime: boolean;
+  parentSurface: TSimpleSurfaceWithEffect;
+begin
+  if MouseState = msCreatingLine then exit;
+  MouseState := msCreatingLine;
+
+  parentSurface := Surfaces.GetRootItem^.surface;
+
+  item := Bodies.AddEmpty;
+  item^.BodyType := _btLine;
+  item^.ParentSurface := parentSurface;
+
+  firstTime := True;
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    delta := current - ClickOrigin;
+    if firstTime or (delta.x <> 0) or (delta.y <> 0) then begin
+      firstTime := False;
+      item^.UpdateAsLine(ClickOrigin, current);
+    end;
+    Application.ProcessMessages;
+    FScene.DoLoop;
+  until MouseState <> msCreatingLine;
+end;
+
+procedure TScreenSpriteBuilder.LoopCreateCircle;
+var item: PBodyItem;
+  current, delta: TPointF;
+  firstTime: boolean;
+  parentSurface: TSimpleSurfaceWithEffect;
+begin
+  if MouseState = msCreatingCircle then exit;
+  MouseState := msCreatingCircle;
+
+  parentSurface := Surfaces.GetRootItem^.surface;
+
+  item := Bodies.AddEmpty;
+  item^.BodyType := _btCircle;
+  item^.ParentSurface := parentSurface;
+
+  firstTime := True;
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    current.y := ClickOrigin.y;
+    if current.x < ClickOrigin.x then current.x := ClickOrigin.x;
+    delta := current - ClickOrigin;
+    if firstTime or (delta.x <> 0) or (delta.y <> 0) then begin
+      firstTime := False;
+      item^.UpdateAsCircle(ClickOrigin, current);
+    end;
+    Application.ProcessMessages;
+    FScene.DoLoop;
+  until MouseState <> msCreatingCircle;
+end;
+
+procedure TScreenSpriteBuilder.LoopCreateRectangle;
+var item: PBodyItem;
+  current, delta: TPointF;
+  firstTime: boolean;
+  parentSurface: TSimpleSurfaceWithEffect;
+begin
+  if MouseState = msCreatingRectangle then exit;
+  MouseState := msCreatingRectangle;
+
+  parentSurface := Surfaces.GetRootItem^.surface;
+
+  item := Bodies.AddEmpty;
+  item^.BodyType := _btRect;
+  item^.ParentSurface := parentSurface;
+
+  firstTime := True;
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    delta := current - ClickOrigin;
+    if firstTime or (delta.x <> 0) or (delta.y <> 0) then begin
+      firstTime := False;
+      item^.UpdateAsRectangle(ClickOrigin, current);
+    end;
+    Application.ProcessMessages;
+    FScene.DoLoop;
+  until MouseState <> msCreatingRectangle;
+end;
+
+procedure TScreenSpriteBuilder.LoopCreatePolygon;
+var current: TPointF;
+  item: PBodyItem;
+begin
+  // the end of creating a polygon is:
+  // - when user press ESC to cancel the creation
+  // - when user click on the first point to close the path
+  // - when user press ENTER to end the creation
+  // - when user click right mouse button to end the creation
+
+  if MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode] then exit;
+  MouseState := msCreatingPolygon;
+
+  item := Bodies.AddEmpty;
+  item^.BodyType := _btPolygon;
+  item^.ParentSurface := Surfaces.GetRootItem^.surface;
+
+  repeat
+    if MouseState = msCreatingPolygon then begin
+      current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+      if item^.IsOverTheFirstNode(current) then begin
+        // close the path and exit
+        item^.CloseThePolygon;
+        MouseState := msIdle;
+        exit;
+      end;
+
+      item^.UpdateAsPolygon(current);
+      MouseState := msWaitingForNextPolygonNode;
+    end;
+    Application.ProcessMessages;
+    FScene.DoLoop;
+  until not(MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode]);
+
+  if MouseState = msEnterPressedOnPolygonCreation then begin
+    item^.SelectAllNodes;
+    MouseState := msidle;
+  end;
+  // check if ESC was pressed to cancel the creation
+
+end;
+
+procedure TScreenSpriteBuilder.LoopMoveNode;
+var current, delta: TPointF;
+begin
+  if MouseState = msMovingNode then exit;
+  MouseState := msMovingNode;
+
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    delta := current - ClickOrigin;
+    if (delta.x <> 0) or (delta.y <> 0) then begin
+      FWorkingBody^.UpdateNodePosition(FWorkingNode, current);
+    end;
+    Application.ProcessMessages;
+    FScene.DoLoop;
+  until MouseState <> msMovingNode;
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseUpForCollisionBody(
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var items: ArrayOfPUIPointHandle;
+  targetBody: PBodyItem;
+begin
+  items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
+
+  case MouseState of
+    msIdle: SelectNoCollisionBody;
+
+    msMouseDownOnNode: begin
+      if items <> NIL then begin
+        if not (ssShift in Shift) then Bodies.UnselectAllNodes;
+        items[0]^.Selected := True;
+        MouseState := msOverNode;
+      end else begin
+          Bodies.UnselectAllNodes;
+          MouseState := msIdle;
+        end;
+    end;
+
+    msMovingNode: MouseState := msIdle;
+    msCreatingLine: MouseState := msIdle;
+    msCreatingCircle: MouseState := msIdle;
+    msCreatingRectangle: MouseState := msIdle;
+    msMouseDownOnToolLine: MouseState := msIdle;
+    msMouseDownOnToolCircle: MouseState := msIdle;
+    msMouseDownOnToolRectangle: MouseState := msIdle;
+    msMouseDownOnToolPolygon: begin
+      ClickOrigin := PointF(X, Y);
+      LoopCreatePolygon;
+    end;
+    msWaitingForNextPolygonNode: begin
+      ClickOrigin := PointF(X, Y);
+      MouseState := msCreatingPolygon;
+    end;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseDownForCollisionBody(
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var items: ArrayOfPUIPointHandle;
+  targetBody: PBodyItem;
+begin
+  ClickOrigin := PointF(X, Y);
+  items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
+
+  case MouseState of
+    msIdle: ;
+    msOverNode: begin
+      if items <> NIL then begin
+        MouseState := msMouseDownOnNode;
+      end;
+    end;
+    msToolLine: MouseState := msMouseDownOnToolLine;
+    msToolCircle: MouseState := msMouseDownOnToolCircle;
+    msToolRectangle: MouseState := msMouseDownOnToolRectangle;
+    msToolPolygon: MouseState := msMouseDownOnToolPolygon;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseMoveForCollisionBody(Shift: TShiftState; X, Y: Integer);
+var thresholdDone: Boolean;
+  items: ArrayOfPUIPointHandle;
+  targetBody: PBodyItem;
+begin
+  thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
+  items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
+
+  case MouseState of
+    msIdle: begin
+      if items <> NIL then begin
+        FWorkingBody := targetBody;
+        MouseState := msOverNode;
+      end;
+    end;
+    msOverNode: begin
+      if items = NIL then begin
+        FWorkingBody := NIL;
+        MouseState := msIdle;
+      end;
+    end;
+    msMouseDownOnNode: if thresholdDone and (items <> NIL) then begin
+      FWorkingBody := targetBody;
+      FWorkingNode := items[0];
+      LoopMoveNode;
+    end;
+    msMouseDownOnToolLine: if thresholdDone then LoopCreateLine;
+    msMouseDownOnToolCircle: if thresholdDone then LoopCreateCircle;
+    msMouseDownOnToolRectangle: if thresholdDone then LoopCreateRectangle;
+    //msMouseDownOnToolPolygon: if thresholdDone then LoopCreatePolygon;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseWheelForCollisionBody(
+  Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+var items: ArrayOfPUIPointHandle;
+  targetBody: PBodyItem;
+begin
+  items := Bodies.GetItemAndNodesAt(PointF(MousePos), targetBody);
+  if items <> NIL then begin
+    // select/unselect nodes
+    targetBody^.UpdateNodeSelectedFrom(items[0], WheelDelta > 0);
+    Handled := True; // avoid mouse interaction on view
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ProcessKeyUpForCollisionBody(var Key: Word; Shift: TShiftState);
+var item: PBodyItem;
+begin
+  case Key of
+    VK_DELETE: if Bodies.SelectedNodeBelongToTheSameShape then begin
+      if Bodies.SelectedNodesBelongToSinglePolygon(item) then begin
+        if item^.AllNodesAreSelected then begin
+          if QuestionDlg('','Delete the polygon?', mtWarning,
+                      [mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then Bodies.DeleteItem(item);
+        end else item^.DeleteSelectedNodes;
+        exit;
+      end;
+      if QuestionDlg('','Delete the whole shape?',
+                    mtWarning,[mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
+        Bodies.DeleteShapeWithSelectedNode;
+      end;
+    end;
+
+    VK_RETURN: begin
+      if MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode] then
+        MouseState := msEnterPressedOnPolygonCreation;
+    end;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited ProcessMouseUp(Button, Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    ProcessMouseUpForChild(Button, Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    ProcessMouseUpForCollisionBody(Button, Shift, X, Y);
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited ProcessMouseDown(Button, Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    ProcessMouseDownForChild(Button, Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    ProcessMouseDownForCollisionBody(Button, Shift, X, Y);
+end;
+
+procedure TScreenSpriteBuilder.ProcessMouseMove(Shift: TShiftState; X, Y: Integer);
+begin
+  inherited ProcessMouseMove(Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    ProcessMouseMoveForChild(Shift, X, Y);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    ProcessMouseMoveForCollisionBody(Shift, X, Y);
+end;
+
+procedure TScreenSpriteBuilder.ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited ProcessOnKeyUp(Key, Shift);
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    ProcessKeyUpForChild(Key, Shift);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    ProcessKeyUpForCollisionBody(Key, Shift);
+end;
+
 procedure TScreenSpriteBuilder.ProcessMouseWheel(Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    ProcessMouseWheelForChild(Shift, WheelDelta, MousePos, Handled);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    ProcessMouseWheelForCollisionBody(Shift, WheelDelta, MousePos, Handled);
+
   inherited ProcessMouseWheel(Shift, WheelDelta, MousePos, Handled);
-  UpdateHandlePositionOnSelected;
+
+  if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    Bodies.UpdateNodesPosition;
 end;
 
 procedure TScreenSpriteBuilder.SetPivotOnSelection;
@@ -415,7 +853,7 @@ begin
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
     if (delta.x <> 0) or (delta.y <> 0) then begin
-      RotateSelection(Camera.ControlToWorld(current), CtrlPressed);
+      RotateSelection(Camera.ControlToWorld(ClickOrigin), Camera.ControlToWorld(current), CtrlPressed);
       Project.SetModified;
       FScene.DoLoop;
       ClickOrigin := current;
@@ -424,10 +862,28 @@ begin
   until MouseState <> msRotatingSelection;
 end;
 
+procedure TScreenSpriteBuilder.LoopScaleSelection;
+var current, delta: TPointF;
+begin
+  if MouseState = msScalingSelection then exit;
+  MouseState := msScalingSelection;
+  SaveCurrentScaleValueBeforeScalingSelection;
+
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    delta := Camera.ControlToWorld(current) - Camera.ControlToWorld(ClickOrigin);
+    if (delta.x <> 0) or (delta.y <> 0) then begin
+      ScaleSelection(delta, CtrlPressed);
+      Project.SetModified;
+      FScene.DoLoop;
+    end;
+    Application.ProcessMessages;
+  until MouseState <> msScalingSelection;
+end;
+
 procedure TScreenSpriteBuilder.CreateObjects;
 begin
-  ShowLayers([LAYER_UI, LAYER_SPRITEBUILDER]);
-  FContainer.MoveToLayer(LAYER_SPRITEBUILDER);
+  ShowLayers([LAYER_UI, LAYER_COLLISION_BODY, LAYER_SPRITEBUILDER]);
 end;
 
 procedure TScreenSpriteBuilder.FreeObjects;
@@ -439,6 +895,8 @@ procedure TScreenSpriteBuilder.Initialize;
 begin
   FTextures := TTextureList.Create;
   FSurfaces := TSpriteBuilderSurfaceList.Create;
+  FSurfaces.WorkingLayer := LAYER_SPRITEBUILDER;
+  FBodyList := TBodyItemList.Create;
 
   // camera
   CreateCamera([LAYER_SPRITEBUILDER]);
@@ -451,6 +909,8 @@ begin
   FTextures := NIL;
   FSurfaces.Free;
   FSurfaces := NIL;
+  FBodyList.Free;
+  FBodyList := NIL;
 end;
 
 

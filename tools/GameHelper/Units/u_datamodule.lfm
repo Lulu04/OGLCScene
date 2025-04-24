@@ -1,0 +1,12 @@
+object DataModule1: TDataModule1
+  OnCreate = DataModuleCreate
+  OldCreateOrder = False
+  Height = 218
+  HorizontalOffset = 587
+  VerticalOffset = 236
+  Width = 293
+  object ILCursor: TImageList
+    Left = 34
+    Top = 41
+  end
+end

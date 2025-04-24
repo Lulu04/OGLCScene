@@ -11,29 +11,34 @@ uses
 
 type
 
+TScaleHandle = (shTopLeft=0, shTopCenter, shTopRight, shCenterRight, shBottomRight,
+                shBottomCenter, shBottomLeft, shCenterLeft);
+
 { TUIHandleManager }
 
 TUIHandleManager = record
 private
-  Pivot: TSprite;
+  FPivot: TSprite;
   RotateHandle: array[TOGLCCorner] of TSprite;
-  SelectedHandle: array[TOGLCCorner] of TSprite;
+  ScaleHandle: array[TScaleHandle] of TSprite;
 public
-  IsVisible: boolean;
-  function SelectVisible: boolean;
+  function IsVisible: boolean;
+  function ScaleVisible: boolean;
   function RotateVisible: boolean;
+  function PivotVisible: boolean;
   procedure InitDefault;
   procedure KillSurfaces;
   procedure HideAll;
   procedure ShowPivotHandle(aSurface: TSimpleSurfaceWithEffect);
-  procedure ToogleSelectedAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
-  procedure ShowSelectedHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
+  procedure ToogleScaledAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
+  procedure ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
   procedure ShowRotateHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
 
   procedure UpdateHandlePosition(aSurface: TSimpleSurfaceWithEffect);
 
   function IsOverPivotHandle(aWorldPt: TPointF): boolean;
   function IsOverRotateHandle(aWorldPt: TPointF): boolean;
+  function IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
 end;
 PUIHandleManager = ^TUIHandleManager;
 
@@ -41,13 +46,9 @@ PUIHandleManager = ^TUIHandleManager;
 
 TUIHandle = record
 private
-  FAtlas: TAtlas;
-  texHandlePivot, texHandleRotate, texHandleSelected: PTexture;
   FTargetLayer: integer;
 public
   procedure InitDefault;
-  procedure CreateAtlas;
-  procedure FreeAtlas;
 
   procedure CreateUIHandles(aUIHandleManager: PUIHandleManager);
 
@@ -58,7 +59,7 @@ end;
 var UIHandle: TUIHandle;
 
 implementation
-uses u_app_pref, u_common;
+uses u_app_pref, u_common, u_ui_atlas;
 
 { TUIHandleManager }
 
@@ -67,26 +68,40 @@ var p: TPointF;
 begin
   with aSurface do
     p := GetMatrixSurfaceToWorld.Transform(PointF(Width*Pivot.x, Height*Pivot.y));
-  Pivot.SetCenterCoordinate(p);
-  Pivot.Visible := True;
+  FPivot.SetCenterCoordinate(p);
+  FPivot.Visible := True;
 end;
 
-procedure TUIHandleManager.ToogleSelectedAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.ToogleScaledAndRotatedHandle(
+  aSurface: TSimpleSurfaceWithEffect);
 begin
   if IsVisible then begin
-    if SelectVisible then ShowRotateHandleAndPivot(aSurface)
-      else ShowSelectedHandleAndPivot(aSurface);
-  end else ShowSelectedHandleAndPivot(aSurface);
+    if ScaleVisible then ShowRotateHandleAndPivot(aSurface)
+      else ShowScaleHandleAndPivot(aSurface);
+  end else ShowScaleHandleAndPivot(aSurface);
 end;
 
-function TUIHandleManager.SelectVisible: boolean;
+function TUIHandleManager.IsVisible: boolean;
 begin
-  Result := SelectedHandle[cTL].Visible;
+  Result := ScaleVisible or RotateVisible or PivotVisible;
+end;
+
+function TUIHandleManager.ScaleVisible: boolean;
+begin
+  if ScaleHandle[shTopLeft] = NIL then exit(False)
+    else Result := ScaleHandle[shTopLeft].Visible;
 end;
 
 function TUIHandleManager.RotateVisible: boolean;
 begin
-  Result := RotateHandle[cTL].Visible;
+  if RotateHandle[cTL] = NIL then exit(False)
+    else Result := RotateHandle[cTL].Visible;
+end;
+
+function TUIHandleManager.PivotVisible: boolean;
+begin
+  if FPivot = NIL then exit(False)
+    else Result := FPivot.Visible;
 end;
 
 procedure TUIHandleManager.InitDefault;
@@ -96,51 +111,61 @@ end;
 
 procedure TUIHandleManager.HideAll;
 var i: TOGLCCorner;
+  j: TScaleHandle;
 begin
-  Pivot.Visible := False;
-  for i in TOGLCCorner do begin
+  FPivot.Visible := False;
+
+  for i in TOGLCCorner do
     RotateHandle[i].Visible := False;
-    SelectedHandle[i].Visible := False;
-  end;
-  IsVisible := False;
+
+  for j in TScaleHandle do
+    ScaleHandle[j].Visible := False;;
 end;
 
-procedure TUIHandleManager.ShowSelectedHandleAndPivot(
-  aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
 var w, h: single;
   r: TRectF;
 begin
   HideAll;
-  IsVisible := True;
 
   // pivot
   ShowPivotHandle(aSurface);
 
-  // selected handle
+  // scale handle
   r := aSurface.GetRectAreaInWorldSpace(True);
-  w := SelectedHandle[cTR].Width;
-  h := SelectedHandle[cTR].Height;
+  w := ScaleHandle[shTopLeft].Width;
+  h := ScaleHandle[shTopLeft].Height;
 
-  SelectedHandle[cTL].Visible := True;
-  SelectedHandle[cTL].SetCoordinate(r.TopLeft);
+  ScaleHandle[shTopLeft].Visible := True;
+  ScaleHandle[shTopLeft].SetCoordinate(r.Left-w, r.Top-h);
 
-  SelectedHandle[cTR].Visible := True;
-  SelectedHandle[cTR].SetCoordinate(r.Right-w, r.Top);
+  ScaleHandle[shTopCenter].Visible := True;
+  ScaleHandle[shTopCenter].SetCoordinate(r.Left+r.Width*0.5-w*0.5, r.Top-h);
 
-  SelectedHandle[cBR].Visible := True;
-  SelectedHandle[cBR].SetCoordinate(r.Right-w, r.Bottom-h);
+  ScaleHandle[shTopRight].Visible := True;
+  ScaleHandle[shTopRight].SetCoordinate(r.Right, r.Top-h);
 
-  SelectedHandle[cBL].Visible := True;
-  SelectedHandle[cBL].SetCoordinate(r.Left, r.Bottom-h);
+  ScaleHandle[shCenterRight].Visible := True;
+  ScaleHandle[shCenterRight].SetCoordinate(r.Right, r.Top+r.Height*0.5-h*0.5);
+
+  ScaleHandle[shBottomRight].Visible := True;
+  ScaleHandle[shBottomRight].SetCoordinate(r.Right, r.Bottom);
+
+  ScaleHandle[shBottomCenter].Visible := True;
+  ScaleHandle[shBottomCenter].SetCoordinate(r.Left+r.Width*0.5-w*0.5, r.Bottom);
+
+  ScaleHandle[shBottomLeft].Visible := True;
+  ScaleHandle[shBottomLeft].SetCoordinate(r.Left-w, r.Bottom);
+
+  ScaleHandle[shCenterLeft].Visible := True;
+  ScaleHandle[shCenterLeft].SetCoordinate(r.Left-w, r.Top+r.Height*0.5-h*0.5);
 end;
 
-procedure TUIHandleManager.ShowRotateHandleAndPivot(
-  aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.ShowRotateHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
 var w, h: single;
   r: TRectF;
 begin
   HideAll;
-  IsVisible := True;
   ShowPivotHandle(aSurface);
 
   // rotated handle
@@ -149,42 +174,42 @@ begin
   h := RotateHandle[cTR].Height;
 
   RotateHandle[cTL].Visible := True;
-  RotateHandle[cTL].SetCoordinate(r.TopLeft);
+  RotateHandle[cTL].SetCoordinate(r.Left-w, r.Top-h);
 
   RotateHandle[cTR].Visible := True;
-  RotateHandle[cTR].SetCoordinate(r.Right-w, r.Top);
+  RotateHandle[cTR].SetCoordinate(r.Right, r.Top-h);
 
   RotateHandle[cBR].Visible := True;
-  RotateHandle[cBR].SetCoordinate(r.Right-w, r.Bottom-h);
+  RotateHandle[cBR].SetCoordinate(r.Right, r.Bottom);
 
   RotateHandle[cBL].Visible := True;
-  RotateHandle[cBL].SetCoordinate(r.Left, r.Bottom-h);
+  RotateHandle[cBL].SetCoordinate(r.Left-w, r.Bottom);
 
 end;
 
 procedure TUIHandleManager.UpdateHandlePosition(aSurface: TSimpleSurfaceWithEffect);
 begin
   if not IsVisible then exit;
-  if SelectVisible then ShowSelectedHandleAndPivot(aSurface);
+  if ScaleVisible then ShowScaleHandleAndPivot(aSurface);
   if RotateVisible then ShowRotateHandleAndPivot(aSurface);
 end;
 
 function TUIHandleManager.IsOverPivotHandle(aWorldPt: TPointF): boolean;
 var pointCollision: TOGLCBodyItem;
 begin
-  if not IsVisible then exit(False);
+  if not PivotVisible then exit(False);
 
   pointCollision.BodyType:= _btPoint;
   pointCollision.pt := aWorldPt;
 
-  Pivot.CollisionBody.SetSurfaceToWordMatrix(Pivot.GetMatrixSurfaceToWorld);
-  Result := Pivot.CollisionBody.CheckCollisionWith(pointCollision);
+  FPivot.CollisionBody.SetSurfaceToWordMatrix(FPivot.GetMatrixSurfaceToWorld);
+  Result := FPivot.CollisionBody.CheckCollisionWith(pointCollision);
 end;
 
 function TUIHandleManager.IsOverRotateHandle(aWorldPt: TPointF): boolean;
 var pointCollision: TOGLCBodyItem;
 begin
-  if not IsVisible then exit(False);
+  if not RotateVisible then exit(False);
 
   pointCollision.BodyType:= _btPoint;
   pointCollision.pt := aWorldPt;
@@ -205,18 +230,41 @@ begin
   Result := RotateHandle[cBL].CollisionBody.CheckCollisionWith(pointCollision);
 end;
 
+function TUIHandleManager.IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
+var pointCollision: TOGLCBodyItem;
+  i: TScaleHandle;
+begin
+  if not ScaleVisible then exit(False);
+
+  pointCollision.BodyType:= _btPoint;
+  pointCollision.pt := aWorldPt;
+
+  for i in TScaleHandle do begin
+    ScaleHandle[i].CollisionBody.SetSurfaceToWordMatrix(ScaleHandle[i].GetMatrixSurfaceToWorld);
+    if ScaleHandle[i].CollisionBody.CheckCollisionWith(pointCollision) then begin
+      aType := i;
+      exit(True);
+    end;
+  end;
+  Result := False;
+end;
+
 procedure TUIHandleManager.KillSurfaces;
 var i: TOGLCCorner;
+  j: TScaleHandle;
 begin
-  if Pivot <> NIL then Pivot.Kill;
-  Pivot := NIL;
+  if FPivot <> NIL then FPivot.Kill;
+  FPivot := NIL;
+
   for i in TOGLCCorner do begin
     if RotateHandle[i] <> NIL then RotateHandle[i].Kill;
     RotateHandle[i] := NIL;
-    if SelectedHandle[i] <> NIL then SelectedHandle[i].Kill;
-    SelectedHandle[i] := NIL;
   end;
-  IsVisible := False;
+
+  for j in TScaleHandle do begin
+    if ScaleHandle[j] <> NIL then ScaleHandle[j].Kill;
+    ScaleHandle[j] := NIL;
+  end;
 end;
 
 { TUIHandle }
@@ -226,27 +274,8 @@ begin
   FillChar(Self, SizeOf(TUIHandle), 0);
 end;
 
-procedure TUIHandle.CreateAtlas;
-begin
-  FAtlas := FScene.CreateAtlas;
-  FAtlas.Spacing := 2;
-
-  texHandlePivot := FAtlas.AddFromSVG(GetHandleFolder+'Pivot.svg', PPIScale(12), -1);
-  texHandleRotate := FAtlas.AddFromSVG(GetHandleFolder+'Rotate.svg', PPIScale(19), -1);
-  texHandleSelected := FAtlas.AddFromSVG(GetHandleFolder+'Selected.svg', PPIScale(19), -1);
-
-  FAtlas.TryToPack;
-  FAtlas.Build;
-  FAtlas.FreeItemImages;
-end;
-
-procedure TUIHandle.FreeAtlas;
-begin
-  FAtlas.Free;
-  FAtlas := NIL;
-end;
-
 procedure TUIHandle.CreateUIHandles(aUIHandleManager: PUIHandleManager);
+var i: TScaleHandle;
   procedure CreateCollisionRectangle(aSurface: TSimpleSurfaceWithEffect);
   begin
     with aSurface do
@@ -256,8 +285,8 @@ procedure TUIHandle.CreateUIHandles(aUIHandleManager: PUIHandleManager);
 begin
   with aUIHandleManager^ do begin
     InitDefault;
-    Pivot := FScene.AddSprite(texHandlePivot, False, TargetLayer);
-    CreateCollisionRectangle(Pivot);
+    FPivot := FScene.AddSprite(texHandlePivot, False, TargetLayer);
+    CreateCollisionRectangle(FPivot);
 
     RotateHandle[cTL] := FScene.AddSprite(texHandleRotate, False, TargetLayer);
     RotateHandle[cTL].FlipH := True;
@@ -275,21 +304,11 @@ begin
     RotateHandle[cBL].FlipV := True;
     CreateCollisionRectangle(RotateHandle[cBL]);
 
-    SelectedHandle[cTL] := FScene.AddSprite(texHandleSelected, False, TargetLayer);
-    SelectedHandle[cTL].FlipH := True;
-    SelectedHandle[cTL].Visible := False;
-
-    SelectedHandle[cTR] := FScene.AddSprite(texHandleSelected, False, TargetLayer);
-    SelectedHandle[cTR].Visible := False;
-
-    SelectedHandle[cBR] := FScene.AddSprite(texHandleSelected, False, TargetLayer);
-    SelectedHandle[cBR].FlipV := True;
-    SelectedHandle[cBR].Visible := False;
-
-    SelectedHandle[cBL] := FScene.AddSprite(texHandleSelected, False, TargetLayer);
-    SelectedHandle[cBL].FlipH := True;
-    SelectedHandle[cBL].FlipV := True;
-    SelectedHandle[cBL].Visible := False;
+    for i in TScaleHandle do begin
+      ScaleHandle[i] := FScene.AddSprite(texArrowH, False, TargetLayer);
+      ScaleHandle[i].Angle.Value := 45*(Ord(i)+1);
+      CreateCollisionRectangle(ScaleHandle[i]);
+    end;
   end;
 end;
 

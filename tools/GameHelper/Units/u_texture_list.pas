@@ -231,11 +231,11 @@ begin
 end;
 
 procedure TTextureList.LoadFromString(const s: string);
-var prop: TProperties;
+var o: TTextureItem;
+  prop: TProperties;
   i: SizeUInt;
   c: integer;
   s1: string;
-  o: TTextureItem;
 begin
   Clear;
   prop.Split(s, '|');

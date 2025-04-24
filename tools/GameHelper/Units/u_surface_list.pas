@@ -21,6 +21,7 @@ TSurfaceDescriptor = record
 private
   HandleManager: TUIHandleManager;
   FAngleOrigin: single; // used to rotate the surface
+  FScaleOrigin, FPosOrigin: TPointF;
   function GetPivot: TPointF;
   function GetSelected: boolean;
   procedure SetPivot(AWorldCoor: TPointF);
@@ -28,7 +29,7 @@ private
 public
   ParentList: TSurfaceList;
   id: integer;           // unique ID
-  parentID: integer;     // parentID = -1 means the surface is child of the TSpriteContainer root.
+  parentID: integer;     // parentID = -1 means the surface is the root.
   name: string;          // by default same as textureName
   surface: TSimpleSurfaceWithEffect;
   textureName: string;   // the filename+extension without path
@@ -43,6 +44,9 @@ public
   procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,...
   procedure DuplicateValuesToTemporaryVariables;
 
+  function IsRoot: boolean;
+
+  function IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
   function IsOverRotateHandle(aWorldPt: TPointF): boolean;
   function IsOverPivotHandle(aWorldPt: TPointF): boolean;
   procedure AddOffsetToPivot(aOffset: TPointF); // in world coordinates
@@ -50,7 +54,10 @@ public
   procedure ToogleSelectedAndRotatedHandle;
 
   procedure SaveCurrentAngleBeforeRotation;
-  procedure ComputeAngle(aReferencePointInWorld: TPointF; aUseIncrement: boolean);
+  procedure ComputeAngle(aPreviousReferencePointInWorld,
+    aReferencePointInWorld: TPointF; aUseIncrement: boolean);
+  procedure SaveCurrentScaleValueBeforeScaling;
+  procedure ComputeScale(aType: TScaleHandle; aDelta: TPointF; aKeepAspectRatio: boolean);
 
   property Selected: boolean read GetSelected write SetSelected;
   property Pivot: TPointF read GetPivot write SetPivot;
@@ -69,6 +76,8 @@ private
   FID: integer;
   function NextID: integer;
   function GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDescriptor;
+private
+  FWorkingLayer: integer;
 public
   procedure Clear; reintroduce;
   function AddEmpty: PSurfaceDescriptor;
@@ -77,6 +86,9 @@ public
   function GetItemIndexByID(aID: integer): integer;
   function GetByIndex(aIndex: integer): PSurfaceDescriptor;
   function GetItemBySurface(aSurface: TSimpleSurfaceWithEffect): PSurfaceDescriptor;
+
+  function GetRootItem: PSurfaceDescriptor;
+  function RootIsDefined: boolean;
 
   // Returns the items located at the specified position.
   // Items are sorted from nearest to furthest away.
@@ -99,13 +111,15 @@ public
   procedure FillListBox(aLB: TListBox);
 
   function Textures: TTextureList; virtual; abstract;
+
+  property WorkingLayer: integer read FWorkingLayer write FWorkingLayer;
 end;
 
 
 
 implementation
 
-uses u_common, u_screen_spritebuilder, u_utils;
+uses u_common, form_main, Math;
 
 { TSurfaceDescriptor }
 
@@ -132,7 +146,7 @@ end;
 
 procedure TSurfaceDescriptor.SetSelected(AValue: boolean);
 begin
-  if AValue then HandleManager.ToogleSelectedAndRotatedHandle(surface)
+  if AValue then HandleManager.ToogleScaledAndRotatedHandle(surface)
     else HandleManager.HideAll;
 end;
 
@@ -156,7 +170,6 @@ end;
 procedure TSurfaceDescriptor.CreateSurface;
 var texItem: PTextureItem;
   tex: PTexture;
-  path: TOGLCPath;
 begin
   texItem := ParentList.Textures.GetItemByName(textureName);
   if texItem <> NIL then tex := texItem^.texture else tex := NIL;
@@ -164,11 +177,35 @@ begin
   if classType = TSprite then
     surface := TSprite.Create(tex, False)
   else
+  if classType = TSpriteWithElasticCorner then
+    surface := TSpriteWithElasticCorner.Create(tex, False)
+  else
+  if classType = TTiledSprite then
+    surface := TTiledSprite.Create(tex, False)
+  else
+  if classType = TPolarSprite then
+    surface := TPolarSprite.Create(tex, False)
+  else
+  if classType = TScrollableSprite then
+    surface := TScrollableSprite.Create(tex, False)
+  else
+  if classType = TShapeOutline then
+    surface := TShapeOutline.Create(FScene)
+  else
+  if classType = TGradientRectangle then
+    surface := TGradientRectangle.Create(FScene)
+  else
+  if classType = TQuad4Color then begin
+    surface := TQuad4Color.Create(FScene);
+    TQuad4Color(surface).SetSize(10, 10);
+  end else
   if classType = TDeformationGrid then
     surface := TDeformationGrid.Create(tex, False)
   else
-  if classType = TSpriteContainer then
-    surface := TSpriteContainer.Create(FScene)
+  if classType = TSpriteContainer then begin
+    surface := TSpriteContainer.Create(FScene);
+    TSpriteContainer(surface).ShowOrigin := True;
+  end
   else raise exception.create('forgot to implement!');
 
   // collision for selection
@@ -181,7 +218,7 @@ end;
 procedure TSurfaceDescriptor.SetChildDependency;
 var parentItem: PSurfaceDescriptor;
 begin
-  if parentID = -1 then surface.SetChildOf(FContainer, zOrder)
+  if parentID = -1 then FScene.Add(surface, ParentList.WorkingLayer)
   else begin
       parentItem := ParentList.GetItemByID(parentID);
       if parentItem = NIL
@@ -215,6 +252,16 @@ begin
   zOrder := surface.ZOrderAsChild;
 end;
 
+function TSurfaceDescriptor.IsRoot: boolean;
+begin
+  Result := parentID = -1;
+end;
+
+function TSurfaceDescriptor.IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
+begin
+  Result := HandleManager.IsOverScaleHandle(aWorldPt, aType);
+end;
+
 function TSurfaceDescriptor.IsOverRotateHandle(aWorldPt: TPointF): boolean;
 begin
   Result := HandleManager.IsOverRotateHandle(aWorldPt);
@@ -230,7 +277,7 @@ begin
   FAngleOrigin := surface.Angle.Value;
 end;
 
-procedure TSurfaceDescriptor.ComputeAngle(aReferencePointInWorld: TPointF;
+procedure TSurfaceDescriptor.ComputeAngle(aPreviousReferencePointInWorld, aReferencePointInWorld: TPointF;
   aUseIncrement: boolean);
 var ppivot: TPointF;
   a: single;
@@ -238,10 +285,145 @@ begin
   with surface do
     ppivot := SurfaceToScene(PointF(Width*Pivot.x, Height*Pivot.y));
 
-  a := FAngleOrigin + CartesianToPolar(ppivot, aReferencePointInWorld).Angle;
+  a := surface.Angle.Value + CartesianToPolar(ppivot, aReferencePointInWorld).Angle -
+                             CartesianToPolar(ppivot, aPreviousReferencePointInWorld).Angle;
   if aUseIncrement then
     a := Trunc(a / 15) * 15;
   surface.Angle.Value := a;
+end;
+
+procedure TSurfaceDescriptor.SaveCurrentScaleValueBeforeScaling;
+begin
+  FScaleOrigin := surface.Scale.Value;
+  FPosOrigin := surface.GetXY;
+end;
+
+procedure TSurfaceDescriptor.ComputeScale(aType: TScaleHandle; aDelta: TPointF;
+  aKeepAspectRatio: boolean);
+const MIN_SCALE = 0.1;
+var zx, zy, deltaW, deltaH: single;
+  signDeltaX, signDeltaY: TValueSign;
+begin
+  zx := 0;
+  zy := 0;
+
+  case aType of
+    shTopLeft: begin   // ok
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
+      if aKeepAspectRatio then begin
+        if zx < zy then zy := zx else zx := zy;
+      end;
+      deltaH := zy * surface.Height * 0.5;
+      deltaW := zx * surface.Width * 0.5;
+      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x + deltaW;
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shTopCenter: begin  // ok
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
+      if aKeepAspectRatio then zx := zy;
+      deltaH := zy * surface.Height * 0.5;
+      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shTopRight: begin  // aKeepAspectRatio problem
+   {   if aKeepAspectRatio then begin
+        if (aDelta.x) < (aDelta.y) then aDelta.y := -Abs(aDelta.x) else aDelta.x := (aDelta.y);
+      end; }
+FrameToolsSpriteBuilder.Label19.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
+
+      if aKeepAspectRatio then begin
+        if Abs(aDelta.x) < Abs(aDelta.y) then begin
+          if aDelta.y < 0 then aDelta.y := -Abs(aDelta.x)
+            else aDelta.y := -Abs(aDelta.x);
+        end else begin
+          if aDelta.x < 0 then  aDelta.x := Abs(aDelta.y)
+            else aDelta.x := Abs(aDelta.y);
+        end;
+      end;
+
+FrameToolsSpriteBuilder.Label22.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
+
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
+      {if aKeepAspectRatio then begin
+        if (zx) < (zy) then zy := (zx) else zx := -(zy);
+      end;    }
+      deltaH := zy * surface.Height * 0.5;
+      deltaW := zx * surface.Width * 0.5;
+      surface.Scale.x.Value := FScaleOrigin.x + zx;
+      surface.Scale.y.Value := FScaleOrigin.y - zy;
+      surface.X.Value := FPosOrigin.x + deltaW;
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shCenterRight: begin  // ok
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
+      if aKeepAspectRatio then zy := zx;
+      deltaW := zx * surface.Width * 0.5;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x + deltaW;
+    end;
+
+    shBottomRight: begin  // ok
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
+      if aKeepAspectRatio then begin
+        if zx < zy then zy := zx else zx := zy;
+      end;
+      deltaH := zy * surface.Height * 0.5;
+      deltaW := zx * surface.Width * 0.5;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x + deltaW;
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shBottomCenter: begin // ok
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
+      if aKeepAspectRatio then zx := zy;
+      deltaH := zy * surface.Height * 0.5;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shBottomLeft: begin  // aKeepAspectRatio problem
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
+      zy := aDelta.y / surface.Height;
+      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
+      if aKeepAspectRatio then begin
+        if zx < zy then zy := -zx else zx := -zy;
+      end;
+      deltaH := zy * surface.Height * 0.5;
+      deltaW := zx * surface.Width * 0.5;
+
+      surface.Scale.x.Value := FScaleOrigin.x - zx;
+      surface.Scale.y.Value := FScaleOrigin.y + zy;
+      surface.X.Value := FPosOrigin.x + deltaW;
+      surface.Y.Value := FPosOrigin.y + deltaH;
+    end;
+
+    shCenterLeft: begin  // ok
+      zx := aDelta.x / surface.Width;
+      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
+      if aKeepAspectRatio then zy := zx;
+      deltaW := zx * surface.Width * 0.5;
+      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x + deltaW;
+    end;
+  end;
 end;
 
 procedure TSurfaceDescriptor.AddOffsetToPivot(aOffset: TPointF);
@@ -260,7 +442,7 @@ end;
 
 procedure TSurfaceDescriptor.ToogleSelectedAndRotatedHandle;
 begin
-  HandleManager.ToogleSelectedAndRotatedHandle(surface);
+  HandleManager.ToogleScaledAndRotatedHandle(surface);
 end;
 
 function TSurfaceDescriptor.SaveToString: string;
@@ -330,19 +512,26 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
   procedure CheckRecursive(aSurface: TSimpleSurfaceWithEffect);
   var i: integer;
     o: TSimpleSurfaceWithEffect;
-    item: PSurfaceDescriptor;
+    parentIsRegistered: boolean=False;
   begin
+    parentIsRegistered := False;
     for i:=aSurface.ChildCount-1 downto 0 do begin
       o := aSurface.Childs[i];
+      if not parentIsRegistered and (o.ZOrderAsChild < 0) then begin
+        parentIsRegistered := True;
+        AddToResult(GetItemBySurface(aSurface));
+      end;
       if o.ChildCount > 0 then CheckRecursive(o);
-      item := GetItemBySurface(o);
-      if item <> NIL then AddToResult(item);
+      AddToResult(GetItemBySurface(o))
     end;
+    if not parentIsRegistered then
+      AddToResult(GetItemBySurface(aSurface));
   end;
 begin
   Result := NIL;
   if Size = 0 then exit;
-  CheckRecursive(FContainer);
+  if RootIsDefined then
+    CheckRecursive(GetRootItem^.surface);
 end;
 
 procedure TSurfaceList.Clear;
@@ -407,6 +596,23 @@ begin
       Result := Mutable[i];
       exit;
     end;
+end;
+
+function TSurfaceList.GetRootItem: PSurfaceDescriptor;
+var i: SizeUInt;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.parentID = -1 then begin
+      Result := Mutable[i];
+      exit;
+    end;
+end;
+
+function TSurfaceList.RootIsDefined: boolean;
+begin
+  Result := GetRootItem <> NIL;
 end;
 
 function TSurfaceList.GetItemsAt(aX, aY: integer): ArrayOfPSurfaceDescriptor;
@@ -536,7 +742,6 @@ procedure TSurfaceList.FillComboBox(aCB: TComboBox);
 var i: SizeUInt;
 begin
   aCB.Clear;
-  aCB.Items.Add('Root sprite container');
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aCB.Items.Add(Mutable[i]^.id.ToString);

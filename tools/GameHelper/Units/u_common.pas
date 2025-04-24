@@ -5,22 +5,23 @@ unit u_common;
 interface
 
 uses
-  Classes, SysUtils, OGLCScene;
+  Classes, SysUtils,
+  OGLCScene;
 
 
 const
 
 // Scene layers
-LAYER_COUNT = 4;
-   LAYER_TOP           = 0;
-   LAYER_UI            = 1;
-   LAYER_SPRITEBUILDER = 2;
-   LAYER_SPRITEBANK    = 3;
+LAYER_COUNT = 5;
+   LAYER_TOP             = 0;
+   LAYER_UI              = 1;
+   LAYER_COLLISION_BODY  = 2;
+   LAYER_SPRITEBUILDER   = 3;
+   LAYER_SPRITEBANK      = 4;
 
 
 var
   FScene: TOGLCScene;
-  FContainer: TSpriteContainer; // used to contain sprite
 
 implementation
 
