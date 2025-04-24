@@ -74,6 +74,7 @@ procedure AdjustCornerOnConsecutiveQuadF(var Q1, Q2: TQuadF);
 
 function NextPowerOfTwo(aValue: integer): integer;
 function Distance(aPt1, aPt2: TPointF): single;
+function MiddleOf(aPt1, aPt2: TPointF): TPointF;
 // Return the angle/s computed from the specified speed value.
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 
@@ -194,6 +195,12 @@ end;
 function Distance(aPt1, aPt2: TPointF): single;
 begin
   Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
+end;
+
+function MiddleOf(aPt1, aPt2: TPointF): TPointF;
+begin
+  Result.x := (aPt1.x + aPt2.x) * 0.5;
+  Result.y := (aPt1.y + aPt2.y) * 0.5;
 end;
 
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
