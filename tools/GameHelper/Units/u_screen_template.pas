@@ -114,9 +114,12 @@ end;
 
 procedure TCustomScreenTemplate.SetMouseState(AValue: TMouseState);
 var tex: PTexture;
+debug:string;
 begin
   if FMouseState = AValue then Exit;
   FMouseState := AValue;
+WriteStr(debug, AValue);
+FScene.LogDebug('MouseState = '+debug);
   case FMouseState of
     msIdle: tex := texMouseNormal; // FormMain.OGL.Cursor := crDefault;
 

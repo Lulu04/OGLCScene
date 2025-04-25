@@ -64,7 +64,7 @@ public
   procedure SelectAllNodes;
   procedure UnselectAllNodes;
   function GetNodesAt(aWorldPt: TPointF): ArrayOfPUIPointHandle;
-  procedure UpdateNodePosition(aNode: PUINodeHandle; aWolrdPos: TPointF);
+  procedure UpdateSelectedNodePosition(aWolrdOffset: TPointF);
   function SomeNodesAreSelected: boolean;
   function AllNodesAreSelected: boolean;
   function GetNodeSelectedCount: integer;
@@ -100,6 +100,8 @@ TBodyItemList = class(specialize TVector<TBodyItem>)
   procedure DeleteShapeWithSelectedNode;
   procedure DeleteItem(aItem: PBodyItem);
 
+  procedure SetParentSurface(aSurface: TSimpleSurfaceWithEffect);
+
   function SaveToString: string;
   procedure LoadFromString(const s: string);
   procedure SaveTo(t: TStringList);
@@ -108,7 +110,7 @@ end;
 
 implementation
 
-uses u_common, u_ui_atlas, Math, BGRAPath;
+uses u_common, u_ui_atlas, BGRAPath;
 
 { TUINodeHandle }
 
@@ -239,8 +241,9 @@ begin
         ps[i] := ParentSurface.SurfaceToScene(ItemDescriptor.pts[i]);
       //if PolygonIsClosed then ps.ClosePath;
       //ps.ForceTopLeftToOrigin;
-      p1 := ParentSurface.SurfaceToScene(PointF(0, 0)); //ItemDescriptor.pts[0]);
-      OutLine.SetShapeCustom(p1.x, p1.y, ItemDescriptor.pts); //ps);
+   //   p1 := ParentSurface.SurfaceToScene(PointF(0, 0)); //ItemDescriptor.pts[0]);
+      p1 := ParentSurface.GetXY;
+      OutLine.SetShapeCustom(p1.x, p1.y, ps); // ItemDescriptor.pts); //ps);
       for i:=0 to High(Pts) do
         Pts[i].UpdatePosition(ps[i]);
     end
@@ -265,7 +268,7 @@ begin
 end;
 
 procedure TBodyItem.UpdateAsCircle(aWorldCenter, aWorldPtRadius: TPointF);
-var localCenter, localPtRadius: TPointF;
+var localPtRadius: TPointF;
 begin
   CreateSprites;
   if Pts = NIL then begin
@@ -276,7 +279,6 @@ begin
     Pts[1].CreateSprite;
   end;
 
-  localCenter := ParentSurface.SceneToSurface(aWorldCenter);
   localPtRadius := ParentSurface.SceneToSurface(aWorldPtRadius);
 
   ItemDescriptor.center := ParentSurface.SceneToSurface(aWorldCenter);
@@ -355,45 +357,42 @@ begin
     end;
 end;
 
-procedure TBodyItem.UpdateNodePosition(aNode: PUINodeHandle; aWolrdPos: TPointF);
+procedure TBodyItem.UpdateSelectedNodePosition(aWolrdOffset: TPointF);
 var i: integer;
-  delta: TPointF;
 begin
-  //aNode^.UpdatePosition(aWolrdPos);
-  // adjust the coordinates into itemDescriptor ( circle center, rzdius, line pt1,...)
+  if Length(Pts) = 0 then exit;
+
   case ItemDescriptor.BodyType of
     _btLine: begin
-      if aNode = @Pts[0] then ItemDescriptor.pt1 := ParentSurface.SceneToSurface(aWolrdPos);
-      if aNode = @Pts[1] then ItemDescriptor.pt2 := ParentSurface.SceneToSurface(aWolrdPos);
+      if Pts[0].Selected then ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
+      if Pts[1].Selected then ItemDescriptor.pt2 := ItemDescriptor.pt2 + aWolrdOffset;
       UpdateNodesPosition;
     end;
     _btCircle: begin
-      if aNode = @Pts[0] then begin
-        delta := ItemDescriptor.center;
-        ItemDescriptor.center := ParentSurface.SceneToSurface(aWolrdPos);
-        delta := ItemDescriptor.center - delta;
-        ItemDescriptor.pt1 := ItemDescriptor.pt1 + delta;
-      end;
-      if aNode = @Pts[1] then begin
-        ItemDescriptor.pt1 := ParentSurface.SceneToSurface(aWolrdPos);
+      if Pts[0].Selected then begin
+        ItemDescriptor.center := ItemDescriptor.center + aWolrdOffset;
+        ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
+      end
+      else
+      if Pts[1].Selected then begin
+        ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
         ItemDescriptor.pt1.y := ItemDescriptor.center.y;
       end;
       UpdateNodesPosition;
     end;
     _btRect: begin
-      if aNode = @Pts[0] then ItemDescriptor.rect.TopLeft := ParentSurface.SceneToSurface(aWolrdPos);
-      if aNode = @Pts[1] then ItemDescriptor.rect.BottomRight := ParentSurface.SceneToSurface(aWolrdPos);
+      if Pts[0].Selected then ItemDescriptor.rect.TopLeft := ItemDescriptor.rect.TopLeft + aWolrdOffset;
+      if Pts[1].Selected then ItemDescriptor.rect.BottomRight := ItemDescriptor.rect.BottomRight + aWolrdOffset;
       UpdateNodesPosition;
     end;
     _btPolygon: begin
       for i:=0 to High(Pts) do
-        if aNode = @Pts[i] then
-          ItemDescriptor.pts[i] := ParentSurface.SceneToSurface(aWolrdPos);
+        if Pts[i].Selected then
+          ItemDescriptor.pts[i] := ItemDescriptor.pts[i] + aWolrdOffset;
       if PolygonIsClosed then ItemDescriptor.pts[High(Pts)] := ItemDescriptor.pts[0];
       UpdateNodesPosition;
     end;
-    else raise exception.create('forgot to implement!');
-  end;
+  end;//case
 end;
 
 function TBodyItem.SomeNodesAreSelected: boolean;
@@ -508,13 +507,14 @@ begin
       prop.Add('br', PointFToString(ItemDescriptor.rect.BottomRight));
     end;
     _btPolygon: begin
-      prop.Add('Count', Length(ItemDescriptor.pts));
+      prop.Add('closed', PolygonIsClosed);
+      prop.Add('count', Length(ItemDescriptor.pts));
       s := '';
       for i:=0 to High(ItemDescriptor.pts) do begin
         s := s + PointFToString(ItemDescriptor.pts[i]);
         if i < High(ItemDescriptor.pts) then s := s + ' ';
       end;
-      prop.Add('Pts', s);
+      prop.Add('pts', s);
     end;
     else raise exception.create('forgot to implement!');
   end;
@@ -537,41 +537,53 @@ begin
   prop.Split(s, '~');
   prop.IntegerValueOf('Type', vi, vi);
   ItemDescriptor.BodyType := TOGLCBodyItemType(vi);
+  CreateSprites;
 
   case ItemDescriptor.BodyType of
     _btPoint: begin
       if prop.StringValueOf('pt', s1, '') then
         ItemDescriptor.pt := StringToPointF(s1);
+      SetLength(Pts, 1);
     end;
     _btLine: begin
       if prop.StringValueOf('pt1', s1, '') then
         ItemDescriptor.pt1 := StringToPointF(s1);
       if prop.StringValueOf('pt2', s1, '') then
         ItemDescriptor.pt2 := StringToPointF(s1);
+      SetLength(Pts, 2);
     end;
     _btCircle: begin
       if prop.StringValueOf('center', s1, '') then
         ItemDescriptor.center := StringToPointF(s1);
       if prop.SingleValueOf('radius', vs, 0) then
         ItemDescriptor.radius := vs;
+      SetLength(Pts, 2);
     end;
     _btRect: begin
       if prop.StringValueOf('tl', s1, '') then
         ItemDescriptor.rect.TopLeft := StringToPointF(s1);
       if prop.StringValueOf('br', s1, '') then
         ItemDescriptor.rect.BottomRight := StringToPointF(s1);
+      SetLength(Pts, 2);
     end;
     _btPolygon: begin
-      prop.IntegerValueOf('Count', c, 0);
+      prop.BooleanValueOf('closed', PolygonIsClosed, False);
+      prop.IntegerValueOf('count', c, 0);
       if c > 0 then begin
+        SetLength(Pts, c);
         SetLength(ItemDescriptor.pts, c);
-        prop.StringValueOf('Pts', s1, '');
+        prop.StringValueOf('pts', s1, '');
         A := s1.Split([' ']);
         for i:=0 to c-1 do
           ItemDescriptor.pts[i] := PointF(StringToSingle(A[i*2]), StringToSingle(A[i*2+1]));
       end;
     end;
     else raise exception.create('forgot to implement!');
+  end;
+
+  for i:=0 to High(Pts) do begin
+    Pts[i].InitDefault;
+    Pts[i].CreateSprite;
   end;
 end;
 
@@ -670,6 +682,15 @@ begin
       Erase(i);
       exit;
     end;
+end;
+
+procedure TBodyItemList.SetParentSurface(aSurface: TSimpleSurfaceWithEffect);
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    Mutable[i]^.ParentSurface := aSurface;
+  UpdateNodesPosition;
 end;
 
 function TBodyItemList.GetItemAndNodesAt(aWorldPt: TPointF; out aBody: PBodyItem): ArrayOfPUIPointHandle;
