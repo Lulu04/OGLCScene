@@ -9,7 +9,7 @@ uses
   BGRABitmap, BGRABitmapTypes,
   OGLCScene,
   u_common, u_screen_template, u_spritebank,
-  u_surface_list, u_texture_list;
+  u_surface_list, u_texture_list, u_collisionbody_list;
 
 type
 
@@ -25,6 +25,7 @@ TScreenSpriteBank = class(TCustomScreenTemplate)
 private
   FTextures: TTextureList;
   FSurfaces: TSpriteBankSurfaceList;
+  FBodies: TBodyItemList;
 private
 {public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -46,6 +47,7 @@ public
 
   property Textures: TTextureList read FTextures;
   property Surfaces: TSpriteBankSurfaceList read FSurfaces;
+  property Bodies: TBodyItemList read FBodies;
 end;
 
 var ScreenSpriteBank: TScreenSpriteBank;
@@ -63,7 +65,7 @@ end;
 
 procedure TScreenSpriteBank.CreateObjects;
 begin
-  ShowLayers([LAYER_UI, LAYER_SPRITEBANK]);
+  ShowLayers([LAYER_UI, LAYER_SPRITEBANK, LAYER_COLLISION_BODY]);
 end;
 
 procedure TScreenSpriteBank.FreeObjects;
@@ -75,6 +77,7 @@ begin
   FTextures := TTextureList.Create;
   FSurfaces := TSpriteBankSurfaceList.Create;
   FSurfaces.WorkingLayer := LAYER_SPRITEBANK;
+  FBodies := TBodyItemList.Create;
 
   // camera
   CreateCamera([LAYER_SPRITEBANK]);
@@ -87,18 +90,23 @@ begin
   FTextures := NIL;
   FSurfaces.Free;
   FSurfaces := NIL;
+  FBodies.Free;
+  FBodies := NIL;
 end;
 
 procedure TScreenSpriteBank.ClearView;
 begin
   FSurfaces.Clear;
   FTextures.Clear;
+  FBodies.Clear;
 end;
 
 procedure TScreenSpriteBank.ShowSprite(aIndex: integer);
 begin
   FTextures.LoadFromString(SpriteBank.Mutable[aIndex]^.textures);
   FSurfaces.LoadFromString(SpriteBank.Mutable[aIndex]^.surfaces);
+  FBodies.LoadFromString(SpriteBank.Mutable[aIndex]^.collisionbodies);
+  FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);
 end;
 
 end.
