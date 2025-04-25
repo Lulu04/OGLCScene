@@ -6,8 +6,8 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
   ClientHeight = 384
   ClientWidth = 319
   TabOrder = 0
-  DesignLeft = 661
-  DesignTop = 272
+  DesignLeft = 803
+  DesignTop = 163
   object Panel1: TPanel
     Left = 0
     Height = 384

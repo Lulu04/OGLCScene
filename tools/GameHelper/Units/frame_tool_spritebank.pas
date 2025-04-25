@@ -56,8 +56,9 @@ end;
 procedure TFrameToolSpriteBank.BExportToPascalUnitClick(Sender: TObject);
 var t: TStringlist;
   i: integer;
-  s, sw, sh: string;
-  rootItem, current: PSurfaceDescriptor;
+  s, sw, sh, sx, sy: string;
+  rootItem, current, _parent: PSurfaceDescriptor;
+  xx, yy: single;
   function GetClassName: string;
   begin
     Result := Trim(Edit1.Text);
@@ -187,20 +188,25 @@ begin
   t.Add(s);
   t.AddText('  if aLayerIndex <> -1 then'#10+
             '    FScene.Add(Self, aLayerIndex);'#10);
-  if rootItem <> NIL then
-    t.AddText('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
-                                 FormatFloatWithDot('0.00', rootItem^.y)+');'#10+
-              '  Pivot := PointF('+FormatFloatWithDot('0.00', rootItem^.pivotX)+', '+
-                                   FormatFloatWithDot('0.00', rootItem^.pivotY)+');'#10+
-              '  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';'#10+
-              '  Scale.Value := PointF('+FormatFloatWithDot('0.00', rootItem^.scaleX)+', '+
-                                         FormatFloatWithDot('0.00', rootItem^.scaleY)+');'#10#10)
-  else t.Add('');
+  if rootItem <> NIL then begin
+    if (rootItem^.x <> 0.0) or (rootItem^.y <> 0.0) then
+      t.Add('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
+                               FormatFloatWithDot('0.00', rootItem^.y)+');');
+    if (rootItem^.pivotX <> 0.5) or (rootItem^.pivotY <> 0.5) then
+      t.Add('  Pivot := PointF('+FormatFloatWithDot('0.00', rootItem^.pivotX)+', '+
+                                 FormatFloatWithDot('0.00', rootItem^.pivotY)+');');
+    if rootitem^.angle <> 0.0 then
+      t.Add('  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';');
+    if (rootItem^.scaleX <> 1.0) or (rootItem^.scaleY <> 1.0) then
+      t.Add('  Scale.Value := PointF('+FormatFloatWithDot('0.00', rootItem^.scaleX)+', '+
+                                       FormatFloatWithDot('0.00', rootItem^.scaleY)+');');
+    t.Add('');
+  end else t.Add('');
 
   // creating childs
   for i:=0 to Surfaces.Size-1 do begin
     current := Surfaces.Mutable[i];
-    // copy values to variable
+    // copy values to variable for easier access
     current^.DuplicateValuesToTemporaryVariables;
 
     if (rootItem <> NIL) and (current = rootItem) then continue;
@@ -217,23 +223,46 @@ begin
     end else raise exception.create('forgot to implement!');
     t.Add(s);
     // set child dependency and values
+    _parent := Surfaces.GetItemByID(current^.parentID);
     if rootItem = NIL then begin
       if current^.parentID = -1 then s := 'Self'
-        else s := Surfaces.GetItemByID(current^.parentID)^.name;
+        else s := _parent^.name;
     end else begin
       if current^.parentID = rootItem^.id then s := 'Self'
-        else s := Surfaces.GetItemByID(current^.parentID)^.name;
+        else s := _parent^.name;
     end;
     t.AddText('  with '+current^.name+' do begin'#10+
-              '    SetChildOf('+s+', '+current^.zOrder.ToString+');'#10+
-              '    SetCoordinate('+FormatFloatWithDot('0.00', current^.x)+', '+
-                                   FormatFloatWithDot('0.00', current^.y)+');'#10+
-              '    Pivot := PointF('+FormatFloatWithDot('0.00', current^.pivotX)+', '+
-                                     FormatFloatWithDot('0.00', current^.pivotY)+');'#10+
-              '    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';'#10+
-              '    Scale.Value := PointF('+FormatFloatWithDot('0.00', current^.scaleX)+', '+
-                                     FormatFloatWithDot('0.00', current^.scaleY)+');'#10+
-              '  end;');
+              '    SetChildOf('+s+', '+current^.zOrder.ToString+');');
+
+    // to keep right proportion, coordinates must be relative to
+    // the width and height of the parent or current
+    if (current^.x <> 0) or (current^.y <> 0) then begin
+      if _parent^.classtype = TSpriteContainer then begin
+        xx := current^.x/current^.surface.Width;
+        yy := current^.y/current^.surface.Height;
+        sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
+        sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height';
+      end else begin
+        xx := current^.x/_parent^.surface.Width;
+        yy := current^.y/_parent^.surface.Height;
+        sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
+        sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';
+      end;
+      t.Add('    SetCoordinate('+sx+', '+sy+');');
+    end;
+
+ {   if (current^.x <> 0) or (current^.y <> 0) then
+      t.Add('    SetCoordinate('+FormatFloatWithDot('0.00', current^.x)+', '+
+                                 FormatFloatWithDot('0.00', current^.y)+');'); }
+    if (current^.pivotX <> 0.5) or (current^.pivotY <> 0.5) then
+      t.Add('    Pivot := PointF('+FormatFloatWithDot('0.00', current^.pivotX)+', '+
+                                   FormatFloatWithDot('0.00', current^.pivotY)+');');
+    if current^.angle <> 0 then
+      t.Add('    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';');
+    if (current^.scaleX <> 1.0) or (current^.scaleY <> 1.0) then
+      t.Add('    Scale.Value := PointF('+FormatFloatWithDot('0.00', current^.scaleX)+', '+
+                                     FormatFloatWithDot('0.00', current^.scaleY)+');');
+    t.Add('  end;');
     if i < Surfaces.Size-1 then t.Add('');
   end;
   t.Add('end;');
