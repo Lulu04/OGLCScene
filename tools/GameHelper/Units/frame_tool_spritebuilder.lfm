@@ -17,9 +17,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 536
     Top = 0
     Width = 293
-    ActivePage = PageCollisionBody
+    ActivePage = PageChilds
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 0
     OnChange = PC1Change
     object PageChilds: TTabSheet

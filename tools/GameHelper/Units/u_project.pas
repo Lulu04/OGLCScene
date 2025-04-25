@@ -121,6 +121,7 @@ begin
   try
     ScreenSpriteBuilder.Textures.SaveTo(t);
     ScreenSpriteBuilder.Surfaces.SaveTo(t);
+    ScreenSpriteBuilder.Bodies.SaveTo(t);
     SpriteBank.SaveTo(t);
 
     t.SaveToFile(aFilename);
@@ -140,6 +141,7 @@ begin
 
       ScreenSpriteBuilder.Textures.LoadFrom(t);
       ScreenSpriteBuilder.Surfaces.LoadFrom(t);
+      ScreenSpriteBuilder.Bodies.LoadFrom(t);
       SpriteBank.LoadFrom(t);
 
       Result := True;

@@ -58,7 +58,7 @@ private // collision body
   FBodyList: TBodyItemList;
   FWorkingBody: PBodyItem;
   FWorkingNode: PUINodeHandle;
-  procedure SelectNoCollisionBody;
+  procedure UnselectAllNodes;
   procedure LoopCreateLine;
   procedure LoopCreateCircle;
   procedure LoopCreateRectangle;
@@ -312,8 +312,8 @@ begin
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
     if (delta.x <> 0) or (delta.y <> 0) then begin
-      delta.x := delta.x / Zoom;
-      delta.y := delta.y / Zoom;
+     // delta.x := delta.x / Zoom;
+     // delta.y := delta.y / Zoom;
       AddOffsetToPivotOnSelection(delta);
       Project.SetModified;
       FScene.DoLoop;
@@ -398,6 +398,10 @@ begin
   thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
   case MouseState of
     msIdle: begin
+      // mouse is over pivot handle ? (only one selected)
+      if MouseIsOverPivotHandle(PointF(X,Y)) then
+        MouseState := msOverPivot
+      else
       // mouse is over scale handle ?
       if MouseIsOverScaleHandle(PointF(X,Y)) then
         MouseState := msOverScaleHandle
@@ -494,7 +498,7 @@ begin
   end;
 end;
 
-procedure TScreenSpriteBuilder.SelectNoCollisionBody;
+procedure TScreenSpriteBuilder.UnselectAllNodes;
 begin
   Bodies.UnselectAllNodes;
 end;
@@ -636,8 +640,11 @@ begin
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
+    delta.x := delta.x / Zoom;
+    delta.y := delta.y / Zoom;
     if (delta.x <> 0) or (delta.y <> 0) then begin
-      FWorkingBody^.UpdateNodePosition(FWorkingNode, current);
+      FWorkingBody^.UpdateSelectedNodePosition(delta);
+      ClickOrigin := current;
     end;
     Application.ProcessMessages;
     FScene.DoLoop;
@@ -652,7 +659,7 @@ begin
   items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
 
   case MouseState of
-    msIdle: SelectNoCollisionBody;
+    msIdle: UnselectAllNodes;
 
     msMouseDownOnNode: begin
       if items <> NIL then begin
@@ -728,6 +735,8 @@ begin
     end;
     msMouseDownOnNode: if thresholdDone and (items <> NIL) then begin
       FWorkingBody := targetBody;
+      if not (ssSHift in Shift) then UnselectAllNodes;
+      items[0]^.Selected := True;
       FWorkingNode := items[0];
       LoopMoveNode;
     end;
@@ -853,7 +862,7 @@ begin
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
     if (delta.x <> 0) or (delta.y <> 0) then begin
-      RotateSelection(Camera.ControlToWorld(ClickOrigin), Camera.ControlToWorld(current), CtrlPressed);
+      RotateSelection(ClickOrigin, current, CtrlPressed);
       Project.SetModified;
       FScene.DoLoop;
       ClickOrigin := current;

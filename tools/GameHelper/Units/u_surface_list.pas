@@ -432,6 +432,7 @@ begin
   with surface do
     ppivot := SurfaceToScene(PointF(Width*Pivot.x, Height*Pivot.y));
   ppivot := ppivot + aOffset;
+
   Pivot := ppivot;
 end;
 

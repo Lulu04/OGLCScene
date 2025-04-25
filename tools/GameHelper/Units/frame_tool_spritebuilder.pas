@@ -10,7 +10,7 @@ uses
   BGRABitmapTypes,
   OGLCScene,
   u_surface_list, u_texture_list, Types,
-  u_screen_spritebuilder;
+  u_screen_spritebuilder, u_collisionbody_list;
 
 type
 
@@ -118,6 +118,7 @@ type
     procedure UpdateValuesToWorkingSurface;
     function Textures: TTextureList;
     function Surfaces: TSpriteBuilderSurfaceList;
+    function Bodies: TBodyItemList;
     procedure DoClearAll;
   private // collision shape
 
@@ -216,13 +217,14 @@ begin
   if o <> NIL then
     if QuestionDlg('','a sprite named "'+nam+'" already exists in the bank.'+LineEnding+
                 'Would you like to replace it ?',
-                mtWarning, [mbOk, 'Replace', mbCancel, 'Cancel'],0) = mrCancel then exit;
+                mtWarning, [mrOk, 'Replace', mrCancel, 'Cancel'],0) = mrCancel then exit;
 
   if o = NIL then o := SpriteBank.AddEmpty;
 
   o^.name := nam;
   o^.textures := Textures.SaveToString;
   o^.surfaces := Surfaces.SaveToString;
+  o^.collisionbodies := Bodies.SaveToString;
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
@@ -518,6 +520,11 @@ begin
   Result := ScreenSpriteBuilder.Surfaces;
 end;
 
+function TFrameToolsSpriteBuilder.Bodies: TBodyItemList;
+begin
+  Result := ScreenSpriteBuilder.Bodies;
+end;
+
 procedure TFrameToolsSpriteBuilder.DoClearAll;
 begin
   FWorkingChild := NIL;
@@ -525,6 +532,7 @@ begin
 
   Surfaces.Clear;
   Textures.Clear;
+  Bodies.Clear;
 
   CBTextures.Clear;
   Edit5.Text := '';
@@ -633,6 +641,9 @@ begin
 
   Textures.LoadFromString(o^.textures);
   Surfaces.LoadFromString(o^.surfaces);
+  Bodies.LoadFromString(o^.collisionbodies);
+  Bodies.SetParentSurface(Surfaces.GetRootItem^.surface);
+
   Edit2.Text := o^.name;
 end;
 
