@@ -5,8 +5,9 @@ unit frame_tool_spritebank;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, Buttons, Dialogs,
-  Types, gvector, u_screen_spritebank, u_surface_list, u_texture_list;
+  Classes, SysUtils, gvector, Forms, Controls, ExtCtrls, StdCtrls, Buttons,
+  Dialogs, u_screen_spritebank, u_surface_list, u_texture_list,
+  u_collisionbody_list;
 
 type
 
@@ -33,11 +34,13 @@ type
 
     function Textures: TTextureList;
     function Surfaces: TSpriteBankSurfaceList;
+    function Bodies: TBodyItemList;
   end;
 
 implementation
 
-uses LCLType, Graphics, u_spritebank, u_common, form_main, OGLCScene;
+uses LCLType, Graphics, u_spritebank, u_common, form_main, OGLCScene,
+  BGRABitmap, BGRABitmapTypes;
 
 {$R *.lfm}
 
@@ -55,10 +58,11 @@ end;
 
 procedure TFrameToolSpriteBank.BExportToPascalUnitClick(Sender: TObject);
 var t: TStringlist;
-  i: integer;
+  i, j, c: integer;
   s, sw, sh, sx, sy: string;
   rootItem, current, _parent: PSurfaceDescriptor;
   xx, yy: single;
+  bodyItem: PBodyItem;
   function GetClassName: string;
   begin
     Result := Trim(Edit1.Text);
@@ -66,6 +70,14 @@ var t: TStringlist;
   function GetClassType: string;
   begin
     Result := rootItem^.surface.ClassName;
+  end;
+  function PointFToString(const aX, aY: single): string; overload;
+  begin
+    Result := 'PointF('+FormatFloatWithDot('0.00', aX)+', '+FormatFloatWithDot('0.00', aY)+')';
+  end;
+  function PointFToString(const aPt: TPointF): string; overload;
+  begin
+    Result := 'PointF('+FormatFloatWithDot('0.00', aPt.x)+', '+FormatFloatWithDot('0.00', aPt.y)+')';
   end;
 
 begin
@@ -96,11 +108,12 @@ begin
 
   // textures declaration
   t.Add('private'#10);
+  t.Add('  class var FAdditionalScale: single;');
   s := '  class var ';
   for i:=0 to Textures.Size-1 do begin
     s := s + Textures.Mutable[i]^.name;
     if i < Textures.Size-1 then s := s +', ';
-    if (i mod 4 = 0) and (i > 0) and (i < Textures.Size-1) then s := s + #10;
+    if (i mod 4 = 0) and (i > 0) and (i < Textures.Size-1) then s := s + #10'  ';
   end;
   s := s + ': PTexture;';
   t.AddText(s);
@@ -118,7 +131,8 @@ begin
 
   // methods
   t.AddText('public'#10+
-            '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
+            '  // aAdditionalScale is used to scale the collision bodies'#10+
+            '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single=1.0);'#10+
             '  constructor Create(aLayerIndex: integer=-1);'#10+
             'end;'#10+
             #10+
@@ -128,8 +142,9 @@ begin
             #10);
 
   // procedure load Texture
-  t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
-            'begin'#10);
+  t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single);'#10+
+            'begin'#10+
+            '  FAdditionalScale := aAdditionalScale;');
   for i:=0 to Textures.Size-1 do begin
     s := '  '+Textures.Mutable[i]^.name + ' := ';
     if ExtractFileExt(Textures.Mutable[i]^.filename) = '.svg' then begin
@@ -193,13 +208,11 @@ begin
       t.Add('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
                                FormatFloatWithDot('0.00', rootItem^.y)+');');
     if (rootItem^.pivotX <> 0.5) or (rootItem^.pivotY <> 0.5) then
-      t.Add('  Pivot := PointF('+FormatFloatWithDot('0.00', rootItem^.pivotX)+', '+
-                                 FormatFloatWithDot('0.00', rootItem^.pivotY)+');');
+      t.Add('  Pivot := '+PointFToString(rootItem^.pivotX, rootItem^.pivotY)+';');
     if rootitem^.angle <> 0.0 then
       t.Add('  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';');
     if (rootItem^.scaleX <> 1.0) or (rootItem^.scaleY <> 1.0) then
-      t.Add('  Scale.Value := PointF('+FormatFloatWithDot('0.00', rootItem^.scaleX)+', '+
-                                       FormatFloatWithDot('0.00', rootItem^.scaleY)+');');
+      t.Add('  Scale.Value := '+PointFToString(rootItem^.scaleX, rootItem^.scaleY)+';');
     t.Add('');
   end else t.Add('');
 
@@ -251,20 +264,46 @@ begin
       t.Add('    SetCoordinate('+sx+', '+sy+');');
     end;
 
- {   if (current^.x <> 0) or (current^.y <> 0) then
-      t.Add('    SetCoordinate('+FormatFloatWithDot('0.00', current^.x)+', '+
-                                 FormatFloatWithDot('0.00', current^.y)+');'); }
     if (current^.pivotX <> 0.5) or (current^.pivotY <> 0.5) then
-      t.Add('    Pivot := PointF('+FormatFloatWithDot('0.00', current^.pivotX)+', '+
-                                   FormatFloatWithDot('0.00', current^.pivotY)+');');
+      t.Add('    Pivot := '+PointFToString(current^.pivotX, current^.pivotY)+';');
     if current^.angle <> 0 then
       t.Add('    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';');
     if (current^.scaleX <> 1.0) or (current^.scaleY <> 1.0) then
-      t.Add('    Scale.Value := PointF('+FormatFloatWithDot('0.00', current^.scaleX)+', '+
-                                     FormatFloatWithDot('0.00', current^.scaleY)+');');
+      t.Add('    Scale.Value := '+PointFToString(current^.scaleX, current^.scaleY)+';');
     t.Add('  end;');
     if i < Surfaces.Size-1 then t.Add('');
+  end;//for
+
+  // create collision bodies
+  if Bodies.Size > 0 then begin
+    t.Add('  // Collision body adjusted with the additional scale value');
+    for i:=0 to Bodies.Size-1 do begin
+      bodyItem := Bodies.Mutable[i];
+      case bodyItem^.BodyType of
+        _btPoint: t.Add('  CollisionBody.AddPoint('+PointFToString(bodyItem^.ItemDescriptor.pt)+'*FAdditionalScale);');
+        _btLine: t.Add('  CollisionBody.AddLine('+PointFToString(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
+                                    PointFToString(bodyItem^.ItemDescriptor.pt2)+'*FAdditionalScale);');
+        _btCircle: t.Add('  CollisionBody.AddCircle('+PointFToString(bodyItem^.ItemDescriptor.center)+'*FAdditionalScale, '+
+                                      FormatFloatWithDot('0.00', bodyItem^.ItemDescriptor.radius)+'*FAdditionalScale);');
+        _btRect: t.Add('  CollisionBody.AddRect(RectF('+PointFToString(bodyItem^.ItemDescriptor.rect.TopLeft)+'*FAdditionalScale, '+
+                                          PointFToString(bodyItem^.ItemDescriptor.rect.BottomRight)+'*FAdditionalScale));');
+        _btPolygon: begin
+          if Length(bodyItem^.ItemDescriptor.pts) = 0 then continue;
+          s := '  CollisionBody.AddPolygon([';
+          c := 0;
+          for j:=0 to High(bodyItem^.ItemDescriptor.pts) do begin
+            s := s + PointFToString(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
+            if j < High(bodyItem^.ItemDescriptor.pts) then s := s+', ';
+            inc(c);
+            if (c mod 2 = 0) and (j > 0) and (j < Length(bodyItem^.ItemDescriptor.pts)-1) then s := s + #10'    ';
+          end;
+          s := s+']);';
+          t.AddText(s);
+        end;
+      end;//case
+    end;
   end;
+
   t.Add('end;');
   t.Add('');
   t.Add('end.');
@@ -319,6 +358,11 @@ end;
 function TFrameToolSpriteBank.Surfaces: TSpriteBankSurfaceList;
 begin
   Result := ScreenSpriteBank.Surfaces;
+end;
+
+function TFrameToolSpriteBank.Bodies: TBodyItemList;
+begin
+  Result := ScreenSpriteBank.Bodies;
 end;
 
 end.
