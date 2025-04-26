@@ -14,6 +14,7 @@ type
   { TFrameToolSpriteBank }
 
   TFrameToolSpriteBank = class(TFrame)
+    CBShowCollisionBody: TCheckBox;
     Edit1: TEdit;
     Label1: TLabel;
     LB: TListBox;
@@ -23,6 +24,7 @@ type
     BEdit: TSpeedButton;
     BExportToPascalUnit: TSpeedButton;
     procedure BEditClick(Sender: TObject);
+    procedure CBShowCollisionBodyChange(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; User: boolean);
     procedure BExportToPascalUnitClick(Sender: TObject);
@@ -322,9 +324,17 @@ begin
 end;
 
 procedure TFrameToolSpriteBank.BEditClick(Sender: TObject);
+var i: integer;
 begin
-  if LB.ItemIndex = -1 then exit;
-  FormMain.EditSpriteInSpriteBank(LB.Items.Strings[LB.ItemIndex]);
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+  LB.ItemIndex := -1;
+  FormMain.EditSpriteInSpriteBank(LB.Items.Strings[i]);
+end;
+
+procedure TFrameToolSpriteBank.CBShowCollisionBodyChange(Sender: TObject);
+begin
+  ShowSprite(LB.ItemIndex);
 end;
 
 procedure TFrameToolSpriteBank.FillLB;
@@ -332,7 +342,7 @@ var i: SizeUInt;
 begin
   LB.Clear;
   if SpriteBank.Size = 0 then exit;
-  for i:=0 to SpriteBank.Size do
+  for i:=0 to SpriteBank.Size-1 do
     LB.Items.Add(SpriteBank.Mutable[i]^.name);
 end;
 

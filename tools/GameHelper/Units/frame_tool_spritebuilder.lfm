@@ -17,9 +17,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 536
     Top = 0
     Width = 293
-    ActivePage = PageChilds
+    ActivePage = PageCollisionBody
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 0
     OnChange = PC1Change
     object PageChilds: TTabSheet
@@ -754,50 +754,66 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Cursor = crHandPoint
           Left = 12
           Height = 32
+          Hint = 'Line'
           Top = 56
           Width = 32
           Images = DataModule1.ILCursor
           ImageIndex = 1
           OnClick = BLineClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BCircle: TSpeedButton
           Cursor = crHandPoint
           Left = 12
           Height = 32
+          Hint = 'Circle'
           Top = 96
           Width = 32
           Images = DataModule1.ILCursor
           ImageIndex = 2
           OnClick = BLineClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BRectangle: TSpeedButton
           Cursor = crHandPoint
           Left = 12
           Height = 32
+          Hint = 'Rectangle'#13#10'(use only if the sprite don''t rotate)'#13#10'if the sprite rotate, use instead a polygon'
           Top = 136
           Width = 32
           Images = DataModule1.ILCursor
           ImageIndex = 3
           OnClick = BLineClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BSelect: TSpeedButton
+          Cursor = crHandPoint
           Left = 12
           Height = 32
+          Hint = 'Selection mode'
           Top = 16
           Width = 32
           Images = DataModule1.ILCursor
           ImageIndex = 0
           OnClick = BLineClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BPolygon: TSpeedButton
           Cursor = crHandPoint
           Left = 12
           Height = 32
+          Hint = 'Polygon'
           Top = 176
           Width = 32
           Images = DataModule1.ILCursor
           ImageIndex = 4
           OnClick = BLineClick
+          ShowHint = True
+          ParentShowHint = False
         end
       end
     end

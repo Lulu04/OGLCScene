@@ -529,6 +529,11 @@ begin
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msCreatingLine;
+
+  if MouseState = msCancelShapeCreation then begin
+    Bodies.DeleteItem(item);
+    MouseState := msIdle;
+  end;
 end;
 
 procedure TScreenSpriteBuilder.LoopCreateCircle;
@@ -559,6 +564,11 @@ begin
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msCreatingCircle;
+
+  if MouseState = msCancelShapeCreation then begin
+    Bodies.DeleteItem(item);
+    MouseState := msIdle;
+  end;
 end;
 
 procedure TScreenSpriteBuilder.LoopCreateRectangle;
@@ -587,6 +597,11 @@ begin
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msCreatingRectangle;
+
+  if MouseState = msCancelShapeCreation then begin
+    Bodies.DeleteItem(item);
+    MouseState := msIdle;
+  end;
 end;
 
 procedure TScreenSpriteBuilder.LoopCreatePolygon;
@@ -627,16 +642,21 @@ begin
     item^.SelectAllNodes;
     MouseState := msidle;
   end;
-  // check if ESC was pressed to cancel the creation
 
+  if MouseState = msCancelShapeCreation then begin
+    Bodies.DeleteItem(item);
+    MouseState := msIdle;
+  end;
 end;
 
 procedure TScreenSpriteBuilder.LoopMoveNode;
 var current, delta: TPointF;
+  changed: boolean;
 begin
   if MouseState = msMovingNode then exit;
   MouseState := msMovingNode;
 
+  changed := False;
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
@@ -644,11 +664,14 @@ begin
     delta.y := delta.y / Zoom;
     if (delta.x <> 0) or (delta.y <> 0) then begin
       FWorkingBody^.UpdateSelectedNodePosition(delta);
+      changed := True;
       ClickOrigin := current;
     end;
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msMovingNode;
+
+  if changed then Project.SetModified;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUpForCollisionBody(
@@ -768,19 +791,33 @@ begin
       if Bodies.SelectedNodesBelongToSinglePolygon(item) then begin
         if item^.AllNodesAreSelected then begin
           if QuestionDlg('','Delete the polygon?', mtWarning,
-                      [mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then Bodies.DeleteItem(item);
-        end else item^.DeleteSelectedNodes;
+                      [mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
+            Bodies.DeleteItem(item);
+            Project.SetModified;
+          end;
+        end else begin
+          item^.DeleteSelectedNodes;
+          Project.SetModified;
+        end;
         exit;
       end;
       if QuestionDlg('','Delete the whole shape?',
                     mtWarning,[mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
         Bodies.DeleteShapeWithSelectedNode;
+        Project.SetModified;
       end;
     end;
 
     VK_RETURN: begin
       if MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode] then
         MouseState := msEnterPressedOnPolygonCreation;
+    end;
+
+    VK_ESCAPE: begin
+      if MouseState in [msCreatingLine,msCreatingCircle,msCreatingRectangle,
+                        msCreatingPolygon,msWaitingForNextPolygonNode] then begin
+        MouseState := msCancelShapeCreation;
+      end;
     end;
   end;
 end;

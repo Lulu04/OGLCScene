@@ -298,6 +298,7 @@ begin
   // interdire la selection des éléments du sprite
   // et autoriser la sélection des shapes de collision
   FScene.Layer[LAYER_COLLISION_BODY].Visible := SelectedTabIsCollisionBody;
+  if SelectedTabIsCollisionBody then Bodies.UpdateNodesPosition;
 
 end;
 
@@ -555,6 +556,9 @@ begin
   Textures.FillComboBox(CBTextures);
   ShowSelectionData(NIL);
   PC1.PageIndex := PC1.IndexOf(PageChilds);
+
+  FScene.Layer[LAYER_COLLISION_BODY].Visible := False;
+  Bodies.UpdateNodesPosition;
 end;
 
 procedure TFrameToolsSpriteBuilder.FillListBoxTextureNames;
