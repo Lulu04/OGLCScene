@@ -51,7 +51,9 @@ TMouseState = ( msIdle,
                 msMouseDownOnToolPolygon,
                 msCreatingPolygon,
                 msWaitingForNextPolygonNode,
-                msEnterPressedOnPolygonCreation
+                msEnterPressedOnPolygonCreation,
+
+                msCancelShapeCreation  // used when user pess ESCAPE while creating a collision shape
               );
 
 { TCustomScreenTemplate }

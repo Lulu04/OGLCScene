@@ -106,7 +106,7 @@ end;
 
 procedure TUIHandleManager.InitDefault;
 begin
-  FillChar(Self, SizeOf(TUIHandleManager), 0);
+  Self := Default(TUIHandleManager);
 end;
 
 procedure TUIHandleManager.HideAll;

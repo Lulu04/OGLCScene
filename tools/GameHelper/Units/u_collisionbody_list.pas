@@ -180,7 +180,7 @@ end;
 
 procedure TBodyItem.InitDefault;
 begin
-  FillChar(Self, SizeOf(TBodyItem), 0);
+  Self := Default(TBodyItem);
 end;
 
 procedure TBodyItem.CreateSprites;
@@ -414,7 +414,7 @@ begin
 end;
 
 procedure TBodyItem.UpdateNodeSelectedFrom(aNode: PUINodeHandle; aSelectState: boolean);
-var origin, prev, next: integer;
+var origin, left, right: integer;
   function NextIndex(aIndex: integer): integer;
   begin
     Result := aIndex + 1;
@@ -434,33 +434,55 @@ begin
   if aSelectState and AllNodesAreSelected then exit;
   if not aSelectState and not SomeNodesAreSelected then exit;
 
-  // retrieve the next/previous node to toogle
   // retrieve the current node index
   for origin:=0 to High(Pts) do
     if @Pts[origin] = aNode then break;
 
   if aSelectState then begin
-    next := NextIndex(origin);
-    prev := PreviousIndex(origin);
+    if not aNode^.Selected then begin
+      aNode^.Selected := True;
+      exit;
+    end;
+    right := NextIndex(origin);
+    left := PreviousIndex(origin);
     repeat
-      if next <> origin then begin
-        if not Pts[next].Selected then begin
-          Pts[next].Selected := True;
+      if right <> origin then begin
+        if not Pts[right].Selected then begin
+          Pts[right].Selected := True;
           exit;
         end;
-        next := NextIndex(next);
+        right := NextIndex(right);
       end;
-      if prev <> origin then begin
-        if not Pts[prev].Selected then begin
-          Pts[prev].Selected := True;
+      if left <> origin then begin
+        if not Pts[left].Selected then begin
+          Pts[left].Selected := True;
           exit;
         end;
-        prev := PreviousIndex(prev);
+        left := PreviousIndex(left);
       end;
-    until (next = origin) and (prev = origin);
+    until (right = origin) and (left = origin);
   end else begin
-
-
+     right := origin + Length(Pts) div 2;
+     if right >= Length(Pts) then right := right - Length(Pts);
+     left := origin - Length(Pts) div 2;
+     if left < 0 then left := left + Length(Pts);
+     repeat
+       if right <> origin then begin
+         if Pts[right].Selected then begin
+           Pts[right].Selected := False;
+           exit;
+         end;
+         right := PreviousIndex(right);
+       end;
+       if left <> origin then begin
+         if Pts[left].Selected then begin
+           Pts[left].Selected := False;
+           exit;
+         end;
+         left := NextIndex(left);
+       end;
+     until (right = origin) and (left = origin);
+     Pts[origin].Selected := False;
   end;
 end;
 

@@ -66,7 +66,7 @@ uses u_common;
 
 procedure TTextureItem.InitDefault;
 begin
-  FillChar(Self, SizeOf(TTextureItem), 0);
+  Self := Default(TTextureItem);
 end;
 
 procedure TTextureItem.CreateTexture;
@@ -100,9 +100,47 @@ begin
 end;
 
 procedure TTextureItem.LoadFromString(const s: string);
-var prop: TProperties;
+//var prop: TProperties;
+var
+  i: integer;
+  procedure GoAfterNextTilde;
+  begin
+    repeat
+      inc(i);
+    until s[i] = '~';
+    inc(i);
+  end;
+  function GetStringToNextTilde: string;
+  var j: integer;
+  begin
+    j := i;
+    repeat
+      inc(j);
+    until (j >= Length(s)) or (s[j] = '~');
+    Result := Copy(s, i, j-i);
+    if j < Length(s) then inc(j);
+    i := j;
+  end;
+
 begin
   InitDefault;
+  i := 1;
+  GoAfterNextTilde;
+  filename := GetStringToNextTilde;
+  GoAfterNextTilde;
+  name := GetStringToNextTilde;
+  GoAfterNextTilde;
+  width := GetStringToNextTilde.ToInteger;
+  GoAfterNextTilde;
+  height := GetStringToNextTilde.ToInteger;
+  GoAfterNextTilde;
+  isMultiFrame := GetStringToNextTilde = 'true';
+  GoAfterNextTilde;
+  frameWidth := GetStringToNextTilde.ToInteger;
+  GoAfterNextTilde;
+  frameHeight := GetStringToNextTilde.ToInteger;
+
+{  InitDefault;
   prop.Split(s, '~');
   prop.StringValueOf('Filename', filename, filename);
   prop.StringValueOf('Name', name, ChangeFileExt(ExtractFilename(filename), ''));
@@ -110,8 +148,7 @@ begin
   prop.IntegerValueOf('Height', height, height);
   prop.BooleanValueOf('IsMultiFrame', isMultiFrame, isMultiFrame);
   prop.IntegerValueOf('FrameWidth', frameWidth, frameWidth);
-  prop.IntegerValueOf('FrameHeight', frameHeight, frameHeight);
-FScene.LogDebug('Texture '+filename+' width '+width.ToString+' height '+height.ToString);
+  prop.IntegerValueOf('FrameHeight', frameHeight, frameHeight);   }
 end;
 
 { TTextureList }
@@ -131,7 +168,6 @@ begin
 end;
 
 destructor TTextureList.Destroy;
-var i: SizeUInt;
 begin
   Clear;
   inherited Destroy;

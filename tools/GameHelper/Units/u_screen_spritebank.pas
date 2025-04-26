@@ -31,9 +31,9 @@ private
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); override;
-  procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState); override;
+  procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState); override; }
   procedure ProcessMouseWheel(Shift: TShiftState; WheelDelta: Integer;
-        MousePos: TPoint; var Handled: Boolean); override;   }
+        MousePos: TPoint; var Handled: Boolean); override;
 
 public
   procedure CreateObjects; override;
@@ -54,6 +54,8 @@ var ScreenSpriteBank: TScreenSpriteBank;
 
 implementation
 
+uses form_main;
+
 { TSpriteBankSurfaceList }
 
 function TSpriteBankSurfaceList.Textures: TTextureList;
@@ -62,6 +64,15 @@ begin
 end;
 
 { TScreenSpriteBank }
+
+procedure TScreenSpriteBank.ProcessMouseWheel(Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  inherited ProcessMouseWheel(Shift, WheelDelta, MousePos, Handled);
+
+  if FrameToolsSpriteBank.CBShowCollisionBody.Checked then
+    Bodies.UpdateNodesPosition;
+end;
 
 procedure TScreenSpriteBank.CreateObjects;
 begin
@@ -105,8 +116,10 @@ procedure TScreenSpriteBank.ShowSprite(aIndex: integer);
 begin
   FTextures.LoadFromString(SpriteBank.Mutable[aIndex]^.textures);
   FSurfaces.LoadFromString(SpriteBank.Mutable[aIndex]^.surfaces);
-  FBodies.LoadFromString(SpriteBank.Mutable[aIndex]^.collisionbodies);
-  FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);
+  if FrameToolsSpriteBank.CBShowCollisionBody.Checked then begin;
+    FBodies.LoadFromString(SpriteBank.Mutable[aIndex]^.collisionbodies);
+    FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);
+  end else FBodies.Clear;
 end;
 
 end.

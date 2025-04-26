@@ -100,6 +100,15 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
         Text = 'Edit1'
       end
     end
+    object CBShowCollisionBody: TCheckBox
+      Left = 3
+      Height = 19
+      Top = 213
+      Width = 124
+      Caption = 'Show collision body'
+      TabOrder = 2
+      OnChange = CBShowCollisionBodyChange
+    end
   end
   object SD1: TSaveDialog
     Filter = 'pascal unit|*.pas|all files|*.*'
