@@ -13,7 +13,8 @@ uses
   u_screen_spritebuilder, u_project, u_texture_list,
   u_app_pref, Dialogs, u_surface_list, u_utils, u_screen_template, u_spritebank,
   u_ui_handle, u_screen_spritebank, frame_tool_spritebuilder,
-frame_tool_spritebank, u_collisionbody_list, u_ui_atlas, u_datamodule;
+frame_tool_spritebank, u_collisionbody_list, u_ui_atlas, u_datamodule,
+u_undo_redo, u_undoredo_spritebuilder;
 
 {$R *.res}
 

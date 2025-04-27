@@ -119,9 +119,9 @@ var t: TStringList;
 begin
   t := TStringList.Create;
   try
-    ScreenSpriteBuilder.Textures.SaveTo(t);
+   { ScreenSpriteBuilder.Textures.SaveTo(t);
     ScreenSpriteBuilder.Surfaces.SaveTo(t);
-    ScreenSpriteBuilder.Bodies.SaveTo(t);
+    ScreenSpriteBuilder.Bodies.SaveTo(t);  }
     SpriteBank.SaveTo(t);
 
     t.SaveToFile(aFilename);
@@ -139,9 +139,9 @@ begin
       t.LoadFromFile(aFilename);
       if t.Count = 0 then exit(False);
 
-      ScreenSpriteBuilder.Textures.LoadFrom(t);
+    {  ScreenSpriteBuilder.Textures.LoadFrom(t);
       ScreenSpriteBuilder.Surfaces.LoadFrom(t);
-      ScreenSpriteBuilder.Bodies.LoadFrom(t);
+      ScreenSpriteBuilder.Bodies.LoadFrom(t);   }
       SpriteBank.LoadFrom(t);
 
       Result := True;
@@ -157,6 +157,7 @@ procedure TProject.DoClose;
 begin
   ScreenSpriteBuilder.Textures.Clear;
   ScreenSpriteBuilder.Surfaces.Clear;
+  ScreenSpriteBuilder.Bodies.Clear;
   SpriteBank.Clear;
 end;
 

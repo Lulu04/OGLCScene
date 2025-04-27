@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils,
   OGLCScene, gvector,
-  u_surface_list;
+  u_surface_list, u_undo_redo;
 
 type
 
@@ -32,6 +32,9 @@ TSpriteBank = class(specialize TVector<TSpriteBankItem>)
   function SpriteNameExists(const aName: string): boolean;
   function GetItemByName(const aName: string): PSpriteBankItem;
 
+  procedure DeleteByIndex(aIndex: integer);
+  procedure DeleteByName(const aName: string);
+
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
 end;
@@ -39,7 +42,32 @@ end;
 var
   SpriteBank: TSpriteBank;
 
+type
+TBankUndoRedoActionType = (uratBankUndefined,
+                           uratBankDeleteItem, // user delete a sprite
+                           uratBankRenameItem, // user rename a sprite
+                           uratBankAddItem     // user duplicate a sprite
+                          );
+TBankUndoRedoItem = record
+  action: TBankUndoRedoActionType;
+  name, textures, surfaces, collisionbodies: string;
+  oldName: string;
+end;
+
+{ TBankUndoRedoManager }
+
+TBankUndoRedoManager = class(specialize TGenericUndoRedoManager<TBankUndoRedoItem>)
+  procedure ProcessUndo(var aItem: TBankUndoRedoItem); override;
+  procedure ProcessRedo(var aItem: TBankUndoRedoItem); override;
+
+  procedure AddActionDeleteSprite(aIndex: integer);
+  procedure AddActionRenameSprite(aIndex: integer; const aOldName: string);
+  procedure AddActionDuplicateSprite(aIndexNewItem: integer);
+end;
+
 implementation
+
+uses form_main;
 
 { TSpriteBankItem }
 
@@ -91,9 +119,25 @@ begin
     end;
 end;
 
+procedure TSpriteBank.DeleteByIndex(aIndex: integer);
+begin
+  Erase(aIndex);
+end;
+
+procedure TSpriteBank.DeleteByName(const aName: string);
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.name = aName then begin
+      DeleteByIndex(i);
+      exit;
+    end;
+
+end;
+
 procedure TSpriteBank.SaveTo(t: TStringList);
-var prop: TProperties;
-  i: SizeUInt;
+var i: SizeUInt;
 begin
   t.Add('[SPRITE BANK]');
   t.Add(integer(Size).ToString);
@@ -129,6 +173,107 @@ begin
     o.collisionbodies := t.Strings[k];
     PushBack(o);
   end;
+end;
+
+{ TBankUndoRedoManager }
+
+procedure TBankUndoRedoManager.ProcessUndo(var aItem: TBankUndoRedoItem);
+var o: PSpriteBankItem;
+  temp: string;
+  i: integer;
+begin
+  case aItem.action of
+    uratBankDeleteItem: begin
+      o := SpriteBank.AddEmpty;
+      o^.name := aItem.name;
+      o^.textures := aItem.textures;
+      o^.surfaces := aItem.surfaces;
+      o^.collisionbodies := aItem.collisionbodies;
+      FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
+    end;
+
+    uratBankRenameItem: begin
+      temp := aItem.name;
+      aItem.name := aItem.oldName;
+      aItem.oldName := temp;
+      i := FrameToolsSpriteBank.LB.ItemIndex;
+      FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.name;
+    end;
+
+    uratBankAddItem: begin
+      SpriteBank.DeleteByName(aItem.name);
+      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.name);
+      if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
+    end;
+  end;
+end;
+
+procedure TBankUndoRedoManager.ProcessRedo(var aItem: TBankUndoRedoItem);
+var i: Integer;
+  temp: string;
+  o: PSpriteBankItem;
+begin
+  case aItem.action of
+    uratBankAddItem: begin
+      o := SpriteBank.AddEmpty;
+      o^.name := aItem.name;
+      o^.textures := aItem.textures;
+      o^.surfaces := aItem.surfaces;
+      o^.collisionbodies := aItem.collisionbodies;
+      FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
+    end;
+
+    uratBankDeleteItem: begin
+      SpriteBank.DeleteByName(aItem.name);
+      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.name);
+      if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
+    end;
+
+    uratBankRenameItem: begin
+      temp := aItem.name;
+      aItem.name := aItem.oldName;
+      aItem.oldName := temp;
+      i := FrameToolsSpriteBank.LB.ItemIndex;
+      FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.name;
+    end;
+  end;
+end;
+
+procedure TBankUndoRedoManager.AddActionDeleteSprite(aIndex: integer);
+var o: TBankUndoRedoItem;
+begin
+  o := Default(TBankUndoRedoItem);
+  o.action := uratBankDeleteItem;
+  o.name := SpriteBank.Mutable[aIndex]^.name;
+  o.textures := SpriteBank.Mutable[aIndex]^.textures;
+  o.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
+  o.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  AddItem(o);
+end;
+
+procedure TBankUndoRedoManager.AddActionRenameSprite(aIndex: integer; const aOldName: string);
+var o: TBankUndoRedoItem;
+begin
+  o := Default(TBankUndoRedoItem);
+  o.action := uratBankRenameItem;
+  o.name := SpriteBank.Mutable[aIndex]^.name;
+  o.textures := SpriteBank.Mutable[aIndex]^.textures;
+  o.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
+  o.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  o.oldName := aOldName;
+  AddItem(o);
+end;
+
+procedure TBankUndoRedoManager.AddActionDuplicateSprite(aIndexNewItem: integer);
+var o: TBankUndoRedoItem;
+begin
+  o := Default(TBankUndoRedoItem);
+  o.action := uratBankAddItem;
+  o.name := SpriteBank.Mutable[aIndexNewItem]^.name;
+  o.textures := SpriteBank.Mutable[aIndexNewItem]^.textures;
+  o.surfaces := SpriteBank.Mutable[aIndexNewItem]^.surfaces;
+  o.collisionbodies := SpriteBank.Mutable[aIndexNewItem]^.collisionbodies;
+  AddItem(o);
 end;
 
 end.

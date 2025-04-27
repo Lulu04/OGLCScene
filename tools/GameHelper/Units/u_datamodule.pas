@@ -13,6 +13,7 @@ type
 
   TDataModule1 = class(TDataModule)
     ILCursor: TImageList;
+    ImageList1: TImageList;
     procedure DataModuleCreate(Sender: TObject);
   private
     FPath: string;
