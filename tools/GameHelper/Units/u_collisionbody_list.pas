@@ -8,8 +8,8 @@ interface
 uses
   Classes, SysUtils,
   OGLCScene, gvector,
-  BGRABitmap, BGRABitmapTypes
-  {u_ui_handle};
+  BGRABitmap, BGRABitmapTypes,
+  u_undo_redo;
 
 type
 
@@ -106,6 +106,26 @@ TBodyItemList = class(specialize TVector<TBodyItem>)
   procedure LoadFromString(const s: string);
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
+end;
+
+
+type
+TCBodyUndoRedoActionType = (
+                           cburatUndefined
+                           );
+TCBodyUndoRedoItem = record
+  action: TCBodyUndoRedoActionType;
+  ItemDescriptor: TOGLCBodyItem;
+end;
+
+{ TTextureUndoRedoManager }
+
+{ TCBodyUndoRedoManager }
+
+TCBodyUndoRedoManager = class(specialize TGenericUndoRedoManager<TCBodyUndoRedoItem>)
+  ParentCBodylist: TBodyItemList;
+  procedure ProcessUndo(var aItem: TCBodyUndoRedoItem); override;
+  procedure ProcessRedo(var aItem: TCBodyUndoRedoItem); override;
 end;
 
 implementation
@@ -779,6 +799,18 @@ begin
   k := t.IndexOf(SPRITE_BUILDER_COLLISION_SECTION);
   if (k = -1) or (k = t.Count-1) then exit;
   LoadFromString(t.Strings[k+1]);
+end;
+
+{ TCBodyUndoRedoManager }
+
+procedure TCBodyUndoRedoManager.ProcessUndo(var aItem: TCBodyUndoRedoItem);
+begin
+
+end;
+
+procedure TCBodyUndoRedoManager.ProcessRedo(var aItem: TCBodyUndoRedoItem);
+begin
+
 end;
 
 end.

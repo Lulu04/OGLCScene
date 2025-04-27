@@ -26,7 +26,6 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    ImageList1: TImageList;
     Label1: TLabel;
     Label3: TLabel;
     Notebook1: TNotebook;

@@ -5,33 +5,54 @@ unit frame_tool_spritebank;
 interface
 
 uses
-  Classes, SysUtils, gvector, Forms, Controls, ExtCtrls, StdCtrls, Buttons,
-  Dialogs, u_screen_spritebank, u_surface_list, u_texture_list,
-  u_collisionbody_list;
+  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, Buttons,
+  Dialogs, Menus, u_screen_spritebank, u_surface_list, u_texture_list,
+  u_collisionbody_list, u_spritebank;
 
 type
 
   { TFrameToolSpriteBank }
 
   TFrameToolSpriteBank = class(TFrame)
+    BDuplicate: TSpeedButton;
+    BRename: TSpeedButton;
+    BUndo: TSpeedButton;
+    BRedo: TSpeedButton;
     CBShowCollisionBody: TCheckBox;
+    CheckBox1: TCheckBox;
+    CheckBox2: TCheckBox;
     Edit1: TEdit;
     Label1: TLabel;
+    Label24: TLabel;
     LB: TListBox;
+    MIRedo: TMenuItem;
+    MIUndo: TMenuItem;
+    Panel8: TPanel;
+    Separator2: TMenuItem;
+    Separator1: TMenuItem;
+    MIDuplicate: TMenuItem;
+    MIDelete: TMenuItem;
     Panel1: TPanel;
     Panel2: TPanel;
     SD1: TSaveDialog;
     BEdit: TSpeedButton;
     BExportToPascalUnit: TSpeedButton;
+    BDelete: TSpeedButton;
+    procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
     procedure CBShowCollisionBodyChange(Sender: TObject);
-    procedure LBMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure LBSelectionChange(Sender: TObject; User: boolean);
+    procedure LBMouseUp(Sender: TObject; {%H-}Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure LBSelectionChange(Sender: TObject; {%H-}User: boolean);
     procedure BExportToPascalUnitClick(Sender: TObject);
   private
     procedure FillLB;
     procedure ShowSprite(aIndex: integer);
+    procedure UpdateWidgetState;
+  private
+    FUndoRedoManager: TBankUndoRedoManager;
   public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
     procedure OnShow;
 
     function Textures: TTextureList;
@@ -41,8 +62,8 @@ type
 
 implementation
 
-uses LCLType, Graphics, u_spritebank, u_common, form_main, OGLCScene,
-  BGRABitmap, BGRABitmapTypes;
+uses LCLType, Graphics, form_main, u_project, OGLCScene, BGRABitmap,
+  BGRABitmapTypes;
 
 {$R *.lfm}
 
@@ -51,6 +72,7 @@ uses LCLType, Graphics, u_spritebank, u_common, form_main, OGLCScene,
 procedure TFrameToolSpriteBank.LBSelectionChange(Sender: TObject; User: boolean);
 var i: integer;
 begin
+  UpdateWidgetState;
   ShowSprite(LB.ItemIndex);
 
   i := LB.ItemIndex;
@@ -61,10 +83,12 @@ end;
 procedure TFrameToolSpriteBank.BExportToPascalUnitClick(Sender: TObject);
 var t: TStringlist;
   i, j, c: integer;
-  s, sw, sh, sx, sy: string;
+  s, sw, sh, sx, sy, texFilename: string;
   rootItem, current, _parent: PSurfaceDescriptor;
   xx, yy: single;
   bodyItem: PBodyItem;
+  p: SizeInt;
+  bodyList: TBodyItemList;
   function GetClassName: string;
   begin
     Result := Trim(Edit1.Text);
@@ -109,8 +133,8 @@ begin
             GetClassName+' = class('+GetClassType+')');
 
   // textures declaration
-  t.Add('private'#10);
-  t.Add('  class var FAdditionalScale: single;');
+  t.AddText('private'#10+
+            '  class var FAdditionalScale: single;');
   s := '  class var ';
   for i:=0 to Textures.Size-1 do begin
     s := s + Textures.Mutable[i]^.name;
@@ -131,11 +155,20 @@ begin
   end;
   t.AddText(s);
 
+  // flipH and flipV for ApplySymmetryWhenFlip
+  if CheckBox1.Checked then
+    t.AddText('protected'#10+
+              '  procedure SetFlipH(AValue: boolean); override;'#10+
+              '  procedure SetFlipV(AValue: boolean); override;');
+
   // methods
+  if CheckBox2.Checked then s := '  procedure ProcessMessage(UserValue: TUserMessageValue); override;'#10
+    else s := '';
   t.AddText('public'#10+
             '  // aAdditionalScale is used to scale the collision bodies'#10+
             '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single=1.0);'#10+
             '  constructor Create(aLayerIndex: integer=-1);'#10+
+            s+
             'end;'#10+
             #10+
             'implementation'#10+
@@ -145,9 +178,17 @@ begin
 
   // procedure load Texture
   t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single);'#10+
+            'var dataFolder: string;'#10+
             'begin'#10+
-            '  FAdditionalScale := aAdditionalScale;');
+            '  FAdditionalScale := aAdditionalScale;'#10+
+            '  dataFolder := FScene.App.DataFolder;');
   for i:=0 to Textures.Size-1 do begin
+    // texture filename must be relative to application Data folder
+    texFilename := Textures.Mutable[i]^.filename;
+    p := texFilename.LastIndexOf(DirectorySeparator+'Data'+DirectorySeparator);
+    texFilename := texFilename.Remove(0, p+6);
+    texFilename := 'dataFolder+'''+texFilename+'''';
+
     s := '  '+Textures.Mutable[i]^.name + ' := ';
     if ExtractFileExt(Textures.Mutable[i]^.filename) = '.svg' then begin
       if Textures.Mutable[i]^.width = -1 then sw := '-1'
@@ -156,25 +197,47 @@ begin
         else sh := 'ScaleH('+Textures.Mutable[i]^.height.ToString+')';
 
       if Textures.Mutable[i]^.isMultiFrame then
-        s := s + '(aAtlas.AddMultiFrameImageFromSVG('''+Textures.Mutable[i]^.filename+''''+
+        s := s + '(aAtlas.AddMultiFrameImageFromSVG('+texFilename+
            ', '+sw+', '+sh+
            ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
            ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+
            ', 0);'
       else
-        s := s + 'aAtlas.AddFromSVG('''+Textures.Mutable[i]^.filename+''''+', '+sw+', '+sh+');';
+        s := s + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
     end else begin
       if Textures.Mutable[i]^.isMultiFrame then
-        s := s + 'aAtlas.AddMultiFrameImage('''+Textures.Mutable[i]^.filename+''''+
+        s := s + 'aAtlas.AddMultiFrameImage('+texFilename+
         ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
         ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+');'
       else
-        s := s + 'aAtlas.Add('''+Textures.Mutable[i]^.filename+''');';
+        s := s + 'aAtlas.Add('+texFilename+');';
     end;
     t.Add(s);
   end;
   t.AddText('end;'#10+
             #10);
+
+  // procedure SetFlipH and SetFlipV
+  if CheckBox1.Checked then begin
+    t.AddText('procedure '+GetClassName+'.SetFlipH(AValue: boolean);'#10+
+              'begin'#10+
+              '  inherited SetFlipH(AValue);');
+    s := '';
+    for i:=0 to Surfaces.Size-1 do begin
+      current := Surfaces.Mutable[i];
+      if (rootItem <> NIL) and (current = rootItem) then continue;
+      t.Add('  '+current^.name+'.SetFlipH(AValue);');
+      s := s+'  '+current^.name+'.SetFlipV(AValue);';
+      if i < Surfaces.Size-1 then s := s + #10;
+    end;
+    t.AddText('end;'#10+#10+
+              'procedure '+GetClassName+'.SetFlipV(AValue: boolean);'#10+
+              'begin'#10+
+              '  inherited SetFlipV(AValue);'#10+
+              s+#10+
+              'end;');
+    t.Add('');
+  end;
 
   // constructor
   t.AddText('constructor '+GetClassName+'.Create(aLayerIndex: integer);'#10+
@@ -272,15 +335,21 @@ begin
       t.Add('    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';');
     if (current^.scaleX <> 1.0) or (current^.scaleY <> 1.0) then
       t.Add('    Scale.Value := '+PointFToString(current^.scaleX, current^.scaleY)+';');
+    if CheckBox1.Checked then
+      t.Add('    ApplySymmetryWhenFlip := True;');
     t.Add('  end;');
     if i < Surfaces.Size-1 then t.Add('');
   end;//for
 
   // create collision bodies
-  if Bodies.Size > 0 then begin
-    t.Add('  // Collision body adjusted with the additional scale value');
-    for i:=0 to Bodies.Size-1 do begin
-      bodyItem := Bodies.Mutable[i];
+  bodyList := TBodyItemList.Create;
+  i := FrameToolsSpriteBank.LB.ItemIndex;
+  bodyList.LoadFromString(SpriteBank.GetItemByName(FrameToolsSpriteBank.LB.Items.Strings[i])^.collisionbodies);
+
+  if bodyList.Size > 0 then begin
+    t.Add('  // Collision body');
+    for i:=0 to bodyList.Size-1 do begin
+      bodyItem := bodyList.Mutable[i];
       case bodyItem^.BodyType of
         _btPoint: t.Add('  CollisionBody.AddPoint('+PointFToString(bodyItem^.ItemDescriptor.pt)+'*FAdditionalScale);');
         _btLine: t.Add('  CollisionBody.AddLine('+PointFToString(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
@@ -305,9 +374,23 @@ begin
       end;//case
     end;
   end;
+  bodyList.Free;
 
   t.Add('end;');
   t.Add('');
+
+  // method ProcessMessage()
+  if CheckBox2.Checked then begin
+    t.AddText('procedure '+GetClassName+'.ProcessMessage(UserValue: TUserMessageValue);'#10+
+              'begin'#10+
+              '  case UserValue of'#10+
+              '    0: begin'#10+
+              '    end;'#10+
+              '  end;//case'#10+
+              'end;');
+    t.Add('');
+  end;
+
   t.Add('end.');
   try
     t.SaveToFile(SD1.FileName);
@@ -332,6 +415,70 @@ begin
   FormMain.EditSpriteInSpriteBank(LB.Items.Strings[i]);
 end;
 
+procedure TFrameToolSpriteBank.BDeleteClick(Sender: TObject);
+var oldName, newName: string;
+  i, k: integer;
+  item, newSprite: PSpriteBankItem;
+begin
+  i := LB.ItemIndex;
+
+  if Sender = BDelete then begin
+    if i = -1 then exit;
+    if QuestionDlg('','Delete this sprite ?', mtWarning,
+                   [mrOk, 'Delete', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+    FUndoRedoManager.AddActionDeleteSprite(i);
+    SpriteBank.DeleteByIndex(i);
+    LB.Items.Delete(i);
+    ScreenSpriteBank.ClearView;
+    Project.SetModified;
+    UpdateWidgetState;
+  end;
+
+  if Sender = BDuplicate then begin
+    if i = -1 then exit;
+    oldName := LB.Items.Strings[i];
+    k := 0;
+    repeat
+      inc(k);
+      if k < 100 then newName := oldName+'_'+Format('%.2d', [k])
+        else newName := oldName+'_'+k.ToString;
+    until not SpriteBank.SpriteNameExists(newName);
+    item := SpriteBank.GetItemByName(oldName);
+    if item = NIL then exit;
+    newSprite := SpriteBank.AddEmpty;
+    newSprite^.name := newName;
+    newSprite^.textures := item^.textures;
+    newSprite^.surfaces := item^.surfaces;
+    newSprite^.collisionbodies := item^.collisionbodies;
+    LB.ItemIndex := LB.Items.Add(newName);
+    FUndoRedoManager.AddActionDuplicateSprite(LB.ItemIndex);
+    Project.SetModified;
+  end;
+
+  if Sender = BRename then begin
+    if i = -1 then exit;
+    oldName := LB.Items.Strings[i];
+    newName := InputBox('', 'Enter the new name:', oldName);
+    if newName = oldName then exit;
+    SpriteBank.GetItemByName(LB.Items.Strings[i])^.name := newName;
+    FUndoRedoManager.AddActionRenameSprite(i, oldName);
+    LB.Items.Strings[i] := newName;
+    Project.SetModified;
+  end;
+
+  if Sender = BUndo then begin
+    FUndoRedoManager.Undo;
+    Project.SetModified;
+    UpdateWidgetState;
+  end;
+
+  if Sender = BRedo then begin
+    FUndoRedoManager.Redo;
+    Project.SetModified;
+    UpdateWidgetState;
+  end;
+end;
+
 procedure TFrameToolSpriteBank.CBShowCollisionBodyChange(Sender: TObject);
 begin
   ShowSprite(LB.ItemIndex);
@@ -353,11 +500,32 @@ begin
     ScreenSpriteBank.ShowSprite(aIndex);
 end;
 
+procedure TFrameToolSpriteBank.UpdateWidgetState;
+begin
+  BDuplicate.Enabled := LB.ItemIndex <> -1;
+  BRename.Enabled := BDuplicate.Enabled;
+  BDelete.Enabled := BDuplicate.Enabled;
+  BUndo.Enabled := FUndoRedoManager.CanUndo;
+  BRedo.Enabled := FUndoRedoManager.CanRedo;
+end;
+
+constructor TFrameToolSpriteBank.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FUndoRedoManager := TBankUndoRedoManager.Create;
+end;
+
+destructor TFrameToolSpriteBank.Destroy;
+begin
+  FUndoRedoManager.Free;
+  FUndoRedoManager := NIL;
+  inherited Destroy;
+end;
+
 procedure TFrameToolSpriteBank.OnShow;
 begin
   FillLB;
-//  if LB.Count > 0 then
-//    LB.ItemIndex := 0;
+  UpdateWidgetState;
 end;
 
 function TFrameToolSpriteBank.Textures: TTextureList;

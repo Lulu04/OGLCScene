@@ -116,7 +116,7 @@ procedure TScreenSpriteBank.ShowSprite(aIndex: integer);
 begin
   FTextures.LoadFromString(SpriteBank.Mutable[aIndex]^.textures);
   FSurfaces.LoadFromString(SpriteBank.Mutable[aIndex]^.surfaces);
-  if FrameToolsSpriteBank.CBShowCollisionBody.Checked then begin;
+  if FrameToolsSpriteBank.CBShowCollisionBody.Checked then begin
     FBodies.LoadFromString(SpriteBank.Mutable[aIndex]^.collisionbodies);
     FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);
   end else FBodies.Clear;

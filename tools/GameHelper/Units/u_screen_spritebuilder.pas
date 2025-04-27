@@ -28,6 +28,7 @@ private
   FSurfaces: TSpriteBuilderSurfaceList;
 private
   FSelected: ArrayOfPSurfaceDescriptor;
+  FAlternateOverlappedIndex: integer;  // used to chose between several overlapped objects
   FScaleHandleType: TScaleHandle;
   function GetSelectedCount: integer;
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
@@ -153,7 +154,7 @@ end;
 procedure TScreenSpriteBuilder.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
 begin
   if Length(aItems) = 0 then exit;
-  AddToSelected([aItems[0]]);
+  AddToSelected([aItems[FAlternateOverlappedIndex]]); //0]]);
 end;
 
 procedure TScreenSpriteBuilder.SelectNone;
@@ -225,7 +226,7 @@ begin
 end;
 
 procedure TScreenSpriteBuilder.DeleteSelection;
-var i: integer;
+var i, j: integer;
 begin
   if Length(FSelected) = 0 then exit;
 
@@ -243,7 +244,8 @@ begin
   FSelected := NIL;
 
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
-  Project.SetModified;
+  Surfaces.FillComboBox(FrameToolsSpriteBuilder.CBParent);
+  FrameToolsSpriteBuilder.Modified := True;
 end;
 
 procedure TScreenSpriteBuilder.UpdateHandlePositionOnSelected;
@@ -293,7 +295,7 @@ begin
       delta.x := delta.x / Zoom;
       delta.y := delta.y / Zoom;
       AddOffsetCoordinateToSelection(delta);
-      Project.SetModified;
+      FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
       ClickOrigin := current;
     end;
@@ -315,7 +317,7 @@ begin
      // delta.x := delta.x / Zoom;
      // delta.y := delta.y / Zoom;
       AddOffsetToPivotOnSelection(delta);
-      Project.SetModified;
+      FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
       ClickOrigin := current;
     end;
@@ -335,6 +337,13 @@ begin
       // item selection
       case Button of
         mbLeft:begin
+          if ssAlt in Shift then begin
+            inc(FAlternateOverlappedIndex);
+            if not (ssShift in Shift) then SelectNone;
+          end else FAlternateOverlappedIndex := 0;
+          if FAlternateOverlappedIndex > High(items) then
+            FAlternateOverlappedIndex := 0;
+
           if items = NIL then begin
             SelectNone;
             MouseState := msIdle;
@@ -348,7 +357,7 @@ begin
             if not items[0]^.Selected then begin
               SelectNone;
               AddOnlyTheFirstToSelected(items);
-            end else items[0]^.ToogleSelectedAndRotatedHandle;
+            end else items[FAlternateOverlappedIndex]^.ToogleSelectedAndRotatedHandle; //items[0]^.ToogleSelectedAndRotatedHandle;
             MouseState := msOverSurface;
           end;
         end;
@@ -433,11 +442,11 @@ begin
     msMouseDownOnSurface: begin
       if items <> NIL then begin
         if thresholdDone then begin
-          if GetSelectedCount = 0 then AddToSelected([items[0]])
+          if GetSelectedCount = 0 then AddToSelected([items[FAlternateOverlappedIndex]]) //0]])
           else begin
-            if not AlreadySelected([items[0]]) then begin
+            if not AlreadySelected([items[FAlternateOverlappedIndex]]) then begin //0]]) then begin
               if not (ssShift in Shift) then SelectNone;
-              AddToSelected([items[0]]);
+              AddToSelected([items[FAlternateOverlappedIndex]]); //0]]);
             end;
           end;
           LoopMoveSelection;
@@ -446,7 +455,7 @@ begin
     end;
 
     msOverScaleHandle: begin
-      if not MouseIsOverRotateHandle(PointF(X,Y)) then
+      if not MouseIsOverScaleHandle(PointF(X,Y)) then
         if items = NIL then MouseState := msIdle
           else MouseState := msOverSurface;
     end;
@@ -651,12 +660,10 @@ end;
 
 procedure TScreenSpriteBuilder.LoopMoveNode;
 var current, delta: TPointF;
-  changed: boolean;
 begin
   if MouseState = msMovingNode then exit;
   MouseState := msMovingNode;
 
-  changed := False;
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
@@ -664,14 +671,12 @@ begin
     delta.y := delta.y / Zoom;
     if (delta.x <> 0) or (delta.y <> 0) then begin
       FWorkingBody^.UpdateSelectedNodePosition(delta);
-      changed := True;
+      FrameToolsSpriteBuilder.Modified := True;
       ClickOrigin := current;
     end;
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msMovingNode;
-
-  if changed then Project.SetModified;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUpForCollisionBody(
@@ -793,18 +798,18 @@ begin
           if QuestionDlg('','Delete the polygon?', mtWarning,
                       [mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
             Bodies.DeleteItem(item);
-            Project.SetModified;
+            FrameToolsSpriteBuilder.Modified := True;
           end;
         end else begin
           item^.DeleteSelectedNodes;
-          Project.SetModified;
+          FrameToolsSpriteBuilder.Modified := True;
         end;
         exit;
       end;
       if QuestionDlg('','Delete the whole shape?',
                     mtWarning,[mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
         Bodies.DeleteShapeWithSelectedNode;
-        Project.SetModified;
+        FrameToolsSpriteBuilder.Modified := True;
       end;
     end;
 
@@ -876,6 +881,8 @@ begin
 
   inherited ProcessMouseWheel(Shift, WheelDelta, MousePos, Handled);
 
+  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+    UpdateHandlePositionOnSelected;
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
     Bodies.UpdateNodesPosition;
 end;
@@ -900,7 +907,7 @@ begin
     delta := current - ClickOrigin;
     if (delta.x <> 0) or (delta.y <> 0) then begin
       RotateSelection(ClickOrigin, current, CtrlPressed);
-      Project.SetModified;
+      FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
       ClickOrigin := current;
     end;
@@ -920,7 +927,7 @@ begin
     delta := Camera.ControlToWorld(current) - Camera.ControlToWorld(ClickOrigin);
     if (delta.x <> 0) or (delta.y <> 0) then begin
       ScaleSelection(delta, CtrlPressed);
-      Project.SetModified;
+      FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
     end;
     Application.ProcessMessages;
@@ -940,6 +947,8 @@ end;
 procedure TScreenSpriteBuilder.Initialize;
 begin
   FTextures := TTextureList.Create;
+  FrameToolsSpriteBuilder.TextureUndoRedoManager.ParentTexturelist := FTextures;
+
   FSurfaces := TSpriteBuilderSurfaceList.Create;
   FSurfaces.WorkingLayer := LAYER_SPRITEBUILDER;
   FBodyList := TBodyItemList.Create;
