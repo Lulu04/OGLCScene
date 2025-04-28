@@ -10,7 +10,7 @@ uses
   OGLCScene,
   u_common, u_screen_template,
   u_surface_list, u_texture_list, u_ui_handle,
-  u_collisionbody_list;
+  u_collisionbody_list, u_posture_list;
 
 type
 
@@ -70,6 +70,8 @@ private // collision body
   procedure ProcessMouseMoveForCollisionBody(Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseWheelForCollisionBody(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   procedure ProcessKeyUpForCollisionBody(var Key: Word; Shift: TShiftState);
+private // posture
+  FPostures: TPostureList;
 public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -91,6 +93,7 @@ public
   property Textures: TTextureList read FTextures;
   property Surfaces: TSpriteBuilderSurfaceList read FSurfaces;
   property Bodies: TBodyItemList read FBodyList;
+  property Postures: TPostureList read FPostures;
 end;
 
 var ScreenSpriteBuilder: TScreenSpriteBuilder;
@@ -154,7 +157,7 @@ end;
 procedure TScreenSpriteBuilder.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
 begin
   if Length(aItems) = 0 then exit;
-  AddToSelected([aItems[FAlternateOverlappedIndex]]); //0]]);
+  AddToSelected([aItems[FAlternateOverlappedIndex]]);
 end;
 
 procedure TScreenSpriteBuilder.SelectNone;
@@ -357,7 +360,7 @@ begin
             if not items[0]^.Selected then begin
               SelectNone;
               AddOnlyTheFirstToSelected(items);
-            end else items[FAlternateOverlappedIndex]^.ToogleSelectedAndRotatedHandle; //items[0]^.ToogleSelectedAndRotatedHandle;
+            end else items[FAlternateOverlappedIndex]^.ToogleSelectedAndRotatedHandle;
             MouseState := msOverSurface;
           end;
         end;
@@ -442,11 +445,11 @@ begin
     msMouseDownOnSurface: begin
       if items <> NIL then begin
         if thresholdDone then begin
-          if GetSelectedCount = 0 then AddToSelected([items[FAlternateOverlappedIndex]]) //0]])
+          if GetSelectedCount = 0 then AddToSelected([items[FAlternateOverlappedIndex]])
           else begin
-            if not AlreadySelected([items[FAlternateOverlappedIndex]]) then begin //0]]) then begin
+            if not AlreadySelected([items[FAlternateOverlappedIndex]]) then begin
               if not (ssShift in Shift) then SelectNone;
-              AddToSelected([items[FAlternateOverlappedIndex]]); //0]]);
+              AddToSelected([items[FAlternateOverlappedIndex]]);
             end;
           end;
           LoopMoveSelection;
@@ -831,7 +834,8 @@ procedure TScreenSpriteBuilder.ProcessMouseUp(Button: TMouseButton; Shift: TShif
 begin
   inherited ProcessMouseUp(Button, Shift, X, Y);
 
-  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+  if FrameToolsSpriteBuilder.SelectedTabIsChild or
+     FrameToolsSpriteBuilder.SelectedTabIsPosture then
     ProcessMouseUpForChild(Button, Shift, X, Y);
 
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
@@ -842,7 +846,8 @@ procedure TScreenSpriteBuilder.ProcessMouseDown(Button: TMouseButton; Shift: TSh
 begin
   inherited ProcessMouseDown(Button, Shift, X, Y);
 
-  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+  if FrameToolsSpriteBuilder.SelectedTabIsChild or
+     FrameToolsSpriteBuilder.SelectedTabIsPosture then
     ProcessMouseDownForChild(Button, Shift, X, Y);
 
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
@@ -853,7 +858,8 @@ procedure TScreenSpriteBuilder.ProcessMouseMove(Shift: TShiftState; X, Y: Intege
 begin
   inherited ProcessMouseMove(Shift, X, Y);
 
-  if FrameToolsSpriteBuilder.SelectedTabIsChild then
+  if FrameToolsSpriteBuilder.SelectedTabIsChild or
+     FrameToolsSpriteBuilder.SelectedTabIsPosture then
     ProcessMouseMoveForChild(Shift, X, Y);
 
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
@@ -909,7 +915,6 @@ begin
       RotateSelection(ClickOrigin, current, CtrlPressed);
       FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
-      ClickOrigin := current;
     end;
     Application.ProcessMessages;
   until MouseState <> msRotatingSelection;
@@ -951,7 +956,10 @@ begin
 
   FSurfaces := TSpriteBuilderSurfaceList.Create;
   FSurfaces.WorkingLayer := LAYER_SPRITEBUILDER;
+
   FBodyList := TBodyItemList.Create;
+
+  FPostures := TPostureList.Create;
 
   // camera
   CreateCamera([LAYER_SPRITEBUILDER]);
@@ -966,6 +974,8 @@ begin
   FSurfaces := NIL;
   FBodyList.Free;
   FBodyList := NIL;
+  FPostures.Free;
+  FPostures := NIL;
 end;
 
 

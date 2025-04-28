@@ -8,9 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
   ExtCtrls, StdCtrls, Buttons, Spin,
   BGRABitmapTypes,
-  OGLCScene,
+  OGLCScene, gvector,
   u_surface_list, u_texture_list, Types,
-  u_screen_spritebuilder, u_collisionbody_list;
+  u_screen_spritebuilder, u_collisionbody_list, u_posture_list;
 
 type
 
@@ -21,12 +21,16 @@ type
     BAddToSpriteBank: TSpeedButton;
     BChooseImageFile: TSpeedButton;
     BDeleteTexture: TSpeedButton;
+    BDeletePosture: TSpeedButton;
     BRectangle: TSpeedButton;
     BCircle: TSpeedButton;
     BNewChild: TSpeedButton;
     BPolygon: TSpeedButton;
+    BRenamePosture: TSpeedButton;
     BTextureRedo: TSpeedButton;
+    BPostureRedo: TSpeedButton;
     BTextureUndo: TSpeedButton;
+    BPostureUndo: TSpeedButton;
     BUpdateTexture: TSpeedButton;
     CBParent: TComboBox;
     CBChildType: TComboBox;
@@ -34,7 +38,9 @@ type
     CheckBox1: TCheckBox;
     Edit1: TEdit;
     Edit2: TEdit;
+    Edit3: TEdit;
     Edit5: TEdit;
+    FSE1: TFloatSpinEdit;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -50,10 +56,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
-    Label23: TLabel;
     Label24: TLabel;
-    Label25: TLabel;
-    Label26: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -62,10 +65,13 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LBTextureNames: TListBox;
+    LBPostureNames: TListBox;
     OD1: TOpenDialog;
     PageChilds: TTabSheet;
     PageTextures: TTabSheet;
     Panel1: TPanel;
+    Panel10: TPanel;
+    Panel11: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -73,15 +79,11 @@ type
     Panel6: TPanel;
     Panel7: TPanel;
     Panel8: TPanel;
-    Panel9: TPanel;
     PC1: TPageControl;
     SE1: TFloatSpinEdit;
     SE10: TSpinEdit;
     SE11: TSpinEdit;
     SE12: TSpinEdit;
-    SE13: TFloatSpinEdit;
-    SE14: TFloatSpinEdit;
-    SE15: TFloatSpinEdit;
     SE2: TFloatSpinEdit;
     SE3: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
@@ -96,6 +98,8 @@ type
     BSelect: TSpeedButton;
     BCancel: TSpeedButton;
     PagePostures: TTabSheet;
+    BAddPostureToList: TSpeedButton;
+    procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
@@ -104,6 +108,7 @@ type
     procedure CBParentDrawItem(Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
+    procedure LBPostureNamesSelectionChange(Sender: TObject; User: boolean);
     procedure LBTextureNamesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
@@ -126,13 +131,17 @@ type
     function CheckChildWidgets: boolean;
     function DoAddNewChild: boolean;
     procedure DoUpdateChild;
-
+  private // postures
+    FPostureTabIsActive: boolean;
+    procedure UpdatePostureWidgetState;
+    procedure DoAddposture;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
     function Textures: TTextureList;
     function Surfaces: TSpriteBuilderSurfaceList;
     function Bodies: TBodyItemList;
+    function Postures: TPostureList;
     procedure DoClearAll;
   private
     FModified: boolean;
@@ -147,6 +156,7 @@ type
 
     function SelectedTabIsChild: boolean;
     function SelectedTabIsCollisionBody: boolean;
+    function SelectedTabIsPosture: boolean;
 
     property TextureUndoRedoManager: TTextureUndoRedoManager read FTextureUndoRedoManager write FTextureUndoRedoManager;
     property Modified: boolean read FModified write FModified;
@@ -274,13 +284,61 @@ begin
 
   if o = NIL then o := SpriteBank.AddEmpty;
 
+  // restore the originals surfaces values
+  if FPostureTabIsActive then begin
+    FPostureTabIsActive := False;
+    Surfaces.SetValuesFromTemporaryVariables;
+  end;
+
   o^.name := nam;
   o^.textures := Textures.SaveToString;
   o^.surfaces := Surfaces.SaveToString;
   o^.collisionbodies := Bodies.SaveToString;
+  o^.postures := Postures.SaveToString;
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
+end;
+
+procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
+var i: integer;
+  oldName, newName: string;
+begin
+  i := LBPostureNames.ItemIndex;
+
+  if Sender = BAddPostureToList then
+    DoAddposture;
+
+  if Sender = BDeletePosture then begin
+    if i = -1 then exit;
+    Postures.DeleteItemByName(LBPostureNames.Items.Strings[i]);
+    LBPostureNames.Items.Delete(i);
+    Modified := True;
+    UpdatePostureWidgetState;
+  end;
+
+  if Sender = BRenamePosture then begin
+    if i = -1 then exit;
+    oldName := LBPostureNames.Items.Strings[i];
+    newName := InputBox('', 'Enter the new name:', oldName);
+    if newName = oldName then exit;
+    Postures.GetItemByName(oldName)^.name := newName;
+    //FUndoRedoManager.AddActionRenameSprite(i, oldName);
+    LBPostureNames.Items.Strings[i] := newName;
+    Modified := True;
+    UpdatePostureWidgetState;
+  end;
+
+  if Sender = BPostureUndo then begin
+    UpdatePostureWidgetState;
+  end;
+
+  if Sender = BPostureRedo then begin
+    UpdatePostureWidgetState;
+  end;
+
+  if Sender = Edit3 then
+    UpdatePostureWidgetState;
 end;
 
 procedure TFrameToolsSpriteBuilder.CBParentDrawItem(Control: TWinControl;
@@ -325,6 +383,27 @@ begin
                  (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value);
     DoUpdateChild;
   end;
+end;
+
+procedure TFrameToolsSpriteBuilder.LBPostureNamesSelectionChange(Sender: TObject; User: boolean);
+var i, j: integer;
+  post: PPostureItem;
+  surf: PSurfaceDescriptor;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+  if Surfaces.Size = 0 then exit;
+
+  post := Postures.Mutable[i];
+  if Length(post^.Values) <> Surfaces.Size then raise exception.create('bug');
+  Edit3.Text := post^.name;
+  for j:=0 to Surfaces.Size-1 do begin
+    surf := Surfaces.Mutable[j];
+    surf^.surface.X.ChangeTo(post^.Values[j].x, FSE1.Value, idcSinusoid);
+    surf^.surface.Y.ChangeTo(post^.Values[j].y, FSE1.Value, idcSinusoid);
+    surf^.surface.Angle.ChangeTo(post^.Values[j].angle, FSE1.Value, idcSinusoid);
+  end;
+  ScreenSpriteBuilder.SelectNone;
 end;
 
 procedure TFrameToolsSpriteBuilder.LBTextureNamesMouseUp(Sender: TObject;
@@ -375,6 +454,15 @@ begin
   // et autoriser la sélection des shapes de collision
   FScene.Layer[LAYER_COLLISION_BODY].Visible := SelectedTabIsCollisionBody;
   if SelectedTabIsCollisionBody then Bodies.UpdateNodesPosition;
+
+  // if user enter the postures tab, we save the surfaces values (x, y, angle, scale...)
+  // when user exit from postures tab, we restore the surfaces values.
+  if FPostureTabIsActive and not SelectedTabIsPosture then
+    Surfaces.SetValuesFromTemporaryVariables
+  else
+  if not FPostureTabIsActive and SelectedTabIsPosture then
+    Surfaces.CopySurfaceValuesToTemporaryVariables;
+  FPostureTabIsActive := SelectedTabIsPosture;
 
 end;
 
@@ -526,6 +614,47 @@ begin
   UpdateValuesToWorkingSurface;
 end;
 
+procedure TFrameToolsSpriteBuilder.UpdatePostureWidgetState;
+begin
+  BDeletePosture.Enabled := LBPostureNames.ItemIndex <> -1;
+  //BPostureUndo.Enabled := PostureUndoRedoManager.CanUndo;
+  //BPostureRedo.Enabled := PostureUndoRedoManager.CanRedo;
+  BAddPostureToList.Enabled := (Surfaces.Size > 0) and (Trim(Edit3.Text) <> '');
+end;
+
+procedure TFrameToolsSpriteBuilder.DoAddposture;
+var item: PPostureItem;
+  i: integer;
+  nam: string;
+  addNameToLB: boolean;
+begin
+  i := LBPostureNames.ItemIndex;
+  nam := Trim(Edit3.Text);
+  if nam = '' then exit;
+
+  item := Postures.GetItemByName(nam); //NIL;
+  addNameToLB := True;
+
+  if item = NIL then item := Postures.AddEmpty
+  else
+  if (i <> -1) and (LBPostureNames.Items.Strings[i] = nam) then begin
+    // replace?
+    if QuestionDlg('','Replace the selected posture ?', mtConfirmation,
+                   [mrOk, 'Yes', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+    item := Postures.GetItemByName(nam);
+    addNameToLB := False;
+  end else
+    if QuestionDlg('','A posture with this name is already defined', mtConfirmation,
+               [mrOk, 'Replace', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+
+  item^.name := nam;
+  item^.TakeValuesFrom(Surfaces);
+  if addNameToLB then
+    LBPostureNames.ItemIndex := LBPostureNames.Items.Add(item^.name);
+  Edit3.Text := '';
+  Modified := True;
+  UpdatePostureWidgetState;end;
+
 function TFrameToolsSpriteBuilder.LBToTextureName: string;
 var i: Integer;
 begin
@@ -612,6 +741,11 @@ begin
   Result := ScreenSpriteBuilder.Bodies;
 end;
 
+function TFrameToolsSpriteBuilder.Postures: TPostureList;
+begin
+  Result := ScreenSpriteBuilder.Postures;
+end;
+
 procedure TFrameToolsSpriteBuilder.DoClearAll;
 begin
   FModified := False;
@@ -655,6 +789,7 @@ begin
   FillListBoxTextureNames;
   Surfaces.FillComboBox(CBParent);
   Textures.FillComboBox(CBTextures);
+  Postures.FillListBox(LBPostureNames);
   ShowSelectionData(NIL);
   PC1.PageIndex := PC1.IndexOf(PageChilds);
 
@@ -662,6 +797,7 @@ begin
   Bodies.UpdateNodesPosition;
 
   UpdateTextureWidgetState;
+  UpdatePostureWidgetState;
 end;
 
 procedure TFrameToolsSpriteBuilder.FillListBoxTextureNames;
@@ -751,6 +887,7 @@ begin
   Surfaces.LoadFromString(o^.surfaces);
   Bodies.LoadFromString(o^.collisionbodies);
   Bodies.SetParentSurface(Surfaces.GetRootItem^.surface);
+  Postures.LoadFromString(o^.postures);
   FModified := False;
 
   Edit2.Text := o^.name;
@@ -764,6 +901,11 @@ end;
 function TFrameToolsSpriteBuilder.SelectedTabIsCollisionBody: boolean;
 begin
   Result := PC1.PageIndex = PC1.IndexOf(PageCollisionBody);
+end;
+
+function TFrameToolsSpriteBuilder.SelectedTabIsPosture: boolean;
+begin
+  Result := PC1.PageIndex = PC1.IndexOf(PagePostures);
 end;
 
 end.

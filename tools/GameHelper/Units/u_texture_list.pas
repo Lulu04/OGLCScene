@@ -88,7 +88,7 @@ end;
 
 implementation
 
-uses u_common, form_main, u_utils;
+uses u_common, form_main;
 
 { TTextureItem }
 
@@ -319,7 +319,6 @@ end;
 
 procedure TTextureUndoRedoManager.ProcessUndo(var aItem: TTextureUndoRedoItem);
 var i: integer;
-  s: string;
   item: PTextureItem;
 begin
   case aItem.Action of
