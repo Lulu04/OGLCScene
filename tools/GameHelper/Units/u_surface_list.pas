@@ -34,7 +34,7 @@ public
   surface: TSimpleSurfaceWithEffect;
   textureName: string;   // the filename+extension without path
   classtype: classOfSimpleSurfaceWithEffect;
-  // temporary variables used when loading
+  // temporary variables used when loading. They keep safe the original values
   pivotX, pivotY, angle, x, y, scaleX, scaleY: single;
   zOrder: integer;
   procedure InitDefault;
@@ -100,6 +100,9 @@ public
   procedure DeleteItemByID(aID: integer);
 
   procedure SelectNone;
+
+  procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,... on all surfaces
+  procedure CopySurfaceValuesToTemporaryVariables;
 
   function SaveToString: string;
   procedure LoadFromString(const s: string);
@@ -285,8 +288,13 @@ begin
   with surface do
     ppivot := SurfaceToScene(PointF(Width*Pivot.x, Height*Pivot.y));
 
-  a := surface.Angle.Value + CartesianToPolar(ppivot, aReferencePointInWorld).Angle -
+  a := FAngleOrigin{surface.Angle.Value} + CartesianToPolar(ppivot, aReferencePointInWorld).Angle -
                              CartesianToPolar(ppivot, aPreviousReferencePointInWorld).Angle;
+  //if a < 0 then a := a + 360;
+  if a > 180 then a := a - 360
+  else if a < -180 then a := a + 360;
+
+
   if aUseIncrement then
     a := Trunc(a / 15) * 15;
   surface.Angle.Value := a;
@@ -336,7 +344,7 @@ begin
    {   if aKeepAspectRatio then begin
         if (aDelta.x) < (aDelta.y) then aDelta.y := -Abs(aDelta.x) else aDelta.x := (aDelta.y);
       end; }
-FrameToolsSpriteBuilder.Label19.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
+//FrameToolsSpriteBuilder.Label19.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
 
       if aKeepAspectRatio then begin
         if Abs(aDelta.x) < Abs(aDelta.y) then begin
@@ -348,7 +356,7 @@ FrameToolsSpriteBuilder.Label19.Caption:='aDelta = '+FormatFloat('0.00', aDelta.
         end;
       end;
 
-FrameToolsSpriteBuilder.Label22.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
+//FrameToolsSpriteBuilder.Label22.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
 
       zx := aDelta.x / surface.Width;
       if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
@@ -670,6 +678,22 @@ begin
   if Size > 0 then
    for i:=0 to Size-1 do
      Mutable[i]^.Selected := False;
+end;
+
+procedure TSurfaceList.SetValuesFromTemporaryVariables;
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    Mutable[i]^.SetValuesFromTemporaryVariables;
+end;
+
+procedure TSurfaceList.CopySurfaceValuesToTemporaryVariables;
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    Mutable[i]^.DuplicateValuesToTemporaryVariables;
 end;
 
 function TSurfaceList.SaveToString: string;

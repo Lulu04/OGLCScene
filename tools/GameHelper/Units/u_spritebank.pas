@@ -18,7 +18,8 @@ TSpriteBankItem = record
   name,
   textures,
   surfaces,
-  collisionbodies: string;
+  collisionbodies,
+  postures: string;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const s: string);
@@ -78,7 +79,7 @@ end;
 
 function TSpriteBankItem.SaveToString: string;
 begin
-  Result := name+'#'+textures+'#'+surfaces+'#'+collisionbodies;
+  Result := name+'#'+textures+'#'+surfaces+'#'+collisionbodies+'#'+postures;
 end;
 
 procedure TSpriteBankItem.LoadFromString(const s: string);
@@ -90,6 +91,8 @@ begin
   surfaces := A[2];
   if Length(A) = 4 then collisionbodies := A[3]
     else collisionbodies := '';
+  if Length(A) = 5 then postures := A[4]
+    else postures := '';
 end;
 
 { TSpriteBank }
@@ -147,6 +150,7 @@ begin
       t.Add(Mutable[i]^.textures);
       t.Add(Mutable[i]^.surfaces);
       t.Add(Mutable[i]^.collisionbodies);
+      t.Add(Mutable[i]^.postures);
     end;
 end;
 
@@ -171,6 +175,8 @@ begin
     o.surfaces := t.Strings[k];
     inc(k);
     o.collisionbodies := t.Strings[k];
+    inc(k);
+    o.postures := t.Strings[k];
     PushBack(o);
   end;
 end;

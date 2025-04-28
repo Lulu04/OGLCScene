@@ -6,8 +6,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
   ClientHeight = 720
   ClientWidth = 300
   TabOrder = 0
-  DesignLeft = 956
-  DesignTop = 163
+  DesignLeft = 968
+  DesignTop = 95
   object PC1: TPageControl
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Panel8
@@ -15,27 +15,27 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 560
+    Height = 512
     Top = 32
     Width = 300
-    ActivePage = PageChilds
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    ActivePage = PagePostures
+    Anchors = [akTop, akLeft, akRight]
+    TabIndex = 3
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet
       Caption = 'Textures'
-      ClientHeight = 532
+      ClientHeight = 484
       ClientWidth = 292
       object Panel3: TPanel
         AnchorSideBottom.Control = PageTextures
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 532
+        Height = 484
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 532
+        ClientHeight = 484
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -349,15 +349,15 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PageChilds: TTabSheet
       Caption = 'Root/Childs'
-      ClientHeight = 532
+      ClientHeight = 484
       ClientWidth = 292
       object Panel1: TPanel
         Left = 0
-        Height = 532
+        Height = 484
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 532
+        ClientHeight = 484
         ClientWidth = 292
         Color = 9671571
         ParentBackground = False
@@ -735,92 +735,19 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             TabOrder = 7
           end
         end
-        object Panel2: TPanel
-          AnchorSideLeft.Control = Panel1
-          AnchorSideTop.Control = Panel4
-          AnchorSideTop.Side = asrBottom
-          AnchorSideRight.Control = Panel1
-          AnchorSideRight.Side = asrBottom
-          Left = 1
-          Height = 102
-          Top = 314
-          Width = 290
-          Anchors = [akTop, akLeft, akRight]
-          BorderSpacing.Top = 10
-          BevelOuter = bvNone
-          ClientHeight = 102
-          ClientWidth = 290
-          Color = 6908265
-          ParentBackground = False
-          ParentColor = False
-          TabOrder = 5
-          object BAddToSpriteBank: TSpeedButton
-            AnchorSideLeft.Control = Panel2
-            AnchorSideLeft.Side = asrCenter
-            Cursor = crHandPoint
-            Left = 45
-            Height = 30
-            Top = 64
-            Width = 200
-            Caption = 'Add to Sprite Bank'
-            OnClick = BAddToSpriteBankClick
-          end
-          object Label3: TLabel
-            AnchorSideLeft.Control = Panel2
-            Left = 10
-            Height = 15
-            Top = 13
-            Width = 101
-            BorderSpacing.Left = 10
-            Caption = 'Name of the sprite:'
-          end
-          object Edit2: TEdit
-            AnchorSideLeft.Control = Label3
-            AnchorSideRight.Control = Panel2
-            AnchorSideRight.Side = asrBottom
-            Left = 10
-            Height = 23
-            Top = 30
-            Width = 270
-            Anchors = [akTop, akLeft, akRight]
-            BorderSpacing.Right = 10
-            TabOrder = 0
-          end
-        end
-        object Label19: TLabel
-          Left = 10
-          Height = 15
-          Top = 424
-          Width = 40
-          Caption = 'Label19'
-        end
-        object Label22: TLabel
-          Left = 48
-          Height = 15
-          Top = 451
-          Width = 40
-          Caption = 'Label22'
-        end
-        object Label23: TLabel
-          Left = 8
-          Height = 15
-          Top = 451
-          Width = 31
-          Caption = 'après:'
-        end
       end
     end
     object PageCollisionBody: TTabSheet
       Caption = 'Collision body'
-      ClientHeight = 532
+      ClientHeight = 484
       ClientWidth = 292
       object Panel6: TPanel
         Left = 0
-        Height = 532
+        Height = 484
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 532
+        ClientHeight = 484
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -895,88 +822,190 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PagePostures: TTabSheet
       Caption = 'Postures'
-      ClientHeight = 532
+      ClientHeight = 484
       ClientWidth = 292
-      object Panel9: TPanel
-        Left = 1
-        Height = 55
-        Top = 17
-        Width = 282
-        ClientHeight = 55
-        ClientWidth = 282
-        Color = 8355711
+      object Panel10: TPanel
+        AnchorSideLeft.Control = PagePostures
+        AnchorSideTop.Control = Panel11
+        AnchorSideTop.Side = asrBottom
+        AnchorSideRight.Control = PagePostures
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 374
+        Top = 26
+        Width = 292
+        Anchors = [akTop, akLeft, akRight]
+        BevelOuter = bvNone
+        ClientHeight = 374
+        ClientWidth = 292
+        Color = 8289918
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
-        object Label25: TLabel
-          AnchorSideLeft.Control = Panel4
-          AnchorSideTop.Control = Panel4
-          Left = 10
-          Height = 15
-          Top = 12
-          Width = 67
-          BorderSpacing.Left = 10
-          BorderSpacing.Top = 27
-          Caption = 'Coordinates:'
-        end
-        object SE13: TFloatSpinEdit
-          AnchorSideLeft.Control = Label25
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label25
-          AnchorSideBottom.Side = asrBottom
-          Left = 87
-          Height = 23
-          Top = 8
-          Width = 70
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          MaxValue = 100000
-          MinValue = -1000000
-          OnChange = CBChildTypeSelect
+        object LBPostureNames: TListBox
+          AnchorSideLeft.Control = Panel10
+          AnchorSideTop.Control = Panel10
+          AnchorSideRight.Control = Panel10
+          AnchorSideRight.Side = asrBottom
+          Left = 0
+          Height = 208
+          Top = 0
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ItemHeight = 0
           TabOrder = 0
+          OnMouseUp = LBTextureNamesMouseUp
+          OnSelectionChange = LBPostureNamesSelectionChange
         end
-        object SE14: TFloatSpinEdit
-          AnchorSideLeft.Control = SE13
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideTop.Control = SE13
-          AnchorSideBottom.Side = asrCenter
-          Left = 167
-          Height = 23
-          Top = 8
-          Width = 70
-          BorderSpacing.Left = 10
-          MaxValue = 100000
-          MinValue = -1000000
-          OnChange = CBChildTypeSelect
-          TabOrder = 1
-        end
-        object Label26: TLabel
-          AnchorSideTop.Control = Label15
-          AnchorSideTop.Side = asrBottom
-          Left = 32
+        object Label19: TLabel
+          AnchorSideLeft.Control = Panel10
+          Left = 5
           Height = 15
-          Top = 40
-          Width = 34
-          BorderSpacing.Top = 10
-          Caption = 'Angle:'
+          Top = 264
+          Width = 76
+          BorderSpacing.Left = 5
+          Caption = 'Posture name:'
         end
-        object SE15: TFloatSpinEdit
-          AnchorSideLeft.Control = Label26
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label26
-          AnchorSideBottom.Side = asrBottom
-          Left = 73
+        object Edit3: TEdit
+          AnchorSideLeft.Control = Label19
+          AnchorSideTop.Control = Label19
+          AnchorSideTop.Side = asrBottom
+          Left = 5
           Height = 23
-          Top = 32
-          Width = 58
+          Top = 279
+          Width = 247
+          TabOrder = 1
+          OnChange = BAddPostureToListClick
+        end
+        object BAddPostureToList: TSpeedButton
+          AnchorSideLeft.Control = Panel10
+          AnchorSideLeft.Side = asrCenter
+          AnchorSideTop.Control = Edit3
+          AnchorSideTop.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 64
+          Height = 23
+          Top = 312
+          Width = 164
+          BorderSpacing.Top = 10
+          Caption = 'Add to posture list'
+          OnClick = BAddPostureToListClick
+        end
+        object Label22: TLabel
+          Left = 6
+          Height = 15
+          Top = 217
+          Width = 86
+          Caption = 'Animation time:'
+        end
+        object FSE1: TFloatSpinEdit
+          AnchorSideLeft.Control = Label22
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideBottom.Control = Label22
+          AnchorSideBottom.Side = asrBottom
+          Left = 97
+          Height = 23
+          Top = 209
+          Width = 63
           Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 7
-          DecimalPlaces = 1
+          BorderSpacing.Left = 5
           Increment = 0.5
-          MaxValue = 360
-          MinValue = -360
-          OnChange = CBChildTypeSelect
           TabOrder = 2
+          Value = 0.5
+        end
+      end
+      object Panel11: TPanel
+        AnchorSideLeft.Control = PagePostures
+        AnchorSideTop.Control = PagePostures
+        AnchorSideRight.Control = PagePostures
+        AnchorSideRight.Side = asrBottom
+        Left = 0
+        Height = 26
+        Top = 0
+        Width = 292
+        Anchors = [akTop, akLeft, akRight]
+        BevelOuter = bvNone
+        ClientHeight = 26
+        ClientWidth = 292
+        Color = 3158064
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 1
+        object BDeletePosture: TSpeedButton
+          AnchorSideTop.Control = Panel11
+          AnchorSideTop.Side = asrCenter
+          AnchorSideRight.Control = BPostureUndo
+          Cursor = crHandPoint
+          Left = 197
+          Height = 24
+          Hint = 'Delete the selected texture'
+          Top = 1
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Top = 3
+          BorderSpacing.Right = 15
+          Images = DataModule1.ImageList1
+          ImageIndex = 5
+          OnClick = BAddPostureToListClick
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object BPostureUndo: TSpeedButton
+          AnchorSideTop.Control = Panel11
+          AnchorSideTop.Side = asrCenter
+          AnchorSideRight.Control = BPostureRedo
+          Cursor = crHandPoint
+          Left = 236
+          Height = 24
+          Hint = 'Undo'
+          Top = 1
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Top = 3
+          BorderSpacing.Right = 5
+          Images = DataModule1.ImageList1
+          ImageIndex = 9
+          OnClick = BAddPostureToListClick
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object BPostureRedo: TSpeedButton
+          AnchorSideTop.Control = Panel11
+          AnchorSideTop.Side = asrCenter
+          AnchorSideRight.Control = Panel11
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 265
+          Height = 24
+          Hint = 'Redo'
+          Top = 1
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Top = 3
+          BorderSpacing.Right = 3
+          Images = DataModule1.ImageList1
+          ImageIndex = 10
+          OnClick = BAddPostureToListClick
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object BRenamePosture: TSpeedButton
+          AnchorSideLeft.Control = Panel11
+          AnchorSideTop.Control = Panel11
+          AnchorSideTop.Side = asrCenter
+          Cursor = crHandPoint
+          Left = 5
+          Height = 24
+          Hint = 'Rename the selected sprite'
+          Top = 1
+          Width = 24
+          BorderSpacing.Left = 5
+          BorderSpacing.Top = 3
+          Images = DataModule1.ImageList1
+          ImageIndex = 12
+          OnClick = BAddPostureToListClick
+          ShowHint = True
+          ParentShowHint = False
         end
       end
     end
@@ -990,12 +1019,12 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 128
-    Top = 592
+    Height = 176
+    Top = 544
     Width = 300
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 128
+    ClientHeight = 176
     ClientWidth = 300
     Color = 6118749
     ParentBackground = False
@@ -1003,12 +1032,64 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     TabOrder = 1
     object BNew: TSpeedButton
       Cursor = crHandPoint
-      Left = 32
+      Left = 8
       Height = 19
-      Top = 32
+      Top = 144
       Width = 74
       Caption = 'NEW'
       OnClick = BNewClick
+    end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = Panel5
+      AnchorSideTop.Control = Panel4
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel5
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 117
+      Top = 19
+      Width = 300
+      Anchors = [akLeft, akRight]
+      BorderSpacing.Top = 10
+      BevelOuter = bvNone
+      ClientHeight = 117
+      ClientWidth = 300
+      Color = 6908265
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 0
+      object BAddToSpriteBank: TSpeedButton
+        AnchorSideLeft.Control = Panel2
+        AnchorSideLeft.Side = asrCenter
+        Cursor = crHandPoint
+        Left = 50
+        Height = 30
+        Top = 64
+        Width = 200
+        Caption = 'Add to Sprite Bank'
+        OnClick = BAddToSpriteBankClick
+      end
+      object Label3: TLabel
+        AnchorSideLeft.Control = Panel2
+        Left = 10
+        Height = 15
+        Top = 13
+        Width = 101
+        BorderSpacing.Left = 10
+        Caption = 'Name of the sprite:'
+      end
+      object Edit2: TEdit
+        AnchorSideLeft.Control = Label3
+        AnchorSideRight.Control = Panel2
+        AnchorSideRight.Side = asrBottom
+        Left = 10
+        Height = 23
+        Top = 30
+        Width = 280
+        Anchors = [akTop, akLeft, akRight]
+        BorderSpacing.Right = 10
+        TabOrder = 0
+      end
     end
   end
   object Panel8: TPanel
@@ -1064,7 +1145,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
   object OD1: TOpenDialog
     Title = 'Open image file'
     Filter = 'All files|*.*|Image files|*.svg;*.png;*.jpg;*.bmp'
-    Left = 240
-    Top = 640
+    Left = 264
+    Top = 648
   end
 end
