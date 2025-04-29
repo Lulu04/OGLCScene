@@ -24,6 +24,7 @@ type
     Edit1: TEdit;
     Label1: TLabel;
     Label24: TLabel;
+    Label25: TLabel;
     LB: TListBox;
     MIRedo: TMenuItem;
     MIUndo: TMenuItem;
@@ -106,6 +107,23 @@ var t: TStringlist;
   function PointFToString(const aPt: TPointF): string; overload;
   begin
     Result := 'PointF('+FormatFloatWithDot('0.00', aPt.x)+', '+FormatFloatWithDot('0.00', aPt.y)+')';
+  end;
+  function Generate_AngleChangeTo(aAngle: single; const aSurfaceName: string): string;
+  begin
+    Result :='  '+aSurfaceName+'.Angle.ChangeTo(';
+    if aAngle = 0 then Result := Result+'0'
+      else Result := Result+FormatFloatWithDot('0.000', aAngle);
+    Result := Result+', aDuration, idcSinusoid);';
+  end;
+  function FormatXCoorRelativeToParentWidth(aX: single; const aSurfaceName: string): string;
+  begin
+    if aX = 0 then Result := '0'
+      else Result := FormatFloatWithDot('0.000', aX)+'*'+aSurfaceName+'.Width';
+  end;
+  function FormatYCoorRelativeToParentHeight(aY: single; const aSurfaceName: string): string;
+  begin
+    if aY = 0 then Result := '0'
+      else Result := FormatFloatWithDot('0.000', aY)+'*'+aSurfaceName+'.Height';
   end;
 
 begin
@@ -330,15 +348,19 @@ begin
     // the width and height of the parent or current
     if (current^.x <> 0) or (current^.y <> 0) then begin
       if _parent^.classtype = TSpriteContainer then begin
-        xx := current^.x/current^.surface.Width;
+        sx := FormatXCoorRelativeToParentWidth(current^.x/current^.surface.Width, current^.name);
+        sy := FormatYCoorRelativeToParentHeight(current^.y/current^.surface.Height, current^.name);
+        {xx := current^.x/current^.surface.Width;
+        if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
         yy := current^.y/current^.surface.Height;
-        sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
-        sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height';
+        if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height'; }
       end else begin
-        xx := current^.x/_parent^.surface.Width;
+        sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, _parent^.name);
+        sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, _parent^.name);
+{        xx := current^.x/_parent^.surface.Width;
+        if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
         yy := current^.y/_parent^.surface.Height;
-        sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
-        sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';
+        if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';  }
       end;
       t.Add('    SetCoordinate('+sx+', '+sy+');');
     end;
@@ -413,32 +435,32 @@ begin
                 'begin');
       for j:=0 to Surfaces.Size-1 do begin
         current := Surfaces.Mutable[j];
+        if current = rootItem then continue;
+        _parent := Surfaces.GetItemByID(current^.parentID);
         // copy values to variable for easier access
         current^.DuplicateValuesToTemporaryVariables;
 
         // to keep right proportion, coordinates must be relative to
         // the width and height of the parent or current
         pt := Postures.Mutable[i]^.Values[j];
-//        if (current^.x <> pt.x) or (current^.y <> pt.y) then begin
-          if _parent^.classtype = TSpriteContainer then begin
-            xx := pt.x/current^.surface.Width;
-            yy := pt.y/current^.surface.Height;
-            sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
-            sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height';
-          end else begin
-            xx := pt.x/_parent^.surface.Width;
-            yy := pt.y/_parent^.surface.Height;
-            sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
-            sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';
-          end;
-          t.Add('  '+current^.name+'.SetCoordinate('+sx+', '+sy+', aDuration, idcSinusoid);');
-//        end;
+        if _parent^.classtype = TSpriteContainer then begin
+          sx := FormatXCoorRelativeToParentWidth(pt.x/current^.surface.Width, current^.name);
+          sy := FormatYCoorRelativeToParentHeight(pt.y/current^.surface.Height, current^.name);
+      {    xx := pt.x/current^.surface.Width;
+          if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
+          yy := pt.y/current^.surface.Height;
+          if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height'; }
+        end else begin
+          sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width, _parent^.name);
+          sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, _parent^.name);
+{          xx := pt.x/_parent^.surface.Width;
+          if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
+          yy := pt.y/_parent^.surface.Height;
+          if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height'; }
+        end;
+        t.Add('  '+current^.name+'.SetCoordinate('+sx+', '+sy+', aDuration, idcSinusoid);');
 
-//        if current^.angle <> Postures.Mutable[i]^.Values[j].angle then begin
-          t.Add('  '+current^.name+'.Angle.ChangeTo('+
-                 FormatFloatWithDot('0.000', Postures.Mutable[i]^.Values[j].angle)+
-                 ', aDuration, idcSinusoid);');
-//        end;
+        t.Add(Generate_AngleChangeTo(Postures.Mutable[i]^.Values[j].angle, current^.name));
       end;
       t.Add('end;');
       t.Add('');
