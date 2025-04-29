@@ -12,7 +12,7 @@ type
   { TDataModule1 }
 
   TDataModule1 = class(TDataModule)
-    ILCursor: TImageList;
+    ILIcon24: TImageList;
     ImageList1: TImageList;
     procedure DataModuleCreate(Sender: TObject);
   private
@@ -48,19 +48,20 @@ end;
 
 procedure TDataModule1.RedrawImageForCursor;
 begin
-  ILCursor.BeginUpdate;
-  ILCursor.Clear;
-  ILCursor.Width := FormMain.ScaleDesignToForm(32);
-  ILCursor.Height := ILCursor.Width;
+  ILIcon24.BeginUpdate;
+  ILIcon24.Clear;
+  ILIcon24.Width := FormMain.ScaleDesignToForm(24);
+  ILIcon24.Height := ILIcon24.Width;
 
-  FPath := GetCursorFolder;
-  AddImageToImageList('Select.svg', ILCursor);
-  AddImageToImageList('Line.svg', ILCursor);
-  AddImageToImageList('Circle.svg', ILCursor);
-  AddImageToImageList('Rectangle.svg', ILCursor);
-  AddImageToImageList('Polygon.svg', ILCursor);
+  FPath := GetIconFolder;
+  AddImageToImageList('Select.svg', ILIcon24);
+  AddImageToImageList('Line.svg', ILIcon24);
+  AddImageToImageList('Circle.svg', ILIcon24);
+  AddImageToImageList('Rectangle.svg', ILIcon24);
+  AddImageToImageList('Polygon.svg', ILIcon24);
+  AddImageToImageList('AddNode.svg', ILIcon24);
 
-  ILCursor.EndUpdate;
+  ILIcon24.EndUpdate;
 end;
 
 end.

@@ -52,6 +52,7 @@ TMouseState = ( msIdle,
                 msCreatingPolygon,
                 msWaitingForNextPolygonNode,
                 msEnterPressedOnPolygonCreation,
+                msBackPressedOnPolygonCreation,
 
                 msCancelShapeCreation  // used when user pess ESCAPE while creating a collision shape
               );
@@ -72,11 +73,11 @@ private
   FClickOrigin: TPointF;
   procedure SetMouseState(AValue: TMouseState);
 public // callback from main form and openglcontrol to manage mouse and keyboard on the view
-  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
-  procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); virtual;
-  procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); virtual;
-  procedure ProcessOnKeyDown(var Key: Word; Shift: TShiftState); virtual;
-  procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState); virtual;
+  procedure ProcessMouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer); virtual;
+  procedure ProcessMouseDown({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer); virtual;
+  procedure ProcessMouseMove({%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer); virtual;
+  procedure ProcessOnKeyDown(var Key: Word; {%H-}Shift: TShiftState); virtual;
+  procedure ProcessOnKeyUp(var Key: Word; {%H-}Shift: TShiftState); virtual;
   procedure ProcessMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean); virtual;
 public // camera
   procedure CreateCamera(const aLayerIndexList: array of integer);
@@ -153,7 +154,7 @@ FScene.LogDebug('MouseState = '+debug);
 
     msToolPolygon,
     msCreatingPolygon: tex := texMouseToolPolygon;
-    msWaitingForNextPolygonNode: tex := texMouseAddNode;
+    msWaitingForNextPolygonNode, msBackPressedOnPolygonCreation: tex := texMouseAddNode;
     else tex := texMouseNormal;
   end;
 

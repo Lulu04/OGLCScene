@@ -51,7 +51,9 @@ TBankUndoRedoActionType = (uratBankUndefined,
                           );
 TBankUndoRedoItem = record
   action: TBankUndoRedoActionType;
-  name, textures, surfaces, collisionbodies: string;
+  data: TSpriteBankItem;
+  newData: TSpriteBankItem;
+  //name, textures, surfaces, collisionbodies, postures: string;
   oldName: string;
 end;
 
@@ -185,30 +187,30 @@ end;
 
 procedure TBankUndoRedoManager.ProcessUndo(var aItem: TBankUndoRedoItem);
 var o: PSpriteBankItem;
-  temp: string;
   i: integer;
 begin
   case aItem.action of
     uratBankDeleteItem: begin
       o := SpriteBank.AddEmpty;
-      o^.name := aItem.name;
-      o^.textures := aItem.textures;
-      o^.surfaces := aItem.surfaces;
-      o^.collisionbodies := aItem.collisionbodies;
+      o^.name := aItem.data.name;
+      o^.textures := aItem.data.textures;
+      o^.surfaces := aItem.data.surfaces;
+      o^.collisionbodies := aItem.data.collisionbodies;
+      o^.postures := aItem.data.postures;
       FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
     end;
 
     uratBankRenameItem: begin
-      temp := aItem.name;
-      aItem.name := aItem.oldName;
-      aItem.oldName := temp;
+      o := SpriteBank.GetItemByName(aItem.data.name);
+      if o = NIL then begin raise exception.Create('bug: name not found in SpriteBank'); exit; end;
+      o^.name := aItem.oldName;
       i := FrameToolsSpriteBank.LB.ItemIndex;
-      FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.name;
+      if i <> -1 then FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.oldName;
     end;
 
     uratBankAddItem: begin
-      SpriteBank.DeleteByName(aItem.name);
-      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.name);
+      SpriteBank.DeleteByName(aItem.data.name);
+      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.data.name);
       if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
     end;
   end;
@@ -216,31 +218,31 @@ end;
 
 procedure TBankUndoRedoManager.ProcessRedo(var aItem: TBankUndoRedoItem);
 var i: Integer;
-  temp: string;
   o: PSpriteBankItem;
 begin
   case aItem.action of
     uratBankAddItem: begin
       o := SpriteBank.AddEmpty;
-      o^.name := aItem.name;
-      o^.textures := aItem.textures;
-      o^.surfaces := aItem.surfaces;
-      o^.collisionbodies := aItem.collisionbodies;
+      o^.name := aItem.data.name;
+      o^.textures := aItem.data.textures;
+      o^.surfaces := aItem.data.surfaces;
+      o^.collisionbodies := aItem.data.collisionbodies;
+      o^.postures := aItem.data.postures;
       FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
     end;
 
     uratBankDeleteItem: begin
-      SpriteBank.DeleteByName(aItem.name);
-      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.name);
+      SpriteBank.DeleteByName(aItem.data.name);
+      i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.data.name);
       if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
     end;
 
     uratBankRenameItem: begin
-      temp := aItem.name;
-      aItem.name := aItem.oldName;
-      aItem.oldName := temp;
+      o := SpriteBank.GetItemByName(aItem.oldName);
+      if o = NIL then begin raise exception.Create('bug: oldName not found in SpriteBank'); exit; end;
+      o^.name := aItem.data.name;
       i := FrameToolsSpriteBank.LB.ItemIndex;
-      FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.name;
+      if i <> -1 then FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.data.name;
     end;
   end;
 end;
@@ -250,10 +252,11 @@ var o: TBankUndoRedoItem;
 begin
   o := Default(TBankUndoRedoItem);
   o.action := uratBankDeleteItem;
-  o.name := SpriteBank.Mutable[aIndex]^.name;
-  o.textures := SpriteBank.Mutable[aIndex]^.textures;
-  o.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
-  o.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  o.data.name := SpriteBank.Mutable[aIndex]^.name;
+  o.data.textures := SpriteBank.Mutable[aIndex]^.textures;
+  o.data.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
+  o.data.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  o.data.postures := SpriteBank.Mutable[aIndex]^.postures;
   AddItem(o);
 end;
 
@@ -262,10 +265,11 @@ var o: TBankUndoRedoItem;
 begin
   o := Default(TBankUndoRedoItem);
   o.action := uratBankRenameItem;
-  o.name := SpriteBank.Mutable[aIndex]^.name;
-  o.textures := SpriteBank.Mutable[aIndex]^.textures;
-  o.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
-  o.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  o.data.name := SpriteBank.Mutable[aIndex]^.name;
+  o.data.textures := SpriteBank.Mutable[aIndex]^.textures;
+  o.data.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
+  o.data.collisionbodies := SpriteBank.Mutable[aIndex]^.collisionbodies;
+  o.data.postures := SpriteBank.Mutable[aIndex]^.postures;
   o.oldName := aOldName;
   AddItem(o);
 end;
@@ -275,10 +279,11 @@ var o: TBankUndoRedoItem;
 begin
   o := Default(TBankUndoRedoItem);
   o.action := uratBankAddItem;
-  o.name := SpriteBank.Mutable[aIndexNewItem]^.name;
-  o.textures := SpriteBank.Mutable[aIndexNewItem]^.textures;
-  o.surfaces := SpriteBank.Mutable[aIndexNewItem]^.surfaces;
-  o.collisionbodies := SpriteBank.Mutable[aIndexNewItem]^.collisionbodies;
+  o.data.name := SpriteBank.Mutable[aIndexNewItem]^.name;
+  o.data.textures := SpriteBank.Mutable[aIndexNewItem]^.textures;
+  o.data.surfaces := SpriteBank.Mutable[aIndexNewItem]^.surfaces;
+  o.data.collisionbodies := SpriteBank.Mutable[aIndexNewItem]^.collisionbodies;
+  o.data.postures:= SpriteBank.Mutable[aIndexNewItem]^.postures;
   AddItem(o);
 end;
 

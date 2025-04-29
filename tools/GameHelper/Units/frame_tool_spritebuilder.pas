@@ -6,9 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  ExtCtrls, StdCtrls, Buttons, Spin,
+  ExtCtrls, StdCtrls, Buttons, Spin, Menus,
   BGRABitmapTypes,
-  OGLCScene, gvector,
+  OGLCScene,
   u_surface_list, u_texture_list, Types,
   u_screen_spritebuilder, u_collisionbody_list, u_posture_list;
 
@@ -66,6 +66,8 @@ type
     Label9: TLabel;
     LBTextureNames: TListBox;
     LBPostureNames: TListBox;
+    MIDeleteNode: TMenuItem;
+    MIAddNode: TMenuItem;
     OD1: TOpenDialog;
     PageChilds: TTabSheet;
     PageTextures: TTabSheet;
@@ -80,6 +82,7 @@ type
     Panel7: TPanel;
     Panel8: TPanel;
     PC1: TPageControl;
+    PopupNode: TPopupMenu;
     SE1: TFloatSpinEdit;
     SE10: TSpinEdit;
     SE11: TSpinEdit;
@@ -99,19 +102,21 @@ type
     BCancel: TSpeedButton;
     PagePostures: TTabSheet;
     BAddPostureToList: TSpeedButton;
+    BUpdateposture: TSpeedButton;
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BNewClick(Sender: TObject);
-    procedure CBParentDrawItem(Control: TWinControl; Index: Integer;
+    procedure CBParentDrawItem({%H-}Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
-    procedure LBPostureNamesSelectionChange(Sender: TObject; User: boolean);
-    procedure LBTextureNamesMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
+    procedure LBPostureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
+    procedure LBTextureNamesMouseUp(Sender: TObject; {%H-}Button: TMouseButton;
+      {%H-}Shift: TShiftState; X, Y: Integer);
+    procedure LBTextureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
+    procedure MIAddNodeClick(Sender: TObject);
     procedure PC1Change(Sender: TObject);
   private // textures
     FTextureUndoRedoManager: TTextureUndoRedoManager;
@@ -133,8 +138,13 @@ type
     procedure DoUpdateChild;
   private // postures
     FPostureTabIsActive: boolean;
+    FPostureUndoRedoManager: TPostureUndoRedoManager;
+    function LBSelectedToName: string;
     procedure UpdatePostureWidgetState;
     procedure DoAddposture;
+    procedure DoUpdatePosture;
+    procedure DoRenamePosture;
+    procedure DoDeletePosture;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
@@ -301,39 +311,26 @@ begin
 end;
 
 procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
-var i: integer;
-  oldName, newName: string;
 begin
-  i := LBPostureNames.ItemIndex;
-
   if Sender = BAddPostureToList then
     DoAddposture;
 
-  if Sender = BDeletePosture then begin
-    if i = -1 then exit;
-    Postures.DeleteItemByName(LBPostureNames.Items.Strings[i]);
-    LBPostureNames.Items.Delete(i);
-    Modified := True;
-    UpdatePostureWidgetState;
-  end;
+  if Sender = BUpdatePosture then
+    DoUpdatePosture;
 
-  if Sender = BRenamePosture then begin
-    if i = -1 then exit;
-    oldName := LBPostureNames.Items.Strings[i];
-    newName := InputBox('', 'Enter the new name:', oldName);
-    if newName = oldName then exit;
-    Postures.GetItemByName(oldName)^.name := newName;
-    //FUndoRedoManager.AddActionRenameSprite(i, oldName);
-    LBPostureNames.Items.Strings[i] := newName;
-    Modified := True;
-    UpdatePostureWidgetState;
-  end;
+  if Sender = BDeletePosture then
+    DoDeletePosture;
+
+  if Sender = BRenamePosture then
+    DoRenamePosture;
 
   if Sender = BPostureUndo then begin
+    FPostureUndoRedoManager.Undo;
     UpdatePostureWidgetState;
   end;
 
   if Sender = BPostureRedo then begin
+    FPostureUndoRedoManager.Redo;
     UpdatePostureWidgetState;
   end;
 
@@ -394,7 +391,8 @@ begin
   if i = -1 then exit;
   if Surfaces.Size = 0 then exit;
 
-  post := Postures.Mutable[i];
+  post := Postures.GetItemByName(LBSelectedToName);
+  if post = NIL then raise exception.create('bug: post is NIL');
   if Length(post^.Values) <> Surfaces.Size then raise exception.create('bug');
   Edit3.Text := post^.name;
   for j:=0 to Surfaces.Size-1 do begin
@@ -443,6 +441,19 @@ begin
   FInitializingWidget := False;
 
   UpdateTextureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.MIAddNodeClick(Sender: TObject);
+var key: word;
+begin
+  if Sender = MIAddNode then begin
+    ScreenSpriteBuilder.AddNodeBetweenSelectedOnPolygon;
+  end;
+
+  if Sender = MIDeleteNode then begin
+    key := VK_DELETE;
+    ScreenSpriteBuilder.ProcessKeyUpForCollisionBody(key, []);
+  end;
 end;
 
 procedure TFrameToolsSpriteBuilder.PC1Change(Sender: TObject);
@@ -614,46 +625,128 @@ begin
   UpdateValuesToWorkingSurface;
 end;
 
+function TFrameToolsSpriteBuilder.LBSelectedToName: string;
+var i: Integer;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then Result := ''
+    else Result := LBPostureNames.Items.Strings[i];
+end;
+
 procedure TFrameToolsSpriteBuilder.UpdatePostureWidgetState;
+var s: string;
 begin
   BDeletePosture.Enabled := LBPostureNames.ItemIndex <> -1;
-  //BPostureUndo.Enabled := PostureUndoRedoManager.CanUndo;
-  //BPostureRedo.Enabled := PostureUndoRedoManager.CanRedo;
-  BAddPostureToList.Enabled := (Surfaces.Size > 0) and (Trim(Edit3.Text) <> '');
+  BPostureUndo.Enabled := FPostureUndoRedoManager.CanUndo;
+  BPostureRedo.Enabled := FPostureUndoRedoManager.CanRedo;
+  s := Trim(Edit3.Text);
+  BAddPostureToList.Enabled := (Surfaces.Size > 0) and
+                               (s <> '') and not Postures.NameAlreadyExists(s);
+
+  BUpdateposture.Enabled := (Surfaces.Size > 0) and
+                            (s <> '') and Postures.NameAlreadyExists(s);
 end;
 
 procedure TFrameToolsSpriteBuilder.DoAddposture;
 var item: PPostureItem;
-  i: integer;
   nam: string;
-  addNameToLB: boolean;
 begin
-  i := LBPostureNames.ItemIndex;
   nam := Trim(Edit3.Text);
   if nam = '' then exit;
+  if Postures.GetItemByName(nam) <> NIL then exit;
 
-  item := Postures.GetItemByName(nam); //NIL;
-  addNameToLB := True;
+  item := Postures.AddEmpty;
+  item^.name := nam;
+  item^.TakeValuesFrom(Surfaces);
 
-  if item = NIL then item := Postures.AddEmpty
-  else
-  if (i <> -1) and (LBPostureNames.Items.Strings[i] = nam) then begin
-    // replace?
+  FPostureUndoRedoManager.AddActionAddPosture(item);
+
+  LBPostureNames.ItemIndex := LBPostureNames.Items.Add(item^.name);
+  Edit3.Text := '';
+  Modified := True;
+  UpdatePostureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.DoUpdatePosture;
+var item: PPostureItem;
+  i: integer;
+  nam: string;
+  undoredoItem: PPostureUndoRedoItem;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+  item := Postures.GetItemByName(LBPostureNames.Items.Strings[i]);
+  if item = NIL then exit;
+
+  nam := Trim(Edit3.Text);
+  if LBPostureNames.Items.Strings[i] = nam then begin
     if QuestionDlg('','Replace the selected posture ?', mtConfirmation,
                    [mrOk, 'Yes', mrCancel, 'Cancel'], 0) = mrCancel then exit;
-    item := Postures.GetItemByName(nam);
-    addNameToLB := False;
   end else
     if QuestionDlg('','A posture with this name is already defined', mtConfirmation,
                [mrOk, 'Replace', mrCancel, 'Cancel'], 0) = mrCancel then exit;
 
+  // construct the undo/redo item
+  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem^.action := puratModifyPosture;
+  undoredoItem^.data.name := item^.name;
+  undoredoItem^.data.Values := Copy(item^.Values);
+  undoredoItem^.newData.name := nam;
+  undoredoItem^.newData.TakeValuesFrom(Surfaces);
+
   item^.name := nam;
   item^.TakeValuesFrom(Surfaces);
-  if addNameToLB then
-    LBPostureNames.ItemIndex := LBPostureNames.Items.Add(item^.name);
-  Edit3.Text := '';
+  LBPostureNames.Items.Strings[i] := nam;
   Modified := True;
-  UpdatePostureWidgetState;end;
+  UpdatePostureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.DoRenamePosture;
+var i: Integer;
+  oldName, newName: string;
+  undoredoItem: PPostureUndoRedoItem;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+
+  oldName := LBPostureNames.Items.Strings[i];
+  newName := InputBox('', 'Enter the new name:', oldName);
+  if newName = oldName then exit;
+
+  // construct the undo/redo item
+  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem^.action := puratRenamePosture;
+  undoredoItem^.data.name := oldName;
+  undoredoItem^.newData.name := newName;
+
+  Postures.GetItemByName(oldName)^.name := newName;
+  //FPostureUndoRedoManager.AddActionRenamePosture(i, oldName);
+  LBPostureNames.Items.Strings[i] := newName;
+  Modified := True;
+  UpdatePostureWidgetState;  end;
+
+procedure TFrameToolsSpriteBuilder.DoDeletePosture;
+var i: Integer;
+  item: PPostureItem;
+  undoredoItem: PPostureUndoRedoItem;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+  item := Postures.GetItemByName(LBPostureNames.Items.Strings[i]);
+  if item = NIL then exit;
+
+  // construct the undo/redo item
+  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem^.action := puratDeletePosture;
+  undoredoItem^.ListBoxitemIndexWhenDeleted := i;
+  undoredoItem^.data.name := item^.name;
+  undoredoItem^.data.Values := Copy(item^.Values);
+
+  Postures.DeleteItemByName(LBPostureNames.Items.Strings[i]);
+  LBPostureNames.Items.Delete(i);
+  Modified := True;
+  UpdatePostureWidgetState;
+end;
 
 function TFrameToolsSpriteBuilder.LBToTextureName: string;
 var i: Integer;
@@ -775,12 +868,15 @@ constructor TFrameToolsSpriteBuilder.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
   FTextureUndoRedoManager := TTextureUndoRedoManager.Create;
+  FPostureUndoRedoManager := TPostureUndoRedoManager.Create;
 end;
 
 destructor TFrameToolsSpriteBuilder.Destroy;
 begin
   FTextureUndoRedoManager.Free;
   FTextureUndoRedoManager := NIL;
+  FPostureUndoRedoManager.Free;
+  FPostureUndoRedoManager := NIL;
   inherited Destroy;
 end;
 

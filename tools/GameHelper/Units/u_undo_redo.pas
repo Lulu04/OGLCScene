@@ -14,12 +14,14 @@ type
 { TGenericUndoRedoManager }
 
 generic TGenericUndoRedoManager<T> = class
+private type PT = ^T;
 private
   FItems: array[0..UNDO_REDO_MAX_ITEMS-1] of T;
   FNextIndex: integer;
   FAvailableUndo, FAvailableRedo: integer;
 public
   procedure Clear;
+  function AddEmpty: PT;
   procedure AddItem(const aItem: T);
   function CanUndo: boolean;
   function CanRedo: boolean;
@@ -40,6 +42,14 @@ begin
   FNextIndex := 0;
   FAvailableUndo := 0;
   FAvailableRedo := 0;
+end;
+
+function TGenericUndoRedoManager.AddEmpty: PT;
+var o: T;
+begin
+  Result := @FItems[FNextIndex];
+  o := Default(T);
+  AddItem(o);
 end;
 
 procedure TGenericUndoRedoManager.AddItem(const aItem: T);
