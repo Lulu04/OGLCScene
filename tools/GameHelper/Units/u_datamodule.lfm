@@ -5,7 +5,7 @@ object DataModule1: TDataModule1
   HorizontalOffset = 587
   VerticalOffset = 236
   Width = 293
-  object ILCursor: TImageList
+  object ILIcon24: TImageList
     Left = 34
     Top = 41
   end

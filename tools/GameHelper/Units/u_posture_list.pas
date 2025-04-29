@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils, StdCtrls,
   OGLCScene, gvector,
-  u_surface_list;
+  u_surface_list, u_undo_redo;
 
 type
 
@@ -40,6 +40,7 @@ TPostureList = class(specialize TVector<TPostureItem>)
 public
   //procedure Clear; reintroduce;
   function AddEmpty: PPostureItem;
+  function InsertEmpty(aIndex: SizeUInt): PPostureItem;
   procedure DeleteItemByName(const aName: string);
   function NameAlreadyExists(const aName: string): boolean;
   function GetItemByName(const aName: string): PPostureItem;
@@ -50,7 +51,34 @@ public
   procedure FillListBox(aLB: TListBox);
 end;
 
+type
+TPostureUndoRedoActionType = (
+                           puratUndefined,
+                           puratAddPosture,
+                           puratDeletePosture,
+                           puratModifyPosture,
+                           puratRenamePosture
+                          );
+TPostureUndoRedoItem = record
+  action: TPostureUndoRedoActionType;
+  data: TPostureItem;
+  newData: TPostureItem;
+  ListBoxitemIndexWhenDeleted: integer;
+end;
+PPostureUndoRedoItem = ^TPostureUndoRedoItem;
+
+{ TPostureUndoRedoManager }
+
+TPostureUndoRedoManager = class(specialize TGenericUndoRedoManager<TPostureUndoRedoItem>)
+  procedure ProcessUndo(var aItem: TPostureUndoRedoItem); override;
+  procedure ProcessRedo(var aItem: TPostureUndoRedoItem); override;
+
+  procedure AddActionAddPosture(aItem: PPostureItem);
+end;
+
 implementation
+
+uses u_screen_spritebuilder, form_main;
 
 { TPostureValues }
 
@@ -134,6 +162,14 @@ begin
   Result := Mutable[Size-1];
 end;
 
+function TPostureList.InsertEmpty(aIndex: SizeUInt): PPostureItem;
+var o: TPostureItem;
+begin
+  o.Initdefault;
+  Self.Insert(aIndex, o);
+  Result := Mutable[aIndex];
+end;
+
 procedure TPostureList.DeleteItemByName(const aName: string);
 var i: SizeUInt;
 begin
@@ -204,6 +240,97 @@ begin
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aLB.Items.Add(Mutable[i]^.name);
+end;
+
+{ TPostureUndoRedoManager }
+
+procedure TPostureUndoRedoManager.ProcessUndo(var aItem: TPostureUndoRedoItem);
+var i: integer;
+  item: PPostureItem;
+begin
+  case aItem.action of
+    puratAddPosture: begin
+      ScreenSpriteBuilder.Postures.DeleteItemByName(aItem.data.name);
+      i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.data.name);
+      if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Delete(i);
+    end;
+
+    puratDeletePosture: begin
+      item := ScreenSpriteBuilder.Postures.InsertEmpty(aItem.ListBoxitemIndexWhenDeleted);
+      item^.name := aItem.data.name;
+      item^.Values := Copy(aItem.data.Values);
+      with FrameToolsSpriteBuilder.LBPostureNames do begin
+        Items.Insert(aItem.ListBoxitemIndexWhenDeleted, aItem.data.name);
+        ItemIndex := aItem.ListBoxitemIndexWhenDeleted;
+      end;
+    end;
+
+    puratRenamePosture: begin
+      item := ScreenSpriteBuilder.Postures.GetItemByName(aItem.newData.name);
+      if item <> NIL then item^.name := aItem.data.name;
+      i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.newData.name);
+      if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Strings[i] := aItem.data.name;
+    end;
+
+    puratModifyPosture: begin
+      item := ScreenSpriteBuilder.Postures.GetItemByName(aItem.newData.name);
+      if item <> NIL then begin
+        item^.name := aItem.data.name;
+        item^.Values := Copy(aItem.data.Values);
+        i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.newData.name);
+        if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Strings[i] := aItem.data.name;
+      end;
+    end;
+  end;
+end;
+
+procedure TPostureUndoRedoManager.ProcessRedo(var aItem: TPostureUndoRedoItem);
+var item: PPostureItem;
+  i: integer;
+begin
+  case aItem.action of
+    puratAddPosture: begin
+      item := ScreenSpriteBuilder.Postures.AddEmpty;
+      item^.name := aItem.data.name;
+      item^.Values := Copy(aItem.data.Values);
+      with FrameToolsSpriteBuilder.LBPostureNames do
+        ItemIndex := Items.Add(aItem.data.name);
+    end;
+
+    puratDeletePosture: begin
+      ScreenSpriteBuilder.Postures.DeleteItemByName(aItem.data.name);
+      FrameToolsSpriteBuilder.LBPostureNames.Items.Delete(aItem.ListBoxitemIndexWhenDeleted);
+      //i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.data.name);
+      //if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Delete(i);
+    end;
+
+    puratRenamePosture: begin
+      item := ScreenSpriteBuilder.Postures.GetItemByName(aItem.Data.name);
+      if item <> NIL then item^.name := aItem.newData.name;
+      i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.Data.name);
+      if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Strings[i] := aItem.newData.name;
+    end;
+
+    puratModifyPosture: begin
+      item := ScreenSpriteBuilder.Postures.GetItemByName(aItem.Data.name);
+      if item <> NIL then begin
+        item^.name := aItem.newData.name;
+        item^.Values := Copy(aItem.newData.Values);
+        i := FrameToolsSpriteBuilder.LBPostureNames.Items.IndexOf(aItem.Data.name);
+        if i <> -1 then FrameToolsSpriteBuilder.LBPostureNames.Items.Strings[i] := aItem.newData.name;
+      end;
+    end;
+  end;
+end;
+
+procedure TPostureUndoRedoManager.AddActionAddPosture(aItem: PPostureItem);
+var o: TPostureUndoRedoItem;
+begin
+  o := Default(TPostureUndoRedoItem);
+  o.action := puratAddPosture;
+  o.data.name := aItem^.name;
+  o.data.Values := Copy(aItem^.Values);
+  AddItem(o);
 end;
 
 end.

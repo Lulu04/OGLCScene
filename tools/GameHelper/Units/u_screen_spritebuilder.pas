@@ -53,8 +53,8 @@ private
   procedure ProcessMouseUpForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseDownForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseMoveForChild(Shift: TShiftState; X, Y: Integer);
-  procedure ProcessMouseWheelForChild(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-  procedure ProcessKeyUpForChild(var Key: Word; Shift: TShiftState);
+  procedure ProcessMouseWheelForChild(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var {%H-}Handled: Boolean);
+  procedure ProcessKeyUpForChild(var Key: Word; {%H-}Shift: TShiftState);
 private // collision body
   FBodyList: TBodyItemList;
   FWorkingBody: PBodyItem;
@@ -65,11 +65,14 @@ private // collision body
   procedure LoopCreateRectangle;
   procedure LoopCreatePolygon;
   procedure LoopMoveNode;
-  procedure ProcessMouseUpForCollisionBody(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-  procedure ProcessMouseDownForCollisionBody(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseUpForCollisionBody({%H-}Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseDownForCollisionBody({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseMoveForCollisionBody(Shift: TShiftState; X, Y: Integer);
-  procedure ProcessMouseWheelForCollisionBody(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-  procedure ProcessKeyUpForCollisionBody(var Key: Word; Shift: TShiftState);
+  procedure ProcessMouseWheelForCollisionBody({%H-}Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+public
+  procedure ProcessKeyUpForCollisionBody(var Key: Word; {%H-}Shift: TShiftState);
+  procedure AddNodeBetweenSelectedOnPolygon;
+  function ConsecutiveNodeAreSelectedOnPolygon: boolean;
 private // posture
   FPostures: TPostureList;
 public
@@ -229,7 +232,7 @@ begin
 end;
 
 procedure TScreenSpriteBuilder.DeleteSelection;
-var i, j: integer;
+var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
 
@@ -646,8 +649,16 @@ begin
       item^.UpdateAsPolygon(current);
       MouseState := msWaitingForNextPolygonNode;
     end;
+
     Application.ProcessMessages;
     FScene.DoLoop;
+    if MouseState = msBackPressedOnPolygonCreation then begin
+      if Length(item^.Pts) = 1 then MouseState := msCancelShapeCreation
+      else begin
+        item^.DeleteLastNode;
+        MouseState := msWaitingForNextPolygonNode;
+      end;
+    end;
   until not(MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode]);
 
   if MouseState = msEnterPressedOnPolygonCreation then begin
@@ -689,34 +700,44 @@ var items: ArrayOfPUIPointHandle;
 begin
   items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
 
-  case MouseState of
-    msIdle: UnselectAllNodes;
+  if Button = mbLeft then begin
+    case MouseState of
+      msIdle: UnselectAllNodes;
 
-    msMouseDownOnNode: begin
-      if items <> NIL then begin
-        if not (ssShift in Shift) then Bodies.UnselectAllNodes;
-        items[0]^.Selected := True;
-        MouseState := msOverNode;
-      end else begin
-          Bodies.UnselectAllNodes;
-          MouseState := msIdle;
-        end;
-    end;
+      msMouseDownOnNode: begin
+        if items <> NIL then begin
+          if not (ssShift in Shift) then Bodies.UnselectAllNodes;
+          items[0]^.Selected := True;
+          MouseState := msOverNode;
+        end else begin
+            Bodies.UnselectAllNodes;
+            MouseState := msIdle;
+          end;
+      end;
 
-    msMovingNode: MouseState := msIdle;
-    msCreatingLine: MouseState := msIdle;
-    msCreatingCircle: MouseState := msIdle;
-    msCreatingRectangle: MouseState := msIdle;
-    msMouseDownOnToolLine: MouseState := msIdle;
-    msMouseDownOnToolCircle: MouseState := msIdle;
-    msMouseDownOnToolRectangle: MouseState := msIdle;
-    msMouseDownOnToolPolygon: begin
-      ClickOrigin := PointF(X, Y);
-      LoopCreatePolygon;
+      msMovingNode: MouseState := msIdle;
+      msCreatingLine: MouseState := msIdle;
+      msCreatingCircle: MouseState := msIdle;
+      msCreatingRectangle: MouseState := msIdle;
+      msMouseDownOnToolLine: MouseState := msIdle;
+      msMouseDownOnToolCircle: MouseState := msIdle;
+      msMouseDownOnToolRectangle: MouseState := msIdle;
+      msMouseDownOnToolPolygon: begin
+        ClickOrigin := PointF(X, Y);
+        LoopCreatePolygon;
+      end;
+      msWaitingForNextPolygonNode: begin
+        ClickOrigin := PointF(X, Y);
+        MouseState := msCreatingPolygon;
+      end;
     end;
-    msWaitingForNextPolygonNode: begin
-      ClickOrigin := PointF(X, Y);
-      MouseState := msCreatingPolygon;
+  end else if Button = mbRight then begin
+    case MouseState of
+      msOverNode: begin
+        FrameToolsSpriteBuilder.MIAddNode.Enabled := ConsecutiveNodeAreSelectedOnPolygon;
+        FrameToolsSpriteBuilder.MIDeleteNode.Enabled := (FWorkingBody <> NIL) and (FWorkingBody^.SomeNodesAreSelected);
+        FrameToolsSpriteBuilder.PopupNode.PopUp;
+      end;
     end;
   end;
 end;
@@ -729,17 +750,21 @@ begin
   ClickOrigin := PointF(X, Y);
   items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
 
-  case MouseState of
-    msIdle: ;
-    msOverNode: begin
-      if items <> NIL then begin
-        MouseState := msMouseDownOnNode;
+  if Button = mbLeft then begin
+    case MouseState of
+      msIdle: ;
+      msOverNode: begin
+        if items <> NIL then begin
+          MouseState := msMouseDownOnNode;
+        end;
       end;
+      msToolLine: MouseState := msMouseDownOnToolLine;
+      msToolCircle: MouseState := msMouseDownOnToolCircle;
+      msToolRectangle: MouseState := msMouseDownOnToolRectangle;
+      msToolPolygon: MouseState := msMouseDownOnToolPolygon;
     end;
-    msToolLine: MouseState := msMouseDownOnToolLine;
-    msToolCircle: MouseState := msMouseDownOnToolCircle;
-    msToolRectangle: MouseState := msMouseDownOnToolRectangle;
-    msToolPolygon: MouseState := msMouseDownOnToolPolygon;
+  end else if Button = mbRight then begin
+
   end;
 end;
 
@@ -774,7 +799,6 @@ begin
     msMouseDownOnToolLine: if thresholdDone then LoopCreateLine;
     msMouseDownOnToolCircle: if thresholdDone then LoopCreateCircle;
     msMouseDownOnToolRectangle: if thresholdDone then LoopCreateRectangle;
-    //msMouseDownOnToolPolygon: if thresholdDone then LoopCreatePolygon;
   end;
 end;
 
@@ -827,7 +851,26 @@ begin
         MouseState := msCancelShapeCreation;
       end;
     end;
+
+    VK_BACK: begin
+      if MouseState in [msCreatingPolygon,msWaitingForNextPolygonNode] then begin
+         MouseState := msBackPressedOnPolygonCreation;
+      end;
+    end;
   end;
+end;
+
+procedure TScreenSpriteBuilder.AddNodeBetweenSelectedOnPolygon;
+begin
+  if FWorkingBody <> NIL then
+    FWorkingBody^.AddNodeBetweenSelectedOnPolygon;
+end;
+
+function TScreenSpriteBuilder.ConsecutiveNodeAreSelectedOnPolygon: boolean;
+begin
+  if (FWorkingBody <> NIL) and (FWorkingBody^.BodyType = _btPolygon) then
+    Result := FWorkingBody^.ConsecutiveNodeAreSelectedOnPolygon
+  else Result := False;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);

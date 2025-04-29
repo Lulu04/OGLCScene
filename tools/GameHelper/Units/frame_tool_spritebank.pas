@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, Buttons,
   Dialogs, Menus, u_screen_spritebank, u_surface_list, u_texture_list,
-  u_collisionbody_list, u_spritebank;
+  u_collisionbody_list, u_posture_list, u_spritebank;
 
 type
 
@@ -58,6 +58,7 @@ type
     function Textures: TTextureList;
     function Surfaces: TSpriteBankSurfaceList;
     function Bodies: TBodyItemList;
+    function Postures: TPostureList;
   end;
 
 implementation
@@ -89,6 +90,7 @@ var t: TStringlist;
   bodyItem: PBodyItem;
   p: SizeInt;
   bodyList: TBodyItemList;
+  pt: TPostureValues;
   function GetClassName: string;
   begin
     Result := Trim(Edit1.Text);
@@ -161,17 +163,29 @@ begin
               '  procedure SetFlipH(AValue: boolean); override;'#10+
               '  procedure SetFlipV(AValue: boolean); override;');
 
-  // methods
+  // oglc methods declaration
   if CheckBox2.Checked then s := '  procedure ProcessMessage(UserValue: TUserMessageValue); override;'#10
     else s := '';
   t.AddText('public'#10+
             '  // aAdditionalScale is used to scale the collision bodies'#10+
             '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single=1.0);'#10+
             '  constructor Create(aLayerIndex: integer=-1);'#10+
-            s+
-            'end;'#10+
-            #10+
-            'implementation'#10+
+            s);
+
+  // methods declaration for posture
+  if Postures.Size > 0 then begin
+    s := 'public'#10;
+    for i:=0 to Postures.Size-1 do begin
+      s := s+'  procedure Posture_'+Postures.Mutable[i]^.name+'(aDuration: single=0.5);';
+      if i < Postures.Size-1 then s := s+#10;
+    end;
+    t.AddText(s);
+  end;
+
+
+  t.Add('end;');   // end of class declaration
+  t.Add('');
+  t.AddText('implementation'#10+
             #10+
             '{ '+GetClassName+' }'#10+
             #10);
@@ -391,6 +405,46 @@ begin
     t.Add('');
   end;
 
+
+  // methods for postures
+  if Postures.Size > 0 then begin
+    for i:=0 to Postures.Size-1 do begin
+      t.AddText('procedure '+GetClassName+'.Posture_'+Postures.Mutable[i]^.name+'(aDuration: single);'#10+
+                'begin');
+      for j:=0 to Surfaces.Size-1 do begin
+        current := Surfaces.Mutable[j];
+        // copy values to variable for easier access
+        current^.DuplicateValuesToTemporaryVariables;
+
+        // to keep right proportion, coordinates must be relative to
+        // the width and height of the parent or current
+        pt := Postures.Mutable[i]^.Values[j];
+//        if (current^.x <> pt.x) or (current^.y <> pt.y) then begin
+          if _parent^.classtype = TSpriteContainer then begin
+            xx := pt.x/current^.surface.Width;
+            yy := pt.y/current^.surface.Height;
+            sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
+            sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height';
+          end else begin
+            xx := pt.x/_parent^.surface.Width;
+            yy := pt.y/_parent^.surface.Height;
+            sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
+            sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';
+          end;
+          t.Add('  '+current^.name+'.SetCoordinate('+sx+', '+sy+', aDuration, idcSinusoid);');
+//        end;
+
+//        if current^.angle <> Postures.Mutable[i]^.Values[j].angle then begin
+          t.Add('  '+current^.name+'.Angle.ChangeTo('+
+                 FormatFloatWithDot('0.000', Postures.Mutable[i]^.Values[j].angle)+
+                 ', aDuration, idcSinusoid);');
+//        end;
+      end;
+      t.Add('end;');
+      t.Add('');
+    end;
+  end;
+
   t.Add('end.');
   try
     t.SaveToFile(SD1.FileName);
@@ -450,6 +504,7 @@ begin
     newSprite^.textures := item^.textures;
     newSprite^.surfaces := item^.surfaces;
     newSprite^.collisionbodies := item^.collisionbodies;
+    newSprite^.postures := item^.collisionbodies;
     LB.ItemIndex := LB.Items.Add(newName);
     FUndoRedoManager.AddActionDuplicateSprite(LB.ItemIndex);
     Project.SetModified;
@@ -541,6 +596,11 @@ end;
 function TFrameToolSpriteBank.Bodies: TBodyItemList;
 begin
   Result := ScreenSpriteBank.Bodies;
+end;
+
+function TFrameToolSpriteBank.Postures: TPostureList;
+begin
+  Result := ScreenSpriteBank.Postures
 end;
 
 end.

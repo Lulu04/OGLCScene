@@ -122,7 +122,7 @@ end;
 
 implementation
 
-uses u_common, form_main, Math;
+uses u_common, Math;
 
 { TSurfaceDescriptor }
 

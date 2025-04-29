@@ -56,6 +56,7 @@ public
   procedure UpdateAsCircle(aWorldCenter, aWorldPtRadius: TPointF);
   procedure UpdateAsRectangle(aWorldTopLeft, aWorldBottomRight: TPointF);
   procedure UpdateAsPolygon(aWorldPt: TPointF);
+  procedure DeleteLastNode; // only for polygon
 
   procedure CloseThePolygon;
 
@@ -68,6 +69,9 @@ public
   function SomeNodesAreSelected: boolean;
   function AllNodesAreSelected: boolean;
   function GetNodeSelectedCount: integer;
+
+  procedure AddNodeBetweenSelectedOnPolygon;
+  function ConsecutiveNodeAreSelectedOnPolygon: boolean;
 
   procedure UpdateNodeSelectedFrom(aNode: PUINodeHandle; aSelectState: boolean);
 
@@ -339,6 +343,18 @@ begin
   UpdateNodesPosition;
 end;
 
+procedure TBodyItem.DeleteLastNode;
+var i: integer;
+begin
+  if BodyType <> _btPolygon then exit;
+  if Length(Pts) <= 1 then exit;
+  i := High(Pts);
+  Pts[i].KillSprite;
+  SetLength(Pts, i);
+  SetLength(itemDescriptor.pts, i);
+  UpdateNodesPosition;
+end;
+
 procedure TBodyItem.CloseThePolygon;
 begin
   PolygonIsClosed := True;
@@ -431,6 +447,42 @@ begin
   Result := 0;
   for i:=0 to High(Pts) do
     if Pts[i].Selected then inc(Result);
+end;
+
+procedure TBodyItem.AddNodeBetweenSelectedOnPolygon;
+var i, next: Integer;
+  p: TUINodeHandle;
+  pos: TPointF;
+begin
+  if BodyType <> _btPolygon then exit;
+
+i:=Length(Pts);
+
+  for i:=High(Pts) downto 0 do begin
+    if i = High(Pts) then next := 0 else next := i + 1;
+    if Pts[i].Selected and Pts[next].Selected then begin
+      p.InitDefault;
+      p.CreateSprite;
+      p.Selected := True;
+      Insert(p, Pts, i+1);
+      pos := MiddleOf(itemDescriptor.pts[i], itemDescriptor.pts[next]);
+      Insert(pos, itemDescriptor.pts, i+1);
+      p.UpdatePosition(ParentSurface.SurfaceToScene(pos));
+    end;
+  end;
+end;
+
+function TBodyItem.ConsecutiveNodeAreSelectedOnPolygon: boolean;
+var i, next: Integer;
+begin
+  Result := False;
+  if BodyType <> _btPolygon then exit;
+
+  for i:=High(Pts) downto 0 do begin
+    if i = High(Pts) then next := 0 else next := i + 1;
+    if Pts[i].Selected and Pts[next].Selected then
+      exit(True);
+  end;
 end;
 
 procedure TBodyItem.UpdateNodeSelectedFrom(aNode: PUINodeHandle; aSelectState: boolean);
