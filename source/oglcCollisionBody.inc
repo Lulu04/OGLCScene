@@ -17,6 +17,7 @@ TOGLCBodyItem = packed record
   pt1, pt2: TPointF; //_btLine
   pt: TPointF;       //_btPoint
   pts: array of TPointF; //_btPolygon
+ procedure CopyFrom(const aSource: TOGLCBodyItem);
  // to transform model coordinates to word coordinates
  function GetTransformed(const aMatrix: TOGLCMatrix): TOGLCBodyItem;
 end;
@@ -80,6 +81,29 @@ end;
 {$ifdef oglcIMPLEMENTATION}
 
 { TOGLCBodyItem }
+
+procedure TOGLCBodyItem.CopyFrom(const aSource: TOGLCBodyItem);
+begin
+  BodyType := aSource.BodyType;
+  case BodyType of
+    _btPoint: pt := aSource.pt;
+    _btLine: begin
+      pt1 := aSource.pt1;
+      pt2 := aSource.pt2;
+    end;
+    _btCircle: begin
+      center := aSource.center;
+      radius := aSource.radius;
+    end;
+    _btRect: begin
+      rect.TopLeft := aSource.rect.TopLeft;
+      rect.BottomRight := aSource.rect.BottomRight;
+    end;
+    _btPolygon: begin
+      pts := Copy(aSource.pts);
+    end;
+  end;
+end;
 
 function TOGLCBodyItem.GetTransformed(const aMatrix: TOGLCMatrix): TOGLCBodyItem;
 var p: TPointF;
