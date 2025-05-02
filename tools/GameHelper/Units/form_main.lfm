@@ -234,6 +234,7 @@ object FormMain: TFormMain
         AutoSize = True
         BorderSpacing.Right = 10
         Caption = 'SPRITE BANK '
+        Enabled = False
         Font.Color = clBlack
         Font.Style = [fsBold]
         OnClick = BSpriteBankClick

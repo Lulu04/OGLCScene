@@ -87,7 +87,6 @@ var t: TStringlist;
   i, j, c: integer;
   s, sw, sh, sx, sy, texFilename: string;
   rootItem, current, _parent: PSurfaceDescriptor;
-  xx, yy: single;
   bodyItem: PBodyItem;
   p: SizeInt;
   bodyList: TBodyItemList;
@@ -350,17 +349,9 @@ begin
       if _parent^.classtype = TSpriteContainer then begin
         sx := FormatXCoorRelativeToParentWidth(current^.x/current^.surface.Width, current^.name);
         sy := FormatYCoorRelativeToParentHeight(current^.y/current^.surface.Height, current^.name);
-        {xx := current^.x/current^.surface.Width;
-        if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
-        yy := current^.y/current^.surface.Height;
-        if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height'; }
       end else begin
         sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, _parent^.name);
         sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, _parent^.name);
-{        xx := current^.x/_parent^.surface.Width;
-        if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
-        yy := current^.y/_parent^.surface.Height;
-        if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height';  }
       end;
       t.Add('    SetCoordinate('+sx+', '+sy+');');
     end;
@@ -446,17 +437,9 @@ begin
         if _parent^.classtype = TSpriteContainer then begin
           sx := FormatXCoorRelativeToParentWidth(pt.x/current^.surface.Width, current^.name);
           sy := FormatYCoorRelativeToParentHeight(pt.y/current^.surface.Height, current^.name);
-      {    xx := pt.x/current^.surface.Width;
-          if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+current^.name+'.Width';
-          yy := pt.y/current^.surface.Height;
-          if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+current^.name+'.Height'; }
         end else begin
           sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width, _parent^.name);
           sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, _parent^.name);
-{          xx := pt.x/_parent^.surface.Width;
-          if xx = 0 then sx := '0' else sx := FormatFloatWithDot('0.000', xx)+'*'+_parent^.name+'.Width';
-          yy := pt.y/_parent^.surface.Height;
-          if yy = 0 then sy := '0' else sy := FormatFloatWithDot('0.000', yy)+'*'+_parent^.name+'.Height'; }
         end;
         t.Add('  '+current^.name+'.SetCoordinate('+sx+', '+sy+', aDuration, idcSinusoid);');
 

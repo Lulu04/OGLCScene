@@ -46,14 +46,17 @@ private
   function MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
+public
+  procedure ReverseAngleOnSelection;
+  procedure ToogleScaledAndRotatedHandleOnSelection;
 private
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
 private
   procedure ProcessMouseUpForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-  procedure ProcessMouseDownForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+  procedure ProcessMouseDownForChild(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseMoveForChild(Shift: TShiftState; X, Y: Integer);
-  procedure ProcessMouseWheelForChild(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var {%H-}Handled: Boolean);
+  procedure ProcessMouseWheelForChild({%H-}Shift: TShiftState; {%H-}WheelDelta: Integer; {%H-}MousePos: TPoint; var {%H-}Handled: Boolean);
   procedure ProcessKeyUpForChild(var Key: Word; {%H-}Shift: TShiftState);
 private // collision body
   FBodyList: TBodyItemList;
@@ -73,8 +76,11 @@ public
   procedure ProcessKeyUpForCollisionBody(var Key: Word; {%H-}Shift: TShiftState);
   procedure AddNodeBetweenSelectedOnPolygon;
   function ConsecutiveNodeAreSelectedOnPolygon: boolean;
+
 private // posture
   FPostures: TPostureList;
+  procedure ProcessKeyUpForPostures(var Key: Word; {%H-}Shift: TShiftState);
+
 public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -288,6 +294,25 @@ begin
       Exit(True);
 end;
 
+procedure TScreenSpriteBuilder.ReverseAngleOnSelection;
+var i: integer;
+  a: single;
+begin
+  for i:=0 to High(FSelected) do begin
+    a := FSelected[i]^.surface.Angle.Value;
+    if a > 0 then a := a - 360 else a := a + 360;
+    FSelected[i]^.surface.Angle.Value := a;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ToogleScaledAndRotatedHandleOnSelection;
+var i: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.ToogleScaledAndRotatedHandle;
+end;
+
 procedure TScreenSpriteBuilder.LoopMoveSelection;
 var current, delta: TPointF;
 begin
@@ -296,7 +321,8 @@ begin
 
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
-    delta := current - ClickOrigin;
+    delta := (current - ClickOrigin);
+    ApplyMoveRestrictionOn(delta);
     if (delta.x <> 0) or (delta.y <> 0) then begin
       delta.x := delta.x / Zoom;
       delta.y := delta.y / Zoom;
@@ -319,9 +345,8 @@ begin
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
+    ApplyMoveRestrictionOn(delta);
     if (delta.x <> 0) or (delta.y <> 0) then begin
-     // delta.x := delta.x / Zoom;
-     // delta.y := delta.y / Zoom;
       AddOffsetToPivotOnSelection(delta);
       FrameToolsSpriteBuilder.Modified := True;
       FScene.DoLoop;
@@ -336,6 +361,7 @@ procedure TScreenSpriteBuilder.ProcessMouseUpForChild(Button: TMouseButton;
 var items: ArrayOfPSurfaceDescriptor;
 begin
   items := Surfaces.GetItemsAt(X, Y);
+
   case MouseState of
     msIdle: SelectNone;
 
@@ -363,7 +389,7 @@ begin
             if not items[0]^.Selected then begin
               SelectNone;
               AddOnlyTheFirstToSelected(items);
-            end else items[FAlternateOverlappedIndex]^.ToogleSelectedAndRotatedHandle;
+            end else items[FAlternateOverlappedIndex]^.ToogleScaledAndRotatedHandle;
             MouseState := msOverSurface;
           end;
         end;
@@ -411,6 +437,7 @@ var items: ArrayOfPSurfaceDescriptor;
 begin
   items := Surfaces.GetItemsAt(X, Y);
   thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
+
   case MouseState of
     msIdle: begin
       // mouse is over pivot handle ? (only one selected)
@@ -448,6 +475,10 @@ begin
     msMouseDownOnSurface: begin
       if items <> NIL then begin
         if thresholdDone then begin
+          if FAlternateOverlappedIndex >= Length(items) then begin
+            SelectNone;
+            FAlternateOverlappedIndex := 0;
+          end;
           if GetSelectedCount = 0 then AddToSelected([items[FAlternateOverlappedIndex]])
           else begin
             if not AlreadySelected([items[FAlternateOverlappedIndex]]) then begin
@@ -455,6 +486,7 @@ begin
               AddToSelected([items[FAlternateOverlappedIndex]]);
             end;
           end;
+          ComputeMoveRestriction(ClickOrigin, PointF(X,Y));
           LoopMoveSelection;
         end;
       end else MouseState := msIdle;
@@ -493,8 +525,10 @@ begin
     end;
 
     msMouseDownOnPivot: begin
-      if thresholdDone then
+      if thresholdDone then begin
+        ComputeMoveRestriction(ClickOrigin, PointF(X,Y));
         LoopMovePivotOnSelection;
+      end;
     end;
 
   end;
@@ -510,6 +544,18 @@ procedure TScreenSpriteBuilder.ProcessKeyUpForChild(var Key: Word; Shift: TShift
 begin
   case Key of
     VK_DELETE: DeleteSelection;
+
+    VK_R: begin
+     ToogleScaledAndRotatedHandleOnSelection;
+    end;
+
+
+    VK_Z: begin
+      if ssCtrl in Shift then
+        if ssShift in Shift then Surfaces.UndoRedoManager.Redo
+          else Surfaces.UndoRedoManager.Undo;
+      MouseState := msIdle;
+    end;
   end;
 end;
 
@@ -546,8 +592,12 @@ begin
   until MouseState <> msCreatingLine;
 
   if MouseState = msCancelShapeCreation then begin
+    // cancel the shape
     Bodies.DeleteItem(item);
     MouseState := msIdle;
+  end else begin
+    FrameToolsSpriteBuilder.Modified := True;
+    Bodies.UndoRedoManager.AddActionAddShape(item);
   end;
 end;
 
@@ -583,6 +633,9 @@ begin
   if MouseState = msCancelShapeCreation then begin
     Bodies.DeleteItem(item);
     MouseState := msIdle;
+  end else begin
+    FrameToolsSpriteBuilder.Modified := True;
+    Bodies.UndoRedoManager.AddActionAddShape(item);
   end;
 end;
 
@@ -616,6 +669,9 @@ begin
   if MouseState = msCancelShapeCreation then begin
     Bodies.DeleteItem(item);
     MouseState := msIdle;
+  end else begin
+    FrameToolsSpriteBuilder.Modified := True;
+    Bodies.UndoRedoManager.AddActionAddShape(item);
   end;
 end;
 
@@ -643,6 +699,8 @@ begin
         // close the path and exit
         item^.CloseThePolygon;
         MouseState := msIdle;
+        FrameToolsSpriteBuilder.Modified := True;
+        Bodies.UndoRedoManager.AddActionAddShape(item);
         exit;
       end;
 
@@ -661,23 +719,25 @@ begin
     end;
   until not(MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode]);
 
-  if MouseState = msEnterPressedOnPolygonCreation then begin
-    item^.SelectAllNodes;
-    MouseState := msidle;
-  end;
-
   if MouseState = msCancelShapeCreation then begin
     Bodies.DeleteItem(item);
     MouseState := msIdle;
+  end else begin
+    FrameToolsSpriteBuilder.Modified := True;
+    Bodies.UndoRedoManager.AddActionAddShape(item);
   end;
 end;
 
 procedure TScreenSpriteBuilder.LoopMoveNode;
 var current, delta: TPointF;
+  changed: boolean;
+  previousItemDescriptor: TOGLCBodyItem;
 begin
   if MouseState = msMovingNode then exit;
   MouseState := msMovingNode;
 
+  previousItemDescriptor.CopyFrom(FWorkingBody^.ItemDescriptor);
+  changed := False;
   repeat
     current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
     delta := current - ClickOrigin;
@@ -685,17 +745,22 @@ begin
     delta.y := delta.y / Zoom;
     if (delta.x <> 0) or (delta.y <> 0) then begin
       FWorkingBody^.UpdateSelectedNodePosition(delta);
-      FrameToolsSpriteBuilder.Modified := True;
       ClickOrigin := current;
+      changed := True;
     end;
     Application.ProcessMessages;
     FScene.DoLoop;
   until MouseState <> msMovingNode;
+
+  if changed then begin
+    FrameToolsSpriteBuilder.Modified := True;
+    Bodies.UndoRedoManager.AddActionModify(previousItemDescriptor, FWorkingBody);
+  end;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUpForCollisionBody(
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var items: ArrayOfPUIPointHandle;
+var items: ArrayOfPUINodeHandle;
   targetBody: PBodyItem;
 begin
   items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
@@ -744,7 +809,7 @@ end;
 
 procedure TScreenSpriteBuilder.ProcessMouseDownForCollisionBody(
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var items: ArrayOfPUIPointHandle;
+var items: ArrayOfPUINodeHandle;
   targetBody: PBodyItem;
 begin
   ClickOrigin := PointF(X, Y);
@@ -770,7 +835,7 @@ end;
 
 procedure TScreenSpriteBuilder.ProcessMouseMoveForCollisionBody(Shift: TShiftState; X, Y: Integer);
 var thresholdDone: Boolean;
-  items: ArrayOfPUIPointHandle;
+  items: ArrayOfPUINodeHandle;
   targetBody: PBodyItem;
 begin
   thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
@@ -804,7 +869,7 @@ end;
 
 procedure TScreenSpriteBuilder.ProcessMouseWheelForCollisionBody(
   Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-var items: ArrayOfPUIPointHandle;
+var items: ArrayOfPUINodeHandle;
   targetBody: PBodyItem;
 begin
   items := Bodies.GetItemAndNodesAt(PointF(MousePos), targetBody);
@@ -817,6 +882,7 @@ end;
 
 procedure TScreenSpriteBuilder.ProcessKeyUpForCollisionBody(var Key: Word; Shift: TShiftState);
 var item: PBodyItem;
+  previousItemDescriptor: TOGLCBodyItem;
 begin
   case Key of
     VK_DELETE: if Bodies.SelectedNodeBelongToTheSameShape then begin
@@ -824,25 +890,27 @@ begin
         if item^.AllNodesAreSelected then begin
           if QuestionDlg('','Delete the polygon?', mtWarning,
                       [mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
+            Bodies.UndoRedoManager.AddActionDelete(item);
             Bodies.DeleteItem(item);
             FrameToolsSpriteBuilder.Modified := True;
+            MouseState := msIdle;
           end;
         end else begin
+          previousItemDescriptor.CopyFrom(item^.ItemDescriptor);
           item^.DeleteSelectedNodes;
+          Bodies.UndoRedoManager.AddActionModify(previousItemDescriptor, item);
           FrameToolsSpriteBuilder.Modified := True;
+          MouseState := msIdle;
         end;
         exit;
       end;
       if QuestionDlg('','Delete the whole shape?',
                     mtWarning,[mrOk,'Delete', mrCancel, 'Cancel'], 0) = mrOk then begin
+        Bodies.UndoRedoManager.AddActionDelete(Bodies.GetFirstItemWithSelectedNode);
         Bodies.DeleteShapeWithSelectedNode;
         FrameToolsSpriteBuilder.Modified := True;
+        MouseState := msIdle;
       end;
-    end;
-
-    VK_RETURN: begin
-      if MouseState in [msCreatingPolygon, msWaitingForNextPolygonNode] then
-        MouseState := msEnterPressedOnPolygonCreation;
     end;
 
     VK_ESCAPE: begin
@@ -856,6 +924,13 @@ begin
       if MouseState in [msCreatingPolygon,msWaitingForNextPolygonNode] then begin
          MouseState := msBackPressedOnPolygonCreation;
       end;
+    end;
+
+    VK_Z: begin
+      if ssCtrl in Shift then
+        if ssShift in Shift then Bodies.UndoRedoManager.Redo
+          else Bodies.UndoRedoManager.Undo;
+      MouseState := msIdle;
     end;
   end;
 end;
@@ -871,6 +946,22 @@ begin
   if (FWorkingBody <> NIL) and (FWorkingBody^.BodyType = _btPolygon) then
     Result := FWorkingBody^.ConsecutiveNodeAreSelectedOnPolygon
   else Result := False;
+end;
+
+procedure TScreenSpriteBuilder.ProcessKeyUpForPostures(var Key: Word; Shift: TShiftState);
+begin
+  case Key of
+    VK_R: begin
+     ToogleScaledAndRotatedHandleOnSelection;
+    end;
+
+    VK_Z: begin
+      if ssCtrl in Shift then
+        if ssShift in Shift then Postures.UndoRedoManager.Redo
+          else Postures.UndoRedoManager.Undo;
+      MouseState := msIdle;
+    end;
+  end;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -917,6 +1008,9 @@ begin
 
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
     ProcessKeyUpForCollisionBody(Key, Shift);
+
+  if FrameToolsSpriteBuilder.SelectedTabIsPosture then
+    ProcessKeyUpForPostures(Key, Shift);
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseWheel(Shift: TShiftState;
@@ -990,12 +1084,15 @@ end;
 procedure TScreenSpriteBuilder.FreeObjects;
 begin
   SelectNone;
+  FTextures.Clear;
+  FSurfaces.Clear;
+  FBodyList.Clear;
+  FPostures.Clear;
 end;
 
 procedure TScreenSpriteBuilder.Initialize;
 begin
   FTextures := TTextureList.Create;
-  FrameToolsSpriteBuilder.TextureUndoRedoManager.ParentTexturelist := FTextures;
 
   FSurfaces := TSpriteBuilderSurfaceList.Create;
   FSurfaces.WorkingLayer := LAYER_SPRITEBUILDER;
