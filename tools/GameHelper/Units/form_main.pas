@@ -147,6 +147,7 @@ begin
     FScene.RunScreen(ScreenSpriteBank);
     Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
     FrameToolsSpriteBank.OnShow;
+    UpdateWidgets;
   end;
 
   if Sender = BSpriteBuilder then begin
@@ -154,6 +155,7 @@ begin
     Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
     FrameToolsSpriteBuilder.OnShow;
     //FormToolsBuilder.Show;
+    UpdateWidgets;
   end;
 end;
 
@@ -256,7 +258,8 @@ end;
 
 procedure TFormMain.UpdateWidgets;
 begin
-
+  BSpriteBank.Enabled := False;
+  BSpriteBuilder.Enabled := Notebook1.PageIndex <> Notebook1.IndexOf(PageSpriteBuilder);
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
@@ -264,6 +267,7 @@ begin
   Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
   FrameToolsSpriteBank.OnShow;
   FScene.RunScreen(ScreenSpriteBank);
+  UpdateWidgets;
 end;
 
 procedure TFormMain.ShowPageSpriteBuilder;
@@ -271,6 +275,7 @@ begin
   Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
   FrameToolsSpriteBuilder.OnShow;
   FScene.RunScreen(ScreenSpriteBuilder);
+  UpdateWidgets;
 end;
 
 procedure TFormMain.EditSpriteInSpriteBank(const aName: string);

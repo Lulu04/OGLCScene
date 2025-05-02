@@ -28,8 +28,8 @@ private
   FBodies: TBodyItemList;
   FPostures: TPosturelist;
 private
-{public
-  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+public
+{  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessOnKeyUp(var Key: Word; Shift: TShiftState); override; }

@@ -29,8 +29,8 @@ public
   property Selected: boolean read GetSelected write SetSelected;
 end;
 PUINodeHandle = ^TUINodeHandle;
-ArrayOfPUIPointHandle = array of PUINodeHandle;
-ArrayOfUIPointHandle = array of TUINodeHandle;
+ArrayOfPUINodeHandle = array of PUINodeHandle;
+ArrayOfUINodeHandle = array of TUINodeHandle;
 
 { TBodyItem }
 
@@ -42,9 +42,10 @@ private
   procedure SetBodyType(AValue: TOGLCBodyItemType);
   procedure UpdateNodesPosition;
 public
+  ID: integer;
   Outline: TShapeOutline;
   ItemDescriptor: TOGLCBodyItem;
-  Pts: ArrayOfUIPointHandle;
+  Pts: ArrayOfUINodeHandle;
   ParentSurface: TSimpleSurfaceWithEffect;
   PolygonIsClosed: boolean;
   procedure InitDefault;
@@ -64,7 +65,7 @@ public
 
   procedure SelectAllNodes;
   procedure UnselectAllNodes;
-  function GetNodesAt(aWorldPt: TPointF): ArrayOfPUIPointHandle;
+  function GetNodesAt(aWorldPt: TPointF): ArrayOfPUINodeHandle;
   procedure UpdateSelectedNodePosition(aWolrdOffset: TPointF);
   function SomeNodesAreSelected: boolean;
   function AllNodesAreSelected: boolean;
@@ -84,25 +85,43 @@ public
 end;
 PBodyItem = ^TBodyItem;
 
+{$define _INTERFACE}
+{$I u_collisionbody_undoredo.inc}
+{$undef _INTERFACE}
+
 { TBodyItemList }
 
 TBodyItemList = class(specialize TVector<TBodyItem>)
+private
+  FUndoRedoManager: TBodyUndoRedoManager;
+  FID: integer;
+  function NextID: integer;
+public
+  constructor Create;
   destructor Destroy; override;
 
   procedure Clear; reintroduce;
   function AddEmpty: PBodyItem;
 
+  function GetItemByID(aID: integer): PBodyItem;
+
   procedure UpdateNodesPosition;
   procedure UnselectAllNodes;
-  function GetItemAndNodesAt(aWorldPt: TPointF; out aBody: PBodyItem): ArrayOfPUIPointHandle;
+  function GetItemAndNodesAt(aWorldPt: TPointF; out aBody: PBodyItem): ArrayOfPUINodeHandle;
 
   function SelectedNodeBelongToTheSameShape: boolean;
 
   function SelectedNodesBelongToSinglePolygon(out aPolygon: PBodyItem): boolean;
-  //function SelectedNodes
+  function GetFirstItemWithSelectedNode: PBodyItem;
 
   procedure DeleteShapeWithSelectedNode;
   procedure DeleteItem(aItem: PBodyItem);
+
+  procedure DeleteByID(aID: integer);
+
+  // called by undo/redo manager
+  procedure CreateItemByDescriptor(const aDescriptor: TOGLCBodyItem; aId: integer);
+  procedure ReplaceNodes(const aDescriptor: TOGLCBodyItem; aId: integer);
 
   procedure SetParentSurface(aSurface: TSimpleSurfaceWithEffect);
 
@@ -110,31 +129,19 @@ TBodyItemList = class(specialize TVector<TBodyItem>)
   procedure LoadFromString(const s: string);
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
+
+  property UndoRedoManager: TBodyUndoRedoManager read FUndoRedoManager;
 end;
 
 
-type
-TCBodyUndoRedoActionType = (
-                           cburatUndefined
-                           );
-TCBodyUndoRedoItem = record
-  action: TCBodyUndoRedoActionType;
-  ItemDescriptor: TOGLCBodyItem;
-end;
-
-{ TTextureUndoRedoManager }
-
-{ TCBodyUndoRedoManager }
-
-TCBodyUndoRedoManager = class(specialize TGenericUndoRedoManager<TCBodyUndoRedoItem>)
-  ParentCBodylist: TBodyItemList;
-  procedure ProcessUndo(var aItem: TCBodyUndoRedoItem); override;
-  procedure ProcessRedo(var aItem: TCBodyUndoRedoItem); override;
-end;
 
 implementation
 
-uses u_common, u_ui_atlas, BGRAPath;
+uses u_common, u_ui_atlas, u_screen_spritebuilder, BGRAPath;
+
+{$define _IMPLEMENTATION}
+{$I u_collisionbody_undoredo.inc}
+{$undef _IMPLEMENTATION}
 
 { TUINodeHandle }
 
@@ -381,11 +388,12 @@ begin
     Pts[i].Selected := False;
 end;
 
-function TBodyItem.GetNodesAt(aWorldPt: TPointF): ArrayOfPUIPointHandle;
+function TBodyItem.GetNodesAt(aWorldPt: TPointF): ArrayOfPUINodeHandle;
 var i: integer;
 begin
   Result := NIL;
   if Length(Pts) = 0 then exit;
+FScene.LogDebug('TBodyItem.GetNodesAt: Pts length ='+Length(Pts).ToString);
   for i:=0 to High(Pts) do
     if Pts[i].IsOver(aWorldPt) then begin
       SetLength(Result, Length(Result)+1);
@@ -683,9 +691,24 @@ end;
 
 { TBodyItemList }
 
+function TBodyItemList.NextID: integer;
+begin
+  inc(FID);
+  Result := FID;
+end;
+
+constructor TBodyItemList.Create;
+begin
+  inherited Create;
+  FUndoRedoManager := TBodyUndoRedoManager.Create;
+  FUndoRedoManager.ParentBodylist := Self;
+end;
+
 destructor TBodyItemList.Destroy;
 begin
   Clear;
+  FUndoRedoManager.Free;
+  FUndoRedoManager := NIL;
   inherited Destroy;
 end;
 
@@ -696,14 +719,29 @@ begin
     for i:=0 to Size-1 do
       Mutable[i]^.KillSprites;
   inherited Clear;
+  FUndoRedoManager.Clear;
+  FID := 0;
 end;
 
 function TBodyItemList.AddEmpty: PBodyItem;
 var o: TBodyItem;
 begin
   o.InitDefault;
+  o.ID := NextID;
   PushBack(o);
   Result := Mutable[Size-1];
+end;
+
+function TBodyItemList.GetItemByID(aID: integer): PBodyItem;
+var i: SizeUInt;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.ID = aID then begin
+      Result := Mutable[i];
+      exit;
+    end;
 end;
 
 procedure TBodyItemList.UpdateNodesPosition;
@@ -754,6 +792,18 @@ begin
   if not Result then aPolygon := NIL;
 end;
 
+function TBodyItemList.GetFirstItemWithSelectedNode: PBodyItem;
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.SomeNodesAreSelected then begin
+      Result := Mutable[i];
+      exit;
+    end;
+  Result := NIL;
+end;
+
 procedure TBodyItemList.DeleteShapeWithSelectedNode;
 var i: SizeUInt;
 begin
@@ -778,6 +828,103 @@ begin
     end;
 end;
 
+procedure TBodyItemList.DeleteByID(aID: integer);
+var i: SizeUInt;
+begin
+FScene.LogDebug('TBodyItemList.DeleteByID');
+FScene.LogDebug('BEFORE deletion size = '+Size.tostring);
+for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.ID = aID then begin
+      Mutable[i]^.KillSprites;
+      Erase(i);
+//      exit;
+    end;
+FScene.LogDebug('AFTER deletion size = '+Size.tostring);
+for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+end;
+
+procedure TBodyItemList.CreateItemByDescriptor(const aDescriptor: TOGLCBodyItem; aId: integer);
+var o: TBodyItem;
+  i: integer;
+debug: PBodyItem;
+begin
+FScene.LogDebug('TBodyItemList.CreateItemByDescriptor');
+FScene.LogDebug('BEFORE creation size = '+Size.tostring);
+for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+  o.InitDefault;
+  o.ID := aID;
+  o.ItemDescriptor.BodyType := aDescriptor.BodyType;
+  o.ParentSurface := ScreenSpriteBuilder.Surfaces.GetRootItem^.surface;
+  case aDescriptor.BodyType of
+    _btLine: begin
+      o.UpdateAsLine(o.ParentSurface.SurfaceToScene(aDescriptor.pt1),
+                     o.ParentSurface.SurfaceToScene(aDescriptor.pt2));
+    end;
+    _btCircle: begin
+      o.UpdateAsCircle(o.ParentSurface.SurfaceToScene(aDescriptor.center),
+                       o.ParentSurface.SurfaceToScene(aDescriptor.center+PointF(aDescriptor.radius,0)));
+    end;
+    _btRect: begin
+      o.UpdateAsRectangle(o.ParentSurface.SurfaceToScene(aDescriptor.rect.TopLeft),
+                          o.ParentSurface.SurfaceToScene(aDescriptor.rect.BottomRight));
+    end;
+    _btPolygon: begin
+      for i:=0 to High(aDescriptor.pts) do begin
+        o.UpdateAsPolygon(o.ParentSurface.SurfaceToScene(aDescriptor.pts[i]));
+      end;
+    end;
+    else raise exception.Create('forgot to implement!');
+  end;//case
+  PushBack(o);
+debug:=mutable[size-1];
+FScene.LogDebug('TBodyItemList.CreateItemByDescriptor: item created at index '+(size-1).tostring+' with Pts length='+Length(debug^.Pts).tostring);
+FScene.LogDebug('AFTER creation size = '+Size.tostring);
+for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+end;
+
+procedure TBodyItemList.ReplaceNodes(const aDescriptor: TOGLCBodyItem; aId: integer);
+var o: PBodyItem;
+  i: integer;
+begin
+  o := GetItemByID(aID);
+  case o^.BodyType of
+    _btLine: begin
+      o^.ItemDescriptor.pt1 := aDescriptor.pt1;
+      o^.ItemDescriptor.pt2 := aDescriptor.pt2;
+      o^.UpdateNodesPosition;
+    end;
+    _btCircle: begin
+      o^.ItemDescriptor.center := aDescriptor.center;
+      o^.ItemDescriptor.radius:= aDescriptor.radius;
+      o^.ItemDescriptor.pt1 := aDescriptor.pt1;
+      o^.UpdateNodesPosition;
+    end;
+    _btRect: begin
+      o^.ItemDescriptor.rect.TopLeft := aDescriptor.rect.TopLeft;
+      o^.ItemDescriptor.rect.BottomRight := aDescriptor.rect.BottomRight;
+      o^.UpdateNodesPosition;
+    end;
+    _btPolygon: begin
+      o^.ItemDescriptor.pts := Copy(aDescriptor.pts);
+      if Length(aDescriptor.pts) > Length(o^.Pts) then begin
+        i := Length(o^.Pts);
+        SetLength(o^.Pts, Length(aDescriptor.pts));
+        while i < High(o^.Pts) do begin
+          o^.Pts[i].CreateSprite;
+          inc(i);
+        end;
+      end else if Length(aDescriptor.pts) < Length(o^.Pts) then begin
+        for i:=High(o^.Pts) downto Length(aDescriptor.pts) do
+          o^.Pts[i].KillSprite;
+      end;
+      o^.UpdateNodesPosition;
+    end;
+    else raise exception.Create('forgot to implement!');
+  end;//case
+end;
+
 procedure TBodyItemList.SetParentSurface(aSurface: TSimpleSurfaceWithEffect);
 var i: SizeUInt;
 begin
@@ -787,14 +934,15 @@ begin
   UpdateNodesPosition;
 end;
 
-function TBodyItemList.GetItemAndNodesAt(aWorldPt: TPointF; out aBody: PBodyItem): ArrayOfPUIPointHandle;
+function TBodyItemList.GetItemAndNodesAt(aWorldPt: TPointF; out aBody: PBodyItem): ArrayOfPUINodeHandle;
 var i: SizeUInt;
 begin
   Result := NIL;
   aBody := NIL;
+FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: Size='+Size.ToString);
   if Size = 0 then exit;
-
   for i:=0 to Size-1 do begin
+FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: checking item index '+i.tostring+' with Pts Length='+Length(Mutable[i]^.Pts).tostring);
     Result := Mutable[i]^.GetNodesAt(aWorldPt);
     if Length(Result) > 0 then begin
       aBody := Mutable[i];
@@ -833,6 +981,7 @@ begin
   for i:=0 to c-1 do
     if prop.StringValueOf('Body'+i.ToString, s1, '') then begin
       o.LoadFromString(s1);
+      o.ID := NextID;
       PushBack(o);
     end;
 end;
@@ -851,18 +1000,6 @@ begin
   k := t.IndexOf(SPRITE_BUILDER_COLLISION_SECTION);
   if (k = -1) or (k = t.Count-1) then exit;
   LoadFromString(t.Strings[k+1]);
-end;
-
-{ TCBodyUndoRedoManager }
-
-procedure TCBodyUndoRedoManager.ProcessUndo(var aItem: TCBodyUndoRedoItem);
-begin
-
-end;
-
-procedure TCBodyUndoRedoManager.ProcessRedo(var aItem: TCBodyUndoRedoItem);
-begin
-
 end;
 
 end.

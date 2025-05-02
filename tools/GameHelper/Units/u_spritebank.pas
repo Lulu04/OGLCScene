@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils,
   OGLCScene, gvector,
-  u_surface_list, u_undo_redo;
+  u_undo_redo;
 
 type
 

@@ -20,8 +20,11 @@ type
     BAddTexture: TSpeedButton;
     BAddToSpriteBank: TSpeedButton;
     BChooseImageFile: TSpeedButton;
+    BDeleteBody: TSpeedButton;
     BDeleteTexture: TSpeedButton;
     BDeletePosture: TSpeedButton;
+    BBodyRedo: TSpeedButton;
+    BBodyUndo: TSpeedButton;
     BRectangle: TSpeedButton;
     BCircle: TSpeedButton;
     BNewChild: TSpeedButton;
@@ -74,6 +77,7 @@ type
     Panel1: TPanel;
     Panel10: TPanel;
     Panel11: TPanel;
+    Panel12: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -103,6 +107,7 @@ type
     PagePostures: TTabSheet;
     BAddPostureToList: TSpeedButton;
     BUpdateposture: TSpeedButton;
+    BReverseAngle: TSpeedButton;
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
@@ -119,7 +124,6 @@ type
     procedure MIAddNodeClick(Sender: TObject);
     procedure PC1Change(Sender: TObject);
   private // textures
-    FTextureUndoRedoManager: TTextureUndoRedoManager;
     FInitializingWidget: boolean;
     procedure UpdateTextureWidgetState;
     function LBToTextureName: string;
@@ -138,13 +142,13 @@ type
     procedure DoUpdateChild;
   private // postures
     FPostureTabIsActive: boolean;
-    FPostureUndoRedoManager: TPostureUndoRedoManager;
     function LBSelectedToName: string;
     procedure UpdatePostureWidgetState;
     procedure DoAddposture;
     procedure DoUpdatePosture;
     procedure DoRenamePosture;
     procedure DoDeletePosture;
+    procedure DoReverseAngleOnPosture;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
@@ -156,8 +160,6 @@ type
   private
     FModified: boolean;
   public
-    constructor Create(aOwner: TComponent); override;
-    destructor Destroy; override;
     procedure OnShow;
     procedure FillListBoxTextureNames;
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
@@ -168,7 +170,6 @@ type
     function SelectedTabIsCollisionBody: boolean;
     function SelectedTabIsPosture: boolean;
 
-    property TextureUndoRedoManager: TTextureUndoRedoManager read FTextureUndoRedoManager write FTextureUndoRedoManager;
     property Modified: boolean read FModified write FModified;
   end;
 
@@ -199,7 +200,7 @@ begin
     if i = -1 then exit;
     item := Textures.GetItemByName(LBTextureNames.Items.Strings[i]);
     if item = NIL then exit;
-    TextureUndoRedoManager.AddActionModifyTexture(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
+    Textures.UndoRedoManager.AddActionModifyTexture(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
                     CheckBox1.Checked, SE11.Value, SE12.Value);
     Textures.Update(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
                     CheckBox1.Checked, SE11.Value, SE12.Value);
@@ -219,12 +220,12 @@ begin
   end;
 
   if Sender = BTextureUndo then begin
-    TextureUndoRedoManager.Undo;
+    Textures.UndoRedoManager.Undo;
     UpdateTextureWidgetState;
   end;
 
   if Sender = BTextureRedo then begin
-    TextureUndoRedoManager.Redo;
+    Textures.UndoRedoManager.Redo;
     UpdateTextureWidgetState;
   end;
 
@@ -306,12 +307,17 @@ begin
   o^.collisionbodies := Bodies.SaveToString;
   o^.postures := Postures.SaveToString;
 
+  Project.SetModified;
+
   DoClearAll;
   FormMain.ShowPageSpriteBank;
 end;
 
 procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
 begin
+  if Sender = BReverseAngle then
+    DoReverseAngleOnPosture;
+
   if Sender = BAddPostureToList then
     DoAddposture;
 
@@ -325,12 +331,12 @@ begin
     DoRenamePosture;
 
   if Sender = BPostureUndo then begin
-    FPostureUndoRedoManager.Undo;
+    Postures.UndoRedoManager.Undo;
     UpdatePostureWidgetState;
   end;
 
   if Sender = BPostureRedo then begin
-    FPostureUndoRedoManager.Redo;
+    Postures.UndoRedoManager.Redo;
     UpdatePostureWidgetState;
   end;
 
@@ -510,8 +516,8 @@ begin
   SE12.Enabled := CheckBox1.Checked;
 
   BDeleteTexture.Enabled := LBTextureNames.ItemIndex <> -1;
-  BTextureUndo.Enabled := FTextureUndoRedoManager.CanUndo;
-  BTextureRedo.Enabled := FTextureUndoRedoManager.CanRedo;
+  BTextureUndo.Enabled := Textures.UndoRedoManager.CanUndo;
+  BTextureRedo.Enabled := Textures.UndoRedoManager.CanRedo;
 end;
 
 procedure TFrameToolsSpriteBuilder.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
@@ -594,6 +600,8 @@ end;
 
 procedure TFrameToolsSpriteBuilder.DoUpdateChild;
 var recreateSurface: Boolean;
+  childs: array of TSimpleSurfaceWithEffect;
+  i: integer;
 begin
   if FWorkingChild = NIL then exit;
 
@@ -610,11 +618,23 @@ begin
   FWorkingChild^.name := Trim(Edit5.Text);
 
   if recreateSurface then begin
+    // keep the childs of the surface to kill
+    childs := NIL;
+    if FWorkingChild^.surface <> NIL then begin
+      SetLength(childs, FWorkingChild^.surface.ChildCount);
+      for i:=FWorkingChild^.surface.ChildCount-1 downto 0 do begin
+        childs[i] := FWorkingChild^.surface.Childs[i];
+        FWorkingChild^.surface.RemoveChild(childs[i]);
+      end;
+    end;
     // create a new surface
     FWorkingChild^.KillSurface;
     FWorkingChild^.classtype := CBToClassType;
     FWorkingChild^.textureName := CBToTextureName;
     FWorkingChild^.CreateSurface;
+    // restore the childs
+    for i:=0 to High(childs) do
+      childs[i].SetChildOf(FWorkingChild^.surface, childs[i].ZOrderAsChild);
     // set child dependency
     FWorkingChild^.parentID := CBToParentID;
     FWorkingChild^.zOrder := SE8.Value;
@@ -623,6 +643,9 @@ begin
   end;
 
   UpdateValuesToWorkingSurface;
+
+  // in case the name was changed, we update the combobox parent
+  Surfaces.ReplaceNameInComboBox(CBParent);
 end;
 
 function TFrameToolsSpriteBuilder.LBSelectedToName: string;
@@ -637,8 +660,8 @@ procedure TFrameToolsSpriteBuilder.UpdatePostureWidgetState;
 var s: string;
 begin
   BDeletePosture.Enabled := LBPostureNames.ItemIndex <> -1;
-  BPostureUndo.Enabled := FPostureUndoRedoManager.CanUndo;
-  BPostureRedo.Enabled := FPostureUndoRedoManager.CanRedo;
+  BPostureUndo.Enabled := Postures.UndoRedoManager.CanUndo;
+  BPostureRedo.Enabled := Postures.UndoRedoManager.CanRedo;
   s := Trim(Edit3.Text);
   BAddPostureToList.Enabled := (Surfaces.Size > 0) and
                                (s <> '') and not Postures.NameAlreadyExists(s);
@@ -659,7 +682,7 @@ begin
   item^.name := nam;
   item^.TakeValuesFrom(Surfaces);
 
-  FPostureUndoRedoManager.AddActionAddPosture(item);
+  Postures.UndoRedoManager.AddActionAddPosture(item);
 
   LBPostureNames.ItemIndex := LBPostureNames.Items.Add(item^.name);
   Edit3.Text := '';
@@ -687,7 +710,7 @@ begin
                [mrOk, 'Replace', mrCancel, 'Cancel'], 0) = mrCancel then exit;
 
   // construct the undo/redo item
-  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem := Postures.UndoRedoManager.AddEmpty;
   undoredoItem^.action := puratModifyPosture;
   undoredoItem^.data.name := item^.name;
   undoredoItem^.data.Values := Copy(item^.Values);
@@ -714,16 +737,16 @@ begin
   if newName = oldName then exit;
 
   // construct the undo/redo item
-  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem := Postures.UndoRedoManager.AddEmpty;
   undoredoItem^.action := puratRenamePosture;
   undoredoItem^.data.name := oldName;
   undoredoItem^.newData.name := newName;
 
   Postures.GetItemByName(oldName)^.name := newName;
-  //FPostureUndoRedoManager.AddActionRenamePosture(i, oldName);
   LBPostureNames.Items.Strings[i] := newName;
   Modified := True;
-  UpdatePostureWidgetState;  end;
+  UpdatePostureWidgetState;
+end;
 
 procedure TFrameToolsSpriteBuilder.DoDeletePosture;
 var i: Integer;
@@ -736,7 +759,7 @@ begin
   if item = NIL then exit;
 
   // construct the undo/redo item
-  undoredoItem := FPostureUndoRedoManager.AddEmpty;
+  undoredoItem := Postures.UndoRedoManager.AddEmpty;
   undoredoItem^.action := puratDeletePosture;
   undoredoItem^.ListBoxitemIndexWhenDeleted := i;
   undoredoItem^.data.name := item^.name;
@@ -744,6 +767,30 @@ begin
 
   Postures.DeleteItemByName(LBPostureNames.Items.Strings[i]);
   LBPostureNames.Items.Delete(i);
+  Modified := True;
+  UpdatePostureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.DoReverseAngleOnPosture;
+var i: integer;
+  item: PPostureItem;
+  undoredoItem: PPostureUndoRedoItem;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+  item := Postures.GetItemByName(LBPostureNames.Items.Strings[i]);
+  if item = NIL then exit;
+
+  ScreenSpriteBuilder.ReverseAngleOnSelection;
+  // construct the undo/redo item
+  undoredoItem := Postures.UndoRedoManager.AddEmpty;
+  undoredoItem^.action := puratModifyPosture;
+  undoredoItem^.data.name := item^.name;
+  undoredoItem^.data.Values := Copy(item^.Values);
+  undoredoItem^.newData.name := item^.name;
+  undoredoItem^.newData.TakeValuesFrom(Surfaces);
+
+  item^.TakeValuesFrom(Surfaces);
   Modified := True;
   UpdatePostureWidgetState;
 end;
@@ -779,7 +826,7 @@ begin
   LBTextureNames.ItemIndex := LBTextureNames.Items.Add(texName);
   UpdateTextureWidgetState;
 
-  TextureUndoRedoManager.AddActionAddTexture(texName);
+  Textures.UndoRedoManager.AddActionAddTexture(texName);
   Textures.FillComboBox(CBTextures); // refresh the combobox in childs page
   FModified := True;
 end;
@@ -796,9 +843,10 @@ begin
     exit;
   end;
 
-  TextureUndoRedoManager.AddActionDeleteTexture(textureName);
+  Textures.UndoRedoManager.AddActionDeleteTexture(textureName);
   Textures.DeleteByName(textureName);
   LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
+  Textures.FillComboBox(CBTextures);
 
   FModified := True;
 end;
@@ -849,6 +897,7 @@ begin
   Surfaces.Clear;
   Textures.Clear;
   Bodies.Clear;
+  Postures.Clear;
 
   CBTextures.Clear;
   Edit5.Text := '';
@@ -862,22 +911,6 @@ begin
 
   PC1.PageIndex := PC1.IndexOf(PageTextures);
   FInitializingWidget := False;
-end;
-
-constructor TFrameToolsSpriteBuilder.Create(aOwner: TComponent);
-begin
-  inherited Create(aOwner);
-  FTextureUndoRedoManager := TTextureUndoRedoManager.Create;
-  FPostureUndoRedoManager := TPostureUndoRedoManager.Create;
-end;
-
-destructor TFrameToolsSpriteBuilder.Destroy;
-begin
-  FTextureUndoRedoManager.Free;
-  FTextureUndoRedoManager := NIL;
-  FPostureUndoRedoManager.Free;
-  FPostureUndoRedoManager := NIL;
-  inherited Destroy;
 end;
 
 procedure TFrameToolsSpriteBuilder.OnShow;

@@ -29,13 +29,19 @@ TTextureItem = record
 end;
 PTextureItem = ^TTextureItem;
 
+{$define _INTERFACE}
+{$I u_texture_undoredo.inc}
+{$undef _INTERFACE}
+
 { TTextureList }
 
 TTextureList = class(specialize TVector<TTextureItem>)
 private
+  FUndoRedoManager: TTextureUndoRedoManager;
   procedure DoUpdate(aItem: PTextureItem; const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
                     aFrameWidth, aFrameHeight: integer);
 public
+  constructor Create;
   destructor Destroy; override;
   procedure Clear; reintroduce;
   procedure Add(const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
@@ -57,38 +63,17 @@ public
 
   procedure FillComboBox(aCB: TComboBox);
   procedure FillListBox(aLB: TListBox);
-end;
 
-
-type
-TTextureUndoRedoActionType = (
-                           turatUndefined,
-                           turatAddTexture,
-                           turatDeleteTexture,
-                           turatModifyTexture
-                          );
-TTextureUndoRedoItem = record
-  action: TTextureUndoRedoActionType;
-  data: TTextureItem;
-  newData: TTextureItem;
-end;
-
-{ TTextureUndoRedoManager }
-
-TTextureUndoRedoManager = class(specialize TGenericUndoRedoManager<TTextureUndoRedoItem>)
-  ParentTexturelist: TTextureList;
-  procedure ProcessUndo(var aItem: TTextureUndoRedoItem); override;
-  procedure ProcessRedo(var aItem: TTextureUndoRedoItem); override;
-
-  procedure AddActionAddTexture(const aName: string);
-  procedure AddActionDeleteTexture(const aName: string);
-  procedure AddActionModifyTexture(aItem: PTextureItem; const aFilename, aName: string;
-                  aWidth, aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
+  property UndoRedoManager: TTextureUndoRedoManager read FUndoRedoManager;
 end;
 
 implementation
 
 uses u_common, form_main;
+
+{$define _IMPLEMENTATION}
+{$I u_texture_undoredo.inc}
+{$undef _IMPLEMENTATION}
 
 { TTextureItem }
 
@@ -157,9 +142,18 @@ begin
   aItem^.CreateTexture;
 end;
 
+constructor TTextureList.Create;
+begin
+  inherited Create;
+  FUndoRedoManager := TTextureUndoRedoManager.Create;
+  FUndoRedoManager.ParentTexturelist := Self;
+end;
+
 destructor TTextureList.Destroy;
 begin
   Clear;
+  FUndoRedoManager.Free;
+  FUndoRedoManager := NIL;
   inherited Destroy;
 end;
 
@@ -170,6 +164,7 @@ begin
     for i:=0 to Size-1 do
       FScene.TexMan.Delete(Mutable[i]^.texture);
   inherited Clear;
+  FUndoRedoManager.Clear;
 end;
 
 procedure TTextureList.Add(const aFilename, aName: string; aWidth, aHeight: integer;
@@ -236,6 +231,7 @@ procedure TTextureList.DeleteByName(const aName: string);
 var i: integer;
 begin
   i := GetItemIndexByName(aName);
+  if i = -1 then raise exception.create('item name "'+aName+'" not found!');
   Mutable[i]^.FreeTexture;
   Erase(i);
 end;
@@ -313,105 +309,6 @@ begin
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aLB.Items.Add(Mutable[i]^.name);
-end;
-
-{ TTextureUndoRedoManager }
-
-procedure TTextureUndoRedoManager.ProcessUndo(var aItem: TTextureUndoRedoItem);
-var i: integer;
-  item: PTextureItem;
-begin
-  case aItem.Action of
-    turatAddTexture: begin
-      ParentTexturelist.DeleteByName(aItem.data.name);
-      i := FrameToolsSpriteBuilder.LBTextureNames.Items.IndexOf(aItem.data.name);
-      if i <> -1 then FrameToolsSpriteBuilder.LBTextureNames.Items.Delete(i);
-    end;
-
-    turatDeleteTexture: begin
-      ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
-                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
-      FrameToolsSpriteBuilder.LBTextureNames.Items.Add(aItem.data.name);
-    end;
-
-    turatModifyTexture: begin
-      item := ParentTexturelist.GetItemByName(aItem.newData.name);
-      ParentTexturelist.Update(item, aItem.data.filename, aItem.data.name, aItem.data.width,
-                 aItem.data.height, aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
-   {   ExchangeString(aItem.data.filename, aItem.newData.filename);
-      ExchangeString(aItem.data.name, aItem.newData.name);
-      ExchangeInteger(aItem.data.width, aItem.newData.width);
-      ExchangeInteger(aItem.data.height, aItem.newData.height);
-      ExchangeBoolean(aItem.data.isMultiFrame, aItem.newData.isMultiFrame);
-      ExchangeInteger(aItem.data.frameWidth, aItem.newData.frameWidth);
-      ExchangeInteger(aItem.data.frameHeight, aItem.newData.frameHeight); }
-    end;
-  end;
-end;
-
-procedure TTextureUndoRedoManager.ProcessRedo(var aItem: TTextureUndoRedoItem);
-var i: Integer;
-  item: PTextureItem;
-begin
-  case aItem.Action of
-    turatAddTexture: begin
-      ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
-                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
-      FrameToolsSpriteBuilder.LBTextureNames.Items.Add(aItem.data.name);
-    end;
-
-    turatDeleteTexture: begin
-      ParentTexturelist.DeleteByName(aItem.data.name);
-      i := FrameToolsSpriteBuilder.LBTextureNames.Items.IndexOf(aItem.data.name);
-      if i <> -1 then FrameToolsSpriteBuilder.LBTextureNames.Items.Delete(i);
-    end;
-
-    turatModifyTexture: begin
-      item := ParentTexturelist.GetItemByName(aItem.data.name);
-      ParentTexturelist.Update(item, aItem.newData.filename, aItem.newData.name, aItem.newData.width,
-                               aItem.newData.height, aItem.newData.isMultiFrame,
-                               aItem.newData.frameWidth, aItem.newData.frameHeight);
-    end;
-  end;
-end;
-
-procedure TTextureUndoRedoManager.AddActionAddTexture(const aName: string);
-var o: TTextureUndoRedoItem;
-begin
-  o.action := turatAddTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
-  o.data := ParentTexturelist.GetItemByName(aName)^;
-  AddItem(o);
-end;
-
-procedure TTextureUndoRedoManager.AddActionDeleteTexture(const aName: string);
-var o: TTextureUndoRedoItem;
-begin
-  o.action := turatDeleteTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
-  o.data := ParentTexturelist.GetItemByName(aName)^;
-  AddItem(o);
-end;
-
-procedure TTextureUndoRedoManager.AddActionModifyTexture(aItem: PTextureItem;
-  const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
-  aFrameWidth, aFrameHeight: integer);
-var o: TTextureUndoRedoItem;
-begin
-  o.action := turatModifyTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
-  o.data := aItem^;
-  o.newData.filename := aFilename;
-  o.newData.name := aName;
-  o.newData.width := aWidth;
-  o.newData.height := aHeight;
-  o.newData.isMultiFrame := aIsFramed;
-  o.newData.frameWidth := aFrameWidth;
-  o.newData.frameHeight := aFrameHeight;
-  AddItem(o);
 end;
 
 end.

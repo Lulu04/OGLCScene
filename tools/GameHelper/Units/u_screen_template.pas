@@ -51,7 +51,6 @@ TMouseState = ( msIdle,
                 msMouseDownOnToolPolygon,
                 msCreatingPolygon,
                 msWaitingForNextPolygonNode,
-                msEnterPressedOnPolygonCreation,
                 msBackPressedOnPolygonCreation,
 
                 msCancelShapeCreation  // used when user pess ESCAPE while creating a collision shape
@@ -71,6 +70,7 @@ private
 private
   FMouseState: TMouseState;
   FClickOrigin: TPointF;
+  FMoveRestriction: TPointF;
   procedure SetMouseState(AValue: TMouseState);
 public // callback from main form and openglcontrol to manage mouse and keyboard on the view
   procedure ProcessMouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer); virtual;
@@ -88,18 +88,21 @@ public // camera
 public // layers
   // show only the specified layers and hide the other
   procedure ShowLayers(const aLayerIndexList: array of integer);
-public // mouse and keyboardinteraction on view
+public // mouse and keyboard interaction on view
   function TransformCoor(aControlPt: TPointF): TPointF;
+  procedure ComputeMoveRestriction(aPtOrigin, aPtNew: TPointF);
+  procedure ApplyMoveRestrictionOn(var aPt: TPointF);
   property MouseState: TMouseState read FMouseState write SetMouseState;
   property ClickOrigin: TPointF read FClickOrigin write FClickOrigin;
   property SpacePressed: boolean read FSpacePressed;
   property CtrlPressed: boolean read FCtrlPressed;
+  property MoveRestriction: TPointF read FMoveRestriction;
 public
   procedure AddToSpriteBank;
 end;
 
 implementation
-uses LCLType, Controls, Math, u_common, form_main, u_ui_atlas;
+uses LCLType, Controls, Math, u_common, u_ui_atlas;
 
 { TCustomScreenTemplate }
 
@@ -264,6 +267,27 @@ begin
   if FCamera <> NIL
     then Result := FCamera.ControlToWorld(aControlPt)
     else Result := aControlPt;
+end;
+
+procedure TCustomScreenTemplate.ComputeMoveRestriction(aPtOrigin, aPtNew: TPointF);
+var delta: TPointF;
+begin
+  FMoveRestriction := PointF(1, 1);
+  if CtrlPressed then begin
+    delta := aPtOrigin - aPtNew;
+    delta.x := Abs(delta.x);
+    delta.y := Abs(delta.y);
+    if delta.x > delta.y then FMoveRestriction := PointF(1, 0)
+      else if delta.y > delta.x then FMoveRestriction := PointF(0, 1)
+  end;
+end;
+
+procedure TCustomScreenTemplate.ApplyMoveRestrictionOn(var aPt: TPointF);
+begin
+  if CtrlPressed then begin
+    aPt.x := aPt.x * FMoveRestriction.x;
+    aPt.y := aPt.y * FMoveRestriction.y;
+  end;
 end;
 
 procedure TCustomScreenTemplate.AddToSpriteBank;

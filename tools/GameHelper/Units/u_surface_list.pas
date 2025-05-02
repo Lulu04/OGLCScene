@@ -9,7 +9,7 @@ uses
   Classes, SysUtils, StdCtrls,
   OGLCScene, gvector,
   BGRABitmap, BGRABitmapTypes,
-  u_texture_list, u_ui_handle;
+  u_texture_list, u_ui_handle, u_undo_redo;
 
 type
 
@@ -51,7 +51,7 @@ public
   function IsOverPivotHandle(aWorldPt: TPointF): boolean;
   procedure AddOffsetToPivot(aOffset: TPointF); // in world coordinates
   procedure UpdateHandlePosition;
-  procedure ToogleSelectedAndRotatedHandle;
+  procedure ToogleScaledAndRotatedHandle;
 
   procedure SaveCurrentAngleBeforeRotation;
   procedure ComputeAngle(aPreviousReferencePointInWorld,
@@ -69,6 +69,10 @@ end;
 PSurfaceDescriptor = ^TSurfaceDescriptor;
 ArrayOfPSurfaceDescriptor = array of PSurfaceDescriptor;
 
+{$define _INTERFACE}
+{$I u_surface_undoredo.inc}
+{$undef _INTERFACE}
+
 { TSurfaceList }
 
 TSurfaceList = class(specialize TVector<TSurfaceDescriptor>)
@@ -77,8 +81,11 @@ private
   function NextID: integer;
   function GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDescriptor;
 private
+  FUndoRedoManager: TSurfaceUndoRedoManager;
   FWorkingLayer: integer;
 public
+  constructor Create;
+  destructor Destroy; override;
   procedure Clear; reintroduce;
   function AddEmpty: PSurfaceDescriptor;
 
@@ -111,18 +118,23 @@ public
 
   // items are the ID of each TSurfaceDescriptor
   procedure FillComboBox(aCB: TComboBox);
+  procedure ReplaceNameInComboBox(aCB: TComboBox);
   procedure FillListBox(aLB: TListBox);
 
   function Textures: TTextureList; virtual; abstract;
 
   property WorkingLayer: integer read FWorkingLayer write FWorkingLayer;
+  property UndoRedoManager: TSurfaceUndoRedoManager read FUndoRedoManager;
 end;
-
 
 
 implementation
 
 uses u_common, Math;
+
+{$define _IMPLEMENTATION}
+{$I u_surface_undoredo.inc}
+{$undef _IMPLEMENTATION}
 
 { TSurfaceDescriptor }
 
@@ -449,7 +461,7 @@ begin
   HandleManager.UpdateHandlePosition(surface);
 end;
 
-procedure TSurfaceDescriptor.ToogleSelectedAndRotatedHandle;
+procedure TSurfaceDescriptor.ToogleScaledAndRotatedHandle;
 begin
   HandleManager.ToogleScaledAndRotatedHandle(surface);
 end;
@@ -543,6 +555,19 @@ begin
     CheckRecursive(GetRootItem^.surface);
 end;
 
+constructor TSurfaceList.Create;
+begin
+  inherited Create;
+  FUndoRedoManager := TSurfaceUndoRedoManager.Create;
+end;
+
+destructor TSurfaceList.Destroy;
+begin
+  FUndoRedoManager.Free;
+  FUndoRedoManager := NIL;
+  inherited Destroy;
+end;
+
 procedure TSurfaceList.Clear;
 var i: SizeUInt;
 begin
@@ -551,6 +576,7 @@ begin
       Mutable[i]^.KillSurface;
   inherited Clear;
   FID := 0;
+  FUndoRedoManager.Clear;
 end;
 
 function TSurfaceList.AddEmpty: PSurfaceDescriptor;
@@ -770,6 +796,14 @@ begin
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aCB.Items.Add(Mutable[i]^.id.ToString);
+end;
+
+procedure TSurfaceList.ReplaceNameInComboBox(aCB: TComboBox);
+var i: integer;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    aCB.Items.strings[i] := Mutable[i]^.id.ToString;
 end;
 
 procedure TSurfaceList.FillListBox(aLB: TListBox);
