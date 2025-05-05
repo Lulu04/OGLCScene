@@ -509,7 +509,7 @@ begin
     newSprite^.textures := item^.textures;
     newSprite^.surfaces := item^.surfaces;
     newSprite^.collisionbodies := item^.collisionbodies;
-    newSprite^.postures := item^.collisionbodies;
+    newSprite^.postures := item^.postures;
     LB.ItemIndex := LB.Items.Add(newName);
     FUndoRedoManager.AddActionDuplicateSprite(LB.ItemIndex);
     Project.SetModified;

@@ -90,8 +90,8 @@ procedure TTextureUndoRedoManager.AddActionAddTexture(const aName: string);
 var o: TTextureUndoRedoItem;
 begin
   o.action := turatAddTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
+  o.data := Default(TTextureItem);
+  o.newData := Default(TTextureItem);
   o.data := ParentTexturelist.GetItemByName(aName)^;
   AddItem(o);
 end;
@@ -100,8 +100,8 @@ procedure TTextureUndoRedoManager.AddActionDeleteTexture(const aName: string);
 var o: TTextureUndoRedoItem;
 begin
   o.action := turatDeleteTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
+  o.data := Default(TTextureItem);
+  o.newData := Default(TTextureItem);
   o.data := ParentTexturelist.GetItemByName(aName)^;
   AddItem(o);
 end;
@@ -112,8 +112,8 @@ procedure TTextureUndoRedoManager.AddActionModifyTexture(aItem: PTextureItem;
 var o: TTextureUndoRedoItem;
 begin
   o.action := turatModifyTexture;
-  o.data.InitDefault;
-  o.newData.InitDefault;
+  o.data := Default(TTextureItem);
+  o.newData := Default(TTextureItem);
   o.data := aItem^;
   o.newData.filename := aFilename;
   o.newData.name := aName;

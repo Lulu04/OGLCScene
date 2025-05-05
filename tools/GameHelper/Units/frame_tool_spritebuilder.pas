@@ -35,6 +35,7 @@ type
     BTextureUndo: TSpeedButton;
     BPostureUndo: TSpeedButton;
     BUpdateTexture: TSpeedButton;
+    BUpdateTextureListbox: TSpeedButton;
     CBParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
@@ -130,6 +131,7 @@ type
     function CheckTextureWidgets: boolean;
     procedure DoAddTexture;
     procedure DoDeleteTexture;
+    procedure DoUpdateTexture;
   private // childs
     procedure ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
     function CBToClassType: classOfSimpleSurfaceWithEffect;
@@ -139,7 +141,7 @@ type
     function CBToParentID: integer;
     function CheckChildWidgets: boolean;
     function DoAddNewChild: boolean;
-    procedure DoUpdateChild;
+    procedure DoUpdateChild(aForceRecreateSurface: boolean);
   private // postures
     FPostureTabIsActive: boolean;
     function LBSelectedToName: string;
@@ -184,6 +186,9 @@ procedure TFrameToolsSpriteBuilder.BChooseImageFileClick(Sender: TObject);
 var i: integer;
   item: PTextureItem;
 begin
+  if sender=BUpdateTextureListbox then
+    Textures.FillListBox(LBTextureNames);
+
   if Sender = BChooseImageFile then begin
     if not OD1.Execute then exit;
     Label2.Caption := OD1.FileName;
@@ -195,19 +200,8 @@ begin
     UpdateTextureWidgetState;
   end;
 
-  if Sender = BUpdateTexture then begin
-    i := LBTextureNames.ItemIndex;
-    if i = -1 then exit;
-    item := Textures.GetItemByName(LBTextureNames.Items.Strings[i]);
-    if item = NIL then exit;
-    Textures.UndoRedoManager.AddActionModifyTexture(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
-                    CheckBox1.Checked, SE11.Value, SE12.Value);
-    Textures.Update(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
-                    CheckBox1.Checked, SE11.Value, SE12.Value);
-    Label2.Caption := '';
-    UpdateTextureWidgetState;
-    FModified := True;
-  end;
+  if Sender = BUpdateTexture then
+    DoUpdateTexture;
 
   if Sender = BAddTexture then begin
     DoAddTexture;
@@ -362,6 +356,7 @@ end;
 
 procedure TFrameToolsSpriteBuilder.CBChildTypeSelect(Sender: TObject);
 var texItem: PTextureItem;
+  chang: boolean;
 begin
   if FInitializingWidget then exit;
 
@@ -375,16 +370,18 @@ begin
 
   if FWorkingChild <> NIL then begin
     with FWorkingChild^.surface do
-      FModified := FModified or
-                 not (FWorkingChild^.surface is CBToClassType) or
-                 (FWorkingChild^.textureName <> CBToTextureName) or
-                 (FWorkingChild^.parentID <> CBToParentID) or
-                 (FWorkingChild^.name <> Trim(Edit5.Text)) or
-                 (X.Value <> SE1.Value) or (Y.Value <> SE2.Value) or
-                 (Pivot.x <> SE3.Value) or (Pivot.y <> SE4.Value) or
-                 (Scale.x.Value <> SE5.Value) or (Scale.y.Value <> SE6.Value) or
-                 (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value);
-    DoUpdateChild;
+      chang := not (FWorkingChild^.surface is CBToClassType) or
+                   (FWorkingChild^.textureName <> CBToTextureName) or
+                   (FWorkingChild^.parentID <> CBToParentID) or
+                   (FWorkingChild^.name <> Trim(Edit5.Text)) or
+                   (X.Value <> SE1.Value) or (Y.Value <> SE2.Value) or
+                   (Pivot.x <> SE3.Value) or (Pivot.y <> SE4.Value) or
+                   (Scale.x.Value <> SE5.Value) or (Scale.y.Value <> SE6.Value) or
+                   (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value);
+    if chang then begin
+      DoUpdateChild(False);
+      FModified := True;
+    end;
   end;
 end;
 
@@ -423,6 +420,7 @@ procedure TFrameToolsSpriteBuilder.LBTextureNamesSelectionChange(
 var i: integer;
   p: PTextureItem;
 begin
+  if FInitializingWidget then exit;
   FInitializingWidget := True;
 
   i := LBTextureNames.ItemIndex;
@@ -590,7 +588,8 @@ begin
   end;
 
   FWorkingChild := Surfaces.AddEmpty;
-  DoUpdateChild;
+  DoUpdateChild(False);
+  Postures.AddValueEntryOnEachPosture;
 
   CBParent.Items.Add(FWorkingChild^.ID.ToString);
   FWorkingChild := NIL;
@@ -598,14 +597,14 @@ begin
   Result := True;
 end;
 
-procedure TFrameToolsSpriteBuilder.DoUpdateChild;
+procedure TFrameToolsSpriteBuilder.DoUpdateChild(aForceRecreateSurface: boolean);
 var recreateSurface: Boolean;
   childs: array of TSimpleSurfaceWithEffect;
   i: integer;
 begin
   if FWorkingChild = NIL then exit;
 
-  recreateSurface := False;
+  recreateSurface := aForceRecreateSurface;
   if not (FWorkingChild^.surface is CBToClassType) then
     recreateSurface := True;
 
@@ -618,23 +617,15 @@ begin
   FWorkingChild^.name := Trim(Edit5.Text);
 
   if recreateSurface then begin
-    // keep the childs of the surface to kill
-    childs := NIL;
-    if FWorkingChild^.surface <> NIL then begin
-      SetLength(childs, FWorkingChild^.surface.ChildCount);
-      for i:=FWorkingChild^.surface.ChildCount-1 downto 0 do begin
-        childs[i] := FWorkingChild^.surface.Childs[i];
-        FWorkingChild^.surface.RemoveChild(childs[i]);
-      end;
-    end;
+    // save the childs of the surface before killing it
+    FWorkingChild^.SaveAndRemoveChilds;
     // create a new surface
     FWorkingChild^.KillSurface;
     FWorkingChild^.classtype := CBToClassType;
     FWorkingChild^.textureName := CBToTextureName;
     FWorkingChild^.CreateSurface;
     // restore the childs
-    for i:=0 to High(childs) do
-      childs[i].SetChildOf(FWorkingChild^.surface, childs[i].ZOrderAsChild);
+    FWorkingChild^.RestoreChilds;
     // set child dependency
     FWorkingChild^.parentID := CBToParentID;
     FWorkingChild^.zOrder := SE8.Value;
@@ -817,13 +808,27 @@ end;
 
 procedure TFrameToolsSpriteBuilder.DoAddTexture;
 var texName: string;
+i:integer;
 begin
   if not CheckTextureWidgets then exit;
 
   texName := Trim(Edit1.Text);
+
+FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: BEFORE Textures.Size='+Textures.Size.tostring);
+for i:=0 to Textures.Size-1 do
+  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);
+
+FScene.LogDebug('  ADDING '+Label2.Caption+'  '+texName);
   Textures.Add(Label2.Caption, texName, SE9.Value, SE10.Value,
                CheckBox1.Checked, SE11.Value, SE12.Value);
+
+FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: AFTER Textures.Size='+Textures.Size.tostring);
+for i:=0 to Textures.Size-1 do
+  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);
+
+  FInitializingWidget := True;
   LBTextureNames.ItemIndex := LBTextureNames.Items.Add(texName);
+  FInitializingWidget := False;
   UpdateTextureWidgetState;
 
   Textures.UndoRedoManager.AddActionAddTexture(texName);
@@ -842,12 +847,49 @@ begin
     ShowMessage('This texture is used by a surface, you can not delete it');
     exit;
   end;
-
   Textures.UndoRedoManager.AddActionDeleteTexture(textureName);
   Textures.DeleteByName(textureName);
   LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
   Textures.FillComboBox(CBTextures);
 
+  FModified := True;
+
+  FInitializingWidget := True;
+  Label2.Caption := '';
+  Edit1.Text := '';
+  SE9.Value := 0;
+  SE10.Value := 0;
+  CheckBox1.Checked := False;
+  SE11.Value := 0;
+  SE12.Value := 0;
+  FInitializingWidget := False;
+end;
+
+procedure TFrameToolsSpriteBuilder.DoUpdateTexture;
+var i, j: Integer;
+  item: PTextureItem;
+  surf: ArrayOfPSurfaceDescriptor;
+begin
+  i := LBTextureNames.ItemIndex;
+  if i = -1 then exit;
+
+  item := Textures.GetItemByName(LBTextureNames.Items.Strings[i]);
+  if item = NIL then exit;
+
+  Textures.UndoRedoManager.AddActionModifyTexture(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
+                  CheckBox1.Checked, SE11.Value, SE12.Value);
+  Textures.Update(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
+                  CheckBox1.Checked, SE11.Value, SE12.Value);
+
+  // recreate the surfaces that use this texture (if any)
+  surf := Surfaces.GetItemsThatUseThisTexture(item);
+  if Length(surf) <> 0 then begin
+    for j:=0 to High(surf)do
+      surf[j]^.RecreateSurfaceBecauseTextureChanged;
+  end;
+
+  Label2.Caption := '';
+  UpdateTextureWidgetState;
   FModified := True;
 end;
 

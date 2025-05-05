@@ -18,9 +18,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 512
     Top = 32
     Width = 300
-    ActivePage = PagePostures
+    ActivePage = PageTextures
     Anchors = [akTop, akLeft, akRight]
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet
@@ -340,6 +340,23 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             BorderSpacing.Right = 3
             Images = DataModule1.ImageList1
             ImageIndex = 10
+            OnClick = BChooseImageFileClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object BUpdateTextureListbox: TSpeedButton
+            AnchorSideLeft.Control = Panel7
+            AnchorSideTop.Control = Panel7
+            AnchorSideTop.Side = asrCenter
+            Cursor = crHandPoint
+            Left = 10
+            Height = 28
+            Top = -1
+            Width = 28
+            AutoSize = True
+            BorderSpacing.Left = 10
+            Images = DataModule1.ImageList1
+            ImageIndex = 6
             OnClick = BChooseImageFileClick
             ShowHint = True
             ParentShowHint = False

@@ -53,6 +53,11 @@ public
   function NameAlreadyExists(const aName: string): boolean;
   function GetItemByName(const aName: string): PPostureItem;
 
+  // called when user delete a surface
+  procedure DeleteValueEntryInEachPosture(aIndex: integer);
+  // called when user add a surface
+  procedure AddValueEntryOnEachPosture;
+
   function SaveToString: string;
   procedure LoadFromString(const s: string);
 
@@ -206,6 +211,22 @@ begin
       Result := Mutable[i];
       exit;
     end;
+end;
+
+procedure TPostureList.DeleteValueEntryInEachPosture(aIndex: integer);
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    Delete(Mutable[i]^.Values, aIndex, 1);
+end;
+
+procedure TPostureList.AddValueEntryOnEachPosture;
+var i: SizeUInt;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    SetLength(Mutable[i]^.Values, Length(Mutable[i]^.Values)+1);
 end;
 
 function TPostureList.SaveToString: string;
