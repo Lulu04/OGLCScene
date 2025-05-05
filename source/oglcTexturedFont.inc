@@ -13,7 +13,13 @@ TTexturedFont = class{(TFPHashList)}
   function GetChar(aUTF8Char: string): PTexturedChar;
   procedure Init(aFont: TFontDescriptor);
   function GetTexture: PTexture;
-  procedure InternalBuild(aPacker: TOGLCImagePacker; const aCharSet: string; aFillTexture: TBGRABitmap);
+  procedure InternalBuild(aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean; const aCharSet: string;
+        aFillTexture: TBGRABitmap);
+ private
+  class var FCharPrefix: integer; // used to  identify the char's texture into a loaded atlas
+  class procedure NextCharPrefix;
+  class function CharPrefix: string;
+  class procedure ResetCharPrefix;
  public
   // This property affect the space between character
   //   value from 0.1 to 1 -> the characters are closest
@@ -21,8 +27,8 @@ TTexturedFont = class{(TFPHashList)}
   //   value > 1 -> the characters are farther apart from each other
   CharSpacingCoeff: TBoundedFParam;
   Constructor Create(aParentScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
-  constructor CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aFont: TFontDescriptor;
-                                    const aCharSet: string; aFillTexture: TBGRABitmap=NIL);
+  constructor CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean;
+     aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
   Destructor Destroy; override;
 
   function StringToCharIndexes(const aCaption: string): TTexturedCharIndexes;
@@ -67,17 +73,19 @@ begin
   Init(aFont);
   FAtlasOwner := True;
   FAtlas := TOGLCTextureAtlas.Create(aParentScene);
-  InternalBuild(FAtlas, aCharSet, aFillTexture);
+  InternalBuild(FAtlas, False, aCharSet, aFillTexture);
   FAtlas.TryToPack;
   FAtlas.Build;
 end;
 
-constructor TTexturedFont.CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aFont: TFontDescriptor;
-  const aCharSet: string; aFillTexture: TBGRABitmap);
+constructor TTexturedFont.CreateFromImagePacker(aParentScene: TOGLCScene;
+  aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean;
+  aFont: TFontDescriptor; const aCharSet: string;
+  aFillTexture: TBGRABitmap);
 begin
   FParentScene := aParentScene;
   Init(aFont);
-  InternalBuild(aPacker, aCharSet, aFillTexture);
+  InternalBuild(aPacker, aPackerLoadedFromFile, aCharSet, aFillTexture);
   FAtlasOwner := False;
 end;
 
@@ -130,11 +138,14 @@ begin
 end;
 
 
-procedure TTexturedFont.InternalBuild(aPacker: TOGLCImagePacker; const aCharSet: string; aFillTexture: TBGRABitmap);
+procedure TTexturedFont.InternalBuild(aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean;
+  const aCharSet: string; aFillTexture: TBGRABitmap);
 var i: integer;
     temp: TBGRABitmap;
     s: string;
 begin
+  NextCharPrefix;
+
   temp := TBGRABitmap.Create(1, 1);
   FFont.SetFontRendererOn(temp);
 
@@ -144,12 +155,34 @@ begin
    begin
     s := UTF8Copy(aCharSet, i+1, 1);
     FFont.ResizeAndDrawStringOn(temp, s, aFillTexture);
-    FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate);
+
+    if aPackerLoadedFromFile then
+      FTexCharArray[i].Texture := aPacker.RetrieveTextureByFileName(CharPrefix+s)
+    else begin
+      FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate);
+      FTexCharArray[i].Texture^.Filename := CharPrefix+s; // '_'+s+'_';
+    end;
+
     FTexCharArray[i].Character := s;
     FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
     FTexCharArray[i].OriginalCharSize := temp.TextSize(s);
    end;
   temp.Free;
+end;
+
+class procedure TTexturedFont.NextCharPrefix;
+begin
+  inc(FCharPrefix);
+end;
+
+class function TTexturedFont.CharPrefix: string;
+begin
+  Result := FCharPrefix.ToString+'_';
+end;
+
+class procedure TTexturedFont.ResetCharPrefix;
+begin
+  FCharPrefix := 0;
 end;
 
 function TTexturedFont.StringToCharIndexes(const aCaption: string): TTexturedCharIndexes;

@@ -13,6 +13,9 @@ TOGLCImagePackerItem = record
   FrameSize: TSize;
   function PixelsConsumed: integer;
   function IsOverlappedByRec(const aRec: TRect; aSpacing: integer): boolean;
+
+  procedure SaveTo(aStream: TFileStream);
+  procedure LoadFrom(aStream: TFileStream);
 end;
 
 
@@ -26,6 +29,7 @@ private
   FSpacing: integer;
   FAllItemPlaced: boolean;
   FTexturedFontToFree: array of TTexturedFont;
+  FLoadedFromFile: boolean;
 private
   FInflateDelta: integer;
   function RawPackedImage: TBGRABitmap;
@@ -62,6 +66,8 @@ public
 
   // Image Packer is the owner of the returned TTexturedFont, don't free it in your code !
   function AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont;
+
+  function RetrieveTextureByFileName(const aFilename: string): PTexture; virtual;
 
   // try to pack all added images in single one with size constraints.
   // aSpacing is the number of pixel to insert between each image both vertically
@@ -118,7 +124,17 @@ public
   // texture atlas and its sub-textures.
   procedure Build(aForceSizePowerOfTwo: boolean=True; aForceSquare: boolean=True);
 
-  function RetrieveTextureByFileName(const aFilename: string): PTexture;
+  // Save the atlas to a file.
+  //  aGameVersion is the version of the game when the atlas is saved.
+  procedure SaveToFile(const aFilename, aGameVersion: string);
+  // Load the atlas from file.
+  procedure LoadFromFile(const aFilename: string);
+  // The function return the version of the game when the atlas was saved. Compare it
+  // with the current version, and if they don't match you can reconstruct the atlas
+  // because graphics may change from a version to another.
+  class function GetAtlasFileVersion(const aFilename: string): string;
+
+  function RetrieveTextureByFileName(const aFilename: string): PTexture; override;
 
   property Texture: PTexture read GetAtlasTexture;
 end;
@@ -142,6 +158,28 @@ var r: TRect;
 begin
   r.Create(ComputedRect.TopLeft, ComputedRect.Width+aSpacing, ComputedRect.Height+aSpacing);
   Result := Placed and r.IntersectsWith(aRec);
+end;
+
+procedure TOGLCImagePackerItem.SaveTo(aStream: TFileStream);
+begin
+  aStream.WriteAnsiString(Texture^.Filename);
+  aStream.WriteWord(ComputedRect.Left);
+  aStream.WriteWord(ComputedRect.Top);
+  aStream.WriteWord(ComputedRect.Right);
+  aStream.WriteWord(ComputedRect.Bottom);
+  aStream.WriteWord(FrameSize.cx);
+  aStream.WriteWord(FrameSize.cy);
+end;
+
+procedure TOGLCImagePackerItem.LoadFrom(aStream: TFileStream);
+begin
+  Texture^.Filename := aStream.ReadAnsiString;
+  ComputedRect.Left := aStream.ReadWord;
+  ComputedRect.Top := aStream.ReadWord;
+  ComputedRect.Right := aStream.ReadWord;
+  ComputedRect.Bottom := aStream.ReadWord;
+  FrameSize.cx := aStream.ReadWord;
+  FrameSize.cy := aStream.ReadWord;
 end;
 
 { TOGLCImagePacker }
@@ -199,15 +237,12 @@ end;
 
 procedure TOGLCImagePacker.InternalInsertSorted(aItem: POGLCImagePackerItem);
 var itemInList: POGLCImagePackerItem;
-  //newItemPixelCount: integer;
 begin
   itemInList := FirstItem;
   if itemInList = NIL then Append(aItem)
   else begin
-    //newItemPixelCount := aItem^.PixelsConsumed;
     repeat
       if Max(aItem^.Bitmap.Width, aItem^.Bitmap.Height) > Max(itemInList^.Bitmap.Width, itemInList^.Bitmap.Height) then begin
-      //if newItemPixelCount > itemInList^.PixelsConsumed then begin
         InsertBefore(aItem, itemInList);
         exit;
       end;
@@ -388,10 +423,25 @@ end;
 function TOGLCImagePacker.AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
 begin
   aFont.Check;
-  Result := TTexturedFont.CreateFromImagePacker(aScene, Self, aFont, aCharSet, aFillTexture);
+  Result := TTexturedFont.CreateFromImagePacker(aScene, Self, FLoadedFromFile, aFont, aCharSet, aFillTexture);
 
   SetLength(FTexturedFontToFree, Length(FTexturedFontToFree)+1);
   FTexturedFontToFree[High(FTexturedFontToFree)] := Result;
+end;
+
+function TOGLCImagePacker.RetrieveTextureByFileName(const aFilename: string): PTexture;
+var item: POGLCImagePackerItem;
+begin
+  item := FirstItem;
+  repeat
+    if item^.Texture <> NIL then
+      if item^.Texture^.Filename = aFilename then begin
+        Result := item^.Texture;
+        exit;
+      end;
+    item := item^.Next;
+  until item = NIL;
+  Result := NIL;
 end;
 
 function TOGLCImagePacker.TryToPack(aMaxTextureSize: integer): boolean;
@@ -557,6 +607,8 @@ constructor TOGLCTextureAtlas.Create(aParentScene: TOGLCScene);
 begin
   Inherited Create;
   FParentScene := aParentScene;
+
+  TTexturedFont.ResetCharPrefix;
 end;
 
 destructor TOGLCTextureAtlas.Destroy;
@@ -575,6 +627,7 @@ function TOGLCTextureAtlas.AddString(const aString: string; aFont: TFontDescript
         aFillTexture: TBGRABitmap): PTexture;
 begin
   Result := Add(aFont.StringToBitmap(aString, aFillTexture));
+  Result^.Filename := aString;
 end;
 
 function TOGLCTextureAtlas.AddScaledPPI(const aFilename: string): PTexture;
@@ -608,23 +661,110 @@ begin
   until item = NIL;
 end;
 
-function TOGLCTextureAtlas.RetrieveTextureByFileName(const aFilename: string): PTexture;
-var item: POGLCImagePackerItem;
+procedure TOGLCTextureAtlas.SaveToFile(const aFilename, aGameVersion: string);
+var stream: TFileStream;
+   streamImage: TMemoryStream;
+  item: POGLCImagePackerItem;
+  wholeImage: TBGRABitmap;
 begin
-  item := FirstItem;
-  repeat
-    if item^.Texture <> NIL then
-      if item^.Texture^.Filename = aFilename then begin
-        Result := item^.Texture;
-        exit;
-      end;
-    item := item^.Next;
-  until item = NIL;
-  Result := NIL;
+  stream := TFileStream.Create(aFilename, fmCreate);
+  try
+    // save game version
+    stream.WriteAnsiString(aGameVersion);
+
+    // save the whole image as png
+    // we use a temporary TMemoryStream because TBGRABitmap.SaveToStreamAsPng() sets
+    // the stream position to the begining, and overwrite previous data pushed into the stream.
+    wholeImage := GetPackedImage;
+    streamImage := TMemoryStream.Create;
+    wholeImage.SaveToStreamAsPng(streamImage);
+    wholeImage.Free;
+    streamImage.SaveToStream(stream);
+    streamImage.Free;
+
+ {   wholeImage := GetPackedImage;
+    wholeImage.SaveToStreamAsPng(stream);
+    wholeImage.Free;   }
+
+    // save sub-textures info
+    stream.WriteDWord(Count);
+    item := FirstItem;
+    repeat
+      item^.SaveTo(stream);
+      item := item^.Next;
+    until item = NIL;
+  finally
+    stream.Free;
+  end;
 end;
 
+procedure TOGLCTextureAtlas.LoadFromFile(const aFilename: string);
+var stream: TFileStream;
+  streamImage: TMemoryStream;
+  c: integer;
+  item: POGLCImagePackerItem;
+  wholeImage: TBGRABitmap;
+begin
+  FLoadedFromFile := True;
+
+  // load atlas data
+  stream := TFileStream.Create(aFilename, fmOpenRead or fmShareDenyWrite);
+  try
+    // read atlas version
+    stream.ReadAnsiString;
+
+    // read the whole image as png and create the whole texture
+    wholeImage := TBGRABitmap.Create;
+    wholeImage.LoadFromStream(stream);
+    FAtlasTexture := FParentScene.TexMan.Add(wholeImage);
+    wholeImage.Free;
 
 
+    // read the sub-textures info
+    c := stream.ReadDWord;
+    while c > 0 do begin
+      item := AddInstanceToList;
+      item^.Placed := True;
+      item^.Bitmap := NIL;
+      new(item^.Texture);
+      item^.LoadFrom(stream);
+      dec(c);
+    end;
+  finally
+    stream.Free;
+  end;
+
+  // initialize all sub-textures
+  item := FirstItem;
+  repeat
+    with item^ do
+      Texture^.TakePartOf(FAtlasTexture, ComputedRect, FrameSize.cx, FrameSize.cy);
+    item := item^.Next;
+  until item = NIL;
+end;
+
+class function TOGLCTextureAtlas.GetAtlasFileVersion(const aFilename: string
+  ): string;
+var stream: TFileStream;
+begin
+  stream := TFileStream.Create(aFilename, fmOpenRead or fmShareDenyWrite);
+  try
+    try
+      Result := stream.ReadAnsiString;
+    except
+      Result := '';
+    end;
+  finally
+    stream.Free;
+  end;
+end;
+
+function TOGLCTextureAtlas.RetrieveTextureByFileName(const aFilename: string): PTexture;
+begin
+  Result := inherited RetrieveTextureByFileName(aFilename);
+  if Result = NIL then
+    FParentScene.LogError('texture "'+aFilename+'" not found in atlas');
+end;
 
 {$endif oglcIMPLEMENTATION}
 
