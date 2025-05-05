@@ -419,7 +419,7 @@ begin
    Result^.Filename := ExtractFilename(aFilename);
    ima.Free;
   except
-   raise Exception.Create('Texture manager can''t create texture from file '+aFilename );
+   raise Exception.Create('Texture manager can''t create texture from file "'+aFilename+'"');
    Result := NIL;
   end;
 end;
