@@ -21,7 +21,6 @@ TTextureItem = record
 
   isMultiFrame: boolean;
   frameWidth, frameHeight: integer;
-  procedure InitDefault;
   procedure CreateTexture;
   procedure FreeTexture;
   function SaveToString: string;
@@ -61,6 +60,7 @@ public
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
 
+  // fill combobox with the name of the textures
   procedure FillComboBox(aCB: TComboBox);
   procedure FillListBox(aLB: TListBox);
 
@@ -76,11 +76,6 @@ uses u_common, form_main;
 {$undef _IMPLEMENTATION}
 
 { TTextureItem }
-
-procedure TTextureItem.InitDefault;
-begin
-  Self := Default(TTextureItem);
-end;
 
 procedure TTextureItem.CreateTexture;
 begin
@@ -115,7 +110,7 @@ end;
 procedure TTextureItem.LoadFromString(const s: string);
 var prop: TProperties;
 begin
-  InitDefault;
+  Self := Default(TTextureItem);
   prop.Split(s, '~');
   prop.StringValueOf('Filename', filename, filename);
   prop.StringValueOf('Name', name, ChangeFileExt(ExtractFilename(filename), ''));
@@ -170,10 +165,20 @@ end;
 procedure TTextureList.Add(const aFilename, aName: string; aWidth, aHeight: integer;
   aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
 var o: TTextureItem;
+i:integer;
 begin
-  o.InitDefault;
+FScene.LogDebug('TTextureList.Add: BEFORE Textures.Size='+Size.tostring);
+
+  //o.InitDefault;
+  o := Default(TTextureItem);
   DoUpdate(@o, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight);
+for i:=0 to Size-1 do
+ FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name);
   PushBack(o);
+
+FScene.LogDebug('TTextureList.Add: AFTER Textures.Size='+Size.tostring);
+for i:=0 to Size-1 do
+ FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name);
 end;
 
 procedure TTextureList.Update(aItem: PTextureItem; const aFilename, aName: string; aWidth,
@@ -296,7 +301,7 @@ end;
 procedure TTextureList.FillComboBox(aCB: TComboBox);
 var i: SizeUInt;
 begin
-  aCB.Clear;
+  aCB.Items.Clear;
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aCB.Items.Add(Mutable[i]^.name);

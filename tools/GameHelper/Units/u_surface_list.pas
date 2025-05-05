@@ -26,6 +26,8 @@ private
   function GetSelected: boolean;
   procedure SetPivot(AWorldCoor: TPointF);
   procedure SetSelected(AValue: boolean);
+private
+  FChildsStored: array of TSimpleSurfaceWithEffect;
 public
   ParentList: TSurfaceList;
   id: integer;           // unique ID
@@ -39,8 +41,13 @@ public
   zOrder: integer;
   procedure InitDefault;
   procedure KillSurface;
-  procedure CreateSurface;
+  procedure CreateSurface(aCreateUIHandle: boolean=True);
+  procedure RecreateSurfaceBecauseTextureChanged;
   procedure SetChildDependency;
+
+  procedure SaveAndRemoveChilds;
+  procedure RestoreChilds;
+
   procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,...
   procedure DuplicateValuesToTemporaryVariables;
 
@@ -93,6 +100,7 @@ public
   function GetItemIndexByID(aID: integer): integer;
   function GetByIndex(aIndex: integer): PSurfaceDescriptor;
   function GetItemBySurface(aSurface: TSimpleSurfaceWithEffect): PSurfaceDescriptor;
+  function GetItemsThatUseThisTexture(aTextureItem: PTextureItem): ArrayOfPSurfaceDescriptor;
 
   function GetRootItem: PSurfaceDescriptor;
   function RootIsDefined: boolean;
@@ -130,7 +138,7 @@ end;
 
 implementation
 
-uses u_common, Math;
+uses u_common, u_screen_spritebuilder, Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -182,7 +190,7 @@ begin
   HandleManager.KillSurfaces;
 end;
 
-procedure TSurfaceDescriptor.CreateSurface;
+procedure TSurfaceDescriptor.CreateSurface(aCreateUIHandle: boolean=True);
 var texItem: PTextureItem;
   tex: PTexture;
 begin
@@ -227,7 +235,17 @@ begin
   surface.CollisionBody.AddPolygon([PointF(0,0), PointF(surface.Width, 0),
                                     PointF(surface.Width, surface.Height), PointF(0, surface.Height)]);
 
-  UIHandle.CreateUIHandles(@HandleManager);
+  if aCreateUIHandle then
+    UIHandle.CreateUIHandles(@HandleManager);
+end;
+
+procedure TSurfaceDescriptor.RecreateSurfaceBecauseTextureChanged;
+begin
+  SaveAndRemoveChilds;
+  KillSurface;
+  CreateSurface;
+  RestoreChilds;
+  SetChildDependency;
 end;
 
 procedure TSurfaceDescriptor.SetChildDependency;
@@ -238,10 +256,28 @@ begin
       parentItem := ParentList.GetItemByID(parentID);
       if parentItem = NIL
         then raise exception.create('parent with ID='+parentID.ToString+' not found !')
-        else begin
-          surface.SetChildOf(parentItem^.surface, zOrder);
-        end;
+        else surface.SetChildOf(parentItem^.surface, zOrder);
   end;
+end;
+
+procedure TSurfaceDescriptor.SaveAndRemoveChilds;
+var i: Integer;
+begin
+  FChildsStored := NIL;
+  if surface = NIl then exit;
+  SetLength(FChildsStored, surface.ChildCount);
+  for i:=surface.ChildCount-1 downto 0 do begin
+    FChildsStored[i] := surface.Childs[i];
+    surface.RemoveChild(surface.Childs[i]);
+  end;
+end;
+
+procedure TSurfaceDescriptor.RestoreChilds;
+var i: Integer;
+begin
+  if surface = NIl then exit;
+  for i:=0 to High(FChildsStored) do
+    FChildsStored[i].SetChildOf(surface, FChildsStored[i].ZOrderAsChild);
 end;
 
 procedure TSurfaceDescriptor.SetValuesFromTemporaryVariables;
@@ -633,6 +669,18 @@ begin
     end;
 end;
 
+function TSurfaceList.GetItemsThatUseThisTexture(aTextureItem: PTextureItem): ArrayOfPSurfaceDescriptor;
+var i: SizeUInt;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.textureName = aTextureItem^.name then begin
+      SetLength(Result, Length(Result)+1);
+      Result[High(Result)] := Mutable[i];
+    end;
+end;
+
 function TSurfaceList.GetRootItem: PSurfaceDescriptor;
 var i: SizeUInt;
 begin
@@ -695,7 +743,11 @@ procedure TSurfaceList.DeleteItemByID(aID: integer);
 var i: integer;
 begin
   i := GetItemIndexByID(aID);
-  if i <> -1 then Self.Erase(i);
+  if i <> -1 then begin
+    Mutable[i]^.KillSurface;
+    Self.Erase(i);
+    ScreenSpriteBuilder.Postures.DeleteValueEntryInEachPosture(i);
+  end;
 end;
 
 procedure TSurfaceList.SelectNone;

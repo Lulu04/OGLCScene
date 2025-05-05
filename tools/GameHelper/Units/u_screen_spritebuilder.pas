@@ -238,7 +238,7 @@ begin
 end;
 
 procedure TScreenSpriteBuilder.DeleteSelection;
-var i: integer;
+var i, k: integer;
 begin
   if Length(FSelected) = 0 then exit;
 
@@ -249,14 +249,14 @@ begin
       exit;
     end;
 
-  for i:=0 to High(FSelected) do begin
-    FSelected[i]^.KillSurface;
-    Surfaces.Erase(Surfaces.GetItemIndexByID(FSelected[i]^.id));
-  end;
+  for i:=0 to High(FSelected) do
+    Surfaces.DeleteItemByID(FSelected[i]^.id);
+
   FSelected := NIL;
 
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
   Surfaces.FillComboBox(FrameToolsSpriteBuilder.CBParent);
+Textures.FillComboBox(FrameToolsSpriteBuilder.CBTextures);
   FrameToolsSpriteBuilder.Modified := True;
 end;
 
