@@ -99,6 +99,9 @@ public
 
   // Use this property after a call to TryToPack or Pack to retrieve the size of the whole image.
   property ComputedAtlasSize: integer read FCurrentAtlasSize;
+
+  // True if the atlas is loaded from a file
+  property LoadedFromFile: boolean read FLoadedFromFile;
 end;
 
 
@@ -323,17 +326,25 @@ end;
 function TOGLCImagePacker.Add(const aFilename: string): PTexture;
 var ima: TBGRABitmap;
 begin
-  ima := TBGRABitmap.Create(aFilename);
-  Result := Add(ima);
-  Result^.Filename := ExtractFilename(aFilename);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aFilename))
+  else begin
+    ima := TBGRABitmap.Create(aFilename);
+    Result := Add(ima);
+    Result^.Filename := ExtractFilename(aFilename);
+  end;
 end;
 
 function TOGLCImagePacker.Add(const aFilename: string; AFrameWidth, AFrameHeight: integer): PTexture;
 var ima: TBGRABitmap;
 begin
-  ima := TBGRABitmap.Create(aFilename);
-  Result := Add(ima, AFrameWidth, AFrameHeight);
-  Result^.Filename := ExtractFilename(aFilename);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aFilename))
+  else begin
+    ima := TBGRABitmap.Create(aFilename);
+    Result := Add(ima, AFrameWidth, AFrameHeight);
+    Result^.Filename := ExtractFilename(aFilename);
+  end;
 end;
 
 function TOGLCImagePacker.Add(aImage: TBGRABitmap): PTexture;
@@ -351,9 +362,13 @@ end;
 function TOGLCImagePacker.AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture;
 var ima: TBGRABitmap;
 begin
-  ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
-  Result := Add(ima);
-  Result^.Filename := ExtractFilename(aSVGFilename);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aSVGFilename))
+  else begin
+    ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
+    Result := Add(ima);
+    Result^.Filename := ExtractFilename(aSVGFilename);
+  end;
 end;
 
 function TOGLCImagePacker.AddMultiFrameImage(const aFileNames: TStringArray; aXCount, aYCount, aSpacing: integer): PTexture;
@@ -363,29 +378,33 @@ begin
   if Length(aFileNames) = 0 then raise exception.create('you must provide a valid array of filenames');
   if aXCount*aYCount < Length(aFileNames) then raise exception.Create('bad value for aXCount and/or aYCount');
 
-  imaWhole := TBGRABitmap.Create(1,1);
-  xx := 0;
-  yy := 0;
-  ix := 0;
-  for i:=0 to High(aFileNames) do begin
-    ima := TBGRABitmap.Create(aFileNames[i]);
-    if i = 0 then begin
-      frameWidth := ima.Width;
-      frameHeight := ima.Height;
-      imaWhole.SetSize(ima.Width*aXCount, ima.Height*aYCount);
-      imaWhole.Fill(BGRAPixelTransparent);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aFileNames[0]))
+  else begin
+    imaWhole := TBGRABitmap.Create(1,1);
+    xx := 0;
+    yy := 0;
+    ix := 0;
+    for i:=0 to High(aFileNames) do begin
+      ima := TBGRABitmap.Create(aFileNames[i]);
+      if i = 0 then begin
+        frameWidth := ima.Width;
+        frameHeight := ima.Height;
+        imaWhole.SetSize(ima.Width*aXCount, ima.Height*aYCount);
+        imaWhole.Fill(BGRAPixelTransparent);
+      end;
+      imaWhole.PutImage(xx, yy, ima, dmDrawWithTransparency);
+      ima.Free;
+      inc(ix);
+      if ix = aXCount then begin
+        ix := 0;
+        xx := 0;
+        yy := yy + frameHeight + aSpacing;
+      end else xx := xx + frameWidth + aSpacing;
     end;
-    imaWhole.PutImage(xx, yy, ima, dmDrawWithTransparency);
-    ima.Free;
-    inc(ix);
-    if ix = aXCount then begin
-      ix := 0;
-      xx := 0;
-      yy := yy + frameHeight + aSpacing;
-    end else xx := xx + frameWidth + aSpacing;
+    Result := Add(imaWhole, frameWidth, frameHeight);
+    Result^.Filename := ExtractFilename(aFileNames[0]);
   end;
-  Result := Add(imaWhole, frameWidth, frameHeight);
-  Result^.Filename := ExtractFilename(aFileNames[0]);
 end;
 
 function TOGLCImagePacker.AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture;
@@ -395,29 +414,33 @@ begin
   if Length(aSVGFilenames) = 0 then raise exception.create('you must provide a valid array of filenames');
   if aXCount*aYCount < Length(aSVGFilenames) then raise exception.Create('bad value for aXCount and/or aYCount');
 
-  imaWhole := TBGRABitmap.Create(1,1);
-  xx := 0;
-  yy := 0;
-  ix := 0;
-  for i:=0 to High(aSVGFilenames) do begin
-    ima := LoadBitmapFromSVG(aSVGFilenames[i], aWidth, aHeight);
-    if i = 0 then begin
-      frameWidth := ima.Width + aSpacing;
-      frameHeight := ima.Height + aSpacing;
-      imaWhole.SetSize(frameWidth*aXCount, frameHeight*aYCount);
-      imaWhole.Fill(BGRAPixelTransparent);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aSVGFilenames[0]))
+  else begin
+    imaWhole := TBGRABitmap.Create(1,1);
+    xx := 0;
+    yy := 0;
+    ix := 0;
+    for i:=0 to High(aSVGFilenames) do begin
+      ima := LoadBitmapFromSVG(aSVGFilenames[i], aWidth, aHeight);
+      if i = 0 then begin
+        frameWidth := ima.Width + aSpacing;
+        frameHeight := ima.Height + aSpacing;
+        imaWhole.SetSize(frameWidth*aXCount, frameHeight*aYCount);
+        imaWhole.Fill(BGRAPixelTransparent);
+      end;
+      imaWhole.PutImage(xx, yy, ima, dmDrawWithTransparency);
+      ima.Free;
+      inc(ix);
+      if ix = aXCount then begin
+        ix := 0;
+        xx := 0;
+        yy := yy + frameHeight;
+      end else xx := xx + frameWidth;
     end;
-    imaWhole.PutImage(xx, yy, ima, dmDrawWithTransparency);
-    ima.Free;
-    inc(ix);
-    if ix = aXCount then begin
-      ix := 0;
-      xx := 0;
-      yy := yy + frameHeight;
-    end else xx := xx + frameWidth;
+    Result := Add(imaWhole, frameWidth, frameHeight);
+    Result^.Filename := ExtractFilename(aSVGFilenames[0]);
   end;
-  Result := Add(imaWhole, frameWidth, frameHeight);
-  Result^.Filename := ExtractFilename(aSVGFilenames[0]);
 end;
 
 function TOGLCImagePacker.AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
@@ -626,16 +649,24 @@ end;
 function TOGLCTextureAtlas.AddString(const aString: string; aFont: TFontDescriptor;
         aFillTexture: TBGRABitmap): PTexture;
 begin
-  Result := Add(aFont.StringToBitmap(aString, aFillTexture));
-  Result^.Filename := aString;
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(aString)
+  else begin
+    Result := Add(aFont.StringToBitmap(aString, aFillTexture));
+    Result^.Filename := aString;
+  end;
 end;
 
 function TOGLCTextureAtlas.AddScaledPPI(const aFilename: string): PTexture;
 var ima: TBGRABitmap;
 begin
-  ima := LoadBitmapScaledPPI(FParentScene, aFileName);
-  Result := InitFromBitmap(ima, ima.Width, ima.Height);
-  Result^.Filename := ExtractFilename(aFilename);
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aFilename))
+  else begin
+    ima := LoadBitmapScaledPPI(FParentScene, aFileName);
+    Result := InitFromBitmap(ima, ima.Width, ima.Height);
+    Result^.Filename := ExtractFilename(aFilename);
+  end;
 end;
 
 procedure TOGLCTextureAtlas.Build(aForceSizePowerOfTwo: boolean; aForceSquare: boolean);
