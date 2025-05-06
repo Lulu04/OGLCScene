@@ -869,6 +869,8 @@ begin
   p := SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
   FParentScene.Add(Self, aLayerIndex);
+  if FParentScene.Layer[aLayerIndex].Camera <> NIL then
+    p := FParentScene.Layer[aLayerIndex].Camera.ControlToWorld(p);
   SetCoordinate(p);
 end;
 
