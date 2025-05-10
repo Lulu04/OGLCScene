@@ -53,6 +53,8 @@ procedure DrawEllipse(const aScene: TOGLCScene; aX, aY, aRx, aRy: single; aColor
 function ScaleValueToFitScene(aTexture: PTexture; AScene: TOGLCScene; aSideMargin: integer=0): TPointF;
 // Compute the scale value to maximize the passed texture on the surface. Aspect ration is keeped.
 function ScaleValueToFitSurface(aTexture: PTexture; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
+// Compute the scale value to force a texture to have the wanted width
+function ScaleValueToFitWidth(aTexture: PTexture; aWantedWidth: integer): TPointF;
 // Compute the scale value to maximize the passed texture on a rectangle. Aspect ration is keeped.
 function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
 
@@ -632,6 +634,12 @@ begin
  rh := aTargetSurface.Height / aTexture^.TextureHeight;
  if rl < rh then r := rl else r := rh;
  Result := PointF(r, r);
+end;
+
+function ScaleValueToFitWidth(aTexture: PTexture; aWantedWidth: integer): TPointF;
+begin
+  Result.x := aWantedWidth/aTexture^.FrameWidth;
+  Result.y := Result.x;
 end;
 
 function ScaleValueToFitRect(aRect: TRectF; aTargetSurface: TSimpleSurfaceWithEffect): TPointF;
