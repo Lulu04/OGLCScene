@@ -1399,12 +1399,10 @@ begin
 end;
 
 procedure TOGLCScene.KillCamera(var aCamera: TOGLCCamera);
-var i: integer;
 begin
   if aCamera = NIL then exit;
-  for i:=0 to LayerCount-1 do
-    if Layer[i].Camera = aCamera then Layer[i].Camera := NIL;
-  FCameraList.Remove( aCamera );
+  aCamera.Unassign;
+  FCameraList.Remove(aCamera);
   aCamera.Free;
   aCamera := NIL;
 end;
