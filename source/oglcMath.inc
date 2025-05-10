@@ -34,6 +34,7 @@ TQuadCoorHelper = type helper for TQuadCoor
   procedure CopyFrom(const aQuad: TQuadCoor); inline;
   procedure AddOffset(const aOffsets: TQuadParamF); inline;
   procedure Translate(dx, dy: single);
+  function Bounds: TRectF;
 end;
 function QuadCoor(const aTL, aTR, aBR, aBL: TPointF): TQuadCoor;
 
@@ -278,6 +279,14 @@ begin
   Self[cTR].x := Self[cTR].x + dx;  Self[cTR].y := Self[cTR].y + dy;
   Self[cBR].x := Self[cBR].x + dx;  Self[cBR].y := Self[cBR].y + dy;
   Self[cBL].x := Self[cBL].x + dx;  Self[cBL].y := Self[cBL].y + dy;
+end;
+
+function TQuadCoorHelper.Bounds: TRectF;
+begin
+  Result.Left := Min(Min(Min(Self[cTL].x, Self[cTR].x), Self[cBR].x), Self[cBL].x);
+  Result.Right := Max(Max(Max(Self[cTL].x, Self[cTR].x), Self[cBR].x), Self[cBL].x);
+  Result.Top := Min(Min(Min(Self[cTL].y, Self[cTR].y), Self[cBR].y), Self[cBL].y);
+  Result.Bottom := Max(Max(Max(Self[cTL].y, Self[cTR].y), Self[cBR].y), Self[cBL].y);
 end;
 
 {$endif oglcIMPLEMENTATION}
