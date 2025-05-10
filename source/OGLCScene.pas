@@ -1175,19 +1175,19 @@ begin
      // empty modal panel list
      FModalPanelList.FreeAll;
 
-       if FCurrentScreen <> NIL then begin
-         FCurrentScreen.FreeObjects;
-         if FCurrentScreen.FreeWhenLeave
-           then FCurrentScreen.Free
-           else FCurrentScreen.ClearMessageList;
-       end;
-       FCurrentScreen := FScreenRequested;
-       FScreenRequested := NIL;
-       FCurrentScreen.ClearMessageList;
-       FCurrentScreen.CreateObjects;
-       ClearKeysState;
-       ColorFadeOut(FScreenFadeTime);
-       Mouse.MousePoolEnabled := True;
+     if FCurrentScreen <> NIL then begin
+       FCurrentScreen.FreeObjects;
+       if FCurrentScreen.FreeWhenLeave
+         then FCurrentScreen.Free
+         else FCurrentScreen.ClearMessageList;
+     end;
+     FCurrentScreen := FScreenRequested;
+     FScreenRequested := NIL;
+     FCurrentScreen.ClearMessageList;
+     FCurrentScreen.CreateObjects;
+     ClearKeysState;
+     ColorFadeOut(FScreenFadeTime);
+     Mouse.MousePoolEnabled := True;
    end;
  end;
 end;
