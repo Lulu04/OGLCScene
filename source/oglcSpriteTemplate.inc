@@ -618,8 +618,12 @@ begin
 end;
 
 procedure TQuad4Color.SetSize(const aQuad: TQuadCoor);
+var r: TRectF;
 begin
   FModelArea.CopyFrom(aQuad);
+  r := aQuad.Bounds;
+  FWidth := Round(r.Width);
+  FHeight := Round(r.Height);
 end;
 
 procedure TQuad4Color.SetAllColorsTo(AColor: TBGRAPixel);
