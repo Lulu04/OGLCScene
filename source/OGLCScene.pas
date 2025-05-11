@@ -180,7 +180,6 @@ TOGLCCamera = class;
 {$I oglcAppSaveUtils.inc}
 {$I oglcShader.inc}
 {$I oglcMessage.inc}
-{$I oglcScreenTemplate.inc}
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
@@ -195,6 +194,7 @@ TOGLCCamera = class;
 {$I oglcSurfaceWithProceduralShader.inc}
 {$I oglcPostProcessing.inc}
 {$I oglcSpriteTemplate.inc}
+{$I oglcScreenTemplate.inc}
 {$I oglcFXExplodeTexture.inc}
 {$I oglcFXScrolledSprite.inc}
 {$I oglcElectricalFX.inc}
@@ -388,6 +388,8 @@ TOGLCScene = class(TOGLCContext)
   procedure SetBlendMode(AValue: byte);
  private
   FPostProcessingEngine: TOGLCPostProcessingEngine;
+ private
+  FLoadingMessageSprite: TSprite;
  public
   // Post processing effects can be applyed on layers.
   // this property offers a bunch of tools to facilitate post-processing control.
@@ -898,7 +900,6 @@ end;
 {$I oglcAppSaveUtils.inc}
 {$I oglcShader.inc}
 {$I oglcMessage.inc}
-{$I oglcScreenTemplate.inc}
 {$I oglcTexture.inc}
 {$I oglcTextureAtlas.inc}
 {$I oglcTimer.inc}
@@ -913,6 +914,7 @@ end;
 {$I oglcSurfaceWithProceduralShader.inc}
 {$I oglcBorderAndFill.inc}
 {$I oglcSpriteTemplate.inc}
+{$I oglcScreenTemplate.inc}
 {$I oglcFXExplodeTexture.inc}
 {$I oglcFXScrolledSprite.inc}
 {$I oglcElectricalFX.inc}
@@ -1017,7 +1019,8 @@ begin
   FTextureManager := NIL;
   DestroyRenderers;
 
-
+  FLoadingMessageSprite.Free;
+  FLoadingMessageSprite := NIL;
 
   FreeVelocityCurveList;
 
@@ -1181,6 +1184,18 @@ begin
          then FCurrentScreen.Free
          else FCurrentScreen.ClearMessageList;
      end;
+
+     // show loading message sprite
+     FLoadingMessageSprite := FScreenRequested.GetLoadingMessageSprite;
+     if FLoadingMessageSprite <> NIL then begin
+       FLoadingMessageSprite.ParentScene := Self;
+       FLoadingMessageSprite.CenterOnScene;
+       Draw;
+       glFlush;
+       glFinish;
+       FOGLC.SwapBuffers;
+     end;
+
      FCurrentScreen := FScreenRequested;
      FScreenRequested := NIL;
      FCurrentScreen.ClearMessageList;
@@ -1188,6 +1203,9 @@ begin
      ClearKeysState;
      ColorFadeOut(FScreenFadeTime);
      Mouse.MousePoolEnabled := True;
+
+     FLoadingMessageSprite.Free;
+     FLoadingMessageSprite := NIL;
    end;
  end;
 end;
@@ -1523,6 +1541,10 @@ begin
   // Scene global fade
   if FGlobalFadeColor.Alpha.Value > 0
     then FillBox(Self, 0, 0, GetViewPortWidth, GetViewPortHeight, FGlobalFadeColor.Value);
+
+  // Loading message sprite
+  if FLoadingMessageSprite <> NIL then
+    FLoadingMessageSprite.Draw(1.0);
 
   // render an eventual remains in the batch renderer process
   FTexturedMVTriangleRenderer.Batch_Flush;

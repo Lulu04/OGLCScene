@@ -34,6 +34,10 @@ public
   procedure FreeObjects; virtual; abstract;
   // override to update objects according time. don't forget to call inherited.
   procedure Update(const AElapsedTime: single); virtual;
+
+  // override to define a sprite to show a message to the player before the call
+  // to CreateObjects.
+  function GetLoadingMessageSprite: TSprite; virtual;
 end;
 
 {$endif oglcINTERFACE}
@@ -70,6 +74,11 @@ end;
 procedure TScreenTemplate.Update(const AElapsedTime: single);
 begin
   FMessageList.ProcessMessages(AElapsedTime);
+end;
+
+function TScreenTemplate.GetLoadingMessageSprite: TSprite;
+begin
+  Result := NIL;
 end;
 
 {$endif oglcIMPLEMENTATION}
