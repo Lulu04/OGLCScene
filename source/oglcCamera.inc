@@ -158,7 +158,7 @@ public
   procedure AssignToLayer(aLayerIndex: integer); overload;
   // Assign the camera to several layers specified by their indexes
   // All previous assigned camera is replaced by the new one.
-  procedure AssignToLayer(const aLayerIndexList: array of integer); overload;
+  procedure AssignToLayers(const aLayerIndexList: array of integer); overload;
   // Assign the camera to the layers specified by a range index.
   // All previous assigned camera is replaced by the new one.
   procedure AssignToLayerRange(aFirstLayerIndex, aLastLayerIndex: integer);
@@ -555,7 +555,7 @@ begin
   FParentScene.Layer[aLayerIndex].Camera := self;
 end;
 
-procedure TOGLCCamera.AssignToLayer(const aLayerIndexList: array of integer);
+procedure TOGLCCamera.AssignToLayers(const aLayerIndexList: array of integer);
 var i: Integer;
 begin
   with FParentScene do
