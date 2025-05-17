@@ -242,7 +242,6 @@ TOGLCContext = class(TLayerList)
   FNeedToResizeViewPort: boolean;
   FKeyState: array[0..255] of boolean;
   FKeyPressed: array[0..255] of boolean;
-  FKeyPressedCount: integer;
   FLastKeyDown: Byte;
   FLastUTF8CharEntered: string;
   FMouseManager: TMouseManager;
@@ -662,8 +661,11 @@ begin
 end;
 
 function TOGLCContext.GetUserPressAKey: boolean;
+var i: integer;
 begin
-  Result := FKeyPressedCount > 0;
+  Result := False;
+  for i:=0 to High(FKeyState) do
+    if FKeyState[i] then exit(True);
 end;
 
 procedure TOGLCContext.ProcessOnMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -826,12 +828,10 @@ begin
       if lclintf.GetKeyState(VK_RCONTROL) < 0 then key2 := VK_RCONTROL;
     end;
     if key2 <> 0 then begin
-      if not FKeyState[byte(Key2)] then inc(FKeyPressedCount);
       FKeyState[byte(Key2)] := TRUE;
       FLastKeyDown := byte(Key2);
     end else FLastKeyDown := byte(Key);
 
-    if not FKeyState[byte(Key)] then inc(FKeyPressedCount);
     FKeyState[byte(Key)] := TRUE;
   end;
 end;
@@ -852,20 +852,16 @@ begin
       if FKeyState[VK_RCONTROL] and (lclintf.GetKeyState(VK_RCONTROL) >= 0) then key2 := VK_RCONTROL;
     end;
     if key2 <> 0 then begin
-      if FKeyState[byte(key2)] then begin
+      if FKeyState[byte(key2)] then
         FKeyPressed[byte(key2)] := TRUE;
-        dec(FKeyPressedCount);
-      end;
       FKeyState[byte(key2)] := FALSE;
     end;
 
-    if FKeyState[byte(Key)] then begin
+    if FKeyState[byte(Key)] then
       FKeyPressed[byte(Key)] := TRUE;
-      dec(FKeyPressedCount);
-    end;
+
     FKeyState[byte(Key)] := FALSE;
   end;
-if FKeyPressedCount < 0 then raise exception.create('FKeyPressedCount is < 0');
 end;
 
 procedure TOGLCContext.ProcessOnUTF8KeyPress(var UTF8Key: TUTF8Char);
