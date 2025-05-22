@@ -265,8 +265,15 @@ public // utils
   // Center the surface on its parent
   procedure CenterOnParent;
 public // Local <-> World
+  // Transform local coordinates to world coordinates.
+  // Take in acount the camera assigned to the parent layer of the surface.
   function SurfaceToScene(aPt: TPointF): TPointF;
+  // Transform world coordinates to local coordinates.
+  // Take in acount the camera assigned to the parent layer of the surface.
   function SceneToSurface(aPt: TPointF): TPointF;
+  // Transform local coordinates to world coordinates.
+  // Don't take in acount the camera assigned to the parent layer of the surface.
+  function SurfaceToSceneWithoutLayerTransform(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
@@ -938,6 +945,17 @@ begin
   until s = NIL;      }
 
   Result := GetMatrixSurfaceToWorld.Inverse.Transform(aPt);
+end;
+
+function TSimpleSurfaceWithEffect.SurfaceToSceneWithoutLayerTransform(aPt: TPointF): TPointF;
+var s: TSimpleSurfaceWithEffect;
+begin
+  s := Self;
+  Result := aPt;
+  repeat
+    Result := s.GetMatrix.Transform(Result);
+    s := s.ParentSurface;
+  until s = NIL;
 end;
 
 function TSimpleSurfaceWithEffect.SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect): TPointF;
