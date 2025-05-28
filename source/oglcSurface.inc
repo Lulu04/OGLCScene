@@ -274,6 +274,7 @@ public // Local <-> World
   // Transform local coordinates to world coordinates.
   // Don't take in acount the camera assigned to the parent layer of the surface.
   function SurfaceToSceneWithoutLayerTransform(aPt: TPointF): TPointF;
+  function SceneToSurfaceWithoutLayerTransform(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
@@ -873,11 +874,11 @@ procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayerIndex: integer);
 var p: TPointF;
 begin
   if ParentSurface = NIL then exit;
-  p := SurfaceToScene(PointF(0,0));
+  p := SurfaceToSceneWithoutLayerTransform(PointF(0,0)); //SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
   FParentScene.Add(Self, aLayerIndex);
-  if FParentScene.Layer[aLayerIndex].Camera <> NIL then
-    p := FParentScene.Layer[aLayerIndex].Camera.ControlToWorld(p);
+ { if FParentScene.Layer[aLayerIndex].Camera <> NIL then
+    p := FParentScene.Layer[aLayerIndex].Camera.ControlToWorld(p); }
   SetCoordinate(p);
 end;
 
@@ -886,7 +887,7 @@ var p: TPointF;
 begin
   if aParentSurface = NIL then exit;
 
-  p := aParentSurface.SceneToSurface(GetXY);
+  p := aParentSurface.SceneToSurfaceWithoutLayerTransform(GetXY); // aParentSurface.SceneToSurface(GetXY);
   ParentLayer.Remove(Self);
   aParentSurface.AddChild(Self, aZOrder);
   SetCoordinate(p);
@@ -954,6 +955,17 @@ begin
   Result := aPt;
   repeat
     Result := s.GetMatrix.Transform(Result);
+    s := s.ParentSurface;
+  until s = NIL;
+end;
+
+function TSimpleSurfaceWithEffect.SceneToSurfaceWithoutLayerTransform(aPt: TPointF): TPointF;
+var s: TSimpleSurfaceWithEffect;
+begin
+  s := Self;
+  Result := aPt;
+  repeat
+    Result := s.GetInverseMatrix.Transform(Result);
     s := s.ParentSurface;
   until s = NIL;
 end;
