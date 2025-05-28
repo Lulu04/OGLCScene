@@ -194,6 +194,10 @@ TFontDescriptor = record
                    aOutLineColor: TBGRAPixel; aOutLineWidth: single;
                    aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer); overload;
 
+  // After creating a font descriptor, call this method to compute the font height so that the passed string will
+  // fit in the passed rect with a maximum size.
+  procedure ComputeMaxHeightFor(const aString: string; const aRect: TRect);
+
   procedure Check;
   function StringToBitmap(const aStr: string; aFillTexture: TBGRABitmap): TBGRABitmap;
   // if the font use outline or shadow, aBitmap must be initialized with a font renderer with method SetFontRendererOn(...).
@@ -598,6 +602,22 @@ begin
   ima := TBGRABitmap.Create(1,1);
   SetFontRendererOn(ima);
   FontPixelMetric := ima.FontPixelMetric;
+  ima.Free;
+end;
+
+procedure TFontDescriptor.ComputeMaxHeightFor(const aString: string; const aRect: TRect);
+var ima: TBGRABitmap;
+  siz: TSize;
+begin
+  ima := TBGRABitmap.Create(1, 1);
+  SetFontRendererOn(ima);
+  ima.FontFullHeight := 1;
+  repeat
+    ima.FontFullHeight := ima.FontFullHeight + 1;
+    siz := ima.TextSize(aString);
+  until (siz.cx > aRect.Width) or (siz.cy > aRect.Height);
+  FontHeight := ima.FontFullHeight - 1;
+  Check;
   ima.Free;
 end;
 
