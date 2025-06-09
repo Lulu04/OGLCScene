@@ -8,6 +8,7 @@ private
   FTextureOwner: boolean;
   FTexture: PTexture;
   FModelArea: TQuadCoor;
+  FWidth, FHeight: integer;
   procedure Init; virtual;
   procedure SetTexture(AValue: PTexture); virtual;
 protected
@@ -22,6 +23,8 @@ public
   // Draw aCaption in a texture and create a sprite with it.
   constructor Create(aParentScene: TOGLCScene; const aFont: TFontDescriptor; const aCaption: string; aFillTexture: TBGRABitmap=NIL);
   Destructor Destroy; override;
+  // Allow to resize the sprite: the texture will be stretched
+  procedure SetSize(aWidth, aHeight: integer);
   property Texture: PTexture read FTexture write SetTexture;
 end;
 TArrayOfSprite = array of TSprite;
@@ -318,18 +321,12 @@ end;
 
 function TSprite.GetWidth: integer;
 begin
-  if FTexture = NIL then
-    Result := 0
-  else
-    Result := FTexture^.FrameWidth;
+  Result := FWidth;
 end;
 
 function TSprite.GetHeight: integer;
 begin
-  if FTexture = NIL then
-    Result := 0
-  else
-    Result := FTexture^.FrameHeight;
+  Result := FHeight;
 end;
 
 procedure TSprite.DoDraw;
@@ -348,8 +345,15 @@ begin
   inherited Create;
   FTextureOwner := Owner;
   FTexture := ATexture;
-  if FTexture <> NIL then FModelArea.SetAsRectangle(FTexture^.FrameWidth, FTexture^.FrameHeight)
-    else FModelArea.SetAsEmpty;
+  if FTexture <> NIL then begin
+    FModelArea.SetAsRectangle(FTexture^.FrameWidth, FTexture^.FrameHeight);
+    FWidth := FTexture^.FrameWidth;
+    FHeight := FTexture^.FrameHeight;
+  end else begin
+    FModelArea.SetAsEmpty;
+    FWidth := 1;
+    FHeight := 1;
+  end;
   Init;
 end;
 
@@ -365,6 +369,13 @@ destructor TSprite.Destroy;
 begin
   if FTextureOwner then FParentScene.TexMan.Delete(FTexture);
   inherited Destroy;
+end;
+
+procedure TSprite.SetSize(aWidth, aHeight: integer);
+begin
+  FWidth := aWidth;
+  FHeight := aHeight;
+  FModelArea.SetAsRectangle(aWidth, aHeight);
 end;
 
 { TSpriteWithElasticCorner }
