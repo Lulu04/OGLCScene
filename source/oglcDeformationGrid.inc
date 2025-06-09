@@ -151,7 +151,7 @@ begin
      end;
 
      dtWindingUp: begin
-      if DeformationSpeed.x.Value > 0 then begin
+      if DeformationSpeed.y.Value > 0 then begin
         if p^.y > 0 then begin
           p^.y := p^.y - aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
           if p^.y < 0 then p^.y := 0
@@ -166,7 +166,7 @@ begin
      end;
 
      dtWindingDown: begin
-      if DeformationSpeed.x.Value > 0 then begin
+      if DeformationSpeed.y.Value > 0 then begin
         if p^.y < Height then begin
           p^.y := p^.y + aElapsedTime*p^.TimeMultiplicator*DeformationSpeed.y.Value*ampY*p^.DeformationAmount;
           if p^.y > Height then p^.y := Height
