@@ -323,7 +323,6 @@ end;
 TUIImage = class(TSprite)
 private
   FAutoSize, FKeepProportion, FCentered: boolean;
-  FWidth, FHeight: integer;
   FDrawOffset: TPointF;
   FRectToRender: TRect;
   procedure SetAutoSize(AValue: boolean);
