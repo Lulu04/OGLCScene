@@ -27,8 +27,8 @@ function SecondsToString(aTime: single; aShowFractionalPart: boolean): string;
 // return a TBGRABitmap from an SVG file.
 // aWidth and aHeight = -1 => return an image with original size as described in svg.
 // aWidth and aHeight <> -1 => return a streched image that fit in the given rectangle (don't keep aspect ratio).
-// Only aImageWidth = '-1' => returned image width is computed from aHeight to keep aspect ratio.
-// Only aImageHeight = '-1' => returned image height is computed from aWidth to keep aspect ratio.
+// Only aWidth = '-1' => the width of the returned image is computed in respect of aHeight to keep aspect ratio.
+// Only aHeight = '-1' => the height of the returned image is computed in respect of aWidth to keep aspect ratio.
 // the drawing is centered in the returned bitmap
 function LoadBitmapFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): TBGRABitmap;
 
