@@ -23,7 +23,11 @@ public
   // Draw aCaption in a texture and create a sprite with it.
   constructor Create(aParentScene: TOGLCScene; const aFont: TFontDescriptor; const aCaption: string; aFillTexture: TBGRABitmap=NIL);
   Destructor Destroy; override;
-  // Allow to resize the sprite: the texture will be stretched
+  // Allow to resize or stretch the sprite (the texture is not modified).
+  // aWidth and aHeight = -1 => do nothing
+  // aWidth and aHeight <> -1 => strech the sprite (don't keep aspect ratio).
+  // Only aWidth = '-1' => the width is computed in respect of aHeight to keep aspect ratio.
+  // Only aHeight = '-1' => the height is computed in respect of aWidth to keep aspect ratio.
   procedure SetSize(aWidth, aHeight: integer);
   property Texture: PTexture read FTexture write SetTexture;
 end;
@@ -346,9 +350,9 @@ begin
   FTextureOwner := Owner;
   FTexture := ATexture;
   if FTexture <> NIL then begin
-    FModelArea.SetAsRectangle(FTexture^.FrameWidth, FTexture^.FrameHeight);
     FWidth := FTexture^.FrameWidth;
     FHeight := FTexture^.FrameHeight;
+    FModelArea.SetAsRectangle(FWidth, FHeight);
   end else begin
     FModelArea.SetAsEmpty;
     FWidth := 1;
@@ -372,7 +376,19 @@ begin
 end;
 
 procedure TSprite.SetSize(aWidth, aHeight: integer);
+var FWHFactor, cw, ch: single;
 begin
+  if (aWidth = -1) and (aHeight = -1) then exit;
+
+  cw := FWidth;
+  ch := FHeight;
+  FWHFactor := cw/ch;
+  if aWidth = -1 then begin
+    aWidth := round(aHeight*FWHFactor) // compute width to keep aspect ratio
+  end else if aHeight = -1 then begin
+    aHeight := round(aWidth/FWHFactor); // compute height to keep aspect ratio
+  end;
+
   FWidth := aWidth;
   FHeight := aHeight;
   FModelArea.SetAsRectangle(aWidth, aHeight);
