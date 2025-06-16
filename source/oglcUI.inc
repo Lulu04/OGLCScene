@@ -514,6 +514,7 @@ public
   // Use this object to define the color used to fill the progress.
   // You can define a simple color or a complex gradient.
   Gradient: TGradientDescriptor;
+  // aOrientation can be uioHorizontal or uioVertical
   constructor Create(aParentScene: TOGLCScene; aOrientation: TUIOrientation);
   property Orientation: TUIOrientation read FOrientation write FOrientation;
   property Percent: single read FPercent write SetPercent; // [0..1]
