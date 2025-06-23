@@ -504,7 +504,9 @@ private
   FOrientation: TUIOrientation;
   FPercent: single;
   FFillForStencil: TOGLCFill;
+  FReversed: boolean;
   procedure SetPercent(AValue: single);
+  procedure SetReversed(AValue: boolean);
   procedure UpdateWidgetSizeAndLayout; override;
 protected
   function Margin: integer; override;
@@ -518,6 +520,7 @@ public
   constructor Create(aParentScene: TOGLCScene; aOrientation: TUIOrientation);
   property Orientation: TUIOrientation read FOrientation write FOrientation;
   property Percent: single read FPercent write SetPercent; // [0..1]
+  property Reversed: boolean read FReversed write SetReversed;
 end;
 
 {$endif oglcINTERFACE}
@@ -1169,21 +1172,34 @@ begin
   UpdateWidgetSizeAndLayout;
 end;
 
+procedure TUIProgressBar.SetReversed(AValue: boolean);
+begin
+  if FReversed = AValue then Exit;
+  FReversed := AValue;
+  UpdateWidgetSizeAndLayout;
+end;
+
 procedure TUIProgressBar.UpdateWidgetSizeAndLayout;
-var w, h: single;
+var w, h, xx, yy: single;
    path: TOGLCPath;
 begin
   ComputeClientArea;
   if FPercent > 0 then begin
+    xx := 0;
+    yy := 0;
     if FOrientation = uioHorizontal then begin
       w := ClientArea.Width*FPercent; // Width*FPercent;
       h := ClientArea.Height; // Height;
+      if FReversed then
+        xx := ClientArea.Width - w;
     end else begin
       w := ClientArea.Width;  //Width;
       h := ClientArea.Height*FPercent; //Height*FPercent;
+      if FReversed then
+        yy := ClientArea.Height - h;
     end;
     path := NIL;
-    path.CreateRect(0, 0, w, h, False);
+    path.CreateRect(xx, yy, w, h, False);
     FFillForStencil.InitFromPath(path, PointF(w*0.5, h*0.5));
   end;
   Gradient.ComputeVerticesAndIndices(Width, Height);
