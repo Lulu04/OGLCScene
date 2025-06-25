@@ -24,9 +24,9 @@ object Form_Principale: TForm_Principale
     Height = 350
     Top = 400
     Width = 1024
-    ActivePage = TabSheet10
+    ActivePage = TabSheet2
     Align = alClient
-    TabIndex = 7
+    TabIndex = 0
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = 'Texture and Frame animation'
