@@ -67,6 +67,10 @@ public
   // Image Packer is the owner of the returned TTexturedFont, don't free it in your code !
   function AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont;
 
+  // Construct a tileset image from several svg files (tiles with same size) and
+  // add it to the atlas. Tiles must be square.
+  function AddTileSetFromSVG(const aName: string; aTileSize, aRowCount, aColumnCount: integer; const aSVGFileNames: TStringArray): PTexture;
+
   function RetrieveTextureByFileName(const aFilename: string): PTexture; virtual;
 
   // try to pack all added images in single one with size constraints.
@@ -450,6 +454,26 @@ begin
 
   SetLength(FTexturedFontToFree, Length(FTexturedFontToFree)+1);
   FTexturedFontToFree[High(FTexturedFontToFree)] := Result;
+end;
+
+function TOGLCImagePacker.AddTileSetFromSVG(const aName: string; aTileSize,
+  aRowCount, aColumnCount: integer; const aSVGFileNames: TStringArray): PTexture;
+var wholeIma, ima: TBGRABitmap;
+  i, ro, co: integer;
+begin
+  if Length(aSVGFileNames) = 0 then raise exception.Create('file array is empty...');
+  wholeIma := TBGRABitmap.Create(aColumnCount*aTileSize, aRowCount*aTileSize, BGRAPixelTransparent);
+  i := 0;
+  for ro:=0 to aRowCount-1 do
+    for co:=0 to aColumnCount-1 do begin
+      ima := LoadBitmapFromSVG(aSVGFileNames[i], aTileSize, aTileSize);
+      wholeIma.PutImage(aTileSize*co, aTileSize*ro, ima, dmDrawWithTransparency);
+      ima.Free;
+      inc(i);
+    end;
+
+  Result := Add(wholeIma);
+  Result^.Filename := aName;
 end;
 
 function TOGLCImagePacker.RetrieveTextureByFileName(const aFilename: string): PTexture;
