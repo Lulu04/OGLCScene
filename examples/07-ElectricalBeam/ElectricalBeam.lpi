@@ -83,7 +83,7 @@
         <Filename Value="ElectricalBeam.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <CursorPos Y="4"/>
+        <CursorPos X="44" Y="17"/>
         <UsageCount Value="200"/>
       </Unit0>
       <Unit1>
@@ -113,11 +113,15 @@
         <Loaded Value="True"/>
       </Unit3>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="11" Column="6"/>
       </Position1>
+      <Position2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="17" Column="40"/>
+      </Position2>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
