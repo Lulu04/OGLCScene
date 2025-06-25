@@ -172,13 +172,13 @@ FScene.LogDebug('TTextureList.Add: BEFORE Textures.Size='+Size.tostring);
   //o.InitDefault;
   o := Default(TTextureItem);
   DoUpdate(@o, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight);
-for i:=0 to Size-1 do
- FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name);
+{for i:=0 to Size-1 do
+ FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name); }
   PushBack(o);
 
-FScene.LogDebug('TTextureList.Add: AFTER Textures.Size='+Size.tostring);
+{FScene.LogDebug('TTextureList.Add: AFTER Textures.Size='+Size.tostring);
 for i:=0 to Size-1 do
- FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name);
+ FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name); }
 end;
 
 procedure TTextureList.Update(aItem: PTextureItem; const aFilename, aName: string; aWidth,

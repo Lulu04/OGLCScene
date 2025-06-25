@@ -18,9 +18,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 512
     Top = 32
     Width = 300
-    ActivePage = PageTextures
+    ActivePage = PagePostures
     Anchors = [akTop, akLeft, akRight]
-    TabIndex = 0
+    TabIndex = 3
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet

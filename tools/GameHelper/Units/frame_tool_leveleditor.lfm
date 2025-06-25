@@ -1,0 +1,23 @@
+object FrameToolLevelEditor: TFrameToolLevelEditor
+  Left = 0
+  Height = 541
+  Top = 0
+  Width = 300
+  ClientHeight = 541
+  ClientWidth = 300
+  TabOrder = 0
+  DesignLeft = 642
+  DesignTop = 257
+  object PC1: TPageControl
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 424
+    Top = 0
+    Width = 300
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 0
+  end
+end
