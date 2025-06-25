@@ -9,7 +9,8 @@ uses
   StdCtrls, Menus, OpenGLContext,
   OGLCScene, u_common, Types,
   frame_tool_spritebuilder,
-  frame_tool_spritebank;
+  frame_tool_spritebank,
+  frame_tool_leveleditor;
 
 {
  RIGHT MOUSE button: Move view
@@ -26,12 +27,16 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
+    BLevelBank: TSpeedButton;
+    BLevelEditor: TSpeedButton;
     Label1: TLabel;
     Label3: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
+    PageLevelEditor: TPage;
+    PageLevelBank: TPage;
     PageSpriteBuilder: TPage;
-    PageBank: TPage;
+    PageSpriteBank: TPage;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
@@ -42,6 +47,7 @@ type
     BSpriteBank: TSpeedButton;
     BSpriteBuilder: TSpeedButton;
     Panel8: TPanel;
+    Panel9: TPanel;
     ToolBar1: TToolBar;
     BNewScreen: TToolButton;
     BLoadScreen: TToolButton;
@@ -83,11 +89,12 @@ var
 
   FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder;
   FrameToolsSpriteBank: TFrameToolSpriteBank;
+  FrameToolLevelEditor: TFrameToolLevelEditor;
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas, u_datamodule,
-  BGRABitmap, BGRABitmapTypes;
+  u_screen_levelbank, BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
 
 { TFormMain }
@@ -99,7 +106,7 @@ begin
   FScene := TOGLCScene.Create(OGL, -1);
   FScene.DesignPPI := 96;
   FScene.LayerCount := LAYER_COUNT;
-  //FScene.BackgroundColor := BGRA(0,200,255);
+  FScene.BackgroundColor := BGRA(40,40,40);
   FScene.ScreenFadeTime := 0;
   FScene.CreateLogFile(Application.Location+'scene.log', True);
 
@@ -113,8 +120,13 @@ begin
   FrameToolsSpriteBuilder.Align := alClient;
 
   FrameToolsSpriteBank := TFrameToolSpriteBank.Create(Self);
-  FrameToolsSpriteBank.Parent := PageBank;
+  FrameToolsSpriteBank.Parent := PageSpriteBank;
   FrameToolsSpriteBank.Align := alClient;
+
+  FrameToolLevelEditor := TFrameToolLevelEditor.Create(Self);
+  FrameToolLevelEditor.Parent := PageLevelEditor;
+  FrameToolLevelEditor.Align := alClient;
+
 
 end;
 
@@ -145,7 +157,7 @@ procedure TFormMain.BSpriteBankClick(Sender: TObject);
 begin
   if Sender = BSpriteBank then begin
     FScene.RunScreen(ScreenSpriteBank);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBank);
     FrameToolsSpriteBank.OnShow;
     UpdateWidgets;
   end;
@@ -154,7 +166,13 @@ begin
     FScene.RunScreen(ScreenSpriteBuilder);
     Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
     FrameToolsSpriteBuilder.OnShow;
-    //FormToolsBuilder.Show;
+    UpdateWidgets;
+  end;
+
+  if Sender = BLevelBank then begin
+    FScene.RunScreen(ScreenLevelBank);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
+    FrameToolLevelEditor.OnShow;
     UpdateWidgets;
   end;
 end;
@@ -227,6 +245,9 @@ begin
 
   SpriteBank := TSpriteBank.Create;
 
+  // level bank
+  ScreenLevelBank := TScreenLevelBank.Create;
+
   // load last project
   if AppPref.LastProjectFilename <> ''
     then Project.Load(AppPref.LastProjectFilename);
@@ -248,6 +269,9 @@ begin
 
   ScreenSpriteBank.Finalize;
   FreeAndNil(ScreenSpriteBank);
+
+  ScreenLevelBank.Finalize;
+  FreeAndNil(ScreenLevelBank);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
@@ -258,13 +282,19 @@ end;
 
 procedure TFormMain.UpdateWidgets;
 begin
-  BSpriteBank.Enabled := False;
-  BSpriteBuilder.Enabled := Notebook1.PageIndex <> Notebook1.IndexOf(PageSpriteBuilder);
+  BSpriteBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageLevelBank);
+//  BSpriteBuilder.Enabled := (Notebook1.PageIndex <> Notebook1.IndexOf(PageSpriteBuilder)) and
+//                            (Notebook1.PageIndex <> Notebook1.IndexOf(PageLevelEditor));
+
+  BLevelBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageSpriteBank);
+
+  BSpriteBuilder.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
+  BLevelEditor.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
 begin
-  Notebook1.PageIndex := Notebook1.IndexOf(PageBank);
+  Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBank);
   FrameToolsSpriteBank.OnShow;
   FScene.RunScreen(ScreenSpriteBank);
   UpdateWidgets;

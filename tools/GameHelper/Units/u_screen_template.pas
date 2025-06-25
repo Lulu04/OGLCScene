@@ -236,7 +236,7 @@ procedure TCustomScreenTemplate.CreateCamera(
   const aLayerIndexList: array of integer);
 begin
   FCamera := FScene.CreateCamera;
-  FCamera.AssignToLayer(aLayerIndexList);
+  FCamera.AssignToLayers(aLayerIndexList);
   FCamera.MoveTo(PointF(0,0));
   FViewOffset := -FCamera.LookAt.Value;
   Zoom := 1.0;

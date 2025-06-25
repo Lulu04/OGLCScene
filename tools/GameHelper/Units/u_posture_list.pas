@@ -15,7 +15,7 @@ type
 { TPostureValues }
 
 TPostureValues = record
-  angle, x, y: single;
+  angle, x, y, scalex, scaley: single;
   function SaveToString: string;
   procedure LoadFromString(const s: string);
 end;
@@ -80,7 +80,9 @@ function TPostureValues.SaveToString: string;
 begin
   Result := FormatFloatWithDot('0.000', x)+' '+
             FormatFloatWithDot('0.000', y)+' '+
-            FormatFloatWithDot('0.000', angle);
+            FormatFloatWithDot('0.000', angle)+' '+
+            FormatFloatWithDot('0.000', scalex)+' '+
+            FormatFloatWithDot('0.000', scaley);
 end;
 
 procedure TPostureValues.LoadFromString(const s: string);
@@ -90,6 +92,8 @@ begin
   x := StringToSingle(A[0]);
   y := StringToSingle(A[1]);
   angle := StringToSingle(A[2]);
+  if Length(A) > 3 then scalex := StringToSingle(A[3]) else scalex := 1.0;
+  if Length(A) > 4 then scaley := StringToSingle(A[4]) else scaley := 1.0;
 end;
 
 { TPostureItem }
@@ -112,6 +116,8 @@ begin
     Values[i].x := item^.surface.X.Value;
     Values[i].y := item^.surface.Y.Value;
     Values[i].angle := item^.surface.Angle.Value;
+    Values[i].scalex := item^.surface.Scale.X.Value;
+    Values[i].scaley := item^.surface.Scale.Y.Value;
   end;
 end;
 

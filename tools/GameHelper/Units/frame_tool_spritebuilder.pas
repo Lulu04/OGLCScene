@@ -403,6 +403,8 @@ begin
     surf^.surface.X.ChangeTo(post^.Values[j].x, FSE1.Value, idcSinusoid);
     surf^.surface.Y.ChangeTo(post^.Values[j].y, FSE1.Value, idcSinusoid);
     surf^.surface.Angle.ChangeTo(post^.Values[j].angle, FSE1.Value, idcSinusoid);
+    surf^.surface.Scale.X.ChangeTo(post^.Values[j].scalex, FSE1.Value, idcSinusoid);
+    surf^.surface.Scale.Y.ChangeTo(post^.Values[j].scaley, FSE1.Value, idcSinusoid);
   end;
   ScreenSpriteBuilder.SelectNone;
 end;
@@ -814,17 +816,17 @@ begin
 
   texName := Trim(Edit1.Text);
 
-FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: BEFORE Textures.Size='+Textures.Size.tostring);
+{FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: BEFORE Textures.Size='+Textures.Size.tostring);
 for i:=0 to Textures.Size-1 do
-  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);
+  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name); }
 
 FScene.LogDebug('  ADDING '+Label2.Caption+'  '+texName);
   Textures.Add(Label2.Caption, texName, SE9.Value, SE10.Value,
                CheckBox1.Checked, SE11.Value, SE12.Value);
 
-FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: AFTER Textures.Size='+Textures.Size.tostring);
+{FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: AFTER Textures.Size='+Textures.Size.tostring);
 for i:=0 to Textures.Size-1 do
-  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);
+  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);  }
 
   FInitializingWidget := True;
   LBTextureNames.ItemIndex := LBTextureNames.Items.Add(texName);

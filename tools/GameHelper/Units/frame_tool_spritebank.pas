@@ -91,6 +91,7 @@ var t: TStringlist;
   p: SizeInt;
   bodyList: TBodyItemList;
   pt: TPostureValues;
+  pf: TPointF;
   function GetClassName: string;
   begin
     Result := Trim(Edit1.Text);
@@ -113,6 +114,16 @@ var t: TStringlist;
     if aAngle = 0 then Result := Result+'0'
       else Result := Result+FormatFloatWithDot('0.000', aAngle);
     Result := Result+', aDuration, idcSinusoid);';
+  end;
+  function Generate_ScaleChangeTo(aScaleX, aScaleY: single; const aSurfaceName: string): string;
+  begin
+    Result := '  '+aSurfaceName+'.Scale.ChangeTo(PointF(';
+    if aScaleX = 1.0 then Result := Result+'1.0'
+      else Result := Result+FormatFloatWithDot('0.000', aScaleX);
+    Result := Result + ', ';
+    if aScaleY = 1.0 then Result := Result+'1.0'
+      else Result := Result+FormatFloatWithDot('0.000', aScaleY);
+    Result := Result + '), aDuration, idcSinusoid);';
   end;
   function FormatXCoorRelativeToParentWidth(aX: single; const aSurfaceName: string): string;
   begin
@@ -137,7 +148,7 @@ begin
 
   t := TStringlist.Create;
 
-  t.AddText('unit '+ Trim(Edit1.Text)+';'#10+
+  t.AddText('unit '+ ChangeFileExt(ExtractFilename(SD1.FileName), '')+';'#10+
             #10+
             '{$mode ObjFPC}{$H+}'#10+
             #10+
@@ -322,7 +333,7 @@ begin
 
     if current^.classtype = TSpriteContainer then begin
       s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
-           //#10;
+
     end else
     if current^.classtype = TSprite then begin
       s := '  '+current^.name+' := TSprite.Create('+current^.textureName+', False);';
@@ -377,6 +388,8 @@ begin
     t.Add('  // Collision body');
     for i:=0 to bodyList.Size-1 do begin
       bodyItem := bodyList.Mutable[i];
+      // to keep right proportion, coordinates must be relative to
+      // the width and height
       case bodyItem^.BodyType of
         _btPoint: t.Add('  CollisionBody.AddPoint('+PointFToString(bodyItem^.ItemDescriptor.pt)+'*FAdditionalScale);');
         _btLine: t.Add('  CollisionBody.AddLine('+PointFToString(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
@@ -390,7 +403,11 @@ begin
           s := '  CollisionBody.AddPolygon([';
           c := 0;
           for j:=0 to High(bodyItem^.ItemDescriptor.pts) do begin
-            s := s + PointFToString(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
+            pf := bodyItem^.ItemDescriptor.pts[j];
+            s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, rootItem^.name)+
+                     ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, rootItem^.name)+
+                     ')*FAdditionalScale';
+            //s := s + PointFToString(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
             if j < High(bodyItem^.ItemDescriptor.pts) then s := s+', ';
             inc(c);
             if (c mod 2 = 0) and (j > 0) and (j < Length(bodyItem^.ItemDescriptor.pts)-1) then s := s + #10'    ';
@@ -441,9 +458,10 @@ begin
           sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width, _parent^.name);
           sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, _parent^.name);
         end;
-        t.Add('  '+current^.name+'.SetCoordinate('+sx+', '+sy+', aDuration, idcSinusoid);');
+        t.Add('  '+current^.name+'.MoveTo('+sx+', '+sy+', aDuration, idcSinusoid);');
 
         t.Add(Generate_AngleChangeTo(Postures.Mutable[i]^.Values[j].angle, current^.name));
+        t.Add(Generate_ScaleChangeTo(Postures.Mutable[i]^.Values[j].scalex, Postures.Mutable[i]^.Values[j].scaley, current^.name));
       end;
       t.Add('end;');
       t.Add('');

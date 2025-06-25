@@ -10,11 +10,12 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, lazopenglcontext, OGLCScene, u_common, form_main,
-  u_screen_spritebuilder, u_project, u_texture_list,
-  u_app_pref, Dialogs, u_surface_list, u_utils, u_screen_template, u_spritebank,
-  u_ui_handle, u_screen_spritebank, frame_tool_spritebuilder,
-frame_tool_spritebank, u_collisionbody_list, u_ui_atlas, u_datamodule,
-u_undo_redo, u_undoredo_spritebuilder, u_posture_list;
+  u_screen_spritebuilder, u_project, u_texture_list, u_app_pref, Dialogs,
+  u_surface_list, u_utils, u_screen_template, u_spritebank, u_ui_handle,
+  u_screen_spritebank, frame_tool_spritebuilder, frame_tool_spritebank,
+  u_collisionbody_list, u_ui_atlas, u_datamodule, u_undo_redo,
+  u_undoredo_spritebuilder, u_posture_list, frame_tool_leveleditor,
+u_screen_levelbank, u_levelbank, u_surface_extradata;
 
 {$R *.res}
 
