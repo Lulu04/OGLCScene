@@ -114,7 +114,9 @@ begin
     with aTileEngine.GetPTile( ro, co )^ do
       begin
        if co > 0 then s += ' ';
-       s += 'T' + inttostr( TextureIndex ) + ',' + inttostr( ixFrame ) + ',' + inttostr( iyFrame ) + ',' + inttostr( UserEvent );
+       s += 'T' + TextureIndex.ToString + ',' +
+            ixFrame.ToString + ',' + iyFrame.ToString + ',' + UserEvent.ToString +
+            ',' + FlipIndex.ToString;
       end;
    end;
    FMapFile.Add( s );

@@ -14,7 +14,7 @@ object Form_Main: TForm_Main
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 0
@@ -42,6 +42,7 @@ object Form_Main: TForm_Main
     Caption = 'Panel1'
     ClientHeight = 19
     ClientWidth = 19
+    ParentBackground = False
     TabOrder = 1
     object SBHelp3: TSpeedButton
       Cursor = crHandPoint
@@ -103,6 +104,7 @@ object Form_Main: TForm_Main
     ClientHeight = 30
     ClientWidth = 1000
     Color = 13619151
+    ParentBackground = False
     ParentColor = False
     TabOrder = 2
     object Panel3: TPanel
@@ -114,6 +116,7 @@ object Form_Main: TForm_Main
       BevelOuter = bvNone
       ClientHeight = 30
       ClientWidth = 80
+      ParentBackground = False
       TabOrder = 0
       object SpeedButton1: TSpeedButton
         AnchorSideLeft.Control = Panel3
@@ -312,6 +315,7 @@ object Form_Main: TForm_Main
       ClientHeight = 30
       ClientWidth = 256
       Color = 16777196
+      ParentBackground = False
       ParentColor = False
       TabOrder = 1
       object ComboBox1: TComboBox
@@ -331,11 +335,11 @@ object Form_Main: TForm_Main
           'Tilesets'
           'Patterns'
         )
-        OnChange = ComboBox1Change
         Style = csDropDownList
         TabOrder = 0
         TabStop = False
         Text = 'Layers'
+        OnChange = ComboBox1Change
       end
       object Label1: TLabel
         AnchorSideLeft.Control = Panel4
@@ -392,6 +396,7 @@ object Form_Main: TForm_Main
       ClientHeight = 30
       ClientWidth = 604
       Color = 12171705
+      ParentBackground = False
       ParentColor = False
       TabOrder = 2
       object SpeedButton3: TSpeedButton
@@ -668,6 +673,20 @@ object Form_Main: TForm_Main
     object MenuItem10: TMenuItem
       Caption = 'Set ground type...'
       OnClick = MenuItem10Click
+    end
+    object MenuItem16: TMenuItem
+      Caption = 'Flip H'
+      ShortCut = 16456
+      OnClick = MenuItem16Click
+    end
+    object MenuItem17: TMenuItem
+      Caption = 'Flip V'
+      ShortCut = 16458
+      OnClick = MenuItem16Click
+    end
+    object MenuItem18: TMenuItem
+      Caption = 'NoFlip'
+      OnClick = MenuItem16Click
     end
     object MenuItem11: TMenuItem
       Caption = '-'

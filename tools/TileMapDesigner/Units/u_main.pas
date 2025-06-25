@@ -52,6 +52,9 @@ type
     MenuItem13: TMenuItem;
     MenuItem14: TMenuItem;
     MenuItem15: TMenuItem;
+    MenuItem16: TMenuItem;
+    MenuItem17: TMenuItem;
+    MenuItem18: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem5: TMenuItem;
@@ -92,6 +95,7 @@ type
     procedure MenuItem10Click(Sender: TObject);
     procedure MenuItem12Click(Sender: TObject);
     procedure MenuItem14Click(Sender: TObject);
+    procedure MenuItem16Click(Sender: TObject);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
     procedure MenuItem7Click(Sender: TObject);
@@ -234,6 +238,9 @@ begin
   VK_V : if ssCtrl in Shift then begin
     Menu_PasteClick( self );
   end;
+
+  VK_H: if ssCtrl in Shift then MenuItem16Click(MenuItem16);
+  VK_J: if ssCtrl in Shift then MenuItem16Click(MenuItem17);
  end;//case
 end;
 
@@ -340,6 +347,79 @@ begin
  p:=OpenGLControl1.ScreenToClient( Mouse.CursorPos );
  Clipboard.AsText := inttostr(round(p.x-FWorkingTileEngine.X.Value)) + ',' + inttostr(round(p.y-FWorkingTileEngine.Y.Value));
  ShowActionText( p.x, p.y, 'Map position copied to clipboard');
+end;
+
+// popup flip H
+procedure TForm_Main.MenuItem16Click(Sender: TObject);
+var p1: TPoint;
+  s: TSize;
+  t: string;
+  ro, co: integer;
+begin
+  if Sender = MenuItem16 then begin
+   if not SelectionAvailable then begin
+     // toggle flipH on tile under mouse
+    if XYCoorIsInMap(FMousePos.x, FMousePos.y) then begin
+      p1 := ClientPosToTileIndex(FMousePos);
+      FWorkingTileEngine.ToggleTileFlipH(p1.y, p1.x);
+      ShowActionText(FMousePos.x, FMousePos.y, 'toggle FLIPH');
+      SetProjectModified;
+    end;
+   end else begin
+     // toggle flipH on selection
+     s := TileCountInSelection;
+     p1 := ClientCoorToColumnRowIndex(FCoorBeginLeftClick);
+     for ro:=p1.y to p1.y+s.cy-1 do
+      for co:=p1.x to p1.x+s.cx-1 do
+        FWorkingTileEngine.ToggleTileFlipH(ro, co);
+
+     t := 'toggle '+inttostr(s.cx * s.cy)+' FLIPH';
+     ShowActionText(FMousePos.x, FMousePos.y, t);
+     SetProjectModified;
+   end;
+  end;
+
+  if Sender = MenuItem17 then begin
+   if not SelectionAvailable then begin
+     // toggle flipV on tile under mouse
+    p1 := ClientPosToTileIndex(FMousePos);
+    FWorkingTileEngine.ToggleTileFlipV(p1.y, p1.x);
+    ShowActionText( FMousePos.x, FMousePos.y, 'toggle FLIPV');
+    SetProjectModified;
+   end else begin
+     // toggle flipV on selection
+     s := TileCountInSelection;
+     p1 := ClientCoorToColumnRowIndex(FCoorBeginLeftClick);
+     for ro:=p1.y to p1.y+s.cy-1 do
+      for co:=p1.x to p1.x+s.cx-1 do
+       FWorkingTileEngine.ToggleTileFlipV(ro, co);
+
+     t := 'toggle '+inttostr(s.cx * s.cy)+' FLIPV';
+     ShowActionText(FMousePos.x, FMousePos.y, t);
+     SetProjectModified;
+   end;
+  end;
+
+  if Sender = MenuItem18 then begin
+   if not SelectionAvailable then begin
+     // toggle flipV on tile under mouse
+    p1 := ClientPosToTileIndex(FMousePos);
+    FWorkingTileEngine.SetTileFlipIndex(p1.y, p1.x, 0);
+    ShowActionText( FMousePos.x, FMousePos.y, 'no FLIP');
+    SetProjectModified;
+   end else begin
+     // toggle flipV on selection
+     s := TileCountInSelection;
+     p1 := ClientCoorToColumnRowIndex(FCoorBeginLeftClick);
+     for ro:=p1.y to p1.y+s.cy-1 do
+      for co:=p1.x to p1.x+s.cx-1 do
+       FWorkingTileEngine.SetTileFlipIndex(ro, co, 0);
+
+     t := 'no FLIP on '+inttostr(s.cx * s.cy)+' tiles';
+     ShowActionText(FMousePos.x, FMousePos.y, t);
+     SetProjectModified;
+   end;
+  end;
 end;
 
 // popup Set user event value

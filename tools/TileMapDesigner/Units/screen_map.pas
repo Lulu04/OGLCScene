@@ -43,10 +43,10 @@ begin
   FAtlas.Spacing := 1;
 
   fd.Create('Arial', 9, [fsBold], BGRA(200,200,200));
-  FEventFont:= FAtlas.AddTexturedFont(fd, ASCII_SYMBOL_CHARSET+SIMPLELATIN_CHARSET);
+  FEventFont:= FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
   fd.Create('Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
-  FHintFont:= FAtlas.AddTexturedFont(fd, ASCII_SYMBOL_CHARSET+SIMPLELATIN_CHARSET);
+  FHintFont:= FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
   ima := TBGRABitmap.Create(FScene.Width, FScene.Height);
   ima.Fill(FImageBackGround);

@@ -74,10 +74,12 @@ type
 // a tilemap can have several textures.
 // each tile have a texture index, (ix,iy) indexes to reference the frame in this texture
 // and an user value to trigger an event when the tile is drawn.
+// Tile size must be the same horizontally and vertically.
 TTile = record
          TextureIndex,       // index of texture in TTilemap.FTextureList
          ixFrame,            // frame x index on texture
          iyFrame,            // frame y index
+         FlipIndex,          // 0 no flip, 1=flipH, 2=flipV, 3=flipH and V
          UserEvent: integer; // when the tile is drawn, TTileEngine.OnTileEvent is called with this parameter
 end;
 PTile = ^TTile;
@@ -98,6 +100,8 @@ PArrayOfTileTexInfo = ^TArrayOfTileTexInfo;
 
 
 TTileEvent = procedure (Sender: TTileEngine; const TileTopLeftCoor: TPointF; EventValue: integer) of object;
+
+{ TTileEngine }
 
 TTileEngine = class(TSimpleSurfaceWithEffect)
 private
@@ -169,6 +173,9 @@ public
  function GetPTile(ARow, AColumn: integer): PTile;
  function GetPTileTexInfo(ARow, AColumn: integer): PTileTexInfo;
  procedure SetUserEventValue(ARow, AColumn, AUserEvent: integer);
+ procedure SetTileFlipIndex(ARow, AColumn, AFlipIndex: integer);
+ procedure ToggleTileFlipH(ARow, AColumn: integer);
+ procedure ToggleTileFlipV(ARow, AColumn: integer);
  function GetUserEventValue(ARow, AColumn: integer): integer; overload;
  procedure SetCell(ARow, AColumn, ATextureIndex, ixFrame, iyFrame: integer);
 // procedure GetCellTextureAndFrameIndex( ARow, AColumn: integer; out TextureIndex, ixFrame, iyFrame: integer );
@@ -577,7 +584,7 @@ begin
               tileRenderer.Prepare(ptTriangles, FParentScene.MVPMatrix, currentTex, 0, FComputedOpacity, FComputedTint, BlendMode,
                                    clipArea);
             previousTex := currentTex;
-            tileRenderer.PushFrame(indexFrame, 0, xx, yy);
+            tileRenderer.PushFrame(indexFrame, ptrTile^.FlipIndex, xx, yy);
           end else begin
             FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
             previousTex := NIL;
@@ -890,6 +897,27 @@ begin
  if p <> NIL then p^.UserEvent := AUserEvent;
 end;
 
+procedure TTileEngine.SetTileFlipIndex(ARow, AColumn, AFlipIndex: integer);
+var p: PTile;
+begin
+  p := GetPTile(ARow, AColumn);
+  if p <> NIL then p^.FlipIndex := AFlipIndex;
+end;
+
+procedure TTileEngine.ToggleTileFlipH(ARow, AColumn: integer);
+var p: PTile;
+begin
+  p := GetPTile(ARow, AColumn);
+  if p <> NIL then p^.FlipIndex := p^.FlipIndex xor 1;
+end;
+
+procedure TTileEngine.ToggleTileFlipV(ARow, AColumn: integer);
+var p: PTile;
+begin
+  p := GetPTile(ARow, AColumn);
+  if p <> NIL then p^.FlipIndex := p^.FlipIndex xor 2;
+end;
+
 function TTileEngine.GetUserEventValue(ARow, AColumn: integer): integer;
 var p: PTile;
 begin
@@ -1134,6 +1162,8 @@ begin
                              txtsplited[1].ToInteger,
                              txtsplited[2].ToInteger);
               SetUserEventValue(i, j, txtsplited[3].ToInteger);
+              if High(txtsplited) >= 4 then SetTileFlipIndex(i, j, txtsplited[4].ToInteger)
+                else SetTileFlipIndex(i, j, 0);
               inc(j);
              end;
       end;//case
