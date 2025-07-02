@@ -466,13 +466,15 @@ begin
   i := 0;
   for ro:=0 to aRowCount-1 do
     for co:=0 to aColumnCount-1 do begin
-      ima := LoadBitmapFromSVG(aSVGFileNames[i], aTileSize, aTileSize);
-      wholeIma.PutImage(aTileSize*co, aTileSize*ro, ima, dmDrawWithTransparency);
-      ima.Free;
-      inc(i);
+      if i < Length(aSVGFileNames) then begin
+        ima := LoadBitmapFromSVG(aSVGFileNames[i], aTileSize, aTileSize);
+        wholeIma.PutImage(aTileSize*co, aTileSize*ro, ima, dmDrawWithTransparency);
+        ima.Free;
+        inc(i);
+      end;
     end;
 
-  Result := Add(wholeIma);
+  Result := Add(wholeIma, aTileSize, aTileSize);
   Result^.Filename := aName;
 end;
 
