@@ -329,7 +329,7 @@ begin
 end;
 
 procedure TOGLCTileRenderer.PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-var deltax, deltay, v: single;
+var deltax, deltay: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
     texCoord: TQuadCoor;
