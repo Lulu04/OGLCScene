@@ -51,6 +51,8 @@ type
     Edit7: TEdit;
     Edit8: TEdit;
     Edit9: TEdit;
+    EditFrameWidth1: TEdit;
+    EditFrameWidth2: TEdit;
     FrameShowColor1: TFrameShowColor;
     Label31: TLabel;
     Label32: TLabel;
@@ -67,6 +69,8 @@ type
     Label55: TLabel;
     Label56: TLabel;
     Label57: TLabel;
+    Label58: TLabel;
+    Label59: TLabel;
     OPD1: TOpenPictureDialog;
     OD3: TOpenDialog;
     Panel10: TPanel;
@@ -494,13 +498,27 @@ end;
 
 // Texture Width and height
 procedure TForm_Principale.EditFrameWidthEditingDone(Sender: TObject);
+var w, h: integer;
 begin
-  if strtoint(EditFrameWidth.Text) < 1 then EditFrameWidth.Text := '1';
-  if strtoint(EditFrameHeight.Text) < 1 then EditFrameHeight.Text := '1';
+  w := strtoint(EditFrameWidth.Text);
+  h := strtoint(EditFrameHeight.Text);
+  if w < 1 then begin
+    w := 1;
+    EditFrameWidth.Text := '1';
+  end;
+  if h < 1 then begin
+    h := 1;
+    EditFrameHeight.Text := '1';
+  end;
 
   if PE.FParticleParam.Texture <> NIL
     then FScene.TexMan.Delete(PE.FParticleParam.Texture);
-  PE.FParticleParam.Texture := FScene.TexMan.Add(OD2.FileName, strtoint(EditFrameWidth.Text), strtoint(EditFrameHeight.Text));
+  PE.FParticleParam.Texture := NIL;
+  if not FileExists(OD2.FileName) then exit;
+
+  if LowerCase(ExtractFileExt(OD2.FileName)) = '.svg'
+    then PE.FParticleParam.Texture := FScene.TexMan.AddFromSVG(OD2.FileName, w, h)
+    else PE.FParticleParam.Texture := FScene.TexMan.Add(OD2.FileName, w, h);
 end;
 
 // Rectangle size
