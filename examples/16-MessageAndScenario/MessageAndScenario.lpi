@@ -103,7 +103,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="49" Y="13"/>
+        <TopLine Value="97"/>
+        <CursorPos X="100" Y="110"/>
         <UsageCount Value="64"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -121,11 +122,15 @@
         <Loaded Value="True"/>
       </Unit4>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="2" HistoryIndex="1">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="11" Column="8"/>
       </Position1>
+      <Position2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="19" Column="25"/>
+      </Position2>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

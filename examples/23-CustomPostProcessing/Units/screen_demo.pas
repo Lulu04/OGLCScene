@@ -62,7 +62,7 @@ begin
 
   // we define the font for the text
   fd.Create('Arial', FScene.ScaleDesignToScene(30), [fsBold], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET + ASCII_SYMBOL_CHARSET); // use 2 predefined charsets
+  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
@@ -76,15 +76,14 @@ begin
   FAtlas.FreeItemImages;
 
   // we define the y coordinate where to trigger the mirror effect (for our custom post processing renderer)
-  yGround := FScene.Height - FtexJungle^.TextureHeight*1.2;
+  yGround := FScene.Height - FtexJungle^.FrameHeight*1.2;
 
-  // add the jungle image
+  // add a sprite with the jungle image
   FSpriteJungle := FScene.AddSprite(FtexJungle, False, LAYER_SPRITE);
-
-  // scale the sprite to fit the width of the scene
-  FSpriteJungle.Scale.Value := ScaleValueToFitScene(FtexJungle, FScene);
-  FSpriteJungle.ScaledX := 0;
-  FSpriteJungle.ScaledY := yGround - FSpriteJungle.ScaledHeight+3;
+  // stretch the sprite to fit the width of the scene
+  FSpriteJungle.SetSize(FScene.Width, -1);
+  // jungle sprite is above the mirror effect
+  FSpriteJungle.BottomY := yGround + FScene.ScaleDesignToScene(4);
 
   // text area
   FTextArea := FScene.Add_UITextArea(LAYER_UI);
@@ -102,7 +101,7 @@ begin
   FMyPostProcessingRenderer := TMyPostProcessingRenderer.Create(FScene, True);
   FMyPostProcessingRenderer.SetParams(BGRA(0,75,100,90), yGround);
 
-  // enable the pfCustomRenderer effect on LAYER_SPRITE
+  // enable the 'Custom Renderer' effect on LAYER_SPRITE
   FScene.Layer[LAYER_SPRITE].PostProcessing.Enable([ppCustomRenderer]);
   // and ask LAYER_SPRITE to use our custom renderer defined in unit u_MyPostProcessingRenderer.pas
   FScene.Layer[LAYER_SPRITE].PostProcessing.UseCustomRenderer(FMyPostProcessingRenderer);

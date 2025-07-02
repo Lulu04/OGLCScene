@@ -93,7 +93,7 @@ begin
   FtexShip := FAtlas.AddFromSVG(path+'SpaceShip.svg', Round(FScene.Width/8), -1);
 
   fd.Create('Arial', 30, [fsBold], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET+ASCII_SYMBOL_CHARSET);
+  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the

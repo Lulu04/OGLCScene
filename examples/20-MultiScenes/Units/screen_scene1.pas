@@ -25,6 +25,7 @@ private
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
+  procedure ProcessMessage(UserValue: TUserMessageValue); override;
 end;
 
 var ScreenDemo1: TScreenDemo1 = NIL;
@@ -70,8 +71,8 @@ begin
 
   FCamera := FScene1.CreateCamera;
   FCamera.AssignToAllLayers;
-  FCamera.Scale.ChangeTo(PointF(0.5,0.5), 5.0, idcSinusoid);
   FCamera.Angle.AddConstant(5);
+  PostMessage(0); // repeat animation camera zoom in and out
 
   FScene1.BackgroundColor := BGRA(0,80,0);
 end;
@@ -81,6 +82,21 @@ begin
   FScene1.ClearAllLayer;    // kill all surfaces on all layer
   FreeAndNil(FAtlas);
   FScene1.KillCamera(FCamera);
+end;
+
+procedure TScreenDemo1.ProcessMessage(UserValue: TUserMessageValue);
+begin
+  case UserValue of
+    0: begin
+      FCamera.Scale.ChangeTo(PointF(0.5, 0.5), 5.0, idcSinusoid);
+      PostMessage(10, 5.0);
+    end;
+    10: begin
+      FCamera.Scale.ChangeTo(PointF(1.0, 1.0), 5.0, idcSinusoid);
+      PostMessage(0, 5.0);
+    end;
+
+  end;
 end;
 
 

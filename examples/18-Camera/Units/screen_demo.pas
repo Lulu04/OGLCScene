@@ -122,7 +122,7 @@ begin
   FAtlas.Add(path+'Dust_particle.png');
 
   fd.Create('Arial', FScene.ScaleDesignToScene(18), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET+ASCII_SYMBOL_CHARSET);
+  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
@@ -199,7 +199,7 @@ begin
 
   // we create a camera that affects only the layer LAYER_SHIP and LAYER_BACK
   FCamera := FScene.CreateCamera;
-  FCamera.AssignToLayer([LAYER_SHIP, LAYER_BACK]);
+  FCamera.AssignToLayers([LAYER_SHIP, LAYER_BACK]);
 
   FGameState := gsWaitNearMeteor;
 end;
