@@ -71,16 +71,22 @@ const
 VALUE_NO_EVENT = -1;
 
 type
-// a tilemap can have several textures.
-// each tile have a texture index, (ix,iy) indexes to reference the frame in this texture
-// and an user value to trigger an event when the tile is drawn.
-// Tile size must be the same horizontally and vertically.
+{
+ a tilemap can have several textures.
+ each tile have
+    - a texture index,
+    - (ix,iy) indexes to reference the frame in this texture
+    - an user value to trigger an event when the tile is drawn
+    - flip info
+ If you use the flip feature, tile must have the same size horizontally and vertically.
+}
 TTile = record
-         TextureIndex,       // index of texture in TTilemap.FTextureList
-         ixFrame,            // frame x index on texture
-         iyFrame,            // frame y index
-         FlipIndex,          // 0 no flip, 1=flipH, 2=flipV, 3=flipH and V
-         UserEvent: integer; // when the tile is drawn, TTileEngine.OnTileEvent is called with this parameter
+  TextureIndex,       // index of texture in TTilemap.FTextureList
+  ixFrame,            // frame x index on texture
+  iyFrame,            // frame y index
+  FlipIndex,          // 0 no flip, 1=flipH, 2=flipV, 3=flipH and V
+  UserEvent: integer; // when the tile is drawn, TTileEngine.OnTileEvent is called with this parameter
+  procedure CopyTo(var aDest: TTile);
 end;
 PTile = ^TTile;
 
@@ -99,7 +105,7 @@ TArrayOfTileTexInfo = array of TTileTexInfo;
 PArrayOfTileTexInfo = ^TArrayOfTileTexInfo;
 
 
-TTileEvent = procedure (Sender: TTileEngine; const TileTopLeftCoor: TPointF; EventValue: integer) of object;
+TTileEvent = procedure (Sender: TTileEngine; const TileTopLeftCoor: TPointF; aTile: PTile) of object;
 
 { TTileEngine }
 
@@ -141,7 +147,6 @@ private
   procedure DoLoadMapSizeFromStringList(t: TStringList);
   procedure DoLoadScrollInfoFromStringList(t: TStringList);
   procedure DoLoadStartTileFromStringList(t: TStringList);
-  procedure DoLoadHoleColorFromStringList(t: TStringList);
   procedure DoLoadMapDataFromStringList(t: TStringList);
 protected
  function GetWidth: integer; override;
@@ -155,7 +160,6 @@ public
  Destructor Destroy; override;
 public
  // methods to construct map. Used by 'Tile Map Designer' utility
- TileMapDesignerModeEnable: boolean;
  procedure SetTileSize(AHSize, AVSize: integer);
  function GetFirstTileColumnIndex: integer;
  function GetFirstTileRowIndex: integer;
@@ -178,6 +182,9 @@ public
  procedure ToggleTileFlipV(ARow, AColumn: integer);
  function GetUserEventValue(ARow, AColumn: integer): integer; overload;
  procedure SetCell(ARow, AColumn, ATextureIndex, ixFrame, iyFrame: integer);
+ procedure ExchangeCell(aRow1, aColumn1, aRow2, aColumn2: integer);
+ procedure CopyPartTo(var aDest: TArrayOfArrayOfTile; aTopLeftTile: TPoint; aSize: TSize);
+ procedure CopyPartFrom(aSrc: TArrayOfArrayOfTile; aDestTopLeftTile: TPoint);
 // procedure GetCellTextureAndFrameIndex( ARow, AColumn: integer; out TextureIndex, ixFrame, iyFrame: integer );
  procedure SetGroundType(ATextureIndex, ixFrame, iyFrame, AGroundType: integer);
  function GetGroundType(ATextureIndex, ixFrame, iyFrame: integer): integer; overload;
@@ -196,9 +203,6 @@ public
 
  // scrolling speed in pixel per seconds for both axis x y
  ScrollSpeed: TPointFParam;
-
- // color for the 'holes' in the map
- MapHoleColor: TBGRAParam;
 
  // give real position on map pointed by 'PositionOnMap'
  function GetBoundedPositionOnMap: TPointF;
@@ -229,7 +233,8 @@ public
 // function SceneCoorToMapPosition( aSceneCoor: TPointF ): TPointF; inline;
 // function MapPositionToSceneCoor( aMapPos: TPointF ): TPointF; inline;
 
- // set the size in pixels of the surface on which the map will be drawn in the scene. You can retrieve it with property Width and Height
+ // set the size in pixels of the surface on which the map will be drawn in the scene.
+ // You can retrieve it with property Width and Height
  procedure SetViewSize(AWidth, AHeight: integer);
 
  property MapSize: TSize read GetMapSize; // give total map size in pixel
@@ -324,7 +329,7 @@ begin
 end;
 
 procedure TOGLCTileRenderer.PushFrame(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single);
-var deltax, deltay: single;
+var deltax, deltay, v: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
     texCoord: TQuadCoor;
@@ -340,7 +345,7 @@ begin
   fi := EnsureRange(aFrameIndex, 0, tex^.FrameCount-1);
   {%H-}texCoord.CopyFrom(tex^.FramesCoord[fi]);
   clippedRect := RectF(aXPosOffset, aYPosOffset, aXPosOffset+tex^.FrameWidth, aYPosOffset+tex^.FrameHeight);
-  if not CheckAndAdjustF(FClipAreaF, clippedRect, texCoord) then exit;
+  if not CheckAndAdjustF(FClipAreaF, clippedRect, texCoord, aFlipIndex) then exit;
 
   case FBatch^.CurrentPrimitiveType of
     ptTriangleStrip: begin
@@ -405,6 +410,15 @@ begin
   end;
 end;
 
+procedure TTile.CopyTo(var aDest: TTile);
+begin
+  aDest.TextureIndex := TextureIndex;
+  aDest.ixFrame := ixFrame;
+  aDest.iyFrame := iyFrame;
+  aDest.FlipIndex := FlipIndex;
+  aDest.UserEvent := UserEvent;
+end;
+
 { TTileEngine }
 
 constructor TTileEngine.Create(aParentScene: TOGLCScene);
@@ -413,13 +427,10 @@ begin
  FParentScene := aParentScene;
  ScrollSpeed := TPointFParam.Create;
  PositionOnMap := TPointFParam.Create;
- MapHoleColor := TBGRAParam.Create;
  FOnTileEvent := NIL;
 
  FVScrollEnable := TRUE;
  FHScrollEnable := TRUE;
-
- TileMapDesignerModeEnable := FALSE;
 
  Clear;
 
@@ -435,8 +446,6 @@ begin
   ScrollSpeed := NIL;
   PositionOnMap.Free;
   PositionOnMap := NIL;
-  MapHoleColor.Free;
-  MapHoleColor := NIL;
   inherited Destroy;
 end;
 
@@ -453,8 +462,6 @@ begin
   if ScrollSpeed.y.Value <> 0.000
     then PositionOnMap.y.Value := PositionOnMap.y.Value - aElapsedTime * ScrollSpeed.y.Value
     else PositionOnMap.y.OnElapse( aElapsedTime );
-
-  MapHoleColor.OnElapse( aElapsedTime );
 end;
 
 procedure TTileEngine.EnsurePositionInMap(var APos: TPointF);
@@ -527,7 +534,6 @@ procedure TTileEngine.Draw(const aLayerPercentOpacity: single);
 var ixtile, iytile, indexTex, indexFrame: integer;
     ptrTile: PTile;
     xx, yy: single;
-    cHole: TBGRAPixel;
     currentTex, previousTex: PTexture;
     tileRenderer: TOGLCTileRenderer;
     clipArea: TRectF;
@@ -535,13 +541,17 @@ begin
   FComputedOpacity := Opacity.Value*OneDiv255*aLayerPercentOpacity;
   if FComputedOpacity = 0 then exit;
 
-  // if the data map are empty, we draw a colored square with the hole color
+  // if the data map are empty, we draw only the childs
   if (Length(FMap) = 0) or (GetTextureCount = 0) then
   begin
     PushAndPrepareSceneMV;
     FParentScene.BlendMode := FBlendMode;
-    FillBox(FParentScene, 0, 0, Width-1, Height-1, MapHoleColor.Value, FComputedOpacity);
-    DrawChildSurfacesWithPositiveZOrder(FComputedOpacity);
+
+    if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
+      else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
+    if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
+      else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
+
     PopSceneMV;
     exit;
   end;
@@ -553,9 +563,6 @@ begin
   // compute first tile indexes and its offset
   ComputeIndexes(PositionOnMap.Value);
 
-  cHole := MapHoleColor.Value;
-  cHole.alpha := Round(FComputedOpacity*cHole.alpha);
-
   PushAndPrepareSceneMV;
   yy := FYOffsetFirstTile;
   iytile := FRowIndexFirstTile;
@@ -566,13 +573,13 @@ begin
     ixtile := FColumnIndexFirstTile;
     repeat
       // draw only visible tiles
-      if ((xx < FParentScene.Width) and (xx+FTileSize.cx > 0) and
-          (yy < FParentScene.Height) and (yy+FTileSize.cy > 0)) or
+      if ((xx < FParentScene.Width) and (xx+FTileSize.cx >= 0) and
+          (yy < FParentScene.Height) and (yy+FTileSize.cy >= 0)) or
          ForceTheDrawingOfAllTheTiles then
       begin
         // ensure map data integrity
-        if (ixtile >= 0) or (ixtile < FMapTileCount.cx) or
-           (iytile >= 0) or (iytile < FMapTileCount.cy) then
+        if (ixtile >= 0) and (ixtile < FMapTileCount.cx) and
+           (iytile >= 0) and (iytile < FMapTileCount.cy) then
         begin
           ptrTile := @FMap[iytile,ixtile];
           if ptrTile^.TextureIndex > -1 then begin
@@ -585,14 +592,11 @@ begin
                                    clipArea);
             previousTex := currentTex;
             tileRenderer.PushFrame(indexFrame, ptrTile^.FlipIndex, xx, yy);
-          end else begin
-            FillBox(FParentScene, xx, yy, FTileSize.cx, FTileSize.cy, cHole);
-            previousTex := NIL;
-          end;
+          end else previousTex := NIL;
 
           // callback event
-          if (FOnTileEvent <> NIL) and ((ptrTile^.UserEvent <> VALUE_NO_EVENT) or TileMapDesignerModeEnable)
-            then FOnTileEvent(self, PointF(xx,yy), ptrTile^.UserEvent);
+          if (FOnTileEvent <> NIL) and (ptrTile^.UserEvent <> VALUE_NO_EVENT) then
+            FOnTileEvent(self, PointF(xx,yy), ptrTile);
         end;
       end;
 
@@ -756,6 +760,7 @@ begin
      begin
       FMap[ro][co].TextureIndex := -1;
       FMap[ro][co].UserEvent := VALUE_NO_EVENT;
+      FMap[ro][co].FlipIndex := 0;
      end;
 
  if oldRowCount < ARowCount then
@@ -764,6 +769,7 @@ begin
     begin
      FMap[ro][co].TextureIndex := -1;
      FMap[ro][co].UserEvent := VALUE_NO_EVENT;
+     FMap[ro][co].FlipIndex := 0;
     end;
 end;
 
@@ -783,6 +789,7 @@ begin
     FMap[ro][co].ixFrame := FMap[ro-ACount][co].ixFrame;
     FMap[ro][co].iyFrame := FMap[ro-ACount][co].iyFrame;
     FMap[ro][co].UserEvent := FMap[ro-ACount][co].UserEvent;
+    FMap[ro][co].FlipIndex := FMap[ro-ACount][co].FlipIndex;
   end;
 
  for ro:=ARowIndex to ARowIndex+ACount-1 do
@@ -790,6 +797,7 @@ begin
    begin
     FMap[ro][co].TextureIndex := -1;
     FMap[ro][co].UserEvent := VALUE_NO_EVENT;
+    FMap[ro][co].FlipIndex := 0;
    end;
 end;
 
@@ -804,9 +812,10 @@ begin
  for ro:=0 to FMapTileCount.cy-1 do
   for co:=FMapTileCount.cx-1 downto AColumnIndex+ACount do begin
     FMap[ro][co].TextureIndex := FMap[ro][co-ACount].TextureIndex;
-    FMap[ro][co].ixFrame := FMap[ro-ACount][co].ixFrame;
+    FMap[ro][co].ixFrame := FMap[ro][co-ACount].ixFrame;
     FMap[ro][co].iyFrame := FMap[ro][co-ACount].iyFrame;
     FMap[ro][co].UserEvent := FMap[ro][co-ACount].UserEvent;
+    FMap[ro][co].FlipIndex := FMap[ro][co-ACount].FlipIndex;
   end;
 
  for ro:=0 to FMapTileCount.cy-1 do
@@ -814,6 +823,7 @@ begin
    begin
     FMap[ro][co].TextureIndex := -1;
     FMap[ro][co].UserEvent := VALUE_NO_EVENT;
+    FMap[ro][co].FlipIndex := 0;
    end;
 end;
 
@@ -825,6 +835,7 @@ begin
    begin
     SetCell( ro, co, -1, 0, 0 );
     SetUserEventValue( ro, co, VALUE_NO_EVENT );
+    SetTileFlipIndex(ro, co, 0);
    end;
 end;
 
@@ -866,7 +877,7 @@ begin
  p := GetTexture( iTexture );
  if p^.FrameCount = 1
    then Result := 0
-   else Result := iyFrame * p^.GetFrameCount.cx + ixFrame + 1;  //[ix,iy]=[0,0]=> FrameIndex := 1
+   else Result := iyFrame * p^.FramePerRow + ixFrame + 1;
 end;
 
 procedure TTileEngine.SetCell(ARow, AColumn, ATextureIndex, ixFrame, iyFrame: integer);
@@ -888,6 +899,66 @@ begin
 
  if p^.iyFrame >= fc.cy then  p^.iyFrame := fc.cy-1;
  if p^.iyFrame < 0 then  p^.iyFrame := 0;
+end;
+
+procedure TTileEngine.ExchangeCell(aRow1, aColumn1, aRow2, aColumn2: integer);
+var pSrc, pDest: PTile;
+    temp: integer;
+begin
+  pSrc := GetPTile(aRow1, aColumn1);
+  pDest := GetPTile(aRow2, aColumn2);
+  if (pSrc = NIL) or (pDest = NIL) then exit;
+  temp := pSrc^.TextureIndex;
+  pSrc^.TextureIndex := pDest^.TextureIndex;
+  pDest^.TextureIndex := temp;
+
+  temp := pSrc^.ixFrame;
+  pSrc^.ixFrame := pDest^.ixFrame;
+  pDest^.ixFrame := temp;
+
+  temp := pSrc^.iyFrame;
+  pSrc^.iyFrame := pDest^.iyFrame;
+  pDest^.iyFrame := temp;
+
+  temp := pSrc^.UserEvent;
+  pSrc^.UserEvent := pDest^.UserEvent;
+  pDest^.UserEvent := temp;
+
+  temp := pSrc^.FlipIndex;
+  pSrc^.FlipIndex := pDest^.FlipIndex;
+  pDest^.FlipIndex := temp;
+end;
+
+procedure TTileEngine.CopyPartTo(var aDest: TArrayOfArrayOfTile; aTopLeftTile: TPoint; aSize: TSize);
+var ro, co: integer;
+    p: PTile;
+begin
+  // prepare destination buffer
+  aDest := NIL;
+  SetLength(aDest, aSize.cy, aSize.cx);
+
+  // copy the tiles to dest
+  for ro:=aTopLeftTile.y to aTopLeftTile.y+aSize.cy-1 do
+    for co:=aTopLeftTile.x to aTopLeftTile.x+aSize.cx-1 do begin
+      p := GetPTile(ro, co);
+      p^.CopyTo(aDest[ro-aTopLeftTile.y][co-aTopLeftTile.x]);
+    end;
+end;
+
+procedure TTileEngine.CopyPartFrom(aSrc: TArrayOfArrayOfTile; aDestTopLeftTile: TPoint);
+var ro, co: integer;
+    p: PTile;
+    s: TSize;
+begin
+  s.cy := Length(aSrc);
+  s.cx := Length(aSrc[0]);
+
+  // copy the tiles from source
+  for ro:=aDestTopLeftTile.y to aDestTopLeftTile.y+s.cy-1 do
+    for co:=aDestTopLeftTile.x to aDestTopLeftTile.x+s.cx-1 do begin
+      p := GetPTile(ro, co);
+      aSrc[ro-aDestTopLeftTile.y][co-aDestTopLeftTile.x].CopyTo(p^);
+    end;
 end;
 
 procedure TTileEngine.SetUserEventValue(ARow, AColumn, AUserEvent: integer);
@@ -1133,14 +1204,6 @@ begin
   end;
 end;
 
-procedure TTileEngine.DoLoadHoleColorFromStringList(t: TStringList);
-var k: Integer;
-begin
-  k := t.IndexOf('HOLE_COLOR');
-  if k <> -1 then MapHoleColor.Value := HexToBGRAPixel(t.Strings[k+1])
-  else MapHoleColor.Value := BGRA(0,0,0);
-end;
-
 procedure TTileEngine.DoLoadMapDataFromStringList(t: TStringList);
 var k, i, j, z: Integer;
   temp, txtsplited: TStringArray;
@@ -1284,9 +1347,6 @@ begin
   DoLoadScrollInfoFromStringList(t);
   // Start tile
   DoLoadStartTileFromStringList(t);
-  // hole color
-  if aTileEngineToCopy = NIL then DoLoadHoleColorFromStringList(t)
-   else MapHoleColor.Value := aTileEngineToCopy.MapHoleColor.Value;
   // Build map from Data
   DoLoadMapDataFromStringList(t);
 
@@ -1321,8 +1381,6 @@ begin
   DoLoadScrollInfoFromStringList(t);
   // Start tile
   DoLoadStartTileFromStringList(t);
-  // hole color
-  DoLoadHoleColorFromStringList(t);
   // Build map from Data
   DoLoadMapDataFromStringList(t);
   t.Free;
