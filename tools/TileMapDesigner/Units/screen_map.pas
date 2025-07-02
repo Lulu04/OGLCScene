@@ -23,6 +23,8 @@ public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
   procedure Update(const{%H-}AElapsedTime: single ); override;
+
+  procedure BindTextureAtlas;
 end;
 
 var ScreenMap: TScreenMap = NIL;
@@ -122,6 +124,11 @@ begin
 
   FLabelDebug.Caption := 'TileEngine: ('+inttostr(round(MapList.MainMap.TileEngine.X.Value))+','+inttostr(round(MapList.MainMap.TileEngine.Y.Value))+')    '+
                          ' WH: '+inttostr(MapList.MainMap.TileEngine.Width)+','+inttostr(MapList.MainMap.TileEngine.Height);
+end;
+
+procedure TScreenMap.BindTextureAtlas;
+begin
+  FScene.TexMan.Bind(FAtlas.Texture);
 end;
 
 

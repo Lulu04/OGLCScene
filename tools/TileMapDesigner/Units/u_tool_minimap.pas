@@ -38,7 +38,7 @@ var
   Form_Minimap: TForm_Minimap;
 
 implementation
-uses u_main;
+uses u_main, Math, OGLCScene;
 
 {$R *.lfm}
 
@@ -85,23 +85,33 @@ begin
 end;
 
 procedure TForm_Minimap.SetMapsCoordinates(aX, aY: integer);
-var xx, yy: single;
+var xx, yy, delta: integer;
+  te: TTileEngine;
 begin
   if aX > PB2.Width then aX := PB2.Width;
   if aX < 0 then aX := 0;
   if aY > PB2.Height then aY := PB2.Height;
   if aY < 0 then aY := 0;
 
-  xx := MapList.MainMap.TileEngine.MapSize.cx * aX / PB2.Width-FScene.Width*0.5;
-  yy := MapList.MainMap.TileEngine.MapSize.cy * aY / PB2.Height-FScene.Height*0.5;
+  te := MapList.MainMap.TileEngine;
+
+  delta := (FScene.Width div te.TileSize.cx) * te.TileSize.cx;
+  xx := te.MapSize.cx * aX div PB2.Width;
+  xx := (xx div te.TileSize.cx) * te.TileSize.cx;
+  xx := xx - delta;
+
+  delta := (FScene.Height div te.TileSize.cy) * te.TileSize.cy;
+  yy := te.MapSize.cy * aY div PB2.Height;
+  yy := (yy div te.TileSize.cy) * te.TileSize.cy;
+  yy := yy - delta;
 
   // in the case of the whole map fit on the scene, we center it
   if MapList.MainMap.TileEngine.MapSize.cx <= FScene.Width
-    then xx := -( FScene.Width - MapList.MainMap.TileEngine.MapSize.cx )/2;
+    then xx := 0;
   if MapList.MainMap.TileEngine.MapSize.cy <= FScene.Height
-   then yy := -( FScene.Height - MapList.MainMap.TileEngine.MapSize.cy )/2;
+   then yy := 0;
 
-  MapList.SetTileEngineCoordinates(-xx, -yy);
+  MapList.MoveTileEngineTo(xx, yy);
   FMiniMapTarget := Point(aX, aY);
   PB2.Invalidate;
 end;
@@ -109,11 +119,21 @@ end;
 procedure TForm_Minimap.PB2MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  if Button = mbLeft then
-  begin
+  if Button = mbLeft then begin
     PB2.Tag := 1;
     SetMapsCoordinates(X, Y);
   end;
+end;
+
+procedure TForm_Minimap.PB2MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+begin
+  if PB2.Tag = 0 then exit;
+  SetMapsCoordinates(X, Y);
+end;
+
+procedure TForm_Minimap.PB2MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  if Button = mbLeft then PB2.Tag:=0;
 end;
 
 procedure TForm_Minimap.FormShow(Sender: TObject);
@@ -145,20 +165,10 @@ end;
 
 procedure TForm_Minimap.FormResize(Sender: TObject);
 begin
- if Width < ScaleDesignToForm(40) then Width := ScaleDesignToForm(40);
- if Height < ScaleDesignToForm(30) then Height := ScaleDesignToForm(30);
+  if Width < ScaleDesignToForm(40) then Width := ScaleDesignToForm(40);
+  if Height < ScaleDesignToForm(30) then Height := ScaleDesignToForm(30);
 end;
 
-procedure TForm_Minimap.PB2MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-begin
- if PB2.Tag = 0 then exit;
- SetMapsCoordinates(X, Y);
-end;
-
-procedure TForm_Minimap.PB2MouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-begin
- if Button = mbLeft then PB2.Tag:=0;
-end;
 
 end.
 

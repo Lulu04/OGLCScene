@@ -193,7 +193,6 @@ begin
  FScene.Add(FTileEngine, Layer_Pattern);
 // FTileEngine.SetTextureListFromAnotherTileEngine( MapList.MainMap.TileEngine );
  FTileEngine.ForceTheDrawingOfAllTheTiles := TRUE;
- FTileEngine.MapHoleColor.Value := BGRA(0,0,0,0);
 
  FList := TList.Create;
  FWorkingPattern := TTiledPattern.Create;
@@ -479,7 +478,6 @@ begin
  FScene.Add(FTileEngine, Layer_WorkTileSet);
  FTileEngine.SetTextureListFromAnotherTileEngine(MapList.MainMap.TileEngine);
  FTileEngine.ForceTheDrawingOfAllTheTiles := TRUE;
- FTileEngine.MapHoleColor.Value := BGRA(0,0,0,0);
 end;
 
 destructor TTilesetEdit.Destroy;
