@@ -489,6 +489,8 @@ TOGLCScene = class(TOGLCContext)
   property NoFilterTexturedMVTriangleRenderer: TOGLCNoFilterTextureMVTriangleRenderer read GetNoFilterTexturedMVTriangleRenderer;
   property TexturedTriangleRendererWithFX: TOGLCTexturedTriangleRendererWithFX read GetTexturedTriangleRendererWithFX;
   property ScrollableTextureRenderer: TOGLCScrollableTextureRenderer read GetScrollableTextureRenderer;
+  // Flush the batch renderer system
+  procedure FlushRenderer;
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
   function CreateTexturedFont(aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
@@ -1358,6 +1360,11 @@ end;
 function TOGLCScene.MVPMatrix: TOGLCMatrix;
 begin
   Result.Matrix := MultMat(ModelViewMatrix.Matrix, ProjectionMatrix.Matrix);
+end;
+
+procedure TOGLCScene.FlushRenderer;
+begin
+  FTexturedMVTriangleRenderer.Batch_Flush;
 end;
 
 function TOGLCScene.CreateAtlas: TOGLCTextureAtlas;
