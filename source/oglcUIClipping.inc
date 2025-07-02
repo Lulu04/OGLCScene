@@ -56,8 +56,17 @@ function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect; var aTe
 // If only a part is visible, the function 'cut' the surface area and its
 // texture coordinates in respect of the clipping area.
 // TRectF version
-function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean;
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean; overload;
 
+
+// Check if the specified surface area is visible in the given clipped rectangle.
+//   > return True if at least one part of the surface is visible (the object can be drawn)
+//   > return False if the surface is completely outside.
+// If only a part is visible, the function 'cut' the surface area and its
+// texture coordinates in respect of the clipping area.
+// TRectF version with
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor;
+                         aFlipIndex: integer): boolean; overload;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
@@ -260,6 +269,82 @@ begin
      aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
      aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
      aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+    end;
+  end;
+end;
+
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF;
+  var aTexCoor: TQuadCoor; aFlipIndex: integer): boolean;
+var delta, uvHorizontalRange, uvVerticalRange, pc, surfaceAreaWidth, surfaceAreaHeight: single;
+  flipH, flipV: boolean;
+begin
+  surfaceAreaWidth := aSurfaceArea.Width;
+  if surfaceAreaWidth <= 0 then exit(False);
+
+  surfaceAreaHeight := aSurfaceArea.Height;
+  if surfaceAreaHeight <= 0 then exit(False);
+
+  with aClipRect do begin
+    if (aSurfaceArea.Left > Right) or (aSurfaceArea.Right < Left) or
+       (aSurfaceArea.Top > Bottom) or (aSurfaceArea.Bottom < Top)  then exit(False);
+
+    flipH := aFlipIndex in [1, 3];
+    flipV := aFlipIndex in [2, 3];
+
+    Result := True;
+    uvHorizontalRange := aTexCoor[cTR].x - aTexCoor[cTL].x;
+    uvVerticalRange := aTexCoor[cBL].y - aTexCoor[cTL].y;
+
+    if aSurfaceArea.Left < Left then begin  //trim the left
+      delta := Left - aSurfaceArea.Left;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Left := aSurfaceArea.Left + delta;
+      if not flipH then begin
+        aTexCoor[cTL].x := aTexCoor[cTL].x + uvHorizontalRange * pc;
+        aTexCoor[cBL].x := aTexCoor[cBL].x + uvHorizontalRange * pc;
+      end else begin
+        aTexCoor[cTR].x := aTexCoor[cTR].x - uvHorizontalRange * pc;
+        aTexCoor[cBR].x := aTexCoor[cBR].x - uvHorizontalRange * pc;
+      end;
+    end;
+
+    if aSurfaceArea.Right > Right then begin  //trim the right
+      delta := aSurfaceArea.Right - Right;
+      pc := delta / surfaceAreaWidth;
+      aSurfaceArea.Right := aSurfaceArea.Right - delta;
+      if not flipH then begin
+        aTexCoor[cTR].x := aTexCoor[cTR].x - uvHorizontalRange * pc;
+        aTexCoor[cBR].x := aTexCoor[cBR].x - uvHorizontalRange * pc;
+      end else begin
+        aTexCoor[cTL].x := aTexCoor[cTL].x + uvHorizontalRange * pc;
+        aTexCoor[cBL].x := aTexCoor[cBL].x + uvHorizontalRange * pc;
+      end;
+    end;
+
+    if aSurfaceArea.Top < Top then begin  //trim the top
+      delta := Top - aSurfaceArea.Top;
+      pc := delta / surfaceAreaHeight;
+      aSurfaceArea.Top := aSurfaceArea.Top + delta;
+      if not flipV then begin
+        aTexCoor[cTL].y := aTexCoor[cTL].y + uvVerticalRange * pc;
+        aTexCoor[cTR].y := aTexCoor[cTR].y + uvVerticalRange * pc;
+      end else begin
+        aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
+        aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+      end;
+    end;
+
+    if aSurfaceArea.Bottom > Bottom then begin  //trim the bottom
+     delta := aSurfaceArea.Bottom - Bottom;
+     pc := delta / surfaceAreaHeight;
+     aSurfaceArea.Bottom := aSurfaceArea.Bottom - delta;
+     if not flipV then begin
+       aTexCoor[cBL].y := aTexCoor[cBL].y - uvVerticalRange * pc;
+       aTexCoor[cBR].y := aTexCoor[cBR].y - uvVerticalRange * pc;
+     end else begin
+       aTexCoor[cTL].y := aTexCoor[cTL].y + uvVerticalRange * pc;
+       aTexCoor[cTR].y := aTexCoor[cTR].y + uvVerticalRange * pc;
+     end;
     end;
   end;
 end;
