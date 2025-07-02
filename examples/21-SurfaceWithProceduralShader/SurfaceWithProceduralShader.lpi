@@ -104,7 +104,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="20" Y="16"/>
+        <TopLine Value="34"/>
+        <CursorPos X="100" Y="48"/>
         <UsageCount Value="204"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -310,7 +311,7 @@
         <UsageCount Value="10"/>
       </Unit29>
     </Units>
-    <JumpHistory Count="25" HistoryIndex="24">
+    <JumpHistory Count="26" HistoryIndex="25">
       <Position1>
         <Filename Value="Units\u_mysurfacewithgradient.pas"/>
         <Caret Line="48" Column="26" TopLine="28"/>
@@ -411,6 +412,10 @@
         <Filename Value="..\..\source\oglcSurfaceWithProceduralShader.inc"/>
         <Caret Line="7"/>
       </Position25>
+      <Position26>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="16" Column="20"/>
+      </Position26>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

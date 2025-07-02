@@ -100,17 +100,18 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="42" Y="11"/>
+        <TopLine Value="189"/>
+        <CursorPos X="25" Y="202"/>
         <UsageCount Value="76"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="15" Y="13"/>
+        <CursorPos X="16" Y="14"/>
         <UsageCount Value="43"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -197,7 +198,7 @@
         <Loaded Value="True"/>
       </Unit15>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="4" HistoryIndex="3">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="194" Column="19" TopLine="180"/>
@@ -206,6 +207,14 @@
         <Filename Value="..\..\source\OGLCScene.pas"/>
         <Caret Line="189" Column="10" TopLine="186"/>
       </Position2>
+      <Position3>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="14" Column="16"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="125" Column="100" TopLine="112"/>
+      </Position4>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

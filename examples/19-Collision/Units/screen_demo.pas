@@ -59,7 +59,7 @@ begin
   FAtlas.Spacing := 1;
 
   fd.Create('Arial', FScene.ScaleDesignToScene(20), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, SIMPLELATIN_CHARSET + ASCII_SYMBOL_CHARSET);
+  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   path := PathToDataFolder;
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));
