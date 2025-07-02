@@ -15,7 +15,7 @@ object Form_Minimap: TForm_Minimap
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   object PB2: TPaintBox
     Left = 0
     Height = 80

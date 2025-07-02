@@ -16,7 +16,7 @@ const
 LAYER_COUNT = 5;
   Layer_InfoMap         = 0;
   Layer_Pattern         = 1;   // to show the pattern's list
-  Layer_WorkTileSet     = 2;   // to show/edit the tileset or
+  Layer_WorkTileSet     = 2;   // to show/edit the selected tileset
   Layer_WorkMap         = 3;   // to edit the layer's map
   Layer_Grid            = 4;   // to show the checkerboard
 
@@ -26,6 +26,7 @@ var
 FScene: TOGLCScene=NIL;
 
 FWorkingTileEngine: TTileEngine=NIL;
+FTileSetTileEngine: TTileEngine;
 
 FImageBackGround: TBGRABitmap=NIL;
 

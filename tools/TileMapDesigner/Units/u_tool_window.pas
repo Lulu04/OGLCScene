@@ -44,7 +44,6 @@ type
     CB6: TCheckBox;
     CheckBox1: TCheckBox;
     CLBLayer: TCheckListBox;
-    ColorButton1: TColorButton;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -65,8 +64,6 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label40: TLabel;
-    Label41: TLabel;
-    Label42: TLabel;
     Label46: TLabel;
     Label47: TLabel;
     Label48: TLabel;
@@ -97,7 +94,6 @@ type
     Panel14: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
-    Panel8: TPanel;
     PB1: TPaintBox;
     PopupMenu1: TPopupMenu;
     SBHelp2: TSpeedButton;
@@ -105,7 +101,6 @@ type
     SD2: TSaveDialog;
     SE3: TSpinEdit;
     SE4: TSpinEdit;
-    SE6: TSpinEdit;
     SE7: TSpinEdit;
     SE8: TSpinEdit;
     Shape1: TShape;
@@ -128,7 +123,6 @@ type
     procedure CheckBox1Change(Sender: TObject);
     procedure CLBLayerClickCheck(Sender: TObject);
     procedure CLBLayerSelectionChange(Sender: TObject; {%H-}User: boolean);
-    procedure ColorButton1ColorChanged(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure MenuItem5Click(Sender: TObject);
@@ -144,7 +138,6 @@ type
     procedure SBHelp1Click(Sender: TObject);
     procedure SBHelp2Click(Sender: TObject);
     procedure SE3Change(Sender: TObject);
-    procedure SE6Change(Sender: TObject);
     procedure SE7Change(Sender: TObject);
   private
     procedure LoadTextureToProject( AFilename: string; AFrameWidth, AFrameHeight: integer );
@@ -165,8 +158,7 @@ var
 
 implementation
 {$R *.lfm}
-uses u_tileset_edit,
-  u_main;
+uses u_tileset_edit, u_main;
 
 { TForm_Tools }
 
@@ -189,10 +181,6 @@ begin
   // Tile Size
   Label13.Caption := inttostr( MapList.MainMap.TileEngine.TileSize.cx );
   Label14.Caption := inttostr( MapList.MainMap.TileEngine.TileSize.cy );
-
-  // Hole color
-  ColorButton1.ButtonColor := BGRAToColor( MapList.MainMap.TileEngine.MapHoleColor.Value );
-  SE6.Value := MapList.MainMap.TileEngine.MapHoleColor.Alpha.Value;
 
   // draw size
   if CB4.ItemIndex = 0 then
@@ -219,29 +207,16 @@ end;
 
 // set Paintbox size and pos
 procedure TForm_Tools.PB1SetSizeAndPos;
-var ll, tt, ww, hh: integer;
+var cellWidth, cellHeight: integer;
+  tileAspectRatio: single;
 begin
-  PB1.Invalidate;
-  if CB1.ItemIndex = -1 then exit;
   with TileSetManager.TileSet[CB1.ItemIndex] do
   begin
-    if MAX_PAINTBOX_SIZE div TileWidth > XTileCount then begin
-      ww := XTileCount * TileWidth;
-      ll := 5 + ( MAX_PAINTBOX_SIZE - ww ) div 2;
-    end else begin
-     ww := MAX_PAINTBOX_SIZE;
-     ll := 5;
-    end;
-    if MAX_PAINTBOX_SIZE div TileHeight > YTileCount then begin
-      hh := YTileCount * TileHeight;
-      tt := 5;
-    end else begin
-      hh := MAX_PAINTBOX_SIZE;
-      tt := 5;
-    end;
+    cellWidth := PB1.Width div XTileCount;
+    tileAspectRatio := TileWidth / TileHeight;
+    cellHeight := Round(cellWidth/tileAspectRatio);
+    PB1.SetBounds(0, 0, cellWidth*XTileCount, cellHeight*YTileCount);
   end;
-
-  PB1.SetBounds(ll, tt, ww, hh);
 end;
 
 // delete Tileset
@@ -372,14 +347,6 @@ begin
   CB3.Checked := FWorkingTileEngine.VLoopMode;
 end;
 
-// user have changed hole color
-procedure TForm_Tools.ColorButton1ColorChanged(Sender: TObject);
-var c: TBGRAPixel;
-begin
-  c := ColorToBGRA(ColorButton1.ButtonColor);
-  MapList.SetTileEngineRGBHoleColor(c);
-end;
-
 procedure TForm_Tools.FormCreate(Sender: TObject);
 begin
   MapList := TMapList.Create;
@@ -493,6 +460,7 @@ begin
   end;
 
   PB1.Invalidate;
+  Form_Main.SetFocus;
 end;
 
 
@@ -524,7 +492,7 @@ begin
     for i:=1 to trunc(deltaV)-1 do
       ima.DrawLineAntialias(0, i * deltaV, ima.Width, i * deltaV, BGRAWhite, 1);
 
-    // ground type
+    // label ground type
     if CheckBox1.Checked then
     begin
       xx := deltaH / 2;
@@ -535,8 +503,8 @@ begin
           s := GroundTypeToString(MapList.MainMap.TileEngine.GetGroundType(CB1.ItemIndex, ixfr, iyfr));
           xxx := round(xx-ima.TextSize(s).cx div 2);
           yyy := round(yy - ima.TextSize(s).cy div 2);
-          ima.Rectangle(xxx, yyy, xxx + ima.TextSize(s).cx, yyy + ima.TextSize(s).cy, BGRABlack, BGRABlack, dmSet);
-          ima.TextOut(xxx, yyy, s, BGRA(128,128,128));
+          ima.Rectangle(xxx, yyy, xxx + ima.TextSize(s).cx, yyy + ima.TextSize(s).cy, BGRA(0,0,0,150), BGRA(0,0,0,150));// dmSet);
+          ima.TextOut(xxx, yyy, s, BGRA(220,220,220));
 
           xx += deltaH;
           if xx > ima.Width then
@@ -630,12 +598,6 @@ procedure TForm_Tools.SE3Change(Sender: TObject);
 begin
 
  SetProjectModified;
-end;
-
-// user change opacity on map hole color
-procedure TForm_Tools.SE6Change(Sender: TObject);
-begin
-  MapList.SetTileEngineOpacityHoleColor(SE6.Value);
 end;
 
 // scrolling speed (main map)

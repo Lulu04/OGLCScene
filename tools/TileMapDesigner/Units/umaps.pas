@@ -31,7 +31,7 @@ private
   FMainMap: TMapInfo;
   function GetCount: integer;
   function GetMainMap: TMapInfo;
-  function GetMapByIndex( aIndex: integer):TMapInfo;
+  function GetMapByIndex(aIndex: integer):TMapInfo;
   function GetSelectedLayerName: string;
   function GetSelectedMap: TMapInfo;
   function GetSelectedTileEngine: TTileEngine;
@@ -40,8 +40,8 @@ private
   procedure RemoveTileEngineFromSceneLayer;
   procedure PutTileEngineToSceneLayer;
   procedure ClearList;
-  procedure SetAsMainMap( aMapInfo: TMapInfo );
-  procedure SetAsNormalMap( aMapInfo: TMapInfo );
+  procedure SetAsMainMap(aMapInfo: TMapInfo);
+  procedure SetAsNormalMap(aMapInfo: TMapInfo);
 public
   constructor Create;
   destructor Destroy; override;
@@ -53,14 +53,12 @@ public
   procedure DeleteMap;
   procedure RenameMap;
 
-  procedure SetSize( aRow, aColumns: integer );
-  procedure SetTileEngineCoordinates( aX, aY: single );
-  procedure MoveTileEngineTo( aX, aY: single );
-  procedure SetTileEngineRGBHoleColor( aC: TBGRAPixel );
-  procedure SetTileEngineOpacityHoleColor( aOpacity: byte );
+  procedure SetSize(aRow, aColumns: integer);
+  procedure SetTileEngineCoordinates(aX, aY: single);
+  procedure MoveTileEngineTo(aX, aY: single);
   procedure ResetMaps; // clear all maps, keep all layers.
-  procedure InsertRow( aRowIndex, aCount: integer );
-  procedure InsertColumn( aColumnIndex, aCount: integer );
+  procedure InsertRow(aRowIndex, aCount: integer);
+  procedure InsertColumn(aColumnIndex, aCount: integer);
 
   procedure ShiftMapUp;
   procedure ShiftMapDown;
@@ -82,17 +80,16 @@ uses u_tool_window,
   u_main,
   tileset_manager,
   usavemap, uaskrenamemap,
-  u_tileset_edit;
+  u_tileset_edit, Math;
 
 { TMapInfo }
 
 constructor TMapInfo.Create;
 begin
   TileEngine := TTileEngine.Create(FScene);
-  TileEngine.TileMapDesignerModeEnable := TRUE;
+  //TileEngine.TileMapDesignerModeEnable := TRUE;
   TileEngine.OnTileEvent := @Form_Main.ProcessTileEngineEvent;
-  TileEngine.MapHoleColor.Value := ColorToBGRA(Form_Tools.ColorButton1.ButtonColor,
-                                               Form_Tools.SE6.Value);
+  TileEngine.SetViewSize(FScene.Width, FScene.Height);
 end;
 
 destructor TMapInfo.Destroy;
@@ -308,7 +305,10 @@ begin
   // load the main map data
   FMainMap.TileEngine.TexturesOwner:=TRUE;
   FMainMap.TileEngine.LoadMapFile( map_path+FMainMap.LayerName+'.map' );
-  with FMainMap.TileEngine do SetViewSize( TileSize.cx * MapTileCount.cx, TileSize.cy * MapTileCount.cy ); // set view to whole map
+  //with FMainMap.TileEngine do SetViewSize( TileSize.cx * MapTileCount.cx, TileSize.cy * MapTileCount.cy ); // set view to whole map
+  FMainMap.TileEngine.SetViewSize(FScene.Width, FScene.Height);
+  FMainMap.TileEngine.PositionOnMap.Value := PointF(0, 0);
+  FMainMap.TileEngine.SetCoordinate(0, 0);
 
   // load tilesset from main map data
   TileSetManager.LoadTileSetFromMapFile( map_path+FMainMap.LayerName+'.map' );
@@ -322,7 +322,10 @@ begin
      with GetMapByIndex(i) do begin
       TileEngine.LoadMapFile(map_path+LayerName+'.map', FMainMap.TileEngine);
       // set tileengine view to fit whole map
-      TileEngine.SetViewSize(TileEngine. TileSize.cx * TileEngine.MapTileCount.cx, TileEngine.TileSize.cy * TileEngine.MapTileCount.cy );
+      //TileEngine.SetViewSize(TileEngine. TileSize.cx * TileEngine.MapTileCount.cx, TileEngine.TileSize.cy * TileEngine.MapTileCount.cy );
+      TileEngine.SetViewSize(FScene.Width, FScene.Height);
+      TileEngine.PositionOnMap.Value := PointF(0, 0);
+      TileEngine.SetCoordinate(0, 0);
      end;
 
   Form_Tools.PB1SetSizeAndPos;
@@ -355,8 +358,6 @@ begin
      o.TileEngine.VScrollEnable := FMainMap.TileEngine.VScrollEnable;
      o.TileEngine.HLoopMode := FMainMap.TileEngine.HLoopMode;
      o.TileEngine.VLoopMode := FMainMap.TileEngine.VLoopMode;
-
-     o.TileEngine.MapHoleColor.Value := FMainMap.TileEngine.MapHoleColor.Value;
 
      o.TileEngine.SetCoordinate( MainMap.TileEngine.GetXY );
    end;
@@ -430,30 +431,16 @@ begin
 end;
 
 procedure TMapList.MoveTileEngineTo(aX, aY: single);
-var i: integer;
+var i, delta: integer;
 begin
-  for i:=0 to FMapList.Count-1 do
-   with GetMapByIndex(i).TileEngine do MoveTo( aX, aY, 0.2, idcSinusoid );
-end;
+  delta := (FScene.Width div MainMap.TileEngine.TileSize.cx) * MainMap.TileEngine.TileSize.cx;
+  aX  := EnsureRange(aX, 0, MainMap.TileEngine.MapSize.cx - delta);
+  delta := (FScene.Height div MainMap.TileEngine.TileSize.cy) * MainMap.TileEngine.TileSize.cy;
+  aY  := EnsureRange(aY, 0, MainMap.TileEngine.MapSize.cy - delta);
 
-procedure TMapList.SetTileEngineRGBHoleColor(aC: TBGRAPixel);
-var i: integer;
-begin
   for i:=0 to FMapList.Count-1 do
-   with GetMapByIndex(i).TileEngine do begin
-    MapHoleColor.Red.Value := aC.red;
-    MapHoleColor.Green.Value := aC.green;
-    MapHoleColor.Blue.Value := aC.blue;
-    end;
-  SetProjectModified;
-end;
-
-procedure TMapList.SetTileEngineOpacityHoleColor(aOpacity: byte);
-var i: integer;
-begin
-  for i:=0 to FMapList.Count-1 do
-   GetMapByIndex(i).TileEngine.MapHoleColor.Alpha.Value := aOpacity;
-  SetProjectModified;
+   with GetMapByIndex(i).TileEngine do
+     PositionOnMap.Value := PointF(aX, aY);
 end;
 
 procedure TMapList.ResetMaps;
@@ -473,6 +460,7 @@ begin
     t.InsertRow( aRowIndex, aCount);
     // set tileengine view to see whole map
     t.SetViewSize( t.MapSize.cx, t.MapSize.cy );
+    Form_Tools.UpdateMapParameterOnScreen;
   end;
 end;
 
@@ -481,10 +469,11 @@ var i: integer;
   t: TTileEngine;
 begin
   for i:=0 to FMapList.Count-1 do begin
-    t:=GetMapByIndex(i).TileEngine;
+    t := GetMapByIndex(i).TileEngine;
     t.InsertColumn(aColumnIndex, aCount);
     // set tileengine view to see whole map
-    t.SetViewSize( t.MapSize.cx, t.MapSize.cy );
+    t.SetViewSize(t.MapSize.cx, t.MapSize.cy);
+    Form_Tools.UpdateMapParameterOnScreen;
   end;
 end;
 

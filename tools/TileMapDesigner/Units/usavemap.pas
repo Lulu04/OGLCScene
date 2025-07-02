@@ -68,10 +68,6 @@ begin
   FMapFile.Add('START_TILE');
   FMapFile.Add( Form_Tools.Label10.Caption + '|' + Form_Tools.Label11.Caption );
 
-  // hole color
-  FMapFile.Add('HOLE_COLOR');
-  FMapFile.Add( BGRAPixelToHex( aTileEngine.MapHoleColor.Value ));
-
   // Event names
   if Form_AskEvent.LB.Count > 0 then
   begin

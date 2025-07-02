@@ -6,7 +6,7 @@ object Form_Tools: TForm_Tools
   BorderIcons = [biSystemMenu]
   BorderStyle = bsToolWindow
   Caption = 'Tool Layers'
-  ClientHeight = 621
+  ClientHeight = 641
   ClientWidth = 339
   Color = 3685953
   DefaultMonitor = dmPrimary
@@ -16,41 +16,47 @@ object Form_Tools: TForm_Tools
   Menu = MainMenu1
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   object PageControl1: TPageControl
     Left = 0
-    Height = 621
+    Height = 641
     Top = 0
     Width = 339
-    ActivePage = TabSheet1
+    ActivePage = pageLayer
     Align = alClient
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Tilesets'
-      ClientHeight = 593
+      ClientHeight = 613
       ClientWidth = 331
       object Panel12: TPanel
         Left = 0
-        Height = 593
+        Height = 613
         Top = 0
         Width = 331
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 593
+        ClientHeight = 613
         ClientWidth = 331
         Color = 4937317
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Panel13: TPanel
+          AnchorSideLeft.Control = Panel12
+          AnchorSideTop.Control = Panel12
+          AnchorSideRight.Control = Panel12
+          AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 57
           Top = 0
           Width = 331
-          Align = alTop
+          Anchors = [akTop, akLeft, akRight]
           ClientHeight = 57
           ClientWidth = 331
           Color = 3028029
+          ParentBackground = False
           ParentColor = False
           TabOrder = 0
           object Button1: TButton
@@ -59,8 +65,8 @@ object Form_Tools: TForm_Tools
             Top = 8
             Width = 76
             Caption = 'Add tileset'
-            OnClick = Button1Click
             TabOrder = 0
+            OnClick = Button1Click
           end
           object Button2: TButton
             Left = 96
@@ -68,8 +74,8 @@ object Form_Tools: TForm_Tools
             Top = 8
             Width = 83
             Caption = 'Remove tileset'
-            OnClick = Button2Click
             TabOrder = 1
+            OnClick = Button2Click
           end
           object CB1: TComboBox
             Left = 208
@@ -78,9 +84,9 @@ object Form_Tools: TForm_Tools
             Width = 119
             Color = 4605794
             ItemHeight = 15
-            OnChange = CB1Change
             Style = csDropDownList
             TabOrder = 2
+            OnChange = CB1Change
           end
           object SBHelp2: TSpeedButton
             Cursor = crHandPoint
@@ -134,13 +140,13 @@ object Form_Tools: TForm_Tools
           end
           object CheckBox1: TCheckBox
             Left = 8
-            Height = 19
+            Height = 17
             Top = 32
-            Width = 20
+            Width = 18
             Checked = True
-            OnChange = CheckBox1Change
             State = cbChecked
             TabOrder = 3
+            OnChange = CheckBox1Change
           end
           object Label6: TLabel
             AnchorSideLeft.Control = CheckBox1
@@ -212,12 +218,17 @@ object Form_Tools: TForm_Tools
           end
         end
         object PB1: TPaintBox
+          AnchorSideLeft.Control = Panel12
+          AnchorSideTop.Control = Panel13
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel12
+          AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 536
+          Height = 551
           Hint = 'Right click = set ground type'
           Top = 57
           Width = 331
-          Align = alClient
+          Anchors = [akTop, akLeft, akRight]
           ParentShowHint = False
           PopupMenu = PopupMenu1
           ShowHint = True
@@ -228,18 +239,19 @@ object Form_Tools: TForm_Tools
     end
     object pageLayer: TTabSheet
       Caption = 'Layer'
-      ClientHeight = 593
+      ClientHeight = 613
       ClientWidth = 331
       object Panel14: TPanel
         Left = 0
-        Height = 593
+        Height = 613
         Top = 0
         Width = 331
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 593
+        ClientHeight = 613
         ClientWidth = 331
         Color = 4937317
+        ParentBackground = False
         ParentColor = False
         TabOrder = 0
         object Button7: TButton
@@ -249,8 +261,8 @@ object Form_Tools: TForm_Tools
           Top = 200
           Width = 65
           Caption = 'Add Layer'
-          OnClick = Button7Click
           TabOrder = 0
+          OnClick = Button7Click
         end
         object CLBLayer: TCheckListBox
           Left = 8
@@ -264,12 +276,12 @@ object Form_Tools: TForm_Tools
           Font.Height = -17
           Font.Style = [fsBold]
           ItemHeight = 0
-          OnClickCheck = CLBLayerClickCheck
-          OnSelectionChange = CLBLayerSelectionChange
           ParentFont = False
           ParentShowHint = False
           ShowHint = True
           TabOrder = 1
+          OnClickCheck = CLBLayerClickCheck
+          OnSelectionChange = CLBLayerSelectionChange
         end
         object Button8: TButton
           Left = 192
@@ -278,10 +290,10 @@ object Form_Tools: TForm_Tools
           Top = 200
           Width = 40
           Caption = 'Delete'
-          OnClick = Button8Click
           ParentShowHint = False
           ShowHint = True
           TabOrder = 2
+          OnClick = Button8Click
         end
         object Arrow1: TArrow
           Left = 239
@@ -316,6 +328,7 @@ object Form_Tools: TForm_Tools
           ClientHeight = 60
           ClientWidth = 243
           Color = 9210954
+          ParentBackground = False
           ParentColor = False
           TabOrder = 3
           object Shape1: TShape
@@ -369,8 +382,8 @@ object Form_Tools: TForm_Tools
             Top = 35
             Width = 48
             Caption = 'Set size'
-            OnClick = Button4Click
             TabOrder = 0
+            OnClick = Button4Click
           end
           object Label40: TLabel
             Left = 8
@@ -384,62 +397,6 @@ object Form_Tools: TForm_Tools
             ParentFont = False
           end
         end
-        object Panel8: TPanel
-          Left = 256
-          Height = 116
-          Top = 232
-          Width = 64
-          BevelOuter = bvNone
-          ClientHeight = 116
-          ClientWidth = 64
-          Color = 7290425
-          ParentColor = False
-          TabOrder = 4
-          object Label41: TLabel
-            Left = 7
-            Height = 15
-            Top = 4
-            Width = 52
-            Caption = 'Hole color'
-            Font.Color = 10671092
-            Font.Style = [fsItalic]
-            ParentColor = False
-            ParentFont = False
-          end
-          object ColorButton1: TColorButton
-            Left = 7
-            Height = 27
-            Top = 21
-            Width = 53
-            BorderWidth = 2
-            ButtonColorSize = 16
-            ButtonColor = 3231082
-            OnColorChanged = ColorButton1ColorChanged
-          end
-          object Label42: TLabel
-            Left = 14
-            Height = 15
-            Top = 53
-            Width = 39
-            Caption = 'opacity'
-            Font.Color = 10671092
-            Font.Style = [fsItalic]
-            ParentColor = False
-            ParentFont = False
-          end
-          object SE6: TSpinEdit
-            Left = 9
-            Height = 23
-            Top = 69
-            Width = 48
-            Font.Style = [fsBold]
-            MaxValue = 255
-            OnChange = SE6Change
-            ParentFont = False
-            TabOrder = 0
-            Value = 255
-          end
-        end
         object Panel6: TPanel
           Left = 8
           Height = 53
@@ -449,8 +406,9 @@ object Form_Tools: TForm_Tools
           ClientHeight = 53
           ClientWidth = 243
           Color = 3829058
+          ParentBackground = False
           ParentColor = False
-          TabOrder = 5
+          TabOrder = 4
           object CB4: TComboBox
             AnchorSideLeft.Control = SE4
             AnchorSideLeft.Side = asrBottom
@@ -468,11 +426,11 @@ object Form_Tools: TForm_Tools
               'pixels'
               'tiles'
             )
-            OnChange = CB4Change
             ParentFont = False
             Style = csDropDownList
             TabOrder = 0
             Text = 'pixels'
+            OnChange = CB4Change
           end
           object SE4: TSpinEdit
             AnchorSideLeft.Control = SE3
@@ -579,8 +537,9 @@ object Form_Tools: TForm_Tools
           ClientHeight = 40
           ClientWidth = 312
           Color = 6440540
+          ParentBackground = False
           ParentColor = False
-          TabOrder = 6
+          TabOrder = 5
           object Label11: TLabel
             AnchorSideLeft.Control = Label10
             AnchorSideLeft.Side = asrBottom
@@ -670,12 +629,13 @@ object Form_Tools: TForm_Tools
           ClientHeight = 41
           ClientWidth = 312
           Color = 4154217
+          ParentBackground = False
           ParentColor = False
-          TabOrder = 7
+          TabOrder = 6
           object Label17: TLabel
             AnchorSideLeft.Control = CB3
             AnchorSideTop.Control = CB3
-            Left = 249
+            Left = 251
             Height = 15
             Top = 21
             Width = 27
@@ -690,20 +650,20 @@ object Form_Tools: TForm_Tools
             AnchorSideLeft.Control = Label25
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = CB6
-            Left = 228
-            Height = 19
+            Left = 230
+            Height = 17
             Top = 19
-            Width = 20
+            Width = 18
             BorderSpacing.Left = 12
             Checked = True
-            OnChange = CB5Change
             State = cbChecked
             TabOrder = 0
+            OnChange = CB5Change
           end
           object Label25: TLabel
             AnchorSideLeft.Control = CB6
             AnchorSideTop.Control = CB6
-            Left = 181
+            Left = 183
             Height = 15
             Top = 21
             Width = 35
@@ -720,16 +680,16 @@ object Form_Tools: TForm_Tools
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label23
             AnchorSideRight.Side = asrBottom
-            Left = 160
-            Height = 19
+            Left = 162
+            Height = 17
             Top = 19
-            Width = 20
+            Width = 18
             Anchors = [akTop, akRight]
             BorderSpacing.Right = 87
             Checked = True
-            OnChange = CB5Change
             State = cbChecked
             TabOrder = 1
+            OnChange = CB5Change
           end
           object Label23: TLabel
             Left = 170
@@ -745,7 +705,7 @@ object Form_Tools: TForm_Tools
           object Label16: TLabel
             AnchorSideLeft.Control = CB2
             AnchorSideTop.Control = CB2
-            Left = 101
+            Left = 103
             Height = 15
             Top = 21
             Width = 27
@@ -760,20 +720,20 @@ object Form_Tools: TForm_Tools
             AnchorSideLeft.Control = Label24
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = CB5
-            Left = 80
-            Height = 19
+            Left = 82
+            Height = 17
             Top = 19
-            Width = 20
+            Width = 18
             BorderSpacing.Left = 13
             Checked = True
-            OnChange = CB5Change
             State = cbChecked
             TabOrder = 2
+            OnChange = CB5Change
           end
           object Label24: TLabel
             AnchorSideLeft.Control = CB5
             AnchorSideTop.Control = CB5
-            Left = 32
+            Left = 34
             Height = 15
             Top = 21
             Width = 35
@@ -789,16 +749,16 @@ object Form_Tools: TForm_Tools
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label22
             AnchorSideRight.Side = asrBottom
-            Left = 11
-            Height = 19
+            Left = 13
+            Height = 17
             Top = 19
-            Width = 20
+            Width = 18
             Anchors = [akTop, akRight]
             BorderSpacing.Right = 96
             Checked = True
-            OnChange = CB5Change
             State = cbChecked
             TabOrder = 3
+            OnChange = CB5Change
           end
           object Label22: TLabel
             Left = 14
@@ -821,8 +781,9 @@ object Form_Tools: TForm_Tools
           ClientHeight = 106
           ClientWidth = 300
           Color = 3299433
+          ParentBackground = False
           ParentColor = False
-          TabOrder = 8
+          TabOrder = 7
           object Label46: TLabel
             Left = 24
             Height = 15
@@ -895,8 +856,8 @@ object Form_Tools: TForm_Tools
             Top = 26
             Width = 75
             Caption = 'Stop scroll'
-            OnClick = Button5Click
             TabOrder = 2
+            OnClick = Button5Click
           end
           object Button6: TButton
             Left = 136
@@ -904,8 +865,8 @@ object Form_Tools: TForm_Tools
             Top = 64
             Width = 75
             Caption = 'Go to top left'
-            OnClick = Button6Click
             TabOrder = 3
+            OnClick = Button6Click
           end
           object Label1: TLabel
             Left = 8
@@ -925,10 +886,10 @@ object Form_Tools: TForm_Tools
           Top = 200
           Width = 56
           Caption = 'Rename'
-          OnClick = Button11Click
           ParentShowHint = False
           ShowHint = True
-          TabOrder = 9
+          TabOrder = 8
+          OnClick = Button11Click
         end
         object SBHelp1: TSpeedButton
           Cursor = crHandPoint

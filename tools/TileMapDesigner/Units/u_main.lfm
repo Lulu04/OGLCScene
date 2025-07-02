@@ -3,6 +3,7 @@ object Form_Main: TForm_Main
   Height = 680
   Top = 120
   Width = 1064
+  BorderStyle = bsSingle
   Caption = 'Tile Map Designer'
   ClientHeight = 680
   ClientWidth = 1064
@@ -16,17 +17,6 @@ object Form_Main: TForm_Main
   OnShow = FormShow
   LCLVersion = '3.8.0.0'
   WindowState = wsMaximized
-  object OpenGLControl1: TOpenGLControl
-    Left = 0
-    Height = 680
-    Top = 0
-    Width = 1064
-    Align = alClient
-    AlphaBits = 8
-    OnMouseDown = OpenGLControl1MouseDown
-    OnMouseMove = OpenGLControl1MouseMove
-    OnMouseUp = OpenGLControl1MouseUp
-  end
   object Panel1: TPanel
     AnchorSideTop.Control = OpenGLControl1
     AnchorSideRight.Control = OpenGLControl1
@@ -43,7 +33,7 @@ object Form_Main: TForm_Main
     ClientHeight = 19
     ClientWidth = 19
     ParentBackground = False
-    TabOrder = 1
+    TabOrder = 0
     object SBHelp3: TSpeedButton
       Cursor = crHandPoint
       Left = 0
@@ -96,17 +86,22 @@ object Form_Main: TForm_Main
     end
   end
   object Panel2: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
     Left = 0
     Height = 30
     Top = 0
-    Width = 1000
+    Width = 1064
+    Anchors = [akTop, akLeft, akRight]
     BevelOuter = bvNone
     ClientHeight = 30
-    ClientWidth = 1000
+    ClientWidth = 1064
     Color = 13619151
     ParentBackground = False
     ParentColor = False
-    TabOrder = 2
+    TabOrder = 1
     object Panel3: TPanel
       Left = 0
       Height = 30
@@ -307,7 +302,7 @@ object Form_Main: TForm_Main
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
-      Left = 744
+      Left = 808
       Height = 30
       Top = 0
       Width = 256
@@ -328,6 +323,7 @@ object Form_Main: TForm_Main
         Width = 125
         BorderSpacing.Left = 10
         Color = 16777196
+        Enabled = False
         ItemHeight = 14
         ItemIndex = 0
         Items.Strings = (
@@ -353,25 +349,6 @@ object Form_Main: TForm_Main
         Caption = 'view'
         ParentColor = False
       end
-      object ToggleBox1: TToggleBox
-        Left = 191
-        Height = 25
-        Hint = 'show/hide event value on the map'
-        Top = 2
-        Width = 41
-        Caption = 'SHOW'#13#10'EVENT'
-        Checked = True
-        Color = 12050612
-        Font.Color = 3503664
-        Font.Height = -8
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
-        ParentShowHint = False
-        ShowHint = True
-        State = cbChecked
-        TabOrder = 1
-      end
     end
     object Shape1: TShape
       AnchorSideLeft.Control = Panel3
@@ -389,12 +366,12 @@ object Form_Main: TForm_Main
       Left = 115
       Height = 30
       Top = 0
-      Width = 604
+      Width = 668
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 25
       BorderSpacing.Right = 25
       ClientHeight = 30
-      ClientWidth = 604
+      ClientWidth = 668
       Color = 12171705
       ParentBackground = False
       ParentColor = False
@@ -405,7 +382,7 @@ object Form_Main: TForm_Main
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = Panel5
         AnchorSideRight.Side = asrBottom
-        Left = 570
+        Left = 634
         Height = 22
         Hint = 'Mini map  - M'
         Top = 4
@@ -591,7 +568,7 @@ object Form_Main: TForm_Main
     object Shape2: TShape
       AnchorSideLeft.Control = Panel3
       AnchorSideLeft.Side = asrBottom
-      Left = 657
+      Left = 699
       Height = 22
       Top = 4
       Width = 3
@@ -599,8 +576,38 @@ object Form_Main: TForm_Main
       BorderSpacing.Left = 10
     end
   end
+  object Panel6: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel2
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 650
+    Top = 30
+    Width = 1064
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 650
+    ClientWidth = 1064
+    ParentBackground = False
+    TabOrder = 2
+    object OpenGLControl1: TOpenGLControl
+      Left = 80
+      Height = 280
+      Top = 64
+      Width = 417
+      Anchors = []
+      AlphaBits = 8
+      OnMouseDown = OpenGLControl1MouseDown
+      OnMouseMove = OpenGLControl1MouseMove
+      OnMouseUp = OpenGLControl1MouseUp
+    end
+  end
   object PopupMenu1: TPopupMenu
     Alignment = paCenter
+    OnPopup = PopupMenu1Popup
     Left = 111
     Top = 149
     object Menu_FillWithSelectedTile: TMenuItem
@@ -610,40 +617,40 @@ object Form_Main: TForm_Main
     object MenuItem2: TMenuItem
       Caption = '-'
     end
-    object Menu_Cut: TMenuItem
+    object MICut: TMenuItem
       Caption = 'Cut - (Ctrl X)'
-      OnClick = Menu_CutClick
+      OnClick = MICutClick
     end
-    object Menu_Copy: TMenuItem
+    object MICopy: TMenuItem
       Caption = 'Copy - (Ctrl C)'
-      OnClick = Menu_CopyClick
+      OnClick = MICopyClick
     end
-    object Menu_Paste: TMenuItem
+    object MIPaste: TMenuItem
       Caption = 'Paste - (Ctrl V)'
-      OnClick = Menu_PasteClick
+      OnClick = MIPasteClick
     end
-    object MenuClear: TMenuItem
+    object MIClear: TMenuItem
       Caption = 'Clear - (Delete)'
-      OnClick = MenuClearClick
+      OnClick = MIClearClick
     end
     object MenuItem6: TMenuItem
       Caption = '-'
     end
-    object MenuItem12: TMenuItem
+    object MIKeepAsPAttern: TMenuItem
       Caption = 'Keep as Pattern'
       ShortCut = 16464
-      OnClick = MenuItem12Click
+      OnClick = MIKeepAsPAtternClick
     end
     object MenuItem13: TMenuItem
       Caption = '-'
     end
-    object Menu_InsertRow: TMenuItem
+    object MIInsertRow: TMenuItem
       Caption = 'Insert row...'
-      OnClick = Menu_InsertRowClick
+      OnClick = MIInsertRowClick
     end
-    object Menu_InsertColumn: TMenuItem
+    object MIInsertColumn: TMenuItem
       Caption = 'Insert columns...'
-      OnClick = Menu_InsertColumnClick
+      OnClick = MIInsertColumnClick
     end
     object MenuItem1: TMenuItem
       Caption = '-'
@@ -655,52 +662,70 @@ object Form_Main: TForm_Main
     object MenuItem4: TMenuItem
       Caption = '-'
     end
-    object MenuItem3: TMenuItem
+    object MIEvent: TMenuItem
       Caption = 'Event...'
-      OnClick = MenuItem3Click
+      OnClick = MIEventClick
     end
-    object MenuItem5: TMenuItem
+    object MIDeleteEvent: TMenuItem
       Caption = 'Delete event'
-      OnClick = MenuItem5Click
+      OnClick = MIDeleteEventClick
     end
-    object MenuItem7: TMenuItem
+    object MICopyEventToClipboard: TMenuItem
       Caption = 'Copy event types to CLIPBOARD'
-      OnClick = MenuItem7Click
+      OnClick = MICopyEventToClipboardClick
     end
     object MenuItem8: TMenuItem
       Caption = '-'
     end
-    object MenuItem10: TMenuItem
+    object MISetGroundType: TMenuItem
       Caption = 'Set ground type...'
-      OnClick = MenuItem10Click
+      OnClick = MISetGroundTypeClick
     end
-    object MenuItem16: TMenuItem
+    object MIFlipH: TMenuItem
       Caption = 'Flip H'
       ShortCut = 16456
-      OnClick = MenuItem16Click
+      OnClick = MIFlipHClick
     end
-    object MenuItem17: TMenuItem
+    object MIFlipV: TMenuItem
       Caption = 'Flip V'
       ShortCut = 16458
-      OnClick = MenuItem16Click
+      OnClick = MIFlipHClick
     end
-    object MenuItem18: TMenuItem
+    object MINoFlip: TMenuItem
       Caption = 'NoFlip'
-      OnClick = MenuItem16Click
+      OnClick = MIFlipHClick
+    end
+    object Separator1: TMenuItem
+      Caption = '-'
+    end
+    object MIMirrorH: TMenuItem
+      Caption = 'Mirror H'
+      OnClick = MIMirrorHClick
+    end
+    object MIMirrorV: TMenuItem
+      Caption = 'Mirror V'
+      OnClick = MIMirrorHClick
+    end
+    object Separator2: TMenuItem
+      Caption = '-'
+    end
+    object MIMoveSelection: TMenuItem
+      Caption = 'Move selection'
+      OnClick = MIMoveSelectionClick
     end
     object MenuItem11: TMenuItem
       Caption = '-'
     end
-    object MenuItem14: TMenuItem
+    object MICopyMapPositionToClipboard: TMenuItem
       Caption = 'Copy map position to CLIPBOARD'
-      OnClick = MenuItem14Click
+      OnClick = MICopyMapPositionToClipboardClick
     end
     object MenuItem15: TMenuItem
       Caption = '-'
     end
-    object MenuItem9: TMenuItem
+    object MIPutAllTileset: TMenuItem
       Caption = 'Put all tileset'
-      OnClick = MenuItem9Click
+      OnClick = MIPutAllTilesetClick
     end
   end
   object ApplicationProperties1: TApplicationProperties
