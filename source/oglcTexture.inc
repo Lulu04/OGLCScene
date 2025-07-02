@@ -17,11 +17,12 @@ public
   ID: GLuint;
   IDOwner: boolean;
   Filename: string; // the filename without path. '' if the texture is not loaded from a file.
-  TextureWidth: integer;
-  TextureHeight: integer;
-  FrameWidth: integer;
-  FrameHeight: integer;
-  FrameCount: integer; // = 1 minimum = length(FramesCoord)
+  TextureWidth: integer;  // the texture width in pixel
+  TextureHeight: integer; // the texture height in pixel
+  FrameWidth: integer;    // the width of one frame in this texture (same as TextureWidth if there is only 1 frame)
+  FrameHeight: integer;   // the height of one frame in this texture (same as TextureHeight if there is only 1 frame)
+  FrameCount: integer;    // = 1 minimum = length(FramesCoord)
+  FramePerRow: integer;   // the number of frame per row in a tileset.
   FramesCoord: array of TQuadCoor;  // [0] is whole texture or sub-texture, [1] is first frame, [2] is second frame, ...
 
   // convert a texture pixel coordinates into its UV equivalent
@@ -114,6 +115,7 @@ end;
 procedure TTexture.SetSingleFrame;
 begin
   SetFrameSize(TextureWidth, TextureHeight);
+  FramePerRow := 1;
 end;
 
 procedure TTexture.SetFrameSize(AFrameWidth, AFrameHeight: integer);
@@ -142,6 +144,7 @@ begin
   if aXFrameCount < 1 then aXFrameCount := 1;
   if aYFrameCount < 1 then aYFrameCount := 1;
   FrameCount := aXFrameCount * aYFrameCount;
+  FramePerRow := aXFrameCount;
 
   if FrameCount > 1
     then FrameCount := FrameCount + 1; // because frame[0] is whole texture, frame index start at 1
@@ -217,6 +220,7 @@ begin
   FrameWidth := aRect.Width;
   FrameHeight := aRect.Height;
   FrameCount := 1;
+  FramePerRow := 1;
   ID := aTexture^.ID;
   IDOwner := FALSE;
 
@@ -260,6 +264,7 @@ begin
   fcx := aRect.Width div AFrameWidth;
   fcy := aRect.Height div AFrameHeight;
   FrameCount := fcx*fcy;
+  FramePerRow := fcx;
   if FrameCount > 1 then inc(FrameCount); // because frame[0] is whole texture
   SetLength(FramesCoord, FrameCount);
 
@@ -317,8 +322,8 @@ end;
 function TTexture.GetFrameCount: TSize;
 begin
   if (FrameWidth > 0) and (FrameHeight > 0) then begin
-    Result.cx := TextureWidth div FrameWidth;
-    Result.cy := TextureHeight div FrameHeight;
+    Result.cx := FramePerRow;
+    Result.cy := (FrameCount-1) div FramePerRow;
   end else begin
     Result.cx := 0;
     Result.cy := 0;
