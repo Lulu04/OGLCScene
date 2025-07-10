@@ -1,4 +1,5 @@
 Version 1.2 - 2025
+> tile engine: now tiles can be flipped horizontally and vertically. Tool TileMap Designer has been improved to support this new feature.
 > new function TSimpleSurfaceWithEffect.SurfaceToSceneWithoutLayerTransform() that transform a local coordinates to world coordinates without taking in account the camera assigned to the parent layer of the surface.
 > when a game changes screen, its now possible to display a sprite with a loading message to warn the player of the wait.
 > texture atlas can now be saved and loaded to/from a file on the disk.
@@ -13,7 +14,6 @@ Version 1.2 - 2025
 > TQuad4Color replace TMultiColorRectangle (the last is now deprecated). TQuad4Color can be a rectangle or any convex quadrilateral with a different color for each vertex. 
 > code in function TOGLCCamera.WorldToControl() and ControlToWorld() now use matrix to transform the point.
 > added camera AutoFollow feature: camera can now moves smoothly to a fixed point or follow a surface.
-> added TSmoothPointF and TSmoothSingle: allow to change value smoothly for variable TPointF or single.
 > fixed wrong formula in function LinearSpeedToAngleRotation().
 > fix missing condition check to SetChildOf() function.
 > fix a bug in TTexture.TakePartOf() function. Now the returned texture have the right UV coordinates.
