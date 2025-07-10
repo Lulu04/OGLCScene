@@ -49,6 +49,8 @@ private
 public
   procedure ReverseAngleOnSelection;
   procedure ToogleScaledAndRotatedHandleOnSelection;
+  procedure MoveSelection(aDelta: TPointF);
+  procedure ResetValuesOnSelection;
 private
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
@@ -63,6 +65,7 @@ private // collision body
   FWorkingBody: PBodyItem;
   FWorkingNode: PUINodeHandle;
   procedure UnselectAllNodes;
+  procedure DoCreatePoint;
   procedure LoopCreateLine;
   procedure LoopCreateCircle;
   procedure LoopCreateRectangle;
@@ -311,6 +314,22 @@ begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.ToogleScaledAndRotatedHandle;
+end;
+
+procedure TScreenSpriteBuilder.MoveSelection(aDelta: TPointF);
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do begin
+    FSelected[i]^.surface.X.Value := FSelected[i]^.surface.X.Value + aDelta.x;
+    FSelected[i]^.surface.Y.Value := FSelected[i]^.surface.Y.Value + aDelta.y;
+  end;
+end;
+
+procedure TScreenSpriteBuilder.ResetValuesOnSelection;
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.SetValuesFromTemporaryVariables;
 end;
 
 procedure TScreenSpriteBuilder.LoopMoveSelection;
@@ -564,6 +583,27 @@ begin
   Bodies.UnselectAllNodes;
 end;
 
+procedure TScreenSpriteBuilder.DoCreatePoint;
+var item: PBodyItem;
+    parentSurface: TSimpleSurfaceWithEffect;
+    current: TPointF;
+begin
+  if MouseState = msCreatingPoint then exit;
+  MouseState := msCreatingPoint;
+
+  current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+
+  parentSurface := Surfaces.GetRootItem^.surface;
+
+  item := Bodies.AddEmpty;
+  item^.BodyType := _btPoint;
+  item^.ParentSurface := parentSurface;
+  item^.UpdateAsPoint(current);
+
+  FrameToolsSpriteBuilder.Modified := True;
+  Bodies.UndoRedoManager.AddActionAddShape(item);
+end;
+
 procedure TScreenSpriteBuilder.LoopCreateLine;
 var item: PBodyItem;
   current, delta: TPointF;
@@ -781,6 +821,10 @@ begin
       end;
 
       msMovingNode: MouseState := msIdle;
+      msMouseDownOnToolPoint: begin
+        DoCreatePoint;
+        MouseState := msIdle;
+      end;
       msCreatingLine: MouseState := msIdle;
       msCreatingCircle: MouseState := msIdle;
       msCreatingRectangle: MouseState := msIdle;
@@ -823,6 +867,7 @@ begin
           MouseState := msMouseDownOnNode;
         end;
       end;
+      msToolPoint: MouseState := msMouseDownOnToolPoint;
       msToolLine: MouseState := msMouseDownOnToolLine;
       msToolCircle: MouseState := msMouseDownOnToolCircle;
       msToolRectangle: MouseState := msMouseDownOnToolRectangle;

@@ -35,6 +35,10 @@ TMouseState = ( msIdle,
                 msMouseDownOnNode,
                 msMovingNode,
 
+                msToolPoint,
+                msMouseDownOnToolPoint,
+                msCreatingPoint,
+
                 msToolLine,
                 msMouseDownOnToolLine,
                 msCreatingLine,
@@ -145,6 +149,9 @@ FScene.LogDebug('MouseState = '+debug);
 
     msOverNode: tex := texMouseOverNode;
     msMouseDownOnNode, msMovingNode: tex := texMouseMovingNode;
+
+    msToolPoint,
+    msCreatingPoint: tex := texMouseToolPoint;
 
     msToolLine,
     msCreatingLine: tex := texMouseToolLine;

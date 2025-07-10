@@ -6,17 +6,21 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls,
-  ExtCtrls, StdCtrls, Buttons, Spin, Menus,
+  ExtCtrls, StdCtrls, Buttons, Spin, Menus, Arrow,
   BGRABitmapTypes,
   OGLCScene,
   u_surface_list, u_texture_list, Types,
-  u_screen_spritebuilder, u_collisionbody_list, u_posture_list;
+  u_screen_spritebuilder, u_collisionbody_list, u_posture_list, u_undo_redo;
 
 type
 
   { TFrameToolsSpriteBuilder }
 
   TFrameToolsSpriteBuilder = class(TFrame)
+    ArrowRight: TArrow;
+    ArrowUp: TArrow;
+    ArrowDown: TArrow;
+    ArrowLeft: TArrow;
     BAddTexture: TSpeedButton;
     BAddToSpriteBank: TSpeedButton;
     BChooseImageFile: TSpeedButton;
@@ -30,6 +34,7 @@ type
     BNewChild: TSpeedButton;
     BPolygon: TSpeedButton;
     BRenamePosture: TSpeedButton;
+    BPoint: TSpeedButton;
     BTextureRedo: TSpeedButton;
     BPostureRedo: TSpeedButton;
     BTextureUndo: TSpeedButton;
@@ -109,6 +114,8 @@ type
     BAddPostureToList: TSpeedButton;
     BUpdateposture: TSpeedButton;
     BReverseAngle: TSpeedButton;
+    BResetPos: TSpeedButton;
+    procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BChooseImageFileClick(Sender: TObject);
@@ -151,6 +158,7 @@ type
     procedure DoRenamePosture;
     procedure DoDeletePosture;
     procedure DoReverseAngleOnPosture;
+    procedure DoResetPosOnSelection;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
@@ -238,6 +246,10 @@ begin
     ScreenSpriteBuilder.MouseState := msIdle;
   end;
 
+  if Sender = BPoint then begin
+    ScreenSpriteBuilder.MouseState := msToolPoint;
+  end;
+
   if Sender = BLine then begin
     ScreenSpriteBuilder.MouseState := msToolLine;
   end;
@@ -309,6 +321,9 @@ end;
 
 procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
 begin
+  if Sender = BResetPos then
+    DoResetPosOnSelection;
+
   if Sender = BReverseAngle then
     DoReverseAngleOnPosture;
 
@@ -336,6 +351,25 @@ begin
 
   if Sender = Edit3 then
     UpdatePostureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.ArrowUpClick(Sender: TObject);
+begin
+  if Sender = ArrowUp then begin
+    ScreenSpriteBuilder.MoveSelection(PointF(0, -1));
+  end;
+
+  if Sender = ArrowDown then begin
+    ScreenSpriteBuilder.MoveSelection(PointF(0, 1));
+  end;
+
+  if Sender = ArrowLeft then begin
+    ScreenSpriteBuilder.MoveSelection(PointF(-1, 0));
+  end;
+
+  if Sender = ArrowRight then begin
+    ScreenSpriteBuilder.MoveSelection(PointF(1, 0));
+  end;
 end;
 
 procedure TFrameToolsSpriteBuilder.CBParentDrawItem(Control: TWinControl;
@@ -775,6 +809,31 @@ begin
   if item = NIL then exit;
 
   ScreenSpriteBuilder.ReverseAngleOnSelection;
+  // construct the undo/redo item
+  undoredoItem := Postures.UndoRedoManager.AddEmpty;
+  undoredoItem^.action := puratModifyPosture;
+  undoredoItem^.data.name := item^.name;
+  undoredoItem^.data.Values := Copy(item^.Values);
+  undoredoItem^.newData.name := item^.name;
+  undoredoItem^.newData.TakeValuesFrom(Surfaces);
+
+  item^.TakeValuesFrom(Surfaces);
+  Modified := True;
+  UpdatePostureWidgetState;
+end;
+
+procedure TFrameToolsSpriteBuilder.DoResetPosOnSelection;
+var
+  i: Integer;
+  item: PPostureItem;
+  undoredoItem: PPostureUndoRedoItem;
+begin
+  i := LBPostureNames.ItemIndex;
+  if i = -1 then exit;
+  item := Postures.GetItemByName(LBPostureNames.Items.Strings[i]);
+  if item = NIL then exit;
+
+  ScreenSpriteBuilder.ResetValuesOnSelection;
   // construct the undo/redo item
   undoredoItem := Postures.UndoRedoManager.AddEmpty;
   undoredoItem^.action := puratModifyPosture;
