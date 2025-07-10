@@ -53,6 +53,7 @@ public
   procedure KillSprites;
 
   property BodyType: TOGLCBodyItemType read GetBodyType write SetBodyType;
+  procedure UpdateAsPoint(aWorldPt: TPointF);
   procedure UpdateAsLine(aWorldPt1, aWorldPt2: TPointF);
   procedure UpdateAsCircle(aWorldCenter, aWorldPtRadius: TPointF);
   procedure UpdateAsRectangle(aWorldTopLeft, aWorldBottomRight: TPointF);
@@ -242,6 +243,10 @@ var p1, p2: TPointF;
   i: integer;
 begin
   case ItemDescriptor.BodyType of
+    _btPoint: begin
+      p1 := ParentSurface.SurfaceToScene(ItemDescriptor.pt);
+      Pts[0].UpdatePosition(p1);
+    end;
     _btLine: begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.pt1);
       p2 := ParentSurface.SurfaceToScene(ItemDescriptor.pt2);
@@ -280,6 +285,19 @@ begin
     end
     else raise exception.create('forgot to implement!');
   end;
+end;
+
+procedure TBodyItem.UpdateAsPoint(aWorldPt: TPointF);
+begin
+  CreateSprites;
+  if Pts = NIL then begin
+    SetLength(Pts, 1);
+    Pts[0].InitDefault;
+    Pts[0].CreateSprite;
+  end;
+
+  ItemDescriptor.pt := ParentSurface.SceneToSurface(aWorldPt);
+  UpdateNodesPosition;
 end;
 
 procedure TBodyItem.UpdateAsLine(aWorldPt1, aWorldPt2: TPointF);

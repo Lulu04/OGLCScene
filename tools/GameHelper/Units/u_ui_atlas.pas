@@ -32,7 +32,7 @@ var
   texMouseNormal,
   texMouseOverSurface, texMouseOverPivot, texMouseRotateSurface, texMouseScaleSurface,
   texMouseOverNode, texMouseMovingNode, texMouseAddNode,
-  texMouseToolLine, texMouseToolCircle, texMouseToolRectangle, texMouseToolPolygon: PTexture;
+  texMouseToolPoint, texMouseToolLine, texMouseToolCircle, texMouseToolRectangle, texMouseToolPolygon: PTexture;
 
 implementation
 
@@ -71,6 +71,7 @@ begin
   texMouseOverNode := FAtlas.AddFromSVG(path+'OverNode.svg', PPIScale(32), -1);
   texMouseMovingNode := FAtlas.AddFromSVG(path+'MovingNode.svg', PPIScale(32), -1);
   texMouseAddNode := FAtlas.AddFromSVG(path+'AddNode.svg', PPIScale(32), -1);
+  texMouseToolPoint := FAtlas.AddFromSVG(path+'Point.svg', PPIScale(32), -1);
   texMouseToolLine := FAtlas.AddFromSVG(path+'Line.svg', PPIScale(32), -1);
   texMouseToolCircle := FAtlas.AddFromSVG(path+'Circle.svg', PPIScale(32), -1);
   texMouseToolRectangle := FAtlas.AddFromSVG(path+'Rectangle.svg', PPIScale(32), -1);

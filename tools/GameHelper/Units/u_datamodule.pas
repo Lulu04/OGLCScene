@@ -60,6 +60,7 @@ begin
   AddImageToImageList('Rectangle.svg', ILIcon24);
   AddImageToImageList('Polygon.svg', ILIcon24);
   AddImageToImageList('AddNode.svg', ILIcon24);
+  AddImageToImageList('Point.svg', ILIcon24);
 
   ILIcon24.EndUpdate;
 end;
