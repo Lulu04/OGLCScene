@@ -7,17 +7,17 @@ object Form_AskEvent: TForm_AskEvent
   Caption = 'Event value'
   ClientHeight = 232
   ClientWidth = 458
-  Color = 5804495
+  Color = 9079434
   Position = poScreenCenter
-  LCLVersion = '2.2.6.0'
+  LCLVersion = '3.8.0.0'
   object Button1: TButton
     Left = 216
     Height = 25
     Top = 32
     Width = 56
     Caption = '<< Add'
-    OnClick = Button1Click
     TabOrder = 0
+    OnClick = Button1Click
   end
   object LB: TListBox
     Left = 8
@@ -33,8 +33,8 @@ object Form_AskEvent: TForm_AskEvent
     Top = 67
     Width = 56
     Caption = 'Delete'
-    OnClick = Button2Click
     TabOrder = 2
+    OnClick = Button2Click
   end
   object Label1: TLabel
     Left = 8
@@ -89,9 +89,9 @@ object Form_AskEvent: TForm_AskEvent
     Width = 105
     Caption = 'Load from another map'
     Font.Height = 12
-    OnClick = Button3Click
     ParentFont = False
     TabOrder = 6
+    OnClick = Button3Click
   end
   object Button4: TButton
     Left = 216
@@ -99,8 +99,8 @@ object Form_AskEvent: TForm_AskEvent
     Top = 100
     Width = 56
     Caption = 'Rename'
-    OnClick = Button4Click
     TabOrder = 7
+    OnClick = Button4Click
   end
   object SBHelp1: TSpeedButton
     Cursor = crHandPoint
