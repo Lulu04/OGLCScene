@@ -573,8 +573,8 @@ begin
     ixtile := FColumnIndexFirstTile;
     repeat
       // draw only visible tiles
-      if ((xx < FParentScene.Width) and (xx+FTileSize.cx >= 0) and
-          (yy < FParentScene.Height) and (yy+FTileSize.cy >= 0)) or
+      if ((xx < clipArea.Width) and (xx+FTileSize.cx >= 0) and
+          (yy < clipArea.Height) and (yy+FTileSize.cy >= 0)) or
          ForceTheDrawingOfAllTheTiles then
       begin
         // ensure map data integrity
