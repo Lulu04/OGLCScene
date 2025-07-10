@@ -77,6 +77,11 @@ public
   Opacity: TBoundedFParam;
   PostProcessing: TOGLCPostProcessingParameters;
 
+  // Return the size of the view:
+  //  - no camera assigned: the size of the scene
+  //  - a camera is assigned to this layer: the view rect of the camera
+  function GetViewRect: TRectF;
+
   procedure KillAll;
   // Blink  aNumberOfBlink=-1 for infinite blink
   procedure Blink(aNumberOfBlink: integer; aVisibleTime, aInvisibleTime: single);
@@ -335,6 +340,12 @@ end;
 procedure TLayer.Clear;
 begin
   inherited Clear;
+end;
+
+function TLayer.GetViewRect: TRectF;
+begin
+  if FCamera <> NIL then Result := FCamera.GetViewRect
+    else Result := RectF(0, 0, FParentScene.Width, FParentScene.Height);
 end;
 
 procedure TLayer.KillAll;
