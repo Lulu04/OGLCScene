@@ -837,17 +837,19 @@ begin
 
  if ( Button = mbLeft ) and not   // left clic alone = start moving view and unselect previous selection
     (( ssShift in Shift )or( ssCtrl in Shift )or( ssAlt in Shift )) then begin
-   FState := sMoveView;
+{   FState := sMoveView;
    FOriginTileEngine.x := round(FWorkingTileEngine.X.Value);
    FOriginTileEngine.y := round(FWorkingTileEngine.Y.Value);
-   WorkingPattern.Clear;
- end;
-
- if ( Button = mbLeft ) and ( ssShift in Shift )   // left clic + SHIFT = start a rectangular selection without clear the previous selection
-    and not( ssCtrl in Shift ) and XYCoorIsInMap( X, Y ) then begin
+   WorkingPattern.Clear;  }
    FState := sSelecting;
    FCoorEndLeftClick := FCoorBeginLeftClick;
  end;
+
+{ if ( Button = mbLeft ) and ( ssShift in Shift )   // left clic + SHIFT = start a rectangular selection without clear the previous selection
+    and not( ssCtrl in Shift ) and XYCoorIsInMap( X, Y ) then begin
+   FState := sSelecting;
+   FCoorEndLeftClick := FCoorBeginLeftClick;
+ end;  }
 
  if ( Button = mbLeft ) and ( ssCtrl in Shift ) then begin  // left clic + CTRL = add a single tile to selection
    if XYCoorIsInMap( X, Y ) then begin

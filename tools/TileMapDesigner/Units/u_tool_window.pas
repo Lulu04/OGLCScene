@@ -552,10 +552,6 @@ begin
 
              'MAP SIZE -> reflect the size in tiles of your project. Click ''Set size'' button to change it.'+lineending+
              '            All layers will be affected.'+lineending+lineending+
-             'HOLE COLOR -> A colored square will be drawn if there isn''t specified tile in a cell of your map.'+lineending+
-             '        You can set the color of your choice here.'+lineending+
-             '        Set the opacity less than 255 for transparency.'+lineending+
-             '        All layers will be affected.'+lineending+lineending+
              'VIEW SIZE IN GAME -> Here you can set the size of the rectangular surface where the map will be displayed'+lineending+
              '                     This size can be in tiles or in pixels.'+lineending+
              'Use TTileEngine.SetViewSize method to change it at running time in your game/application.'+lineending+
