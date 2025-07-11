@@ -371,13 +371,13 @@ begin
         sx := FormatXCoorRelativeToParentWidth(current^.x/current^.surface.Width, current^.name);
         sy := FormatYCoorRelativeToParentHeight(current^.y/current^.surface.Height, current^.name);
       end else begin
-if _parent^.IsRoot then begin
-  sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, 'Self');
-  sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, 'Self');
-end else begin
-        sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, _parent^.name);
-        sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, _parent^.name);
-end;
+        if _parent^.IsRoot then begin
+          sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, 'Self');
+          sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, 'Self');
+        end else begin
+          sx := FormatXCoorRelativeToParentWidth(current^.x/_parent^.surface.Width, _parent^.name);
+          sy := FormatYCoorRelativeToParentHeight(current^.y/_parent^.surface.Height, _parent^.name);
+        end;
       end;
       t.Add('    SetCoordinate('+sx+', '+sy+');');
     end;
@@ -513,8 +513,13 @@ end;
           sx := FormatXCoorRelativeToParentWidth(pt.x/current^.surface.Width, current^.name);
           sy := FormatYCoorRelativeToParentHeight(pt.y/current^.surface.Height, current^.name);
         end else begin
-          sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width, _parent^.name);
-          sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, _parent^.name);
+          if _parent^.IsRoot then begin
+            sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width,'Self');
+            sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, 'Self');
+          end else begin
+            sx := FormatXCoorRelativeToParentWidth(pt.x/_parent^.surface.Width, _parent^.name);
+            sy := FormatYCoorRelativeToParentHeight(pt.y/_parent^.surface.Height, _parent^.name);
+          end;
         end;
         t.Add('  '+current^.name+'.MoveTo('+sx+', '+sy+', aDuration, idcSinusoid);');
 

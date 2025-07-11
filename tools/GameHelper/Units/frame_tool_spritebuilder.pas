@@ -441,6 +441,7 @@ begin
     surf^.surface.Scale.Y.ChangeTo(post^.Values[j].scaley, FSE1.Value, idcSinusoid);
   end;
   ScreenSpriteBuilder.SelectNone;
+  UpdatePostureWidgetState;
 end;
 
 procedure TFrameToolsSpriteBuilder.LBTextureNamesMouseUp(Sender: TObject;
