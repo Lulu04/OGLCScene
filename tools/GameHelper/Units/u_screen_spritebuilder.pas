@@ -50,6 +50,7 @@ public
   procedure ReverseAngleOnSelection;
   procedure ToogleScaledAndRotatedHandleOnSelection;
   procedure MoveSelection(aDelta: TPointF);
+  procedure SetAngleOnSelection(aAngle: single);
   procedure ResetValuesOnSelection;
 private
   procedure LoopMoveSelection;
@@ -94,6 +95,7 @@ public // selection
   procedure SetPivotOnSelection;
   procedure LoopRotateSelection;
   procedure LoopScaleSelection;
+  property SelectedCount: integer read GetSelectedCount;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -323,6 +325,13 @@ begin
     FSelected[i]^.surface.X.Value := FSelected[i]^.surface.X.Value + aDelta.x;
     FSelected[i]^.surface.Y.Value := FSelected[i]^.surface.Y.Value + aDelta.y;
   end;
+end;
+
+procedure TScreenSpriteBuilder.SetAngleOnSelection(aAngle: single);
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.surface.Angle.Value := aAngle;
 end;
 
 procedure TScreenSpriteBuilder.ResetValuesOnSelection;
