@@ -220,7 +220,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideLeft.Side = asrCenter
       Left = 52
       Height = 30
-      Top = 144
+      Top = 136
       Width = 197
       Caption = 'Export sprite to Pascal unit'
       ImageIndex = 8
@@ -254,7 +254,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideLeft.Control = Panel2
       Left = 6
       Height = 19
-      Top = 96
+      Top = 88
       Width = 290
       BorderSpacing.Left = 5
       Caption = 'Generate code to activate ApplySymmetryWhenFlip'
@@ -266,7 +266,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideTop.Side = asrBottom
       Left = 6
       Height = 19
-      Top = 115
+      Top = 107
       Width = 255
       BorderSpacing.Left = 5
       Caption = 'Generate code for override ProcessMessage()'
@@ -296,7 +296,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
   object SD1: TSaveDialog
     Filter = 'pascal unit|*.pas|all files|*.*'
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 16
-    Top = 432
+    Left = 256
+    Top = 496
   end
 end

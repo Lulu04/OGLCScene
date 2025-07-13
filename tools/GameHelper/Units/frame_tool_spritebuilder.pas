@@ -49,6 +49,7 @@ type
     Edit2: TEdit;
     Edit3: TEdit;
     Edit5: TEdit;
+    FSE2: TFloatSpinEdit;
     FSE1: TFloatSpinEdit;
     Label1: TLabel;
     Label10: TLabel;
@@ -65,6 +66,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
+    Label23: TLabel;
     Label24: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -150,7 +152,7 @@ type
     function DoAddNewChild: boolean;
     procedure DoUpdateChild(aForceRecreateSurface: boolean);
   private // postures
-    FPostureTabIsActive: boolean;
+    FPostureTabIsActive, FAddingPosture: boolean;
     function LBSelectedToName: string;
     procedure UpdatePostureWidgetState;
     procedure DoAddposture;
@@ -158,7 +160,6 @@ type
     procedure DoRenamePosture;
     procedure DoDeletePosture;
     procedure DoReverseAngleOnPosture;
-    procedure DoResetPosOnSelection;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
@@ -322,7 +323,7 @@ end;
 procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
 begin
   if Sender = BResetPos then
-    DoResetPosOnSelection;
+    ScreenSpriteBuilder.ResetValuesOnSelection;
 
   if Sender = BReverseAngle then
     DoReverseAngleOnPosture;
@@ -355,6 +356,11 @@ end;
 
 procedure TFrameToolsSpriteBuilder.ArrowUpClick(Sender: TObject);
 begin
+  if Sender = FSE2 then begin
+    if ScreenSpriteBuilder.SelectedCount = 1 then
+      ScreenSpriteBuilder.SetAngleOnSelection(FSE2.Value);
+  end;
+
   if Sender = ArrowUp then begin
     ScreenSpriteBuilder.MoveSelection(PointF(0, -1));
   end;
@@ -424,6 +430,7 @@ var i, j: integer;
   post: PPostureItem;
   surf: PSurfaceDescriptor;
 begin
+  if FAddingPosture then exit;
   i := LBPostureNames.ItemIndex;
   if i = -1 then exit;
   if Surfaces.Size = 0 then exit;
@@ -636,8 +643,6 @@ end;
 
 procedure TFrameToolsSpriteBuilder.DoUpdateChild(aForceRecreateSurface: boolean);
 var recreateSurface: Boolean;
-  childs: array of TSimpleSurfaceWithEffect;
-  i: integer;
 begin
   if FWorkingChild = NIL then exit;
 
@@ -712,8 +717,10 @@ begin
 
   Postures.UndoRedoManager.AddActionAddPosture(item);
 
+  FAddingPosture := True;
   LBPostureNames.ItemIndex := LBPostureNames.Items.Add(item^.name);
   Edit3.Text := '';
+  FAddingPosture := False;
   Modified := True;
   UpdatePostureWidgetState;
 end;
@@ -810,31 +817,6 @@ begin
   if item = NIL then exit;
 
   ScreenSpriteBuilder.ReverseAngleOnSelection;
-  // construct the undo/redo item
-  undoredoItem := Postures.UndoRedoManager.AddEmpty;
-  undoredoItem^.action := puratModifyPosture;
-  undoredoItem^.data.name := item^.name;
-  undoredoItem^.data.Values := Copy(item^.Values);
-  undoredoItem^.newData.name := item^.name;
-  undoredoItem^.newData.TakeValuesFrom(Surfaces);
-
-  item^.TakeValuesFrom(Surfaces);
-  Modified := True;
-  UpdatePostureWidgetState;
-end;
-
-procedure TFrameToolsSpriteBuilder.DoResetPosOnSelection;
-var
-  i: Integer;
-  item: PPostureItem;
-  undoredoItem: PPostureUndoRedoItem;
-begin
-  i := LBPostureNames.ItemIndex;
-  if i = -1 then exit;
-  item := Postures.GetItemByName(LBPostureNames.Items.Strings[i]);
-  if item = NIL then exit;
-
-  ScreenSpriteBuilder.ResetValuesOnSelection;
   // construct the undo/redo item
   undoredoItem := Postures.UndoRedoManager.AddEmpty;
   undoredoItem^.action := puratModifyPosture;

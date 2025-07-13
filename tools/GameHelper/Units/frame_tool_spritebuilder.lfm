@@ -979,12 +979,12 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         AnchorSideRight.Control = PagePostures
         AnchorSideRight.Side = asrBottom
         Left = 0
-        Height = 374
+        Height = 446
         Top = 26
         Width = 292
         Anchors = [akTop, akLeft, akRight]
         BevelOuter = bvNone
-        ClientHeight = 374
+        ClientHeight = 446
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -1010,7 +1010,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideLeft.Control = Panel10
           Left = 5
           Height = 15
-          Top = 280
+          Top = 328
           Width = 76
           BorderSpacing.Left = 5
           Caption = 'Posture name:'
@@ -1021,8 +1021,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 23
-          Top = 295
-          Width = 247
+          Top = 343
+          Width = 203
           TabOrder = 1
           OnChange = BAddPostureToListClick
         end
@@ -1033,8 +1033,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Cursor = crHandPoint
           Left = 10
           Height = 28
-          Top = 328
+          Top = 376
           Width = 129
+          Anchors = [akLeft]
           AutoSize = True
           BorderSpacing.Left = 10
           BorderSpacing.Top = 10
@@ -1072,7 +1073,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideRight.Side = asrBottom
           Left = 169
           Height = 28
-          Top = 328
+          Top = 376
           Width = 113
           Anchors = [akTop, akRight]
           AutoSize = True
@@ -1103,13 +1104,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         object ArrowUp: TArrow
           Left = 248
           Height = 20
+          Hint = 'Allow to move hidden object'
           Top = 216
           Width = 20
           ArrowType = atUp
           Constraints.MinHeight = 8
           Constraints.MinWidth = 8
           OnClick = ArrowUpClick
+          ParentShowHint = False
           ShadowType = stNone
+          ShowHint = True
         end
         object ArrowDown: TArrow
           AnchorSideLeft.Control = ArrowUp
@@ -1118,13 +1122,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 248
           Height = 20
+          Hint = 'Allow to move hidden object'
           Top = 256
           Width = 20
           ArrowType = atDown
           Constraints.MinHeight = 8
           Constraints.MinWidth = 8
           OnClick = ArrowUpClick
+          ParentShowHint = False
           ShadowType = stNone
+          ShowHint = True
         end
         object ArrowLeft: TArrow
           AnchorSideTop.Control = ArrowUp
@@ -1132,13 +1139,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideRight.Control = ArrowUp
           Left = 228
           Height = 20
+          Hint = 'Allow to move hidden object'
           Top = 236
           Width = 20
           Anchors = [akTop, akRight]
           Constraints.MinHeight = 8
           Constraints.MinWidth = 8
           OnClick = ArrowUpClick
+          ParentShowHint = False
           ShadowType = stNone
+          ShowHint = True
         end
         object ArrowRight: TArrow
           AnchorSideLeft.Control = ArrowUp
@@ -1147,13 +1157,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 268
           Height = 20
+          Hint = 'Allow to move hidden object'
           Top = 236
           Width = 20
           ArrowType = atRight
           Constraints.MinHeight = 8
           Constraints.MinWidth = 8
           OnClick = ArrowUpClick
+          ParentShowHint = False
           ShadowType = stNone
+          ShowHint = True
         end
         object BResetPos: TSpeedButton
           Left = 5
@@ -1164,6 +1177,27 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Caption = 'Reset pos on selection'
           OnClick = BAddPostureToListClick
           ParentShowHint = False
+        end
+        object Label23: TLabel
+          Left = 192
+          Height = 15
+          Top = 288
+          Width = 31
+          Caption = 'Angle'
+        end
+        object FSE2: TFloatSpinEdit
+          Left = 230
+          Height = 23
+          Hint = 'Set the angle value on the selected part (only one part)'
+          Top = 280
+          Width = 59
+          DecimalPlaces = 1
+          MaxValue = 360
+          MinValue = -360
+          OnChange = ArrowUpClick
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
         end
       end
       object Panel11: TPanel
@@ -1384,7 +1418,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
       Cursor = crHandPoint
       Left = 275
       Height = 24
-      Hint = 'Close the Sprite Builder'
+      Hint = 'Return to the main window'
       Top = 4
       Width = 24
       Anchors = [akTop, akRight]
