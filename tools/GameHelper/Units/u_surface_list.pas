@@ -713,7 +713,7 @@ begin
   sorted := GetSortedSurfaceFromNearestTofurthest;
   for i:=0 to High(sorted) do begin
     o := sorted[i]^.surface;
-    o.CollisionBody.SetSurfaceToWordMatrix(o.GetMatrixSurfaceToWorld);
+    o.CollisionBody.SetTransformMatrix(o.GetMatrixSurfaceToScene);
     if o.CollisionBody.CheckCollisionWith(collisionPoint) then begin
       SetLength(Result, length(Result)+1);
       Result[High(Result)] := sorted[i];

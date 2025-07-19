@@ -67,7 +67,7 @@ procedure TUIHandleManager.ShowPivotHandle(aSurface: TSimpleSurfaceWithEffect);
 var p: TPointF;
 begin
   with aSurface do
-    p := GetMatrixSurfaceToWorld.Transform(PointF(Width*Pivot.x, Height*Pivot.y));
+    p := GetMatrixSurfaceToScene.Transform(PointF(Width*Pivot.x, Height*Pivot.y));
   FPivot.SetCenterCoordinate(p);
   FPivot.Visible := True;
 end;
@@ -132,7 +132,7 @@ begin
   ShowPivotHandle(aSurface);
 
   // scale handle
-  r := aSurface.GetRectAreaInWorldSpace(True);
+  r := aSurface.GetRectAreaInSceneSpace(True);
   w := ScaleHandle[shTopLeft].Width;
   h := ScaleHandle[shTopLeft].Height;
 
@@ -169,7 +169,7 @@ begin
   ShowPivotHandle(aSurface);
 
   // rotated handle
-  r := aSurface.GetRectAreaInWorldSpace(True);
+  r := aSurface.GetRectAreaInSceneSpace(True);
   w := RotateHandle[cTR].Width;
   h := RotateHandle[cTR].Height;
 
@@ -202,7 +202,7 @@ begin
   pointCollision.BodyType:= _btPoint;
   pointCollision.pt := aWorldPt;
 
-  FPivot.CollisionBody.SetSurfaceToWordMatrix(FPivot.GetMatrixSurfaceToWorld);
+  FPivot.CollisionBody.SetTransformMatrix(FPivot.GetMatrixSurfaceToScene);
   Result := FPivot.CollisionBody.CheckCollisionWith(pointCollision);
 end;
 
@@ -214,19 +214,19 @@ begin
   pointCollision.BodyType:= _btPoint;
   pointCollision.pt := aWorldPt;
 
-  RotateHandle[cTL].CollisionBody.SetSurfaceToWordMatrix(RotateHandle[cTL].GetMatrixSurfaceToWorld);
+  RotateHandle[cTL].CollisionBody.SetTransformMatrix(RotateHandle[cTL].GetMatrixSurfaceToScene);
   Result := RotateHandle[cTL].CollisionBody.CheckCollisionWith(pointCollision);
   if Result then exit;
 
-  RotateHandle[cTR].CollisionBody.SetSurfaceToWordMatrix(RotateHandle[cTR].GetMatrixSurfaceToWorld);
+  RotateHandle[cTR].CollisionBody.SetTransformMatrix(RotateHandle[cTR].GetMatrixSurfaceToScene);
   Result := RotateHandle[cTR].CollisionBody.CheckCollisionWith(pointCollision);
   if Result then exit;
 
-  RotateHandle[cBR].CollisionBody.SetSurfaceToWordMatrix(RotateHandle[cBR].GetMatrixSurfaceToWorld);
+  RotateHandle[cBR].CollisionBody.SetTransformMatrix(RotateHandle[cBR].GetMatrixSurfaceToScene);
   Result := RotateHandle[cBR].CollisionBody.CheckCollisionWith(pointCollision);
   if Result then exit;
 
-  RotateHandle[cBL].CollisionBody.SetSurfaceToWordMatrix(RotateHandle[cBL].GetMatrixSurfaceToWorld);
+  RotateHandle[cBL].CollisionBody.SetTransformMatrix(RotateHandle[cBL].GetMatrixSurfaceToScene);
   Result := RotateHandle[cBL].CollisionBody.CheckCollisionWith(pointCollision);
 end;
 
@@ -240,7 +240,7 @@ begin
   pointCollision.pt := aWorldPt;
 
   for i in TScaleHandle do begin
-    ScaleHandle[i].CollisionBody.SetSurfaceToWordMatrix(ScaleHandle[i].GetMatrixSurfaceToWorld);
+    ScaleHandle[i].CollisionBody.SetTransformMatrix(ScaleHandle[i].GetMatrixSurfaceToScene);
     if ScaleHandle[i].CollisionBody.CheckCollisionWith(pointCollision) then begin
       aType := i;
       exit(True);
