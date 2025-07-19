@@ -40,7 +40,7 @@ var fd: TFontDescriptor;
   sky: TGradientRectangle;
 begin
   // create the sky
-  sky := TGradientRectangle.Create;
+  sky := TGradientRectangle.Create(FScene);
   FScene.Add(sky);
   sky.Gradient.CreateVertical([BGRA(0,128,255), BGRA(50,200,200)],
                               [0.0, 1.0]);
