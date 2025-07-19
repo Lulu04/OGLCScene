@@ -1,0 +1,7 @@
+Default~volsteps|20|iterations|17|stepsize|0.1000|zoom|0.8000|tile|0.8500|speed|0.0000|brightness|0.0015|darkmatter|0.8000|distfading|0.7300|saturation|0.8500
+GrayBlue~volsteps|20|iterations|17|stepsize|0.1000|zoom|1.7000|tile|0.8500|speed|0.0000|brightness|0.0020|darkmatter|0.8000|distfading|0.4600|saturation|-1.9900
+Simple~volsteps|20|iterations|17|stepsize|0.1000|zoom|3.3000|tile|0.8500|speed|0.0000|brightness|0.0002|darkmatter|1.7000|distfading|0.7300|saturation|0.8500
+VerySimple~volsteps|1|iterations|17|stepsize|0.1000|zoom|0.8000|tile|0.8500|brightness|0.0016|darkmatter|0.8000|distfading|0.7300|saturation|0.2400
+RedAsteroidFieldBG~volsteps|2|iterations|17|stepsize|0.1000|zoom|1.7000|tile|0.8500|brightness|0.0095|darkmatter|0.8000|distfading|0.4600|saturation|8.4500
+SimpleMonochrome~volsteps|3|iterations|17|stepsize|0.1000|zoom|0.8000|tile|0.8500|brightness|0.0016|darkmatter|0.8000|distfading|0.7300|saturation|0.2400
+SimpleHot~volsteps|3|iterations|17|stepsize|0.1000|zoom|1.7000|tile|0.8500|brightness|0.0020|darkmatter|0.8000|distfading|0.4600|saturation|0.5000

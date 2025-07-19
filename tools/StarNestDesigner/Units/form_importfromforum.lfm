@@ -1,0 +1,65 @@
+object FormImportPreset: TFormImportPreset
+  Left = 297
+  Height = 165
+  Top = 275
+  Width = 675
+  Caption = 'Import preset from FPC/Lazarus forum'
+  ClientHeight = 165
+  ClientWidth = 675
+  OnShow = FormShow
+  LCLVersion = '3.8.0.0'
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 5
+    Height = 60
+    Top = 8
+    Width = 665
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 5
+    Caption = '1) Copy the preset from the FPC/Lazarus forum into the clipboard'#13#10'2) Paste it into the TMemo below'#13#10'3) click ''Import the preset'''#13#10'4) if all is right, the preset is added to the list of presets and the planet is displayed.'
+    Font.Style = [fsBold]
+    ParentFont = False
+    WordWrap = True
+  end
+  object Memo1: TMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Label1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = SpeedButton1
+    Left = 5
+    Height = 45
+    Top = 78
+    Width = 665
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 5
+    BorderSpacing.Bottom = 10
+    Lines.Strings = (
+      'Memo1'
+    )
+    TabOrder = 0
+    WordWrap = False
+  end
+  object SpeedButton1: TSpeedButton
+    AnchorSideLeft.Control = Owner
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 273
+    Height = 27
+    Top = 133
+    Width = 129
+    Anchors = [akLeft, akBottom]
+    BorderSpacing.Bottom = 5
+    Caption = 'Import the preset'
+    OnClick = SpeedButton1Click
+  end
+end
