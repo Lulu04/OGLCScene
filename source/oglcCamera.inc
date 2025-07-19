@@ -338,7 +338,7 @@ begin
     _ctmNone: exit;
     _ctmSurface: begin
       if FTargetSurface = NIL then exit;
-      targetPos := FTargetSurface.SurfaceToSceneWithoutLayerTransform(FTargetSurfaceOffset);
+      targetPos := FTargetSurface.SurfaceToWorld(FTargetSurfaceOffset);
     end;
     _ctmPoint: targetPos := FTargetPoint;
   end;
@@ -373,7 +373,7 @@ begin
     CancelTargeting
   else begin
     if aMoveImmediately then
-      FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToSceneWithoutLayerTransform(aOffset)));
+      FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToWorld(aOffset)));
     FTargetSurface := aSurface;
     FTargetSurfaceOffset := aOffset;
     if aSurface <> NIL
