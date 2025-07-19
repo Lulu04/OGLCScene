@@ -231,6 +231,7 @@ public
   // Rotate around point
   procedure RotationAroundPoint( aXPt, aYPt: single; aAnglePerSecond: single; aSelfRotate: boolean=TRUE ) ; overload;
   procedure RotationAroundPoint( aPt: TPointF; aAnglePerSecond: single; aSelfRotate: boolean=TRUE ) ; overload;
+  procedure StopRotationAroundPoint;
   // Bind this surface to another
   procedure BindToSprite(aTargetSurface:TSimpleSurface; aOffsetX, aOffsetY: single);
   // Bind the center of this surface to the center of another
@@ -265,25 +266,31 @@ public // utils
   // Center the surface on its parent
   procedure CenterOnParent;
 public // Local <-> World
-  // Transform local coordinates to world coordinates.
-  // Take in acount the camera assigned to the parent layer of the surface.
+  // Transform local coordinates to scene coordinates.
+  // (take in acount the camera assigned to the parent layer of the surface)
   function SurfaceToScene(aPt: TPointF): TPointF;
-  // Transform world coordinates to local coordinates.
-  // Take in acount the camera assigned to the parent layer of the surface.
+  // Transform scene coordinates to local coordinates.
+  // (take in acount the camera assigned to the parent layer of the surface)
   function SceneToSurface(aPt: TPointF): TPointF;
   // Transform local coordinates to world coordinates.
-  // Don't take in acount the camera assigned to the parent layer of the surface.
-  function SurfaceToSceneWithoutLayerTransform(aPt: TPointF): TPointF;
-  function SceneToSurfaceWithoutLayerTransform(aPt: TPointF): TPointF;
+  // (don't take in acount the camera assigned to the parent layer of the surface)
+  function SurfaceToWorld(aPt: TPointF): TPointF;
+  function SceneToSurfaceWorld(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
   procedure AddTransformTo(var aMatrix: TOGLCMatrix);
+  // Gives a matrix to transform surface coordinates to scene coordinates.
+  // (take in acount the camera assigned to the parent layer of the surface)
+  function GetMatrixSurfaceToScene: TOGLCMatrix;
   // Gives a matrix to transform surface coordinates to world coordinates.
-  // Take in acount the camera assigned to the parent layer of the surface.
+  // (don't take in acount the camera assigned to the parent layer of the surface)
   function GetMatrixSurfaceToWorld: TOGLCMatrix;
-  // Returns the rectangular area that contains the transformed surface.
-  function GetRectAreaInWorldSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF;
+  // Returns the rectangular area that contains the transformed surface in scene coordinate.
+  function GetRectAreaInSceneSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF;
+  // Returns the rectangular area that contains the transformed surface in world coordinate.
+  function GetRectAreaInWorldSpace: TRectF;
+  //function GetRectAreaInWorldSpace
   // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
   // and without applying model view matrix.
   function GetRectAreaInLocalSpace: TRectF;
@@ -317,9 +324,12 @@ public // Childs
   procedure MoveFromSceneToChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
   // If any, remove current child dependency and add the surface as child of another.
   procedure SetChildOf(aParentSurface: TSimpleSurfaceWithEffect; aZOrder: integer);
-  // Before, the surface can be a child of another or on another layer.
-  // After, the surface is no more a child and it's added to the specified layer.
+  // Extract the surface from its owner (another layer or parent surface)
+  // then add it to a layer.
   procedure MoveToLayer(aLayerIndex: integer);
+  // Extract the surface from its owner (another layer or parent surface)
+  // then insert it to a layer at the specified index.
+  procedure InsertToLayer(aSurfaceIndex, aLayerIndex: integer);
   function IsParentOf(aSurface: TSimpleSurfaceWithEffect): boolean;
   function ChildCount: integer;
   function IsChild(aSurface: TSimpleSurfaceWithEffect): boolean;
@@ -552,7 +562,7 @@ begin
                          Angle.Value, Width*Pivot.x, Height*Pivot.y);
 end;
 
-function TSimpleSurfaceWithEffect.GetMatrixSurfaceToWorld: TOGLCMatrix;
+function TSimpleSurfaceWithEffect.GetMatrixSurfaceToScene: TOGLCMatrix;
   procedure ScanMatrixRecursive(aSurface: TSimpleSurfaceWithEffect; var m: TOGLCMatrix);
   begin
     if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m)
@@ -566,7 +576,18 @@ begin
   ScanMatrixRecursive(Self, Result);
 end;
 
-function TSimpleSurfaceWithEffect.GetRectAreaInWorldSpace(
+function TSimpleSurfaceWithEffect.GetMatrixSurfaceToWorld: TOGLCMatrix;
+  procedure ScanMatrixRecursive(aSurface: TSimpleSurfaceWithEffect; var m: TOGLCMatrix);
+  begin
+    if aSurface.ParentSurface <> NIL then ScanMatrixRecursive(aSurface.ParentSurface, m);
+    aSurface.AddTransformTo(m);
+  end;
+begin
+  Result.LoadIdentity;
+  ScanMatrixRecursive(Self, Result);
+end;
+
+function TSimpleSurfaceWithEffect.GetRectAreaInSceneSpace(
   aGiveRectThatContainRotatedBounds: boolean): TRectF;
 var tl,tr,bl,br, mini, maxi: TPointF;
     m: TOGLCMatrix;
@@ -580,7 +601,7 @@ var tl,tr,bl,br, mini, maxi: TPointF;
   end;
 begin
   if aGiveRectThatContainRotatedBounds then begin
-    m := GetMatrixSurfaceToWorld;
+    m := GetMatrixSurfaceToScene;
     tl := m.Transform(PointF(0, 0));
     tr := m.Transform(PointF(Width, 0));
     br := m.Transform(PointF(Width, Height));
@@ -596,7 +617,13 @@ begin
     Result.Right := maxi.x;
     Result.Bottom := maxi.y;
   end
-  else Result := GetMatrixSurfaceToWorld.Transform(GetRectAreaInLocalSpace);
+  else Result := GetMatrixSurfaceToScene.Transform(GetRectAreaInLocalSpace);
+end;
+
+function TSimpleSurfaceWithEffect.GetRectAreaInWorldSpace: TRectF;
+begin
+  Result.TopLeft := SurfaceToWorld(PointF(0, 0));
+  Result.BottomRight := SurfaceToWorld(PointF(Width, Height));
 end;
 
 function TSimpleSurfaceWithEffect.GetRectAreaInLocalSpace: TRectF;
@@ -874,7 +901,7 @@ procedure TSimpleSurfaceWithEffect.MoveFromChildToScene(aLayerIndex: integer);
 var p: TPointF;
 begin
   if ParentSurface = NIL then exit;
-  p := SurfaceToSceneWithoutLayerTransform(PointF(0,0)); //SurfaceToScene(PointF(0,0));
+  p := SurfaceToWorld(PointF(0,0)); //SurfaceToScene(PointF(0,0));
   ParentSurface.RemoveChild(Self);
   FParentScene.Add(Self, aLayerIndex);
  { if FParentScene.Layer[aLayerIndex].Camera <> NIL then
@@ -887,7 +914,7 @@ var p: TPointF;
 begin
   if aParentSurface = NIL then exit;
 
-  p := aParentSurface.SceneToSurfaceWithoutLayerTransform(GetXY); // aParentSurface.SceneToSurface(GetXY);
+  p := aParentSurface.SceneToSurfaceWorld(GetXY); // aParentSurface.SceneToSurface(GetXY);
   ParentLayer.Remove(Self);
   aParentSurface.AddChild(Self, aZOrder);
   SetCoordinate(p);
@@ -911,14 +938,26 @@ end;
 
 procedure TSimpleSurfaceWithEffect.MoveToLayer(aLayerIndex: integer);
 begin
-  // Before, the surface can be a child of another or on another layer.
-  // After, the surface is no more a child and it's added to the specified layer.
   if ParentSurface <> NIL then
     MoveFromChildToScene(aLayerIndex)
   else begin
     if ParentLayer <> NIL then
       ParentLayer.Remove(Self);
     FParentScene.Add(Self, aLayerIndex)
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.InsertToLayer(aSurfaceIndex,
+  aLayerIndex: integer);
+begin
+  if ParentSurface <> NIL then begin
+    MoveFromChildToScene(aLayerIndex);
+    ParentLayer.Remove(Self);
+    FParentScene.Insert(aSurfaceIndex, Self, aLayerIndex);
+  end else begin
+    if ParentLayer <> NIL then
+      ParentLayer.Remove(Self);
+    FParentScene.Insert(aSurfaceIndex, Self, aLayerIndex);
   end;
 end;
 
@@ -932,7 +971,7 @@ begin
     s := s.ParentSurface;
   until s = NIL;     }
 
-  Result := GetMatrixSurfaceToWorld.Transform(aPt);
+  Result := GetMatrixSurfaceToScene.Transform(aPt);
 end;
 
 function TSimpleSurfaceWithEffect.SceneToSurface(aPt: TPointF): TPointF;
@@ -945,10 +984,10 @@ begin
     s := s.ParentSurface;
   until s = NIL;      }
 
-  Result := GetMatrixSurfaceToWorld.Inverse.Transform(aPt);
+  Result := GetMatrixSurfaceToScene.Inverse.Transform(aPt);
 end;
 
-function TSimpleSurfaceWithEffect.SurfaceToSceneWithoutLayerTransform(aPt: TPointF): TPointF;
+function TSimpleSurfaceWithEffect.SurfaceToWorld(aPt: TPointF): TPointF;
 var s: TSimpleSurfaceWithEffect;
 begin
   s := Self;
@@ -959,7 +998,7 @@ begin
   until s = NIL;
 end;
 
-function TSimpleSurfaceWithEffect.SceneToSurfaceWithoutLayerTransform(aPt: TPointF): TPointF;
+function TSimpleSurfaceWithEffect.SceneToSurfaceWorld(aPt: TPointF): TPointF;
 var s: TSimpleSurfaceWithEffect;
 begin
   s := Self;
@@ -1141,6 +1180,11 @@ end;
 procedure TSimpleSurfaceWithEffect.RotationAroundPoint(aPt: TPointF; aAnglePerSecond: single; aSelfRotate: boolean);
 begin
   RotationAroundPoint(aPt.x, aPt.y, aAnglePerSecond, aSelfRotate);
+end;
+
+procedure TSimpleSurfaceWithEffect.StopRotationAroundPoint;
+begin
+  FRotationAroundPt.InProgress := False;
 end;
 
 procedure TSimpleSurfaceWithEffect.DrawChildSurfacesWithPositiveZOrder(const aLayerPercentOpacity: single);

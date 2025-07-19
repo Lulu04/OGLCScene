@@ -53,7 +53,7 @@ private type TBodyItems = class(specialize TVector<TOGLCBodyItem>);
 private
   FParentSurface: TSimpleSurfaceWithEffect;
   FItems: TBodyItems;
-  FSurfaceToWordMatrix: TOGLCMatrix;
+  FTransformMatrix: TOGLCMatrix;
   function GetTransformedItem(const aItem: TOGLCBodyItem): TOGLCBodyItem;
 public
   constructor Create(aParentSurface: TSimpleSurfaceWithEffect);
@@ -68,10 +68,11 @@ public
   procedure AddLine(const aPt1, aPt2: TPointF);
   procedure AddPoint(const aPt: TPointF);
 
-  // Before check for a collision, you must initialize the matrix
-  // to convert local coordinates to world coordinates.
-  // You can take this matrix with function MySurface.GetMatrixSurfaceToWorld
-  procedure SetSurfaceToWordMatrix(const aMatrix: TOGLCMatrix);
+  // Before check for a collision, you must initialize the transform matrix
+  // to convert local coordinates to world or scene coordinates.
+  // You can take this matrix with function MySurface.GetMatrixSurfaceToScene or
+  // MySurface.GetMatrixSurfaceToWorld
+  procedure SetTransformMatrix(const aMatrix: TOGLCMatrix);
   function CheckCollisionWith(aSurface: TSimpleSurfaceWithEffect): boolean; overload;
   function CheckCollisionWith(const aBodyItem: TOGLCBodyItem): boolean; overload;
 end;
@@ -174,16 +175,16 @@ var item: TOGLCBodyItem;
 begin
   Result := False;
   // sets the 2 matrix
-  //FSurfaceToWordMatrix.CopyFrom(FParentSurface.GetMatrixSurfaceSpaceToScene);
-  //aSurface.FCollisionBody.FSurfaceToWordMatrix.CopyFrom(aSurface.GetMatrixSurfaceSpaceToScene);
+  //FTransformMatrix.CopyFrom(FParentSurface.GetMatrixSurfaceSpaceToScene);
+  //aSurface.FCollisionBody.FTransformMatrix.CopyFrom(aSurface.GetMatrixSurfaceSpaceToScene);
 
   for item in aSurface.FCollisionBody.FItems do
     if CheckCollisionWith(aSurface.FCollisionBody.GetTransformedItem(item)) then exit(True);
 end;
 
-procedure TOGLCCollisionBody.SetSurfaceToWordMatrix(const aMatrix: TOGLCMatrix);
+procedure TOGLCCollisionBody.SetTransformMatrix(const aMatrix: TOGLCMatrix);
 begin
-  FSurfaceToWordMatrix.CopyFrom(aMatrix);
+  FTransformMatrix.CopyFrom(aMatrix);
 end;
 
 function TOGLCCollisionBody.CheckCollisionWith(const aBodyItem: TOGLCBodyItem): boolean;
@@ -193,11 +194,11 @@ begin
   Result := False;
   if FItems.Size = 0 then exit;
   // sets the matrix
-  //FSurfaceToWordMatrix.CopyFrom(FParentSurface.GetMatrixSurfaceSpaceToScene);
+  //FTransformMatrix.CopyFrom(FParentSurface.GetMatrixSurfaceSpaceToScene);
 
   for i:=0 to FItems.Size-1 do begin
     // transform model coordinates to word coordinates
-    item := FItems.Mutable[i]^.GetTransformed(FSurfaceToWordMatrix);
+    item := FItems.Mutable[i]^.GetTransformed(FTransformMatrix);
     case item.BodyType of
       _btPolygon: begin
         case aBodyItem.BodyType of
@@ -254,7 +255,7 @@ end;
 
 function TOGLCCollisionBody.GetTransformedItem(const aItem: TOGLCBodyItem): TOGLCBodyItem;
 begin
-  Result := aItem.GetTransformed(FSurfaceToWordMatrix);
+  Result := aItem.GetTransformed(FTransformMatrix);
 end;
 
 constructor TOGLCCollisionBody.Create(aParentSurface: TSimpleSurfaceWithEffect);
