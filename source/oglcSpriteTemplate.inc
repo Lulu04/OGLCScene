@@ -367,6 +367,7 @@ begin
   ima := aFont.StringToBitmap(aCaption, aFillTexture);
   Create(aParentScene.TexMan.Add(ima), True);
   ima.Free;
+  ParentScene := aParentScene;
 end;
 
 destructor TSprite.Destroy;
