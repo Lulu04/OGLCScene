@@ -177,7 +177,7 @@ end;
 function TUINodeHandle.IsOver(aWorldPt: TPointF): boolean;
 var r: TRectF;
 begin
-  r := FSprite.GetRectAreaInWorldSpace(False);
+  r := FSprite.GetRectAreaInSceneSpace(False);
   Result := FScene.Collision.PointRectF(aWorldPt, r);
 end;
 
