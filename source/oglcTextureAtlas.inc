@@ -762,7 +762,6 @@ end;
 
 procedure TOGLCTextureAtlas.LoadFromFile(const aFilename: string);
 var stream: TFileStream;
-  streamImage: TMemoryStream;
   c: integer;
   item: POGLCImagePackerItem;
   wholeImage: TBGRABitmap;
