@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1602"/>
+      <BuildNr Value="1604"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
