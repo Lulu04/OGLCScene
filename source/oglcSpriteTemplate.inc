@@ -19,6 +19,7 @@ public
 public
   // create a sprite from a texture.
   // if Owner is set to TRUE, the texture is freed when the sprite is killed.
+  // By default, the shape is rectangular with the size of the texture.
   constructor Create(ATexture: PTexture; Owner: boolean=FALSE);
   // Draw aCaption in a texture and create a sprite with it.
   constructor Create(aParentScene: TOGLCScene; const aFont: TFontDescriptor; const aCaption: string; aFillTexture: TBGRABitmap=NIL);
@@ -29,6 +30,9 @@ public
   // Only aWidth = '-1' => the width is computed in respect of aHeight to keep aspect ratio.
   // Only aHeight = '-1' => the height is computed in respect of aWidth to keep aspect ratio.
   procedure SetSize(aWidth, aHeight: integer);
+  // Allow to resize or stretch the sprite by specifying the corner position in local space.
+  procedure SetShape(aTopLeft, aTopRight, aBottomRight, aBottomLeft: TPointF); overload;
+  procedure SetShape(const aQuad: TQuadCoor); overload;
   property Texture: PTexture read FTexture write SetTexture;
 end;
 TArrayOfSprite = array of TSprite;
@@ -393,6 +397,18 @@ begin
   FWidth := aWidth;
   FHeight := aHeight;
   FModelArea.SetAsRectangle(aWidth, aHeight);
+end;
+
+procedure TSprite.SetShape(aTopLeft, aTopRight, aBottomRight, aBottomLeft: TPointF);
+begin
+  FWidth := Round(aTopRight.x - aTopLeft.x);
+  FHeight := Round(aBottomLeft.y - aTopLeft.y);
+  FModelArea.Create(aTopLeft, aTopRight, aBottomRight, aBottomLeft);
+end;
+
+procedure TSprite.SetShape(const aQuad: TQuadCoor);
+begin
+  SetShape(aQuad[cTL], aQuad[cTR], aQuad[cBR], aQuad[cBL]);
 end;
 
 { TSpriteWithElasticCorner }

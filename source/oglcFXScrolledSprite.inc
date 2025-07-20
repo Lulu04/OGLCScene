@@ -114,10 +114,6 @@ public
 public
   // Offset in pixels. Default value is (0, 0)
   Offset: TBoundedPointFParam;
-
-  // Call this method to customize the shape of the sprite
-  // the default shape is a rectangular area with the texture size
-  procedure SetShape(const aQuad: TQuadCoor);
 end;
 
 {$endif oglcINTERFACE}
@@ -342,11 +338,6 @@ begin
   Offset.Free;
   Offset := NIL;
   inherited Destroy;
-end;
-
-procedure TScrollableSprite.SetShape(const aQuad: TQuadCoor);
-begin
-  FModelArea.CopyFrom(aQuad);
 end;
 
 {$endif oglcIMPLEMENTATION}
