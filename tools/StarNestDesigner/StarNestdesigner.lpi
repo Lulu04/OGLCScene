@@ -93,9 +93,7 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="136"/>
         <CursorPos X="3" Y="139"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -310,9 +308,10 @@
       <Unit29>
         <Filename Value="Units\u_procedural_starnest.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="162"/>
-        <CursorPos X="16" Y="175"/>
+        <TopLine Value="488"/>
+        <CursorPos X="23" Y="505"/>
         <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit29>
@@ -356,123 +355,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="161" Column="19" TopLine="154"/>
+        <Caret Line="162" Column="23" TopLine="146"/>
       </Position1>
       <Position2>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="162" Column="23" TopLine="146"/>
+        <Caret Line="81" TopLine="64"/>
       </Position2>
       <Position3>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="81" TopLine="64"/>
+        <Caret Line="148" Column="27" TopLine="135"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="148" Column="27" TopLine="135"/>
-      </Position4>
-      <Position5>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="23" Column="18"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="178" Column="70" TopLine="162"/>
       </Position5>
       <Position6>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="178" Column="70" TopLine="162"/>
+        <Caret Line="179" Column="70" TopLine="163"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="179" Column="70" TopLine="163"/>
+        <Filename Value="Units\u_procedural_starnest.pas"/>
+        <Caret Line="167" Column="19" TopLine="146"/>
       </Position7>
       <Position8>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="167" Column="19" TopLine="146"/>
+        <Caret Line="375" Column="27" TopLine="352"/>
       </Position8>
       <Position9>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="375" Column="27" TopLine="352"/>
+        <Caret Line="171" Column="18" TopLine="155"/>
       </Position9>
       <Position10>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="171" Column="18" TopLine="155"/>
+        <Caret Line="396" Column="33" TopLine="379"/>
       </Position10>
       <Position11>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="396" Column="33" TopLine="379"/>
+        <Caret Line="195" Column="18" TopLine="183"/>
       </Position11>
       <Position12>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="195" Column="18" TopLine="183"/>
+        <Caret Line="524" Column="27" TopLine="512"/>
       </Position12>
       <Position13>
-        <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="524" Column="27" TopLine="512"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="181" Column="50" TopLine="158"/>
       </Position13>
       <Position14>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="181" Column="50" TopLine="158"/>
+        <Caret Line="182" Column="50" TopLine="159"/>
       </Position14>
       <Position15>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="182" Column="50" TopLine="159"/>
+        <Caret Line="183" Column="50" TopLine="160"/>
       </Position15>
       <Position16>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="183" Column="50" TopLine="160"/>
+        <Caret Line="184" Column="36" TopLine="161"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="184" Column="36" TopLine="161"/>
+        <Filename Value="Units\u_procedural_starnest.pas"/>
+        <Caret Line="176" Column="16" TopLine="168"/>
       </Position17>
       <Position18>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="176" Column="16" TopLine="168"/>
+        <Caret Line="489" Column="3" TopLine="486"/>
       </Position18>
       <Position19>
         <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="489" Column="3" TopLine="486"/>
+        <Caret Line="175" Column="16" TopLine="162"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\u_procedural_starnest.pas"/>
-        <Caret Line="175" Column="16" TopLine="162"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="171" Column="40" TopLine="162"/>
       </Position20>
       <Position21>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="171" Column="40" TopLine="162"/>
+        <Caret Line="77" Column="25" TopLine="61"/>
       </Position21>
       <Position22>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="77" Column="25" TopLine="61"/>
+        <Caret Line="233" Column="17" TopLine="222"/>
       </Position22>
       <Position23>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="233" Column="17" TopLine="222"/>
-      </Position23>
-      <Position24>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="23" Column="17" TopLine="9"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="139" TopLine="134"/>
       </Position24>
       <Position25>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="139" TopLine="134"/>
+        <Caret Line="62" Column="21" TopLine="52"/>
       </Position25>
       <Position26>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="62" Column="21" TopLine="52"/>
+        <Caret Line="134" Column="3" TopLine="131"/>
       </Position26>
       <Position27>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="134" Column="3" TopLine="131"/>
+        <Caret Line="61" Column="15" TopLine="49"/>
       </Position27>
       <Position28>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="61" Column="15" TopLine="49"/>
+        <Caret Line="129" Column="3" TopLine="126"/>
       </Position28>
       <Position29>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="129" Column="3" TopLine="126"/>
+        <Caret Line="63" Column="23" TopLine="51"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="63" Column="23" TopLine="51"/>
+        <Filename Value="Units\u_procedural_starnest.pas"/>
+        <Caret Line="175" Column="16" TopLine="162"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
