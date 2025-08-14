@@ -106,6 +106,8 @@ var
 function ColorAttachmentCount: GLint;
 
 const
+  PI: single = 3.1415926535;
+  TAU: single = 6.2831853071;
   deg2rad: single = 0.017453292;
   rad2deg: single = 57.29578049;
   OneDiv255: single = 1/255;
