@@ -67,6 +67,7 @@ private
   FTargetSurface: TSimpleSurfaceWithEffect;
   FTargetSurfaceOffset: TPointF;
   FTargetPoint: TPointF;
+  FApplyBounds: boolean;
   function GetSpeed: single;
   function GetTargetSurface: TSimpleSurfaceWithEffect;
   procedure Reset; // sets all parameters to their default values.
@@ -76,6 +77,7 @@ private
   function ApplyBoundsOnPoint(aPt: TPointF): TPointF;
 public
   // Use this property to initialize the bounds of the camera.
+  // Default value is the bounds of the parent scene
   Bounds: TRectF;
 
   // Ask the camera to follow a surface.
@@ -98,6 +100,8 @@ public
   // Decrease to smooth the movement, increase for a rougher movement
   property Speed: single read GetSpeed write SetSpeed;
   property TargetSurface: TSimpleSurfaceWithEffect read GetTargetSurface;
+  // Set this property to True (default) to constraint the camera in the defined bounds (see Bounds property)
+  property ApplyBounds: boolean read FApplyBounds write FApplyBounds;
 end;
 
 
@@ -349,16 +353,21 @@ begin
   FSmoothPointF.Update(cameraPos, targetPos, AElapsedTime);
 
   // apply bounds
-  cameraPos.x := EnsureRange(cameraPos.x, Bounds.Left, Bounds.Right);
-  cameraPos.y := EnsureRange(cameraPos.y, Bounds.Top, Bounds.Bottom);
+  if FApplyBounds then begin
+    cameraPos.x := EnsureRange(cameraPos.x, Bounds.Left, Bounds.Right);
+    cameraPos.y := EnsureRange(cameraPos.y, Bounds.Top, Bounds.Bottom);
+  end;
 
   FParentCamera.LookAt.Value := FParentScene.Center - cameraPos;
 end;
 
 function TOGLCCameraAutoFollow.ApplyBoundsOnPoint(aPt: TPointF): TPointF;
 begin
-  Result.x := EnsureRange(aPt.x, Bounds.Left, Bounds.Right);
-  Result.y := EnsureRange(aPt.y, Bounds.Top, Bounds.Bottom);
+  if not FApplyBounds then Result := aPt
+  else begin
+    Result.x := EnsureRange(aPt.x, Bounds.Left, Bounds.Right);
+    Result.y := EnsureRange(aPt.y, Bounds.Top, Bounds.Bottom);
+  end;
 end;
 
 procedure TOGLCCameraAutoFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean);
@@ -373,7 +382,8 @@ begin
     CancelTargeting
   else begin
     if aMoveImmediately then
-      FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToWorld(aOffset)));
+      FParentCamera.LookAt.Value := FParentScene.Center - ApplyBoundsOnPoint(aSurface.SurfaceToWorld(aOffset));
+      //FParentCamera.MoveTo(ApplyBoundsOnPoint(aSurface.SurfaceToWorld(aOffset)));
     FTargetSurface := aSurface;
     FTargetSurfaceOffset := aOffset;
     if aSurface <> NIL
@@ -392,7 +402,8 @@ end;
 procedure TOGLCCameraAutoFollow.SetTargetPoint(aPt: TPointF; aMoveImmediately: boolean);
 begin
   if aMoveImmediately then
-    FParentCamera.MoveTo(ApplyBoundsOnPoint(aPt));
+    FParentCamera.LookAt.Value := FParentScene.Center - ApplyBoundsOnPoint(aPt);
+    //FParentCamera.MoveTo(ApplyBoundsOnPoint(aPt));
 
   FTargetPoint := aPt;
   FTargetMode := _ctmPoint;
@@ -411,6 +422,7 @@ begin
   FSmoothPointF.Speed := 0.05;
   Bounds := RectF(FParentScene.Width*0.5, FParentScene.Height*0.5,
                   FParentScene.Width*0.5, FParentScene.Height*0.5);
+  FApplyBounds := True;
 end;
 
 function TOGLCCameraAutoFollow.GetSpeed: single;
