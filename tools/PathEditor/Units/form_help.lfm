@@ -1,0 +1,30 @@
+object FormHelp: TFormHelp
+  Left = 359
+  Height = 314
+  Top = 196
+  Width = 472
+  Caption = 'Help'
+  ClientHeight = 314
+  ClientWidth = 472
+  Color = clBlack
+  FormStyle = fsStayOnTop
+  Position = poMainFormCenter
+  LCLVersion = '3.8.0.0'
+  object Memo1: TMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideTop.Control = Owner
+    AnchorSideTop.Side = asrCenter
+    Left = 12
+    Height = 289
+    Top = 13
+    Width = 448
+    Lines.Strings = (
+      'Add a node to the path: LEFT CLICK on empty space'
+      'Delete a node: RIGHT CLICK on node'
+      'Delete last node: BACKSPACE'
+      'Enter node coordinates manually: LEFT DOUBLE CLICK on node'
+    )
+    TabOrder = 0
+  end
+end
