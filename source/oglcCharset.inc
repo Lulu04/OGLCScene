@@ -15,7 +15,8 @@ public
 const
   NUMBER='0123456789';
   ASCII_SYMBOL='!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~';
-  SIMPLELATIN=NUMBER+' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  ASCII_LETTER='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  SIMPLELATIN=NUMBER+' '+ASCII_LETTER;
   LATIN1_SUPPLEMENT_1='ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ';
   LATIN1_SUPPLEMENT_2=' ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿';
 
