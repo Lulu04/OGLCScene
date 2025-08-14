@@ -27,10 +27,43 @@ TOGLCPathHelper = type helper for TOGLCPath
   procedure Scale(aValue: single);
   procedure FlipHorizontally;
   procedure FlipVertically;
+
+  procedure ExpandNormalizedTo(aWidth, aHeight: integer);
+  procedure ConvertToSpline(aSplineStyle: TSplineStyle);
+
+  procedure LoadFromFile(const aFilename: string);
+  // load a normalized path from file and expand the path to the specified size
+  procedure LoadFromNormalizedFileAndExpand(const aFilename: string; aWidth, aHeight: integer);
 end;
 
 
+{ TPathToFollow }
 
+TPathToFollow = record
+private
+  FDistanceAndAngle: ArrayOfTPointF; // contains x=distance to the next point, y=angle between current and next point
+  FPathLength: single;
+  FLoop: boolean;
+  FDistanceTravelled: single;
+  procedure CreateObjectInstance;
+public
+  Path: TOGLCPath;
+  Speed: TFParam;
+  procedure InitFrom(aPath: TOGLCPath; aLoop: boolean);
+  procedure InitFromFile(const aFilename: string; aClosePath, aLoop: boolean);
+  procedure InitFromNormalizedFile(const aFilename: string; aClosePath, aLoop: boolean; aWidth, aHeight: integer);
+  procedure ComputeDistanceAndAngle;
+  procedure Free;
+  procedure Update(const aElapsedTime: single);
+  // adjust the distance traveled
+  function TruncDistanceTraveled(aDistanceTraveled: single): single;
+  // return the position and angle(direction in degree) from the distance traveled
+  procedure GetPosAndAngle(out aPos: TPointF; out aAngle: single);
+
+  property DistanceTravelled: single read FDistanceTravelled write FDistanceTravelled;
+  // return the total path length
+  property PathLength: single read FPathLength;
+end;
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -221,6 +254,217 @@ begin
   for i:=0 to High(Self) do begin
     delta := pivot - Self[i].y;
     Self[i].y := pivot + delta;
+  end;
+end;
+
+procedure TOGLCPathHelper.ExpandNormalizedTo(aWidth, aHeight: integer);
+var i: integer;
+begin
+  for i:=0 to High(Self) do begin
+    Self[i].x := Self[i].x * aWidth;
+    Self[i].y := Self[i].y * aHeight;
+  end;
+end;
+
+procedure TOGLCPathHelper.ConvertToSpline(aSplineStyle: TSplineStyle);
+var spline: TOGLCPath;
+begin
+  spline := NIL;
+  spline.ConcatPoints(ComputeOpenedSpline(Self, aSplineStyle));
+  Self := Copy(spline, 0, Length(spline));
+end;
+
+procedure TOGLCPathHelper.LoadFromFile(const aFilename: string);
+var t: TStringList;
+    A: TStringArray;
+    c, k, i, j: integer;
+    s: string;
+    prop: TProperties;
+    activateSplineMode: boolean;
+    splineStyle: TSplineStyle;
+    spline: TOGLCPath;
+begin
+  Self := NIL;
+  t := TStringList.Create;
+  try
+   t.LoadFromFile(aFilename);
+   c := 0;
+   k := 0;
+   s := '';
+   prop.SplitFrom(t, '[OGLC_PATH]', '|');
+   prop.IntegerValueOf('NodeCount', c, 0);
+   SetLength(Self, c);
+   prop.BooleanValueOf('UseSpline', activateSplineMode, False);
+   prop.IntegerValueOf('SplineStyle', k, 0);
+   splineStyle := TSplineStyle(k);
+   prop.StringValueOf('Nodes', s, '');
+   A := s.Split([' ']);
+   i := 0;
+   j := 0;
+   while c > 0 do begin
+    Self[j].x := StringToSingle(A[i]);
+    Self[j].y := StringToSingle(A[i+1]);
+    inc(i, 2);
+    inc(j);
+    dec(c);
+   end;
+   if activateSplineMode then
+     ConvertToSpline(splineStyle);
+  finally
+    t.Free;
+  end;
+end;
+
+procedure TOGLCPathHelper.LoadFromNormalizedFileAndExpand(const aFilename: string; aWidth, aHeight: integer);
+var t: TStringList;
+    A: TStringArray;
+    c, k, i, j: integer;
+    s: string;
+    prop: TProperties;
+    activateSplineMode: boolean;
+    splineStyle: TSplineStyle;
+    spline: TOGLCPath;
+begin
+  Self := NIL;
+  t := TStringList.Create;
+  try
+   t.LoadFromFile(aFilename);
+   c := 0;
+   k := 0;
+   s := '';
+   prop.SplitFrom(t, '[OGLC_PATH]', '|');
+   prop.IntegerValueOf('NodeCount', c, 0);
+   SetLength(Self, c);
+   prop.BooleanValueOf('UseSpline', activateSplineMode, False);
+   prop.IntegerValueOf('SplineStyle', k, 0);
+   splineStyle := TSplineStyle(k);
+   prop.StringValueOf('Nodes', s, '');
+   A := s.Split([' ']);
+   i := 0;
+   j := 0;
+   while c > 0 do begin
+    Self[j].x := StringToSingle(A[i]) * aWidth;
+    Self[j].y := StringToSingle(A[i+1]) * aHeight;
+    inc(i, 2);
+    inc(j);
+    dec(c);
+   end;
+   if activateSplineMode then
+     ConvertToSpline(splineStyle);
+  finally
+    t.Free;
+  end;
+end;
+
+{ TPathToFollow }
+
+procedure TPathToFollow.CreateObjectInstance;
+begin
+  Speed := TFParam.Create;
+end;
+
+procedure TPathToFollow.InitFrom(aPath: TOGLCPath; aLoop: boolean);
+begin
+  FPathLength := 0;
+  Path := Copy(aPath);
+  FLoop := aLoop;
+  ComputeDistanceAndAngle;
+  CreateObjectInstance;
+end;
+
+procedure TPathToFollow.InitFromFile(const aFilename: string; aClosePath, aLoop: boolean);
+begin
+  Path.LoadFromFile(aFilename);
+  if aClosePath then Path.ClosePath;
+  FLoop := aLoop;
+  ComputeDistanceAndAngle;
+  CreateObjectInstance;
+end;
+
+procedure TPathToFollow.InitFromNormalizedFile(const aFilename: string; aClosePath,
+  aLoop: boolean; aWidth, aHeight: integer);
+begin
+  Path.LoadFromNormalizedFileAndExpand(aFilename, aWidth, aHeight);
+  if aClosePath then Path.ClosePath;
+  FLoop := aLoop;
+  ComputeDistanceAndAngle;
+  CreateObjectInstance;
+end;
+
+procedure TPathToFollow.ComputeDistanceAndAngle;
+var i: integer;
+  p: TPolarCoor;
+begin
+  FDistanceAndAngle := NIL;
+  SetLength(FDistanceAndAngle, Length(Path));
+  for i:=1 to high(Path) do begin
+    p := CartesianToPolar(Path[i-1], Path[i]);
+    FDistanceAndAngle[i] := PointF(p.Distance, p.Angle);
+    FPathLength := FPathLength + p.Distance;
+  end;
+  FDistanceAndAngle[0] := PointF(0, FDistanceAndAngle[1].y); // first point: distance=0 angle=same as next point
+end;
+
+procedure TPathToFollow.Free;
+begin
+  FreeAndNil(Speed);
+end;
+
+procedure TPathToFollow.Update(const aElapsedTime: single);
+begin
+  Speed.OnElapse(aElapsedTime);
+  FDistanceTravelled := FDistanceTravelled + Speed.Value*aElapsedTime;
+  if not FLoop then
+    FDistanceTravelled := EnsureRange(FDistanceTravelled, 0, FPathLength);
+end;
+
+function TPathToFollow.TruncDistanceTraveled(aDistanceTraveled: single): single;
+begin
+  if FPathLength <= 0 then begin
+    Result := 0;
+    exit;
+  end;
+
+  Result := aDistanceTraveled;
+  if Result >= FPathLength then begin
+    if FLoop then begin
+      repeat
+       Result := Result - FPathLength;
+      until Result < FPathLength;
+    end else Result := FPathLength;
+  end else if Result < 0 then begin
+    if FLoop then begin
+      repeat
+       Result := Result + FPathLength;
+      until Result > 0;
+    end else Result := 0;
+  end;
+end;
+
+procedure TPathToFollow.GetPosAndAngle(out aPos: TPointF; out aAngle: single);
+var i: integer;
+  d, dnext, distTraveled: single;
+  p: TPolarCoor;
+begin
+  distTraveled := TruncDistanceTraveled(FDistanceTravelled);
+
+  if distTraveled = PathLength then begin
+    aPos := Path[high(Path)];
+    aAngle := FDistanceAndAngle[high(Path)].y;
+    exit;
+  end;
+
+  d := 0;
+  for i:=1 to high(Path) do begin
+    dnext := d + FDistanceAndAngle[i].x;
+    if (distTraveled >= d) and (distTraveled < dnext) then begin
+      aAngle := FDistanceAndAngle[i].y;
+      p := CartesianToPolar(Path[i-1], Path[i]);
+      p.Distance := distTraveled-d;
+      aPos := PolarToCartesian(Path[i-1], p);
+      exit;
+    end;
+    d := dnext;
   end;
 end;
 
