@@ -471,13 +471,13 @@ begin
   if (xx>0) and (yy>=0)
     then Angle.Value := arctan(yy/xx)*Rad2Deg
     else if (xx>0) and (yy<0)
-         then Angle.Value := (arctan(yy/xx)+2*PI)*Rad2Deg
+         then Angle.Value := (arctan(yy/xx)+TAU)*Rad2Deg
          else if xx<0
               then Angle.Value := (arctan(yy/xx)+PI)*Rad2Deg
               else if (xx=0) and (yy>0)
-                   then Angle.Value := Pi/2*Rad2Deg
+                   then Angle.Value := 90 //Pi/2*Rad2Deg
                    else if (xx=0) and (yy<0)
-                        then Angle.Value := 1.5*PI*Rad2Deg
+                        then Angle.Value := 270 //1.5*PI*Rad2Deg
                         else Angle.Value :=0;
 end;
 
