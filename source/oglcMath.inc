@@ -74,10 +74,18 @@ function LineSegmentToQuadF_PosInside(const pt1, pt2: TPointF; const aWidth1, aW
 procedure AdjustCornerOnConsecutiveQuadF(var Q1, Q2: TQuadF);
 
 function NextPowerOfTwo(aValue: integer): integer;
+// return the distance between two point
 function Distance(aPt1, aPt2: TPointF): single;
+// return the squared distance
+function Distance2(aPt1, aPt2: TPointF): single;
 function MiddleOf(aPt1, aPt2: TPointF): TPointF;
 // Return the angle/s computed from the specified speed value.
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
+// Return aAngle value in range [0..360]
+function KeepAngleInRange360(aAngle: single): single;
+// Return the smallest value
+// from https://stackoverflow.com/questions/1878907/how-can-i-find-the-smallest-difference-between-two-angles-around-a-point
+function DeltaAngle(a1, a2: single): single;
 
 // reproduce the GLSL smoothstep function
 function SmoothStep(aEdgeMin, aEdgeMax, aValue: single): single;
@@ -198,6 +206,14 @@ begin
   Result := sqrt(sqr(aPt2.x-aPt1.x)+sqr(aPt2.y-aPt1.y));
 end;
 
+function Distance2(aPt1, aPt2: TPointF): single;
+var xx, yy: single;
+begin
+  xx := aPt2.x - aPt1.x;
+  yy := aPt2.y - aPt1.y;
+  Result := xx*xx + yy*yy;
+end;
+
 function MiddleOf(aPt1, aPt2: TPointF): TPointF;
 begin
   Result.x := (aPt1.x + aPt2.x) * 0.5;
@@ -210,6 +226,19 @@ begin
     Result := 360*aSpeed/(6.28318*aWheelRadius)   // 2*PI*R
   else
     Result :=0;
+end;
+
+function KeepAngleInRange360(aAngle: single): single;
+begin
+  Result := aAngle;
+  while Result > 360 do Result := Result - 360;
+  while Result < 0 do Result := Result + 360;
+end;
+
+function DeltaAngle(a1, a2: single): single;
+begin
+  Result := abs(KeepAngleInRange360(a1) - KeepAngleInRange360(a2));
+  Result := (180 - Abs(Result - 180))*Sign(Result);
 end;
 
 function SmoothStep(aEdgeMin, aEdgeMax, aValue: single): single;
