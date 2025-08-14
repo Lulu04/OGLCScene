@@ -259,10 +259,27 @@ type
     Red, Green, Blue, Alpha: TBoundedFParam;
     constructor Create;
     destructor Destroy; override;
-    // return True if the value have changed
     procedure OnElapse(const AElapsedSec: single); override;
     procedure ChangeTo(aNewValue: TBGRAPixel; aSeconds: single; aCurveID: word = idcLinear);
     property Value: TBGRAPixel read GetBGRAPixel write SetBGRAPixel;
+    property State: TParamState read GetState;
+  end;
+
+
+  { TPoint3DParam }
+
+  TPoint3DParam = class(TCustomParam)
+  private
+    function GetPoint3D: TPoint3D;
+    function GetState: TParamState;
+    procedure SetPoint3D(aValue: TPoint3D);
+  public
+    X, Y, Z: TFParam;
+    constructor Create;
+    destructor Destroy; override;
+    procedure OnElapse(const AElapsedSec: single); override;
+    procedure ChangeTo(aNewValue: TPoint3D; aSeconds: single; aCurveID: word = idcLinear);
+    property Value: TPoint3D read GetPoint3D write SetPoint3D;
     property State: TParamState read GetState;
   end;
 
@@ -564,6 +581,63 @@ begin
   green.ChangeTo(aNewValue.green, aSeconds, aCurveID);
   blue.ChangeTo(aNewValue.blue, aSeconds, aCurveID);
   alpha.ChangeTo(aNewValue.alpha, aSeconds, aCurveID);
+end;
+
+{ TPoint3DParam }
+
+function TPoint3DParam.GetPoint3D: TPoint3D;
+begin
+  Result.x := X.Value;
+  Result.y := Y.Value;
+  Result.z := Z.Value;
+end;
+
+function TPoint3DParam.GetState: TParamState;
+begin
+  if (X.State = psNO_CHANGE) and (Y.State = psNO_CHANGE) and
+     (Z.State = psNO_CHANGE) then
+    Result := psNO_CHANGE
+  else if (X.State = psADD_CONSTANT) or (Y.State = psADD_CONSTANT) or
+    (Z.State = psADD_CONSTANT) then
+    Result := psADD_CONSTANT
+   else Result := psUSE_CURVE;
+end;
+
+procedure TPoint3DParam.SetPoint3D(aValue: TPoint3D);
+begin
+  X.Value := aValue.x;
+  Y.Value := aValue.y;
+  Z.Value := aValue.z;
+end;
+
+constructor TPoint3DParam.Create;
+begin
+  inherited Create;
+  X := TFParam.Create;
+  Y := TFParam.Create;
+  Z := TFParam.Create;
+end;
+
+destructor TPoint3DParam.Destroy;
+begin
+  FreeAndNil(X);
+  FreeAndNil(Y);
+  FreeAndNil(Z);
+  inherited Destroy;
+end;
+
+procedure TPoint3DParam.OnElapse(const AElapsedSec: single);
+begin
+  X.OnElapse(AElapsedSec);
+  Y.OnElapse(AElapsedSec);
+  Z.OnElapse(AElapsedSec);
+end;
+
+procedure TPoint3DParam.ChangeTo(aNewValue: TPoint3D; aSeconds: single; aCurveID: word);
+begin
+  X.ChangeTo(aNewValue.x, aSeconds, aCurveID);
+  Y.ChangeTo(aNewValue.y, aSeconds, aCurveID);
+  Z.ChangeTo(aNewValue.z, aSeconds, aCurveID);
 end;
 
 { TPointFParam }
