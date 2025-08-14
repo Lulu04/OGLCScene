@@ -35,7 +35,7 @@ public
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
 public
-  DeformationSpeed: TPointFParam; // <1 = slower  >1 faster   .X=Horizontam speed  .Y=Vertical speed
+  DeformationSpeed: TPointFParam; // <1 = slower  >1 faster   .X=Horizontal speed  .Y=Vertical speed
   Amplitude: TPointFParam; // deformation amplitude
   // apply a prebuild deformation on the grid
   procedure ApplyDeformation(aType: TDeformationType);
