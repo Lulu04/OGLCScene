@@ -175,6 +175,7 @@ public
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
 public
+  Zoom: TFParam;
   ScrollingSpeed: TFParam;
   ScrollingAngle: TBoundedFParam;
   OpacityThreshold: single; // control the size of transparent part on the top. default is 0.4
@@ -480,6 +481,7 @@ begin
   inherited Update(aElapsedTime);
   ScrollingSpeed.OnElapse(aElapsedTime);
   ScrollingAngle.OnElapse(aElapsedTime);
+  Zoom.OnElapse(aElapsedTime);
 
   FTimeAccu := FTimeAccu + aElapsedTime * ScrollingSpeed.Value;
 end;
@@ -499,6 +501,8 @@ begin
 
   ScrollingSpeed := TFParam.Create;
   ScrollingAngle := CreateBoundedFParam(0, 359.99, True);
+  Zoom := TFParam.Create;
+  Zoom.Value := 0.850;
 
   FWidth := 100;
   FHeight := 100;
