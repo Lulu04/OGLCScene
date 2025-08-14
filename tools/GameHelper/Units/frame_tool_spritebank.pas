@@ -173,8 +173,7 @@ begin
             GetClassName+' = class('+GetClassType+')');
 
   // textures declaration
-  t.AddText('private'#10+
-            '  class var FAdditionalScale: single;');
+  t.AddText('private');
   s := '  class var ';
   for i:=0 to Textures.Size-1 do begin
     s := s + Textures.Mutable[i]^.name;
@@ -205,8 +204,7 @@ begin
   if CheckBox2.Checked then s := '  procedure ProcessMessage(UserValue: TUserMessageValue); override;'#10
     else s := '';
   t.AddText('public'#10+
-            '  // aAdditionalScale is used to scale the collision bodies'#10+
-            '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single=1.0);'#10+
+            '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
             '  constructor Create(aLayerIndex: integer=-1);'#10+
             s);
 
@@ -229,10 +227,9 @@ begin
             #10);
 
   // procedure load Texture
-  t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas; aAdditionalScale: single);'#10+
+  t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
             'var dataFolder: string;'#10+
             'begin'#10+
-            '  FAdditionalScale := aAdditionalScale;'#10+
             '  dataFolder := FScene.App.DataFolder;');
   for i:=0 to Textures.Size-1 do begin
     // texture filename must be relative to application Data folder
@@ -411,7 +408,7 @@ begin
           s := '  CollisionBody.AddPoint(';
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale';
+                   ')';
           t.Add(s);
         end;
         _btLine: begin
@@ -419,11 +416,11 @@ begin
           s := '  CollisionBody.AddLine(';
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale, ';
+                   '), ';
           pf := bodyItem^.ItemDescriptor.pt2;
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale);';
+                   '));';
           t.Add(s);
 
 {          t.Add('  CollisionBody.AddLine('+PointFToString(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
@@ -434,8 +431,8 @@ begin
           s := '  CollisionBody.AddCircle(';
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale, ';
-          s := s + FormatXCoorRelativeToParentWidth(bodyItem^.ItemDescriptor.radius, '')+'*FAdditionalScale);';
+                   '), ';
+          s := s + FormatXCoorRelativeToParentWidth(bodyItem^.ItemDescriptor.radius, '')+');';
           t.Add(s);
 
         //  t.Add('  CollisionBody.AddCircle('+PointFToString(bodyItem^.ItemDescriptor.center)+'*FAdditionalScale, '+
@@ -446,11 +443,11 @@ begin
           s := '  CollisionBody.AddRect(';
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale, ';
+                   '), ';
           pf := bodyItem^.ItemDescriptor.rect.BottomRight;
           s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                    ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                   ')*FAdditionalScale);';
+                   '));';
           t.Add(s);
 
          // t.Add('  CollisionBody.AddRect(RectF('+PointFToString(bodyItem^.ItemDescriptor.rect.TopLeft)+'*FAdditionalScale, '+
@@ -464,7 +461,7 @@ begin
             pf := bodyItem^.ItemDescriptor.pts[j];
             s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                      ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
-                     ')*FAdditionalScale';
+                     ')';
             //s := s + PointFToString(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
             if j < High(bodyItem^.ItemDescriptor.pts) then s := s+', ';
             inc(c);
