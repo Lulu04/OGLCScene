@@ -58,10 +58,13 @@ private const
    '{'#10+
    // adjust the uv coordinate
    '  vec2 uv = TexCoords + UVOffset;'#10+
-   '  if (uv.x >= LeftBottomRightTopUVCoor.z)'#10+
+{   '  if (uv.x >= LeftBottomRightTopUVCoor.z)'#10+
    '     uv.x = LeftBottomRightTopUVCoor.x + uv.x - LeftBottomRightTopUVCoor.z;'#10+
    '  if (uv.y >= LeftBottomRightTopUVCoor.w)'#10+
-   '     uv.y = LeftBottomRightTopUVCoor.y + uv.y - LeftBottomRightTopUVCoor.w;'#10+
+   '     uv.y = LeftBottomRightTopUVCoor.y + uv.y - LeftBottomRightTopUVCoor.w;'#10+   }
+
+   'vec2 coeff = step(LeftBottomRightTopUVCoor.zw, uv);'#10+
+   'uv = (vec2(1.0)-coeff)*uv + coeff*(LeftBottomRightTopUVCoor.xy+uv-LeftBottomRightTopUVCoor.zw);'#10+
 
    '  vec4 col = texture(uTexUnit, uv);'#10+
    // Tint and opacity
