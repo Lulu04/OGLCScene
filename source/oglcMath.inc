@@ -83,7 +83,7 @@ function MiddleOf(aPt1, aPt2: TPointF): TPointF;
 function LinearSpeedToAngleRotation(aSpeed, aWheelRadius: single): single;
 // Return aAngle value in range [0..360]
 function KeepAngleInRange360(aAngle: single): single;
-// Return the smallest value
+// Return the smallest value in range 0..360
 // from https://stackoverflow.com/questions/1878907/how-can-i-find-the-smallest-difference-between-two-angles-around-a-point
 function DeltaAngle(a1, a2: single): single;
 
