@@ -5,3 +5,6 @@ VerySimple~volsteps|1|iterations|17|stepsize|0.1000|zoom|0.8000|tile|0.8500|brig
 RedAsteroidFieldBG~volsteps|2|iterations|17|stepsize|0.1000|zoom|1.7000|tile|0.8500|brightness|0.0095|darkmatter|0.8000|distfading|0.4600|saturation|8.4500
 SimpleMonochrome~volsteps|3|iterations|17|stepsize|0.1000|zoom|0.8000|tile|0.8500|brightness|0.0016|darkmatter|0.8000|distfading|0.7300|saturation|0.2400
 SimpleHot~volsteps|3|iterations|17|stepsize|0.1000|zoom|1.7000|tile|0.8500|brightness|0.0020|darkmatter|0.8000|distfading|0.4600|saturation|0.5000
+HotNebula~volsteps|7|iterations|11|stepsize|0.1000|zoom|1.7500|tile|0.8500|brightness|0.0012|darkmatter|42.2000|distfading|1.1500|saturation|1.8100
+BlueNebula~volsteps|7|iterations|11|stepsize|0.1000|zoom|1.7500|tile|0.8500|brightness|0.0012|darkmatter|100.0000|distfading|0.4700|saturation|-11.1900
+PsycheNebula~volsteps|6|iterations|11|stepsize|0.1000|zoom|1.7500|tile|0.8500|brightness|0.0014|darkmatter|100.0000|distfading|-0.8700|saturation|-11.1900
