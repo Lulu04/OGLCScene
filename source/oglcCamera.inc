@@ -4,23 +4,32 @@ type
 { TShakerDescriptor }
 
 TShakerDescriptor = record
-  // range [0..1]
+private
+  FAmplitudeX, FAmplitudeY, FDurationMin, FDurationMax,
+  FTimeReference, FTimeAccu: single;
+  procedure ComputeOffsetValues;
+  procedure ComputeTimeReference;
+public
+  // Allow to control the amount of the shaker effect (like a volume for a sound)
+  // Range is 0..1 with 0= no shake, 1=max shake
   Amount: TBoundedFParam;
-  AmplitudeX, AmplitudeY, DurationMin, DurationMax,
-  TimeReference, TimeAccu, ComputedX, ComputedY: single;
+  // the computed offset value on X axis
+  ComputedOffsetX,
+  // the computed offset value on Y axis
+  ComputedOffsetY: single;
   procedure Create;
   procedure Free;
   procedure Update(const AElapsedTime: single);
   // Start the shaker effect.
-  // aAmplitudeX, aAmplitudeY are in pixel, aRefreshTime in second.
+  // aAmplitudeX, aAmplitudeY are in pixels, aRefreshTime in second.
   // Set aSetAmountTo1 to True to force amount value to be 1.0 (usefull after a fadeout)
-  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single; aSetAmountTo1: boolean=True);
-  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean=True);
+  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single; aSetAmountTo1: boolean=True); overload;
+  procedure Start(aAmplitudeX, aAmplitudeY, aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean=True); overload;
   // Stop the shaker effect
   procedure Stop;
   // Fade in the shaker effect.
-  // first call Start() to initialize the wanted shaker amplitude and refresh time
-  procedure FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word=idcLinear);
+  // first call Start() to initialize the wanted amplitude and refresh time
+  procedure FadeIn(aFadeDuration: single; aCurve: Word=idcLinear);
   // Fade out the shaker effect. When the fade is done, Amount.Value is equal to 0.0,
   // don't forget to set it to 1.0 before another call to Start().
   procedure FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
@@ -182,6 +191,17 @@ end;
 
 { TShakerDescriptor }
 
+procedure TShakerDescriptor.ComputeOffsetValues;
+begin
+  ComputedOffsetX := (Random*FAmplitudeX - FAmplitudeX*0.5) * Amount.Value;
+  ComputedOffsetY := (Random*FAmplitudeY - FAmplitudeY*0.5) * Amount.Value;
+end;
+
+procedure TShakerDescriptor.ComputeTimeReference;
+begin
+  FTimeReference := Random*(FDurationMax - FDurationMin) + FDurationMin;
+end;
+
 procedure TShakerDescriptor.Create;
 begin
   Amount := CreateBoundedFParam(0.0, MaxSingle-1, False);
@@ -199,58 +219,52 @@ begin
   Amount.OnElapse(AElapsedTime);
 
   // update shaker effect
-  if (AmplitudeX = 0) and (AmplitudeY = 0) then exit;
-  TimeAccu := TimeAccu + AElapsedTime;
-  if TimeAccu >= TimeReference then begin
-    TimeAccu := TimeAccu - TimeReference;
-    TimeReference := Random*(DurationMax-DurationMin) + DurationMin;
-    // compute new offset values
-    ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
-    ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
+  if (FAmplitudeX = 0) and (FAmplitudeY = 0) then exit;
+  FTimeAccu := FTimeAccu + AElapsedTime;
+  if FTimeAccu >= FTimeReference then begin
+    FTimeAccu := FTimeAccu - FTimeReference;
+    ComputeTimeReference;
+    ComputeOffsetValues;
   end;
 end;
 
-procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single;
-  aSetAmountTo1: boolean);
+procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single; aSetAmountTo1: boolean);
 begin
   Start(aAmplitudeX, aAmplitudeY, aRefreshTime, aRefreshTime, aSetAmountTo1);
 end;
 
-procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY,
-  aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean);
+procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTimeMin, aRefreshTimeMax: single;
+  aSetAmountTo1: boolean);
 begin
+  FAmplitudeX := aAmplitudeX;
+  FAmplitudeY := aAmplitudeY;
+  FDurationMin := aRefreshTimeMin;
+  FDurationMax := aRefreshTimeMax;
   if aSetAmountTo1 then Amount.Value := 1.0;
-  AmplitudeX := aAmplitudeX;
-  AmplitudeY := aAmplitudeY;
-  DurationMin := aRefreshTimeMin;
-  DurationMax := aRefreshTimeMax;
-  TimeAccu := 0;
-  TimeReference := Random*(aRefreshTimeMax - aRefreshTimeMin) + aRefreshTimeMin;
-  if (aAmplitudeX = 0) and (aAmplitudeY = 0) then begin
-    ComputedX := 0;
-    ComputedY := 0;
-  end else begin
-    ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
-    ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
-  end;
+  FTimeAccu := 0;
+  ComputeTimeReference;
+  ComputeOffsetValues;
 end;
 
-procedure TShakerDescriptor.FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word);
+procedure TShakerDescriptor.FadeIn(aFadeDuration: single; aCurve: Word);
 begin
-  Amount.ChangeTo(aAmountValue, aFadeDuration, aCurve);
+  Amount.Value := 0.0;
+  Amount.ChangeTo(1, aFadeDuration, aCurve);
+  ComputeOffsetValues;
 end;
 
-procedure TShakerDescriptor.FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
+procedure TShakerDescriptor.FadeOut(aFadeDuration: single; aCurve: Word);
 begin
   Amount.ChangeTo(0, aFadeDuration, aCurve);
 end;
 
 procedure TShakerDescriptor.Stop;
 begin
-  AmplitudeX := 0;
-  AmplitudeY := 0;
-  ComputedX := 0;
-  ComputedY := 0;
+  Amount.Value := 1.0;
+  FAmplitudeX := 0;
+  FAmplitudeY := 0;
+  ComputedOffsetX := 0;
+  ComputedOffsetY := 0;
 end;
 
 { TSmoothFollow }
@@ -594,7 +608,7 @@ begin
   Result.LoadIdentity;
   Result.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                       FParentScene.Width*0.5, FParentScene.Height*0.5,
-                      LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
+                      LookAt.x.Value+Shaker.ComputedOffsetX, LookAt.y.Value+Shaker.ComputedOffsetY);
 end;
 
 function TOGLCCamera.GetInverseTransformMatrix: TOGLCMatrix;
@@ -608,7 +622,7 @@ procedure TOGLCCamera.AddTransformTo(var aMatrix: TOGLCMatrix);
 begin
   aMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                        FParentScene.Width*0.5, FParentScene.Height*0.5,
-                       LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
+                       LookAt.x.Value+Shaker.ComputedOffsetX, LookAt.y.Value+Shaker.ComputedOffsetY);
 end;
 
 procedure TOGLCCamera.Use;
@@ -616,7 +630,7 @@ begin
   FPreviousSceneModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
   FParentScene.ModelViewMatrix.AddTransform(0, 0, Scale.x.Value, Scale.y.Value, Angle.Value,
                                             FParentScene.Width*Pivot.x, FParentScene.Height*Pivot.y,
-                                            LookAt.x.Value+Shaker.ComputedX, LookAt.y.Value+Shaker.ComputedY);
+                                            LookAt.x.Value+Shaker.ComputedOffsetX, LookAt.y.Value+Shaker.ComputedOffsetY);
 end;
 
 procedure TOGLCCamera.Release;
