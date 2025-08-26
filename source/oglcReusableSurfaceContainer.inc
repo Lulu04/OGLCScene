@@ -6,9 +6,8 @@ type
 generic TGenericReusableSurfaceContainer<T> = class
 private type
   TReusableSurfaceItem = record
-    surface: T;
-    active: boolean;
-    index: SizeUInt;
+    surface: TSimpleSurfaceWithEffect;
+    activated: boolean;
   end;
   TSurfaces = class(specialize TVector<TReusableSurfaceItem>);
 private
@@ -26,9 +25,9 @@ public
   function CreateNewSurface: T; virtual; abstract;
 
   // return an index of an available surface
-  function GetInactiveIndex: SizeUInt;
+  function GetInactiveSurface: T;
   //
-  procedure SetInactive(aIndex: SizeUInt);
+  procedure SetInactive(aSurface: T);
 
   property Surfaces[Index: SizeUInt]: T read GetSurface; Default;
   property Count: integer read GetCount;
@@ -42,9 +41,9 @@ end;
 procedure TGenericReusableSurfaceContainer.AddNewItem;
 var o: TReusableSurfaceItem;
 begin
-  o.active := True;
+  o.activated := True;
   o.surface := CreateNewSurface;
-  o.index := FList.Size;
+  o.surface.Tag1 := FList.Size;
   FList.PushBack(o);
 end;
 
@@ -55,7 +54,7 @@ end;
 
 function TGenericReusableSurfaceContainer.GetSurface(Index: SizeUInt): T;
 begin
-  Result := FList.Mutable[Index]^.surface;
+  Result := T(FList.Mutable[Index]^.surface);
 end;
 
 constructor TGenericReusableSurfaceContainer.Create;
@@ -70,34 +69,48 @@ begin
   inherited Destroy;
 end;
 
-function TGenericReusableSurfaceContainer.GetInactiveIndex: SizeUInt;
+function TGenericReusableSurfaceContainer.GetInactiveSurface: T;
 var i: SizeUInt;
 begin
   if FLastInactiveIndex <> SizeUInt.MaxValue then begin
-    Result := FLastInactiveIndex;
-    FList.Mutable[Result]^.active := True;
+    with FList.Mutable[FLastInactiveIndex]^ do begin
+      activated := True;
+      Result := T(surface);
+      with surface do begin
+        Visible := True;
+        Freeze := False;
+      end;
+    end;
     FLastInactiveIndex := SizeUInt.MaxValue;
     exit;
   end;
 
   if FList.Size > 0 then
     for i:=0 to FList.Size-1 do
-      if not FList.Mutable[i]^.active then begin
-        FList.Mutable[i]^.active := True;
-        Result := i;
-        exit;
-      end;
+      with FList.Mutable[i]^ do
+        if not activated then begin
+          activated := True;
+          Result := T(surface);
+          with surface do begin
+            Visible := True;
+            Freeze := False;
+          end;
+          exit;
+        end;
 
   AddNewItem;
-  Result := FList.Size-1;
+  Result := T(FList.Mutable[FList.Size-1]^.surface);
 end;
 
-procedure TGenericReusableSurfaceContainer.SetInactive(aIndex: SizeUInt);
+procedure TGenericReusableSurfaceContainer.SetInactive(aSurface: T);
 begin
-  FList.Mutable[aIndex]^.active := False;
-
-  if (FLastInactiveIndex = SizeUInt.MaxValue) or (FLastInactiveIndex < aIndex) then
-    FLastInactiveIndex := aIndex;
+  with TSimpleSurfaceWithEffect(aSurface) do begin
+    Visible := False;
+    Freeze := True;
+    FList.Mutable[Tag1]^.activated := False;
+    if (FLastInactiveIndex = SizeUInt.MaxValue) or (FLastInactiveIndex < Tag1) then
+      FLastInactiveIndex := Tag1;
+  end;
 end;
 
 {$endif oglcIMPLEMENTATION}
