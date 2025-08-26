@@ -1,9 +1,9 @@
 {$ifdef oglcINTERFACE}
 type
 
-{ TOGLCShakerDescriptor }
+{ TShakerDescriptor }
 
-TOGLCShakerDescriptor = record
+TShakerDescriptor = record
   // range [0..1]
   Amount: TBoundedFParam;
   AmplitudeX, AmplitudeY, DurationMin, DurationMax,
@@ -129,7 +129,7 @@ public
   // Shaker effect
   // The idea is to add periodicaly an offset to the camera LookAt to shake
   // the view, for example, to simulate an earthquake.
-  Shaker: TOGLCShakerDescriptor;
+  Shaker: TShakerDescriptor;
 
   // move the camera immediatly to the specified location.
   // the center of the scene is (Scene.Width*0.5, Scene.Height*0.5).
@@ -180,43 +180,43 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
-{ TOGLCShakerDescriptor }
+{ TShakerDescriptor }
 
-procedure TOGLCShakerDescriptor.Create;
+procedure TShakerDescriptor.Create;
 begin
   Amount := CreateBoundedFParam(0.0, MaxSingle-1, False);
   Amount.Value := 1.0;
 end;
 
-procedure TOGLCShakerDescriptor.Free;
+procedure TShakerDescriptor.Free;
 begin
   Amount.Free;
   Amount := NIL;
 end;
 
-procedure TOGLCShakerDescriptor.Update(const AElapsedTime: single);
+procedure TShakerDescriptor.Update(const AElapsedTime: single);
 begin
   Amount.OnElapse(AElapsedTime);
 
- // update shaker effect
- if (AmplitudeX = 0) and (AmplitudeY = 0) then exit;
- TimeAccu := TimeAccu + AElapsedTime;
- if TimeAccu >= TimeReference then begin
-   TimeAccu := TimeAccu - TimeReference;
-   TimeReference := Random*(DurationMax-DurationMin) + DurationMin;
-   // compute new offset values
-   ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
-   ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
- end;
+  // update shaker effect
+  if (AmplitudeX = 0) and (AmplitudeY = 0) then exit;
+  TimeAccu := TimeAccu + AElapsedTime;
+  if TimeAccu >= TimeReference then begin
+    TimeAccu := TimeAccu - TimeReference;
+    TimeReference := Random*(DurationMax-DurationMin) + DurationMin;
+    // compute new offset values
+    ComputedX := (random*AmplitudeX - AmplitudeX*0.5) * Amount.Value;
+    ComputedY := (random*AmplitudeY - AmplitudeY*0.5) * Amount.Value;
+  end;
 end;
 
-procedure TOGLCShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single;
+procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY, aRefreshTime: single;
   aSetAmountTo1: boolean);
 begin
   Start(aAmplitudeX, aAmplitudeY, aRefreshTime, aRefreshTime, aSetAmountTo1);
- end;
+end;
 
-procedure TOGLCShakerDescriptor.Start(aAmplitudeX, aAmplitudeY,
+procedure TShakerDescriptor.Start(aAmplitudeX, aAmplitudeY,
   aRefreshTimeMin, aRefreshTimeMax: single; aSetAmountTo1: boolean);
 begin
   if aSetAmountTo1 then Amount.Value := 1.0;
@@ -235,17 +235,17 @@ begin
   end;
 end;
 
-procedure TOGLCShakerDescriptor.FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word);
+procedure TShakerDescriptor.FadeIn(aAmountValue, aFadeDuration: single; aCurve: Word);
 begin
   Amount.ChangeTo(aAmountValue, aFadeDuration, aCurve);
 end;
 
-procedure TOGLCShakerDescriptor.FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
+procedure TShakerDescriptor.FadeOut(aFadeDuration: single; aCurve: Word=idcLinear);
 begin
   Amount.ChangeTo(0, aFadeDuration, aCurve);
 end;
 
-procedure TOGLCShakerDescriptor.Stop;
+procedure TShakerDescriptor.Stop;
 begin
   AmplitudeX := 0;
   AmplitudeY := 0;
