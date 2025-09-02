@@ -66,6 +66,7 @@ public // unpack section
  //function DoubleValueOf(const aPropertyName: string; var Value: double; aDefault: single): boolean;
  function ByteValueOf(const aPropertyName: string; var Value: byte; aDefault: byte): boolean;
  function WordValueOf(const aPropertyName: string; var Value: word; aDefault: word): boolean;
+ function BGRAPixelValueOf(const aPropertyName: string; var Value: TBGRAPixel; aDefault: TBGRAPixel): boolean;
 
 public // pack section
  procedure Init(aSeparator: char);
@@ -74,6 +75,7 @@ public // pack section
  procedure Add(const aPropertyName: string; aValue: integer);
  procedure Add(const aPropertyName: string; aValue: int64);
  procedure Add(const aPropertyName: string; aValue: single);
+ procedure Add(const aPropertyName: string; aValue: TBGRAPixel);
  property PackedProperty: string read GetPackedProperty;
 
 public
@@ -346,6 +348,19 @@ begin
     else Value := aDefault;
 end;
 
+function TProperties.BGRAPixelValueOf(const aPropertyName: string; var Value: TBGRAPixel; aDefault: TBGRAPixel): boolean;
+var i: integer;
+begin
+  Result := ValueIndexOf(aPropertyName, i);
+  if Result then begin
+    try
+      Value := HexToBGRAPixel(FProperties[i]);
+    except
+      Value := aDefault;
+    end;
+  end else Value := aDefault;
+end;
+
 procedure TProperties.Init(aSeparator: char);
 begin
   FProperties := NIL;
@@ -375,6 +390,11 @@ end;
 procedure TProperties.Add(const aPropertyName: string; aValue: single);
 begin
   AddProp(aPropertyName, FormatFloatWithDot('0.0000', aValue));
+end;
+
+procedure TProperties.Add(const aPropertyName: string; aValue: TBGRAPixel);
+begin
+  AddProp(aPropertyName, BGRAPixelToHex(aValue));
 end;
 
 function TProperties.ReplaceValue(const aPropertyName, aValue: string): boolean;
