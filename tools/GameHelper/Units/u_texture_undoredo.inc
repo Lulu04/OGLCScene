@@ -42,14 +42,14 @@ begin
   case aItem.Action of
     turatAddTexture: begin
       ParentTexturelist.DeleteByName(aItem.data.name);
-      i := FrameToolsSpriteBuilder.LBTextureNames.Items.IndexOf(aItem.data.name);
-      if i <> -1 then FrameToolsSpriteBuilder.LBTextureNames.Items.Delete(i);
+      i := FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.IndexOf(aItem.data.name);
+      if i <> -1 then FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Delete(i);
     end;
 
     turatDeleteTexture: begin
       ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
                             aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
-      FrameToolsSpriteBuilder.LBTextureNames.Items.Add(aItem.data.name);
+      FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Add(aItem.data.name);
     end;
 
     turatModifyTexture: begin
@@ -68,13 +68,13 @@ begin
     turatAddTexture: begin
       ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
                             aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
-      FrameToolsSpriteBuilder.LBTextureNames.Items.Add(aItem.data.name);
+      FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Add(aItem.data.name);
     end;
 
     turatDeleteTexture: begin
       ParentTexturelist.DeleteByName(aItem.data.name);
-      i := FrameToolsSpriteBuilder.LBTextureNames.Items.IndexOf(aItem.data.name);
-      if i <> -1 then FrameToolsSpriteBuilder.LBTextureNames.Items.Delete(i);
+      i := FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.IndexOf(aItem.data.name);
+      if i <> -1 then FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Delete(i);
     end;
 
     turatModifyTexture: begin

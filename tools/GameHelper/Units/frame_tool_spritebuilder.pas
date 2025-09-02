@@ -10,7 +10,8 @@ uses
   BGRABitmapTypes,
   OGLCScene,
   u_surface_list, u_texture_list, Types,
-  u_screen_spritebuilder, u_collisionbody_list, u_posture_list, u_undo_redo;
+  u_screen_spritebuilder, u_collisionbody_list, u_posture_list, u_undo_redo,
+  frame_texturelist;
 
 type
 
@@ -21,11 +22,8 @@ type
     ArrowUp: TArrow;
     ArrowDown: TArrow;
     ArrowLeft: TArrow;
-    BAddTexture: TSpeedButton;
     BAddToSpriteBank: TSpeedButton;
-    BChooseImageFile: TSpeedButton;
     BDeleteBody: TSpeedButton;
-    BDeleteTexture: TSpeedButton;
     BDeletePosture: TSpeedButton;
     BBodyRedo: TSpeedButton;
     BBodyUndo: TSpeedButton;
@@ -35,23 +33,18 @@ type
     BPolygon: TSpeedButton;
     BRenamePosture: TSpeedButton;
     BPoint: TSpeedButton;
-    BTextureRedo: TSpeedButton;
     BPostureRedo: TSpeedButton;
-    BTextureUndo: TSpeedButton;
     BPostureUndo: TSpeedButton;
-    BUpdateTexture: TSpeedButton;
-    BUpdateTextureListbox: TSpeedButton;
     CBParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
-    CheckBox1: TCheckBox;
-    Edit1: TEdit;
+    CBFlipH: TCheckBox;
+    CBFlipV: TCheckBox;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit5: TEdit;
     FSE2: TFloatSpinEdit;
     FSE1: TFloatSpinEdit;
-    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -62,20 +55,13 @@ type
     Label17: TLabel;
     Label18: TLabel;
     Label19: TLabel;
-    Label2: TLabel;
     Label20: TLabel;
-    Label21: TLabel;
     Label22: TLabel;
     Label23: TLabel;
     Label24: TLabel;
     Label3: TLabel;
     Label4: TLabel;
-    Label5: TLabel;
-    Label6: TLabel;
-    Label7: TLabel;
-    Label8: TLabel;
     Label9: TLabel;
-    LBTextureNames: TListBox;
     LBPostureNames: TListBox;
     MIDeleteNode: TMenuItem;
     MIAddNode: TMenuItem;
@@ -87,18 +73,13 @@ type
     Panel11: TPanel;
     Panel12: TPanel;
     Panel2: TPanel;
-    Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
-    Panel7: TPanel;
     Panel8: TPanel;
     PC1: TPageControl;
     PopupNode: TPopupMenu;
     SE1: TFloatSpinEdit;
-    SE10: TSpinEdit;
-    SE11: TSpinEdit;
-    SE12: TSpinEdit;
     SE2: TFloatSpinEdit;
     SE3: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
@@ -106,7 +87,6 @@ type
     SE6: TFloatSpinEdit;
     SE7: TFloatSpinEdit;
     SE8: TSpinEdit;
-    SE9: TSpinEdit;
     BNew: TSpeedButton;
     PageCollisionBody: TTabSheet;
     BLine: TSpeedButton;
@@ -120,7 +100,7 @@ type
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
-    procedure BChooseImageFileClick(Sender: TObject);
+    procedure BCancelClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BNewClick(Sender: TObject);
@@ -128,19 +108,11 @@ type
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
     procedure LBPostureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
-    procedure LBTextureNamesMouseUp(Sender: TObject; {%H-}Button: TMouseButton;
-      {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure LBTextureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
     procedure MIAddNodeClick(Sender: TObject);
     procedure PC1Change(Sender: TObject);
   private // textures
     FInitializingWidget: boolean;
-    procedure UpdateTextureWidgetState;
-    function LBToTextureName: string;
-    function CheckTextureWidgets: boolean;
-    procedure DoAddTexture;
-    procedure DoDeleteTexture;
-    procedure DoUpdateTexture;
+    procedure ProcessTextureListOnModified(Sender: TObject);
   private // childs
     procedure ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
     function CBToClassType: classOfSimpleSurfaceWithEffect;
@@ -171,6 +143,9 @@ type
   private
     FModified: boolean;
   public
+    FrameTextureList: TFrameTextureList;
+    constructor Create(TheOwner: TComponent); override;
+
     procedure OnShow;
     procedure FillListBoxTextureNames;
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
@@ -190,56 +165,6 @@ uses form_main, u_project, u_common, u_utils, u_spritebank, u_screen_template,
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
-
-procedure TFrameToolsSpriteBuilder.BChooseImageFileClick(Sender: TObject);
-var i: integer;
-  item: PTextureItem;
-begin
-  if sender=BUpdateTextureListbox then
-    Textures.FillListBox(LBTextureNames);
-
-  if Sender = BChooseImageFile then begin
-    if not OD1.Execute then exit;
-    Label2.Caption := OD1.FileName;
-    Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
-    if ExtractFileExt(OD1.FileName) = '.svg' then begin
-      SE9.Value := -1;
-      SE10.Value := -1;
-    end;
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BUpdateTexture then
-    DoUpdateTexture;
-
-  if Sender = BAddTexture then begin
-    DoAddTexture;
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BDeleteTexture then begin
-    DoDeleteTexture;
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BTextureUndo then begin
-    Textures.UndoRedoManager.Undo;
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BTextureRedo then begin
-    Textures.UndoRedoManager.Redo;
-    UpdateTextureWidgetState;
-  end;
-
-  if Sender = BCancel then begin
-    if FModified then
-      if QuestionDlg('','If you leave, changes will be lost.'+LineEnding+'Continue ?', mtWarning,
-                     [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
-    DoClearAll;
-    FormMain.ShowPageSpriteBank;
-  end;
-end;
 
 procedure TFrameToolsSpriteBuilder.BLineClick(Sender: TObject);
 begin
@@ -274,7 +199,6 @@ begin
     if DoAddNewChild then
       ShowSelectionData(NIL);
   end;
-
 end;
 
 procedure TFrameToolsSpriteBuilder.BNewClick(Sender: TObject);
@@ -316,6 +240,15 @@ begin
 
   Project.SetModified;
 
+  DoClearAll;
+  FormMain.ShowPageSpriteBank;
+end;
+
+procedure TFrameToolsSpriteBuilder.BCancelClick(Sender: TObject);
+begin
+  if FModified then
+    if QuestionDlg('','If you leave, changes will be lost.'+LineEnding+'Continue ?', mtWarning,
+                   [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageSpriteBank;
 end;
@@ -417,7 +350,8 @@ begin
                    (X.Value <> SE1.Value) or (Y.Value <> SE2.Value) or
                    (Pivot.x <> SE3.Value) or (Pivot.y <> SE4.Value) or
                    (Scale.x.Value <> SE5.Value) or (Scale.y.Value <> SE6.Value) or
-                   (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value);
+                   (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value) or
+                   (FlipH <> CBFlipH.Checked) or (FlipV <> CBFlipV.Checked);
     if chang then begin
       DoUpdateChild(False);
       FModified := True;
@@ -449,46 +383,6 @@ begin
   end;
   ScreenSpriteBuilder.SelectNone;
   UpdatePostureWidgetState;
-end;
-
-procedure TFrameToolsSpriteBuilder.LBTextureNamesMouseUp(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var lb: TListBox;
-begin
-  lb := Sender as TListBox;
-  lb.ItemIndex := lb.GetIndexAtXY(X, Y);
-end;
-
-procedure TFrameToolsSpriteBuilder.LBTextureNamesSelectionChange(
-  Sender: TObject; User: boolean);
-var i: integer;
-  p: PTextureItem;
-begin
-  if FInitializingWidget then exit;
-  FInitializingWidget := True;
-
-  i := LBTextureNames.ItemIndex;
-  if i = -1 then begin
-    Label2.Caption := '';
-    Edit1.Text := '';
-    SE9.Value := 0;
-    SE10.Value := 0;
-    CheckBox1.Checked := False;
-    SE11.Value := 0;
-    SE12.Value := 0;
-  end else begin
-    p := Textures.GetItemByName(LBTextureNames.Items.Strings[i]); // Textures.Mutable[i];
-    Label2.Caption := p^.filename;
-    Edit1.Text := p^.name;
-    SE9.Value := p^.width;
-    SE10.Value := p^.height;
-    CheckBox1.Checked := p^.isMultiFrame;
-    SE11.Value := p^.frameWidth;
-    SE12.Value := p^.frameHeight;
-  end;
-  FInitializingWidget := False;
-
-  UpdateTextureWidgetState;
 end;
 
 procedure TFrameToolsSpriteBuilder.MIAddNodeClick(Sender: TObject);
@@ -525,41 +419,10 @@ begin
 
 end;
 
-procedure TFrameToolsSpriteBuilder.UpdateTextureWidgetState;
-var siz: TSize;
+procedure TFrameToolsSpriteBuilder.ProcessTextureListOnModified(Sender: TObject);
 begin
-  if not FileExists(Label2.Caption) then begin
-    BUpdateTexture.Enabled := False;
-    BAddTexture.Enabled := False;
-  end
-  else
-  if Textures.GetItemByFilename(Label2.Caption) <> NIL then begin
-    BUpdateTexture.Enabled := True;
-    BAddTexture.Enabled := False;
-  end
-  else
-  begin
-    BUpdateTexture.Enabled := False;
-    BAddTexture.Enabled := True;
-  end;
-
-  // width and height are read only for non svg file
-  SE9.Enabled := ExtractFileExt(Label2.Caption) = '.svg';
-  SE10.Enabled := SE9.Enabled;
-  if not SE9.Enabled and FileExists(Label2.Caption) then begin
-    siz := GetImageSize(Label2.Caption);
-    SE9.Value := siz.cx;
-    SE10.Value := siz.cy;
-  end;
-
-  Label7.Enabled := CheckBox1.Checked;
-  Label8.Enabled := CheckBox1.Checked;
-  SE11.Enabled := CheckBox1.Checked;
-  SE12.Enabled := CheckBox1.Checked;
-
-  BDeleteTexture.Enabled := LBTextureNames.ItemIndex <> -1;
-  BTextureUndo.Enabled := Textures.UndoRedoManager.CanUndo;
-  BTextureRedo.Enabled := Textures.UndoRedoManager.CanRedo;
+  FModified := True;
+  Textures.FillComboBox(CBTextures); // refresh the combobox in childs page
 end;
 
 procedure TFrameToolsSpriteBuilder.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
@@ -830,113 +693,6 @@ begin
   UpdatePostureWidgetState;
 end;
 
-function TFrameToolsSpriteBuilder.LBToTextureName: string;
-var i: Integer;
-begin
-  Result := '';
-  i := LBTextureNames.ItemIndex;
-  if i = -1 then exit;
-  Result := LBTextureNames.Items.Strings[i];
-end;
-
-function TFrameToolsSpriteBuilder.CheckTextureWidgets: boolean;
-begin
-  Result := FileExists(Label2.Caption) and
-            (Trim(Edit1.Text) <> '') and
-            not Textures.NameAlreadyExists(Trim(Edit1.Text)) and
-            (SE9.Value <> 0) and
-            (SE10.Value <> 0);
-  if CheckBox1.Checked then
-    Result := Result and (SE11.Value <> 0) and (SE12.Value <> 0);
-end;
-
-procedure TFrameToolsSpriteBuilder.DoAddTexture;
-var texName: string;
-i:integer;
-begin
-  if not CheckTextureWidgets then exit;
-
-  texName := Trim(Edit1.Text);
-
-{FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: BEFORE Textures.Size='+Textures.Size.tostring);
-for i:=0 to Textures.Size-1 do
-  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name); }
-
-FScene.LogDebug('  ADDING '+Label2.Caption+'  '+texName);
-  Textures.Add(Label2.Caption, texName, SE9.Value, SE10.Value,
-               CheckBox1.Checked, SE11.Value, SE12.Value);
-
-{FScene.LogDebug('TFrameToolsSpriteBuilder.DoAddTexture: AFTER Textures.Size='+Textures.Size.tostring);
-for i:=0 to Textures.Size-1 do
-  FScene.LogDebug('  Textures index '+i.tostring+' name='+Textures.mutable[i]^.name);  }
-
-  FInitializingWidget := True;
-  LBTextureNames.ItemIndex := LBTextureNames.Items.Add(texName);
-  FInitializingWidget := False;
-  UpdateTextureWidgetState;
-
-  Textures.UndoRedoManager.AddActionAddTexture(texName);
-  Textures.FillComboBox(CBTextures); // refresh the combobox in childs page
-  FModified := True;
-end;
-
-procedure TFrameToolsSpriteBuilder.DoDeleteTexture;
-var textureName: string;
-begin
-  textureName := LBToTextureName;
-  if textureName = '' then exit;
-
-  // check if the texture is used by a surface
-  if Surfaces.TextureNameisUsedByASurface(textureName) then begin
-    ShowMessage('This texture is used by a surface, you can not delete it');
-    exit;
-  end;
-  Textures.UndoRedoManager.AddActionDeleteTexture(textureName);
-  Textures.DeleteByName(textureName);
-  LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
-  Textures.FillComboBox(CBTextures);
-
-  FModified := True;
-
-  FInitializingWidget := True;
-  Label2.Caption := '';
-  Edit1.Text := '';
-  SE9.Value := 0;
-  SE10.Value := 0;
-  CheckBox1.Checked := False;
-  SE11.Value := 0;
-  SE12.Value := 0;
-  FInitializingWidget := False;
-end;
-
-procedure TFrameToolsSpriteBuilder.DoUpdateTexture;
-var i, j: Integer;
-  item: PTextureItem;
-  surf: ArrayOfPSurfaceDescriptor;
-begin
-  i := LBTextureNames.ItemIndex;
-  if i = -1 then exit;
-
-  item := Textures.GetItemByName(LBTextureNames.Items.Strings[i]);
-  if item = NIL then exit;
-
-  Textures.UndoRedoManager.AddActionModifyTexture(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
-                  CheckBox1.Checked, SE11.Value, SE12.Value);
-  Textures.Update(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
-                  CheckBox1.Checked, SE11.Value, SE12.Value);
-
-  // recreate the surfaces that use this texture (if any)
-  surf := Surfaces.GetItemsThatUseThisTexture(item);
-  if Length(surf) <> 0 then begin
-    for j:=0 to High(surf)do
-      surf[j]^.RecreateSurfaceBecauseTextureChanged;
-  end;
-
-  Label2.Caption := '';
-  UpdateTextureWidgetState;
-  FModified := True;
-end;
-
 procedure TFrameToolsSpriteBuilder.UpdateValuesToWorkingSurface;
 begin
   if FWorkingChild = NIL then exit;
@@ -949,6 +705,8 @@ begin
     Scale.y.Value := SE6.Value;
     Angle.Value := SE7.Value;
     SetZOrder(SE8.Value);
+    FlipH := CBFlipH.Checked;
+    FlipV := CBFlipV.Checked;
   end;
   FWorkingChild^.UpdateHandlePosition;
 end;
@@ -990,13 +748,22 @@ begin
   Surfaces.FillComboBox(CBParent);
   Edit2.Text := '';
 
-  LBTextureNames.Clear;
-  Label2.Caption := '';
-  Edit1.Text := '';
-  CheckBox1.Checked := False;
+  FrameTextureList.Clear;
 
   PC1.PageIndex := PC1.IndexOf(PageTextures);
   FInitializingWidget := False;
+end;
+
+constructor TFrameToolsSpriteBuilder.Create(TheOwner: TComponent);
+begin
+  inherited Create(TheOwner);
+
+  FrameTextureList := TFrameTextureList.Create(Self);
+  FrameTextureList.Parent := PageTextures;
+  FrameTextureList.Align := alClient;
+  FrameTextureList.OnGetSpriteBuilderSurfaceList := @Surfaces;
+  FrameTextureList.OnGetTextureList := @Textures;
+  FrameTextureList.OnModified := @ProcessTextureListOnModified;
 end;
 
 procedure TFrameToolsSpriteBuilder.OnShow;
@@ -1011,19 +778,13 @@ begin
   FScene.Layer[LAYER_COLLISION_BODY].Visible := False;
   Bodies.UpdateNodesPosition;
 
-  UpdateTextureWidgetState;
+  self.FrameTextureList.UpdateTextureWidgetState;
   UpdatePostureWidgetState;
 end;
 
 procedure TFrameToolsSpriteBuilder.FillListBoxTextureNames;
 begin
-  Textures.FillListBox(LBTextureNames);
-  Label2.Caption := '';
-  SE9.Value := 0;
-  SE10.Value := 0;
-  CheckBox1.Checked := False;
-  SE11.Value := 0;
-  SE12.Value := 0;
+  FrameTextureList.FillListBox;
 end;
 
 procedure TFrameToolsSpriteBuilder.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
@@ -1049,6 +810,8 @@ begin
       SE6.Value := surface.Scale.y.Value;
       SE7.Value := surface.Angle.Value;
       SE8.Value := surface.ZOrderAsChild;
+      CBFlipH.Checked := surface.FlipH;
+      CBFlipV.Checked := surface.FlipV;
     end;
     CBChildType.Enabled := True;
     CBTextures.Enabled := True;
@@ -1086,6 +849,8 @@ begin
     SE6.Value := 1.0;
     SE7.Value := 0.0;
     SE8.Value := 0;
+    CBFlipH.Checked := False;
+    CBFlipV.Checked := False;
     BNewChild.Enabled := True;
   end;
 

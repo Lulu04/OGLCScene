@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene;
+  OGLCScene, u_surface_list;
 
 type
 
@@ -101,8 +101,23 @@ public // mouse and keyboard interaction on view
   property SpacePressed: boolean read FSpacePressed;
   property CtrlPressed: boolean read FCtrlPressed;
   property MoveRestriction: TPointF read FMoveRestriction;
-public
-  procedure AddToSpriteBank;
+end;
+
+
+{ TScreenWithSurfaceHandling }
+
+TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
+protected
+  FSelected: ArrayOfPSurfaceDescriptor;
+  FAlternateOverlappedIndex: integer;  // used to chose between several overlapped objects
+  function GetSelectedCount: integer;
+  procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); virtual;
+  function AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean; overload;
+  function AlreadySelected(item: PSurfaceDescriptor): boolean; overload;
+  procedure AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
+  procedure AddOffsetCoordinateToSelection(aOffset: TPointF); virtual;
+
+
 end;
 
 implementation
@@ -297,9 +312,62 @@ begin
   end;
 end;
 
-procedure TCustomScreenTemplate.AddToSpriteBank;
-begin
+{ TScreenWithSurfaceHandling }
 
+function TScreenWithSurfaceHandling.GetSelectedCount: integer;
+begin
+  Result := Length(FSelected);
+end;
+
+procedure TScreenWithSurfaceHandling.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
+var i: integer;
+begin
+  if Length(aItems) = 0 then exit;
+
+  for i:=0 to High(aItems) do
+     aItems[i]^.Selected := True;
+
+  if FSelected = NIL then FSelected := aItems
+  else begin
+    for i:=0 to High(aItems) do
+      if not AlreadySelected(aItems[i]) then begin
+        SetLength(FSelected, Length(FSelected)+1);
+        FSelected[High(FSelected)] := aItems[i];
+      end;
+  end;
+end;
+
+function TScreenWithSurfaceHandling.AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean;
+var i: integer;
+begin
+  if Length(aItems) = 0 then exit(False);
+  if Length(FSelected) < Length(aItems) then exit(False);
+
+  for i:=0 to High(aItems) do
+    if not AlreadySelected(aItems[i]) then exit(False);
+  Result := True;
+end;
+
+function TScreenWithSurfaceHandling.AlreadySelected(item: PSurfaceDescriptor): boolean;
+var i: integer;
+begin
+  for i:=0 to High(FSelected) do
+    if FSelected[i] = item then exit(True);
+  Result := False;
+end;
+
+procedure TScreenWithSurfaceHandling.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
+begin
+  if Length(aItems) = 0 then exit;
+  AddToSelected([aItems[FAlternateOverlappedIndex]]);
+end;
+
+procedure TScreenWithSurfaceHandling.AddOffsetCoordinateToSelection(aOffset: TPointF);
+var i: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.surface.MoveRelative(aOffset, 0);
 end;
 
 end.

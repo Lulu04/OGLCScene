@@ -10,7 +10,8 @@ uses
   OGLCScene, u_common, Types,
   frame_tool_spritebuilder,
   frame_tool_spritebank,
-  frame_tool_leveleditor;
+  frame_tool_leveleditor,
+  frame_tool_levelbank;
 
 {
  RIGHT MOUSE button: Move view
@@ -30,7 +31,6 @@ type
     BLevelBank: TSpeedButton;
     BLevelEditor: TSpeedButton;
     Label1: TLabel;
-    Label3: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
     PageLevelEditor: TPage;
@@ -39,7 +39,6 @@ type
     PageSpriteBank: TPage;
     Panel1: TPanel;
     Panel2: TPanel;
-    Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
@@ -80,8 +79,11 @@ type
 
     procedure ShowPageSpriteBank;
     procedure ShowPageSpriteBuilder;
+    procedure ShowPageLevelEditor;
+    procedure ShowPageLevelBank;
 
     procedure EditSpriteInSpriteBank(const aName: string);
+    procedure EditLevelInLevelBank(const aName: string);
   end;
 
 var
@@ -90,11 +92,13 @@ var
   FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder;
   FrameToolsSpriteBank: TFrameToolSpriteBank;
   FrameToolLevelEditor: TFrameToolLevelEditor;
+  FrameToolLevelBank: TFrameToolLevelBank;
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas, u_datamodule,
-  u_screen_levelbank, BGRABitmap, BGRABitmapTypes;
+  u_screen_levelbank, u_screen_leveleditor, u_levelbank, BGRABitmap,
+  BGRABitmapTypes;
 {$R *.lfm}
 
 { TFormMain }
@@ -127,7 +131,9 @@ begin
   FrameToolLevelEditor.Parent := PageLevelEditor;
   FrameToolLevelEditor.Align := alClient;
 
-
+  FrameToolLevelBank := TFrameToolLevelBank.Create(Self);
+  FrameToolLevelBank.Parent := PageLevelBank;
+  FrameToolLevelBank.Align := alClient;
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -172,6 +178,13 @@ begin
   if Sender = BLevelBank then begin
     FScene.RunScreen(ScreenLevelBank);
     Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
+    FrameToolLevelBank.OnShow;
+    UpdateWidgets;
+  end;
+
+  if Sender = BLevelEditor then begin
+    FScene.RunScreen(ScreenLevelEditor);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageLevelEditor);
     FrameToolLevelEditor.OnShow;
     UpdateWidgets;
   end;
@@ -244,7 +257,10 @@ begin
   UIHandle.TargetLayer := LAYER_UI;
 
   SpriteBank := TSpriteBank.Create;
+  LevelBank := TLevelBank.Create;
 
+  ScreenLevelEditor := TScreenLevelEditor.Create;
+  ScreenLevelEditor.Initialize;
   // level bank
   ScreenLevelBank := TScreenLevelBank.Create;
 
@@ -264,11 +280,17 @@ begin
   SpriteBank.Free;
   SpriteBank := NIL;
 
+  LevelBank.Free;
+  LevelBank := NIL;
+
   ScreenSpriteBuilder.Finalize;
   FreeAndNil(ScreenSpriteBuilder);
 
   ScreenSpriteBank.Finalize;
   FreeAndNil(ScreenSpriteBank);
+
+  ScreenLevelEditor.Finalize;
+  FreeAndNil(ScreenLevelEditor);
 
   ScreenLevelBank.Finalize;
   FreeAndNil(ScreenLevelBank);
@@ -308,10 +330,32 @@ begin
   UpdateWidgets;
 end;
 
+procedure TFormMain.ShowPageLevelEditor;
+begin
+  Notebook1.PageIndex := Notebook1.IndexOf(PageLevelEditor);
+  FrameToolLevelEditor.OnShow;
+  FScene.RunScreen(ScreenLevelEditor);
+  UpdateWidgets;
+end;
+
+procedure TFormMain.ShowPageLevelBank;
+begin
+  Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
+  FrameToolLevelBank.OnShow;
+  FScene.RunScreen(ScreenLevelBank);
+  UpdateWidgets;
+end;
+
 procedure TFormMain.EditSpriteInSpriteBank(const aName: string);
 begin
   FrameToolsSpriteBuilder.EditSpriteInSpriteBank(aName);
   ShowPageSpriteBuilder;
+end;
+
+procedure TFormMain.EditLevelInLevelBank(const aName: string);
+begin
+  FrameToolLevelEditor.EditLevelInLevelBank(aName);
+  ShowPageLevelEditor;
 end;
 
 

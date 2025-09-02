@@ -15,9 +15,6 @@ function GetImageSize(const aFilename: string): TSize;
 function PPIScale(AValue: integer): integer;
 function PPIScaleF(AValue: single): single;
 
-procedure ExchangeString(var s1, s2: string);
-procedure ExchangeInteger(var v1, v2: integer);
-procedure ExchangeBoolean(var b1, b2: boolean);
 
 implementation
 
@@ -45,30 +42,6 @@ end;
 function PPIScaleF(AValue: single): single;
 begin
   Result := FScene.ScaleDesignToSceneF(AValue);
-end;
-
-procedure ExchangeString(var s1, s2: string);
-var temp: string;
-begin
-  temp := s1;
-  s1 := s2;
-  s2 := temp;
-end;
-
-procedure ExchangeInteger(var v1, v2: integer);
-var temp: integer;
-begin
-  temp := v1;
-  v1 := v2;
-  v2 := temp;
-end;
-
-procedure ExchangeBoolean(var b1, b2: boolean);
-var temp: boolean;
-begin
-  temp := b1;
-  b1 := b2;
-  b2 := temp;
 end;
 
 end.

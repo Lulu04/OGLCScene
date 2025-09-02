@@ -12,13 +12,15 @@ uses
 const
 
 // Scene layers
-LAYER_COUNT = 6;
+LAYER_COUNT = 7;
    LAYER_TOP             = 0;
    LAYER_UI              = 1;
    LAYER_COLLISION_BODY  = 2;
    LAYER_SPRITEBUILDER   = 3;
    LAYER_SPRITEBANK      = 4;
-   LAYER_LEVELBANK       = 5;
+
+   LAYER_LEVELEDITOR     = 5;
+   LAYER_LEVELBANK       = 6;
 
 
 var

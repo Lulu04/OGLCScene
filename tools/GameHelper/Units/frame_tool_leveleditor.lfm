@@ -1,23 +1,586 @@
 object FrameToolLevelEditor: TFrameToolLevelEditor
   Left = 0
-  Height = 541
+  Height = 644
   Top = 0
   Width = 300
-  ClientHeight = 541
+  ClientHeight = 644
   ClientWidth = 300
   TabOrder = 0
-  DesignLeft = 642
-  DesignTop = 257
+  DesignLeft = 665
+  DesignTop = 157
   object PC1: TPageControl
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel8
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 612
+    Top = 32
+    Width = 300
+    ActivePage = PageScreen
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabIndex = 1
+    TabOrder = 0
+    object PageTextures: TTabSheet
+      Caption = 'Textures'
+    end
+    object PageScreen: TTabSheet
+      Caption = 'Screen'
+      ClientHeight = 584
+      ClientWidth = 292
+      object Panel1: TPanel
+        Left = 0
+        Height = 584
+        Top = 0
+        Width = 292
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 584
+        ClientWidth = 292
+        Color = 8289918
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+        object Panel2: TPanel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Left = 0
+          Height = 224
+          Top = 50
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ClientHeight = 224
+          ClientWidth = 292
+          ParentBackground = False
+          TabOrder = 0
+          object Label13: TLabel
+            Left = 24
+            Height = 15
+            Top = 32
+            Width = 67
+            BorderSpacing.Left = 10
+            BorderSpacing.Top = 27
+            Caption = 'Coordinates:'
+          end
+          object Label11: TLabel
+            AnchorSideLeft.Control = SE1
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideBottom.Control = SE1
+            Left = 132
+            Height = 15
+            Top = 9
+            Width = 8
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Right = 5
+            Caption = 'X'
+            Font.Color = clBlack
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label12: TLabel
+            AnchorSideLeft.Control = SE2
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Control = Label11
+            AnchorSideBottom.Control = SE2
+            Left = 213
+            Height = 15
+            Top = 9
+            Width = 7
+            Anchors = [akLeft, akBottom]
+            Caption = 'Y'
+            Font.Color = clBlack
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label14: TLabel
+            AnchorSideTop.Control = Label13
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Control = Label13
+            AnchorSideRight.Side = asrBottom
+            Left = 68
+            Height = 15
+            Top = 57
+            Width = 23
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 10
+            Caption = 'Size:'
+          end
+          object Label15: TLabel
+            AnchorSideTop.Control = Label14
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Control = Label14
+            AnchorSideRight.Side = asrBottom
+            Left = 64
+            Height = 15
+            Top = 82
+            Width = 27
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 10
+            Caption = 'Pivot'
+          end
+          object SE5: TFloatSpinEdit
+            AnchorSideLeft.Control = Label15
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label15
+            AnchorSideBottom.Side = asrBottom
+            Left = 101
+            Height = 23
+            Top = 74
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            DecimalPlaces = 3
+            Increment = 0.1
+            TabOrder = 0
+            Value = 0.5
+          end
+          object SE6: TFloatSpinEdit
+            AnchorSideLeft.Control = SE2
+            AnchorSideTop.Control = SE5
+            AnchorSideBottom.Side = asrCenter
+            Left = 181
+            Height = 23
+            Top = 74
+            Width = 58
+            DecimalPlaces = 3
+            Increment = 0.05
+            TabOrder = 1
+            Value = 0.5
+          end
+          object Label16: TLabel
+            AnchorSideTop.Control = Label15
+            AnchorSideTop.Side = asrBottom
+            Left = 48
+            Height = 15
+            Top = 107
+            Width = 34
+            BorderSpacing.Top = 10
+            Caption = 'Angle:'
+          end
+          object SE7: TFloatSpinEdit
+            AnchorSideLeft.Control = Label16
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label16
+            AnchorSideBottom.Side = asrBottom
+            Left = 92
+            Height = 23
+            Top = 99
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            DecimalPlaces = 1
+            Increment = 0.5
+            MaxValue = 360
+            MinValue = -360
+            TabOrder = 2
+          end
+          object Label18: TLabel
+            AnchorSideTop.Control = Label16
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Control = Label16
+            AnchorSideRight.Side = asrBottom
+            Left = 41
+            Height = 15
+            Top = 132
+            Width = 41
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 10
+            Caption = 'Opacity'
+          end
+          object SE8: TSpinEdit
+            AnchorSideLeft.Control = Label18
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label18
+            AnchorSideBottom.Side = asrBottom
+            Left = 92
+            Height = 23
+            Top = 124
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            MaxValue = 10000
+            MinValue = -10000
+            TabOrder = 3
+          end
+          object SE1: TFloatSpinEdit
+            AnchorSideLeft.Control = Label13
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label13
+            AnchorSideBottom.Side = asrBottom
+            Left = 101
+            Height = 23
+            Top = 24
+            Width = 70
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            MaxValue = 100000
+            MinValue = -1000000
+            TabOrder = 4
+          end
+          object SE2: TFloatSpinEdit
+            AnchorSideLeft.Control = SE1
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideTop.Control = SE1
+            AnchorSideBottom.Side = asrCenter
+            Left = 181
+            Height = 23
+            Top = 24
+            Width = 70
+            BorderSpacing.Left = 10
+            MaxValue = 100000
+            MinValue = -1000000
+            TabOrder = 5
+          end
+          object CBFlipH: TCheckBox
+            AnchorSideLeft.Control = SE2
+            AnchorSideBottom.Control = SE7
+            AnchorSideBottom.Side = asrBottom
+            Left = 181
+            Height = 19
+            Top = 103
+            Width = 46
+            Anchors = [akLeft, akBottom]
+            Caption = 'FlipH'
+            TabOrder = 6
+          end
+          object CBFlipV: TCheckBox
+            AnchorSideLeft.Control = CBFlipH
+            AnchorSideTop.Control = CBFlipH
+            AnchorSideTop.Side = asrBottom
+            Left = 181
+            Height = 19
+            Top = 122
+            Width = 44
+            Caption = 'FlipV'
+            TabOrder = 7
+          end
+          object Label1: TLabel
+            AnchorSideRight.Control = Label13
+            AnchorSideRight.Side = asrBottom
+            Left = 71
+            Height = 15
+            Top = 184
+            Width = 20
+            Anchors = [akTop, akRight]
+            Caption = 'Tint'
+          end
+          object Label2: TLabel
+            AnchorSideLeft.Control = RadioButton1
+            AnchorSideRight.Control = Label13
+            AnchorSideRight.Side = asrBottom
+            AnchorSideBottom.Control = Label3
+            AnchorSideBottom.Side = asrBottom
+            Left = 226
+            Height = 15
+            Top = 153
+            Width = 29
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            Caption = 'mode'
+            Font.Style = [fsItalic]
+            ParentFont = False
+          end
+          object RadioButton1: TRadioButton
+            AnchorSideLeft.Control = SE9
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideTop.Control = SE9
+            AnchorSideBottom.Side = asrBottom
+            Left = 216
+            Height = 19
+            Top = 171
+            Width = 59
+            BorderSpacing.Left = 15
+            Caption = 'Replace'
+            Checked = True
+            TabOrder = 10
+            TabStop = True
+          end
+          object RadioButton2: TRadioButton
+            AnchorSideLeft.Control = RadioButton1
+            AnchorSideTop.Control = RadioButton1
+            AnchorSideTop.Side = asrBottom
+            Left = 216
+            Height = 19
+            Top = 190
+            Width = 38
+            Caption = 'Mix'
+            TabOrder = 8
+          end
+          object ColorButton1: TColorButton
+            AnchorSideLeft.Control = SE1
+            AnchorSideBottom.Control = Label1
+            AnchorSideBottom.Side = asrBottom
+            Left = 101
+            Height = 31
+            Top = 168
+            Width = 44
+            Anchors = [akLeft, akBottom]
+            BorderWidth = 2
+            ButtonColorSize = 16
+            ButtonColor = clBlack
+          end
+          object Label19: TLabel
+            AnchorSideLeft.Control = SE9
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Side = asrBottom
+            AnchorSideBottom.Control = Label3
+            AnchorSideBottom.Side = asrBottom
+            Left = 159
+            Height = 15
+            Top = 153
+            Width = 39
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Top = 15
+            Caption = 'opacity'
+            Font.Style = [fsItalic]
+            ParentFont = False
+          end
+          object SE9: TSpinEdit
+            AnchorSideLeft.Control = ColorButton1
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = ColorButton1
+            AnchorSideBottom.Side = asrCenter
+            Left = 155
+            Height = 23
+            Top = 171
+            Width = 46
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            MaxValue = 255
+            TabOrder = 9
+          end
+          object Label3: TLabel
+            AnchorSideLeft.Control = ColorButton1
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideBottom.Control = ColorButton1
+            Left = 111
+            Height = 15
+            Top = 153
+            Width = 25
+            Anchors = [akLeft, akBottom]
+            Caption = 'color'
+            Font.Style = [fsItalic]
+            ParentFont = False
+          end
+          object SE3: TSpinEdit
+            AnchorSideLeft.Control = SE1
+            AnchorSideBottom.Control = Label14
+            AnchorSideBottom.Side = asrBottom
+            Left = 101
+            Height = 23
+            Top = 49
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            MaxValue = 100000
+            MinValue = 1
+            TabOrder = 11
+            Value = 1
+          end
+          object SE4: TSpinEdit
+            AnchorSideLeft.Control = SE2
+            AnchorSideBottom.Control = Label14
+            AnchorSideBottom.Side = asrBottom
+            Left = 181
+            Height = 23
+            Top = 49
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            MaxValue = 100000
+            MinValue = 1
+            TabOrder = 12
+            Value = 1
+          end
+        end
+        object Panel3: TPanel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Panel2
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          AnchorSideBottom.Control = Panel1
+          AnchorSideBottom.Side = asrBottom
+          Left = 0
+          Height = 102
+          Top = 274
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ClientHeight = 102
+          ClientWidth = 292
+          ParentBackground = False
+          TabOrder = 1
+          object Label25: TLabel
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Control = Panel3
+            AnchorSideRight.Control = Panel3
+            AnchorSideRight.Side = asrBottom
+            Left = 253
+            Height = 15
+            Top = 1
+            Width = 28
+            Anchors = [akTop, akRight]
+            BorderSpacing.Right = 10
+            Caption = 'Align'
+            Font.Color = 1424112
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+        end
+        object Label4: TLabel
+          AnchorSideRight.Side = asrBottom
+          Left = 24
+          Height = 15
+          Top = 19
+          Width = 41
+          Caption = 'Texture:'
+        end
+        object CBTextures: TComboBox
+          AnchorSideLeft.Control = Label4
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideBottom.Control = Label4
+          AnchorSideBottom.Side = asrBottom
+          Left = 70
+          Height = 23
+          Top = 11
+          Width = 167
+          Anchors = [akLeft, akBottom]
+          BorderSpacing.Left = 5
+          DropDownCount = 15
+          ItemHeight = 15
+          Style = csDropDownList
+          TabOrder = 2
+        end
+        object BNewSurface: TSpeedButton
+          Cursor = crHandPoint
+          Left = 256
+          Height = 25
+          Top = 9
+          Width = 30
+          Images = DataModule1.ImageList1
+          ImageIndex = 4
+          OnClick = BNewSurfaceClick
+        end
+        object Panel4: TPanel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Panel3
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Left = 0
+          Height = 96
+          Top = 376
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ClientHeight = 96
+          ClientWidth = 292
+          ParentBackground = False
+          TabOrder = 3
+          object Label5: TLabel
+            AnchorSideLeft.Control = Edit1
+            AnchorSideTop.Control = Panel4
+            Left = 14
+            Height = 15
+            Top = 9
+            Width = 134
+            BorderSpacing.Top = 8
+            Caption = 'Enter a name for the level'
+          end
+          object Edit1: TEdit
+            AnchorSideLeft.Control = Panel4
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Control = Label5
+            AnchorSideTop.Side = asrBottom
+            Left = 14
+            Height = 23
+            Top = 24
+            Width = 265
+            TabOrder = 0
+          end
+          object Label26: TLabel
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Control = Panel4
+            AnchorSideRight.Control = Panel4
+            AnchorSideRight.Side = asrBottom
+            Left = 254
+            Height = 15
+            Top = 1
+            Width = 27
+            Anchors = [akTop, akRight]
+            BorderSpacing.Right = 10
+            Caption = 'Save'
+            Font.Color = 1424112
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object BAddToLevelBank: TSpeedButton
+            AnchorSideLeft.Control = Panel4
+            AnchorSideLeft.Side = asrCenter
+            Cursor = crHandPoint
+            Left = 46
+            Height = 30
+            Top = 56
+            Width = 200
+            Caption = 'Save to Level Bank'
+            Images = DataModule1.ImageList1
+            ImageIndex = 2
+            OnClick = BAddToLevelBankClick
+          end
+        end
+      end
+    end
+  end
+  object Panel8: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 424
+    Height = 32
     Top = 0
     Width = 300
     Anchors = [akTop, akLeft, akRight]
-    TabOrder = 0
+    ClientHeight = 32
+    ClientWidth = 300
+    Color = 1973790
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object Label24: TLabel
+      AnchorSideLeft.Control = Panel8
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      Left = 111
+      Height = 15
+      Top = 9
+      Width = 78
+      Caption = 'LEVEL EDITOR'
+      Font.Color = 1424112
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object BCancel: TSpeedButton
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = Panel8
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 275
+      Height = 24
+      Hint = 'Return to the main window'
+      Top = 4
+      Width = 24
+      Anchors = [akTop, akRight]
+      Flat = True
+      Images = DataModule1.ImageList1
+      ImageIndex = 13
+      OnClick = BCancelClick
+      ShowHint = True
+      ParentShowHint = False
+    end
   end
 end
