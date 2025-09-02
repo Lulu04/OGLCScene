@@ -39,6 +39,10 @@ public
   // temporary variables used when loading. They keep safe the original values
   pivotX, pivotY, angle, x, y, scaleX, scaleY: single;
   zOrder: integer;
+  flipH, flipV: boolean;
+  opacity: single;
+  tint: TBGRAPixel;
+  tintMode: TTintMode;
   procedure InitDefault;
   procedure KillSurface;
   procedure CreateSurface(aCreateUIHandle: boolean=True);
@@ -198,7 +202,10 @@ begin
   if texItem <> NIL then tex := texItem^.texture else tex := NIL;
 
   if classType = TSprite then
-    surface := TSprite.Create(tex, False)
+begin
+    surface := TSprite.Create(tex, False);
+fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
+end
   else
   if classType = TSpriteWithElasticCorner then
     surface := TSpriteWithElasticCorner.Create(tex, False)
@@ -228,6 +235,7 @@ begin
   if classType = TSpriteContainer then begin
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
+fscene.LogDebug('created sprite_container');
   end
   else raise exception.create('forgot to implement!');
 
@@ -289,6 +297,11 @@ begin
   surface.Scale.x.Value := scaleX;
   surface.Scale.y.Value := scaleY;
   surface.Angle.Value := angle;
+  surface.FlipH := flipH;
+  surface.FlipV := flipV;
+  surface.Opacity.Value := opacity;
+  surface.Tint.Value := tint;
+  surface.TintMode := tintmode;
 end;
 
 procedure TSurfaceDescriptor.DuplicateValuesToTemporaryVariables;
@@ -301,6 +314,11 @@ begin
   scaleX := surface.Scale.X.Value;
   scaleY := surface.Scale.Y.Value;
   zOrder := surface.ZOrderAsChild;
+  flipH := surface.FlipH;
+  flipV := surface.FlipV;
+  opacity := surface.Opacity.Value;
+  tint := surface.Tint.Value;
+  tintmode := surface.TintMode;
 end;
 
 function TSurfaceDescriptor.IsRoot: boolean;
@@ -519,13 +537,18 @@ begin
   prop.Add('Y', surface.Y.Value);
   prop.Add('ScaleX', surface.Scale.X.Value);
   prop.Add('ScaleY', surface.Scale.Y.Value);
-
+  prop.Add('FlipH', surface.FlipH);
+  prop.Add('FlipV', surface.FlipV);
+  prop.Add('Opacity', surface.Opacity.Value);
+  prop.Add('Tint', surface.Tint.Value);
+  prop.Add('TintMode', Ord(surface.TintMode));
   Result := prop.PackedProperty;
 end;
 
 procedure TSurfaceDescriptor.LoadFromString(const s: string);
 var prop: TProperties;
   s1: string;
+  v: integer;
 begin
   s1 := '';
   InitDefault;
@@ -550,6 +573,13 @@ begin
   prop.SingleValueOf('Y', y, 0.0);
   prop.SingleValueOf('ScaleX', scaleX, 0.0);
   prop.SingleValueOf('ScaleY', scaleY, 0.0);
+  prop.BooleanValueOf('FlipH', flipH, False);
+  prop.BooleanValueOf('FlipV', flipV, False);
+  prop.SingleValueOf('Opacity', opacity, 255);
+  prop.BGRAPixelValueOf('Tint', tint, BGRA(0,0,0,0));
+  v := 0;
+  prop.IntegerValueOf('TintMode', v, Ord(tmReplaceColor));
+  tintmode := TTintMode(v);
 end;
 
 { TSurfaceList }

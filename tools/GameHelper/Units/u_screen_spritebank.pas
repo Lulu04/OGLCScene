@@ -79,10 +79,13 @@ end;
 procedure TScreenSpriteBank.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_SPRITEBANK, LAYER_COLLISION_BODY]);
+  // camera
+  CreateCamera([LAYER_SPRITEBANK]);
 end;
 
 procedure TScreenSpriteBank.FreeObjects;
 begin
+  FreeCamera;
 end;
 
 procedure TScreenSpriteBank.Initialize;
@@ -93,13 +96,10 @@ begin
   FBodies := TBodyItemList.Create;
   FPostures := TPostureList.Create;
 
-  // camera
-  CreateCamera([LAYER_SPRITEBANK]);
 end;
 
 procedure TScreenSpriteBank.Finalize;
 begin
-  FreeCamera;
   FTextures.Free;
   FTextures := NIL;
   FSurfaces.Free;

@@ -44,24 +44,23 @@ var
   SpriteBank: TSpriteBank;
 
 type
-TBankUndoRedoActionType = (uratBankUndefined,
-                           uratBankDeleteItem, // user delete a sprite
-                           uratBankRenameItem, // user rename a sprite
-                           uratBankAddItem     // user duplicate a sprite
+TSpriteBankUndoRedoActionType = (uratSpriteBankUndefined,
+                           uratSpriteBankDeleteItem, // user delete a sprite
+                           uratSpriteBankRenameItem, // user rename a sprite
+                           uratSpriteBankAddItem     // user duplicate a sprite
                           );
-TBankUndoRedoItem = record
-  action: TBankUndoRedoActionType;
+TSpriteBankUndoRedoItem = record
+  action: TSpriteBankUndoRedoActionType;
   data: TSpriteBankItem;
   newData: TSpriteBankItem;
-  //name, textures, surfaces, collisionbodies, postures: string;
   oldName: string;
 end;
 
-{ TBankUndoRedoManager }
+{ TSpriteBankUndoRedoManager }
 
-TBankUndoRedoManager = class(specialize TGenericUndoRedoManager<TBankUndoRedoItem>)
-  procedure ProcessUndo(var aItem: TBankUndoRedoItem); override;
-  procedure ProcessRedo(var aItem: TBankUndoRedoItem); override;
+TSpriteBankUndoRedoManager = class(specialize TGenericUndoRedoManager<TSpriteBankUndoRedoItem>)
+  procedure ProcessUndo(var aItem: TSpriteBankUndoRedoItem); override;
+  procedure ProcessRedo(var aItem: TSpriteBankUndoRedoItem); override;
 
   procedure AddActionDeleteSprite(aIndex: integer);
   procedure AddActionRenameSprite(aIndex: integer; const aOldName: string);
@@ -76,7 +75,8 @@ uses form_main;
 
 procedure TSpriteBankItem.InitDefault;
 begin
-  FillChar(Self, SizeOf(TSpriteBankItem), 0);
+  //FillChar(Self, SizeOf(TSpriteBankItem), 0);
+  Self := Default(TSpriteBankItem);
 end;
 
 function TSpriteBankItem.SaveToString: string;
@@ -138,7 +138,6 @@ begin
       DeleteByIndex(i);
       exit;
     end;
-
 end;
 
 procedure TSpriteBank.SaveTo(t: TStringList);
@@ -183,14 +182,14 @@ begin
   end;
 end;
 
-{ TBankUndoRedoManager }
+{ TSpriteBankUndoRedoManager }
 
-procedure TBankUndoRedoManager.ProcessUndo(var aItem: TBankUndoRedoItem);
+procedure TSpriteBankUndoRedoManager.ProcessUndo(var aItem: TSpriteBankUndoRedoItem);
 var o: PSpriteBankItem;
   i: integer;
 begin
   case aItem.action of
-    uratBankDeleteItem: begin
+    uratSpriteBankDeleteItem: begin
       o := SpriteBank.AddEmpty;
       o^.name := aItem.data.name;
       o^.textures := aItem.data.textures;
@@ -200,7 +199,7 @@ begin
       FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
     end;
 
-    uratBankRenameItem: begin
+    uratSpriteBankRenameItem: begin
       o := SpriteBank.GetItemByName(aItem.data.name);
       if o = NIL then begin raise exception.Create('bug: name not found in SpriteBank'); exit; end;
       o^.name := aItem.oldName;
@@ -208,7 +207,7 @@ begin
       if i <> -1 then FrameToolsSpriteBank.LB.Items.Strings[i] := aItem.oldName;
     end;
 
-    uratBankAddItem: begin
+    uratSpriteBankAddItem: begin
       SpriteBank.DeleteByName(aItem.data.name);
       i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.data.name);
       if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
@@ -216,12 +215,12 @@ begin
   end;
 end;
 
-procedure TBankUndoRedoManager.ProcessRedo(var aItem: TBankUndoRedoItem);
+procedure TSpriteBankUndoRedoManager.ProcessRedo(var aItem: TSpriteBankUndoRedoItem);
 var i: Integer;
   o: PSpriteBankItem;
 begin
   case aItem.action of
-    uratBankAddItem: begin
+    uratSpriteBankAddItem: begin
       o := SpriteBank.AddEmpty;
       o^.name := aItem.data.name;
       o^.textures := aItem.data.textures;
@@ -231,13 +230,13 @@ begin
       FrameToolsSpriteBank.LB.ItemIndex := FrameToolsSpriteBank.LB.Items.Add(o^.name);
     end;
 
-    uratBankDeleteItem: begin
+    uratSpriteBankDeleteItem: begin
       SpriteBank.DeleteByName(aItem.data.name);
       i := FrameToolsSpriteBank.LB.Items.IndexOf(aItem.data.name);
       if i <> -1 then FrameToolsSpriteBank.LB.Items.Delete(i);
     end;
 
-    uratBankRenameItem: begin
+    uratSpriteBankRenameItem: begin
       o := SpriteBank.GetItemByName(aItem.oldName);
       if o = NIL then begin raise exception.Create('bug: oldName not found in SpriteBank'); exit; end;
       o^.name := aItem.data.name;
@@ -247,11 +246,11 @@ begin
   end;
 end;
 
-procedure TBankUndoRedoManager.AddActionDeleteSprite(aIndex: integer);
-var o: TBankUndoRedoItem;
+procedure TSpriteBankUndoRedoManager.AddActionDeleteSprite(aIndex: integer);
+var o: TSpriteBankUndoRedoItem;
 begin
-  o := Default(TBankUndoRedoItem);
-  o.action := uratBankDeleteItem;
+  o := Default(TSpriteBankUndoRedoItem);
+  o.action := uratSpriteBankDeleteItem;
   o.data.name := SpriteBank.Mutable[aIndex]^.name;
   o.data.textures := SpriteBank.Mutable[aIndex]^.textures;
   o.data.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
@@ -260,11 +259,11 @@ begin
   AddItem(o);
 end;
 
-procedure TBankUndoRedoManager.AddActionRenameSprite(aIndex: integer; const aOldName: string);
-var o: TBankUndoRedoItem;
+procedure TSpriteBankUndoRedoManager.AddActionRenameSprite(aIndex: integer; const aOldName: string);
+var o: TSpriteBankUndoRedoItem;
 begin
-  o := Default(TBankUndoRedoItem);
-  o.action := uratBankRenameItem;
+  o := Default(TSpriteBankUndoRedoItem);
+  o.action := uratSpriteBankRenameItem;
   o.data.name := SpriteBank.Mutable[aIndex]^.name;
   o.data.textures := SpriteBank.Mutable[aIndex]^.textures;
   o.data.surfaces := SpriteBank.Mutable[aIndex]^.surfaces;
@@ -274,11 +273,11 @@ begin
   AddItem(o);
 end;
 
-procedure TBankUndoRedoManager.AddActionDuplicateSprite(aIndexNewItem: integer);
-var o: TBankUndoRedoItem;
+procedure TSpriteBankUndoRedoManager.AddActionDuplicateSprite(aIndexNewItem: integer);
+var o: TSpriteBankUndoRedoItem;
 begin
-  o := Default(TBankUndoRedoItem);
-  o.action := uratBankAddItem;
+  o := Default(TSpriteBankUndoRedoItem);
+  o.action := uratSpriteBankAddItem;
   o.data.name := SpriteBank.Mutable[aIndexNewItem]^.name;
   o.data.textures := SpriteBank.Mutable[aIndexNewItem]^.textures;
   o.data.surfaces := SpriteBank.Mutable[aIndexNewItem]^.surfaces;

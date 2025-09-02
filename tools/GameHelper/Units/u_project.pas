@@ -33,7 +33,6 @@ private
   procedure SetSceneAspectRatio(AValue: single);
 public
   constructor Create;
-  destructor Destroy; override;
   function DoNew: boolean; override;
   procedure DoSave(const aFilename: string); override;
   function DoLoad(const aFilename: string): boolean; override;
@@ -49,7 +48,7 @@ var Project: TProject;
 
 implementation
 uses Forms, Dialogs, u_common, form_main, u_texture_list, u_surface_list,
-  u_spritebank, u_screen_spritebuilder;
+  u_spritebank, u_screen_spritebuilder, u_levelbank;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -101,11 +100,6 @@ begin
   FSceneAspectRatio := 3/4;
 end;
 
-destructor TProject.Destroy;
-begin
-  inherited Destroy;
-end;
-
 function TProject.DoNew: boolean;
 begin
   //Save;
@@ -119,10 +113,8 @@ var t: TStringList;
 begin
   t := TStringList.Create;
   try
-   { ScreenSpriteBuilder.Textures.SaveTo(t);
-    ScreenSpriteBuilder.Surfaces.SaveTo(t);
-    ScreenSpriteBuilder.Bodies.SaveTo(t);  }
     SpriteBank.SaveTo(t);
+    LevelBank.SaveTo(t);
 
     t.SaveToFile(aFilename);
   finally
@@ -139,10 +131,8 @@ begin
       t.LoadFromFile(aFilename);
       if t.Count = 0 then exit(False);
 
-    {  ScreenSpriteBuilder.Textures.LoadFrom(t);
-      ScreenSpriteBuilder.Surfaces.LoadFrom(t);
-      ScreenSpriteBuilder.Bodies.LoadFrom(t);   }
       SpriteBank.LoadFrom(t);
+      LevelBank.LoadFrom(t);
 
       Result := True;
     except
@@ -159,6 +149,7 @@ begin
   ScreenSpriteBuilder.Surfaces.Clear;
   ScreenSpriteBuilder.Bodies.Clear;
   SpriteBank.Clear;
+  LevelBank.Clear;
 end;
 
 procedure TProject.OnModifiedChange(aState: boolean);

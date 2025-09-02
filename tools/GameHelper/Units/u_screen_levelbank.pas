@@ -7,16 +7,24 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene,
-  u_common, u_screen_template, u_spritebank,
-  u_surface_list, u_texture_list, u_collisionbody_list, u_posture_list;
+  //OGLCScene,
+  u_common, u_screen_template,
+  u_surface_list, u_texture_list;
 
 type
+
+{ TLevelBankSurfaceList }
+
+TLevelBankSurfaceList = class(TSurfaceList)
+  function Textures: TTextureList; override;
+end;
+
 
 { TScreenLevelBank }
 
 TScreenLevelBank = class(TCustomScreenTemplate)
 private
+  FSurfaces: TLevelBankSurfaceList;
 public
 {  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -35,43 +43,56 @@ public
   procedure ClearView;
   procedure ShowLevel(aIndex: integer);
 
+  property Surfaces: TLevelBankSurfaceList read FSurfaces;
 end;
 
 var ScreenLevelBank: TScreenLevelBank;
 
 implementation
 
+uses u_levelbank;
+
+{ TLevelBankSurfaceList }
+
+function TLevelBankSurfaceList.Textures: TTextureList;
+begin
+  Result := LevelBank.Textures;
+end;
+
 { TScreenLevelBank }
 
 procedure TScreenLevelBank.CreateObjects;
 begin
+  FSurfaces := TLevelBankSurfaceList.Create;
+  FSurfaces.WorkingLayer := LAYER_LEVELBANK;
   ShowLayers([LAYER_UI, LAYER_LEVELBANK]);
-end;
-
-procedure TScreenLevelBank.FreeObjects;
-begin
-
-end;
-
-procedure TScreenLevelBank.Initialize;
-begin
   // camera
   CreateCamera([LAYER_LEVELBANK]);
 end;
 
+procedure TScreenLevelBank.FreeObjects;
+begin
+  FSurfaces.Free;
+  FSurfaces := NIL;
+  FreeCamera;
+end;
+
+procedure TScreenLevelBank.Initialize;
+begin
+end;
+
 procedure TScreenLevelBank.Finalize;
 begin
-  FreeCamera;
 end;
 
 procedure TScreenLevelBank.ClearView;
 begin
-
+  FSurfaces.Clear;
 end;
 
 procedure TScreenLevelBank.ShowLevel(aIndex: integer);
 begin
-
+  FSurfaces.LoadFromString(LevelBank.Mutable[aIndex]^.surfaces);
 end;
 
 end.

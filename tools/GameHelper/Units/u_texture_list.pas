@@ -82,9 +82,11 @@ begin
   case ExtractFileExt(filename) of
     '.svg': if not isMultiFrame then texture := FScene.TexMan.AddFromSVG(filename, width, height)
              else raise exception.create('multi frame svg not yet implemented');
+
     else if not isMultiFrame then texture := FScene.TexMan.Add(filename)
              else texture := FScene.TexMan.Add(filename, frameWidth, frameHeight);
   end;
+fscene.LogDebug('created texture "'+texture^.Filename+'" w='+texture^.FrameWidth.ToString+' h='+texture^.FrameHeight.ToString+' id='+texture^.ID.ToString);
 end;
 
 procedure TTextureItem.FreeTexture;
@@ -165,7 +167,6 @@ end;
 procedure TTextureList.Add(const aFilename, aName: string; aWidth, aHeight: integer;
   aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
 var o: TTextureItem;
-i:integer;
 begin
 FScene.LogDebug('TTextureList.Add: BEFORE Textures.Size='+Size.tostring);
 

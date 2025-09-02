@@ -1133,6 +1133,8 @@ end;
 procedure TScreenSpriteBuilder.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_COLLISION_BODY, LAYER_SPRITEBUILDER]);
+  // camera
+  CreateCamera([LAYER_SPRITEBUILDER]);
 end;
 
 procedure TScreenSpriteBuilder.FreeObjects;
@@ -1142,6 +1144,7 @@ begin
   FSurfaces.Clear;
   FBodyList.Clear;
   FPostures.Clear;
+  FreeCamera;
 end;
 
 procedure TScreenSpriteBuilder.Initialize;
@@ -1155,13 +1158,10 @@ begin
 
   FPostures := TPostureList.Create;
 
-  // camera
-  CreateCamera([LAYER_SPRITEBUILDER]);
 end;
 
 procedure TScreenSpriteBuilder.Finalize;
 begin
-  FreeCamera;
   FTextures.Free;
   FTextures := NIL;
   FSurfaces.Free;

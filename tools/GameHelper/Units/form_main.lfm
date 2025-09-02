@@ -130,27 +130,33 @@ object FormMain: TFormMain
         TabOrder = 0
         object BNewScreen: TToolButton
           Left = 1
-          Hint = 'Clear all actual screen content to start a new screen'
+          Hint = 'Start a new empty project'
           Top = 0
           Caption = 'BNewScreen'
           ImageIndex = 0
           OnClick = BNewScreenClick
+          ParentShowHint = False
+          ShowHint = True
         end
         object BLoadScreen: TToolButton
           Left = 29
+          Hint = 'Load an existing project'
           Top = 0
           Caption = 'BLoadScreen'
           ImageIndex = 1
           OnClick = BLoadScreenClick
+          ParentShowHint = False
+          ShowHint = True
         end
         object BSaveScreen: TToolButton
           Left = 57
-          Hint = 'Save screen'
+          Hint = 'Save the current project'
           Top = 0
           Caption = 'BSaveScreen'
           ImageIndex = 2
           OnClick = BSaveScreenClick
           ParentShowHint = False
+          ShowHint = True
         end
         object ToolButton1: TToolButton
           Left = 85
@@ -161,47 +167,13 @@ object FormMain: TFormMain
         end
         object BScreenOptions: TToolButton
           Left = 93
-          Hint = 'Screen options'
+          Hint = 'Project options'
           Top = 0
           Caption = 'BScreenOptions'
           ImageIndex = 3
           ParentShowHint = False
           ShowHint = True
         end
-      end
-    end
-    object Panel3: TPanel
-      AnchorSideTop.Control = Panel6
-      AnchorSideBottom.Control = Panel6
-      AnchorSideBottom.Side = asrBottom
-      Left = 144
-      Height = 29
-      Top = 1
-      Width = 184
-      Anchors = [akTop, akLeft, akBottom]
-      ClientHeight = 29
-      ClientWidth = 184
-      Color = 3226172
-      ParentBackground = False
-      ParentColor = False
-      TabOrder = 1
-      object Label3: TLabel
-        AnchorSideLeft.Control = Panel3
-        AnchorSideTop.Control = Panel3
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = Panel3
-        AnchorSideRight.Side = asrBottom
-        Left = 4
-        Height = 15
-        Top = 7
-        Width = 176
-        Anchors = [akTop, akLeft, akRight]
-        BorderSpacing.Left = 3
-        BorderSpacing.Right = 3
-        Caption = 'Label3'
-        Font.Color = 15000804
-        ParentColor = False
-        ParentFont = False
       end
     end
     object Panel2: TPanel
@@ -220,7 +192,7 @@ object FormMain: TFormMain
       Color = 3226172
       ParentBackground = False
       ParentColor = False
-      TabOrder = 2
+      TabOrder = 1
       object BSpriteBank: TSpeedButton
         AnchorSideTop.Control = Panel2
         AnchorSideTop.Side = asrCenter
@@ -276,7 +248,7 @@ object FormMain: TFormMain
       Color = 3226172
       ParentBackground = False
       ParentColor = False
-      TabOrder = 3
+      TabOrder = 2
       object BLevelBank: TSpeedButton
         AnchorSideTop.Control = Panel9
         AnchorSideTop.Side = asrCenter

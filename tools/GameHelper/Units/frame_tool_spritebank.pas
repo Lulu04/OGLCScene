@@ -50,7 +50,7 @@ type
     procedure ShowSprite(aIndex: integer);
     procedure UpdateWidgetState;
   private
-    FUndoRedoManager: TBankUndoRedoManager;
+    FUndoRedoManager: TSpriteBankUndoRedoManager;
   public
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
@@ -275,8 +275,10 @@ begin
     for i:=0 to Surfaces.Size-1 do begin
       current := Surfaces.Mutable[i];
       if (rootItem <> NIL) and (current = rootItem) then continue;
-      t.Add('  '+current^.name+'.FlipH := AValue;');
-      s := s+'  '+current^.name+'.FlipV := AValue;';
+      if current^.flipH then t.Add('  '+current^.name+'.FlipH := not AValue;')
+        else t.Add('  '+current^.name+'.FlipH := AValue;');
+      if current^.FlipV then s := s+'  '+current^.name+'.FlipV := not AValue;'
+        else s := s+'  '+current^.name+'.FlipV := AValue;';
       if i < Surfaces.Size-1 then s := s + #10;
     end;
     t.AddText('end;'#10+#10+
@@ -327,6 +329,10 @@ begin
       t.Add('  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';');
     if (rootItem^.scaleX <> 1.0) or (rootItem^.scaleY <> 1.0) then
       t.Add('  Scale.Value := '+PointFToString(rootItem^.scaleX, rootItem^.scaleY)+';');
+    if rootItem^.flipH then
+      t.Add('  FlipH := True;');
+    if rootItem^.flipV then
+      t.Add('  FlipV := True;');
     t.Add('');
   end else t.Add('');
 
@@ -385,6 +391,10 @@ begin
       t.Add('    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';');
     if (current^.scaleX <> 1.0) or (current^.scaleY <> 1.0) then
       t.Add('    Scale.Value := '+PointFToString(current^.scaleX, current^.scaleY)+';');
+    if current^.flipH then
+      t.Add('    FlipH := True;');
+    if current^.flipV then
+      t.Add('    FlipV := True;');
     if CheckBox1.Checked then
       t.Add('    ApplySymmetryWhenFlip := True;');
     t.Add('  end;');
@@ -650,7 +660,7 @@ end;
 constructor TFrameToolSpriteBank.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FUndoRedoManager := TBankUndoRedoManager.Create;
+  FUndoRedoManager := TSpriteBankUndoRedoManager.Create;
 end;
 
 destructor TFrameToolSpriteBank.Destroy;
