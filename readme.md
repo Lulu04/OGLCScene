@@ -17,12 +17,15 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - UI support nested clipping and customizable border and filling with solid color or gradient color.
 - Camera effects with shaker effect to simulate earthquake and Auto Follow feature to smoothly follow a surface.
 - Log file.
-- Particle engine and its tool 'Particles Editor' to make your own particle effects.
-- Tiled map engine and its tool 'Tile map Designer' usefull to edit and construct your map from tileset.
-- Tool "Path Editor" to easily design path on the screen for your sprite, and save them to file in normalized coordinate (0 to 1). The file can be loaded in your game and expanded to the scene resolution.
-- Tool "Game Helper" is a tool that include:
-  - SPRITE BUILDER: a tool to construct complex sprite, draw their collision bodies, define several postures to animate your characters. The sprite definition con be saved as a Pascal unit ready to incorporate in your project.
-  - LEVEL EDITOR: a tool to construct your game level. Not yet finished. 
+- Particle engine, tile engine.  
+##Tools
+The tools are located in the "tools" folder.
+- Particles Editor to create your own particle effects.
+- Tile Map Designer' to construct your map from tileset.
+- Path Editor to easily design path on the screen for your sprite, and save them to file in normalized coordinate (0 to 1). The file can be loaded in your game and expanded to the scene resolution.
+- Game Helper is a tool that include:
+  - SPRITE BUILDER: to construct complex sprite, draw their collision bodies, define several postures to animate your characters. The sprite definition con be saved as a Pascal unit ready to incorporate in your project.
+  - LEVEL EDITOR: a simple tool to construct your game level. Not yet finished. 
 
   
 # Screenshot
