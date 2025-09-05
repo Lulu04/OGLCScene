@@ -101,11 +101,11 @@ private
   FUndoRedoManager: TSurfaceUndoRedoManager;
   FWorkingLayer: integer;
 private
-  FSaveLoadForLevelEditor: boolean;
+  FModeForLevelEditor: boolean;
 public
   constructor Create;
   destructor Destroy; override;
-  procedure SetSaveLoadForLevelEditor;
+  procedure SetModeForLevelEditor;
 
   procedure Clear; reintroduce;
   function AddEmpty: PSurfaceDescriptor;
@@ -115,6 +115,7 @@ public
   function GetByIndex(aIndex: integer): PSurfaceDescriptor;
   function GetItemBySurface(aSurface: TSimpleSurfaceWithEffect): PSurfaceDescriptor;
   function GetItemsThatUseThisTexture(aTextureItem: PTextureItem): ArrayOfPSurfaceDescriptor;
+  //procedure DeleteItemsThatUseThisTexture(aTextureItem: PTextureItem);
 
   function GetRootItem: PSurfaceDescriptor;
   function RootIsDefined: boolean;
@@ -147,6 +148,8 @@ public
 
   property WorkingLayer: integer read FWorkingLayer write FWorkingLayer;
   property UndoRedoManager: TSurfaceUndoRedoManager read FUndoRedoManager;
+
+  property ModeForLevelEditor: boolean read FModeForLevelEditor;
 end;
 
 
@@ -226,7 +229,7 @@ begin
   if classType = TSprite then
 begin
     surface := TSprite.Create(tex, False);
-    if ParentList.FSaveLoadForLevelEditor then
+    if ParentList.FModeForLevelEditor then
       TSprite(surface).SetSize(width, height);
 //fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
 end
@@ -333,7 +336,7 @@ begin
   surface.Opacity.Value := opacity;
   surface.Tint.Value := tint;
   surface.TintMode := tintmode;
-  if ParentList.FSaveLoadForLevelEditor then
+  if ParentList.FModeForLevelEditor then
     TSprite(surface).SetSize(width, height);
 end;
 
@@ -704,13 +707,13 @@ begin
   prop.Add('ID', id);
   {if parentID <> -1 then} prop.Add('ParentID', parentID);
 
-  if not ParentList.FSaveLoadForLevelEditor then
+  if not ParentList.FModeForLevelEditor then
   {if surface.ZOrderAsChild <> 0 then} prop.Add('ZOrder', surface.ZOrderAsChild);
 
-  if not ParentList.FSaveLoadForLevelEditor then
+  if not ParentList.FModeForLevelEditor then
     prop.Add('Name', name);
 
-  if not ParentList.FSaveLoadForLevelEditor then
+  if not ParentList.FModeForLevelEditor then
   {if classtype <> TSprite then} prop.Add('Classtype', classtype.ClassName);
 
   prop.Add('TextureName', textureName);
@@ -720,7 +723,7 @@ begin
   prop.Add('X', surface.X.Value);
   prop.Add('Y', surface.Y.Value);
 
-  if not ParentList.FSaveLoadForLevelEditor then begin
+  if not ParentList.FModeForLevelEditor then begin
     {if surface.Scale.X.Value <> 1.0 then} prop.Add('ScaleX', surface.Scale.X.Value);
     {if surface.Scale.Y.Value <> 1.0 then} prop.Add('ScaleY', surface.Scale.Y.Value);
   end else begin
@@ -765,7 +768,7 @@ begin
   prop.SingleValueOf('ScaleX', scaleX, 1.0);
   prop.SingleValueOf('ScaleY', scaleY, 1.0);
 
-  if ParentList.FSaveLoadForLevelEditor then begin
+  if ParentList.FModeForLevelEditor then begin
     prop.IntegerValueOf('Width', width, 100);
     prop.IntegerValueOf('Height', height, 100);
   end;
@@ -822,7 +825,7 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
 begin
   Result := NIL;
   if Size = 0 then exit;
-  if FSaveLoadForLevelEditor then CopySurfaceList
+  if FModeForLevelEditor then CopySurfaceList
     else begin
       if RootIsDefined then
         CheckRecursive(GetRootItem^.surface);
@@ -842,9 +845,9 @@ begin
   inherited Destroy;
 end;
 
-procedure TSurfaceList.SetSaveLoadForLevelEditor;
+procedure TSurfaceList.SetModeForLevelEditor;
 begin
-  FSaveLoadForLevelEditor := True;
+  FModeForLevelEditor := True;
 end;
 
 procedure TSurfaceList.Clear;

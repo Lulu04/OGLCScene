@@ -113,6 +113,8 @@ type
   private // textures
     FInitializingWidget: boolean;
     procedure ProcessTextureListOnModified(Sender: TObject);
+    procedure ProcessAskToDeleteTextureEvent(aTextureItem: PTextureItem; var aCanDelete: boolean);
+    procedure ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
   private // childs
     procedure ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
     function CBToClassType: classOfSimpleSurfaceWithEffect;
@@ -240,6 +242,7 @@ begin
 
   Project.SetModified;
   Project.Save;
+  Modified := False;
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
@@ -424,6 +427,26 @@ procedure TFrameToolsSpriteBuilder.ProcessTextureListOnModified(Sender: TObject)
 begin
   FModified := True;
   Textures.FillComboBox(CBTextures); // refresh the combobox in childs page
+end;
+
+procedure TFrameToolsSpriteBuilder.ProcessAskToDeleteTextureEvent(
+  aTextureItem: PTextureItem; var aCanDelete: boolean);
+begin
+  if Length(Surfaces.GetItemsThatUseThisTexture(aTextureItem)) > 0 then begin
+    aCanDelete := False;
+    ShowMessage('This texture is used by a surface, you can not delete it');
+  end;
+end;
+
+procedure TFrameToolsSpriteBuilder.ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
+var surf: ArrayOfPSurfaceDescriptor;
+  i: Integer;
+begin
+  // recreate the surfaces that use this texture (if any)
+  surf := Surfaces.GetItemsThatUseThisTexture(aTextureItem);
+  if Length(surf) <> 0 then
+    for i:=0 to High(surf) do
+      surf[i]^.RecreateSurfaceBecauseTextureChanged;
 end;
 
 procedure TFrameToolsSpriteBuilder.ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
@@ -762,8 +785,9 @@ begin
   FrameTextureList := TFrameTextureList.Create(Self);
   FrameTextureList.Parent := PageTextures;
   FrameTextureList.Align := alClient;
-  FrameTextureList.OnGetSpriteBuilderSurfaceList := @Surfaces;
   FrameTextureList.OnGetTextureList := @Textures;
+  FrameTextureList.OnAskToDeleteTexture := @ProcessAskToDeleteTextureEvent;
+  FrameTextureList.OnTextureChanged := @ProcessOnTextureChangedEvent;
   FrameTextureList.OnModified := @ProcessTextureListOnModified;
 end;
 

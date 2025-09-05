@@ -369,7 +369,7 @@ end;
 procedure TScreenLevelEditor.Initialize;
 begin
   FSurfaces := TLevelEditorSurfaceList.Create;
-  FSurfaces.SetSaveLoadForLevelEditor;
+  FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELEDITOR;
 end;
 

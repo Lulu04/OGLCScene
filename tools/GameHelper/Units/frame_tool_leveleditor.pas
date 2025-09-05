@@ -88,6 +88,8 @@ type
     FInitializingWidget: boolean;
   private // textures
     procedure ProcessTextureListOnModified(Sender: TObject);
+    procedure ProcessAskToDeleteTextureEvent(aTextureItem: PTextureItem; var aCanDelete: boolean);
+    procedure ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
     function Textures: TTextureList;
     procedure TexturenameToCB(aName: string);
     function CBToTextureName: string;
@@ -155,6 +157,7 @@ begin
 
   Project.SetModified;
   Project.Save;
+  Modified := False;
 
   DoClearAll;
   FormMain.ShowPageLevelBank;
@@ -250,6 +253,26 @@ begin
   Textures.FillComboBox(CBTextures);
 end;
 
+procedure TFrameToolLevelEditor.ProcessAskToDeleteTextureEvent(
+  aTextureItem: PTextureItem; var aCanDelete: boolean);
+begin
+  if Length(Surfaces.GetItemsThatUseThisTexture(aTextureItem)) > 0 then begin
+    aCanDelete := False;
+    ShowMessage('This texture is used by a surface, you can not delete it');
+  end;
+end;
+
+procedure TFrameToolLevelEditor.ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
+var surf: ArrayOfPSurfaceDescriptor;
+  i: Integer;
+begin
+  // recreate the surfaces that use this texture (if any)
+  surf := Surfaces.GetItemsThatUseThisTexture(aTextureItem);
+  if Length(surf) <> 0 then
+    for i:=0 to High(surf) do
+      surf[i]^.RecreateSurfaceBecauseTextureChanged;
+end;
+
 function TFrameToolLevelEditor.Textures: TTextureList;
 begin
   Result := LevelBank.Textures;
@@ -266,7 +289,7 @@ begin
     else Result := CBTextures.Items.Strings[CBTextures.ItemIndex];
 end;
 
-function TFrameToolLevelEditor.Surfaces: u_surface_list.TSurfaceList;
+function TFrameToolLevelEditor.Surfaces: TSurfaceList;
 begin
   Result := ScreenLevelEditor.Surfaces;
 end;
@@ -361,6 +384,8 @@ begin
   FrameTextureList.Parent := PageTextures;
   FrameTextureList.Align := alClient;
   FrameTextureList.OnModified := @ProcessTextureListOnModified;
+  FrameTextureList.OnAskToDeleteTexture := @ProcessAskToDeleteTextureEvent;
+  FrameTextureList.OnTextureChanged := @ProcessOnTextureChangedEvent;
   FrameTextureList.OnGetTextureList := @Textures;
 end;
 
