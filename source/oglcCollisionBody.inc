@@ -68,6 +68,10 @@ public
   procedure AddLine(const aPt1, aPt2: TPointF);
   procedure AddPoint(const aPt: TPointF);
 
+  // Remove all collision shape previously defined.
+  // Usefull, i.e., when the surface is resized: call this method then redefine the collision shapes with the new size.
+  procedure RemoveAll;
+
   // Before check for a collision, you must initialize the transform matrix
   // to convert local coordinates to world or scene coordinates.
   // You can take this matrix with function MySurface.GetMatrixSurfaceToScene or
@@ -160,6 +164,11 @@ begin
   o.BodyType := _btPoint;
   o.pt := aPt;
   FItems.PushBack(o);
+end;
+
+procedure TOGLCCollisionBody.RemoveAll;
+begin
+  FItems.Clear;
 end;
 
 procedure TOGLCCollisionBody.AddPolygon(const aPts: ArrayOfTPointF);
