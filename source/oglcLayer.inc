@@ -33,9 +33,9 @@ end;
 
 TLayer = class;
 
-{ TSurfaceList }
+{ TOGLCSurfaceList }
 
-TSurfaceList = class
+TOGLCSurfaceList = class
   Constructor Create;
   Destructor Destroy; override;
 protected
@@ -55,7 +55,7 @@ end;
 
 { TLayer }
 
-TLayer = class(TSurfaceList)
+TLayer = class(TOGLCSurfaceList)
 private
   FParentScene: TOGLCScene;
   FVisible: boolean;
@@ -186,43 +186,43 @@ end;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
 
-{ TSurfaceList }
+{ TOGLCSurfaceList }
 
-constructor TSurfaceList.Create;
+constructor TOGLCSurfaceList.Create;
 begin
   FList := TList.Create;
 end;
 
-destructor TSurfaceList.Destroy;
+destructor TOGLCSurfaceList.Destroy;
 begin
   Clear;
   FList.Free;
   inherited Destroy;
 end;
 
-function TSurfaceList.GetSurfaceCount: integer;
+function TOGLCSurfaceList.GetSurfaceCount: integer;
 begin
   Result := FList.Count;
 end;
 
-function TSurfaceList.GetSurface(aIndex: integer): TSimpleSurfaceWithEffect;
+function TOGLCSurfaceList.GetSurface(aIndex: integer): TSimpleSurfaceWithEffect;
 begin
   Result := TSimpleSurfaceWithEffect(FList.Items[aIndex]);
 end;
 
 
-function TSurfaceList.Add(aSurface: TSimpleSurfaceWithEffect): integer;
+function TOGLCSurfaceList.Add(aSurface: TSimpleSurfaceWithEffect): integer;
 begin
   Result := FList.Add(aSurface);
 end;
 
-procedure TSurfaceList.Remove(aSurface: TSimpleSurfaceWithEffect);
+procedure TOGLCSurfaceList.Remove(aSurface: TSimpleSurfaceWithEffect);
 begin
   FList.Extract(aSurface);//Remove(aSurface);
 end;
 
 
-procedure TSurfaceList.Insert(aIndex: integer;aSurface: TSimpleSurfaceWithEffect);
+procedure TOGLCSurfaceList.Insert(aIndex: integer;aSurface: TSimpleSurfaceWithEffect);
 begin
   if aIndex < 0 then aIndex := 0;
 
@@ -230,7 +230,7 @@ begin
     else FList.Add(aSurface);
 end;
 
-function TSurfaceList.Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
+function TOGLCSurfaceList.Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
 var i: integer;
 begin
   for i:=0 to FList.Count-1 do
@@ -238,12 +238,12 @@ begin
   Result := False;
 end;
 
-procedure TSurfaceList.Delete(Index:integer);
+procedure TOGLCSurfaceList.Delete(Index:integer);
 begin
   FList.Delete(Index);
 end;
 
-procedure TSurfaceList.Clear;
+procedure TOGLCSurfaceList.Clear;
 var o: TSimpleSurface;
 begin
   while FList.Count > 0 do
