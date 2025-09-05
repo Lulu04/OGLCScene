@@ -22,6 +22,7 @@ private
   HandleManager: TUIHandleManager;
   FAngleOrigin: single; // used to rotate the surface
   FScaleOrigin, FPosOrigin: TPointF;
+  FSizeOrigin: TSize;
   function GetPivot: TPointF;
   function GetSelected: boolean;
   procedure SetPivot(AWorldCoor: TPointF);
@@ -43,11 +44,14 @@ public
   opacity: single;
   tint: TBGRAPixel;
   tintMode: TTintMode;
+  width, height: integer;
   procedure InitDefault;
   procedure KillSurface;
+  procedure CreateCollisionBody;
   procedure CreateSurface(aCreateUIHandle: boolean=True);
   procedure RecreateSurfaceBecauseTextureChanged;
   procedure SetChildDependency;
+  function GetTextureFromTextureName: PTexture;
 
   procedure SaveAndRemoveChilds;
   procedure RestoreChilds;
@@ -69,6 +73,8 @@ public
     aReferencePointInWorld: TPointF; aUseIncrement: boolean);
   procedure SaveCurrentScaleValueBeforeScaling;
   procedure ComputeScale(aType: TScaleHandle; aDelta: TPointF; aKeepAspectRatio: boolean);
+  procedure SaveCurrentPosAndSizeBeforeResizing;
+  procedure AddDeltaToSpriteSize(aType: TScaleHandle; aDelta: TPoint; aKeepAspectRatio: boolean);
 
   property Selected: boolean read GetSelected write SetSelected;
   property Pivot: TPointF read GetPivot write SetPivot;
@@ -94,9 +100,13 @@ private
 private
   FUndoRedoManager: TSurfaceUndoRedoManager;
   FWorkingLayer: integer;
+private
+  FSaveLoadForLevelEditor: boolean;
 public
   constructor Create;
   destructor Destroy; override;
+  procedure SetSaveLoadForLevelEditor;
+
   procedure Clear; reintroduce;
   function AddEmpty: PSurfaceDescriptor;
 
@@ -125,8 +135,8 @@ public
 
   function SaveToString: string;
   procedure LoadFromString(const s: string);
-  procedure SaveTo(t:TStringList);
-  procedure LoadFrom(t:TStringList);
+{  procedure SaveTo(t:TStringList);
+  procedure LoadFrom(t:TStringList);  }
 
   // items are the ID of each TSurfaceDescriptor
   procedure FillComboBox(aCB: TComboBox);
@@ -183,6 +193,10 @@ begin
   id := -1;
   parentID := -1;
   textureName := '';
+  tint := BGRA(0,0,0,0);
+  tintmode := tmReplaceColor;
+  opacity := 255;
+
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
 end;
@@ -194,17 +208,27 @@ begin
   HandleManager.KillSurfaces;
 end;
 
+procedure TSurfaceDescriptor.CreateCollisionBody;
+begin
+  surface.CollisionBody.RemoveAll;
+  surface.CollisionBody.AddPolygon([PointF(0,0), PointF(surface.Width, 0),
+                                    PointF(surface.Width, surface.Height), PointF(0, surface.Height)]);
+end;
+
 procedure TSurfaceDescriptor.CreateSurface(aCreateUIHandle: boolean=True);
-var texItem: PTextureItem;
+var //texItem: PTextureItem;
   tex: PTexture;
 begin
-  texItem := ParentList.Textures.GetItemByName(textureName);
-  if texItem <> NIL then tex := texItem^.texture else tex := NIL;
+{  texItem := ParentList.Textures.GetItemByName(textureName);
+  if texItem <> NIL then tex := texItem^.texture else tex := NIL;  }
+  tex := GetTextureFromTextureName;
 
   if classType = TSprite then
 begin
     surface := TSprite.Create(tex, False);
-fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
+    if ParentList.FSaveLoadForLevelEditor then
+      TSprite(surface).SetSize(width, height);
+//fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
 end
   else
   if classType = TSpriteWithElasticCorner then
@@ -240,8 +264,7 @@ fscene.LogDebug('created sprite_container');
   else raise exception.create('forgot to implement!');
 
   // collision for selection
-  surface.CollisionBody.AddPolygon([PointF(0,0), PointF(surface.Width, 0),
-                                    PointF(surface.Width, surface.Height), PointF(0, surface.Height)]);
+  CreateCollisionBody;
 
   if aCreateUIHandle then
     UIHandle.CreateUIHandles(@HandleManager);
@@ -266,6 +289,14 @@ begin
         then raise exception.create('parent with ID='+parentID.ToString+' not found !')
         else surface.SetChildOf(parentItem^.surface, zOrder);
   end;
+end;
+
+function TSurfaceDescriptor.GetTextureFromTextureName: PTexture;
+var texItem: PTextureItem;
+  tex: PTexture;
+begin
+  texItem := ParentList.Textures.GetItemByName(textureName);
+  if texItem <> NIL then Result := texItem^.texture else Result := NIL;
 end;
 
 procedure TSurfaceDescriptor.SaveAndRemoveChilds;
@@ -302,6 +333,8 @@ begin
   surface.Opacity.Value := opacity;
   surface.Tint.Value := tint;
   surface.TintMode := tintmode;
+  if ParentList.FSaveLoadForLevelEditor then
+    TSprite(surface).SetSize(width, height);
 end;
 
 procedure TSurfaceDescriptor.DuplicateValuesToTemporaryVariables;
@@ -319,6 +352,8 @@ begin
   opacity := surface.Opacity.Value;
   tint := surface.Tint.Value;
   tintmode := surface.TintMode;
+  width := surface.Width;
+  height := surface.Height;
 end;
 
 function TSurfaceDescriptor.IsRoot: boolean;
@@ -376,73 +411,82 @@ procedure TSurfaceDescriptor.ComputeScale(aType: TScaleHandle; aDelta: TPointF;
   aKeepAspectRatio: boolean);
 const MIN_SCALE = 0.1;
 var zx, zy, deltaW, deltaH: single;
-  signDeltaX, signDeltaY: TValueSign;
+  procedure CheckZXNoKeepAspect;
+  begin
+    if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
+  end;
+  procedure CheckZYNoKeepAspect;
+  begin
+    if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
+  end;
+  procedure AdjustZXKeepAspect;
+  begin
+    zy := zx;
+    if (FScaleOrigin.x + zx < MIN_SCALE) or (FScaleOrigin.y + zy < MIN_SCALE) then
+      zx := Max(MIN_SCALE - FScaleOrigin.x, MIN_SCALE - FScaleOrigin.y);
+    zy := zx;
+  end;
+  procedure AdjustZYKeepAspect;
+  begin
+    zx := zy;
+    if (FScaleOrigin.x + zx < MIN_SCALE) or (FScaleOrigin.y + zy < MIN_SCALE) then
+      zy := Max(MIN_SCALE - FScaleOrigin.x, MIN_SCALE - FScaleOrigin.y);
+    zx := zy;
+  end;
 begin
   zx := 0;
   zy := 0;
-
   case aType of
     shTopLeft: begin   // ok
-      zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
-      zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
+      zx := -aDelta.x / surface.Width;
+      zy := -aDelta.y / surface.Height;
       if aKeepAspectRatio then begin
-        if zx < zy then zy := zx else zx := zy;
+        if zx < zy then AdjustZXKeepAspect
+          else AdjustZYKeepAspect;
+      end else begin
+        CheckZXNoKeepAspect;
+        CheckZYNoKeepAspect;
       end;
       deltaH := zy * surface.Height * 0.5;
       deltaW := zx * surface.Width * 0.5;
-      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
-      surface.X.Value := FPosOrigin.x + deltaW;
-      surface.Y.Value := FPosOrigin.y + deltaH;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x - deltaW;
+      surface.Y.Value := FPosOrigin.y - deltaH;
     end;
 
     shTopCenter: begin  // ok
-      zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
-      if aKeepAspectRatio then zx := zy;
+      zx := 0;
+      zy := -aDelta.y / surface.Height;
+      if aKeepAspectRatio then AdjustZYKeepAspect
+          else CheckZYNoKeepAspect;
       deltaH := zy * surface.Height * 0.5;
-      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
-      surface.Y.Value := FPosOrigin.y + deltaH;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.Y.Value := FPosOrigin.y - deltaH;
     end;
 
-    shTopRight: begin  // aKeepAspectRatio problem
-   {   if aKeepAspectRatio then begin
-        if (aDelta.x) < (aDelta.y) then aDelta.y := -Abs(aDelta.x) else aDelta.x := (aDelta.y);
-      end; }
-//FrameToolsSpriteBuilder.Label19.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
-
-      if aKeepAspectRatio then begin
-        if Abs(aDelta.x) < Abs(aDelta.y) then begin
-          if aDelta.y < 0 then aDelta.y := -Abs(aDelta.x)
-            else aDelta.y := -Abs(aDelta.x);
-        end else begin
-          if aDelta.x < 0 then  aDelta.x := Abs(aDelta.y)
-            else aDelta.x := Abs(aDelta.y);
-        end;
-      end;
-
-//FrameToolsSpriteBuilder.Label22.Caption:='aDelta = '+FormatFloat('0.00', aDelta.x)+' , '+FormatFloat('0.00', aDelta.y);
-
+    shTopRight: begin  // ok
       zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
-      zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y - zy < MIN_SCALE then zy := FScaleOrigin.y - MIN_SCALE;
-      {if aKeepAspectRatio then begin
-        if (zx) < (zy) then zy := (zx) else zx := -(zy);
-      end;    }
+      zy := -aDelta.y / surface.Height;
+      if aKeepAspectRatio then begin
+        if zx > zy then AdjustZXKeepAspect
+          else AdjustZYKeepAspect;
+      end else begin
+        CheckZXNoKeepAspect;
+        CheckZYNoKeepAspect;
+      end;
       deltaH := zy * surface.Height * 0.5;
       deltaW := zx * surface.Width * 0.5;
       surface.Scale.x.Value := FScaleOrigin.x + zx;
-      surface.Scale.y.Value := FScaleOrigin.y - zy;
+      surface.Scale.y.Value := FScaleOrigin.y + zy;
       surface.X.Value := FPosOrigin.x + deltaW;
-      surface.Y.Value := FPosOrigin.y + deltaH;
+      surface.Y.Value := FPosOrigin.y - deltaH;
     end;
 
     shCenterRight: begin  // ok
       zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
-      if aKeepAspectRatio then zy := zx;
+      zy := 0;
+      if aKeepAspectRatio then AdjustZXKeepAspect
+        else CheckZXNoKeepAspect;
       deltaW := zx * surface.Width * 0.5;
       surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
       surface.X.Value := FPosOrigin.x + deltaW;
@@ -450,11 +494,13 @@ begin
 
     shBottomRight: begin  // ok
       zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x + zx < MIN_SCALE then zx := MIN_SCALE - FScaleOrigin.x;
       zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
       if aKeepAspectRatio then begin
-        if zx < zy then zy := zx else zx := zy;
+        if zx < zy then AdjustZXKeepAspect
+          else AdjustZYKeepAspect;
+      end else begin
+        CheckZXNoKeepAspect;
+        CheckZYNoKeepAspect;
       end;
       deltaH := zy * surface.Height * 0.5;
       deltaW := zx * surface.Width * 0.5;
@@ -464,41 +510,172 @@ begin
     end;
 
     shBottomCenter: begin // ok
+      zx := 0;
       zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
-      if aKeepAspectRatio then zx := zy;
+      if aKeepAspectRatio then AdjustZYKeepAspect
+        else CheckZYNoKeepAspect;
       deltaH := zy * surface.Height * 0.5;
       surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
       surface.Y.Value := FPosOrigin.y + deltaH;
     end;
 
-    shBottomLeft: begin  // aKeepAspectRatio problem
-      zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
-      zy := aDelta.y / surface.Height;
-      if FScaleOrigin.y + zy < MIN_SCALE then zy := MIN_SCALE - FScaleOrigin.y;
-      if aKeepAspectRatio then begin
-        if zx < zy then zy := -zx else zx := -zy;
-      end;
-      deltaH := zy * surface.Height * 0.5;
-      deltaW := zx * surface.Width * 0.5;
-
-      surface.Scale.x.Value := FScaleOrigin.x - zx;
-      surface.Scale.y.Value := FScaleOrigin.y + zy;
-      surface.X.Value := FPosOrigin.x + deltaW;
-      surface.Y.Value := FPosOrigin.y + deltaH;
+    shBottomLeft: begin  // ok
+       zx := -aDelta.x / surface.Width;
+       zy := aDelta.y / surface.Height;
+       if aKeepAspectRatio then begin
+         if zx < zy then AdjustZXKeepAspect
+           else AdjustZYKeepAspect;
+       end else begin
+         CheckZXNoKeepAspect;
+         CheckZYNoKeepAspect;
+       end;
+       surface.Scale.x.Value := FScaleOrigin.x + zx;
+       surface.Scale.y.Value := FScaleOrigin.y + zy;
+       deltaW := zx * surface.Width * 0.5;
+       deltaH := zy * surface.Height * 0.5;
+       surface.X.Value := FPosOrigin.x - deltaW;
+       surface.Y.Value := FPosOrigin.y + deltaH;
     end;
 
     shCenterLeft: begin  // ok
-      zx := aDelta.x / surface.Width;
-      if FScaleOrigin.x - zx < MIN_SCALE then zx := FScaleOrigin.x - MIN_SCALE;
-      if aKeepAspectRatio then zy := zx;
+      zx := -aDelta.x / surface.Width;
+      zy := 0;
+      if aKeepAspectRatio then AdjustZXKeepAspect
+        else CheckZXNoKeepAspect;
       deltaW := zx * surface.Width * 0.5;
-      surface.Scale.Value := FScaleOrigin - PointF(zx, zy);
-      surface.X.Value := FPosOrigin.x + deltaW;
+      surface.Scale.Value := FScaleOrigin + PointF(zx, zy);
+      surface.X.Value := FPosOrigin.x - deltaW;
     end;
   end;
 end;
+
+procedure TSurfaceDescriptor.SaveCurrentPosAndSizeBeforeResizing;
+begin
+  FSizeOrigin.cx :=  surface.Width;
+  FSizeOrigin.cy :=  surface.Height;
+  FPosOrigin := surface.GetXY;
+end;
+
+procedure TSurfaceDescriptor.AddDeltaToSpriteSize(aType: TScaleHandle;
+  aDelta: TPoint; aKeepAspectRatio: boolean);
+const MIN_VALUE = 1;
+var dw, dh, newW, newH: integer;
+  procedure CheckDWNoKeepAspect;
+  begin
+    if FSizeOrigin.cx + dw < MIN_VALUE then dw := MIN_VALUE - FSizeOrigin.cx;
+  end;
+  procedure CheckDHNoKeepAspect;
+  begin
+    if FSizeOrigin.cy + dh < MIN_VALUE then dh := MIN_VALUE - FSizeOrigin.cy;
+  end;
+  procedure AdjustDWKeepAspect;
+  begin
+    dh := dw;
+    if (FSizeOrigin.cx + dw < MIN_VALUE) or (FSizeOrigin.cy + dh < MIN_VALUE) then
+      dw := Max(MIN_VALUE - FSizeOrigin.cx, MIN_VALUE - FSizeOrigin.cy);
+    dh := dw;
+  end;
+  procedure AdjustDHKeepAspect;
+  begin
+    dw := dh;
+    if (FSizeOrigin.cx + dw < MIN_VALUE) or (FSizeOrigin.cy + dh < MIN_VALUE) then
+      dh := Max(MIN_VALUE - FSizeOrigin.cx, MIN_VALUE - FSizeOrigin.cy);
+    dw := dh;
+  end;
+
+begin
+  dw := aDelta.x;
+  dh := aDelta.y;
+  case aType of
+      shTopLeft: begin  // ok
+        dw := -aDelta.x;
+        dh := -aDelta.y;
+        if aKeepAspectRatio then begin
+          if dw < dh then AdjustDWKeepAspect
+            else AdjustDHKeepAspect;
+        end else begin
+          CheckDWNoKeepAspect;
+          CheckDHNoKeepAspect;
+        end;
+        surface.X.Value := FPosOrigin.x - dw;
+        surface.Y.Value := FPosOrigin.y - dh;
+      end;
+
+      shTopCenter: begin // ok
+        dw := 0;
+        dh := -aDelta.y;
+        if aKeepAspectRatio then AdjustDHKeepAspect
+          else CheckDHNoKeepAspect;
+        surface.Y.Value := FPosOrigin.y - dh;
+      end;
+
+      shTopRight: begin  // ok
+        dw := aDelta.x;
+        dh := -aDelta.y;
+        if aKeepAspectRatio then begin
+          if dw > dh then AdjustDWKeepAspect
+            else AdjustDHKeepAspect;
+        end else begin
+          CheckDWNoKeepAspect;
+          CheckDHNoKeepAspect;
+        end;
+        surface.Y.Value := FPosOrigin.y - dh;
+      end;
+
+      shCenterLeft: begin // ok
+        dw := -aDelta.x;
+        dh := 0;
+        if aKeepAspectRatio then AdjustDWKeepAspect
+          else CheckDWNoKeepAspect;
+        surface.X.Value := FPosOrigin.x - dw;
+      end;
+
+      shCenterRight: begin // ok
+        dw := aDelta.x;
+        dh := 0;
+        if aKeepAspectRatio then AdjustDWKeepAspect
+          else CheckDWNoKeepAspect;
+      end;
+
+      shBottomLeft: begin  // ok
+        dw := -aDelta.x;
+        dh := aDelta.y;
+        if aKeepAspectRatio then begin
+          if dw < dh then AdjustDWKeepAspect
+            else AdjustDHKeepAspect;
+        end else begin
+          CheckDWNoKeepAspect;
+          CheckDHNoKeepAspect;
+        end;
+        surface.X.Value := FPosOrigin.x - dw;
+      end;
+
+      shBottomCenter: begin  // ok
+        dw := 0;
+        dh := aDelta.y;
+        if aKeepAspectRatio then AdjustDHKeepAspect
+          else CheckDHNoKeepAspect;
+      end;
+
+      shBottomRight: begin // ok
+        dw := aDelta.x;
+        dh := aDelta.y;
+        if aKeepAspectRatio then begin
+          if dw < dh then AdjustDWKeepAspect
+            else AdjustDHKeepAspect;
+        end else begin
+          CheckDWNoKeepAspect;
+          CheckDHNoKeepAspect;
+        end;
+      end;
+  end;//case
+
+  newW := FSizeOrigin.cx + dw;
+  newH := FSizeOrigin.cy + dh;
+  TSprite(surface).SetSize(newW, newH);
+  CreateCollisionBody;
+end;
+
 
 procedure TSurfaceDescriptor.AddOffsetToPivot(aOffset: TPointF);
 var ppivot: TPointF;
@@ -525,23 +702,37 @@ var prop: TProperties;
 begin
   prop.Init('~');
   prop.Add('ID', id);
-  prop.Add('ParentID', parentID);
-  prop.Add('ZOrder', surface.ZOrderAsChild);
-  prop.Add('Name', name);
-  prop.Add('Classtype', classtype.ClassName);
+  {if parentID <> -1 then} prop.Add('ParentID', parentID);
+
+  if not ParentList.FSaveLoadForLevelEditor then
+  {if surface.ZOrderAsChild <> 0 then} prop.Add('ZOrder', surface.ZOrderAsChild);
+
+  if not ParentList.FSaveLoadForLevelEditor then
+    prop.Add('Name', name);
+
+  if not ParentList.FSaveLoadForLevelEditor then
+  {if classtype <> TSprite then} prop.Add('Classtype', classtype.ClassName);
+
   prop.Add('TextureName', textureName);
-  prop.Add('PivotX', surface.Pivot.x);
-  prop.Add('PivotY', surface.Pivot.y);
-  prop.Add('Angle', surface.Angle.Value);
+  {if surface.Pivot.x <> 0.5 then} prop.Add('PivotX', surface.Pivot.x);
+  {if surface.Pivot.y <> 0.5 then} prop.Add('PivotY', surface.Pivot.y);
+  {if surface.Angle.Value <> 0 then} prop.Add('Angle', surface.Angle.Value);
   prop.Add('X', surface.X.Value);
   prop.Add('Y', surface.Y.Value);
-  prop.Add('ScaleX', surface.Scale.X.Value);
-  prop.Add('ScaleY', surface.Scale.Y.Value);
-  prop.Add('FlipH', surface.FlipH);
-  prop.Add('FlipV', surface.FlipV);
-  prop.Add('Opacity', surface.Opacity.Value);
-  prop.Add('Tint', surface.Tint.Value);
-  prop.Add('TintMode', Ord(surface.TintMode));
+
+  if not ParentList.FSaveLoadForLevelEditor then begin
+    {if surface.Scale.X.Value <> 1.0 then} prop.Add('ScaleX', surface.Scale.X.Value);
+    {if surface.Scale.Y.Value <> 1.0 then} prop.Add('ScaleY', surface.Scale.Y.Value);
+  end else begin
+    prop.Add('Width', surface.Width);
+    prop.Add('Height', surface.Height);
+  end;
+
+  {if surface.FlipH then} prop.Add('FlipH', surface.FlipH);
+  {if surface.FlipV then} prop.Add('FlipV', surface.FlipV);
+  {if surface.Opacity.Value <> 255 then} prop.Add('Opacity', surface.Opacity.Value);
+  {if surface.Tint.Value <> BGRA(0,0,0,0) then} prop.Add('Tint', surface.Tint.Value);
+  {if surface.TintMode <> tmReplaceColor then} prop.Add('TintMode', Ord(surface.TintMode));
   Result := prop.PackedProperty;
 end;
 
@@ -554,10 +745,10 @@ begin
   InitDefault;
   prop.Split(s, '~');
   prop.IntegerValueOf('ID', id, id);
-  prop.IntegerValueOf('ParentID', parentID, parentID);
-  prop.IntegerValueOf('ZOrder', zOrder, zOrder);
+  prop.IntegerValueOf('ParentID', parentID, -1);
+  prop.IntegerValueOf('ZOrder', zOrder, 0);
   prop.StringValueOf('Name', name, 'noname');
-  prop.StringValueOf('Classtype', s1, 'TSimpleSurfaceWithEffect');
+  prop.StringValueOf('Classtype', s1, 'TSprite');
   case s1 of
     'TSprite': classtype := TSprite;
     'TDeformationGrid': classtype := TDeformationGrid;
@@ -571,8 +762,14 @@ begin
   prop.SingleValueOf('Angle', angle, 0.0);
   prop.SingleValueOf('X', x, 0.0);
   prop.SingleValueOf('Y', y, 0.0);
-  prop.SingleValueOf('ScaleX', scaleX, 0.0);
-  prop.SingleValueOf('ScaleY', scaleY, 0.0);
+  prop.SingleValueOf('ScaleX', scaleX, 1.0);
+  prop.SingleValueOf('ScaleY', scaleY, 1.0);
+
+  if ParentList.FSaveLoadForLevelEditor then begin
+    prop.IntegerValueOf('Width', width, 100);
+    prop.IntegerValueOf('Height', height, 100);
+  end;
+
   prop.BooleanValueOf('FlipH', flipH, False);
   prop.BooleanValueOf('FlipV', flipV, False);
   prop.SingleValueOf('Opacity', opacity, 255);
@@ -614,11 +811,22 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
     if not parentIsRegistered then
       AddToResult(GetItemBySurface(aSurface));
   end;
+  procedure CopySurfaceList;
+  var i: SizeUInt;
+  begin
+    SetLength(Result, Size);
+    for i:=0 to Size-1 do
+      Result[i] := Mutable[i];
+  end;
+
 begin
   Result := NIL;
   if Size = 0 then exit;
-  if RootIsDefined then
-    CheckRecursive(GetRootItem^.surface);
+  if FSaveLoadForLevelEditor then CopySurfaceList
+    else begin
+      if RootIsDefined then
+        CheckRecursive(GetRootItem^.surface);
+    end;
 end;
 
 constructor TSurfaceList.Create;
@@ -632,6 +840,11 @@ begin
   FUndoRedoManager.Free;
   FUndoRedoManager := NIL;
   inherited Destroy;
+end;
+
+procedure TSurfaceList.SetSaveLoadForLevelEditor;
+begin
+  FSaveLoadForLevelEditor := True;
 end;
 
 procedure TSurfaceList.Clear;
@@ -855,7 +1068,7 @@ begin
       SetChildDependency;
 end;
 
-const SPRITE_BUILDER_SURFACES_SECTION = '[SPRITE_BUILDER_SURFACES]';
+{const SPRITE_BUILDER_SURFACES_SECTION = '[SPRITE_BUILDER_SURFACES]';
 procedure TSurfaceList.SaveTo(t: TStringList);
 begin
   t.Add(SPRITE_BUILDER_SURFACES_SECTION);
@@ -869,7 +1082,7 @@ begin
   k := t.IndexOf(SPRITE_BUILDER_SURFACES_SECTION);
   if (k = -1) or (k = t.Count-1) then exit;
   LoadFromString(t.Strings[k+1]);
-end;
+end;  }
 
 procedure TSurfaceList.FillComboBox(aCB: TComboBox);
 var i: SizeUInt;

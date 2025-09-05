@@ -96,7 +96,7 @@ var
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
-  u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas, u_datamodule,
+  u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas,
   u_screen_levelbank, u_screen_leveleditor, u_levelbank, BGRABitmap,
   BGRABitmapTypes;
 {$R *.lfm}

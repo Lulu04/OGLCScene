@@ -184,6 +184,7 @@ begin
   if c = 0 then exit;
   for i:=0 to c-1 do begin
     inc(k);
+    o.InitDefault;
     o.name := t.Strings[k];
     inc(k);
     o.surfaces := t.Strings[k];

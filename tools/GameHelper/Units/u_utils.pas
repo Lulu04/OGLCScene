@@ -36,7 +36,7 @@ end;
 
 function PPIScale(AValue: single): single;
 begin
-
+  Result := FScene.ScaleDesignToSceneF(AValue);
 end;
 
 function PPIScaleF(AValue: single): single;

@@ -22,6 +22,7 @@ type
     CBFlipV: TCheckBox;
     CBTextures: TComboBox;
     ColorButton1: TColorButton;
+    CBAlignReference: TComboBox;
     Edit1: TEdit;
     Label1: TLabel;
     Label11: TLabel;
@@ -39,6 +40,8 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
@@ -58,9 +61,28 @@ type
     SE8: TSpinEdit;
     SE9: TSpinEdit;
     SE3: TSpinEdit;
+    BDebug: TSpeedButton;
+    BResetSize: TSpeedButton;
+    SpeedButton1: TSpeedButton;
+    SpeedButton10: TSpeedButton;
+    SpeedButton11: TSpeedButton;
+    SpeedButton12: TSpeedButton;
+    SpeedButton13: TSpeedButton;
+    SpeedButton14: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
+    SpeedButton8: TSpeedButton;
+    SpeedButton9: TSpeedButton;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
+    procedure BDebugClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
+    procedure CBTexturesSelect(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private
     FModified: boolean;
     FInitializingWidget: boolean;
@@ -86,6 +108,7 @@ type
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 
     procedure EditLevelInLevelBank(const aName: string);
+    property Modified: boolean read FModified write FModified;
   end;
 
 implementation
@@ -104,6 +127,11 @@ begin
                    [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageLevelBank;
+end;
+
+procedure TFrameToolLevelEditor.BDebugClick(Sender: TObject);
+begin
+  Label6.Caption := 'surface count: '+Surfaces.Size.ToString;
 end;
 
 procedure TFrameToolLevelEditor.BAddToLevelBankClick(Sender: TObject);
@@ -126,6 +154,7 @@ begin
   o^.surfaces := Surfaces.SaveToString;
 
   Project.SetModified;
+  Project.Save;
 
   DoClearAll;
   FormMain.ShowPageLevelBank;
@@ -135,7 +164,83 @@ procedure TFrameToolLevelEditor.BNewSurfaceClick(Sender: TObject);
 begin
   if Sender = BNewSurface then begin
     if DoAddNewSurface then
-      ShowSelectionData(NIL);
+      ShowSelectionData(ScreenLevelEditor.Selected);
+  end;
+end;
+
+procedure TFrameToolLevelEditor.CBTexturesSelect(Sender: TObject);
+var
+  pTexItem: PTextureItem;
+begin
+  if FInitializingWidget then exit;
+
+  if Sender = CBTextures then begin
+    pTexItem := Textures.GetItemByName(CBToTextureName);
+    if pTexItem <> NIL then begin
+      SE3.Value := pTexItem^.texture^.FrameWidth;
+      SE4.Value := pTexItem^.texture^.FrameHeight;
+    end;
+  end;
+
+  if ScreenLevelEditor.SelectedCount = 0 then exit;
+
+  if (Sender = SE1) or (Sender = SE2) then
+    ScreenLevelEditor.SetPositionOnSelection(SE1.Value, SE2.Value);
+
+  if (Sender = SE3) or (Sender = SE4) then
+    ScreenLevelEditor.SetSizeOnSelection(SE3.Value, SE4.Value);
+
+  if Sender = BResetSize then
+    ScreenLevelEditor.SetOriginalSizeOnSelection;
+
+  if (Sender = SE5) or (Sender = SE6) then
+    ScreenLevelEditor.SetPivotValuesOnSelection(SE5.Value, SE6.Value);
+
+  if Sender = SE7 then
+    ScreenLevelEditor.SetAngleOnSelection(SE7.Value);
+
+  if Sender = SE8 then
+    ScreenLevelEditor.SetOpacityOnSelection(SE8.Value);
+
+  if Sender = CBFlipH then
+    ScreenLevelEditor.SetFlipHOnSelection(CBFlipH.Checked);
+
+  if Sender = CBFlipV then
+    ScreenLevelEditor.SetFlipVOnSelection(CBFlipV.Checked);
+
+  if (Sender = ColorButton1) or (Sender = SE9) then
+    ScreenLevelEditor.SetTintOnSelection(ColorToBGRA(ColorButton1.ButtonColor, SE9.Value));
+
+  if (Sender = RadioButton1) or (Sender = RadioButton2) then
+    if RadioButton1.Checked then ScreenLevelEditor.SetTintModeOnSelection(tmReplaceColor)
+      else ScreenLevelEditor.SetTintModeOnSelection(tmMixColor);
+end;
+
+procedure TFrameToolLevelEditor.SpeedButton1Click(Sender: TObject);
+begin
+  if CBAlignReference.ItemIndex = -1 then exit;
+
+  // align to the first selected
+  if CBAlignReference.ItemIndex = 0 then begin
+    if ScreenLevelEditor.SelectedCount < 2 then exit;
+    with ScreenLevelEditor do
+      case TSpeedButton(Sender).ImageIndex of
+        0: AlignSelectedRightTo(GetFirstSelectedX);
+        1: AlignSelectedRightTo(GetFirstSelectedCenterX);
+        2: AlignSelectedLeftTo(GetFirstSelectedX);
+        3: AlignSelectedHCenterTo(GetFirstSelectedCenterX);
+        4: AlignSelectedRightTo(GetFirstSelectedRightX);
+        5: AlignSelectedLeftTo(GetFirstSelectedCenterX);
+        6: AlignSelectedLeftTo(GetFirstSelectedRightX);
+
+        7: AlignSelectedBottomTo(GetFirstSelectedY);
+        8: AlignSelectedBottomTo(GetFirstSelectedCenterY);
+        9: AlignSelectedTopTo(GetFirstSelectedY);
+        10: AlignSelectedVCenterTo(GetFirstSelectedCenterY);
+        11: AlignSelectedBottomTo(GetFirstSelectedBottomY);
+        12: AlignSelectedTopTo(GetFirstSelectedCenterY);
+        13: AlignSelectedTopTo(GetFirstSelectedBottomY);
+      end;
   end;
 end;
 
@@ -193,8 +298,9 @@ begin
 
   FWorkingChild := Surfaces.AddEmpty;
   DoUpdateSurface(False);
+  ScreenLevelEditor.AddToSelected([FWorkingChild]);
 
-  FWorkingChild := NIL;
+  //FWorkingChild := NIL;
   FModified := True;
   Result := True;
 end;
@@ -212,7 +318,15 @@ begin
     FWorkingChild^.KillSurface;
     FWorkingChild^.classtype := TSprite;
     FWorkingChild^.textureName := CBToTextureName;
+
+//tex := FWorkingChild^.GetTextureFromTextureName;
+FWorkingChild^.width := SE3.Value;
+FWorkingChild^.height := SE4.Value;
+FWorkingChild^.parentID := -1;
+FWorkingChild^.name := '';
+
     FWorkingChild^.CreateSurface;
+FWorkingChild^.SetChildDependency;
     FModified := True;
   end;
 
@@ -321,7 +435,7 @@ begin
     SE5.Value := 0.5;
     SE6.Value := 0.5;
     SE7.Value := 0.0;
-    SE8.Value := 0;
+    SE8.Value := 255;
     CBFlipH.Checked := False;
     CBFlipV.Checked := False;
     ColorButton1.ButtonColor := clBlack;
