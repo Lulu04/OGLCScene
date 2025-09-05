@@ -33,6 +33,8 @@ public
   // Allow to resize or stretch the sprite by specifying the corner position in local space.
   procedure SetShape(aTopLeft, aTopRight, aBottomRight, aBottomLeft: TPointF); overload;
   procedure SetShape(const aQuad: TQuadCoor); overload;
+  // Set the size of the sprite with the default texture size.
+  procedure SetSizeSameAsTexture;
   property Texture: PTexture read FTexture write SetTexture;
 end;
 TArrayOfSprite = array of TSprite;
@@ -353,15 +355,7 @@ begin
   inherited Create;
   FTextureOwner := Owner;
   FTexture := ATexture;
-  if FTexture <> NIL then begin
-    FWidth := FTexture^.FrameWidth;
-    FHeight := FTexture^.FrameHeight;
-    FModelArea.SetAsRectangle(FWidth, FHeight);
-  end else begin
-    FModelArea.SetAsEmpty;
-    FWidth := 1;
-    FHeight := 1;
-  end;
+  SetSizeSameAsTexture;
   Init;
 end;
 
@@ -409,6 +403,19 @@ end;
 procedure TSprite.SetShape(const aQuad: TQuadCoor);
 begin
   SetShape(aQuad[cTL], aQuad[cTR], aQuad[cBR], aQuad[cBL]);
+end;
+
+procedure TSprite.SetSizeSameAsTexture;
+begin
+  if FTexture <> NIL then begin
+    FWidth := FTexture^.FrameWidth;
+    FHeight := FTexture^.FrameHeight;
+    FModelArea.SetAsRectangle(FWidth, FHeight);
+  end else begin
+    FModelArea.SetAsEmpty;
+    FWidth := 1;
+    FHeight := 1;
+  end;
 end;
 
 { TSpriteWithElasticCorner }
