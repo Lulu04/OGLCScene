@@ -580,7 +580,7 @@ var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
 
-  for i:=0 to High(FSelected) do
+  for i:=High(FSelected) downto 0 do
     Surfaces.DeleteItemByID(FSelected[i]^.id);
   FSelected := NIL;
 end;

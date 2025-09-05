@@ -145,6 +145,18 @@ end;
 
 procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
+  if (Notebook1.PageIndex = Notebook1.IndexOf(PageSpriteBuilder)) and
+     FrameToolsSpriteBuilder.Modified then begin
+    CanClose := False;
+    exit;
+  end;
+
+  if (Notebook1.PageIndex = Notebook1.IndexOf(PageLevelEditor)) and
+     FrameToolLevelEditor.Modified then begin
+    CanClose := False;
+    exit;
+  end;
+
   CanClose := Project.DoUserPromptToSaveProject;
 end;
 

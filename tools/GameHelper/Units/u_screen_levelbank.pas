@@ -64,7 +64,7 @@ end;
 procedure TScreenLevelBank.CreateObjects;
 begin
   FSurfaces := TLevelBankSurfaceList.Create;
-  FSurfaces.SetSaveLoadForLevelEditor;
+  FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELBANK;
   ShowLayers([LAYER_UI, LAYER_LEVELBANK]);
   // camera

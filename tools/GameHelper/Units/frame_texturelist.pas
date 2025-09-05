@@ -10,7 +10,8 @@ uses
 
 type
 
-TEventOnGetSpriteBuilderSurfaceList = function(): TSpriteBuilderSurfaceList of object;
+TEventOnAskToDeleteTexture = procedure(aTextureItem: PTextureItem; var aCanDelete: boolean) of object;
+TEventOnTextureChanged = procedure(aTextureItem: PTextureItem) of object;
 TEventOnGetTextureList = function (): TTextureList of object;
 
   { TFrameTextureList }
@@ -45,12 +46,12 @@ TEventOnGetTextureList = function (): TTextureList of object;
       Shift: TShiftState; X, Y: Integer);
     procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
   private
-    FOnGetSpriteBuilderSurfaceList: TEventOnGetSpriteBuilderSurfaceList;
+    FOnAskToDeleteTexture: TEventOnAskToDeleteTexture;
     FOnGetTextureList: TEventOnGetTextureList;
     FInitializingWidget: boolean;
     FOnModified: TNotifyEvent;
+    FOnTextureChanged: TEventOnTextureChanged;
     function Textures: TTextureList;
-    function SpriteBuilderSurfaces: TSurfaceList;
 
     function LBToTextureName: string;
     function CheckTextureWidgets: boolean;
@@ -63,8 +64,9 @@ TEventOnGetTextureList = function (): TTextureList of object;
     procedure FillListBox;
 
     property OnGetTextureList: TEventOnGetTextureList read FOnGetTextureList write FOnGetTextureList;
-    property OnGetSpriteBuilderSurfaceList: TEventOnGetSpriteBuilderSurfaceList read FOnGetSpriteBuilderSurfaceList write FOnGetSpriteBuilderSurfaceList;
 
+    property OnAskToDeleteTexture: TEventOnAskToDeleteTexture read FOnAskToDeleteTexture write FOnAskToDeleteTexture;
+    property OnTextureChanged: TEventOnTextureChanged read FOnTextureChanged write FOnTextureChanged;
     property OnModified: TNotifyEvent read FOnModified write FOnModified;
   end;
 
@@ -158,12 +160,6 @@ end;
 function TFrameTextureList.Textures: TTextureList;
 begin
   Result := FOnGetTextureList();
-end;
-
-function TFrameTextureList.SpriteBuilderSurfaces: TSurfaceList;
-begin
-  if FOnGetSpriteBuilderSurfaceList = NIL then Result := NIL
-    else Result := FOnGetSpriteBuilderSurfaceList();
 end;
 
 procedure TFrameTextureList.UpdateTextureWidgetState;
@@ -265,15 +261,19 @@ end;
 
 procedure TFrameTextureList.DoDeleteTexture;
 var textureName: string;
+  textureItem: PTextureItem;
+  canDelete: boolean;
 begin
   textureName := LBToTextureName;
   if textureName = '' then exit;
+  textureItem := Textures.GetItemByName(textureName);
+  if textureItem = NIL then exit;
 
-  // check if the texture is used by a surface
-  if SpriteBuilderSurfaces.TextureNameisUsedByASurface(textureName) then begin
-    ShowMessage('This texture is used by a surface, you can not delete it');
-    exit;
-  end;
+  // check if we can delete the texture
+  canDelete := True;
+  FOnAskToDeleteTexture(textureItem, canDelete);
+  if not canDelete then exit;
+
   Textures.UndoRedoManager.AddActionDeleteTexture(textureName);
   Textures.DeleteByName(textureName);
   LBTextureNames.Items.Delete(LBTextureNames.ItemIndex);
@@ -292,9 +292,8 @@ begin
 end;
 
 procedure TFrameTextureList.DoUpdateTexture;
-var i, j: Integer;
+var i: Integer;
   item: PTextureItem;
-  surf: ArrayOfPSurfaceDescriptor;
 begin
   i := LBTextureNames.ItemIndex;
   if i = -1 then exit;
@@ -307,13 +306,8 @@ begin
   Textures.Update(item, Label2.Caption, Edit1.Text, SE9.Value, SE10.Value,
                   CheckBox1.Checked, SE11.Value, SE12.Value);
 
-  // recreate the surfaces that use this texture (if any)
-  if SpriteBuilderSurfaces <> NIL then begin
-    surf := SpriteBuilderSurfaces.GetItemsThatUseThisTexture(item);
-    if Length(surf) <> 0 then
-      for j:=0 to High(surf)do
-        surf[j]^.RecreateSurfaceBecauseTextureChanged;
-  end;
+  // notify the texture changed
+  FOnTextureChanged(item);
 
   Label2.Caption := '';
   UpdateTextureWidgetState;
