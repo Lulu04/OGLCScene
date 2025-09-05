@@ -1,8 +1,8 @@
 # OGLCScene
 2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS compatible with OpenGL 3.3.  
-# Dependencies
+## Dependencies
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
-# Support
+## Support
 - Only 2D !
 - Use OpenGL 3.3 core to render graphics.
 - Renderers with batch system to improve performance. Use vertex and index buffers.
@@ -19,7 +19,7 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Log file.
 - Particle engine, tile engine.  
 
-##Tools
+## Tools
 The tools are located in the "tools" folder.
 - Particles Editor to create your own particle effects.
 - Tile Map Designer' to construct your map from tileset.
@@ -29,14 +29,14 @@ The tools are located in the "tools" folder.
   - LEVEL EDITOR: a simple tool to construct your game level. Not yet finished. 
 
   
-# Screenshot
+## Screenshot
 UI elements with customized colors
 ![UI elements with customized colors](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/UIElements.png)
   
 Workshop screen in game Little Red Riding Hood
 ![Workshop screen in game Little Red Riding Hood](https://github.com/Lulu04/OGLCScene/blob/a010429fb9950dc95ed595a0e2866dc50e32ed1b/screenshot/GameLittleRedRidingHood.png)
   
-# Credits
+## Credits
 A large part of the code in the particle engine comes from ZENGL version 0.3.8 originaly written by Andrey Kemka, and actually maintained by Seenkao https://forum.lazarus.freepascal.org/index.php/topic,49143.0.html
 
 Matrix computation located in file 'gl_core_matrix.inc' was originaly written by Chris Rorden and modified for the use in OGLCScene. The file 'glcorearb.pas' was also written by Chris Rorden. Thanks !
