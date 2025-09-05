@@ -14,12 +14,14 @@ type
   TDataModule1 = class(TDataModule)
     ILIcon24: TImageList;
     ImageList1: TImageList;
+    ILIconAlign: TImageList;
     procedure DataModuleCreate(Sender: TObject);
   private
     FPath: string;
     procedure AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
   public
     procedure RedrawImageForCursor;
+    procedure RedrawImageForIconAlign;
   end;
 
 var
@@ -36,6 +38,7 @@ uses u_app_pref, form_main, BGRABitmap, BGRABitmapTypes, OGLCScene;
 procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
   RedrawImageForCursor;
+  RedrawImageForIconAlign;
 end;
 
 procedure TDataModule1.AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
@@ -63,6 +66,32 @@ begin
   AddImageToImageList('Point.svg', ILIcon24);
 
   ILIcon24.EndUpdate;
+end;
+
+procedure TDataModule1.RedrawImageForIconAlign;
+begin
+  ILIconAlign.BeginUpdate;
+  ILIconAlign.Clear;
+  ILIconAlign.Width := FormMain.ScaleDesignToForm(24);
+  ILIconAlign.Height := ILIconAlign.Width;
+
+  FPath := GetIconFolder;
+  AddImageToImageList('AlignHRightToLeft.svg', ILIconAlign);
+  AddImageToImageList('AlignHRightToCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignHLeft.svg', ILIconAlign);
+  AddImageToImageList('AlignHCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignHRight.svg', ILIconAlign);
+  AddImageToImageList('AlignHLeftToCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignHLeftToRight.svg', ILIconAlign);
+
+  AddImageToImageList('AlignVBottomToTop.svg', ILIconAlign);
+  AddImageToImageList('AlignVBottomToCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignVTop.svg', ILIconAlign);
+  AddImageToImageList('AlignVCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignVBottom.svg', ILIconAlign);
+  AddImageToImageList('AlignVTopToCenter.svg', ILIconAlign);
+  AddImageToImageList('AlignVTopToBottom.svg', ILIconAlign);
+
 end;
 
 end.

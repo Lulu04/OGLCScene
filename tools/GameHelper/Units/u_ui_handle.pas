@@ -59,7 +59,7 @@ end;
 var UIHandle: TUIHandle;
 
 implementation
-uses u_app_pref, u_common, u_ui_atlas;
+uses u_common, u_ui_atlas;
 
 { TUIHandleManager }
 

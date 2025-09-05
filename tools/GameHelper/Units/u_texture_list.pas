@@ -103,9 +103,9 @@ begin
   prop.Add('Name', name);
   prop.Add('Width', width);
   prop.Add('Height', height);
-  prop.Add('IsMultiFrame', isMultiFrame);
-  prop.Add('FrameWidth', frameWidth);
-  prop.Add('FrameHeight', frameHeight);
+  if isMultiFrame then prop.Add('IsMultiFrame', isMultiFrame);
+  if isMultiFrame then prop.Add('FrameWidth', frameWidth);
+  if isMultiFrame then prop.Add('FrameHeight', frameHeight);
   Result := prop.PackedProperty;
 end;
 
@@ -118,7 +118,7 @@ begin
   prop.StringValueOf('Name', name, ChangeFileExt(ExtractFilename(filename), ''));
   prop.IntegerValueOf('Width', width, width);
   prop.IntegerValueOf('Height', height, height);
-  prop.BooleanValueOf('IsMultiFrame', isMultiFrame, isMultiFrame);
+  prop.BooleanValueOf('IsMultiFrame', isMultiFrame, False);
   prop.IntegerValueOf('FrameWidth', frameWidth, frameWidth);
   prop.IntegerValueOf('FrameHeight', frameHeight, frameHeight);
 end;

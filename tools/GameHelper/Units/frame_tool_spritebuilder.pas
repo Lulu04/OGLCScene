@@ -160,7 +160,7 @@ type
   end;
 
 implementation
-uses form_main, u_project, u_common, u_utils, u_spritebank, u_screen_template,
+uses form_main, u_project, u_common, u_spritebank, u_screen_template,
   LCLType;
 {$R *.lfm}
 
@@ -239,6 +239,7 @@ begin
   o^.postures := Postures.SaveToString;
 
   Project.SetModified;
+  Project.Save;
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
@@ -718,7 +719,7 @@ end;
 
 function TFrameToolsSpriteBuilder.Surfaces: TSpriteBuilderSurfaceList;
 begin
-  Result := ScreenSpriteBuilder.Surfaces;
+  Result := TSpriteBuilderSurfaceList(ScreenSpriteBuilder.Surfaces);
 end;
 
 function TFrameToolsSpriteBuilder.Bodies: TBodyItemList;

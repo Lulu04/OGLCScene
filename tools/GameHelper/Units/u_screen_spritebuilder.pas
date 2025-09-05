@@ -9,7 +9,7 @@ uses
   BGRABitmap, BGRABitmapTypes,
   OGLCScene,
   u_common, u_screen_template,
-  u_surface_list, u_texture_list, u_ui_handle,
+  u_surface_list, u_texture_list,
   u_collisionbody_list, u_posture_list;
 
 type
@@ -22,39 +22,17 @@ end;
 
 { TScreenSpriteBuilder }
 
-TScreenSpriteBuilder = class(TCustomScreenTemplate)
+TScreenSpriteBuilder = class(TScreenWithSurfaceHandling)
 private
   FTextures: TTextureList;
   FSurfaces: TSpriteBuilderSurfaceList;
-private
-  FSelected: ArrayOfPSurfaceDescriptor;
-  FAlternateOverlappedIndex: integer;  // used to chose between several overlapped objects
-  FScaleHandleType: TScaleHandle;
-  function GetSelectedCount: integer;
-  procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
-  function AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean; overload;
-  function AlreadySelected(item: PSurfaceDescriptor): boolean; overload;
-  procedure AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
-  procedure AddOffsetCoordinateToSelection(aOffset: TPointF);
-  procedure AddOffsetToPivotOnSelection(aOffset: TPointF);
-  procedure SaveCurrentAngleBeforeRotationOnSelection;
-  procedure RotateSelection(aPreviousReferencePoint, aReferencePoint: TPointF; aUseIncrement: boolean);
-  procedure SaveCurrentScaleValueBeforeScalingSelection;
-  procedure ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean);
-  procedure DeleteSelection;
-  procedure UpdateHandlePositionOnSelected;
-  function MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
-  function MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
-  function MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
-public
-  procedure ReverseAngleOnSelection;
-  procedure ToogleScaledAndRotatedHandleOnSelection;
-  procedure MoveSelection(aDelta: TPointF);
-  procedure SetAngleOnSelection(aAngle: single);
-  procedure ResetValuesOnSelection;
-private
-  procedure LoopMoveSelection;
-  procedure LoopMovePivotOnSelection;
+protected
+  procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
+  procedure AddOffsetCoordinateToSelection(aOffset: TPointF); override;
+  procedure AddOffsetToPivotOnSelection(aOffset: TPointF); override;
+  procedure RotateSelection(aPreviousReferencePoint, aReferencePoint: TPointF; aUseIncrement: boolean); override;
+  procedure ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean); override;
+  procedure DeleteSelection; override;
 private
   procedure ProcessMouseUpForChild(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
   procedure ProcessMouseDownForChild(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
@@ -93,9 +71,6 @@ public
   procedure ProcessMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean); override;
 public // selection
   procedure SetPivotOnSelection;
-  procedure LoopRotateSelection;
-  procedure LoopScaleSelection;
-  property SelectedCount: integer read GetSelectedCount;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -103,9 +78,12 @@ public
   procedure Initialize;
   procedure Finalize;
 
-  procedure SelectNone;
+  procedure SelectNone; override;
+  procedure SelectAll; override;
+  procedure SetFlagModified; override;
+  function Surfaces: TSurfaceList; override;
   property Textures: TTextureList read FTextures;
-  property Surfaces: TSpriteBuilderSurfaceList read FSurfaces;
+  //property Surfaces: TSpriteBuilderSurfaceList read FSurfaces;
   property Bodies: TBodyItemList read FBodyList;
   property Postures: TPostureList read FPostures;
 end;
@@ -124,126 +102,61 @@ end;
 
 { TScreenSpriteBuilder }
 
-function TScreenSpriteBuilder.GetSelectedCount: integer;
+function TScreenSpriteBuilder.Surfaces: TSurfaceList;
 begin
-  Result := Length(FSelected);
+  Result := FSurfaces;
 end;
 
 procedure TScreenSpriteBuilder.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
-var i: integer;
 begin
-  if Length(aItems) = 0 then exit;
-
-  for i:=0 to High(aItems) do
-     aItems[i]^.Selected := True;
-
-  if FSelected = NIL then FSelected := aItems
-  else begin
-    for i:=0 to High(aItems) do
-      if not AlreadySelected(aItems[i]) then begin
-        SetLength(FSelected, Length(FSelected)+1);
-        FSelected[High(FSelected)] := aItems[i];
-      end;
-  end;
-
+  inherited AddToSelected(aItems);
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
-end;
-
-function TScreenSpriteBuilder.AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean;
-var i: integer;
-begin
-  if Length(aItems) = 0 then exit(False);
-  if Length(FSelected) < Length(aItems) then exit(False);
-
-  for i:=0 to High(aItems) do
-    if not AlreadySelected(aItems[i]) then exit(False);
-  Result := True;
-end;
-
-function TScreenSpriteBuilder.AlreadySelected(item: PSurfaceDescriptor): boolean;
-var i: integer;
-begin
-  for i:=0 to High(FSelected) do
-    if FSelected[i] = item then exit(True);
-  Result := False;
-end;
-
-procedure TScreenSpriteBuilder.AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
-begin
-  if Length(aItems) = 0 then exit;
-  AddToSelected([aItems[FAlternateOverlappedIndex]]);
 end;
 
 procedure TScreenSpriteBuilder.SelectNone;
-var i: integer;
 begin
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.Selected := False;
-  FSelected := NIL;
-
+  inherited SelectNone;
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
-procedure TScreenSpriteBuilder.AddOffsetCoordinateToSelection(aOffset: TPointF);
-var i: integer;
+procedure TScreenSpriteBuilder.SelectAll;
 begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.surface.MoveRelative(aOffset, 0);
+  inherited SelectAll;
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+end;
 
+procedure TScreenSpriteBuilder.SetFlagModified;
+begin
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AddOffsetCoordinateToSelection(aOffset: TPointF);
+begin
+  inherited AddOffsetCoordinateToSelection(aOffset);
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.AddOffsetToPivotOnSelection(aOffset: TPointF);
-var i: integer;
 begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.AddOffsetToPivot(aOffset);
-
+  inherited AddOffsetToPivotOnSelection(aOffset);
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
-end;
-
-procedure TScreenSpriteBuilder.SaveCurrentAngleBeforeRotationOnSelection;
-var i: integer;
-begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.SaveCurrentAngleBeforeRotation;
 end;
 
 procedure TScreenSpriteBuilder.RotateSelection(aPreviousReferencePoint,
   aReferencePoint: TPointF; aUseIncrement: boolean);
-var i: integer;
 begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.ComputeAngle(aPreviousReferencePoint, aReferencePoint, aUseIncrement);
-
-  UpdateHandlePositionOnSelected;
+  inherited RotateSelection(aPreviousReferencePoint, aReferencePoint, aUseIncrement);
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
-procedure TScreenSpriteBuilder.SaveCurrentScaleValueBeforeScalingSelection;
-var i: integer;
-begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.SaveCurrentScaleValueBeforeScaling;
-end;
-
 procedure TScreenSpriteBuilder.ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean);
-var i: integer;
 begin
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.ComputeScale(FScaleHandleType, aDelta, aKeepAspectRatio);
-
-  UpdateHandlePositionOnSelected;
+  inherited ScaleSelection(aDelta, aKeepAspectRatio);
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenSpriteBuilder.DeleteSelection;
-var i, k: integer;
+var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
 
@@ -254,134 +167,12 @@ begin
       exit;
     end;
 
-  for i:=0 to High(FSelected) do
-    Surfaces.DeleteItemByID(FSelected[i]^.id);
-
-  FSelected := NIL;
+  inherited DeleteSelection;
 
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
   Surfaces.FillComboBox(FrameToolsSpriteBuilder.CBParent);
 Textures.FillComboBox(FrameToolsSpriteBuilder.CBTextures);
   FrameToolsSpriteBuilder.Modified := True;
-end;
-
-procedure TScreenSpriteBuilder.UpdateHandlePositionOnSelected;
-var i: integer;
-begin
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.UpdateHandlePosition;
-end;
-
-function TScreenSpriteBuilder.MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
-var i: integer;
-begin
-  Result := False;
-  for i:=0 to High(FSelected) do
-    if FSelected[i]^.IsOverPivotHandle(aWorldPt) then
-      Exit(True);
-end;
-
-function TScreenSpriteBuilder.MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
-var i: integer;
-begin
-  Result := False;
-  for i:=0 to High(FSelected) do
-    if FSelected[i]^.IsOverRotateHandle(aWorldPt) then
-      Exit(True);
-end;
-
-function TScreenSpriteBuilder.MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
-var i: integer;
-begin
-  Result := False;
-  for i:=0 to High(FSelected) do
-    if FSelected[i]^.IsOverScaleHandle(aWorldPt, FScaleHandleType) then
-      Exit(True);
-end;
-
-procedure TScreenSpriteBuilder.ReverseAngleOnSelection;
-var i: integer;
-  a: single;
-begin
-  for i:=0 to High(FSelected) do begin
-    a := FSelected[i]^.surface.Angle.Value;
-    if a > 0 then a := a - 360 else a := a + 360;
-    FSelected[i]^.surface.Angle.Value := a;
-  end;
-end;
-
-procedure TScreenSpriteBuilder.ToogleScaledAndRotatedHandleOnSelection;
-var i: integer;
-begin
-  if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.ToogleScaledAndRotatedHandle;
-end;
-
-procedure TScreenSpriteBuilder.MoveSelection(aDelta: TPointF);
-var i: integer;
-begin
-  for i:=0 to High(FSelected) do begin
-    FSelected[i]^.surface.X.Value := FSelected[i]^.surface.X.Value + aDelta.x;
-    FSelected[i]^.surface.Y.Value := FSelected[i]^.surface.Y.Value + aDelta.y;
-  end;
-end;
-
-procedure TScreenSpriteBuilder.SetAngleOnSelection(aAngle: single);
-var i: integer;
-begin
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.surface.Angle.Value := aAngle;
-end;
-
-procedure TScreenSpriteBuilder.ResetValuesOnSelection;
-var i: integer;
-begin
-  for i:=0 to High(FSelected) do
-    FSelected[i]^.SetValuesFromTemporaryVariables;
-end;
-
-procedure TScreenSpriteBuilder.LoopMoveSelection;
-var current, delta: TPointF;
-begin
-  if MouseState = msMovingSelection then exit;
-  MouseState := msMovingSelection;
-
-  repeat
-    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
-    delta := (current - ClickOrigin);
-    ApplyMoveRestrictionOn(delta);
-    if (delta.x <> 0) or (delta.y <> 0) then begin
-      delta.x := delta.x / Zoom;
-      delta.y := delta.y / Zoom;
-      AddOffsetCoordinateToSelection(delta);
-      FrameToolsSpriteBuilder.Modified := True;
-      FScene.DoLoop;
-      ClickOrigin := current;
-    end;
-    Application.ProcessMessages;
-    UpdateHandlePositionOnSelected;
-  until MouseState <> msMovingSelection;
-end;
-
-procedure TScreenSpriteBuilder.LoopMovePivotOnSelection;
-var current, delta: TPointF;
-begin
-  if MouseState = msMovePivotOnSelection then exit;
-  MouseState := msMovePivotOnSelection;
-
-  repeat
-    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
-    delta := current - ClickOrigin;
-    ApplyMoveRestrictionOn(delta);
-    if (delta.x <> 0) or (delta.y <> 0) then begin
-      AddOffsetToPivotOnSelection(delta);
-      FrameToolsSpriteBuilder.Modified := True;
-      FScene.DoLoop;
-      ClickOrigin := current;
-    end;
-    Application.ProcessMessages;
-  until MouseState <> msMovePivotOnSelection;
 end;
 
 procedure TScreenSpriteBuilder.ProcessMouseUpForChild(Button: TMouseButton;
@@ -577,6 +368,7 @@ begin
      ToogleScaledAndRotatedHandleOnSelection;
     end;
 
+    VK_A: if ssCtrl in Shift then SelectAll;
 
     VK_Z: begin
       if ssCtrl in Shift then
@@ -1090,44 +882,6 @@ begin
   if GetSelectedCount = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.Pivot := ClickOrigin;
-end;
-
-procedure TScreenSpriteBuilder.LoopRotateSelection;
-var current, delta: TPointF;
-begin
-  if MouseState = msRotatingSelection then exit;
-  MouseState := msRotatingSelection;
-
-  SaveCurrentAngleBeforeRotationOnSelection;
-  repeat
-    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
-    delta := current - ClickOrigin;
-    if (delta.x <> 0) or (delta.y <> 0) then begin
-      RotateSelection(ClickOrigin, current, CtrlPressed);
-      FrameToolsSpriteBuilder.Modified := True;
-      FScene.DoLoop;
-    end;
-    Application.ProcessMessages;
-  until MouseState <> msRotatingSelection;
-end;
-
-procedure TScreenSpriteBuilder.LoopScaleSelection;
-var current, delta: TPointF;
-begin
-  if MouseState = msScalingSelection then exit;
-  MouseState := msScalingSelection;
-  SaveCurrentScaleValueBeforeScalingSelection;
-
-  repeat
-    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
-    delta := Camera.ControlToWorld(current) - Camera.ControlToWorld(ClickOrigin);
-    if (delta.x <> 0) or (delta.y <> 0) then begin
-      ScaleSelection(delta, CtrlPressed);
-      FrameToolsSpriteBuilder.Modified := True;
-      FScene.DoLoop;
-    end;
-    Application.ProcessMessages;
-  until MouseState <> msScalingSelection;
 end;
 
 procedure TScreenSpriteBuilder.CreateObjects;

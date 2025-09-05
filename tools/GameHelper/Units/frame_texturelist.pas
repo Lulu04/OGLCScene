@@ -76,8 +76,6 @@ uses Types, u_utils, u_common;
 { TFrameTextureList }
 
 procedure TFrameTextureList.BChooseImageFileClick(Sender: TObject);
-var i: integer;
-  item: PTextureItem;
 begin
   if sender = BUpdateTextureListbox then
     Textures.FillListBox(LBTextureNames);
@@ -238,7 +236,7 @@ end;
 
 procedure TFrameTextureList.DoAddTexture;
 var texName: string;
-i:integer;
+//i:integer;
 begin
   if not CheckTextureWidgets then exit;
 
