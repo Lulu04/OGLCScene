@@ -18,6 +18,7 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 - Camera effects with shaker effect to simulate earthquake and Auto Follow feature to smoothly follow a surface.
 - Log file.
 - Particle engine, tile engine.  
+
 ##Tools
 The tools are located in the "tools" folder.
 - Particles Editor to create your own particle effects.
