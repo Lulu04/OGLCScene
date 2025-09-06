@@ -22,8 +22,8 @@ You need packages LazOpenGlContext and BGRABitmap installed in the IDE.
 ## Tools
 The tools are located in the "tools" folder.
 - Particles Editor to create your own particle effects.
-- Tile Map Designer' to construct your map from tileset.
-- Path Editor to easily design path on the screen for your sprite, and save them to file in normalized coordinate (0 to 1). The file can be loaded in your game and expanded to the scene resolution.
+- Tile Map Designer to construct your map from tileset.
+- Path Editor to easily design path by adding or dragging nodes on the screen with the mouse. The path is saved to file in normalized coordinate (0 to 1) and can be loaded in your game (node coordinates are expanded to the scene resolution).
 - Game Helper is a tool that include:
   - SPRITE BUILDER: to construct complex sprite, draw their collision bodies, define several postures to animate your characters. The sprite definition con be saved as a Pascal unit ready to incorporate in your project.
   - LEVEL EDITOR: a simple tool to construct your game level. Not yet finished. 
