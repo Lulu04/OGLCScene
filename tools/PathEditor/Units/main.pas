@@ -22,13 +22,11 @@ type
     BitBtn1: TBitBtn;
     BitBtn2: TBitBtn;
     BitBtn3: TBitBtn;
-    Button1: TButton;
     CBActivateSplineMode: TCheckBox;
     CBShowGrid: TCheckBox;
     CheckBox4: TCheckBox;
     ComboBox1: TComboBox;
     GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
     GroupBox3: TGroupBox;
     GroupBox4: TGroupBox;
     GroupBox5: TGroupBox;
@@ -38,8 +36,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
-    Label2: TLabel;
-    Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -54,15 +50,12 @@ type
     SEScreenWidth: TSpinEdit;
     SEScreenHeight: TSpinEdit;
     TBGrid: TTrackBar;
-    TBScale: TTrackBar;
-    TBOpacity: TTrackBar;
     Timer1: TTimer;
     procedure Arrow2Click(Sender: TObject);
     procedure BHelpClick(Sender: TObject);
     procedure BitBtn1Click(Sender: TObject);
     procedure BitBtn2Click(Sender: TObject);
     procedure BitBtn3Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
     procedure CBActivateSplineModeChange(Sender: TObject);
     procedure CBShowGridChange(Sender: TObject);
     procedure CheckBox4Change(Sender: TObject);
@@ -70,13 +63,8 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure RBAspectRatioSelectionChanged(Sender: TObject);
-    procedure TBOpacityChange(Sender: TObject);
-    procedure TBScaleChange(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
   private
-    function GetScaleFactor: single;
-    procedure ComputeBackgroundImageScaled;
-    procedure DrawGraphBackground( BG: TBGRABitmap );
     procedure SetSizeAndPositionOfCurveFrame;
   private
     FrameEditCurve: TFrameEditCurve;
@@ -126,16 +114,6 @@ end;
 procedure TForm1.RBAspectRatioSelectionChanged(Sender: TObject);
 begin
   SetSizeAndPositionOfCurveFrame;
-end;
-
-// load image from disk
-procedure TForm1.Button1Click(Sender: TObject);
-begin
-{ if not OPD1.Execute then exit;
- if FBackgroundImageNotScaled<>NIL then FBackgroundImageNotScaled.Free;
- FBackgroundImageNotScaled := TBGRABitmap.Create( OPD1.FileName );
-
- ComputeBackgroundImageScaled;  }
 end;
 
 procedure TForm1.CBActivateSplineModeChange(Sender: TObject);
@@ -208,48 +186,9 @@ begin
  FrameEditCurve.ShowNodes := CheckBox4.Checked;
 end;
 
-// Image opacity
-procedure TForm1.TBOpacityChange(Sender: TObject);
-begin
-{ Label5.Caption:='opacity: '+inttostr(TBOpacity.Position);
- PB.Invalidate;  }
-end;
-
-// Image scale
-procedure TForm1.TBScaleChange(Sender: TObject);
-begin
- Label2.Caption := 'scale factor: '+FormatFloat('0.00', GetScaleFactor);
- ComputeBackgroundImageScaled;
-end;
-
 procedure TForm1.Timer1Timer(Sender: TObject);
 begin
  Label6.Caption:='Point count : '+FrameEditCurve.NodeCount.ToString;
-end;
-
-function TForm1.GetScaleFactor: single;
-begin
- Result := TBScale.Position*0.1;
-end;
-
-procedure TForm1.ComputeBackgroundImageScaled;
-var ima: TBGRABitmap;
-  xx,yy: integer;
-begin
-{ ima := FBackgroundImageNotScaled.Resample(round(FBackgroundImageNotScaled.Width*GetScaleFactor),
-                                           round(FBackgroundImageNotScaled.Height*GetScaleFactor)) as TBGRABitmap;
- xx := (FBackgroundImageScaled.Width-ima.Width) div 2;
- yy := (FBackgroundImageScaled.Height-ima.Height) div 2;
- FBackgroundImageScaled.Fill( BGRAPixelTRansparent );
- FBackgroundImageScaled.PutImage( xx, yy, ima, dmDrawWithTransparency );
- PB.Invalidate; }
-end;
-
-procedure TForm1.DrawGraphBackground(BG: TBGRABitmap);
-begin
-{ BG.Fill(BGRA(50,20,20));
- if CheckBox3.Checked then
-   BG.PutImage(0, 0, FBackgroundImageScaled, dmDrawWithTransparency, TBOpacity.Position ); }
 end;
 
 procedure TForm1.SetSizeAndPositionOfCurveFrame;

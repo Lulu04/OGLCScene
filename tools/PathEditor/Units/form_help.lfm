@@ -20,11 +20,34 @@ object FormHelp: TFormHelp
     Top = 13
     Width = 448
     Lines.Strings = (
-      'Add a node to the path: LEFT CLICK on empty space'
-      'Delete a node: RIGHT CLICK on node'
-      'Delete last node: BACKSPACE'
-      'Enter node coordinates manually: LEFT DOUBLE CLICK on node'
+      'This tool allow you to draw a path that your sprite can follow.'
+      'The path is saved in a file with normalized coordinates (x and y are in range 0 to 1) and can be loaded in your game.'
+      ''
+      '## FIRST'
+      '- choose the aspect ratio of the scene used by your game.'
+      '- set the scene size or keep the current values. Scene size is needed only if you enter a node coordinates manually.'
+      '- you can start to draw the path.'
+      ''
+      '## USAGE'
+      'Add a node to the path: LEFT CLICK on empty space.'
+      'Delete a node: RIGHT CLICK on node.'
+      'Delete last node: BACKSPACE.'
+      'Enter node coordinates manually: LEFT DOUBLE CLICK on node.'
+      'You can move the whole path with the global move arrows.'
+      'To have smooth rotation of your sprite on the path, you can convert the path to a curve checking the "Use spline". This option will be saved with the path.'
+      ''
+      '## HOW TO LOAD THE PATH IN YOUR GAME'
+      'You can load the path in your game with the following code:'
+      'var path: TOGLCPath;'
+      '      path := NIL;'
+      ' // load the path from a file and expand its coordinate to fit the scene'
+      '      path.LoadFromNormalizedFileAndExpand(FPathFilename, FScene.Width, FScene.Height);'
+      ' // if needed, we can translate the whole path to a specific position in the world'
+      '      path.Translate(PointF(-path[0].x, -path[0].y) + PointF(myWorldX, myWorldY));'
+      ' // if you do not use spline while you created the path, you can convert the path to a curve with:'
+      '      path.ConvertToSpline(ssCrossingWithEnds);'
     )
+    ScrollBars = ssAutoVertical
     TabOrder = 0
   end
 end

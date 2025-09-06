@@ -49,7 +49,7 @@ object Form1: TForm1
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 80
-      Top = 544
+      Top = 448
       Width = 248
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
@@ -93,82 +93,13 @@ object Form1: TForm1
         OnChange = CBShowGridChange
       end
     end
-    object GroupBox2: TGroupBox
-      AnchorSideLeft.Control = Panel1
-      AnchorSideRight.Control = Panel1
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 120
-      Top = 200
-      Width = 248
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 4
-      BorderSpacing.Right = 4
-      Caption = 'Image background'
-      ClientHeight = 100
-      ClientWidth = 244
-      Color = 6650247
-      ParentBackground = False
-      ParentColor = False
-      TabOrder = 1
-      object Button1: TButton
-        Left = 5
-        Height = 23
-        Top = 0
-        Width = 128
-        Caption = 'Load image from disk'
-        TabOrder = 0
-        OnClick = Button1Click
-      end
-      object TBScale: TTrackBar
-        Left = 4
-        Height = 32
-        Top = 40
-        Width = 229
-        Frequency = 10
-        Max = 50
-        Min = 1
-        OnChange = TBScaleChange
-        Position = 10
-        ShowSelRange = False
-        TabOrder = 1
-      end
-      object Label2: TLabel
-        Left = 8
-        Height = 15
-        Top = 24
-        Width = 81
-        Caption = 'scale factor: 1.0'
-        ParentColor = False
-      end
-      object Label5: TLabel
-        Left = 5
-        Height = 15
-        Top = 64
-        Width = 63
-        Caption = 'opacity: 255'
-        ParentColor = False
-      end
-      object TBOpacity: TTrackBar
-        Left = 4
-        Height = 32
-        Top = 80
-        Width = 229
-        Frequency = 10
-        Max = 255
-        OnChange = TBOpacityChange
-        Position = 255
-        ShowSelRange = False
-        TabOrder = 2
-      end
-    end
     object GroupBox3: TGroupBox
       AnchorSideLeft.Control = Panel1
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 208
-      Top = 328
+      Top = 224
       Width = 248
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
@@ -179,7 +110,7 @@ object Form1: TForm1
       Color = 6650247
       ParentBackground = False
       ParentColor = False
-      TabOrder = 2
+      TabOrder = 1
       object BitBtn1: TBitBtn
         Left = 123
         Height = 23
@@ -307,8 +238,8 @@ object Form1: TForm1
         Left = 7
         Height = 19
         Top = 7
-        Width = 129
-        Caption = 'Activate spline mode'
+        Width = 71
+        Caption = 'Use spline'
         TabOrder = 2
         OnChange = CBActivateSplineModeChange
       end
@@ -316,9 +247,9 @@ object Form1: TForm1
         Left = 26
         Height = 23
         Top = 32
-        Width = 128
+        Width = 158
         ItemHeight = 15
-        ItemIndex = 0
+        ItemIndex = 3
         Items.Strings = (
           'ssInside'
           'ssInsideWithEnds'
@@ -331,7 +262,7 @@ object Form1: TForm1
         )
         Style = csDropDownList
         TabOrder = 3
-        Text = 'ssInside'
+        Text = 'ssCrossingWithEnds'
         OnSelect = CBActivateSplineModeChange
       end
     end
@@ -341,7 +272,7 @@ object Form1: TForm1
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 64
-      Top = 632
+      Top = 544
       Width = 248
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
@@ -352,7 +283,7 @@ object Form1: TForm1
       Color = 8631433
       ParentBackground = False
       ParentColor = False
-      TabOrder = 3
+      TabOrder = 2
       object BitBtn2: TBitBtn
         Left = 26
         Height = 35
@@ -532,7 +463,7 @@ object Form1: TForm1
       Width = 187
       AutoFill = True
       BorderSpacing.Left = 4
-      Caption = 'Aspect ratio'
+      Caption = 'Scene aspect ratio'
       ChildSizing.LeftRightSpacing = 6
       ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
       ChildSizing.EnlargeVertical = crsHomogenousChildResize
@@ -553,7 +484,7 @@ object Form1: TForm1
       OnSelectionChanged = RBAspectRatioSelectionChanged
       ParentBackground = False
       ParentColor = False
-      TabOrder = 4
+      TabOrder = 3
     end
     object BHelp: TSpeedButton
       Left = 200
@@ -571,18 +502,18 @@ object Form1: TForm1
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 56
-      Top = 64
+      Top = 72
       Width = 248
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
-      Caption = 'Screen size'
+      Caption = 'Scene size'
       ClientHeight = 36
       ClientWidth = 244
       Color = 6650247
       ParentBackground = False
       ParentColor = False
-      TabOrder = 5
+      TabOrder = 4
       object SEScreenWidth: TSpinEdit
         AnchorSideLeft.Control = Label8
         AnchorSideLeft.Side = asrBottom
@@ -628,7 +559,7 @@ object Form1: TForm1
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 64
-      Top = 128
+      Top = 144
       Width = 248
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 4
@@ -639,7 +570,7 @@ object Form1: TForm1
       Color = 6650247
       ParentBackground = False
       ParentColor = False
-      TabOrder = 6
+      TabOrder = 5
       object Label10: TLabel
         AnchorSideTop.Control = GroupBox6
         Left = 49
