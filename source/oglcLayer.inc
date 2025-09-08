@@ -48,6 +48,8 @@ public
   function Add(aSurface: TSimpleSurfaceWithEffect): integer; virtual;
   procedure Remove(aSurface: TSimpleSurfaceWithEffect);
   procedure Insert(aIndex: integer ; aSurface : TSimpleSurfaceWithEffect); virtual;
+  function IndexOf(aSurface: TSimpleSurfaceWithEffect): integer;
+  procedure Move(aCurrentIndex, aNewIndex: integer);
   function Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
   property SurfaceCount : integer read GetSurfaceCount ;
   property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface; default;
@@ -228,6 +230,16 @@ begin
 
   if aIndex < FList.Count then FList.Insert(aIndex, aSurface)
     else FList.Add(aSurface);
+end;
+
+function TOGLCSurfaceList.IndexOf(aSurface: TSimpleSurfaceWithEffect): integer;
+begin
+  Result := FList.IndexOf(aSurface);
+end;
+
+procedure TOGLCSurfaceList.Move(aCurrentIndex, aNewIndex: integer);
+begin
+  FList.Move(aCurrentIndex, aNewIndex);
 end;
 
 function TOGLCSurfaceList.Contain(aSurface: TSimpleSurfaceWithEffect): boolean;
