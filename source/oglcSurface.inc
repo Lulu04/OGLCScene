@@ -330,6 +330,14 @@ public // Childs
   // Extract the surface from its owner (another layer or parent surface)
   // then insert it to a layer at the specified index.
   procedure InsertToLayer(aSurfaceIndex, aLayerIndex: integer);
+  // if the surface is child of another, its Z order is changed so that is on top of the other childs.
+  // if the surface is on layer, it is moved to be on top of the other surface in this layer.
+  procedure MoveToTop;
+  procedure MoveToTopOneStep;
+  // if the surface is child of another, its Z order is changed so that is below the other childs.
+  // if the surface is on layer, it is moved to be below the other surface in this layer.
+  procedure MoveBack;
+  procedure MoveBackOneStep;
   function IsParentOf(aSurface: TSimpleSurfaceWithEffect): boolean;
   function ChildCount: integer;
   function IsChild(aSurface: TSimpleSurfaceWithEffect): boolean;
@@ -958,6 +966,60 @@ begin
     if ParentLayer <> NIL then
       ParentLayer.Remove(Self);
     FParentScene.Insert(aSurfaceIndex, Self, aLayerIndex);
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.MoveToTop;
+var par: TSimpleSurfaceWithEffect;
+begin
+  if ParentSurface = NIL then begin
+    if ParentLayer = NIL then exit;
+    ParentLayer.Remove(Self);
+    ParentLayer.Add(Self);
+  end else begin
+    par := ParentSurface;
+    ParentSurface.RemoveChild(Self); // here ParentSurface is lost
+    par.AddChild(Self, par.Childs[par.ChildCount-1].ZOrderAsChild + 1);
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.MoveToTopOneStep;
+var i: integer;
+begin
+  if ParentSurface = NIL then begin
+    if ParentLayer = NIL then exit;
+    i := ParentLayer.IndexOf(Self);
+    if i < ParentLayer.SurfaceCount-1 then
+      ParentLayer.Move(i, i+1);
+  end else begin
+    raise exception.Create('not yet implemented');
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.MoveBack;
+var par: TSimpleSurfaceWithEffect;
+begin
+  if ParentSurface = NIL then begin
+    if ParentLayer = NIL then exit;
+    ParentLayer.Remove(Self);
+    ParentLayer.Insert(0, Self);
+  end else begin
+   par := ParentSurface;
+   ParentSurface.RemoveChild(Self); // here ParentSurface is lost
+   par.AddChild(Self, par.Childs[0].ZOrderAsChild - 1);
+  end;
+end;
+
+procedure TSimpleSurfaceWithEffect.MoveBackOneStep;
+var i: integer;
+begin
+  if ParentSurface = NIL then begin
+    if ParentLayer = NIL then exit;
+    i := ParentLayer.IndexOf(Self);
+    if i > 0 then
+      ParentLayer.Move(i, i-1);
+  end else begin
+    raise exception.Create('not yet implemented');
   end;
 end;
 
