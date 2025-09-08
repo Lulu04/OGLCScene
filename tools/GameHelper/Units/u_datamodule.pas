@@ -76,6 +76,7 @@ begin
   ILIconAlign.Height := ILIconAlign.Width;
 
   FPath := GetIconFolder;
+  // 0
   AddImageToImageList('AlignHRightToLeft.svg', ILIconAlign);
   AddImageToImageList('AlignHRightToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignHLeft.svg', ILIconAlign);
@@ -84,6 +85,7 @@ begin
   AddImageToImageList('AlignHLeftToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignHLeftToRight.svg', ILIconAlign);
 
+  // 8
   AddImageToImageList('AlignVBottomToTop.svg', ILIconAlign);
   AddImageToImageList('AlignVBottomToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignVTop.svg', ILIconAlign);
@@ -91,6 +93,16 @@ begin
   AddImageToImageList('AlignVBottom.svg', ILIconAlign);
   AddImageToImageList('AlignVTopToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignVTopToBottom.svg', ILIconAlign);
+
+  // 15
+  AddImageToImageList('Rotate90CCW.svg', ILIconAlign);
+  AddImageToImageList('Rotate90CW.svg', ILIconAlign);
+  AddImageToImageList('MirrorH.svg', ILIconAlign);
+  AddImageToImageList('MirrorV.svg', ILIconAlign);
+  AddImageToImageList('ShiftTop.svg', ILIconAlign);
+  AddImageToImageList('ShiftTopOneStep.svg', ILIconAlign);
+  AddImageToImageList('ShiftBackOneStep.svg', ILIconAlign);
+  AddImageToImageList('ShiftBack.svg', ILIconAlign);
 
 end;
 

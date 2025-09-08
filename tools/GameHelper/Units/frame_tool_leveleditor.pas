@@ -42,14 +42,16 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
+    Panel5: TPanel;
     Panel8: TPanel;
     PC1: TPageControl;
     PageTextures: TTabSheet;
-    PageScreen: TTabSheet;
+    PageSurfaces: TTabSheet;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SE1: TFloatSpinEdit;
@@ -69,7 +71,15 @@ type
     SpeedButton12: TSpeedButton;
     SpeedButton13: TSpeedButton;
     SpeedButton14: TSpeedButton;
+    SpeedButton15: TSpeedButton;
+    SpeedButton16: TSpeedButton;
+    SpeedButton17: TSpeedButton;
+    SpeedButton18: TSpeedButton;
+    SpeedButton19: TSpeedButton;
     SpeedButton2: TSpeedButton;
+    SpeedButton20: TSpeedButton;
+    SpeedButton21: TSpeedButton;
+    SpeedButton22: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButton5: TSpeedButton;
@@ -82,6 +92,7 @@ type
     procedure BDebugClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
     procedure CBTexturesSelect(Sender: TObject);
+    procedure SpeedButton15Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
     FModified: boolean;
@@ -219,6 +230,23 @@ begin
       else ScreenLevelEditor.SetTintModeOnSelection(tmMixColor);
 end;
 
+procedure TFrameToolLevelEditor.SpeedButton15Click(Sender: TObject);
+begin
+  if ScreenLevelEditor.SelectedCount = 0 then exit;
+
+  case TSpeedButton(Sender).ImageIndex of
+    14: ScreenLevelEditor.RotateSelectedCCW;
+    15: ScreenLevelEditor.RotateSelectedCW;
+    16: ScreenLevelEditor.MirrorSelectedH;
+    17: ScreenLevelEditor.MirrorSelectedV;
+    18: ScreenLevelEditor.SelectedToTop;
+    19: ScreenLevelEditor.SelectedToTopOneStep;
+    20: ScreenLevelEditor.SelectedToBackOneStep;
+    21: ScreenLevelEditor.SelectedToBack;
+  end;
+
+end;
+
 procedure TFrameToolLevelEditor.SpeedButton1Click(Sender: TObject);
 begin
   if CBAlignReference.ItemIndex = -1 then exit;
@@ -305,7 +333,7 @@ begin
 
   CBTextures.Clear;
 
-  PC1.PageIndex := PC1.IndexOf(PageScreen);
+  PC1.PageIndex := PC1.IndexOf(PageSurfaces);
   FInitializingWidget := False;
 end;
 
@@ -395,7 +423,7 @@ begin
   Textures.FillComboBox(CBTextures);
 
   ShowSelectionData(NIL);
-  PC1.PageIndex := PC1.IndexOf(PageScreen);
+  PC1.PageIndex := PC1.IndexOf(PageSurfaces);
 
   FrameTextureList.UpdateTextureWidgetState;
   //UpdateScreenWidgetState;
@@ -410,6 +438,7 @@ begin
 end;
 
 procedure TFrameToolLevelEditor.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
+var r,g,b: byte;
 begin
   FInitializingWidget := True;
   FWorkingChild := NIL;
@@ -430,13 +459,17 @@ begin
       SE8.Value := surface.Opacity.Value;
       CBFlipH.Checked := surface.FlipH;
       CBFlipV.Checked := surface.FlipV;
-      ColorButton1.ButtonColor := surface.Tint.Value.ToColor;
+      surface.Tint.Value.ToRGB(r, g, b);
+      ColorButton1.ButtonColor := RGBToColor(r, g, b);
       SE9.Value := Round(surface.Tint.Alpha.Value);
       case surface.TintMode of
         tmMixColor: RadioButton2.Checked := True;
         tmReplaceColor: RadioButton1.Checked := True;
       end;
     end;
+    Label8.Visible := True;
+    Label8.Caption := 'ID '+FWorkingChild^.id.ToString+' index '+Surfaces.GetItemIndexByID(FWorkingChild^.id).ToString+'/'+(integer(Surfaces.Size)-1).ToString+
+                      '  layerIndex '+FWorkingChild^.surface.ParentLayer.IndexOf(FWorkingChild^.surface).ToString+'/'+(FWorkingChild^.surface.ParentLayer.SurfaceCount-1).ToString;
     CBTextures.Enabled := True;
     Panel2.Visible := True;
     BNewSurface.Enabled := False;
@@ -444,6 +477,7 @@ begin
   else
   if Length(aSelected) > 1 then begin
     // several selected -> we can not edit the parameters
+    Label8.Visible := False;
     CBTextures.Enabled := False;
     CBTextures.ItemIndex := -1;
     Panel2.Visible := False;
@@ -467,6 +501,7 @@ begin
     SE9.Value := 0;
     RadioButton1.Checked := True;
     BNewSurface.Enabled := True;
+    Label8.Visible := False;
   end;
 
   FInitializingWidget := False;

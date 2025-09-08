@@ -20,15 +20,15 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Height = 612
     Top = 32
     Width = 300
-    ActivePage = PageScreen
+    ActivePage = PageSurfaces
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabIndex = 1
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
     end
-    object PageScreen: TTabSheet
-      Caption = 'Screen'
+    object PageSurfaces: TTabSheet
+      Caption = 'Surfaces'
       ClientHeight = 584
       ClientWidth = 292
       object Panel1: TPanel
@@ -427,10 +427,23 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             ShowHint = True
             ParentShowHint = False
           end
+          object Label8: TLabel
+            AnchorSideLeft.Control = Panel2
+            AnchorSideTop.Control = Panel2
+            Left = 2
+            Height = 15
+            Top = 2
+            Width = 13
+            BorderSpacing.Left = 1
+            BorderSpacing.Top = 1
+            Caption = 'ID'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
         end
         object Panel3: TPanel
           AnchorSideLeft.Control = Panel1
-          AnchorSideTop.Control = Panel2
+          AnchorSideTop.Control = Panel5
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
@@ -438,7 +451,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 0
           Height = 102
-          Top = 268
+          Top = 314
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 102
@@ -618,7 +631,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton9: TSpeedButton
             Cursor = crHandPoint
-            Left = 46
+            Left = 48
             Height = 26
             Hint = 'Align bottom side to the vertical center of the reference'
             Top = 64
@@ -762,7 +775,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 96
-          Top = 370
+          Top = 416
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 96
@@ -825,18 +838,162 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         object Label6: TLabel
           Left = 9
           Height = 15
-          Top = 490
+          Top = 544
           Width = 80
           Caption = 'surfaces count:'
         end
         object BDebug: TSpeedButton
-          Left = 240
+          Left = 112
           Height = 30
-          Top = 490
+          Top = 536
           Width = 35
           Images = DataModule1.ImageList1
           ImageIndex = 6
           OnClick = BDebugClick
+        end
+        object Panel5: TPanel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Panel2
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Left = 0
+          Height = 46
+          Top = 268
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ClientHeight = 46
+          ClientWidth = 292
+          ParentBackground = False
+          TabOrder = 4
+          object SpeedButton15: TSpeedButton
+            Cursor = crHandPoint
+            Left = 12
+            Height = 26
+            Hint = 'rotate the selection 90° CCW'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 14
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton16: TSpeedButton
+            Cursor = crHandPoint
+            Left = 44
+            Height = 26
+            Hint = 'rotate the selection 90° CW'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 15
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton17: TSpeedButton
+            Cursor = crHandPoint
+            Left = 76
+            Height = 26
+            Hint = 'Mirror horizontal'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 16
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton18: TSpeedButton
+            Cursor = crHandPoint
+            Left = 108
+            Height = 26
+            Hint = 'Mirror vertical'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 17
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton19: TSpeedButton
+            Cursor = crHandPoint
+            Left = 140
+            Height = 26
+            Hint = 'Move to top'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 18
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton20: TSpeedButton
+            Cursor = crHandPoint
+            Left = 172
+            Height = 26
+            Hint = 'Move to top one step'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 19
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton21: TSpeedButton
+            Cursor = crHandPoint
+            Left = 204
+            Height = 26
+            Hint = 'Move to back one step'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 20
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object SpeedButton22: TSpeedButton
+            Cursor = crHandPoint
+            Left = 236
+            Height = 26
+            Hint = 'Move to back'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 21
+            Transparent = False
+            OnClick = SpeedButton15Click
+            ShowHint = True
+            ParentShowHint = False
+          end
         end
       end
     end
