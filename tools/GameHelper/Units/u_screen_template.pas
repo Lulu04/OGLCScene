@@ -131,6 +131,7 @@ TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
   function MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
+  function GetSelectedBounds: TRectF;
 protected
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
@@ -139,6 +140,7 @@ protected
 public
   procedure SelectNone; virtual;
   procedure SelectAll; virtual;
+  procedure DuplicateSelection; virtual;
 
 public // align
   function GetFirstSelectedX: single;
@@ -147,13 +149,22 @@ public // align
   function GetFirstSelectedY: single;
   function GetFirstSelectedCenterY: single;
   function GetFirstSelectedBottomY: single;
+  procedure AlignSelectedLeftTo(aX: single); virtual;
+  procedure AlignSelectedHCenterTo(aX: single); virtual;
+  procedure AlignSelectedRightTo(aX: single); virtual;
+  procedure AlignSelectedTopTo(aY: single); virtual;
+  procedure AlignSelectedVCenterTo(aY: single); virtual;
+  procedure AlignSelectedBottomTo(aY: single); virtual;
+public // rotate 90, mirror, plane
+  procedure RotateSelectedCCW; virtual;
+  procedure RotateSelectedCW; virtual;
+  procedure MirrorSelectedH; virtual;
+  procedure MirrorSelectedV; virtual;
+  procedure SelectedToTop;
+  procedure SelectedToTopOneStep;
+  procedure SelectedToBackOneStep;
+  procedure SelectedToBack;
 
-  procedure AlignSelectedLeftTo(aX: single);
-  procedure AlignSelectedHCenterTo(aX: single);
-  procedure AlignSelectedRightTo(aX: single);
-  procedure AlignSelectedTopTo(aY: single);
-  procedure AlignSelectedVCenterTo(aY: single);
-  procedure AlignSelectedBottomTo(aY: single);
 
 
 
@@ -619,6 +630,35 @@ begin
       Exit(True);
 end;
 
+function TScreenWithSurfaceHandling.GetSelectedBounds: TRectF;
+var i: integer;
+  xmin, xmax, ymin, ymax, xx, yy, w, h: single;
+begin
+  if Length(FSelected) = 0 then begin
+    Result := RectF(0, 0, 0, 0);
+    exit;
+  end;
+
+  xmin := MaxSingle;
+  yMin := MaxSingle;
+  xmax := MinSingle;
+  ymax := MinSingle;
+  for i:=0 to High(FSelected) do begin
+    with FSelected[i]^.surface do begin
+      xx := X.Value;
+      yy := Y.Value;
+      w := Width;
+      h := Height;
+    end;
+    if xx < xmin then xmin := xx;
+    if yy < ymin then ymin := yy;
+    if xx+w > xmax then xmax := xx + w;
+    if yy+h > ymax then ymax := yy + h;
+  end;
+
+  Result := RectF(PointF(xmin, ymin), PointF(xmax, ymax));
+end;
+
 procedure TScreenWithSurfaceHandling.SelectNone;
 var i: integer;
 begin
@@ -638,6 +678,15 @@ begin
     Surfaces.Mutable[i]^.Selected := True;
     FSelected[i] := Surfaces.Mutable[i];
   end;
+end;
+
+procedure TScreenWithSurfaceHandling.DuplicateSelection;
+var A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) = 0 then exit;
+  A := Copy(FSelected, 0, Length(FSelected));
+  SelectNone;
+  AddToSelected(Surfaces.DuplicateItemsByID(A));
 end;
 
 function TScreenWithSurfaceHandling.GetFirstSelectedX: single;
@@ -716,6 +765,236 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.BottomY := aY;
   UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenWithSurfaceHandling.RotateSelectedCCW;
+var i: integer;
+  r: TRectF;
+  centerXRect, centerYRect, xx, yy, s, c: single;
+begin
+  if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = 1 then begin
+    with FSelected[0]^.surface do
+      Angle.Value := Angle.Value - 90;
+    exit;
+  end;
+
+  r := GetSelectedBounds;
+  centerXRect := r.Left + r.Width * 0.5;
+  centerYRect := r.Top + r.Height * 0.5;
+
+  for i:=0 to High(FSelected) do
+    with FSelected[i]^.surface do begin
+      Angle.Value := Angle.Value - 90;
+      xx := CenterX - centerXRect;
+      yy := CenterY - centerYRect;
+      sincos(90 * deg2rad, s, c);
+      SetCenterCoordinate(centerXRect + xx * c + yy * s, centerYRect - xx * s  + c * yy);
+    end;
+
+  UpdateHandlePositionOnSelected
+end;
+
+procedure TScreenWithSurfaceHandling.RotateSelectedCW;
+var i: integer;
+  r: TRectF;
+  centerXRect, centerYRect, xx, yy, s, c: single;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  r := GetSelectedBounds;
+  centerXRect := r.Left + r.Width * 0.5;
+  centerYRect := r.Top + r.Height * 0.5;
+
+  for i:=0 to High(FSelected) do
+    with FSelected[i]^.surface do begin
+      Angle.Value := Angle.Value + 90;
+      xx := CenterX - centerXRect;
+      yy := CenterY - centerYRect;
+      sincos(-90 * deg2rad, s, c);
+      SetCenterCoordinate(centerXRect + xx * c + yy * s, centerYRect - xx * s  + c * yy);
+    end;
+  UpdateHandlePositionOnSelected
+end;
+
+procedure TScreenWithSurfaceHandling.MirrorSelectedH;
+var i: integer;
+  r: TRectF;
+  halfWidthRect, xRectCenter: single;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  if Length(FSelected) = 1 then begin
+    with FSelected[0]^.surface do FlipH := not FlipH;
+    exit;
+  end;
+
+  // mirror the selection
+  r := GetSelectedBounds;
+  halfWidthRect := r.Width*0.5;
+  xRectCenter := r.Left + halfWidthRect;
+
+  for i:=0 to High(FSelected) do
+    with FSelected[i]^.surface do begin
+      FlipH := not FlipH;
+      RightX := r.Left + xRectCenter - X.Value + halfWidthRect;
+    end;
+  UpdateHandlePositionOnSelected
+end;
+
+procedure TScreenWithSurfaceHandling.MirrorSelectedV;
+var i: integer;
+  r: TRectF;
+  halfHeightRect, yRectCenter: single;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  if Length(FSelected) = 1 then begin
+    with FSelected[0]^.surface do FlipV := not FlipV;
+    exit;
+  end;
+
+  // mirror the selection
+  r := GetSelectedBounds;
+  halfHeightRect := r.Height*0.5;
+  yRectCenter := r.Top + halfHeightRect;
+
+  for i:=0 to High(FSelected) do
+    with FSelected[i]^.surface do begin
+      FlipV := not FlipV;
+      BottomY := r.Top + yRectCenter - Y.Value + halfHeightRect;
+    end;
+  UpdateHandlePositionOnSelected
+end;
+
+procedure TScreenWithSurfaceHandling.SelectedToTop;
+var A, ids: TArrayOfInteger;
+  i, newIndex: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  // save the selected IDs
+  ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
+
+  // get the sorted indexes
+  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+
+  // shift the surface in their layer and in the surface list
+  newIndex := Surfaces.Size-1;
+  for i:=High(A) downto 0 do begin
+    Surfaces.GetByIndex(A[i])^.surface.ParentLayer.Move(A[i], newIndex);
+    Surfaces.MoveItemTo(A[i], newIndex);
+    dec(newIndex);
+  end;
+
+  // reconstruct the selected because their adress have changed
+  FSelected := NIL;
+  SetLength(FSelected, Length(ids));
+  for i:=0 to High(ids) do
+    FSelected[i] := Surfaces.GetItemByID(ids[i]);
+
+  SetFlagModified;
+end;
+
+procedure TScreenWithSurfaceHandling.SelectedToTopOneStep;
+var A, ids: TArrayOfInteger;
+  i, newIndex, previous: integer;
+  surf: TSimpleSurfaceWithEffect;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  // save the selected IDs
+  ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
+
+  // get the sorted indexes
+  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+
+  // shift the surface in their layer and in the surface list
+  previous := -1;
+  for i:=High(A) downto 0 do begin
+    newIndex := A[i] + 1;
+    if newIndex <> previous then begin
+      surf := Surfaces.GetByIndex(A[i])^.surface;
+      if newIndex < surf.ParentLayer.SurfaceCount then begin
+        surf.ParentLayer.Move(A[i], newIndex);
+        Surfaces.MoveItemTo(A[i], newIndex);
+        previous := newIndex;
+      end else previous := A[i];
+    end;
+  end;
+
+  // reconstruct the selected because their adress have changed
+  FSelected := NIL;
+  SetLength(FSelected, Length(ids));
+  for i:=0 to High(ids) do
+    FSelected[i] := Surfaces.GetItemByID(ids[i]);
+
+  SetFlagModified;
+end;
+
+procedure TScreenWithSurfaceHandling.SelectedToBackOneStep;
+var A, ids: TArrayOfInteger;
+  i, newIndex, previous: integer;
+  surf: TSimpleSurfaceWithEffect;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  // save the selected IDs
+  ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
+
+  // get the sorted indexes
+  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+
+  // shift the surface in their layer and in the surface list
+  previous := -1;
+  for i:=0 to High(A) do begin
+    newIndex := A[i] - 1;
+    if newIndex <> previous then begin
+      surf := Surfaces.GetByIndex(A[i])^.surface;
+      if newIndex >= 0 then begin
+        surf.ParentLayer.Move(A[i], newIndex);
+        Surfaces.MoveItemTo(A[i], newIndex);
+        previous := newIndex;
+      end else previous := A[i];
+    end;
+  end;
+
+  // reconstruct the selected because their adress have changed
+  FSelected := NIL;
+  SetLength(FSelected, Length(ids));
+  for i:=0 to High(ids) do
+    FSelected[i] := Surfaces.GetItemByID(ids[i]);
+
+  SetFlagModified;
+end;
+
+procedure TScreenWithSurfaceHandling.SelectedToBack;
+var A, ids: TArrayOfInteger;
+  i, newIndex: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  // save the selected IDs
+  ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
+
+  // get the sorted indexes
+  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+
+  // shift the surface in their layer
+  newIndex := 0;
+  for i:=0 to High(A) do begin
+    Surfaces.GetByIndex(A[i])^.surface.ParentLayer.Move(A[i], newIndex);
+    Surfaces.MoveItemTo(A[i], newIndex);
+    inc(newIndex);
+  end;
+
+  // reconstruct the selected because their adress have changed
+  FSelected := NIL;
+  SetLength(FSelected, Length(ids));
+  for i:=0 to High(ids) do
+    FSelected[i] := Surfaces.GetItemByID(ids[i]);
+
+  SetFlagModified;
 end;
 
 procedure TScreenWithSurfaceHandling.ReverseAngleOnSelection;

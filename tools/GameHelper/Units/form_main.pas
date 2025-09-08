@@ -211,15 +211,15 @@ end;
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (FScene = NIL) or (FScene.CurrentScreen = NIL) then exit;
-  FScene.ProcessOnKeyDown(Key, Shift);
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessOnKeyDown(Key, Shift);
+  FScene.ProcessOnKeyDown(Key, Shift);
 end;
 
 procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (FScene = NIL) or (FScene.CurrentScreen = NIL) then exit;
-  FScene.ProcessOnKeyUp(Key, Shift);
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessOnKeyUp(Key, Shift);
+  FScene.ProcessOnKeyUp(Key, Shift);
 end;
 
 procedure TFormMain.OGLMouseDown(Sender: TObject; Button: TMouseButton;

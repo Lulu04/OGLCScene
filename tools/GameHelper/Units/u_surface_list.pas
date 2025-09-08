@@ -17,6 +17,7 @@ classOfSimpleSurfaceWithEffect = class of TSimpleSurfaceWithEffect;
 TSurfaceList = class;
 { TSurfaceDescriptor }
 
+PSurfaceDescriptor = ^TSurfaceDescriptor;
 TSurfaceDescriptor = record
 private
   HandleManager: TUIHandleManager;
@@ -79,11 +80,12 @@ public
   property Selected: boolean read GetSelected write SetSelected;
   property Pivot: TPointF read GetPivot write SetPivot;
 
+  procedure DuplicateTo(aSurface: PSurfaceDescriptor);
+
   function SaveToString: string;
   procedure LoadFromString(const s: string);
 
 end;
-PSurfaceDescriptor = ^TSurfaceDescriptor;
 ArrayOfPSurfaceDescriptor = array of PSurfaceDescriptor;
 
 {$define _INTERFACE}
@@ -120,7 +122,7 @@ public
   function GetRootItem: PSurfaceDescriptor;
   function RootIsDefined: boolean;
 
-  // Returns the items located at the specified position.
+  // Returns the items pointed by the specified position.
   // Items are sorted from nearest to furthest away.
   function GetItemsAt(aX, aY: integer): ArrayOfPSurfaceDescriptor;
 
@@ -128,6 +130,19 @@ public
   function TextureNameisUsedByASurface(const aTextureName: string): boolean;
 
   procedure DeleteItemByID(aID: integer);
+  function DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
+
+  function ItemsDescriptorToArrayOfID(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
+
+  function GetItemsIndexesByIDSortedSmallToHigh(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
+  procedure MoveItemTo(aCurrentIndex, aNewindex: integer);
+  procedure ShiftItemToTopOneStep(aItemIndex: integer);
+  procedure ShiftItemToBackOneStep(aItemIndex: integer);
+
+{  procedure ShiftItemsToTop(A: TArrayOfInteger);
+  procedure ShiftItemsToTopOneStep(A: TArrayOfInteger);
+  procedure ShiftItemsToBack(A: TArrayOfInteger);
+  procedure ShiftItemsToBackOneStep(A: TArrayOfInteger); }
 
   procedure SelectNone;
 
@@ -679,6 +694,27 @@ begin
   CreateCollisionBody;
 end;
 
+procedure TSurfaceDescriptor.DuplicateTo(aSurface: PSurfaceDescriptor);
+begin
+  aSurface^.parentID := parentID;
+  aSurface^.name := name;
+  aSurface^.textureName := textureName;
+  aSurface^.classtype := classtype;
+  aSurface^.CreateSurface(True);
+  aSurface^.surface.ZOrderAsChild := surface.ZOrderAsChild;
+  aSurface^.SetChildDependency;
+  aSurface^.surface.SetCoordinate(surface.GetXY);
+  aSurface^.surface.Pivot := surface.Pivot;
+  aSurface^.surface.Angle.Value := surface.Angle.Value;
+  aSurface^.surface.Scale.Value := surface.Scale.Value;
+  if surface is TSprite then TSprite(aSurface^.surface).SetSize(surface.Width, surface.Height);
+  aSurface^.surface.FlipH := surface.FlipH;
+  aSurface^.surface.FlipV := surface.FlipV;
+  aSurface^.surface.Opacity.Value := surface.Opacity.Value;
+  aSurface^.surface.Tint.Value := surface.Tint.Value;
+  aSurface^.surface.TintMode := surface.TintMode;
+end;
+
 
 procedure TSurfaceDescriptor.AddOffsetToPivot(aOffset: TPointF);
 var ppivot: TPointF;
@@ -815,11 +851,14 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
       AddToResult(GetItemBySurface(aSurface));
   end;
   procedure CopySurfaceList;
-  var i: SizeUInt;
+  var i, j: SizeUInt;
   begin
     SetLength(Result, Size);
-    for i:=0 to Size-1 do
-      Result[i] := Mutable[i];
+    j := Size;
+    for i:=0 to Size-1 do begin
+      dec(j);
+      Result[i] := Mutable[j];
+    end;
   end;
 
 begin
@@ -830,6 +869,29 @@ begin
       if RootIsDefined then
         CheckRecursive(GetRootItem^.surface);
     end;
+end;
+
+procedure TSurfaceList.MoveItemTo(aCurrentIndex, aNewindex: integer);
+var o: TSurfaceDescriptor;
+begin
+  if aCurrentIndex = aNewindex then exit;
+  if (aCurrentIndex >= Size) or (aNewindex >= Size) then begin
+    Raise exception.Create('index out of bounds');
+    exit;
+  end;
+
+  o := Mutable[aCurrentIndex]^;
+  Erase(aCurrentIndex);
+  Insert(aNewindex, o);
+end;
+
+function TSurfaceList.ItemsDescriptorToArrayOfID(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
+var i: integer;
+begin
+  Result := NIL;
+  SetLength(Result, Length(aItems));
+  for i:=0 to High(Result) do
+    Result[i] := aItems[i]^.id;
 end;
 
 constructor TSurfaceList.Create;
@@ -994,6 +1056,65 @@ begin
     Self.Erase(i);
     ScreenSpriteBuilder.Postures.DeleteValueEntryInEachPosture(i);
   end;
+end;
+
+function TSurfaceList.DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
+var i: integer;
+  ids: array of integer;
+begin
+  Result := NIL;
+  if Length(aItems) = 0 then exit;
+
+  // retrieve the item's id to duplicate
+  ids := ItemsDescriptorToArrayOfID(aItems);
+
+  SetLength(Result, Length(aItems));
+  for i:=0 to High(aItems) do begin
+    Result[i] := AddEmpty;
+    GetItemByID(ids[i])^.DuplicateTo(Result[i]);
+  end;
+end;
+
+function TSurfaceList.GetItemsIndexesByIDSortedSmallToHigh(
+  aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
+var i: SizeUInt;
+  k: integer;
+  flag: Boolean;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  if Length(aItems) = 0 then exit;
+
+  SetLength(Result, Length(aItems));
+  for i:=0 to High(Result) do
+    Result[i] := GetItemIndexByID(aItems[i]^.id);
+  if Length(Result) = 1 then exit;
+
+  // sort the index array from small to high
+  repeat
+    flag := False;
+    for i:=0 to High(Result)-1 do
+      if Result[i] > Result[i+1] then begin
+        k := Result[i];
+        Result[i] := Result[i+1];
+        Result[i+1] := k;
+        flag := True;
+      end;
+  until not flag;
+end;
+
+procedure TSurfaceList.ShiftItemToTopOneStep(aItemIndex: integer);
+begin
+  if Size = 0 then exit;
+  if aItemIndex = Size-1 then exit;
+  MoveItemTo(aItemIndex, aItemIndex+1);
+end;
+
+procedure TSurfaceList.ShiftItemToBackOneStep(aItemIndex: integer);
+begin
+  if Size = 0 then exit;
+  if aItemIndex = 0 then exit;
+  MoveItemTo(aItemIndex, aItemIndex-1);
 end;
 
 procedure TSurfaceList.SelectNone;

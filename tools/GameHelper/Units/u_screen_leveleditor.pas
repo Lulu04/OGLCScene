@@ -30,6 +30,18 @@ public
   procedure ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean); override;
   procedure DeleteSelection; override;
   procedure LoopScaleSelection; override; // change size instead scale
+
+  procedure AlignSelectedLeftTo(aX: single); override;
+  procedure AlignSelectedHCenterTo(aX: single); override;
+  procedure AlignSelectedRightTo(aX: single); override;
+  procedure AlignSelectedTopTo(aY: single); override;
+  procedure AlignSelectedVCenterTo(aY: single); override;
+  procedure AlignSelectedBottomTo(aY: single); override;
+
+  procedure RotateSelectedCCW; override;
+  procedure RotateSelectedCW; override;
+  procedure MirrorSelectedH; override;
+  procedure MirrorSelectedV; override;
 public
   FSurfaces: TLevelEditorSurfaceList;
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -137,6 +149,106 @@ begin
     end;
     Application.ProcessMessages;
   until MouseState <> msScalingSelection;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedLeftTo(aX: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedLeftTo(aX);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedHCenterTo(aX: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedHCenterTo(aX);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedRightTo(aX: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedRightTo(aX);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedTopTo(aY: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedTopTo(aY);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedVCenterTo(aY: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedVCenterTo(aY);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.AlignSelectedBottomTo(aY: single);
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited AlignSelectedBottomTo(aY);
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.RotateSelectedCCW;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited RotateSelectedCCW;
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.RotateSelectedCW;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited RotateSelectedCW;
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.MirrorSelectedH;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited MirrorSelectedH;
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.MirrorSelectedV;
+begin
+  if Length(FSelected) = 0 then exit;
+
+  inherited MirrorSelectedV;
+
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+  FrameToolLevelEditor.Modified := True;
 end;
 
 procedure TScreenLevelEditor.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -340,6 +452,10 @@ begin
 
     VK_A: begin
      if ssCtrl in Shift then SelectAll;
+    end;
+
+    VK_D: begin
+     if ssCtrl in Shift then DuplicateSelection;
     end;
 
 
