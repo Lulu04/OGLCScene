@@ -95,6 +95,7 @@ end;
 procedure TScreenLevelBank.ShowLevel(aIndex: integer);
 begin
   FSurfaces.LoadFromString(LevelBank.Mutable[aIndex]^.surfaces);
+  ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
 end;
 
 end.

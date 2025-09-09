@@ -85,7 +85,7 @@ begin
   AddImageToImageList('AlignHLeftToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignHLeftToRight.svg', ILIconAlign);
 
-  // 8
+  // 7
   AddImageToImageList('AlignVBottomToTop.svg', ILIconAlign);
   AddImageToImageList('AlignVBottomToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignVTop.svg', ILIconAlign);
@@ -94,7 +94,7 @@ begin
   AddImageToImageList('AlignVTopToCenter.svg', ILIconAlign);
   AddImageToImageList('AlignVTopToBottom.svg', ILIconAlign);
 
-  // 15
+  // 14
   AddImageToImageList('Rotate90CCW.svg', ILIconAlign);
   AddImageToImageList('Rotate90CW.svg', ILIconAlign);
   AddImageToImageList('MirrorH.svg', ILIconAlign);
@@ -104,6 +104,9 @@ begin
   AddImageToImageList('ShiftBackOneStep.svg', ILIconAlign);
   AddImageToImageList('ShiftBack.svg', ILIconAlign);
 
+  // 22
+  AddImageToImageList('ZoomAll.svg', ILIconAlign);
+  AddImageToImageList('ZoomOnSelection.svg', ILIconAlign);
 end;
 
 end.

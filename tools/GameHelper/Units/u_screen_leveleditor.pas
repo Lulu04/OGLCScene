@@ -5,7 +5,7 @@ unit u_screen_leveleditor;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, SysUtils, Graphics,
   BGRABitmap, BGRABitmapTypes,
   OGLCScene,
   u_common, u_screen_template,
@@ -50,6 +50,8 @@ public
   procedure ProcessMouseWheel({%H-}Shift: TShiftState; {%H-}WheelDelta: Integer; {%H-}MousePos: TPoint; var {%H-}Handled: Boolean); override;
   procedure ProcessOnKeyUp(var Key: Word; {%H-}Shift: TShiftState); override;
 public
+  WorldBounds: TShapeOutline;
+
   procedure CreateObjects; override;
   procedure FreeObjects; override;
 
@@ -69,6 +71,8 @@ public
 
   procedure SetFlagModified; override;
   function Surfaces: TSurfaceList; override;
+
+  procedure UpdateWorldBounds(aX, aY, aWidth, aHeight: single; aColor: TColor; aVisible: boolean);
 end;
 
 var ScreenLevelEditor: TScreenLevelEditor;
@@ -76,7 +80,7 @@ var ScreenLevelEditor: TScreenLevelEditor;
 implementation
 
 uses Forms, u_levelbank, frame_tool_leveleditor, form_main, u_app_pref, Controls,
-  LCLType;
+  LCLType, Math;
 
 { TLevelEditorSurfaceList }
 
@@ -471,13 +475,22 @@ end;
 
 procedure TScreenLevelEditor.CreateObjects;
 begin
-  ShowLayers([LAYER_UI, LAYER_LEVELEDITOR]);
+  ShowLayers([LAYER_UI, LAYER_LEVELEDITOR, LAYER_UIBACK]);
   // camera
-  CreateCamera([LAYER_LEVELEDITOR]);
+  CreateCamera([LAYER_LEVELEDITOR, LAYER_UIBACK]);
+  // world bounds
+  WorldBounds := TShapeOutline.Create(FScene);
+  WorldBounds.LineWidth := 3.0;
+  FScene.Add(WorldBounds, LAYER_UIBACK);
+
+  // do zoom all
+  ZoomAll;
 end;
 
 procedure TScreenLevelEditor.FreeObjects;
 begin
+  WorldBounds.Kill;
+  WorldBounds := NIL;
   //SelectNone;
   FreeCamera;
 end;
@@ -594,6 +607,15 @@ end;
 function TScreenLevelEditor.Surfaces: TSurfaceList;
 begin
   Result := FSurfaces;
+end;
+
+procedure TScreenLevelEditor.UpdateWorldBounds(aX, aY, aWidth,
+  aHeight: single; aColor: TColor; aVisible: boolean);
+begin
+  if WorldBounds = NIL then exit;
+  WorldBounds.SetShapeRectangle(aX, aY, Ceil(aWidth), Ceil(aHeight));
+  WorldBounds.LineColor := ColorToBGRA(aColor);
+  WorldBounds.Visible := aVisible;
 end;
 
 end.

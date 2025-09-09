@@ -5,7 +5,7 @@ unit frame_tool_levelbank;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls, Buttons, StdCtrls,
+  Classes, SysUtils, Forms, Controls, ExtCtrls, Buttons, StdCtrls, Dialogs,
   u_levelbank;
 
 type
@@ -28,8 +28,10 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     Panel8: TPanel;
+    SD1: TSaveDialog;
     procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
+    procedure BExportToPascalUnitClick(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; User: boolean);
@@ -46,7 +48,7 @@ type
 
 implementation
 
-uses u_screen_levelbank, u_project, form_main, Dialogs;
+uses u_screen_levelbank, u_project, form_main;
 
 {$R *.lfm}
 
@@ -121,6 +123,27 @@ begin
   if i = -1 then exit;
   LB.ItemIndex := -1;
   FormMain.EditLevelInLevelBank(LB.Items.Strings[i]);
+end;
+
+procedure TFrameToolLevelBank.BExportToPascalUnitClick(Sender: TObject);
+var t: TStringlist;
+  s: string;
+begin
+  if LB.ItemIndex = -1 then exit;
+  s := Trim(Edit1.Text);
+  if Length(s) < 2 then exit;
+  if s[1] <> 'T' then s := 'T'+s;
+  SD1.FileName := Copy(s, 2, Length(Edit1.Text));
+  if not SD1.Execute then exit;
+
+  t := TStringList.Create;
+
+  try
+    t.SaveToFile(SD1.FileName);
+    ShowMessage('Pascal unit created');
+  finally
+    t.Free;
+  end;
 end;
 
 procedure TFrameToolLevelBank.LBMouseUp(Sender: TObject; Button: TMouseButton;

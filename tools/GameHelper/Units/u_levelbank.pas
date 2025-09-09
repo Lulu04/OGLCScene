@@ -8,14 +8,27 @@ interface
 uses
   Classes, SysUtils,
   OGLCScene, gvector,
+  BGRABitmap, BGRABitmapTypes,
   u_undo_redo, u_texture_list;
 
 //  Bank level have a single texture list shared by all level items.
 
 type
 
+{ TWorldInfo }
+
+TWorldInfo = record
+  x, y, width, height: single;
+  boundscolor: TBGRAPixel;
+  showbounds: boolean;
+  procedure InitDefault;
+  function SaveToString: string;
+  procedure LoadFromString(const s: string);
+end;
+
 TLevelBankItem = record
   name,
+  worldinfo,
   surfaces : string;
   procedure InitDefault;
   function SaveToString: string;
@@ -71,7 +84,39 @@ end;
 
 implementation
 
-uses frame_tool_levelbank, form_main;
+uses frame_tool_levelbank, form_main, u_common;
+
+{ TWorldInfo }
+
+procedure TWorldInfo.InitDefault;
+begin
+  Self := Default(TWorldInfo);
+end;
+
+function TWorldInfo.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('|');
+  prop.Add('WorldX', x);
+  prop.Add('WorldY', y);
+  prop.Add('WorldWidth', width);
+  prop.Add('WorldHeight', height);
+  prop.Add('WorldBoundsColor', boundscolor);
+  prop.Add('WorldShowBounds', showbounds);
+  Result := prop.PackedProperty;
+end;
+
+procedure TWorldInfo.LoadFromString(const s: string);
+var prop: TProperties;
+begin
+  prop.Split(s, '|');
+  prop.SingleValueOf('WorldX', x, 0);
+  prop.SingleValueOf('WorldY', y, 0);
+  prop.SingleValueOf('WorldWidth', width, FScene.Width);
+  prop.SingleValueOf('WorldHeight', height, FScene.Height);
+  prop.BGRAPixelValueOf('WorldBoundsColor', boundscolor, BGRA(255,0,0));
+  prop.BooleanValueOf('WorldShowBounds', showbounds, True);
+end;
 
 { TLevelBankItem }
 
@@ -82,7 +127,7 @@ end;
 
 function TLevelBankItem.SaveToString: string;
 begin
-  Result := name+'#'+surfaces;
+  Result := name+'#'+surfaces+'#'+worldinfo;
 end;
 
 procedure TLevelBankItem.LoadFromString(const s: string);
@@ -91,6 +136,7 @@ begin
   A := s.Split(['#']);
   name := A[0];
   surfaces := A[1];
+  if Length(A) > 2 then worldinfo := A[2] else worldinfo := '';
 end;
 
 constructor TLevelBank.Create;
@@ -164,6 +210,7 @@ begin
     for i:=0 to Size-1 do begin
       t.Add(Mutable[i]^.name);
       t.Add(Mutable[i]^.surfaces);
+      t.Add(Mutable[i]^.worldinfo);
     end;
 end;
 
@@ -188,6 +235,8 @@ begin
     o.name := t.Strings[k];
     inc(k);
     o.surfaces := t.Strings[k];
+    inc(k);
+    o.worldinfo := t.Strings[k];
     PushBack(o);
   end;
 end;
