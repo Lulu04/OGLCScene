@@ -162,8 +162,10 @@ public
   function ControlToWorld(aX, aY: integer): TPointF;
   function ControlToWorld(aPt: TPointF): TPointF;
 
-  // return the bounds of the view currently seen by the camera (in scene coordinates)
+  // return the rectangular bounds of the view currently seen by the camera (in world coordinates)
   function GetViewRect: TRectF;
+  // set the rectangular view seen by the camera to the specified value (in world coordinates).
+  procedure SetViewRect(aRect: TRectF);
 
   // Assign the camera to the layer specified by its index.
   // All previous assigned camera is replaced by the new one.
@@ -561,6 +563,19 @@ begin
   Result.Top := mini.y;
   Result.Right := maxi.x;
   Result.Bottom := maxi.y; }
+end;
+
+procedure TOGLCCamera.SetViewRect(aRect: TRectF);
+var p: TPointF;
+begin
+  p.x := aRect.Left + aRect.Width * 0.5;
+  p.y := aRect.Top + aRect.Height * 0.5;
+  MoveTo(p);
+
+  if (aRect.Width = 0) or (aRect.Height = 0) then exit;
+  p.x := Min(FParentScene.Width / aRect.Width, FParentScene.Height / aRect.Height);
+  p.y := p.x;
+  Scale.Value := p;
 end;
 
 procedure TOGLCCamera.AssignToLayer(aLayerIndex: integer);
