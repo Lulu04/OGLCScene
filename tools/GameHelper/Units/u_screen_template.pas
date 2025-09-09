@@ -83,9 +83,10 @@ public // callback from main form and openglcontrol to manage mouse and keyboard
   procedure ProcessOnKeyDown(var Key: Word; {%H-}Shift: TShiftState); virtual;
   procedure ProcessOnKeyUp(var Key: Word; {%H-}Shift: TShiftState); virtual;
   procedure ProcessMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean); virtual;
-public // camera
+public // camera and view
   procedure CreateCamera(const aLayerIndexList: array of integer);
   procedure FreeCamera;
+  procedure ZoomViewToFit(aRect: TRectF; aZoomCorrection: single=1.0);
   property Camera: TOGLCCamera read FCamera;
   property ViewOffset: TPointF read FViewOffset write SetViewOffset;
   property Zoom: single read FZoom write SetZoom;
@@ -165,6 +166,9 @@ public // rotate 90, mirror, plane
   procedure SelectedToBackOneStep;
   procedure SelectedToBack;
 
+  procedure ZoomAll;
+  procedure ZoomOnSelection;
+
 
 
 
@@ -198,6 +202,12 @@ procedure TCustomScreenTemplate.SetViewOffset(AValue: TPointF);
 begin
   FViewOffset := AValue;
   FCamera.MoveTo(FScene.Center + AValue);
+end;
+
+procedure TCustomScreenTemplate.ZoomViewToFit(aRect: TRectF; aZoomCorrection: single);
+begin
+  Zoom := Min(FScene.Width / aRect.Width, FScene.Height / aRect.Height) * aZoomCorrection;
+  ViewOffset := PointF(aRect.Left + aRect.Width * 0.5, aRect.Top + aRect.Height * 0.5) - FScene.Center;
 end;
 
 procedure TCustomScreenTemplate.SetMouseState(AValue: TMouseState);
@@ -995,6 +1005,19 @@ begin
     FSelected[i] := Surfaces.GetItemByID(ids[i]);
 
   SetFlagModified;
+end;
+
+procedure TScreenWithSurfaceHandling.ZoomAll;
+begin
+  ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
+  UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenWithSurfaceHandling.ZoomOnSelection;
+begin
+  if Length(FSelected) = 0 then exit;
+  ZoomViewToFit(GetSelectedBounds, 0.8);
+  UpdateHandlePositionOnSelected;
 end;
 
 procedure TScreenWithSurfaceHandling.ReverseAngleOnSelection;

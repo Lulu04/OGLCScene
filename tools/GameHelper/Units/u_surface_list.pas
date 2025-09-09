@@ -145,6 +145,7 @@ public
   procedure ShiftItemsToBackOneStep(A: TArrayOfInteger); }
 
   procedure SelectNone;
+  function GetItemsBounds: TRectF;
 
   procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,... on all surfaces
   procedure CopySurfaceValuesToTemporaryVariables;
@@ -741,37 +742,37 @@ var prop: TProperties;
 begin
   prop.Init('~');
   prop.Add('ID', id);
-  {if parentID <> -1 then} prop.Add('ParentID', parentID);
+  if parentID <> -1 then prop.Add('ParentID', parentID);
 
   if not ParentList.FModeForLevelEditor then
-  {if surface.ZOrderAsChild <> 0 then} prop.Add('ZOrder', surface.ZOrderAsChild);
+  if surface.ZOrderAsChild <> 0 then prop.Add('ZOrder', surface.ZOrderAsChild);
 
   if not ParentList.FModeForLevelEditor then
     prop.Add('Name', name);
 
   if not ParentList.FModeForLevelEditor then
-  {if classtype <> TSprite then} prop.Add('Classtype', classtype.ClassName);
+  if classtype <> TSprite then prop.Add('Classtype', classtype.ClassName);
 
   prop.Add('TextureName', textureName);
-  {if surface.Pivot.x <> 0.5 then} prop.Add('PivotX', surface.Pivot.x);
-  {if surface.Pivot.y <> 0.5 then} prop.Add('PivotY', surface.Pivot.y);
-  {if surface.Angle.Value <> 0 then} prop.Add('Angle', surface.Angle.Value);
+  if surface.Pivot.x <> 0.5 then prop.Add('PivotX', surface.Pivot.x);
+  if surface.Pivot.y <> 0.5 then prop.Add('PivotY', surface.Pivot.y);
+  if surface.Angle.Value <> 0 then prop.Add('Angle', surface.Angle.Value);
   prop.Add('X', surface.X.Value);
   prop.Add('Y', surface.Y.Value);
 
   if not ParentList.FModeForLevelEditor then begin
-    {if surface.Scale.X.Value <> 1.0 then} prop.Add('ScaleX', surface.Scale.X.Value);
-    {if surface.Scale.Y.Value <> 1.0 then} prop.Add('ScaleY', surface.Scale.Y.Value);
+    if surface.Scale.X.Value <> 1.0 then prop.Add('ScaleX', surface.Scale.X.Value);
+    if surface.Scale.Y.Value <> 1.0 then prop.Add('ScaleY', surface.Scale.Y.Value);
   end else begin
     prop.Add('Width', surface.Width);
     prop.Add('Height', surface.Height);
   end;
 
-  {if surface.FlipH then} prop.Add('FlipH', surface.FlipH);
-  {if surface.FlipV then} prop.Add('FlipV', surface.FlipV);
-  {if surface.Opacity.Value <> 255 then} prop.Add('Opacity', surface.Opacity.Value);
-  {if surface.Tint.Value <> BGRA(0,0,0,0) then} prop.Add('Tint', surface.Tint.Value);
-  {if surface.TintMode <> tmReplaceColor then} prop.Add('TintMode', Ord(surface.TintMode));
+  if surface.FlipH then prop.Add('FlipH', surface.FlipH);
+  if surface.FlipV then prop.Add('FlipV', surface.FlipV);
+  if surface.Opacity.Value <> 255 then prop.Add('Opacity', surface.Opacity.Value);
+  if surface.Tint.Value <> BGRA(0,0,0,0) then prop.Add('Tint', surface.Tint.Value);
+  if surface.TintMode <> tmReplaceColor then prop.Add('TintMode', Ord(surface.TintMode));
   Result := prop.PackedProperty;
 end;
 
@@ -783,7 +784,7 @@ begin
   s1 := '';
   InitDefault;
   prop.Split(s, '~');
-  prop.IntegerValueOf('ID', id, id);
+  prop.IntegerValueOf('ID', id, -1);
   prop.IntegerValueOf('ParentID', parentID, -1);
   prop.IntegerValueOf('ZOrder', zOrder, 0);
   prop.StringValueOf('Name', name, 'noname');
@@ -1123,6 +1124,35 @@ begin
   if Size > 0 then
    for i:=0 to Size-1 do
      Mutable[i]^.Selected := False;
+end;
+
+function TSurfaceList.GetItemsBounds: TRectF;
+var i: SizeUInt;
+  xmin, xmax, ymin, ymax, xx, yy, w, h: single;
+begin
+  if Size = 0 then begin
+    Result := RectF(0, 0, 0, 0);
+    exit;
+  end;
+
+  xmin := MaxSingle;
+  yMin := MaxSingle;
+  xmax := MinSingle;
+  ymax := MinSingle;
+  for i:=0 to Size-1 do begin
+    with Mutable[i]^.surface do begin
+      xx := X.Value;
+      yy := Y.Value;
+      w := Width;
+      h := Height;
+    end;
+    if xx < xmin then xmin := xx;
+    if yy < ymin then ymin := yy;
+    if xx+w > xmax then xmax := xx + w;
+    if yy+h > ymax then ymax := yy + h;
+  end;
+
+  Result := RectF(PointF(xmin, ymin), PointF(xmax, ymax));
 end;
 
 procedure TSurfaceList.SetValuesFromTemporaryVariables;

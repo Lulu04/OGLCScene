@@ -214,6 +214,7 @@ object FrameToolLevelBank: TFrameToolLevelBank
       Width = 197
       Caption = 'Export level to Pascal unit'
       ImageIndex = 8
+      OnClick = BExportToPascalUnitClick
     end
     object Label1: TLabel
       AnchorSideLeft.Control = Panel2
@@ -256,5 +257,11 @@ object FrameToolLevelBank: TFrameToolLevelBank
       Font.Style = [fsBold]
       ParentFont = False
     end
+  end
+  object SD1: TSaveDialog
+    Filter = 'pascal unit|*.pas|all files|*.*'
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
+    Left = 304
+    Top = 512
   end
 end

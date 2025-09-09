@@ -16,7 +16,7 @@ uses
   u_collisionbody_list, u_ui_atlas, u_datamodule, u_undo_redo,
   u_undoredo_spritebuilder, u_posture_list, frame_tool_leveleditor,
 u_screen_levelbank, u_levelbank, u_surface_extradata, frame_texturelist,
-u_screen_leveleditor, frame_tool_levelbank;
+u_screen_leveleditor, frame_tool_levelbank, unit1;
 
 {$R *.res}
 

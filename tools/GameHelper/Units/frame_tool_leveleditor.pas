@@ -18,36 +18,46 @@ type
     BAddToLevelBank: TSpeedButton;
     BCancel: TSpeedButton;
     BNewSurface: TSpeedButton;
+    BZoomOnSelection: TSpeedButton;
     CBFlipH: TCheckBox;
     CBFlipV: TCheckBox;
     CBTextures: TComboBox;
+    CheckBox1: TCheckBox;
     ColorButton1: TColorButton;
     CBAlignReference: TComboBox;
+    ColorButton2: TColorButton;
     Edit1: TEdit;
     Label1: TLabel;
+    Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
     Label15: TLabel;
     Label16: TLabel;
+    Label17: TLabel;
     Label18: TLabel;
     Label19: TLabel;
     Label2: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
     Label24: TLabel;
     Label25: TLabel;
     Label26: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
+    Panel6: TPanel;
+    Panel7: TPanel;
     Panel8: TPanel;
     PC1: TPageControl;
     PageTextures: TTabSheet;
@@ -63,7 +73,6 @@ type
     SE8: TSpinEdit;
     SE9: TSpinEdit;
     SE3: TSpinEdit;
-    BDebug: TSpeedButton;
     BResetSize: TSpeedButton;
     SpeedButton1: TSpeedButton;
     SpeedButton10: TSpeedButton;
@@ -80,6 +89,8 @@ type
     SpeedButton20: TSpeedButton;
     SpeedButton21: TSpeedButton;
     SpeedButton22: TSpeedButton;
+    BZoomAll: TSpeedButton;
+    SpeedButton23: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButton5: TSpeedButton;
@@ -87,13 +98,19 @@ type
     SpeedButton7: TSpeedButton;
     SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
+    SpinEdit1: TFloatSpinEdit;
+    SpinEdit2: TFloatSpinEdit;
+    SpinEdit3: TFloatSpinEdit;
+    SpinEdit4: TFloatSpinEdit;
+    TabSheet1: TTabSheet;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
-    procedure BDebugClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
+    procedure BZoomAllClick(Sender: TObject);
     procedure CBTexturesSelect(Sender: TObject);
     procedure SpeedButton15Click(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
+    procedure SpinEdit3Change(Sender: TObject);
   private
     FModified: boolean;
     FInitializingWidget: boolean;
@@ -112,6 +129,8 @@ type
     function DoAddNewSurface: boolean;
     procedure DoUpdateSurface(aForceRecreateSurface: boolean);
     procedure UpdateValuesToWorkingSurface;
+  private
+    procedure SendParamToWorldBounds;
   public
     FrameTextureList: TFrameTextureList;
     constructor Create(TheOwner: TComponent); override;
@@ -126,8 +145,8 @@ type
 
 implementation
 
-uses u_levelbank, u_screen_leveleditor, form_main, u_project, Graphics,
-  OGLCScene;
+uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
+  Graphics, OGLCScene;
 
 {$R *.lfm}
 
@@ -142,14 +161,10 @@ begin
   FormMain.ShowPageLevelBank;
 end;
 
-procedure TFrameToolLevelEditor.BDebugClick(Sender: TObject);
-begin
-  Label6.Caption := 'surface count: '+Surfaces.Size.ToString;
-end;
-
 procedure TFrameToolLevelEditor.BAddToLevelBankClick(Sender: TObject);
 var o: PLevelBankItem;
   nam: string;
+  wi: TWorldInfo;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
@@ -166,6 +181,15 @@ begin
   o^.name := nam;
   o^.surfaces := Surfaces.SaveToString;
 
+  wi.InitDefault;
+  wi.x := SpinEdit3.Value;
+  wi.y := SpinEdit4.Value;
+  wi.width := SpinEdit1.Value;
+  wi.height := SpinEdit2.Value;
+  wi.boundscolor := ColorToBGRA(ColorButton2.ButtonColor);
+  wi.showbounds := CheckBox1.Checked;
+  o^.worldinfo := wi.SaveToString;
+
   Project.SetModified;
   Project.Save;
   Modified := False;
@@ -180,6 +204,12 @@ begin
     if DoAddNewSurface then
       ShowSelectionData(ScreenLevelEditor.Selected);
   end;
+end;
+
+procedure TFrameToolLevelEditor.BZoomAllClick(Sender: TObject);
+begin
+  if Sender = BZoomAll then ScreenLevelEditor.ZoomAll;
+  if Sender = BZoomOnSelection then ScreenLevelEditor.ZoomOnSelection;
 end;
 
 procedure TFrameToolLevelEditor.CBTexturesSelect(Sender: TObject);
@@ -273,6 +303,22 @@ begin
         13: AlignSelectedTopTo(GetFirstSelectedBottomY);
       end;
   end;
+end;
+
+procedure TFrameToolLevelEditor.SpinEdit3Change(Sender: TObject);
+var r: TRectF;
+begin
+  if FInitializingWidget then exit;
+  if Sender = SpeedButton23 then begin
+    r := Surfaces.GetItemsBounds;
+    SpinEdit3.Value := r.Left;
+    SpinEdit4.Value := r.Top;
+    SpinEdit1.Value := r.Width;
+    SpinEdit2.Value := r.Height;
+  end;
+
+  SendParamToWorldBounds;
+  FModified := True;
 end;
 
 procedure TFrameToolLevelEditor.ProcessTextureListOnModified(Sender: TObject);
@@ -370,14 +416,13 @@ begin
     FWorkingChild^.classtype := TSprite;
     FWorkingChild^.textureName := CBToTextureName;
 
-//tex := FWorkingChild^.GetTextureFromTextureName;
-FWorkingChild^.width := SE3.Value;
-FWorkingChild^.height := SE4.Value;
-FWorkingChild^.parentID := -1;
-FWorkingChild^.name := '';
+    FWorkingChild^.width := SE3.Value;
+    FWorkingChild^.height := SE4.Value;
+    FWorkingChild^.parentID := -1;
+    FWorkingChild^.name := '';
 
     FWorkingChild^.CreateSurface;
-FWorkingChild^.SetChildDependency;
+    FWorkingChild^.SetChildDependency;
     FModified := True;
   end;
 
@@ -404,9 +449,24 @@ begin
   FWorkingChild^.UpdateHandlePosition;
 end;
 
+procedure TFrameToolLevelEditor.SendParamToWorldBounds;
+begin
+  ScreenLevelEditor.UpdateWorldBounds(SpinEdit3.Value, SpinEdit4.Value,
+                                      SpinEdit1.Value, SpinEdit2.Value,
+                                      ColorButton2.ButtonColor, CheckBox1.Checked);
+end;
+
 constructor TFrameToolLevelEditor.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
+
+  FInitializingWidget := True;
+  SpinEdit1.Value := FScene.Width;
+  SpinEdit2.Value := FScene.Height;
+
+  SpinEdit3.Value := 0;
+  SpinEdit4.Value := 0;
+  FInitializingWidget := False;
 
   FrameTextureList := TFrameTextureList.Create(Self);
   FrameTextureList.Parent := PageTextures;
@@ -426,7 +486,7 @@ begin
   PC1.PageIndex := PC1.IndexOf(PageSurfaces);
 
   FrameTextureList.UpdateTextureWidgetState;
-  //UpdateScreenWidgetState;
+  SendParamToWorldBounds;
 end;
 
 procedure TFrameToolLevelEditor.FillListBoxTextureNames;
@@ -509,12 +569,33 @@ end;
 
 procedure TFrameToolLevelEditor.EditLevelInLevelBank(const aName: string);
 var o: PLevelBankItem;
+  wi: TWorldInfo;
 begin
   o := LevelBank.GetItemByName(aName);
   if o = NIL then exit;
 
   Edit1.Text := o^.name;
   Surfaces.LoadFromString(o^.surfaces);
+
+  FInitializingWidget := True;
+  if Length(o^.worldinfo) > 0 then begin
+    wi.InitDefault;
+    wi.LoadFromString(o^.worldinfo);
+    SpinEdit3.Value := wi.x;
+    SpinEdit4.Value := wi.y;
+    SpinEdit1.Value := wi.width;
+    SpinEdit2.Value := wi.height;
+    ColorButton2.ButtonColor := wi.boundscolor.ToColor;
+    CheckBox1.Checked := wi.showbounds;
+  end else begin
+    SpinEdit3.Value := 0;
+    SpinEdit4.Value := 0;
+    SpinEdit1.Value := FScene.Width;
+    SpinEdit2.Value := FScene.Height;
+    CheckBox1.Checked := True;
+  end;
+  FInitializingWidget := False;
+
   FModified := False;
 end;
 
