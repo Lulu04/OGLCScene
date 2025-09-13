@@ -102,6 +102,9 @@ public // mouse and keyboard interaction on view
   property SpacePressed: boolean read FSpacePressed;
   property CtrlPressed: boolean read FCtrlPressed;
   property MoveRestriction: TPointF read FMoveRestriction;
+public // hint
+  procedure ShowHintTextAtMousepos(const aTxt: string);
+  procedure ShowHintText(aX, aY: single; const aTxt: string);
 end;
 
 
@@ -142,7 +145,8 @@ public
   procedure SelectNone; virtual;
   procedure SelectAll; virtual;
   procedure DuplicateSelection; virtual;
-
+public // hint
+  procedure ShowHintTextOnSelected(const aTxt: string);
 public // align
   function GetFirstSelectedX: single;
   function GetFirstSelectedCenterX: single;
@@ -168,6 +172,8 @@ public // rotate 90, mirror, plane
 
   procedure ZoomAll;
   procedure ZoomOnSelection;
+
+  procedure MoveSelectionToLayer(aLayerIndex: integer); virtual;
 
 
 
@@ -327,8 +333,7 @@ begin
   Handled := True;
 end;
 
-procedure TCustomScreenTemplate.CreateCamera(
-  const aLayerIndexList: array of integer);
+procedure TCustomScreenTemplate.CreateCamera(const aLayerIndexList: array of integer);
 begin
   FCamera := FScene.CreateCamera;
   FCamera.AssignToLayers(aLayerIndexList);
@@ -352,9 +357,8 @@ var i: integer;
     Result := False;
   end;
 begin
-  for i:=0 to LAYER_COUNT-1 do
-    if IndexInArray(i) then FScene.Layer[i].Opacity.ChangeTo(255, 0.5)
-      else FScene.Layer[i].Opacity.ChangeTo(0, 0.5);
+  for i:=0 to APP_LAYER_COUNT-1 do
+    FScene.Layer[i].Visible := IndexInArray(i);
 end;
 
 function TCustomScreenTemplate.TransformCoor(aControlPt: TPointF): TPointF;
@@ -383,6 +387,34 @@ begin
     aPt.x := aPt.x * FMoveRestriction.x;
     aPt.y := aPt.y * FMoveRestriction.y;
   end;
+end;
+
+procedure TCustomScreenTemplate.ShowHintTextAtMousepos(const aTxt: string);
+var p: TPoint;
+begin
+  p := FScene.Mouse.Position;
+  ShowHintText(p.x, p.y, aTxt);
+end;
+
+procedure TCustomScreenTemplate.ShowHintText(aX, aY: single; const aTxt: string);
+var o : TFreeText;
+  rx, ry, time: single;
+begin
+  o := TFreeText.Create(FScene);
+  o.TexturedFont := FHintFont;
+  o.Caption := aTxt;
+  o.SetCenterCoordinate(aX, aY);
+  FScene.Add(o, LAYER_TOP);
+  time := 2.0;
+  o.Opacity.ChangeTo(0, time, idcStartSlowEndFast);
+  if aX > FScene.Width/2
+    then rx := -100
+    else rx := 100;
+  if aY > FScene.Height/2
+    then ry := -100
+    else ry := 100;
+  o.MoveRelative(rx, ry, time, idcSinusoid);
+  o.KillDefered(time);
 end;
 
 { TScreenWithSurfaceHandling }
@@ -694,9 +726,22 @@ procedure TScreenWithSurfaceHandling.DuplicateSelection;
 var A: ArrayOfPSurfaceDescriptor;
 begin
   if Length(FSelected) = 0 then exit;
+  ShowHintTextOnSelected('duplicated');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateItemsByID(A));
+end;
+
+procedure TScreenWithSurfaceHandling.ShowHintTextOnSelected(const aTxt: string);
+var i: integer;
+  p: TPointF;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do begin
+    with FSelected[i]^.surface do
+      p := SurfaceToScene(PointF(Width*0.5, Height*0.5));
+    ShowHintText(p.x, p.y, aTxt);
+  end;
 end;
 
 function TScreenWithSurfaceHandling.GetFirstSelectedX: single;
@@ -1018,6 +1063,15 @@ begin
   if Length(FSelected) = 0 then exit;
   ZoomViewToFit(GetSelectedBounds, 0.8);
   UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenWithSurfaceHandling.MoveSelectionToLayer(aLayerIndex: integer);
+var i: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do
+    FSelected[i]^.surface.MoveToLayer(aLayerIndex);
+  SetFlagModified;
 end;
 
 procedure TScreenWithSurfaceHandling.ReverseAngleOnSelection;

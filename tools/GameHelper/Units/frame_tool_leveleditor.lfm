@@ -6,8 +6,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
   ClientHeight = 644
   ClientWidth = 300
   TabOrder = 0
-  DesignLeft = 665
-  DesignTop = 157
+  DesignLeft = 815
+  DesignTop = 35
   object PC1: TPageControl
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Panel8
@@ -19,7 +19,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Height = 516
     Top = 32
     Width = 300
-    ActivePage = TabSheet1
+    ActivePage = PageLayers
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabIndex = 2
     TabOrder = 0
@@ -49,7 +49,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 216
-          Top = 40
+          Top = 72
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 216
@@ -450,7 +450,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 0
           Height = 102
-          Top = 348
+          Top = 380
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 102
@@ -726,11 +726,13 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
         end
         object Label4: TLabel
+          AnchorSideRight.Control = Label6
           AnchorSideRight.Side = asrBottom
-          Left = 24
+          Left = 32
           Height = 15
-          Top = 19
+          Top = 48
           Width = 41
+          Anchors = [akTop, akRight]
           Caption = 'Texture:'
           ParentShowHint = False
           ShowHint = True
@@ -740,10 +742,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label4
           AnchorSideBottom.Side = asrBottom
-          Left = 70
+          Left = 78
           Height = 23
-          Top = 11
-          Width = 167
+          Top = 40
+          Width = 165
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
           DropDownCount = 15
@@ -774,14 +776,14 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 302
+          Top = 334
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
           ClientWidth = 292
           ParentBackground = False
           TabOrder = 3
-          object SpeedButton15: TSpeedButton
+          object BRotate90CCW: TSpeedButton
             Cursor = crHandPoint
             Left = 12
             Height = 26
@@ -793,11 +795,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 14
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton16: TSpeedButton
+          object BRotate90CW: TSpeedButton
             Cursor = crHandPoint
             Left = 44
             Height = 26
@@ -809,11 +811,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 15
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton17: TSpeedButton
+          object BMirrorH: TSpeedButton
             Cursor = crHandPoint
             Left = 76
             Height = 26
@@ -825,11 +827,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 16
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton18: TSpeedButton
+          object BMirrorV: TSpeedButton
             Cursor = crHandPoint
             Left = 108
             Height = 26
@@ -841,11 +843,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 17
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton19: TSpeedButton
+          object BMoveToTop: TSpeedButton
             Cursor = crHandPoint
             Left = 140
             Height = 26
@@ -857,11 +859,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 18
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton20: TSpeedButton
+          object BMoveToTopOneStep: TSpeedButton
             Cursor = crHandPoint
             Left = 172
             Height = 26
@@ -873,15 +875,15 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 19
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton21: TSpeedButton
+          object BMoveToBottomOneStep: TSpeedButton
             Cursor = crHandPoint
             Left = 204
             Height = 26
-            Hint = 'Move to back one step'
+            Hint = 'Move to bottom one step'
             Top = 8
             Width = 26
             Color = 4934475
@@ -889,15 +891,15 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 20
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
-          object SpeedButton22: TSpeedButton
+          object BMoveToBottom: TSpeedButton
             Cursor = crHandPoint
             Left = 236
             Height = 26
-            Hint = 'Move to back'
+            Hint = 'Move to bottom'
             Top = 8
             Width = 26
             Color = 4934475
@@ -905,7 +907,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 21
             Transparent = False
-            OnClick = SpeedButton15Click
+            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
           end
@@ -918,7 +920,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 256
+          Top = 288
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -958,9 +960,50 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             ParentShowHint = False
           end
         end
+        object Label6: TLabel
+          Left = 8
+          Height = 15
+          Top = 13
+          Width = 65
+          Caption = 'Layer target:'
+        end
+        object CBLayers: TComboBox
+          AnchorSideLeft.Control = Label6
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideBottom.Control = Label6
+          AnchorSideBottom.Side = asrBottom
+          Left = 78
+          Height = 23
+          Top = 5
+          Width = 165
+          Anchors = [akLeft, akBottom]
+          BorderSpacing.Left = 5
+          DropDownCount = 15
+          ItemHeight = 15
+          Style = csDropDownList
+          TabOrder = 5
+          OnSelect = CBTexturesSelect
+        end
       end
     end
-    object TabSheet1: TTabSheet
+    object PageLayers: TTabSheet
+      Caption = 'Layers'
+      ClientHeight = 488
+      ClientWidth = 292
+      object Panel10: TPanel
+        Left = 0
+        Height = 488
+        Top = 0
+        Width = 292
+        Align = alClient
+        BevelOuter = bvNone
+        Color = 8289918
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+      end
+    end
+    object PageWorld: TTabSheet
       Caption = 'World'
       ClientHeight = 488
       ClientWidth = 292
@@ -977,165 +1020,186 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
-        object Label9: TLabel
-          Left = 13
-          Height = 15
-          Top = 90
-          Width = 32
-          Caption = 'Width'
-        end
-        object Label10: TLabel
-          AnchorSideTop.Control = Label9
-          AnchorSideTop.Side = asrBottom
-          AnchorSideRight.Control = Label9
+        object Panel9: TPanel
+          AnchorSideLeft.Control = Panel7
+          AnchorSideTop.Control = Panel7
+          AnchorSideRight.Control = Panel7
           AnchorSideRight.Side = asrBottom
-          Left = 9
-          Height = 15
-          Top = 118
-          Width = 36
-          Anchors = [akTop, akRight]
-          BorderSpacing.Top = 13
-          Caption = 'Height'
-        end
-        object SpeedButton23: TSpeedButton
-          AnchorSideTop.Control = SpinEdit1
-          Left = 155
-          Height = 35
-          Top = 91
-          Width = 96
-          BorderSpacing.Top = 9
-          Caption = 'Compute from'#13#10'surfaces'
-          OnClick = SpinEdit3Change
-        end
-        object CheckBox1: TCheckBox
-          Left = 16
-          Height = 19
-          Top = 152
-          Width = 90
-          Caption = 'Show bounds'
-          Checked = True
-          State = cbChecked
+          Left = 0
+          Height = 154
+          Top = 0
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          ClientHeight = 154
+          ClientWidth = 292
+          ParentBackground = False
           TabOrder = 0
-          OnChange = SpinEdit3Change
-        end
-        object ColorButton2: TColorButton
-          AnchorSideLeft.Control = Label17
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label17
-          AnchorSideBottom.Side = asrBottom
-          Left = 175
-          Height = 24
-          Top = 147
-          Width = 67
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          BorderWidth = 2
-          ButtonColorSize = 16
-          ButtonColor = clRed
-          OnColorChanged = SpinEdit3Change
-        end
-        object Label17: TLabel
-          AnchorSideLeft.Control = CheckBox1
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = CheckBox1
-          AnchorSideBottom.Side = asrBottom
-          Left = 136
-          Height = 15
-          Top = 156
-          Width = 29
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 30
-          Caption = 'Color'
-        end
-        object Label20: TLabel
-          AnchorSideTop.Control = Label21
-          AnchorSideTop.Side = asrBottom
-          AnchorSideRight.Control = Label9
-          AnchorSideRight.Side = asrBottom
-          Left = 38
-          Height = 15
-          Top = 41
-          Width = 7
-          Anchors = [akTop, akRight]
-          BorderSpacing.Top = 20
-          Caption = 'X'
-          ParentFont = False
-        end
-        object Label21: TLabel
-          Left = 16
-          Height = 15
-          Top = 6
-          Width = 135
-          Caption = 'World coordinate and size'
-          Font.Style = [fsItalic]
-          ParentFont = False
-        end
-        object Label22: TLabel
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideTop.Control = Label20
-          AnchorSideRight.Side = asrBottom
-          Left = 144
-          Height = 15
-          Top = 41
-          Width = 7
-          BorderSpacing.Left = 20
-          Caption = 'Y'
-        end
-        object SpinEdit3: TFloatSpinEdit
-          AnchorSideLeft.Control = Label20
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label20
-          AnchorSideBottom.Side = asrBottom
-          Left = 55
-          Height = 23
-          Top = 33
-          Width = 63
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          OnChange = SpinEdit3Change
-          TabOrder = 1
-        end
-        object SpinEdit4: TFloatSpinEdit
-          AnchorSideLeft.Control = Label22
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label22
-          AnchorSideBottom.Side = asrBottom
-          Left = 161
-          Height = 23
-          Top = 33
-          Width = 63
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          OnChange = SpinEdit3Change
-          TabOrder = 2
-        end
-        object SpinEdit1: TFloatSpinEdit
-          AnchorSideLeft.Control = Label9
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label9
-          AnchorSideBottom.Side = asrBottom
-          Left = 55
-          Height = 23
-          Top = 82
-          Width = 80
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          OnChange = SpinEdit3Change
-          TabOrder = 3
-        end
-        object SpinEdit2: TFloatSpinEdit
-          AnchorSideLeft.Control = Label10
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideBottom.Control = Label10
-          AnchorSideBottom.Side = asrBottom
-          Left = 55
-          Height = 23
-          Top = 110
-          Width = 80
-          Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 10
-          OnChange = SpinEdit3Change
-          TabOrder = 4
+          object SpinEdit2: TFloatSpinEdit
+            AnchorSideLeft.Control = Label10
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label10
+            AnchorSideBottom.Side = asrBottom
+            Left = 55
+            Height = 23
+            Top = 88
+            Width = 80
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            OnChange = SpinEdit3Change
+            TabOrder = 0
+          end
+          object SpinEdit3: TFloatSpinEdit
+            AnchorSideLeft.Control = Label20
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label20
+            AnchorSideBottom.Side = asrBottom
+            Left = 55
+            Height = 23
+            Top = 25
+            Width = 63
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            OnChange = SpinEdit3Change
+            TabOrder = 1
+          end
+          object SpinEdit4: TFloatSpinEdit
+            AnchorSideLeft.Control = Label22
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label22
+            AnchorSideBottom.Side = asrBottom
+            Left = 161
+            Height = 23
+            Top = 25
+            Width = 63
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            OnChange = SpinEdit3Change
+            TabOrder = 2
+          end
+          object SpinEdit1: TFloatSpinEdit
+            AnchorSideLeft.Control = Label9
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label9
+            AnchorSideBottom.Side = asrBottom
+            Left = 55
+            Height = 23
+            Top = 60
+            Width = 80
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            OnChange = SpinEdit3Change
+            TabOrder = 3
+          end
+          object Label17: TLabel
+            AnchorSideLeft.Control = CheckBox1
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = CheckBox1
+            AnchorSideBottom.Side = asrBottom
+            Left = 136
+            Height = 15
+            Top = 124
+            Width = 29
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 30
+            Caption = 'Color'
+          end
+          object Label20: TLabel
+            AnchorSideTop.Control = Label21
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Control = Label9
+            AnchorSideRight.Side = asrBottom
+            Left = 38
+            Height = 15
+            Top = 33
+            Width = 7
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 15
+            Caption = 'X'
+            ParentFont = False
+          end
+          object Label21: TLabel
+            AnchorSideTop.Control = Panel9
+            AnchorSideRight.Control = Panel9
+            AnchorSideRight.Side = asrBottom
+            Left = 144
+            Height = 15
+            Top = 3
+            Width = 144
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 2
+            BorderSpacing.Right = 3
+            Caption = 'World coordinate and size'
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object Label22: TLabel
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideTop.Control = Label20
+            AnchorSideRight.Side = asrBottom
+            Left = 144
+            Height = 15
+            Top = 33
+            Width = 7
+            BorderSpacing.Left = 20
+            Caption = 'Y'
+          end
+          object ColorButton2: TColorButton
+            AnchorSideLeft.Control = Label17
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label17
+            AnchorSideBottom.Side = asrBottom
+            Left = 175
+            Height = 24
+            Top = 115
+            Width = 67
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            BorderWidth = 2
+            ButtonColorSize = 16
+            ButtonColor = clRed
+            OnColorChanged = SpinEdit3Change
+          end
+          object CheckBox1: TCheckBox
+            Left = 16
+            Height = 19
+            Top = 120
+            Width = 90
+            Caption = 'Show bounds'
+            Checked = True
+            State = cbChecked
+            TabOrder = 4
+            OnChange = SpinEdit3Change
+          end
+          object SpeedButton23: TSpeedButton
+            AnchorSideTop.Control = SpinEdit1
+            Left = 155
+            Height = 35
+            Top = 69
+            Width = 96
+            BorderSpacing.Top = 9
+            Caption = 'Compute from'#13#10'surfaces'
+            OnClick = SpinEdit3Change
+          end
+          object Label10: TLabel
+            AnchorSideTop.Control = Label9
+            AnchorSideTop.Side = asrBottom
+            AnchorSideRight.Control = Label9
+            AnchorSideRight.Side = asrBottom
+            Left = 9
+            Height = 15
+            Top = 96
+            Width = 36
+            Anchors = [akTop, akRight]
+            BorderSpacing.Top = 13
+            Caption = 'Height'
+          end
+          object Label9: TLabel
+            Left = 13
+            Height = 15
+            Top = 68
+            Width = 32
+            Caption = 'Width'
+          end
         end
       end
     end

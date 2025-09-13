@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, ComCtrls, ExtCtrls, StdCtrls, Spin,
   Dialogs, Buttons,
   BGRABitmap, BGRABitmapTypes,
-  frame_texturelist, u_texture_list, u_surface_list;
+  frame_texturelist, u_texture_list, u_surface_list, frame_viewlayerlist;
 
 type
 
@@ -26,6 +26,7 @@ type
     ColorButton1: TColorButton;
     CBAlignReference: TComboBox;
     ColorButton2: TColorButton;
+    CBLayers: TComboBox;
     Edit1: TEdit;
     Label1: TLabel;
     Label10: TLabel;
@@ -48,10 +49,12 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
+    Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
     Panel1: TPanel;
+    Panel10: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -59,6 +62,7 @@ type
     Panel6: TPanel;
     Panel7: TPanel;
     Panel8: TPanel;
+    Panel9: TPanel;
     PC1: TPageControl;
     PageTextures: TTabSheet;
     PageSurfaces: TTabSheet;
@@ -80,15 +84,15 @@ type
     SpeedButton12: TSpeedButton;
     SpeedButton13: TSpeedButton;
     SpeedButton14: TSpeedButton;
-    SpeedButton15: TSpeedButton;
-    SpeedButton16: TSpeedButton;
-    SpeedButton17: TSpeedButton;
-    SpeedButton18: TSpeedButton;
-    SpeedButton19: TSpeedButton;
+    BRotate90CCW: TSpeedButton;
+    BRotate90CW: TSpeedButton;
+    BMirrorH: TSpeedButton;
+    BMirrorV: TSpeedButton;
+    BMoveToTop: TSpeedButton;
     SpeedButton2: TSpeedButton;
-    SpeedButton20: TSpeedButton;
-    SpeedButton21: TSpeedButton;
-    SpeedButton22: TSpeedButton;
+    BMoveToTopOneStep: TSpeedButton;
+    BMoveToBottomOneStep: TSpeedButton;
+    BMoveToBottom: TSpeedButton;
     BZoomAll: TSpeedButton;
     SpeedButton23: TSpeedButton;
     SpeedButton3: TSpeedButton;
@@ -102,13 +106,14 @@ type
     SpinEdit2: TFloatSpinEdit;
     SpinEdit3: TFloatSpinEdit;
     SpinEdit4: TFloatSpinEdit;
-    TabSheet1: TTabSheet;
+    PageWorld: TTabSheet;
+    PageLayers: TTabSheet;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
     procedure BZoomAllClick(Sender: TObject);
     procedure CBTexturesSelect(Sender: TObject);
-    procedure SpeedButton15Click(Sender: TObject);
+    procedure BRotate90CCWClick(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpinEdit3Change(Sender: TObject);
   private
@@ -119,6 +124,8 @@ type
     procedure ProcessAskToDeleteTextureEvent(aTextureItem: PTextureItem; var aCanDelete: boolean);
     procedure ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
     function Textures: TTextureList;
+    procedure LayerIndexToCB(aIndex: integer);
+    function CBToLayerIndex: integer;
     procedure TexturenameToCB(aName: string);
     function CBToTextureName: string;
   private // surfaces
@@ -133,6 +140,7 @@ type
     procedure SendParamToWorldBounds;
   public
     FrameTextureList: TFrameTextureList;
+    FrameViewLayerList: TFrameViewLayerList;
     constructor Create(TheOwner: TComponent); override;
     procedure OnShow;
 
@@ -146,7 +154,7 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  Graphics, OGLCScene;
+  u_layerlist, Graphics, OGLCScene;
 
 {$R *.lfm}
 
@@ -226,6 +234,10 @@ begin
     end;
   end;
 
+  if Sender = CBLayers then begin
+   ScreenLevelEditor.MoveSelectionToLayer(CBToLayerIndex);
+  end;
+
   if ScreenLevelEditor.SelectedCount = 0 then exit;
 
   if (Sender = SE1) or (Sender = SE2) then
@@ -260,7 +272,7 @@ begin
       else ScreenLevelEditor.SetTintModeOnSelection(tmMixColor);
 end;
 
-procedure TFrameToolLevelEditor.SpeedButton15Click(Sender: TObject);
+procedure TFrameToolLevelEditor.BRotate90CCWClick(Sender: TObject);
 begin
   if ScreenLevelEditor.SelectedCount = 0 then exit;
 
@@ -352,6 +364,16 @@ begin
   Result := LevelBank.Textures;
 end;
 
+procedure TFrameToolLevelEditor.LayerIndexToCB(aIndex: integer);
+begin
+  CBLayers.ItemIndex := aIndex - APP_LAYER_COUNT;
+end;
+
+function TFrameToolLevelEditor.CBToLayerIndex: integer;
+begin
+  Result := CBLayers.ItemIndex + APP_LAYER_COUNT;
+end;
+
 procedure TFrameToolLevelEditor.TexturenameToCB(aName: string);
 begin
   CBTextures.ItemIndex := Textures.GetItemIndexByName(aName);
@@ -385,7 +407,7 @@ end;
 
 function TFrameToolLevelEditor.CheckSurfaceWidgets: boolean;
 begin
-  Result := (CBTextures.ItemIndex <> -1);
+  Result := (CBLayers.ItemIndex <> -1) and (CBTextures.ItemIndex <> -1);
 end;
 
 function TFrameToolLevelEditor.DoAddNewSurface: boolean;
@@ -475,12 +497,18 @@ begin
   FrameTextureList.OnAskToDeleteTexture := @ProcessAskToDeleteTextureEvent;
   FrameTextureList.OnTextureChanged := @ProcessOnTextureChangedEvent;
   FrameTextureList.OnGetTextureList := @Textures;
+
+  FrameViewLayerList := TFrameViewLayerList.Create(Self);
+  FrameViewLayerList.Parent := Panel10;
+  FrameViewLayerList.Align := alClient;
 end;
 
 procedure TFrameToolLevelEditor.OnShow;
 begin
   FillListBoxTextureNames;
   Textures.FillComboBox(CBTextures);
+  Layers.FillComboBox(CBLayers);
+  FrameViewLayerList.Fill;
 
   ShowSelectionData(NIL);
   PC1.PageIndex := PC1.IndexOf(PageSurfaces);
@@ -507,7 +535,7 @@ begin
     // 1 selected -> we can edit its parameters
     FWorkingChild := aSelected[0];
     with FWorkingChild^ do begin
-
+      LayerIndexToCB(GetSurfaceLayerIndex);
       TexturenameToCB(textureName);
       SE1.Value := surface.X.Value;
       SE2.Value := surface.Y.Value;
@@ -530,6 +558,7 @@ begin
     Label8.Visible := True;
     Label8.Caption := 'ID '+FWorkingChild^.id.ToString+' index '+Surfaces.GetItemIndexByID(FWorkingChild^.id).ToString+'/'+(integer(Surfaces.Size)-1).ToString+
                       '  layerIndex '+FWorkingChild^.surface.ParentLayer.IndexOf(FWorkingChild^.surface).ToString+'/'+(FWorkingChild^.surface.ParentLayer.SurfaceCount-1).ToString;
+    CBLayers.Enabled := True;
     CBTextures.Enabled := True;
     Panel2.Visible := True;
     BNewSurface.Enabled := False;
@@ -540,6 +569,8 @@ begin
     Label8.Visible := False;
     CBTextures.Enabled := False;
     CBTextures.ItemIndex := -1;
+    CBLayers.Enabled := False;
+    CBLayers.ItemIndex := -1;
     Panel2.Visible := False;
     BNewSurface.Enabled := False;
   end
