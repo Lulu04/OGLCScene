@@ -45,7 +45,7 @@ public
   opacity: single;
   tint: TBGRAPixel;
   tintMode: TTintMode;
-  width, height: integer;
+  width, height, layerindex: integer;
   procedure InitDefault;
   procedure KillSurface;
   procedure CreateCollisionBody;
@@ -82,8 +82,13 @@ public
 
   procedure DuplicateTo(aSurface: PSurfaceDescriptor);
 
+  function GetSurfaceLayerIndex: integer;
+  procedure SetSurfaceLayerIndex(aIndex: integer);
+
   function SaveToString: string;
   procedure LoadFromString(const s: string);
+
+  function ExportToPascalString: string;
 
 end;
 ArrayOfPSurfaceDescriptor = array of PSurfaceDescriptor;
@@ -151,7 +156,7 @@ public
   procedure CopySurfaceValuesToTemporaryVariables;
 
   function SaveToString: string;
-  procedure LoadFromString(const s: string);
+  procedure LoadFromString(const s: string; aCreateSurfaces: boolean=True);
 {  procedure SaveTo(t:TStringList);
   procedure LoadFrom(t:TStringList);  }
 
@@ -301,8 +306,10 @@ end;
 procedure TSurfaceDescriptor.SetChildDependency;
 var parentItem: PSurfaceDescriptor;
 begin
-  if parentID = -1 then FScene.Add(surface, ParentList.WorkingLayer)
-  else begin
+  if parentID = -1 then begin
+    if ParentList.ModeForLevelEditor then FScene.Add(surface, layerindex)
+      else FScene.Add(surface, ParentList.WorkingLayer);
+  end else begin
       parentItem := ParentList.GetItemByID(parentID);
       if parentItem = NIL
         then raise exception.create('parent with ID='+parentID.ToString+' not found !')
@@ -312,7 +319,6 @@ end;
 
 function TSurfaceDescriptor.GetTextureFromTextureName: PTexture;
 var texItem: PTextureItem;
-  tex: PTexture;
 begin
   texItem := ParentList.Textures.GetItemByName(textureName);
   if texItem <> NIL then Result := texItem^.texture else Result := NIL;
@@ -373,6 +379,8 @@ begin
   tintmode := surface.TintMode;
   width := surface.Width;
   height := surface.Height;
+  if ParentList.ModeForLevelEditor then
+    layerindex := FScene.LayerIndexOf(surface.ParentLayer);
 end;
 
 function TSurfaceDescriptor.IsRoot: boolean;
@@ -716,6 +724,16 @@ begin
   aSurface^.surface.TintMode := surface.TintMode;
 end;
 
+function TSurfaceDescriptor.GetSurfaceLayerIndex: integer;
+begin
+  Result := FScene.LayerIndexOf(surface.ParentLayer);
+end;
+
+procedure TSurfaceDescriptor.SetSurfaceLayerIndex(aIndex: integer);
+begin
+  surface.MoveToLayer(aIndex);
+end;
+
 
 procedure TSurfaceDescriptor.AddOffsetToPivot(aOffset: TPointF);
 var ppivot: TPointF;
@@ -744,8 +762,9 @@ begin
   prop.Add('ID', id);
   if parentID <> -1 then prop.Add('ParentID', parentID);
 
-  if not ParentList.FModeForLevelEditor then
-  if surface.ZOrderAsChild <> 0 then prop.Add('ZOrder', surface.ZOrderAsChild);
+  if not ParentList.FModeForLevelEditor then begin
+    if surface.ZOrderAsChild <> 0 then prop.Add('ZOrder', surface.ZOrderAsChild);
+  end else prop.Add('LayerIndex', GetSurfaceLayerIndex);
 
   if not ParentList.FModeForLevelEditor then
     prop.Add('Name', name);
@@ -786,7 +805,9 @@ begin
   prop.Split(s, '~');
   prop.IntegerValueOf('ID', id, -1);
   prop.IntegerValueOf('ParentID', parentID, -1);
-  prop.IntegerValueOf('ZOrder', zOrder, 0);
+  if not ParentList.ModeForLevelEditor then prop.IntegerValueOf('ZOrder', zOrder, 0)
+    else prop.IntegerValueOf('LayerIndex', layerindex, 0);
+
   prop.StringValueOf('Name', name, 'noname');
   prop.StringValueOf('Classtype', s1, 'TSprite');
   case s1 of
@@ -817,6 +838,30 @@ begin
   v := 0;
   prop.IntegerValueOf('TintMode', v, Ord(tmReplaceColor));
   tintmode := TTintMode(v);
+end;
+
+function TSurfaceDescriptor.ExportToPascalString: string;
+var prop: TProperties;
+  f: integer;
+begin
+  prop.Init(',');
+  prop.Add('L', layerindex-APP_LAYER_COUNT);
+  prop.Add('N', textureName);
+  prop.Add('X', x);
+  prop.Add('Y', y);
+  prop.Add('W', width);
+  prop.Add('H', height);
+  if pivotx <> 0.5 then prop.Add('PX', pivotx);
+  if pivoty <> 0.5 then prop.Add('PY', pivoty);
+  if angle <> 0 then prop.Add('A', angle);
+  if opacity <> 255 then prop.Add('O', opacity);
+  f := 0;
+  if fliph then inc(f);
+  if flipv then inc(f, 2);
+  if f <> 0 then prop.Add('F', f);
+  if tint <> BGRA(0,0,0,0) then prop.Add('T', tint);
+  if tintmode <> tmReplaceColor then prop.Add('M', Ord(tintmode));
+  Result := prop.PackedProperty;
 end;
 
 { TSurfaceList }
@@ -1183,7 +1228,8 @@ begin
   Result := prop.PackedProperty;
 end;
 
-procedure TSurfaceList.LoadFromString(const s: string);
+procedure TSurfaceList.LoadFromString(const s: string; aCreateSurfaces: boolean
+  );
 var prop: TProperties;
   i: SizeUInt;
   c: integer;
@@ -1208,6 +1254,8 @@ begin
   for i:=0 to Size-1 do
     with Mutable[i]^ do
       if FID < id then FID := id;
+
+  if not aCreateSurfaces then exit;
 
   // create the surfaces and init its values
   for i:=0 to Size-1 do

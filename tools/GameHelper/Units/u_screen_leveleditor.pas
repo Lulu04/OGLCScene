@@ -42,6 +42,9 @@ public
   procedure RotateSelectedCW; override;
   procedure MirrorSelectedH; override;
   procedure MirrorSelectedV; override;
+
+  procedure MoveSelectionToLayer(aLayerIndex: integer); override;
+
 public
   FSurfaces: TLevelEditorSurfaceList;
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -79,8 +82,8 @@ var ScreenLevelEditor: TScreenLevelEditor;
 
 implementation
 
-uses Forms, u_levelbank, frame_tool_leveleditor, form_main, u_app_pref, Controls,
-  LCLType, Math;
+uses Forms, u_levelbank, frame_tool_leveleditor, form_main, u_app_pref,
+  u_layerlist, Controls, LCLType, Math;
 
 { TLevelEditorSurfaceList }
 
@@ -253,6 +256,12 @@ begin
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
+end;
+
+procedure TScreenLevelEditor.MoveSelectionToLayer(aLayerIndex: integer);
+begin
+  inherited MoveSelectionToLayer(aLayerIndex);
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
 end;
 
 procedure TScreenLevelEditor.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -474,14 +483,25 @@ begin
 end;
 
 procedure TScreenLevelEditor.CreateObjects;
+var
+  A: TArrayOfInteger;
 begin
-  ShowLayers([LAYER_UI, LAYER_LEVELEDITOR, LAYER_UIBACK]);
+  A := Layers.GetUserLayerIndexes;
+  system.Insert(LAYER_TOP, A, Length(A));
+  system.Insert(LAYER_UI, A, Length(A));
+  system.Insert(LAYER_LEVELEDITOR, A, Length(A));
+  system.Insert(LAYER_LEVELWORLDBOUNDS, A, Length(A));
+  ShowLayers(A);
+ // Layers.MakeUserLayersVisible(True);
   // camera
-  CreateCamera([LAYER_LEVELEDITOR, LAYER_UIBACK]);
+  A := Layers.GetUserLayerIndexes;
+  system.Insert(LAYER_LEVELEDITOR, A, Length(A));
+  system.Insert(LAYER_LEVELWORLDBOUNDS, A, Length(A));
+  CreateCamera(A);
   // world bounds
   WorldBounds := TShapeOutline.Create(FScene);
   WorldBounds.LineWidth := 3.0;
-  FScene.Add(WorldBounds, LAYER_UIBACK);
+  FScene.Add(WorldBounds, LAYER_LEVELWORLDBOUNDS);
 
   // do zoom all
   ZoomAll;
@@ -493,6 +513,8 @@ begin
   WorldBounds := NIL;
   //SelectNone;
   FreeCamera;
+
+  Layers.MakeUserLayersVisible(False);
 end;
 
 procedure TScreenLevelEditor.Initialize;

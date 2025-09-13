@@ -246,7 +246,7 @@ begin
         else sh := 'ScaleH('+Textures.Mutable[i]^.height.ToString+')';
 
       if Textures.Mutable[i]^.isMultiFrame then
-        s := s + '(aAtlas.AddMultiFrameImageFromSVG('+texFilename+
+        s := s + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
            ', '+sw+', '+sh+
            ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
            ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+
@@ -263,8 +263,7 @@ begin
     end;
     t.Add(s);
   end;
-  t.AddText('end;'#10+
-            #10);
+  t.AddText('end;'#10+#10);
 
   // procedure SetFlipH and SetFlipV
   if CheckBox1.Checked then begin

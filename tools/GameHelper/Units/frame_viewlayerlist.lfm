@@ -1,0 +1,46 @@
+object FrameViewLayerList: TFrameViewLayerList
+  Left = 0
+  Height = 282
+  Top = 0
+  Width = 292
+  ClientHeight = 282
+  ClientWidth = 292
+  TabOrder = 0
+  DesignLeft = 450
+  DesignTop = 198
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 282
+    Top = 0
+    Width = 292
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 282
+    ClientWidth = 292
+    TabOrder = 0
+    object LB: TListBox
+      Left = 0
+      Height = 282
+      Top = 0
+      Width = 292
+      Align = alClient
+      Color = 8026746
+      ItemHeight = 0
+      Style = lbOwnerDrawFixed
+      TabOrder = 0
+      OnDrawItem = LBDrawItem
+      OnKeyDown = LBKeyDown
+      OnKeyUp = LBKeyDown
+      OnMouseDown = LBMouseDown
+      OnMouseLeave = LBMouseLeave
+      OnMouseMove = LBMouseMove
+      OnMouseUp = LBMouseUp
+    end
+  end
+end

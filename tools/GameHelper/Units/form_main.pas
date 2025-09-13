@@ -70,6 +70,8 @@ type
     procedure OGLMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
   private
+    procedure CreateAppTextureAtlas;
+    procedure FreeAppTextureAtlas;
   private
     procedure LoadCommonData;
     procedure FreeCommonData;
@@ -109,7 +111,7 @@ begin
 
   FScene := TOGLCScene.Create(OGL, -1);
   FScene.DesignPPI := 96;
-  FScene.LayerCount := LAYER_COUNT;
+  FScene.LayerCount := APP_LAYER_COUNT;
   FScene.BackgroundColor := BGRA(40,40,40);
   FScene.ScreenFadeTime := 0;
   FScene.CreateLogFile(Application.Location+'scene.log', True);
@@ -254,8 +256,31 @@ begin
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessMouseWheel(Shift, WheelDelta, MousePos, Handled);
 end;
 
+procedure TFormMain.CreateAppTextureAtlas;
+var fd: TFontDescriptor;
+begin
+  // create an atlas for the app with a font
+  FAtlas := FScene.CreateAtlas;
+  FAtlas.Spacing := 1;
+
+  fd.Create('Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
+  FHintFont:= FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
+
+  FAtlas.TryToPack;
+  FAtlas.Build;
+end;
+
+procedure TFormMain.FreeAppTextureAtlas;
+begin
+  FAtlas.Free;
+  FAtlas := NIL;
+end;
+
 procedure TFormMain.LoadCommonData;
 begin
+  CreateAppTextureAtlas;
+  Project.Config.InitDefault;
+
   UIAtlas.InitDefault;
   UIAtlas.CreateAtlas;
 
@@ -285,6 +310,8 @@ end;
 
 procedure TFormMain.FreeCommonData;
 begin
+  FreeAppTextureAtlas;
+
   FScene.Mouse.DeleteCursorSprite;
   FScene.ClearAllLayer;
   UIAtlas.FreeAtlas;

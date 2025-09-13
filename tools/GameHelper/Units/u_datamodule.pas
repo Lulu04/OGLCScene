@@ -15,6 +15,7 @@ type
     ILIcon24: TImageList;
     ImageList1: TImageList;
     ILIconAlign: TImageList;
+    ILIconLayerList: TImageList;
     procedure DataModuleCreate(Sender: TObject);
   private
     FPath: string;
@@ -22,6 +23,7 @@ type
   public
     procedure RedrawImageForCursor;
     procedure RedrawImageForIconAlign;
+    procedure RedrawImageForIconLayerList;
   end;
 
 var
@@ -39,6 +41,7 @@ procedure TDataModule1.DataModuleCreate(Sender: TObject);
 begin
   RedrawImageForCursor;
   RedrawImageForIconAlign;
+  RedrawImageForIconLayerList;
 end;
 
 procedure TDataModule1.AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
@@ -107,6 +110,18 @@ begin
   // 22
   AddImageToImageList('ZoomAll.svg', ILIconAlign);
   AddImageToImageList('ZoomOnSelection.svg', ILIconAlign);
+end;
+
+procedure TDataModule1.RedrawImageForIconLayerList;
+begin
+  ILIconLayerList.BeginUpdate;
+  ILIconLayerList.Clear;
+  ILIconLayerList.Width := FormMain.ScaleDesignToForm(18);
+  ILIconLayerList.Height := ILIconLayerList.Width;
+
+  FPath := GetIconFolder;
+  AddImageToImageList('LayerVisible.svg', ILIconLayerList);
+  AddImageToImageList('LayerNotVisible.svg', ILIconLayerList);
 end;
 
 end.

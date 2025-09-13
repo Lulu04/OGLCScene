@@ -284,4 +284,10 @@ object DataModule1: TDataModule1
       FF7B5E73BE00ECE5DB99
     }
   end
+  object ILIconLayerList: TImageList
+    Height = 18
+    Width = 18
+    Left = 175
+    Top = 126
+  end
 end

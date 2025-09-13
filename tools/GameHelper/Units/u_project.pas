@@ -1,13 +1,14 @@
 unit u_project;
 
 {$mode ObjFPC}{$H+}
+{$modeswitch AdvancedRecords}
 
 interface
 
 uses
   Classes, SysUtils,
   project_util,
-  OGLCScene;
+  OGLCScene, u_layerlist;
 
 var
   LayerNames: TStringArray;
@@ -25,23 +26,29 @@ var
 
 type
 
+{ TProjectConfig }
+
+TProjectConfig = record
+  procedure InitDefault;
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
+  procedure SaveTo(t: TStringList);
+  procedure LoadFrom(t: TStringList);
+end;
+
 { TProject }
 
 TProject = class(TCustomProject)
 private
-  FSceneAspectRatio: single;
-  procedure SetSceneAspectRatio(AValue: single);
 public
+  Config: TProjectConfig;
   constructor Create;
   function DoNew: boolean; override;
   procedure DoSave(const aFilename: string); override;
   function DoLoad(const aFilename: string): boolean; override;
   procedure DoClose; override;
-  procedure OnModifiedChange( aState: boolean ); override;
-  procedure OnProjectReadyChange( aState: boolean ); override;
-
-  // default is 4:3
-  property SceneAspectRatio: single read FSceneAspectRatio write SetSceneAspectRatio;
+  procedure OnModifiedChange(aState: boolean); override;
+  procedure OnProjectReadyChange(aState: boolean); override;
 end;
 
 var Project: TProject;
@@ -80,15 +87,48 @@ begin
   Result := FScene.App.ALSoundLibrariesSubFolder;
 end;
 
-{ TProject }
+{ TProjectConfig }
 
-procedure TProject.SetSceneAspectRatio(AValue: single);
+procedure TProjectConfig.InitDefault;
 begin
-  if FSceneAspectRatio = AValue then Exit;
-  FSceneAspectRatio := AValue;
-  SetModified;
-  FScene.ChangeAspectRatioTo(AValue);
+  Layers.InitDefault;
+  Layers.AddDefaultLayersForUser;
 end;
+
+function TProjectConfig.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('|');
+  prop.Add('Layers', Layers.SaveToString);
+  Result := prop.PackedProperty;
+end;
+
+procedure TProjectConfig.LoadFromString(const data: string);
+var prop: TProperties;
+  s: string;
+begin
+  prop.Split(data, '|');
+  s := '';
+  prop.StringValueOf('Layers', s, 'LAYER_TOP');
+  Layers.LoadFromString(s);
+end;
+
+procedure TProjectConfig.SaveTo(t: TStringList);
+begin
+  t.Add('[CONFIG]');
+  t.Add(SaveToString);
+end;
+
+procedure TProjectConfig.LoadFrom(t: TStringList);
+var k: integer;
+begin
+  Self := Default(TProjectConfig);
+  k := t.IndexOf('[CONFIG]');
+  if (k = -1) or (k = t.Count-1) then exit;
+  LoadFromString(t.Strings[k+1]);
+end;
+
+{ TProject }
 
 constructor TProject.Create;
 begin
@@ -96,15 +136,11 @@ begin
   SetFormCaption(FormMain, 'Game Helper');
   AddFilterToDialogs('Game helper files', '*.oglc');
   AddFilterToDialogs('All file', '*.*');
-
-  FSceneAspectRatio := 3/4;
 end;
 
 function TProject.DoNew: boolean;
 begin
-  //Save;
-  //Result := IsReady;
-
+  Config.InitDefault;
   Result := true;
 end;
 
@@ -113,6 +149,7 @@ var t: TStringList;
 begin
   t := TStringList.Create;
   try
+    Config.SaveTo(t);
     SpriteBank.SaveTo(t);
     LevelBank.SaveTo(t);
 
@@ -131,6 +168,7 @@ begin
       t.LoadFromFile(aFilename);
       if t.Count = 0 then exit(False);
 
+      Config.LoadFrom(t);
       SpriteBank.LoadFrom(t);
       LevelBank.LoadFrom(t);
 
@@ -150,6 +188,7 @@ begin
   ScreenSpriteBuilder.Bodies.Clear;
   SpriteBank.Clear;
   LevelBank.Clear;
+  Config.InitDefault;
 end;
 
 procedure TProject.OnModifiedChange(aState: boolean);

@@ -22,7 +22,7 @@ TWorldInfo = record
   boundscolor: TBGRAPixel;
   showbounds: boolean;
   procedure InitDefault;
-  function SaveToString: string;
+  function SaveToString(aSaveAllProperties: boolean=True): string;
   procedure LoadFromString(const s: string);
 end;
 
@@ -93,7 +93,7 @@ begin
   Self := Default(TWorldInfo);
 end;
 
-function TWorldInfo.SaveToString: string;
+function TWorldInfo.SaveToString(aSaveAllProperties: boolean): string;
 var prop: TProperties;
 begin
   prop.Init('|');
@@ -101,8 +101,10 @@ begin
   prop.Add('WorldY', y);
   prop.Add('WorldWidth', width);
   prop.Add('WorldHeight', height);
-  prop.Add('WorldBoundsColor', boundscolor);
-  prop.Add('WorldShowBounds', showbounds);
+  if aSaveAllProperties then begin
+    prop.Add('WorldBoundsColor', boundscolor);
+    prop.Add('WorldShowBounds', showbounds);
+  end;
   Result := prop.PackedProperty;
 end;
 
