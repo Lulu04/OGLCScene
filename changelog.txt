@@ -1,16 +1,17 @@
 Version 1.2 - 2025
-> tile engine: now tiles can be flipped horizontally and vertically. Tool TileMap Designer has been improved to support this new feature.
-> new function TSimpleSurfaceWithEffect.SurfaceToSceneWithoutLayerTransform() that transform a local coordinates to world coordinates without taking in account the camera assigned to the parent layer of the surface.
+> new tool GameHelper that offer a graphic interface to facilitate the creation of complex sprite, the definition of its collision shapes, and also to define different posture for the sprite: usefull for a character with legs and arms. The created sprite can be exported to a Pascal unit to be easily integrated in your game.
+> GameHelper have also a level editor that support multiple layers. The edited levels can be exported to a Pascal unit to easily be integrated in your game.
+> new property for surface: CollisionBody. It allow to describe the collision area for a surface by associating one or several primitive shape: point, line, circle, rectangle, polygon. This primitive shapes are then used to check a collision between another surface. 
+> tile engine: now a tile can be flipped horizontally and vertically. Tool TileMap Designer has been improved to support this new feature.
 > when a game changes screen, its now possible to display a sprite with a loading message to warn the player of the wait.
-> texture atlas can now be saved and loaded to/from a file on the disk.
-> new tool Game Helper that offer a graphic interface to facilitate the creation of complex sprite. The created sprite can be exported to a pascal unit. This tool is not yet complete, but can still be used for simple cases.
+> texture atlas can now be saved and loaded to/from a file on the disk. This reduces the waiting time when creating big atlases from svg files.
 > scene aspect ratio can be changed at runtime calling MyScene.ChangeAspectRatioTo(...). NOTE: the coordinates of existing surface on the scene are not modified. It is recommended to call this function at the beginning of screen.CreateObjects.
 > different unicode charset are defined to easily retrieve the characters used by a language. They are grouped in property TOGLCScene.Charsets.
+> new function for base class TSimpleSurfaceWithEffect: SurfaceToWorld() that transform a local coordinates to world coordinates without taking in account the camera assigned to the parent layer of the surface. SurfaceToScene() transform a local coordinates to scene coordinates taking in account the transformation of the camera assigned to the parent layer of the surface.
 > added ReplaceScenario function: now the content of a scenario can be replaced. Scenario error generates log messages.
-> new surface type TScrollableSprite: it display a texture and can scroll it.
+> new surface type TScrollableSprite: it display and scroll a texture. Note: for now, it work only with individual texture, not with a sub-texture of an atlas.
 > added two procedure to TOGLCPath: FlipHorizontaly and FlipVerticaly.
-> new property for surface: CollisionBody. It allow to describe the collision area for a surface by associating one or several primitive shape: point, line, circle, rectangle, polygon. This primitive shapes are then used to check a collision between another surface. 
-> fixed and improved function ExplodeTexture(). It allow to make an explosion effect with a texture. The principe is: the texture is divided in rectangular sub-textures associated to a TPolarSprite.
+> fixed and improved function ExplodeTexture(). It allow to make an explosion effect with a texture. The principe is: the texture is divided in rectangular sub-textures associated to a TPolarSprite and scattered on the screen;
 > TQuad4Color replace TMultiColorRectangle (the last is now deprecated). TQuad4Color can be a rectangle or any convex quadrilateral with a different color for each vertex. 
 > code in function TOGLCCamera.WorldToControl() and ControlToWorld() now use matrix to transform the point.
 > added camera AutoFollow feature: camera can now moves smoothly to a fixed point or follow a surface.
