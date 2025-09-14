@@ -55,7 +55,7 @@ var
 
 implementation
 
-uses u_layerlist;
+uses u_layerlist, u_project;
 
 {$R *.lfm}
 
@@ -112,7 +112,11 @@ begin
 
   if Sender = BOk then begin
     if not CheckIntegrity then exit;
-    WidgetToConfig;
+    if FModified then begin
+      WidgetToConfig;
+      Project.SetModified;
+      FModified := False;
+    end;
     ModalResult := mrOk;
   end;
 end;
@@ -142,6 +146,7 @@ begin
   if FrameViewLayerList.Count <= 1 then exit;
   if FrameViewLayerList.GetSelectedIndex = -1 then exit;
   FrameViewLayerList.DeleteLayer(FrameViewLayerList.GetSelectedIndex);
+  FModified := True;
 end;
 
 procedure TFormProjectConfig.DoRenameLayer;

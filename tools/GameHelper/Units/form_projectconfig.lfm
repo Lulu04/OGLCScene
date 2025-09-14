@@ -3,7 +3,7 @@ object FormProjectConfig: TFormProjectConfig
   Height = 381
   Top = 196
   Width = 657
-  Caption = 'FormProjectConfig'
+  Caption = 'Project configuration'
   ClientHeight = 381
   ClientWidth = 657
   OnCreate = FormCreate
@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 1
+    PageIndex = 0
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage
