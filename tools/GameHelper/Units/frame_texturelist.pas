@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, Buttons, Spin,
-  Dialogs, u_texture_list, u_surface_list, u_screen_spritebuilder;
+  Dialogs, u_texture_list;
 
 type
 

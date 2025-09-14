@@ -165,12 +165,13 @@ object FormMain: TFormMain
           Caption = 'ToolButton1'
           Style = tbsSeparator
         end
-        object BScreenOptions: TToolButton
+        object BProjectConfig: TToolButton
           Left = 93
-          Hint = 'Project options'
+          Hint = 'Project configuration'
           Top = 0
-          Caption = 'BScreenOptions'
+          Caption = 'BProjectConfig'
           ImageIndex = 3
+          OnClick = BProjectConfigClick
           ParentShowHint = False
           ShowHint = True
         end

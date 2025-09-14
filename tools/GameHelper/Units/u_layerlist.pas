@@ -31,6 +31,7 @@ public
   procedure MakeUserLayersVisible(aValue: boolean);
   function GetUserLayerIndexes: TArrayOfInteger;
 
+  procedure InitWith(A: TStringArray);
   procedure Add(aName: string);
   procedure Delete(aUserIndex: integer);
 
@@ -119,6 +120,11 @@ begin
 
   for i:=0 to High(Result) do
     Result[i] := APP_LAYER_COUNT + i;
+end;
+
+procedure TLayerList.InitWith(A: TStringArray);
+begin
+  FNames := Copy(A, 0, Length(A));
 end;
 
 procedure TLayerList.Add(aName: string);

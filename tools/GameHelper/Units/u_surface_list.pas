@@ -88,7 +88,7 @@ public
   function SaveToString: string;
   procedure LoadFromString(const s: string);
 
-  function ExportToPascalString: string;
+  function ExportToPascalString(aTextureList: TTextureList): string;
 
 end;
 ArrayOfPSurfaceDescriptor = array of PSurfaceDescriptor;
@@ -840,13 +840,17 @@ begin
   tintmode := TTintMode(v);
 end;
 
-function TSurfaceDescriptor.ExportToPascalString: string;
+function TSurfaceDescriptor.ExportToPascalString(aTextureList: TTextureList): string;
 var prop: TProperties;
   f: integer;
+  texItem: PTextureItem;
 begin
   prop.Init(',');
   prop.Add('L', layerindex-APP_LAYER_COUNT);
-  prop.Add('N', textureName);
+
+  texItem := aTextureList.GetItemByName(textureName);
+
+  prop.Add('N', ExtractFilename(texItem^.filename)); // textureName);
   prop.Add('X', x);
   prop.Add('Y', y);
   prop.Add('W', width);

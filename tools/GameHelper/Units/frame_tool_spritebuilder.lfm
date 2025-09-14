@@ -471,7 +471,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 5
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 1
           Transparent = False
           OnClick = BLineClick
@@ -491,7 +491,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 5
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 2
           Transparent = False
           OnClick = BLineClick
@@ -511,7 +511,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 5
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 3
           Transparent = False
           OnClick = BLineClick
@@ -529,7 +529,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Left = 10
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 0
           Transparent = False
           OnClick = BLineClick
@@ -549,7 +549,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 5
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 4
           Transparent = False
           OnClick = BLineClick
@@ -569,7 +569,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 5
           Color = 3026478
           Flat = True
-          Images = DataModule1.ILIcon24
+          Images = DataModule1.ILIconCursor
           ImageIndex = 6
           Transparent = False
           OnClick = BLineClick
@@ -1119,7 +1119,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Top = 648
   end
   object PopupNode: TPopupMenu
-    Images = DataModule1.ILIcon24
+    Images = DataModule1.ILIconCursor
     Left = 256
     Top = 552
     object MIAddNode: TMenuItem
