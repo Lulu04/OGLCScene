@@ -1,0 +1,213 @@
+object FormProjectConfig: TFormProjectConfig
+  Left = 359
+  Height = 381
+  Top = 196
+  Width = 657
+  Caption = 'FormProjectConfig'
+  ClientHeight = 381
+  ClientWidth = 657
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnShow = FormShow
+  LCLVersion = '3.8.0.0'
+  object Notebook1: TNotebook
+    AnchorSideLeft.Control = Panel2
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Panel1
+    Left = 104
+    Height = 336
+    Top = 0
+    Width = 553
+    PageIndex = 1
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    TabOrder = 0
+    object PageScene: TPage
+      object Panel3: TPanel
+        Left = 0
+        Height = 336
+        Top = 0
+        Width = 553
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 336
+        ClientWidth = 553
+        Color = 8289918
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+        object Label1: TLabel
+          Left = 16
+          Height = 15
+          Top = 64
+          Width = 63
+          Caption = 'Aspect ratio'
+        end
+      end
+    end
+    object PageLayers: TPage
+      object Panel4: TPanel
+        Left = 0
+        Height = 336
+        Top = 0
+        Width = 553
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 336
+        ClientWidth = 553
+        Color = 8289918
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+        object Panel5: TPanel
+          AnchorSideLeft.Control = Label2
+          AnchorSideTop.Control = Label2
+          AnchorSideTop.Side = asrBottom
+          Left = 25
+          Height = 235
+          Top = 33
+          Width = 281
+          ParentBackground = False
+          TabOrder = 0
+        end
+        object Label2: TLabel
+          Left = 25
+          Height = 15
+          Top = 18
+          Width = 137
+          Caption = 'Layers used by your game'
+        end
+        object BAddLayer: TSpeedButton
+          AnchorSideLeft.Control = Panel5
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Panel5
+          Cursor = crHandPoint
+          Left = 321
+          Height = 23
+          Top = 73
+          Width = 84
+          BorderSpacing.Left = 15
+          BorderSpacing.Top = 40
+          Caption = 'Add'
+          OnClick = BAddLayerClick
+        end
+        object BDeleteLayer: TSpeedButton
+          AnchorSideLeft.Control = BAddLayer
+          AnchorSideTop.Control = BRenameLayer
+          AnchorSideTop.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 321
+          Height = 23
+          Top = 159
+          Width = 84
+          BorderSpacing.Top = 20
+          Caption = 'Delete'
+          OnClick = BAddLayerClick
+        end
+        object BRenameLayer: TSpeedButton
+          AnchorSideLeft.Control = BAddLayer
+          AnchorSideTop.Control = BAddLayer
+          AnchorSideTop.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 321
+          Height = 23
+          Top = 116
+          Width = 84
+          BorderSpacing.Top = 20
+          Caption = 'Rename'
+          OnClick = BAddLayerClick
+        end
+      end
+    end
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Panel2
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 104
+    Height = 45
+    Top = 336
+    Width = 553
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 45
+    ClientWidth = 553
+    Color = 4345681
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object BCancel: TSpeedButton
+      Cursor = crHandPoint
+      Left = 340
+      Height = 24
+      Top = 12
+      Width = 108
+      Caption = 'Cancel'
+      OnClick = BOkClick
+    end
+    object BOk: TSpeedButton
+      Cursor = crHandPoint
+      Left = 152
+      Height = 24
+      Top = 12
+      Width = 108
+      Caption = 'Ok'
+      OnClick = BOkClick
+    end
+  end
+  object Panel2: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 381
+    Top = 0
+    Width = 104
+    Anchors = [akTop, akLeft, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 381
+    ClientWidth = 104
+    Color = 4345681
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 2
+    object BScene: TSpeedButton
+      AnchorSideLeft.Control = Panel2
+      AnchorSideRight.Control = Panel2
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 2
+      Height = 26
+      Top = 9
+      Width = 100
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Caption = 'Scene'
+      Flat = True
+      Transparent = False
+    end
+    object BLayers: TSpeedButton
+      AnchorSideLeft.Control = Panel2
+      AnchorSideRight.Control = Panel2
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 2
+      Height = 26
+      Top = 56
+      Width = 100
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
+      Caption = 'Layers'
+      Flat = True
+      Transparent = False
+    end
+  end
+end
