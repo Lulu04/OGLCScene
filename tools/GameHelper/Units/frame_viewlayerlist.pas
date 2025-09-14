@@ -31,19 +31,32 @@ type
     FItemIndexUnderMouse: integer;
     FShowIconEye: boolean;
     FTextStyleForTextRect: TTextStyle;
+    function GetCount: integer;
+    function GetNames(index: integer): string;
+    function NameExists(const aName: string): boolean;
     function GetSelectedCount: integer;
+    procedure SetNames(index: integer; AValue: string);
     procedure SetShowIconEye(AValue: boolean);
   public
     constructor Create(TheOwner: TComponent); override;
 
     procedure Fill;
+    function GetSelectedIndex: integer;
+    function GetNewDefaultLayerName: string;
+    procedure AddLayer(const aName: string);
+    procedure DeleteLayer(aIndex: integer);
+
+    procedure SaveLayerConfigToLayerList;
+
+    property Count: integer read GetCount;
+    property Names[index:integer]: string read GetNames write SetNames;
     property SelectedCount: integer read GetSelectedCount;
     // default is true
     property ShowIconEye: boolean read FShowIconEye write SetShowIconEye;
   end;
 
 implementation
-uses LCLType, LCLHelper, u_project, u_utils, u_datamodule, u_common,
+uses LCLType, LCLHelper, u_project, u_utils, u_datamodule,
   u_layerlist, Math;
 
 {$R *.lfm}
@@ -95,7 +108,7 @@ begin
     TextRect(Rect(xx, ARect.Top,
                   yy,
                   ARect.Bottom),
-                  ARect.Left, ARect.Top, LB.Items.Strings[Index], FTextStyleForTextRect);
+                  ARect.Left, ARect.Top, Index.ToString+'-'+LB.Items.Strings[Index], FTextStyleForTextRect);
 
     // render icon visible or not
     if FShowIconEye then begin
@@ -214,6 +227,29 @@ begin
   Result := LB.SelCount;
 end;
 
+procedure TFrameViewLayerList.SetNames(index: integer; AValue: string);
+begin
+  LB.Items.Strings[index] := AValue;
+end;
+
+function TFrameViewLayerList.GetCount: integer;
+begin
+  Result := LB.Count;
+end;
+
+function TFrameViewLayerList.GetNames(index: integer): string;
+begin
+  Result := LB.Items.Strings[index];
+end;
+
+function TFrameViewLayerList.NameExists(const aName: string): boolean;
+var i: integer;
+begin
+  for i:=0 to LB.Count-1 do
+    if LB.Items.Strings[i] = aName then exit(True);
+  Result := False;
+end;
+
 procedure TFrameViewLayerList.SetShowIconEye(AValue: boolean);
 begin
   if FShowIconEye = AValue then Exit;
@@ -242,6 +278,36 @@ procedure TFrameViewLayerList.Fill;
 begin
   Layers.FillListBox(LB);
   LB.Invalidate;
+end;
+
+function TFrameViewLayerList.GetSelectedIndex: integer;
+begin
+  Result := LB.ItemIndex;
+end;
+
+function TFrameViewLayerList.GetNewDefaultLayerName: string;
+var i: integer;
+begin
+  i := Count;
+  repeat
+    Result := 'LAYER_'+i.ToString;
+  until not NameExists(Result);
+end;
+
+procedure TFrameViewLayerList.AddLayer(const aName: string);
+begin
+  LB.Items.Add(aName);
+end;
+
+procedure TFrameViewLayerList.DeleteLayer(aIndex: integer);
+begin
+  if LB.Count = 0 then exit;
+  LB.Items.Delete(aIndex);
+end;
+
+procedure TFrameViewLayerList.SaveLayerConfigToLayerList;
+begin
+  Layers.InitWith(LB.Items.ToStringArray);
 end;
 
 end.

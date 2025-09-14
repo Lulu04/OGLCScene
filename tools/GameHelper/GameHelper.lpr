@@ -15,8 +15,9 @@ uses
   u_screen_spritebank, frame_tool_spritebuilder, frame_tool_spritebank,
   u_collisionbody_list, u_ui_atlas, u_datamodule, u_undo_redo,
   u_undoredo_spritebuilder, u_posture_list, frame_tool_leveleditor,
-u_screen_levelbank, u_levelbank, u_surface_extradata, frame_texturelist,
-u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist;
+  u_screen_levelbank, u_levelbank, u_surface_extradata, frame_texturelist,
+  u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,
+  form_projectconfig;
 
 {$R *.res}
 
@@ -29,6 +30,7 @@ begin
 
   Application.CreateForm(TFormMain, FormMain);
   Application.CreateForm(TDataModule1, DataModule1);
+  Application.CreateForm(TFormProjectConfig, FormProjectConfig);
   Application.Run;
 
   AppPref.Free;

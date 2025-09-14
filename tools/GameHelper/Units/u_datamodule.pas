@@ -12,7 +12,7 @@ type
   { TDataModule1 }
 
   TDataModule1 = class(TDataModule)
-    ILIcon24: TImageList;
+    ILIconCursor: TImageList;
     ImageList1: TImageList;
     ILIconAlign: TImageList;
     ILIconLayerList: TImageList;
@@ -54,21 +54,21 @@ end;
 
 procedure TDataModule1.RedrawImageForCursor;
 begin
-  ILIcon24.BeginUpdate;
-  ILIcon24.Clear;
-  ILIcon24.Width := FormMain.ScaleDesignToForm(24);
-  ILIcon24.Height := ILIcon24.Width;
+  ILIconCursor.BeginUpdate;
+  ILIconCursor.Clear;
+  ILIconCursor.Width := FormMain.ScaleDesignToForm(24);
+  ILIconCursor.Height := ILIconCursor.Width;
 
   FPath := GetIconFolder;
-  AddImageToImageList('Select.svg', ILIcon24);
-  AddImageToImageList('Line.svg', ILIcon24);
-  AddImageToImageList('Circle.svg', ILIcon24);
-  AddImageToImageList('Rectangle.svg', ILIcon24);
-  AddImageToImageList('Polygon.svg', ILIcon24);
-  AddImageToImageList('AddNode.svg', ILIcon24);
-  AddImageToImageList('Point.svg', ILIcon24);
+  AddImageToImageList('Select.svg', ILIconCursor);
+  AddImageToImageList('Line.svg', ILIconCursor);
+  AddImageToImageList('Circle.svg', ILIconCursor);
+  AddImageToImageList('Rectangle.svg', ILIconCursor);
+  AddImageToImageList('Polygon.svg', ILIconCursor);
+  AddImageToImageList('AddNode.svg', ILIconCursor);
+  AddImageToImageList('Point.svg', ILIconCursor);
 
-  ILIcon24.EndUpdate;
+  ILIconCursor.EndUpdate;
 end;
 
 procedure TDataModule1.RedrawImageForIconAlign;
