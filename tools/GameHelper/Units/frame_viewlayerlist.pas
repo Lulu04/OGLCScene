@@ -76,7 +76,7 @@ begin
     end else begin
       if Index Mod 2 = 0 then Brush.Color := LB.Color
         else Brush.Color := PercentColor(LB.Color,0.07);
-      Font.Color := clBlack;
+      Font.Color := clWhite;
     end;
     // render dot rectangle if mouse is over item
     if Index = FItemIndexUnderMouse then begin

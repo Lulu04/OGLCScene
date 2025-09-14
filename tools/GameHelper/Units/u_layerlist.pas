@@ -123,8 +123,13 @@ begin
 end;
 
 procedure TLayerList.InitWith(A: TStringArray);
+var i, k: integer;
 begin
-  FNames := Copy(A, 0, Length(A));
+  InitDefault;
+  k := Length(FNames);
+  SetLength(FNames, Length(FNames)+Length(A));
+  for i:=0 to High(A) do
+    FNames[k+i] := A[i];
 end;
 
 procedure TLayerList.Add(aName: string);

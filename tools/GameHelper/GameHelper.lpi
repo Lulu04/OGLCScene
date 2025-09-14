@@ -636,7 +636,6 @@
         <ComponentName Value="FrameTextureList"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <CursorPos X="26" Y="9"/>
         <UsageCount Value="202"/>
@@ -714,10 +713,11 @@
       <Unit68>
         <Filename Value="Units\u_layerlist.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="19"/>
-        <CursorPos X="13" Y="34"/>
+        <TopLine Value="122"/>
+        <CursorPos Y="128"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit68>
@@ -742,11 +742,10 @@
         <ComponentName Value="FrameViewLayerList"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="44"/>
-        <CursorPos X="60" Y="59"/>
+        <TopLine Value="285"/>
+        <CursorPos X="13" Y="310"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -780,10 +779,12 @@
         <Filename Value="Units\form_projectconfig.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormProjectConfig"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="52"/>
-        <CursorPos X="43" Y="77"/>
+        <TopLine Value="129"/>
+        <CursorPos X="28" Y="137"/>
         <UsageCount Value="40"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -822,124 +823,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\u_layerlist.pas"/>
-        <Caret Line="192" Column="22" TopLine="179"/>
+        <Filename Value="Units\form_projectconfig.pas"/>
+        <Caret Line="36" Column="21" TopLine="30"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\u_layerlist.pas"/>
-        <Caret Line="34" Column="14" TopLine="24"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="288" Column="29" TopLine="284"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\u_layerlist.pas"/>
-        <Caret Line="126" Column="3" TopLine="124"/>
+        <Filename Value="Units\form_projectconfig.pas"/>
+        <Caret Line="83" Column="20" TopLine="79"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="309" Column="23" TopLine="284"/>
+        <Filename Value="Units\form_projectconfig.pas"/>
+        <Caret Line="52" Column="16" TopLine="43"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\u_layerlist.pas"/>
-        <Caret Line="34" Column="39" TopLine="19"/>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <Caret Line="45" Column="24" TopLine="34"/>
       </Position5>
       <Position6>
-        <Filename Value="Units\u_layerlist.pas"/>
-        <Caret Line="126" Column="10" TopLine="116"/>
+        <Filename Value="Units\u_undoredo_spritebuilder.pas"/>
+        <Caret Line="9" Column="6"/>
       </Position6>
       <Position7>
         <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="308" Column="29" TopLine="284"/>
+        <Caret Line="59" Column="15" TopLine="40"/>
       </Position7>
       <Position8>
         <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="246" Column="16" TopLine="232"/>
+        <Caret Line="61" Column="24" TopLine="36"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="86" Column="31" TopLine="74"/>
+        <Filename Value="Units\u_project.pas"/>
+        <Caret Line="26" Column="13"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="41" Column="38" TopLine="22"/>
+        <Filename Value="Units\frame_viewlayerlist.pas"/>
+        <Caret Line="59" Column="60" TopLine="44"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="94" Column="19" TopLine="73"/>
+        <Filename Value="Units\frame_tool_levelbank.pas"/>
+        <Caret Line="183" Column="30" TopLine="170"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="42" Column="30" TopLine="22"/>
+        <Filename Value="Units\frame_viewlayerlist.pas"/>
+        <Caret Line="49" Column="24" TopLine="39"/>
       </Position12>
       <Position13>
         <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="246" Column="16" TopLine="232"/>
+        <Caret Line="310" TopLine="285"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="91" Column="44" TopLine="81"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="126" Column="9" TopLine="111"/>
       </Position14>
       <Position15>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="34" Column="20" TopLine="30"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="28" Column="21" TopLine="19"/>
       </Position15>
       <Position16>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="103" Column="21" TopLine="96"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="88" Column="3" TopLine="85"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="42" Column="30" TopLine="28"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="34" Column="17" TopLine="13"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="94" Column="30" TopLine="85"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="132" Column="15" TopLine="125"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="36" Column="21" TopLine="30"/>
+        <Filename Value="Units\frame_viewlayerlist.pas"/>
+        <Caret Line="310" Column="13" TopLine="285"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\form_main.pas"/>
-        <Caret Line="288" Column="29" TopLine="284"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="34" Column="13" TopLine="19"/>
       </Position20>
       <Position21>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="83" Column="20" TopLine="79"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="128" TopLine="122"/>
       </Position21>
       <Position22>
-        <Filename Value="Units\form_projectconfig.pas"/>
-        <Caret Line="52" Column="16" TopLine="43"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="129" TopLine="122"/>
       </Position22>
       <Position23>
-        <Filename Value="..\..\source\OGLCScene.pas"/>
-        <Caret Line="45" Column="24" TopLine="34"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="130" TopLine="122"/>
       </Position23>
       <Position24>
-        <Filename Value="Units\u_undoredo_spritebuilder.pas"/>
-        <Caret Line="9" Column="6"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="131" TopLine="122"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="59" Column="15" TopLine="40"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="132" TopLine="122"/>
       </Position25>
       <Position26>
-        <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="61" Column="24" TopLine="36"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="131" TopLine="122"/>
       </Position26>
       <Position27>
-        <Filename Value="Units\u_project.pas"/>
-        <Caret Line="26" Column="13"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="132" TopLine="122"/>
       </Position27>
       <Position28>
-        <Filename Value="..\unit_common\project_util.pas"/>
-        <Caret Line="25" Column="10" TopLine="67"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="131" TopLine="122"/>
       </Position28>
       <Position29>
-        <Filename Value="Units\frame_viewlayerlist.pas"/>
-        <Caret Line="59" Column="60" TopLine="44"/>
+        <Filename Value="Units\u_layerlist.pas"/>
+        <Caret Line="132" TopLine="122"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\frame_tool_levelbank.pas"/>
-        <Caret Line="183" Column="30" TopLine="170"/>
+        <Filename Value="Units\form_projectconfig.pas"/>
+        <Caret Line="62" Column="31" TopLine="52"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
