@@ -52,9 +52,10 @@ type
     BLoadScreen: TToolButton;
     BSaveScreen: TToolButton;
     ToolButton1: TToolButton;
-    BScreenOptions: TToolButton;
+    BProjectConfig: TToolButton;
     procedure BLoadScreenClick(Sender: TObject);
     procedure BNewScreenClick(Sender: TObject);
+    procedure BProjectConfigClick(Sender: TObject);
     procedure BSaveScreenClick(Sender: TObject);
     procedure BSpriteBankClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
@@ -99,8 +100,8 @@ var
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas,
-  u_screen_levelbank, u_screen_leveleditor, u_levelbank, BGRABitmap,
-  BGRABitmapTypes;
+  u_screen_levelbank, u_screen_leveleditor, u_levelbank, form_projectconfig,
+  BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
 
 { TFormMain }
@@ -165,6 +166,11 @@ end;
 procedure TFormMain.BNewScreenClick(Sender: TObject);
 begin
   Project.New;
+end;
+
+procedure TFormMain.BProjectConfigClick(Sender: TObject);
+begin
+  FormProjectConfig.ShowModal;
 end;
 
 procedure TFormMain.BSaveScreenClick(Sender: TObject);
