@@ -62,8 +62,7 @@ end;
 
 { TOGLCDecorItem }
 
-function TOGLCDecorItem.LoadFromString(aAtlas: TAtlas; const s: string
-  ): integer;
+function TOGLCDecorItem.LoadFromString(aAtlas: TAtlas; const s: string): integer;
 var prop: TProperties;
   texName: string;
   c: TBGRAPixel;
@@ -81,10 +80,10 @@ begin
   prop.SingleValueOf('Y', y, 0);
   prop.SingleValueOf('W', w, 0);
   prop.SingleValueOf('H', h, 0);
-  prop.SingleValueOf('PX', pivotX, 0);
-  prop.SingleValueOf('PY', pivoty, 0);
+  prop.SingleValueOf('PX', pivotX, 0.5);
+  prop.SingleValueOf('PY', pivoty, 0.5);
   prop.SingleValueOf('A', angle, 0);
-  prop.SingleValueOf('O', opacity, 0);
+  prop.SingleValueOf('O', opacity, 255);
   opacity := opacity * OneDiv255;
   prop.IntegerValueOf('F', flipIndex, 0);
 
@@ -193,7 +192,7 @@ end;
 constructor TOGLCDecorManager.Create(aParentScene: TOGLCScene);
 begin
   FParentScene := aParentScene;
-  FDecors := NIL;
+  FDecors := TDecors.Create;
 end;
 
 destructor TOGLCDecorManager.Destroy;
