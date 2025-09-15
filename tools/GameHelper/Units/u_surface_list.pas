@@ -68,6 +68,7 @@ public
   procedure AddOffsetToPivot(aOffset: TPointF); // in world coordinates
   procedure UpdateHandlePosition;
   procedure ToogleScaledAndRotatedHandle;
+  procedure HideHandle;
 
   procedure SaveCurrentAngleBeforeRotation;
   procedure ComputeAngle(aPreviousReferencePointInWorld,
@@ -136,6 +137,9 @@ public
 
   procedure DeleteItemByID(aID: integer);
   function DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
+  function DuplicateAndShiftItemsByID(aItems: ArrayOfPSurfaceDescriptor;
+    aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single
+  ): ArrayOfPSurfaceDescriptor;
 
   function ItemsDescriptorToArrayOfID(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
 
@@ -709,8 +713,14 @@ begin
   aSurface^.name := name;
   aSurface^.textureName := textureName;
   aSurface^.classtype := classtype;
+  if ParentList.ModeForLevelEditor then begin
+    aSurface^.layerindex := FScene.LayerIndexOf(surface.ParentLayer);
+    aSurface^.width := surface.Width;
+    aSurface^.height := surface.Height;
+  end else begin
+    aSurface^.zOrder := surface.ZOrderAsChild;
+  end;
   aSurface^.CreateSurface(True);
-  aSurface^.surface.ZOrderAsChild := surface.ZOrderAsChild;
   aSurface^.SetChildDependency;
   aSurface^.surface.SetCoordinate(surface.GetXY);
   aSurface^.surface.Pivot := surface.Pivot;
@@ -753,6 +763,11 @@ end;
 procedure TSurfaceDescriptor.ToogleScaledAndRotatedHandle;
 begin
   HandleManager.ToogleScaledAndRotatedHandle(surface);
+end;
+
+procedure TSurfaceDescriptor.HideHandle;
+begin
+  HandleManager.HideAll;
 end;
 
 function TSurfaceDescriptor.SaveToString: string;
@@ -1122,6 +1137,30 @@ begin
   for i:=0 to High(aItems) do begin
     Result[i] := AddEmpty;
     GetItemByID(ids[i])^.DuplicateTo(Result[i]);
+  end;
+end;
+
+function TSurfaceList.DuplicateAndShiftItemsByID(aItems: ArrayOfPSurfaceDescriptor;
+  aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single): ArrayOfPSurfaceDescriptor;
+var i: integer;
+  ids: array of integer;
+begin
+  Result := NIL;
+  if Length(aItems) = 0 then exit;
+
+  // retrieve the item's id to duplicate
+  ids := ItemsDescriptorToArrayOfID(aItems);
+
+  SetLength(Result, Length(aItems));
+  for i:=0 to High(aItems) do begin
+    Result[i] := AddEmpty;
+    with GetItemByID(ids[i])^ do begin
+      DuplicateTo(Result[i]);
+      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value - Result[i]^.surface.Width * aCoeffLeft;
+      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value + Result[i]^.surface.Width * aCoeffRight;
+      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value - Result[i]^.surface.Height * aCoeffTop;
+      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value + Result[i]^.surface.Height * aCoeffBottom;
+    end;
   end;
 end;
 

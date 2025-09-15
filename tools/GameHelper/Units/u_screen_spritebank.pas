@@ -86,6 +86,11 @@ end;
 procedure TScreenSpriteBank.FreeObjects;
 begin
   FreeCamera;
+
+  FBodies.Clear;
+  FPostures.Clear;
+  FSurfaces.Clear;
+  FTextures.Clear;
 end;
 
 procedure TScreenSpriteBank.Initialize;

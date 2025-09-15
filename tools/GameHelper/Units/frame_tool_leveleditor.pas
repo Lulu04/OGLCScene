@@ -7,8 +7,10 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, ComCtrls, ExtCtrls, StdCtrls, Spin,
   Dialogs, Buttons,
+  OGLCScene,
   BGRABitmap, BGRABitmapTypes,
-  frame_texturelist, u_texture_list, u_surface_list, frame_viewlayerlist;
+  frame_texturelist, u_texture_list, u_surface_list, frame_viewlayerlist,
+  lcl_utils;
 
 type
 
@@ -89,6 +91,7 @@ type
     BMirrorH: TSpeedButton;
     BMirrorV: TSpeedButton;
     BMoveToTop: TSpeedButton;
+    BAddMultiple: TSpeedButton;
     SpeedButton2: TSpeedButton;
     BMoveToTopOneStep: TSpeedButton;
     BMoveToBottomOneStep: TSpeedButton;
@@ -119,6 +122,8 @@ type
   private
     FModified: boolean;
     FInitializingWidget: boolean;
+    ToggleSpeedButtonManager: TToggleSpeedButtonManager;
+    procedure CheckCreationOfSpriteMultiple;
   private // textures
     procedure ProcessTextureListOnModified(Sender: TObject);
     procedure ProcessAskToDeleteTextureEvent(aTextureItem: PTextureItem; var aCanDelete: boolean);
@@ -142,7 +147,14 @@ type
     FrameTextureList: TFrameTextureList;
     FrameViewLayerList: TFrameViewLayerList;
     constructor Create(TheOwner: TComponent); override;
+    destructor Destroy; override;
     procedure OnShow;
+
+    // create a TSprite instance with the current parameters
+    function GetSpriteForAddMultiple: TSprite;
+    procedure SetCenterCoordinates(aX, aY: single);
+    procedure AddSurfaceFromCurrentData;
+    procedure ExitModeAddMultiple;
 
     procedure FillListBoxTextureNames;
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
@@ -154,7 +166,7 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  u_layerlist, Graphics, OGLCScene;
+  u_layerlist, Graphics;
 
 {$R *.lfm}
 
@@ -211,6 +223,13 @@ begin
   if Sender = BNewSurface then begin
     if DoAddNewSurface then
       ShowSelectionData(ScreenLevelEditor.Selected);
+  end;
+
+  // disable 'add multiple' if the param aren't correct
+  if Sender = BAddMultiple then begin
+    with ToggleSpeedButtonManager do
+      Checked[BAddMultiple] := Checked[BAddMultiple] and CheckSurfaceWidgets;
+    CheckCreationOfSpriteMultiple;
   end;
 end;
 
@@ -333,6 +352,13 @@ begin
   FModified := True;
 end;
 
+procedure TFrameToolLevelEditor.CheckCreationOfSpriteMultiple;
+begin
+  if ToggleSpeedButtonManager.Checked[BAddMultiple] and
+     not ScreenLevelEditor.SpriteAddMultipleIsCreated then ScreenLevelEditor.CreateSpriteAddMultiple
+  else ScreenLevelEditor.KillSpriteAddMultiple;
+end;
+
 procedure TFrameToolLevelEditor.ProcessTextureListOnModified(Sender: TObject);
 begin
   FModified := True;
@@ -418,6 +444,7 @@ begin
   FWorkingChild := Surfaces.AddEmpty;
   DoUpdateSurface(False);
   ScreenLevelEditor.AddToSelected([FWorkingChild]);
+  ScreenLevelEditor.ShowHintTextOnSelected('Added');
 
   //FWorkingChild := NIL;
   FModified := True;
@@ -437,6 +464,7 @@ begin
     FWorkingChild^.KillSurface;
     FWorkingChild^.classtype := TSprite;
     FWorkingChild^.textureName := CBToTextureName;
+    FWorkingChild^.layerindex := CBToLayerIndex;
 
     FWorkingChild^.width := SE3.Value;
     FWorkingChild^.height := SE4.Value;
@@ -501,6 +529,20 @@ begin
   FrameViewLayerList := TFrameViewLayerList.Create(Self);
   FrameViewLayerList.Parent := Panel10;
   FrameViewLayerList.Align := alClient;
+
+  ToggleSpeedButtonManager := TToggleSpeedButtonManager.Create;
+  ToggleSpeedButtonManager.ToggleType := tsbLikeCheckBox;
+  ToggleSpeedButtonManager.SetActivatedColors(RGBToColor(255,255,0), clBlack);
+  ToggleSpeedButtonManager.SetDeactivatedColors($00ADADAD, clBlack);
+  ToggleSpeedButtonManager.Add(BAddMultiple, False);
+
+end;
+
+destructor TFrameToolLevelEditor.Destroy;
+begin
+  ToggleSpeedButtonManager.Free;
+  ToggleSpeedButtonManager := NIL;
+  inherited Destroy;
 end;
 
 procedure TFrameToolLevelEditor.OnShow;
@@ -515,6 +557,56 @@ begin
 
   FrameTextureList.UpdateTextureWidgetState;
   SendParamToWorldBounds;
+end;
+
+function TFrameToolLevelEditor.GetSpriteForAddMultiple: TSprite;
+var texItem: PTextureItem;
+begin
+  Result := NIL;
+  if not ToggleSpeedButtonManager.Checked[BAddMultiple] then exit;
+  if not CheckSurfaceWidgets then exit;
+
+  texItem := Textures.GetItemByName(CBToTextureName);
+  if texItem = NIL then exit;
+
+  Result := TSprite.Create(texItem^.texture, False);
+  FScene.Add(Result, CBToLayerIndex);
+  Result.SetSize(SE3.Value, SE4.Value);
+  Result.Pivot := PointF(SE5.Value, SE6.Value);
+  Result.Angle.Value := SE7.Value;
+  Result.FlipH := CBFlipH.Checked;
+  Result.FlipV := CBFlipV.Checked;
+  Result.Tint.Value := ColorToBGRA(ColorButton1.ButtonColor, SE9.Value);
+  if RadioButton1.Checked then Result.TintMode := tmReplaceColor
+    else Result.TintMode := tmMixColor;
+end;
+
+procedure TFrameToolLevelEditor.SetCenterCoordinates(aX, aY: single);
+begin
+  FInitializingWidget := True;
+  SE1.Value := aX - SE3.Value * 0.5;
+  SE2.Value := aY - SE4.Value * 0.5;
+  FInitializingWidget := False;
+end;
+
+procedure TFrameToolLevelEditor.AddSurfaceFromCurrentData;
+begin
+  if not CheckSurfaceWidgets then exit;
+
+  FWorkingChild := Surfaces.AddEmpty;
+  DoUpdateSurface(True);
+  FWorkingChild^.HideHandle;
+  //ScreenLevelEditor.AddToSelected([FWorkingChild]);
+  ScreenLevelEditor.ShowHintTextAtMousepos('Added');
+
+  FWorkingChild := NIL;
+  FModified := True;
+end;
+
+procedure TFrameToolLevelEditor.ExitModeAddMultiple;
+begin
+  ScreenLevelEditor.KillSpriteAddMultiple;
+  ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
 end;
 
 procedure TFrameToolLevelEditor.FillListBoxTextureNames;
@@ -557,11 +649,14 @@ begin
     end;
     Label8.Visible := True;
     Label8.Caption := 'ID '+FWorkingChild^.id.ToString+' index '+Surfaces.GetItemIndexByID(FWorkingChild^.id).ToString+'/'+(integer(Surfaces.Size)-1).ToString+
-                      '  layerIndex '+FWorkingChild^.surface.ParentLayer.IndexOf(FWorkingChild^.surface).ToString+'/'+(FWorkingChild^.surface.ParentLayer.SurfaceCount-1).ToString;
+                      '  Index in layer '+FWorkingChild^.surface.ParentLayer.IndexOf(FWorkingChild^.surface).ToString+'/'+(FWorkingChild^.surface.ParentLayer.SurfaceCount-1).ToString;
     CBLayers.Enabled := True;
     CBTextures.Enabled := True;
     Panel2.Visible := True;
     BNewSurface.Enabled := False;
+    ToggleSpeedButtonManager.Checked[BAddMultiple] := False; // True;
+    BAddMultiple.Enabled := True;
+    CheckCreationOfSpriteMultiple;
   end
   else
   if Length(aSelected) > 1 then begin
@@ -573,6 +668,9 @@ begin
     CBLayers.ItemIndex := -1;
     Panel2.Visible := False;
     BNewSurface.Enabled := False;
+    ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
+    BAddMultiple.Enabled := False;
+    CheckCreationOfSpriteMultiple;
   end
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
@@ -593,6 +691,9 @@ begin
     RadioButton1.Checked := True;
     BNewSurface.Enabled := True;
     Label8.Visible := False;
+    ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
+    BAddMultiple.Enabled := True;
+    CheckCreationOfSpriteMultiple;
   end;
 
   FInitializingWidget := False;
