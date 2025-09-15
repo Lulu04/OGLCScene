@@ -145,6 +145,10 @@ public
   procedure SelectNone; virtual;
   procedure SelectAll; virtual;
   procedure DuplicateSelection; virtual;
+  procedure DuplicateSelectionToTheLeft; virtual;
+  procedure DuplicateSelectionToTheRight; virtual;
+  procedure DuplicateSelectionToTheTop; virtual;
+  procedure DuplicateSelectionToTheBottom; virtual;
 public // hint
   procedure ShowHintTextOnSelected(const aTxt: string);
 public // align
@@ -357,6 +361,7 @@ var i: integer;
     Result := False;
   end;
 begin
+exit;
   for i:=0 to APP_LAYER_COUNT-1 do
     FScene.Layer[i].Visible := IndexInArray(i);
 end;
@@ -730,6 +735,46 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateItemsByID(A));
+end;
+
+procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheLeft;
+var A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) = 0 then exit;
+  ShowHintTextOnSelected('duplicated on the left');
+  A := Copy(FSelected, 0, Length(FSelected));
+  SelectNone;
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 1.0, 0.0, 0.0, 0.0));
+end;
+
+procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheRight;
+var A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) = 0 then exit;
+  ShowHintTextOnSelected('duplicated on the right');
+  A := Copy(FSelected, 0, Length(FSelected));
+  SelectNone;
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 1.0, 0.0, 0.0));
+end;
+
+procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheTop;
+var A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) = 0 then exit;
+  ShowHintTextOnSelected('duplicated to the top');
+  A := Copy(FSelected, 0, Length(FSelected));
+  SelectNone;
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 1.0, 0.0));
+end;
+
+procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheBottom;
+var A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) = 0 then exit;
+  ShowHintTextOnSelected('duplicated to the bottom');
+  A := Copy(FSelected, 0, Length(FSelected));
+  SelectNone;
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 0.0, 1.0));
 end;
 
 procedure TScreenWithSurfaceHandling.ShowHintTextOnSelected(const aTxt: string);

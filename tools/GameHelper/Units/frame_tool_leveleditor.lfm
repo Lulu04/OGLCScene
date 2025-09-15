@@ -1,9 +1,9 @@
 object FrameToolLevelEditor: TFrameToolLevelEditor
   Left = 0
-  Height = 644
+  Height = 708
   Top = 0
   Width = 300
-  ClientHeight = 644
+  ClientHeight = 708
   ClientWidth = 300
   TabOrder = 0
   DesignLeft = 815
@@ -16,28 +16,28 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Panel4
     Left = 0
-    Height = 516
+    Height = 580
     Top = 32
     Width = 300
-    ActivePage = PageLayers
+    ActivePage = PageSurfaces
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
     end
     object PageSurfaces: TTabSheet
       Caption = 'Surfaces'
-      ClientHeight = 488
+      ClientHeight = 552
       ClientWidth = 292
       object Panel1: TPanel
         Left = 0
-        Height = 488
+        Height = 552
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 488
+        ClientHeight = 552
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -49,7 +49,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 216
-          Top = 72
+          Top = 96
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 216
@@ -450,7 +450,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 0
           Height = 102
-          Top = 380
+          Top = 404
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 102
@@ -730,7 +730,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 32
           Height = 15
-          Top = 48
+          Top = 58
           Width = 41
           Anchors = [akTop, akRight]
           Caption = 'Texture:'
@@ -744,8 +744,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 78
           Height = 23
-          Top = 40
-          Width = 165
+          Top = 50
+          Width = 154
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
           DropDownCount = 15
@@ -758,9 +758,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         end
         object BNewSurface: TSpeedButton
           Cursor = crHandPoint
-          Left = 256
-          Height = 25
-          Top = 9
+          Left = 248
+          Height = 28
+          Top = 5
           Width = 30
           Images = DataModule1.ImageList1
           ImageIndex = 4
@@ -776,7 +776,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 334
+          Top = 358
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -920,7 +920,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 288
+          Top = 312
           Width = 292
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -963,7 +963,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         object Label6: TLabel
           Left = 8
           Height = 15
-          Top = 13
+          Top = 24
           Width = 65
           Caption = 'Layer target:'
         end
@@ -974,8 +974,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 78
           Height = 23
-          Top = 5
-          Width = 165
+          Top = 16
+          Width = 154
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
           DropDownCount = 15
@@ -984,15 +984,33 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           TabOrder = 5
           OnSelect = CBTexturesSelect
         end
+        object BAddMultiple: TSpeedButton
+          Cursor = crHandPoint
+          Left = 240
+          Height = 49
+          Hint = 'Activate/deactivate multiple  add'
+          Top = 40
+          Width = 49
+          Caption = 'Multiple'
+          Color = 11382189
+          Flat = True
+          Images = DataModule1.ImageList1
+          ImageIndex = 4
+          Layout = blGlyphTop
+          Transparent = False
+          OnClick = BNewSurfaceClick
+          ShowHint = True
+          ParentShowHint = False
+        end
       end
     end
     object PageLayers: TTabSheet
       Caption = 'Layers'
-      ClientHeight = 488
+      ClientHeight = 552
       ClientWidth = 292
       object Panel10: TPanel
         Left = 0
-        Height = 488
+        Height = 552
         Top = 0
         Width = 292
         Align = alClient
@@ -1005,16 +1023,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     end
     object PageWorld: TTabSheet
       Caption = 'World'
-      ClientHeight = 488
+      ClientHeight = 552
       ClientWidth = 292
       object Panel7: TPanel
         Left = 0
-        Height = 488
+        Height = 552
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 488
+        ClientHeight = 552
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -1264,7 +1282,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 96
-    Top = 548
+    Top = 612
     Width = 300
     Anchors = [akLeft, akRight, akBottom]
     ClientHeight = 96

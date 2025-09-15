@@ -22,6 +22,8 @@ end;
 { TScreenLevelEditor }
 
 TScreenLevelEditor = class(TScreenWithSurfaceHandling)
+private
+  FSpriteAddMultiple: TSprite;
 public
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF); override;
@@ -61,6 +63,11 @@ public
   procedure Initialize;
   procedure Finalize;
 
+public
+  procedure CreateSpriteAddMultiple;
+  procedure KillSpriteAddMultiple;
+  function SpriteAddMultipleIsCreated: boolean;
+public
   procedure SelectNone; override;
   procedure SelectAll; override;
   procedure SetPositionOnSelection(aX, aY: single);
@@ -269,6 +276,11 @@ var items: ArrayOfPSurfaceDescriptor;
 begin
   inherited ProcessMouseUp(Button, Shift, X, Y);
 
+  if SpriteAddMultipleIsCreated then begin
+    FrameToolLevelEditor.AddSurfaceFromCurrentData;
+    exit;
+  end;
+
   items := Surfaces.GetItemsAt(X, Y);
 
   case MouseState of
@@ -344,8 +356,17 @@ end;
 procedure TScreenLevelEditor.ProcessMouseMove(Shift: TShiftState; X, Y: Integer);
 var items: ArrayOfPSurfaceDescriptor;
     thresholdDone: boolean;
+    p: TPointF;
 begin
   inherited ProcessMouseMove(Shift, X, Y);
+
+  if SpriteAddMultipleIsCreated then begin
+    p := Camera.ControlToWorld(PointF(X, Y));
+    FSpriteAddMultiple.SetCenterCoordinate(p);
+    //p := TransformCoor(PointF(X, Y));
+    FrameToolLevelEditor.SetCenterCoordinates(p.x, p.y);
+    exit;
+  end;
 
   items := Surfaces.GetItemsAt(X, Y);
   thresholdDone := Distance(ClickOrigin, PointF(X, Y)) > PPIScale(5);
@@ -464,11 +485,38 @@ begin
     end;
 
     VK_A: begin
-     if ssCtrl in Shift then SelectAll;
+     if ssCtrl in Shift then SelectAll
+     else if ssAlt in Shift then ZoomAll
+     else if (Shift = []) and SpriteAddMultipleIsCreated then FrameToolLevelEditor.AddSurfaceFromCurrentData;
     end;
 
     VK_D: begin
      if ssCtrl in Shift then DuplicateSelection;
+    end;
+
+    VK_LEFT: begin
+     if ssCtrl in Shift then DuplicateSelectionToTheLeft;
+    end;
+    VK_RIGHT: begin
+     if ssCtrl in Shift then DuplicateSelectionToTheRight;
+    end;
+    VK_UP: begin
+     if ssCtrl in Shift then DuplicateSelectionToTheTop;
+    end;
+    VK_DOWN: begin
+     if ssCtrl in Shift then DuplicateSelectionToTheBottom;
+    end;
+
+    VK_H: begin
+     if (Shift = []) and SpriteAddMultipleIsCreated then
+       FSpriteAddMultiple.FlipH := not FSpriteAddMultiple.FlipH;
+    end;
+    VK_V: begin
+     if (Shift = []) and SpriteAddMultipleIsCreated then
+       FSpriteAddMultiple.FlipV := not FSpriteAddMultiple.FlipV;
+    end;
+    VK_ESCAPE: begin
+     if SpriteAddMultipleIsCreated then FrameToolLevelEditor.ExitModeAddMultiple;
     end;
 
 
@@ -528,6 +576,25 @@ procedure TScreenLevelEditor.Finalize;
 begin
   FSurfaces.Free;
   FSurfaces := NIL;
+end;
+
+procedure TScreenLevelEditor.CreateSpriteAddMultiple;
+begin
+  KillSpriteAddMultiple;
+  FSpriteAddMultiple := FrameToolLevelEditor.GetSpriteForAddMultiple;
+  if FSpriteAddMultiple = NIL then exit;
+end;
+
+procedure TScreenLevelEditor.KillSpriteAddMultiple;
+begin
+  if FSpriteAddMultiple = NIL then exit;
+  FSpriteAddMultiple.Kill;
+  FSpriteAddMultiple := NIL;
+end;
+
+function TScreenLevelEditor.SpriteAddMultipleIsCreated: boolean;
+begin
+  Result := FSpriteAddMultiple <> NIL;
 end;
 
 procedure TScreenLevelEditor.SelectNone;

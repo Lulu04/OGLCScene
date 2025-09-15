@@ -9,7 +9,7 @@ uses
   BGRABitmap, BGRABitmapTypes,
   //OGLCScene,
   u_common, u_screen_template,
-  u_surface_list, u_texture_list;
+  u_surface_list, u_texture_list, OGLCScene;
 
 type
 
@@ -50,7 +50,7 @@ var ScreenLevelBank: TScreenLevelBank;
 
 implementation
 
-uses u_levelbank;
+uses u_levelbank, u_layerlist;
 
 { TLevelBankSurfaceList }
 
@@ -62,13 +62,20 @@ end;
 { TScreenLevelBank }
 
 procedure TScreenLevelBank.CreateObjects;
+var A: TArrayOfInteger;
 begin
   FSurfaces := TLevelBankSurfaceList.Create;
   FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELBANK;
-  ShowLayers([LAYER_UI, LAYER_LEVELBANK]);
+
+  A := Layers.GetUserLayerIndexes;
+  system.Insert(LAYER_LEVELBANK, A, Length(A));
+  ShowLayers(A);
+
   // camera
-  CreateCamera([LAYER_LEVELBANK]);
+  A := Layers.GetUserLayerIndexes;
+  system.Insert(LAYER_LEVELBANK, A, Length(A));
+  CreateCamera(A);
 end;
 
 procedure TScreenLevelBank.FreeObjects;
