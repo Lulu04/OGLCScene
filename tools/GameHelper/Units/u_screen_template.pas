@@ -361,7 +361,7 @@ var i: integer;
     Result := False;
   end;
 begin
-exit;
+
   for i:=0 to APP_LAYER_COUNT-1 do
     FScene.Layer[i].Visible := IndexInArray(i);
 end;

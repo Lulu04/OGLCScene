@@ -6,18 +6,26 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, lcl_utils, frame_viewlayerlist;
+  StdCtrls, Spin, lcl_utils, frame_viewlayerlist;
 
 type
 
   { TFormProjectConfig }
 
   TFormProjectConfig = class(TForm)
+    BLevelBank: TSpeedButton;
     BRenameLayer: TSpeedButton;
     BDeleteLayer: TSpeedButton;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
     Notebook1: TNotebook;
+    PageLevelBank: TPage;
     PageLayers: TPage;
     PageScene: TPage;
     Panel1: TPanel;
@@ -30,15 +38,23 @@ type
     BOk: TSpeedButton;
     BLayers: TSpeedButton;
     BAddLayer: TSpeedButton;
+    Panel6: TPanel;
+    BEraseLevelBank: TSpeedButton;
+    RadioButton1: TRadioButton;
+    RBMaximizeSceneSize: TRadioButton;
+    SE1: TSpinEdit;
+    SE2: TSpinEdit;
     procedure BAddLayerClick(Sender: TObject);
+    procedure BEraseLevelBankClick(Sender: TObject);
     procedure BOkClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure SE1Change(Sender: TObject);
   private
     NoteBookManager: TNoteBookManager;
     FrameViewLayerList: TFrameViewLayerList;
-    FModified: boolean;
+    FModified, FInitializingWidget: boolean;
     function CheckIntegrity: boolean;
     procedure ConfigToWidget;
     procedure WidgetToConfig;
@@ -55,7 +71,7 @@ var
 
 implementation
 
-uses u_layerlist, u_project;
+uses u_layerlist, u_project, u_levelbank, form_main;
 
 {$R *.lfm}
 
@@ -68,6 +84,7 @@ begin
   NoteBookManager.SetDeactivatedColors(clBtnShadow, clBlack);
   NoteBookManager.LinkButtonToPage(BScene, PageScene);
   NoteBookManager.LinkButtonToPage(BLayers, PageLayers);
+  NoteBookManager.LinkButtonToPage(BLevelBank, PageLevelBank);
   NoteBookManager.ActivePage(PageScene);
   NoteBookManager.OnSelectionChange := @ProcessNoteBookPageSelection;
 
@@ -89,6 +106,11 @@ begin
   ConfigToWidget;
 end;
 
+procedure TFormProjectConfig.SE1Change(Sender: TObject);
+begin
+  FModified := True;
+end;
+
 function TFormProjectConfig.CheckIntegrity: boolean;
 begin
   Result := (FrameViewLayerList.Count > 0);
@@ -96,12 +118,27 @@ end;
 
 procedure TFormProjectConfig.ConfigToWidget;
 begin
+  FInitializingWidget := True;
+
+  // scene
+  SE1.Value := Project.Config.SceneWidth;
+  SE2.Value := Project.Config.SceneHeight;
+  RBMaximizeSceneSize.Checked := Project.Config.MaximizeScene;
   // layers
   FrameViewLayerList.Fill;
+  // level bank
+  Label4.Caption := LevelBank.Size.ToString;
+
+  FInitializingWidget := False;
 end;
 
 procedure TFormProjectConfig.WidgetToConfig;
 begin
+  // scene
+  Project.Config.SceneWidth := SE1.Value;
+  Project.Config.SceneHeight := SE2.Value;
+  Project.Config.MaximizeScene := RBMaximizeSceneSize.Checked;
+
   // layers
   FrameViewLayerList.SaveLayerConfigToLayerList;
 end;
@@ -126,6 +163,16 @@ begin
   if Sender = BAddLayer then DoAddLayer;
   if Sender = BDeleteLayer then DoDeleteLayer;
   if Sender = BRenameLayer then DoRenameLayer;
+end;
+
+procedure TFormProjectConfig.BEraseLevelBankClick(Sender: TObject);
+begin
+  if LevelBank.Size = 0 then exit;
+
+  if QuestionDlg('','Are you sure ?', mtWarning, [mrOk, 'Erase', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+  LevelBank.Clear;
+  FrameToolLevelBank.ClearAll;
+  Project.SetModified;
 end;
 
 procedure TFormProjectConfig.ProcessNoteBookPageSelection(Sender: TObject);
