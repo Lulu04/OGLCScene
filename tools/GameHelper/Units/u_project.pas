@@ -29,6 +29,12 @@ type
 { TProjectConfig }
 
 TProjectConfig = record
+  // scene
+  SceneWidth, SceneHeight: integer;
+  MaximizeScene: boolean;
+  // level bank
+  LevelBankExportClassName,
+  LevelBankExportUnitName: string;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const data: string);
@@ -93,13 +99,30 @@ procedure TProjectConfig.InitDefault;
 begin
   Layers.InitDefault;
   Layers.AddDefaultLayersForUser;
+
+  SceneWidth := 1024;
+  SceneHeight := 768;
+  MaximizeScene := True;
+
+  LevelBankExportClassName := 'TLevels';
+  LevelBankExportUnitName := 'u_levels.pas';
 end;
 
 function TProjectConfig.SaveToString: string;
 var prop: TProperties;
 begin
   prop.Init('|');
+  // scene
+  prop.Add('SceneWidth', SceneWidth);
+  prop.Add('SceneHeight', SceneHeight);
+  prop.Add('MaximizeScene', MaximizeScene);
+  // layers
   prop.Add('Layers', Layers.SaveToString);
+  Result := prop.PackedProperty;
+  //level bank
+  prop.Add('LevelBankExportClassName', LevelBankExportClassName);
+  prop.Add('LevelBankExportUnitName', LevelBankExportUnitName);
+
   Result := prop.PackedProperty;
 end;
 
@@ -109,8 +132,16 @@ var prop: TProperties;
 begin
   prop.Split(data, '|');
   s := '';
+  // scene
+  prop.IntegerValueOf('SceneWidth', SceneWidth, 1024);
+  prop.IntegerValueOf('SceneHeight', SceneHeight, 768);
+  prop.BooleanValueOf('MaximizeScene', MaximizeScene, True);
+  // layers
   prop.StringValueOf('Layers', s, 'LAYER_TOP');
   Layers.LoadFromString(s);
+  //level bank
+  prop.StringValueOf('LevelBankExportClassName', LevelBankExportClassName, LevelBankExportClassName);
+  prop.StringValueOf('LevelBankExportUnitName', LevelBankExportUnitName, LevelBankExportUnitName);
 end;
 
 procedure TProjectConfig.SaveTo(t: TStringList);

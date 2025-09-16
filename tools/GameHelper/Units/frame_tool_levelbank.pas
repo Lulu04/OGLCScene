@@ -34,11 +34,13 @@ type
     procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
     procedure BExportToPascalUnitClick(Sender: TObject);
+    procedure Edit2Change(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; User: boolean);
   private
     FUndoRedoManager: TLevelBankUndoRedoManager;
+    FInitializingWidget: boolean;
     procedure FillLB;
     procedure ShowLevel(aIndex: integer);
     procedure UpdateWidgetState;
@@ -46,6 +48,9 @@ type
     constructor Create(aOwner: TComponent); override;
     destructor Destroy; override;
     procedure OnShow;
+
+    // called from project configuration window
+    procedure ClearAll;
   end;
 
 implementation
@@ -155,7 +160,7 @@ begin
             '  Usage:'#10+
             '    - call '+nameClass+'.LoadTexture() when you construct your texture atlas.'#10+
             '    - call LoadLevel() to load the current game level.'#10+
-            '    - retrieve the world area with function GetWordArea.'#10+
+            '    - retrieve the world area with property WordArea.'#10+
             '}'#10#10+
             'unit '+ChangeFileExt(nameUnit, '')+';'#10#10+
             '{$mode ObjFPC}{$H+}'#10#10+
@@ -166,9 +171,12 @@ begin
             'type'#10#10+
             '{ '+nameClass+' }'#10+#10+
             nameClass+' = class(TOGLCDecorManager)'#10+
+            'protected'#10+
+            '  function ScaleWF(AValue: single): single; override;'#10+
+            '  function ScaleHF(AValue: single): single; override;'#10+
+            'public'#10+
             '  class procedure LoadTexture(aAtlas: TAtlas); override;'#10+
             '  procedure LoadLevel(aIndex: integer);'#10+
-            '  function GetWorldArea: TRectF;'#10+
             'end;'#10#10);
   // implementation
   t.AddText('implementation'#10+
@@ -200,6 +208,17 @@ begin
       sl.Free;
     end;
   end;
+
+  // protected method
+  t.AddText('function '+nameClass+'.ScaleWF(AValue: single): single;'#10+
+            'begin'#10+
+            '  Result := u_app.ScaleWF(AValue);'#10+
+            'end;'#10#10+
+            'function '+nameClass+'.ScaleHF(AValue: single): single;'#10+
+            'begin'#10+
+            '  Result := u_app.ScaleHF(AValue);'#10+
+            'end;'#10);
+
   // method for class LoadTexture()
   t.AddText('{ '+nameClass+' }'+#10+#10);
   t.AddText('class procedure '+nameClass+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
@@ -218,9 +237,9 @@ begin
       s := '  '; //+Mutable[i]^.name + ' := ';
       if ExtractFileExt(Mutable[i]^.filename) = '.svg' then begin
         if Mutable[i]^.width = -1 then sw := '-1'
-          else sw := 'ScaleW('+Mutable[i]^.width.ToString+')';
+          else sw := 'u_app.ScaleW('+Mutable[i]^.width.ToString+')';
         if Mutable[i]^.height = -1 then sh := '-1'
-          else sh := 'ScaleH('+Mutable[i]^.height.ToString+')';
+          else sh := 'u_app.ScaleH('+Mutable[i]^.height.ToString+')';
 
         if Mutable[i]^.isMultiFrame then
           s := s + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
@@ -253,13 +272,13 @@ begin
             'end;'#10#10);
 
   // function GetWorldArea: TRectF;
-  t.AddText('function '+nameClass+'.GetWorldArea: TRectF;'#10+
+{  t.AddText('function '+nameClass+'.GetWorldArea: TRectF;'#10+
             'begin'#10+
             '  Result.Left := ScaleW(Round(FNonScaledWorldArea.Left));'#10+
             '  Result.Top := ScaleH(Round(FNonScaledWorldArea.Top));'#10+
             '  Result.Right := ScaleW(Round(FNonScaledWorldArea.Right));'#10+
             '  Result.Bottom := ScaleH(Round(FNonScaledWorldArea.Bottom));'#10+
-            'end;'#10#10);
+            'end;'#10#10); }
 
   // end of file
   t.Add('end.');
@@ -271,6 +290,19 @@ begin
   end;
 end;
 
+procedure TFrameToolLevelBank.Edit2Change(Sender: TObject);
+begin
+  if FInitializingWidget then exit;
+
+  if Sender = Edit2 then
+    Project.Config.LevelBankExportClassName := Trim(Edit2.Text);
+
+  if Sender = Edit1 then
+    Project.Config.LevelBankExportUnitName := Trim(Edit1.Text);
+
+  Project.SetModified;
+end;
+
 procedure TFrameToolLevelBank.LBMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -278,14 +310,9 @@ begin
 end;
 
 procedure TFrameToolLevelBank.LBSelectionChange(Sender: TObject; User: boolean);
-var i: integer;
 begin
   UpdateWidgetState;
   ShowLevel(LB.ItemIndex);
-
-{  i := LB.ItemIndex;
-  if i = -1 then Edit1.Text := ''
-    else Edit1.Text := 'T'+LevelBank.Mutable[i]^.name;  }
 end;
 
 procedure TFrameToolLevelBank.FillLB;
@@ -328,8 +355,18 @@ end;
 
 procedure TFrameToolLevelBank.OnShow;
 begin
+  FInitializingWidget := True;
   FillLB;
   UpdateWidgetState;
+  Edit1.Text := Project.Config.LevelBankExportUnitName;
+  Edit2.Text := Project.Config.LevelBankExportClassName;
+
+  FInitializingWidget := False;
+end;
+
+procedure TFrameToolLevelBank.ClearAll;
+begin
+  LB.Clear;
 end;
 
 end.

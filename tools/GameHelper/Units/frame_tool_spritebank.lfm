@@ -252,7 +252,6 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 5
       TabOrder = 0
-      Text = 'Edit1'
     end
     object CheckBox1: TCheckBox
       AnchorSideLeft.Control = Panel2
