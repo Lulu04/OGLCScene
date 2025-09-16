@@ -33,12 +33,34 @@ public
 end;
 
 
-// You can use TProperties to associate your data with a name.
-// Here, properties and their values are concatened in a string and separated
-// with a character separator.
-
 { TProperties }
 
+{ TProperties is used to save and load data in a string. A data is associated with a name, like 'Width|500'
+  It use a char separator between a data name and its value.
+
+  SAVING DATA IN A STRING:
+     function DataToString: string;
+     var prop: TProperties;
+     begin
+       prop.Init('|');
+       prop.Add('Width', FWidth);     // we suppose FWidth is integer and = 120
+       prop.Add('Height', FHeight);   // we suppose FHeight is integer and = 100
+       prop.Add('IsValid', FIsValid); // we suppose FIsValid is boolean and = True
+       Result := prop.PackedProperty;   // return the string 'Width|120|Height|100|IsValid|true'
+     end;
+
+  LOADING DATA FROM STRING
+    procedure LoadFromString(const s: string);
+    var prop: TProperties;
+    begin
+      prop.Split(s, '|');
+      prop.IntegerValueOf('Width', FWidth, 10);  // 10 is a default value assigned to FWidth if the field 'Width' is not found
+      prop.IntegerValueOf('Height', FHeight, 10);
+      prop.BooleanValueOf('IsValid', FIsValid, False);
+    end;
+
+// Note: in ASCII table, there are four separator: $1C, $1D, $1E, $1F that can be used
+}
 TProperties = record
 private
  FProperties: TStringArray;
