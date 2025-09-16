@@ -45,16 +45,21 @@ private class var FAtlas: TAtlas;
 private
   FParentScene: TOGLCScene;
   FDecors: TDecors;
+  FWorldArea: TRectF;
   function GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorList;
   procedure Clear;
 protected
-  FNonScaledWorldArea: TRectF;
+  function ScaleWF(AValue: single): single; virtual; abstract;
+  function ScaleHF(AValue: single): single; virtual; abstract;
 public
   class procedure LoadTexture(aAtlas: TAtlas); virtual;
   constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
 
   procedure DoLoadLevel(const s: string);
+
+
+  property WorldArea: TRectF read FWorldArea;
 end;
 
 {$endif oglcINTERFACE}
@@ -119,7 +124,7 @@ begin
     with FItems.Mutable[i]^ do begin
       FComputedOpacity := aLayerPercentOpacity*opacity*Self.Opacity.Value*OneDiv255;
       if FComputedOpacity = 0 then continue;
-      modelArea.SetAsRectangle(0, 0, w, h);
+      {%H-}modelArea.SetAsRectangle(0, 0, w, h);
 
       // draw child with negative Zorder
       if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
@@ -226,13 +231,13 @@ begin
   data := '';
 
   prop.SingleValueOf('WorldX', v, 0);
-  FNonScaledWorldArea.Left := v;
+  FWorldArea.Left := ScaleWF(v);
   prop.SingleValueOf('WorldY', v, 0);
-  FNonScaledWorldArea.Top := v;
+  FWorldArea.Top := ScaleHF(v);
   prop.SingleValueOf('WorldWidth', v, 0);
-  FNonScaledWorldArea.Width := v;
+  FWorldArea.Width := ScaleWF(v);
   prop.SingleValueOf('WorldHeight', v, 0);
-  FNonScaledWorldArea.Height := v;
+  FWorldArea.Height := ScaleHF(v);
 
   c := 0;
   prop.IntegerValueOf('Count', c, 0);
@@ -242,6 +247,11 @@ begin
     if prop.StringValueOf('S'+i.ToString, data, '') then begin
       o := Default(TOGLCDecorItem);
       layerIndex := o.LoadFromString(FAtlas, data);
+      // scale
+      o.x := ScaleWF(o.x);
+      o.y := ScaleHF(o.y);
+      o.w := ScaleWF(o.w);
+      o.h := ScaleHF(o.h);
       GetDecorWithLayerIndexOf(layerIndex).Add(o);
     end;
   end;
