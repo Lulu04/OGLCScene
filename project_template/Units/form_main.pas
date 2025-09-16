@@ -5,10 +5,7 @@ unit form_main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls,
-  BGRABitmap, BGRABitmapTypes,
-  OpenGLContext, OGLCScene,
-  u_common, LCLType;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, OpenGLContext, LCLType;
 
 type
 
@@ -16,37 +13,35 @@ type
 
   TFormMain = class(TForm)
     OpenGLControl1: TOpenGLControl;
-    Timer1: TTimer;
-    procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
-    procedure Timer1Timer(Sender: TObject);
   private
     procedure LoadCommonData;
     procedure FreeCommonData;
     procedure ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
   public
+
   end;
 
 var
   FormMain: TFormMain;
 
 implementation
-uses screen_1;
+uses OGLCScene, u_common, u_app, screen_1;
+
 {$R *.lfm}
 
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  FScene := TOGLCScene.Create(OpenGLControl1, -1); // replace by what you want 4/3, 16/9,... or -1
-  FScene.DesignPPI := 96;  // Replace by the PPI of your monitor
-
+  FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
+  FScene.DesignPPI := 96;
   FScene.LayerCount := LAYER_COUNT;
-  FScene.CreateLogFile(Application.Location+'scene.log', True);
+  FScene.ScreenFadeTime := 0.5;
 
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
@@ -58,11 +53,6 @@ procedure TFormMain.FormDestroy(Sender: TObject);
 begin
   FScene.Free;
   FScene := NIL;
-end;
-
-procedure TFormMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
-  Timer1.Enabled := FALSE;
 end;
 
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -80,23 +70,18 @@ begin
   FScene.ProcessOnUTF8KeyPress(UTF8Key);
 end;
 
-procedure TFormMain.Timer1Timer(Sender: TObject);
-begin
-  Caption := Format('Scene (%d,%d) - %d FPS', [FScene.Width, FScene.Height, FScene.FPS]);
-end;
-
 procedure TFormMain.LoadCommonData;
 begin
-  // Creates your screens here
+  FScene.CreateLogFile(Application.Location+'scene.log', True, NIL, NIL);
+
+  // create the screens here
   Screen1 := TScreen1.Create;
-  //...
-  // then run the first
-  FScene.RunScreen(Screen1, False);
+
+  FScene.RunScreen(Screen1);
 end;
 
 procedure TFormMain.FreeCommonData;
 begin
-  // Free your screens here
   FreeAndNil(Screen1);
 end;
 
@@ -105,7 +90,6 @@ begin
   FScene.DoLoop;
   Done := FALSE;
 end;
-
 
 end.
 

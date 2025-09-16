@@ -52,7 +52,7 @@ begin
   // Add your images to the atlas here
   // example:
       ima := TBGRABitmap.Create(100,100,BGRA(255,255,0));
-      FAtlas.Add(ima); // don't freed your images because FAtlas become their owner !
+      FAtlas.Add(ima); // don't freed 'ima' because FAtlas become its owner !
   // ...
 
   FAtlas.TryToPack;
