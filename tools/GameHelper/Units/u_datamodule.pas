@@ -110,6 +110,10 @@ begin
   // 22
   AddImageToImageList('ZoomAll.svg', ILIconAlign);
   AddImageToImageList('ZoomOnSelection.svg', ILIconAlign);
+
+  // 24
+  AddImageToImageList('DistributeRegularlyH.svg', ILIconAlign);
+  AddImageToImageList('DistributeRegularlyV.svg', ILIconAlign);
 end;
 
 procedure TDataModule1.RedrawImageForIconLayerList;

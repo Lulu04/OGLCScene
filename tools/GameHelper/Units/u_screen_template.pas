@@ -138,6 +138,8 @@ TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
   function MouseIsOverRotateHandle(aWorldPt: TPointF): boolean;
   function MouseIsOverScaleHandle(aWorldPt: TPointF): boolean;
   function GetSelectedBounds: TRectF;
+  function SortSelectedBySurfaceCenterXFromLeftToRight: ArrayOfPSurfaceDescriptor;
+  function SortSelectedBySurfaceCenterYFromTopToBottom: ArrayOfPSurfaceDescriptor;
 protected
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
@@ -166,6 +168,9 @@ public // align
   procedure AlignSelectedTopTo(aY: single); virtual;
   procedure AlignSelectedVCenterTo(aY: single); virtual;
   procedure AlignSelectedBottomTo(aY: single); virtual;
+public // distribute
+  procedure DistributeSelectionHorizontalyWithSameSpacing;
+  procedure DistributeSelectionVerticalyWithSameSpacing;
 public // rotate 90, mirror, plane
   procedure RotateSelectedCCW; virtual;
   procedure RotateSelectedCW; virtual;
@@ -184,9 +189,6 @@ public // rotate 90, mirror, plane
   procedure ZoomOnSelection;
 
   procedure MoveSelectionToLayer(aLayerIndex: integer); virtual;
-
-
-
 
   procedure ReverseAngleOnSelection;
   procedure ToogleScaledAndRotatedHandleOnSelection;
@@ -712,6 +714,48 @@ begin
   Result := RectF(PointF(xmin, ymin), PointF(xmax, ymax));
 end;
 
+function TScreenWithSurfaceHandling.SortSelectedBySurfaceCenterXFromLeftToRight: ArrayOfPSurfaceDescriptor;
+var i: integer;
+  temp: PSurfaceDescriptor;
+  flag: Boolean;
+begin
+  Result := NIL;
+  if Length(FSelected) = 0 then exit;
+  Result := Copy(FSelected, 0 , Length(FSelected));
+  if Length(Result) = 1 then exit;
+  repeat
+    flag := False;
+    for i:=0 to High(Result)-1 do
+      if Result[i]^.surface.CenterX > Result[i+1]^.surface.CenterX then begin
+        temp := Result[i];
+        Result[i] := Result[i+1];
+        Result[i+1] := temp;
+        flag := True;
+      end;
+  until not flag;
+end;
+
+function TScreenWithSurfaceHandling.SortSelectedBySurfaceCenterYFromTopToBottom: ArrayOfPSurfaceDescriptor;
+var i: integer;
+  temp: PSurfaceDescriptor;
+  flag: Boolean;
+begin
+  Result := NIL;
+  if Length(FSelected) = 0 then exit;
+  Result := Copy(FSelected, 0 , Length(FSelected));
+  if Length(Result) = 1 then exit;
+  repeat
+    flag := False;
+    for i:=0 to High(Result)-1 do
+      if Result[i]^.surface.CenterY > Result[i+1]^.surface.CenterY then begin
+        temp := Result[i];
+        Result[i] := Result[i+1];
+        Result[i+1] := temp;
+        flag := True;
+      end;
+  until not flag;
+end;
+
 procedure TScreenWithSurfaceHandling.SelectNone;
 var i: integer;
 begin
@@ -871,6 +915,46 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.BottomY := aY;
   UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenWithSurfaceHandling.DistributeSelectionHorizontalyWithSameSpacing;
+var i: integer;
+  xmin, xmax, delta, xx: single;
+  A: ArrayOfPSurfaceDescriptor;
+begin
+  if Length(FSelected) < 3 then exit;
+  A := SortSelectedBySurfaceCenterXFromLeftToRight;
+
+  // compute delta
+  xmin := A[0]^.surface.CenterX;
+  xmax := A[High(A)]^.surface.CenterX;
+  delta := (xmax-xmin) / (Length(A)-1);
+
+  for i:=1 to High(A)-1 do
+    A[i]^.surface.CenterX := xmin + delta * i;
+
+  UpdateHandlePositionOnSelected;
+  SetFlagModified;
+end;
+
+procedure TScreenWithSurfaceHandling.DistributeSelectionVerticalyWithSameSpacing;
+var i: integer;
+  A: ArrayOfPSurfaceDescriptor;
+  ymin, ymax, delta: Single;
+begin
+  if Length(FSelected) < 3 then exit;
+  A := SortSelectedBySurfaceCenterYFromTopToBottom;
+
+  // compute delta
+  ymin := A[0]^.surface.CenterY;
+  ymax := A[High(A)]^.surface.CenterY;
+  delta := (ymax-ymin) / (Length(A)-1);
+
+  for i:=1 to High(A)-1 do
+    A[i]^.surface.CenterY := ymin + delta * i;
+
+  UpdateHandlePositionOnSelected;
+  SetFlagModified;
 end;
 
 procedure TScreenWithSurfaceHandling.RotateSelectedCCW;

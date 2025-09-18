@@ -48,6 +48,7 @@ type
     Label24: TLabel;
     Label25: TLabel;
     Label26: TLabel;
+    Label27: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -57,6 +58,7 @@ type
     Label9: TLabel;
     Panel1: TPanel;
     Panel10: TPanel;
+    Panel11: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -92,6 +94,8 @@ type
     BMirrorV: TSpeedButton;
     BMoveToTop: TSpeedButton;
     BAddMultiple: TSpeedButton;
+    BDistributeH: TSpeedButton;
+    BDistributeV: TSpeedButton;
     SpeedButton2: TSpeedButton;
     BMoveToTopOneStep: TSpeedButton;
     BMoveToBottomOneStep: TSpeedButton;
@@ -113,6 +117,7 @@ type
     PageLayers: TTabSheet;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
+    procedure BDistributeHClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
     procedure BZoomAllClick(Sender: TObject);
     procedure CBTexturesSelect(Sender: TObject);
@@ -179,6 +184,12 @@ begin
                    [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageLevelBank;
+end;
+
+procedure TFrameToolLevelEditor.BDistributeHClick(Sender: TObject);
+begin
+  if Sender = BDistributeH then ScreenLevelEditor.DistributeSelectionHorizontalyWithSameSpacing;
+  if Sender = BDistributeV then ScreenLevelEditor.DistributeSelectionVerticalyWithSameSpacing;
 end;
 
 procedure TFrameToolLevelEditor.BAddToLevelBankClick(Sender: TObject);
