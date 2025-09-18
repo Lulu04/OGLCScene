@@ -31,7 +31,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="..\..\source;Units"/>
+            <OtherUnitFiles Value="Units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -64,27 +64,30 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="LazOpenGLContext"/>
+        <PackageName Value="OGLCScenePackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="BGRABitmapPack"/>
-        <MinVersion Major="9" Valid="True"/>
+        <PackageName Value="LazOpenGLContext"/>
       </Item2>
       <Item3>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
       </Item3>
       <Item4>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazUtils"/>
       </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
     </RequiredPackages>
     <Units Count="269">
       <Unit0>
         <Filename Value="OGLC_Particles_Editor.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <CursorPos X="49" Y="17"/>
+        <CursorPos Y="17"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -1259,7 +1262,7 @@
         <UnitName Value="Main"/>
         <EditorIndex Value="1"/>
         <TopLine Value="499"/>
-        <CursorPos X="39" Y="511"/>
+        <CursorPos X="33" Y="511"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1555,14 +1558,14 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="9" Y="25"/>
         <UsageCount Value="165"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit193>
       <Unit194>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\DeformationColombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="14"/>
         <UsageCount Value="170"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit194>
       <Unit195>
         <Filename Value="Unit Construction Scenario\etape_def_divers.inc"/>
@@ -1581,21 +1584,21 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="72" Y="5"/>
         <UsageCount Value="58"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit197>
       <Unit198>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\Opacity Colombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="25" Y="2"/>
         <UsageCount Value="52"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit198>
       <Unit199>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\InitColombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="5"/>
         <UsageCount Value="51"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit199>
       <Unit200>
         <Filename Value="..\UNITE COMMUNE\svgtobgrabitmap.pas"/>
@@ -1636,7 +1639,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="103"/>
-        <CursorPos X="31" Y="119"/>
+        <CursorPos X="5" Y="119"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit204>
@@ -1743,7 +1746,7 @@
         <UnitName Value="frame_ShowColor"/>
         <EditorIndex Value="2"/>
         <TopLine Value="13"/>
-        <CursorPos X="37" Y="23"/>
+        <CursorPos X="35" Y="23"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2005,7 +2008,7 @@
         <EditorIndex Value="4"/>
         <WindowIndex Value="1"/>
         <TopLine Value="209"/>
-        <CursorPos X="58" Y="218"/>
+        <CursorPos Y="218"/>
         <UsageCount Value="57"/>
         <Loaded Value="True"/>
       </Unit251>
@@ -2031,7 +2034,7 @@
         <EditorIndex Value="7"/>
         <WindowIndex Value="1"/>
         <TopLine Value="206"/>
-        <CursorPos X="13" Y="195"/>
+        <CursorPos X="7" Y="195"/>
         <UsageCount Value="48"/>
         <Loaded Value="True"/>
       </Unit254>
@@ -2069,7 +2072,7 @@
         <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
         <TopLine Value="147"/>
-        <CursorPos X="48" Y="162"/>
+        <CursorPos X="41" Y="162"/>
         <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit259>
@@ -2078,7 +2081,7 @@
         <EditorIndex Value="6"/>
         <WindowIndex Value="1"/>
         <TopLine Value="16"/>
-        <CursorPos X="29" Y="34"/>
+        <CursorPos Y="34"/>
         <UsageCount Value="18"/>
         <Loaded Value="True"/>
       </Unit260>
@@ -2115,7 +2118,7 @@
         <EditorIndex Value="5"/>
         <WindowIndex Value="1"/>
         <TopLine Value="146"/>
-        <CursorPos X="61" Y="154"/>
+        <CursorPos X="58" Y="154"/>
         <UsageCount Value="14"/>
         <Loaded Value="True"/>
       </Unit265>
@@ -2140,7 +2143,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="421"/>
+        <TopLine Value="420"/>
         <CursorPos X="3" Y="418"/>
         <UsageCount Value="14"/>
         <Loaded Value="True"/>
@@ -2277,7 +2280,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\source;Units"/>
+      <OtherUnitFiles Value="Units"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
