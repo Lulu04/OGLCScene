@@ -138,12 +138,12 @@ public
   procedure DeleteItemByID(aID: integer);
   function DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
   function DuplicateAndShiftItemsByID(aItems: ArrayOfPSurfaceDescriptor;
-    aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single
-  ): ArrayOfPSurfaceDescriptor;
+    aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single): ArrayOfPSurfaceDescriptor;
 
   function ItemsDescriptorToArrayOfID(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
 
   function GetItemsIndexesByIDSortedSmallToHigh(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
+  function GetIndexesForALayer(aLayer: TLayer): TArrayOfInteger;
   procedure MoveItemTo(aCurrentIndex, aNewindex: integer);
   procedure ShiftItemToTopOneStep(aItemIndex: integer);
   procedure ShiftItemToBackOneStep(aItemIndex: integer);
@@ -180,7 +180,7 @@ end;
 
 implementation
 
-uses u_common, u_screen_spritebuilder, Math;
+uses u_common, u_screen_spritebuilder, u_utils, Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -1190,6 +1190,16 @@ begin
         flag := True;
       end;
   until not flag;
+end;
+
+function TSurfaceList.GetIndexesForALayer(aLayer: TLayer): TArrayOfInteger;
+var i: SizeUInt;
+begin
+  Result := NIL;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.surface.ParentLayer = aLayer then
+      Result.Add(i);
 end;
 
 procedure TSurfaceList.ShiftItemToTopOneStep(aItemIndex: integer);

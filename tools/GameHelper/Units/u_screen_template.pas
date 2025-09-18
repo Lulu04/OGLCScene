@@ -11,6 +11,8 @@ uses
 
 type
 
+TArrayOfArrayOfInteger = array of TArrayOfInteger;
+
 TMouseState = ( msIdle,
 
                 // sprite builder surface child
@@ -169,6 +171,10 @@ public // rotate 90, mirror, plane
   procedure RotateSelectedCW; virtual;
   procedure MirrorSelectedH; virtual;
   procedure MirrorSelectedV; virtual;
+  function GetLayerindexesInSelection: TArrayOfInteger;
+  function SelectedAreOnTheSameLayer: boolean;
+  function GetSurfaceIndexesInTheirLayerOnSelection: TArrayOfInteger;
+  function GetSurfaceIndexesInTheListOnSelection: TArrayOfInteger;
   procedure SelectedToTop;
   procedure SelectedToTopOneStep;
   procedure SelectedToBackOneStep;
@@ -198,7 +204,7 @@ public // rotate 90, mirror, plane
 end;
 
 implementation
-uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main;
+uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main, u_utils;
 
 { TCustomScreenTemplate }
 
@@ -967,29 +973,85 @@ begin
   UpdateHandlePositionOnSelected
 end;
 
+function TScreenWithSurfaceHandling.GetLayerindexesInSelection: TArrayOfInteger;
+var i: integer;
+begin
+  Result := NIL;
+  if Length(FSelected) = 0 then exit;
+
+  for i:=0 to High(FSelected) do
+    Result.AddOnlyOneTime(FSelected[i]^.layerindex);
+end;
+
+function TScreenWithSurfaceHandling.SelectedAreOnTheSameLayer: boolean;
+var i, li: integer;
+begin
+  Result := False;
+  if Length(FSelected) = 0 then exit;
+
+  li := FSelected[0]^.layerindex;
+  for i:=1 to High(FSelected) do
+    if li <> FSelected[i]^.layerindex then exit(False);
+
+  Result := True;
+end;
+
+function TScreenWithSurfaceHandling.GetSurfaceIndexesInTheirLayerOnSelection: TArrayOfInteger;
+var i: integer;
+begin
+  // we suppose the selected are on the same layer (checked before the call)
+  Result := NIL;
+  SetLength(Result, Length(Selected));
+  for i:=0 to High(FSelected) do
+    Result[i] := FSelected[i]^.surface.ParentLayer.IndexOf(FSelected[i]^.surface);
+end;
+
+function TScreenWithSurfaceHandling.GetSurfaceIndexesInTheListOnSelection: TArrayOfInteger;
+var i: integer;
+begin
+  Result := NIL;
+  SetLength(Result, Length(Selected));
+  for i:=0 to High(FSelected) do
+    Result[i] := Surfaces.GetItemIndexByID(FSelected[i]^.id);
+end;
+
 procedure TScreenWithSurfaceHandling.SelectedToTop;
-var A, ids: TArrayOfInteger;
+var indexesInLayer, indexesInList, ids: TArrayOfInteger;
   i, newIndex: integer;
+  layer: TLayer;
 begin
   if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = Surfaces.Size then exit;
+  if not SelectedAreOnTheSameLayer then exit;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
 
-  // get the sorted indexes
-  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+  // retrieve the surface indexes in the layer
+  indexesInLayer := GetSurfaceIndexesInTheirLayerOnSelection;
+  indexesInLayer.SortFromSmallToHigh;
+  // retrieve the surface indexes in the list
+  indexesInList := GetSurfaceIndexesInTheListOnSelection;
+  indexesInList.SortFromSmallToHigh;
 
-  // shift the surface in their layer and in the surface list
+  layer := FSelected[0]^.surface.ParentLayer;
+  if layer = NIL then exit;
+
+  // shift the surface in layer
+  newIndex := layer.SurfaceCount-1;
+  for i:=High(indexesInLayer) downto 0 do begin
+    layer.Move(indexesInLayer[i], newIndex);
+    dec(newIndex);
+  end;
+
+  // shift in the list
   newIndex := Surfaces.Size-1;
-  for i:=High(A) downto 0 do begin
-    Surfaces.GetByIndex(A[i])^.surface.ParentLayer.Move(A[i], newIndex);
-    Surfaces.MoveItemTo(A[i], newIndex);
+  for i:=High(indexesInList) downto 0 do begin
+    Surfaces.MoveItemTo(indexesInList[i], newIndex);
     dec(newIndex);
   end;
 
   // reconstruct the selected because their adress have changed
-  FSelected := NIL;
-  SetLength(FSelected, Length(ids));
   for i:=0 to High(ids) do
     FSelected[i] := Surfaces.GetItemByID(ids[i]);
 
@@ -997,35 +1059,54 @@ begin
 end;
 
 procedure TScreenWithSurfaceHandling.SelectedToTopOneStep;
-var A, ids: TArrayOfInteger;
-  i, newIndex, previous: integer;
-  surf: TSimpleSurfaceWithEffect;
+var indexesInLayer, indexesInList, allIndexesInList, ids: TArrayOfInteger;
+  i, newIndex, previous, currentIndex, previousIndex: integer;
+  layer: TLayer;
 begin
   if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = Surfaces.Size then exit;
+  if not SelectedAreOnTheSameLayer then exit;
+  layer := FSelected[0]^.surface.ParentLayer;
+  if layer = NIL then exit;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
 
-  // get the sorted indexes
-  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+  // retrieve the surface indexes in the layer
+  indexesInLayer := GetSurfaceIndexesInTheirLayerOnSelection;
+  indexesInLayer.SortFromSmallToHigh;
+  // retrieve the surface indexes in the list
+  indexesInList := GetSurfaceIndexesInTheListOnSelection;
+  indexesInList.SortFromSmallToHigh;
+  // retrieve the indexes of all surface in the layer in the list
+  allIndexesInList := Surfaces.GetIndexesForALayer(layer);
+  allIndexesInList.SortFromSmallToHigh;
 
-  // shift the surface in their layer and in the surface list
-  previous := -1;
-  for i:=High(A) downto 0 do begin
-    newIndex := A[i] + 1;
+
+  // shift the surface in layer
+  previous := layer.SurfaceCount;
+  for i:=High(indexesInLayer) downto 0 do begin
+    newIndex := indexesInLayer[i] + 1;
     if newIndex <> previous then begin
-      surf := Surfaces.GetByIndex(A[i])^.surface;
-      if newIndex < surf.ParentLayer.SurfaceCount then begin
-        surf.ParentLayer.Move(A[i], newIndex);
-        Surfaces.MoveItemTo(A[i], newIndex);
-        previous := newIndex;
-      end else previous := A[i];
-    end;
+      layer.Move(indexesInLayer[i], newIndex);
+      previous := newIndex;
+    end else previous := indexesInLayer[i];
+  end;
+
+  // shift in the list
+  previousIndex := Length(allIndexesInList);
+
+  for i:=High(indexesInList) downto 0 do begin
+    currentIndex := allIndexesInList.IndexOf(indexesInList[i]);
+    newIndex := currentIndex + 1;
+
+    if (newIndex <> previousIndex) and (newIndex < allIndexesInList.Count)  then begin
+      Surfaces.MoveItemTo(allIndexesInList[currentIndex], allIndexesInList[newIndex]);
+      previousIndex := newIndex;
+    end else previousIndex := currentIndex;
   end;
 
   // reconstruct the selected because their adress have changed
-  FSelected := NIL;
-  SetLength(FSelected, Length(ids));
   for i:=0 to High(ids) do
     FSelected[i] := Surfaces.GetItemByID(ids[i]);
 
@@ -1033,11 +1114,66 @@ begin
 end;
 
 procedure TScreenWithSurfaceHandling.SelectedToBackOneStep;
-var A, ids: TArrayOfInteger;
+var indexesInLayer, indexesInList, allIndexesInList, ids: TArrayOfInteger;
+  i, newIndex, previous, currentIndex, previousIndex: integer;
+  layer: TLayer;
+begin
+  if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = Surfaces.Size then exit;
+  if not SelectedAreOnTheSameLayer then exit;
+  layer := FSelected[0]^.surface.ParentLayer;
+  if layer = NIL then exit;
+
+  // save the selected IDs
+  ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
+
+  // retrieve the surface indexes in the layer
+  indexesInLayer := GetSurfaceIndexesInTheirLayerOnSelection;
+  indexesInLayer.SortFromSmallToHigh;
+  // retrieve the surface indexes in the list
+  indexesInList := GetSurfaceIndexesInTheListOnSelection;
+  indexesInList.SortFromSmallToHigh;
+  // retrieve the indexes of all surface in the layer in the list
+  allIndexesInList := Surfaces.GetIndexesForALayer(layer);
+  allIndexesInList.SortFromSmallToHigh;
+
+
+  // shift the surface in layer
+  previous := 0;
+  for i:=0 to High(indexesInLayer) do begin
+    newIndex := indexesInLayer[i] - 1;
+    if (newIndex <> previous) and (newindex >= 0) then begin
+      layer.Move(indexesInLayer[i], newIndex);
+      previous := newIndex;
+    end else previous := indexesInLayer[i];
+  end;
+
+  // shift in the list
+  previousIndex := Length(allIndexesInList);
+
+  for i:=0 to High(indexesInList) do begin
+    currentIndex := allIndexesInList.IndexOf(indexesInList[i]);
+    newIndex := currentIndex - 1;
+
+    if (newIndex <> previousIndex) and (newIndex >= 0)  then begin
+      Surfaces.MoveItemTo(allIndexesInList[currentIndex], allIndexesInList[newIndex]);
+      previousIndex := newIndex;
+    end else previousIndex := currentIndex;
+  end;
+
+  // reconstruct the selected because their adress have changed
+  for i:=0 to High(ids) do
+    FSelected[i] := Surfaces.GetItemByID(ids[i]);
+
+  SetFlagModified;
+
+{var A, ids: TArrayOfInteger;
   i, newIndex, previous: integer;
   surf: TSimpleSurfaceWithEffect;
 begin
   if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = Surfaces.Size then exit;
+  if not SelectedAreOnTheSameLayer then exit;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
@@ -1060,37 +1196,49 @@ begin
   end;
 
   // reconstruct the selected because their adress have changed
-  FSelected := NIL;
-  SetLength(FSelected, Length(ids));
   for i:=0 to High(ids) do
     FSelected[i] := Surfaces.GetItemByID(ids[i]);
 
-  SetFlagModified;
+  SetFlagModified;   }
 end;
 
 procedure TScreenWithSurfaceHandling.SelectedToBack;
-var A, ids: TArrayOfInteger;
+var indexesInLayer, indexesInList, ids: TArrayOfInteger;
   i, newIndex: integer;
+  layer: TLayer;
 begin
   if Length(FSelected) = 0 then exit;
+  if Length(FSelected) = Surfaces.Size then exit;
+  if not SelectedAreOnTheSameLayer then exit;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
 
-  // get the sorted indexes
-  A := Surfaces.GetItemsIndexesByIDSortedSmallToHigh(FSelected);
+  // retrieve the surface indexes in the layer
+  indexesInLayer := GetSurfaceIndexesInTheirLayerOnSelection;
+  indexesInLayer.SortFromSmallToHigh;
+  // retrieve the surface indexes in the list
+  indexesInList := GetSurfaceIndexesInTheListOnSelection;
+  indexesInList.SortFromSmallToHigh;
 
-  // shift the surface in their layer
+  layer := FSelected[0]^.surface.ParentLayer;
+  if layer = NIL then exit;
+
+  // shift the surface in layer
   newIndex := 0;
-  for i:=0 to High(A) do begin
-    Surfaces.GetByIndex(A[i])^.surface.ParentLayer.Move(A[i], newIndex);
-    Surfaces.MoveItemTo(A[i], newIndex);
+  for i:=0 to High(indexesInLayer) do begin
+    layer.Move(indexesInLayer[i], newIndex);
+    inc(newIndex);
+  end;
+
+  // shift in the list
+  newIndex := 0;
+  for i:=0 to High(indexesInList) do begin
+    Surfaces.MoveItemTo(indexesInList[i], newIndex);
     inc(newIndex);
   end;
 
   // reconstruct the selected because their adress have changed
-  FSelected := NIL;
-  SetLength(FSelected, Length(ids));
   for i:=0 to High(ids) do
     FSelected[i] := Surfaces.GetItemByID(ids[i]);
 
@@ -1114,8 +1262,10 @@ procedure TScreenWithSurfaceHandling.MoveSelectionToLayer(aLayerIndex: integer);
 var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
+  for i:=0 to High(FSelected) do begin
     FSelected[i]^.surface.MoveToLayer(aLayerIndex);
+    FSelected[i]^.layerindex := aLayerIndex;
+  end;
   SetFlagModified;
 end;
 

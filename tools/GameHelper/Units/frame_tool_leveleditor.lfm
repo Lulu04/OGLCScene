@@ -851,7 +851,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 140
             Height = 26
-            Hint = 'Move to top'
+            Hint = 'Move to top'#13#10'work only if the selected surfaces are  on the same layer.'
             Top = 8
             Width = 26
             Color = 4934475
@@ -867,7 +867,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 172
             Height = 26
-            Hint = 'Move to top one step'
+            Hint = 'Move to top one step'#13#10'work only if the selected surfaces are  on the same layer.'
             Top = 8
             Width = 26
             Color = 4934475
@@ -883,7 +883,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 204
             Height = 26
-            Hint = 'Move to bottom one step'
+            Hint = 'Move to bottom one step'#13#10'work only if the selected surfaces are  on the same layer.'
             Top = 8
             Width = 26
             Color = 4934475
@@ -899,7 +899,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 236
             Height = 26
-            Hint = 'Move to bottom'
+            Hint = 'Move to bottom'#13#10'work only if the selected surfaces are  on the same layer.'
             Top = 8
             Width = 26
             Color = 4934475

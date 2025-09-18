@@ -619,6 +619,7 @@ end;
 
 procedure TFrameToolLevelEditor.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 var r,g,b: byte;
+  A: TArrayOfInteger;
 begin
   FInitializingWidget := True;
   FWorkingChild := NIL;
@@ -660,12 +661,14 @@ begin
   end
   else
   if Length(aSelected) > 1 then begin
-    // several selected -> we can not edit the parameters
+    // several selected -> we can not edit the parameters except the layer
     Label8.Visible := False;
     CBTextures.Enabled := False;
     CBTextures.ItemIndex := -1;
-    CBLayers.Enabled := False;
-    CBLayers.ItemIndex := -1;
+    CBLayers.Enabled := True;
+    A := ScreenLevelEditor.GetLayerindexesInSelection;
+    if Length(A) <> 1 then CBLayers.ItemIndex := -1
+      else CBLayers.ItemIndex := A[0];
     Panel2.Visible := False;
     BNewSurface.Enabled := False;
     ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
