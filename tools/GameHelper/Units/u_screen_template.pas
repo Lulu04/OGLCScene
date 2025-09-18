@@ -206,7 +206,8 @@ public // rotate 90, mirror, plane
 end;
 
 implementation
-uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main, u_utils;
+uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main, u_utils,
+  u_layerlist;
 
 { TCustomScreenTemplate }
 
@@ -370,7 +371,7 @@ var i: integer;
   end;
 begin
 
-  for i:=0 to APP_LAYER_COUNT-1 do
+  for i:=0 to Layers.Count-1 do
     FScene.Layer[i].Visible := IndexInArray(i);
 end;
 
