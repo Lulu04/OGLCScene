@@ -513,6 +513,7 @@ destructor TStarNest.Destroy;
 begin
   ScrollingSpeed.Free;
   ScrollingAngle.Free;
+  Zoom.Free;
   inherited Destroy;
 end;
 
