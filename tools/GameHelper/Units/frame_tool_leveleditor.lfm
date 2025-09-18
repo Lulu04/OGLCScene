@@ -1,9 +1,9 @@
 object FrameToolLevelEditor: TFrameToolLevelEditor
   Left = 0
-  Height = 708
+  Height = 748
   Top = 0
   Width = 300
-  ClientHeight = 708
+  ClientHeight = 748
   ClientWidth = 300
   TabOrder = 0
   DesignLeft = 815
@@ -16,7 +16,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Panel4
     Left = 0
-    Height = 580
+    Height = 620
     Top = 32
     Width = 300
     ActivePage = PageSurfaces
@@ -28,16 +28,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     end
     object PageSurfaces: TTabSheet
       Caption = 'Surfaces'
-      ClientHeight = 552
+      ClientHeight = 592
       ClientWidth = 292
       object Panel1: TPanel
         Left = 0
-        Height = 552
+        Height = 592
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 552
+        ClientHeight = 592
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -1002,15 +1002,80 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           ShowHint = True
           ParentShowHint = False
         end
+        object Panel11: TPanel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Panel3
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Left = 0
+          Height = 38
+          Top = 506
+          Width = 292
+          Anchors = [akTop, akLeft, akRight]
+          BevelOuter = bvNone
+          ClientHeight = 38
+          ClientWidth = 292
+          ParentBackground = False
+          TabOrder = 6
+          object Label27: TLabel
+            AnchorSideLeft.Side = asrCenter
+            AnchorSideTop.Control = Panel11
+            AnchorSideRight.Control = Panel11
+            AnchorSideRight.Side = asrBottom
+            Left = 226
+            Height = 15
+            Top = 0
+            Width = 56
+            Anchors = [akTop, akRight]
+            BorderSpacing.Right = 10
+            Caption = 'Distribute'
+            Font.Color = clWhite
+            Font.Style = [fsBold]
+            ParentFont = False
+          end
+          object BDistributeH: TSpeedButton
+            Cursor = crHandPoint
+            Left = 12
+            Height = 26
+            Hint = 'Distributes horizontally with equal spacing'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 24
+            Transparent = False
+            OnClick = BDistributeHClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+          object BDistributeV: TSpeedButton
+            Cursor = crHandPoint
+            Left = 48
+            Height = 26
+            Hint = 'Distributes vertically with equal spacing'
+            Top = 8
+            Width = 26
+            Color = 4934475
+            Flat = True
+            Images = DataModule1.ILIconAlign
+            ImageIndex = 25
+            Transparent = False
+            OnClick = BDistributeHClick
+            ShowHint = True
+            ParentShowHint = False
+          end
+        end
       end
     end
     object PageLayers: TTabSheet
       Caption = 'Layers'
-      ClientHeight = 552
+      ClientHeight = 592
       ClientWidth = 292
       object Panel10: TPanel
         Left = 0
-        Height = 552
+        Height = 592
         Top = 0
         Width = 292
         Align = alClient
@@ -1023,16 +1088,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     end
     object PageWorld: TTabSheet
       Caption = 'World'
-      ClientHeight = 552
+      ClientHeight = 592
       ClientWidth = 292
       object Panel7: TPanel
         Left = 0
-        Height = 552
+        Height = 592
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 552
+        ClientHeight = 592
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -1282,7 +1347,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 96
-    Top = 612
+    Top = 652
     Width = 300
     Anchors = [akLeft, akRight, akBottom]
     ClientHeight = 96
