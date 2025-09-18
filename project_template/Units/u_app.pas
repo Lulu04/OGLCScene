@@ -5,9 +5,10 @@ unit u_app;
 interface
 
 uses
-  Classes, SysUtils, OGLCScene, fgl;
+  Classes, SysUtils,
+  OGLCScene;
 
-// Change this values with yours
+// Change this values to define the size of the screen when you design the graphics
 const
   SCREEN_WIDTH_AT_DESIGN_TIME: single = 1024;
   SCREEN_HEIGHT_AT_DESIGN_TIME: single = 768;
