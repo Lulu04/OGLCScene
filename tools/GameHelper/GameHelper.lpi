@@ -17,7 +17,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="1"/>
-      <BuildNr Value="119"/>
+      <BuildNr Value="120"/>
       <Language Value="040C"/>
       <StringTable CompanyName="LuluTech - Jean-Luc Solimine" LegalCopyright="LuluTech - Jean-Luc Solimine" LegalTrademarks="LuLuTech" ProductVersion="1.0.0.0"/>
     </VersionInfo>
@@ -32,7 +32,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir);Units"/>
-            <OtherUnitFiles Value="Units;..\unit_common;..\..;..\..\source"/>
+            <OtherUnitFiles Value="Units;..\unit_common"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -65,20 +65,23 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="LazOpenGLContext"/>
+        <PackageName Value="OGLCScenePackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="BGRABitmapPack"/>
-        <MinVersion Major="9" Valid="True"/>
+        <PackageName Value="LazOpenGLContext"/>
       </Item2>
       <Item3>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
       </Item3>
       <Item4>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazUtils"/>
       </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
     </RequiredPackages>
     <Units Count="78">
       <Unit0>
@@ -98,7 +101,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="5"/>
         <TopLine Value="225"/>
-        <CursorPos X="73" Y="233"/>
+        <CursorPos X="72" Y="233"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -187,7 +190,7 @@
         <EditorIndex Value="6"/>
         <WindowIndex Value="1"/>
         <TopLine Value="49"/>
-        <CursorPos X="12" Y="52"/>
+        <CursorPos X="5" Y="52"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit11>
@@ -195,7 +198,7 @@
         <Filename Value="..\..\source\OGLCScene.pas"/>
         <WindowIndex Value="2"/>
         <TopLine Value="16"/>
-        <CursorPos X="35" Y="27"/>
+        <CursorPos X="26" Y="27"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -204,7 +207,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="15"/>
         <TopLine Value="1072"/>
-        <CursorPos X="54" Y="1089"/>
+        <CursorPos X="51" Y="1089"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit13>
@@ -294,7 +297,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="358"/>
-        <CursorPos X="33" Y="373"/>
+        <CursorPos Y="373"/>
         <UsageCount Value="202"/>
         <Bookmarks Count="1">
           <Item0 X="52" Y="927"/>
@@ -333,7 +336,7 @@
         <EditorIndex Value="23"/>
         <WindowIndex Value="2"/>
         <TopLine Value="152"/>
-        <CursorPos X="51" Y="163"/>
+        <CursorPos X="50" Y="163"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit26>
@@ -405,7 +408,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="26"/>
         <TopLine Value="75"/>
-        <CursorPos X="21" Y="94"/>
+        <CursorPos X="5" Y="94"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit34>
@@ -430,7 +433,7 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="12"/>
         <TopLine Value="236"/>
-        <CursorPos X="59" Y="239"/>
+        <CursorPos X="53" Y="239"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -513,7 +516,7 @@
         <EditorIndex Value="7"/>
         <WindowIndex Value="1"/>
         <TopLine Value="90"/>
-        <CursorPos X="65" Y="116"/>
+        <CursorPos X="64" Y="116"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -602,7 +605,7 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="4"/>
         <TopLine Value="178"/>
-        <CursorPos X="39" Y="188"/>
+        <CursorPos Y="188"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -663,7 +666,7 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="11"/>
         <TopLine Value="322"/>
-        <CursorPos X="3" Y="296"/>
+        <CursorPos Y="296"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -744,7 +747,7 @@
         <EditorIndex Value="1"/>
         <WindowIndex Value="2"/>
         <TopLine Value="113"/>
-        <CursorPos X="20" Y="51"/>
+        <CursorPos X="10" Y="51"/>
         <UsageCount Value="58"/>
         <Loaded Value="True"/>
       </Unit70>
@@ -787,7 +790,7 @@
         <Filename Value="..\unit_common\project_util.pas"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="10" Y="25"/>
+        <CursorPos Y="25"/>
         <UsageCount Value="47"/>
         <Loaded Value="True"/>
       </Unit75>
@@ -940,7 +943,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);Units"/>
-      <OtherUnitFiles Value="Units;..\unit_common;..\..;..\..\source"/>
+      <OtherUnitFiles Value="Units;..\unit_common"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

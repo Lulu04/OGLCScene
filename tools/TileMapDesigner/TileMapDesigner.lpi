@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1604"/>
+      <BuildNr Value="1605"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -33,7 +33,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="..\..\source;Units"/>
+            <OtherUnitFiles Value="Units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -72,23 +72,26 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="5">
+    <RequiredPackages Count="6">
       <Item1>
-        <PackageName Value="SynEdit"/>
+        <PackageName Value="OGLCScenePackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="LazOpenGLContext"/>
+        <PackageName Value="SynEdit"/>
       </Item2>
       <Item3>
-        <PackageName Value="BGRABitmapPack"/>
-        <MinVersion Major="9" Valid="True"/>
+        <PackageName Value="LazOpenGLContext"/>
       </Item3>
       <Item4>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
       </Item4>
       <Item5>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazUtils"/>
       </Item5>
+      <Item6>
+        <PackageName Value="LCL"/>
+      </Item6>
     </RequiredPackages>
     <Units Count="267">
       <Unit0>
@@ -936,7 +939,7 @@
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="24"/>
-        <CursorPos X="15" Y="30"/>
+        <CursorPos Y="30"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit113>
@@ -1081,7 +1084,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="7"/>
         <TopLine Value="836"/>
-        <CursorPos X="8" Y="847"/>
+        <CursorPos Y="847"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="1">
           <Item0 Y="1103"/>
@@ -1484,14 +1487,14 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="9" Y="25"/>
         <UsageCount Value="138"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit180>
       <Unit181>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\DeformationColombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="14"/>
         <UsageCount Value="143"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit181>
       <Unit182>
         <Filename Value="Unit Construction Scenario\etape_def_divers.inc"/>
@@ -1510,28 +1513,28 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="72" Y="5"/>
         <UsageCount Value="31"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit184>
       <Unit185>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\Opacity Colombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="25" Y="2"/>
         <UsageCount Value="25"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit185>
       <Unit186>
         <Filename Value="E:\UNIVERSITE\DATAseq_essai\Sprites\InitColombe.sce.txt"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="5"/>
         <UsageCount Value="24"/>
-        <DefaultSyntaxHighlighter Value="None"/>
+        <DefaultSyntaxHighlighter Value="Text"/>
       </Unit186>
       <Unit187>
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="10"/>
         <TopLine Value="83"/>
-        <CursorPos X="10" Y="94"/>
+        <CursorPos Y="94"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit187>
@@ -1553,7 +1556,7 @@
         <UnitName Value="uAskTileSize"/>
         <EditorIndex Value="9"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="11" Y="11"/>
+        <CursorPos X="5" Y="11"/>
         <UsageCount Value="204"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1609,7 +1612,7 @@
         <EditorIndex Value="8"/>
         <WindowIndex Value="1"/>
         <TopLine Value="10"/>
-        <CursorPos X="20" Y="31"/>
+        <CursorPos Y="31"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1693,7 +1696,7 @@
         <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
         <TopLine Value="27"/>
-        <CursorPos X="21" Y="41"/>
+        <CursorPos Y="41"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1782,7 +1785,7 @@
         <EditorIndex Value="7"/>
         <WindowIndex Value="1"/>
         <TopLine Value="28"/>
-        <CursorPos X="34" Y="39"/>
+        <CursorPos X="25" Y="39"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1797,7 +1800,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="12" Y="9"/>
+        <CursorPos X="11" Y="9"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1843,7 +1846,7 @@
         <EditorIndex Value="6"/>
         <WindowIndex Value="1"/>
         <TopLine Value="35"/>
-        <CursorPos X="71" Y="52"/>
+        <CursorPos X="41" Y="52"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1887,7 +1890,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="6"/>
         <TopLine Value="70"/>
-        <CursorPos X="24" Y="81"/>
+        <CursorPos X="18" Y="81"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit226>
@@ -1934,7 +1937,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
         <TopLine Value="431"/>
-        <CursorPos X="70" Y="439"/>
+        <CursorPos X="68" Y="439"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit232>
@@ -1947,7 +1950,7 @@
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
         <TopLine Value="13"/>
-        <CursorPos X="95" Y="20"/>
+        <CursorPos X="41" Y="20"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2040,7 +2043,7 @@
         <ResourceBaseClass Value="Form"/>
         <WindowIndex Value="1"/>
         <TopLine Value="3"/>
-        <CursorPos X="40" Y="15"/>
+        <CursorPos X="33" Y="15"/>
         <UsageCount Value="175"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2075,7 +2078,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
         <TopLine Value="92"/>
-        <CursorPos X="65" Y="98"/>
+        <CursorPos X="63" Y="98"/>
         <UsageCount Value="109"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2094,7 +2097,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="2"/>
         <TopLine Value="16"/>
-        <CursorPos X="19" Y="30"/>
+        <CursorPos X="11" Y="30"/>
         <UsageCount Value="98"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -2135,7 +2138,7 @@
         <EditorIndex Value="5"/>
         <WindowIndex Value="2"/>
         <TopLine Value="27"/>
-        <CursorPos X="101" Y="41"/>
+        <CursorPos X="86" Y="41"/>
         <UsageCount Value="33"/>
         <Loaded Value="True"/>
       </Unit256>
@@ -2352,7 +2355,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\source;Units"/>
+      <OtherUnitFiles Value="Units"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
