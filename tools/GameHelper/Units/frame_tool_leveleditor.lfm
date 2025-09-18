@@ -518,7 +518,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton2: TSpeedButton
             Cursor = crHandPoint
-            Left = 48
+            Left = 44
             Height = 26
             Hint = 'Align right side to the horizontal center of the reference'
             Top = 32
@@ -534,7 +534,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton3: TSpeedButton
             Cursor = crHandPoint
-            Left = 80
+            Left = 76
             Height = 26
             Hint = 'Align Left side'
             Top = 32
@@ -550,7 +550,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton4: TSpeedButton
             Cursor = crHandPoint
-            Left = 112
+            Left = 108
             Height = 26
             Hint = 'Center horizontaly'
             Top = 32
@@ -566,7 +566,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton5: TSpeedButton
             Cursor = crHandPoint
-            Left = 144
+            Left = 140
             Height = 26
             Hint = 'Align right side'
             Top = 32
@@ -582,7 +582,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton6: TSpeedButton
             Cursor = crHandPoint
-            Left = 178
+            Left = 172
             Height = 26
             Hint = 'Align left side to the horizontal center of the reference'
             Top = 32
@@ -598,7 +598,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton7: TSpeedButton
             Cursor = crHandPoint
-            Left = 210
+            Left = 204
             Height = 26
             Hint = 'Align left side on the right side of the reference'
             Top = 32
@@ -630,7 +630,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton9: TSpeedButton
             Cursor = crHandPoint
-            Left = 48
+            Left = 44
             Height = 26
             Hint = 'Align bottom side to the vertical center of the reference'
             Top = 64
@@ -646,7 +646,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton10: TSpeedButton
             Cursor = crHandPoint
-            Left = 80
+            Left = 76
             Height = 26
             Hint = 'Align top side'
             Top = 64
@@ -662,7 +662,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton11: TSpeedButton
             Cursor = crHandPoint
-            Left = 112
+            Left = 108
             Height = 26
             Hint = 'Center verticaly'
             Top = 64
@@ -678,7 +678,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton12: TSpeedButton
             Cursor = crHandPoint
-            Left = 144
+            Left = 140
             Height = 26
             Hint = 'Align bottom side'
             Top = 64
@@ -694,7 +694,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton13: TSpeedButton
             Cursor = crHandPoint
-            Left = 178
+            Left = 172
             Height = 26
             Hint = 'Align top side to the vertical center of the reference'
             Top = 64
@@ -710,7 +710,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object SpeedButton14: TSpeedButton
             Cursor = crHandPoint
-            Left = 210
+            Left = 204
             Height = 26
             Hint = 'Align top side on the bottom side of the reference'
             Top = 64
@@ -1052,7 +1052,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           end
           object BDistributeV: TSpeedButton
             Cursor = crHandPoint
-            Left = 48
+            Left = 44
             Height = 26
             Hint = 'Distributes vertically with equal spacing'
             Top = 8

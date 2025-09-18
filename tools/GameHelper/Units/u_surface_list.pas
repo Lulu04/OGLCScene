@@ -1086,6 +1086,8 @@ begin
   sorted := GetSortedSurfaceFromNearestTofurthest;
   for i:=0 to High(sorted) do begin
     o := sorted[i]^.surface;
+    // do not return surfaces on layer not visible
+    if ModeForLevelEditor and not o.ParentLayer.Visible then continue;
     o.CollisionBody.SetTransformMatrix(o.GetMatrixSurfaceToScene);
     if o.CollisionBody.CheckCollisionWith(collisionPoint) then begin
       SetLength(Result, length(Result)+1);
