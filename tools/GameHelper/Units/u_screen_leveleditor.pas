@@ -267,6 +267,7 @@ end;
 
 procedure TScreenLevelEditor.MoveSelectionToLayer(aLayerIndex: integer);
 begin
+  if Length(FSelected) = 0 then exit;
   inherited MoveSelectionToLayer(aLayerIndex);
   FrameToolLevelEditor.ShowSelectionData(FSelected);
 end;
