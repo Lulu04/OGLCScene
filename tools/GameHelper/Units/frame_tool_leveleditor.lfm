@@ -19,9 +19,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Height = 620
     Top = 32
     Width = 296
-    ActivePage = PageSurfaces
+    ActivePage = PageLayers
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
@@ -448,6 +448,26 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Caption = 'ID'
             Font.Style = [fsBold]
             ParentFont = False
+          end
+          object BHelpSurfaces: TSpeedButton
+            AnchorSideTop.Control = Panel7
+            AnchorSideTop.Side = asrCenter
+            AnchorSideRight.Control = Panel7
+            AnchorSideRight.Side = asrBottom
+            Cursor = crHandPoint
+            Left = 264
+            Height = 24
+            Hint = 'Help'
+            Top = 9
+            Width = 24
+            Anchors = [akTop]
+            BorderSpacing.Top = 3
+            BorderSpacing.Right = 3
+            Images = DataModule1.ImageList1
+            ImageIndex = 15
+            OnClick = BHelpSurfacesClick
+            ShowHint = True
+            ParentShowHint = False
           end
         end
         object Panel3: TPanel
@@ -1120,10 +1140,48 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         Width = 288
         Align = alClient
         BevelOuter = bvNone
+        ClientHeight = 592
+        ClientWidth = 288
         Color = 8289918
         ParentBackground = False
         ParentColor = False
         TabOrder = 0
+        object Panel12: TPanel
+          AnchorSideLeft.Control = Panel10
+          AnchorSideTop.Control = BHelpLayers
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel10
+          AnchorSideRight.Side = asrBottom
+          AnchorSideBottom.Control = Panel10
+          AnchorSideBottom.Side = asrBottom
+          Left = 0
+          Height = 558
+          Top = 34
+          Width = 288
+          Anchors = [akTop, akLeft, akRight, akBottom]
+          BorderSpacing.Top = 5
+          ParentBackground = False
+          TabOrder = 0
+        end
+        object BHelpLayers: TSpeedButton
+          AnchorSideTop.Control = Panel10
+          AnchorSideRight.Control = Panel10
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 256
+          Height = 24
+          Hint = 'Help'
+          Top = 5
+          Width = 24
+          Anchors = [akTop]
+          BorderSpacing.Top = 5
+          BorderSpacing.Right = 5
+          Images = DataModule1.ImageList1
+          ImageIndex = 15
+          OnClick = BHelpLayersClick
+          ShowHint = True
+          ParentShowHint = False
+        end
       end
     end
     object PageWorld: TTabSheet
@@ -1145,14 +1203,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         TabOrder = 0
         object Panel9: TPanel
           AnchorSideLeft.Control = Panel7
-          AnchorSideTop.Control = Panel7
+          AnchorSideTop.Control = BHelpWorld
+          AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Panel7
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 154
-          Top = 0
+          Top = 34
           Width = 288
           Anchors = [akTop, akLeft, akRight]
+          BorderSpacing.Top = 5
           ClientHeight = 154
           ClientWidth = 288
           ParentBackground = False
@@ -1323,6 +1383,25 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 32
             Caption = 'Width'
           end
+        end
+        object BHelpWorld: TSpeedButton
+          AnchorSideTop.Control = Panel7
+          AnchorSideRight.Control = Panel7
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 259
+          Height = 24
+          Hint = 'Help'
+          Top = 5
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Top = 5
+          BorderSpacing.Right = 5
+          Images = DataModule1.ImageList1
+          ImageIndex = 15
+          OnClick = BHelpWorldClick
+          ShowHint = True
+          ParentShowHint = False
         end
       end
     end

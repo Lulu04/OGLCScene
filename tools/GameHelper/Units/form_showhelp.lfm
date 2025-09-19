@@ -1,0 +1,22 @@
+object FormShowHelp: TFormShowHelp
+  Left = 474
+  Height = 318
+  Top = 283
+  Width = 493
+  Caption = 'FormShowHelp'
+  ClientHeight = 318
+  ClientWidth = 493
+  FormStyle = fsStayOnTop
+  KeyPreview = True
+  Position = poMainFormCenter
+  LCLVersion = '3.8.0.0'
+  object Memo1: TMemo
+    Left = 0
+    Height = 318
+    Top = 0
+    Width = 493
+    Align = alClient
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+end

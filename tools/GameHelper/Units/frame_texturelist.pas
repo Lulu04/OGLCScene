@@ -21,6 +21,7 @@ TEventOnGetTextureList = function (): TTextureList of object;
     BChooseImageFile: TSpeedButton;
     BDeleteTexture: TSpeedButton;
     BTextureRedo: TSpeedButton;
+    BHelp: TSpeedButton;
     BTextureUndo: TSpeedButton;
     BUpdateTexture: TSpeedButton;
     BUpdateTextureListbox: TSpeedButton;
@@ -42,6 +43,7 @@ TEventOnGetTextureList = function (): TTextureList of object;
     SE12: TSpinEdit;
     SE9: TSpinEdit;
     procedure BChooseImageFileClick(Sender: TObject);
+    procedure BHelpClick(Sender: TObject);
     procedure LBTextureNamesMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure LBTextureNamesSelectionChange(Sender: TObject; User: boolean);
@@ -71,7 +73,7 @@ TEventOnGetTextureList = function (): TTextureList of object;
   end;
 
 implementation
-uses Types, u_utils, u_common;
+uses Types, u_utils, u_common, form_showhelp;
 
 {$R *.lfm}
 
@@ -115,6 +117,22 @@ begin
     Textures.UndoRedoManager.Redo;
     UpdateTextureWidgetState;
   end;
+end;
+
+procedure TFrameTextureList.BHelpClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('Texture are the first thing you have to add.'#10#10+
+  'To add a texture:'#10+
+  ' - click on the button with the landscape and the small plus.'#10+
+  ' - choose an image file (svg, png, etc...) then click open.'#10+
+  ' - if you''ve choosen an SVG file you have to enter the width or the height of the texture.'#10+
+  '   enter the width and keep height to -1 if the texture width is greater than its height.'#10+
+  '   enter the height and keep width to -1 if the texture height is greater than its width.'#10+
+  '   this is to keep precision for long and thin textures.'#10+
+  '   Off course, you can enter both width and height.'#10+
+  ' - click on ''+'' button to add the texture to the list.'#10#10+
+  'In Level Editor, there is only one texture list common to all levels.'#10+
+  'In Sprite Builder, each sprite have its own texture list.');
 end;
 
 procedure TFrameTextureList.LBTextureNamesMouseUp(Sender: TObject;
