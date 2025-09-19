@@ -281,7 +281,7 @@ object FrameTextureList: TFrameTextureList
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = BTextureUndo
         Cursor = crHandPoint
-        Left = 197
+        Left = 132
         Height = 24
         Hint = 'Delete the selected texture'
         Top = 1
@@ -300,7 +300,7 @@ object FrameTextureList: TFrameTextureList
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = BTextureRedo
         Cursor = crHandPoint
-        Left = 236
+        Left = 171
         Height = 24
         Hint = 'Undo'
         Top = 1
@@ -320,12 +320,12 @@ object FrameTextureList: TFrameTextureList
         AnchorSideRight.Control = Panel7
         AnchorSideRight.Side = asrBottom
         Cursor = crHandPoint
-        Left = 265
+        Left = 200
         Height = 24
         Hint = 'Redo'
         Top = 1
         Width = 24
-        Anchors = [akTop, akRight]
+        Anchors = [akTop]
         BorderSpacing.Top = 3
         BorderSpacing.Right = 3
         Images = DataModule1.ImageList1
@@ -348,6 +348,26 @@ object FrameTextureList: TFrameTextureList
         Images = DataModule1.ImageList1
         ImageIndex = 6
         OnClick = BChooseImageFileClick
+        ShowHint = True
+        ParentShowHint = False
+      end
+      object BHelp: TSpeedButton
+        AnchorSideTop.Control = Panel7
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = Panel7
+        AnchorSideRight.Side = asrBottom
+        Cursor = crHandPoint
+        Left = 248
+        Height = 24
+        Hint = 'Help'
+        Top = 1
+        Width = 24
+        Anchors = [akTop]
+        BorderSpacing.Top = 3
+        BorderSpacing.Right = 3
+        Images = DataModule1.ImageList1
+        ImageIndex = 15
+        OnClick = BHelpClick
         ShowHint = True
         ParentShowHint = False
       end

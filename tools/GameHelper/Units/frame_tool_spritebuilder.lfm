@@ -18,9 +18,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 512
     Top = 32
     Width = 300
-    ActivePage = PageChilds
+    ActivePage = PageCollisionBody
     Anchors = [akTop, akLeft, akRight]
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet
@@ -435,6 +435,25 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             OnChange = CBChildTypeSelect
           end
         end
+        object BHelpRootChilds: TSpeedButton
+          AnchorSideTop.Control = Panel1
+          AnchorSideRight.Control = Panel1
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 262
+          Height = 24
+          Hint = 'Help'
+          Top = 6
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Top = 5
+          BorderSpacing.Right = 5
+          Images = DataModule1.ImageList1
+          ImageIndex = 15
+          OnClick = BHelpRootChildsClick
+          ShowHint = True
+          ParentShowHint = False
+        end
       end
     end
     object PageCollisionBody: TTabSheet
@@ -563,7 +582,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Cursor = crHandPoint
           Left = 10
           Height = 32
-          Hint = 'Selection mode'
+          Hint = 'Point'
           Top = 61
           Width = 32
           BorderSpacing.Top = 5
@@ -599,7 +618,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = BBodyUndo
           Cursor = crHandPoint
-          Left = 197
+          Left = 153
           Height = 24
           Hint = 'Delete the selected texture'
           Top = 1
@@ -617,7 +636,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = BBodyRedo
           Cursor = crHandPoint
-          Left = 236
+          Left = 192
           Height = 24
           Hint = 'Undo'
           Top = 1
@@ -633,19 +652,37 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         object BBodyRedo: TSpeedButton
           AnchorSideTop.Control = Panel12
           AnchorSideTop.Side = asrCenter
-          AnchorSideRight.Control = Panel12
-          AnchorSideRight.Side = asrBottom
+          AnchorSideRight.Control = BHelpCollisionBody
           Cursor = crHandPoint
-          Left = 265
+          Left = 221
           Height = 24
           Hint = 'Redo'
           Top = 1
           Width = 24
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
-          BorderSpacing.Right = 3
+          BorderSpacing.Right = 20
           Images = DataModule1.ImageList1
           ImageIndex = 10
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object BHelpCollisionBody: TSpeedButton
+          AnchorSideTop.Control = Panel12
+          AnchorSideTop.Side = asrCenter
+          AnchorSideRight.Control = Panel12
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 265
+          Height = 24
+          Hint = 'Help'
+          Top = 1
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Right = 3
+          Images = DataModule1.ImageList1
+          ImageIndex = 15
+          OnClick = BHelpCollisionBodyClick
           ShowHint = True
           ParentShowHint = False
         end
@@ -904,7 +941,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = BPostureUndo
           Cursor = crHandPoint
-          Left = 197
+          Left = 153
           Height = 24
           Hint = 'Delete the selected posture'
           Top = 1
@@ -923,7 +960,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrCenter
           AnchorSideRight.Control = BPostureRedo
           Cursor = crHandPoint
-          Left = 236
+          Left = 192
           Height = 24
           Hint = 'Undo'
           Top = 1
@@ -940,17 +977,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         object BPostureRedo: TSpeedButton
           AnchorSideTop.Control = Panel11
           AnchorSideTop.Side = asrCenter
-          AnchorSideRight.Control = Panel11
-          AnchorSideRight.Side = asrBottom
+          AnchorSideRight.Control = BHelpPostures
           Cursor = crHandPoint
-          Left = 265
+          Left = 221
           Height = 24
           Hint = 'Redo'
           Top = 1
           Width = 24
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
-          BorderSpacing.Right = 3
+          BorderSpacing.Right = 20
           Images = DataModule1.ImageList1
           ImageIndex = 10
           OnClick = BAddPostureToListClick
@@ -972,6 +1008,25 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Images = DataModule1.ImageList1
           ImageIndex = 12
           OnClick = BAddPostureToListClick
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object BHelpPostures: TSpeedButton
+          AnchorSideTop.Control = Panel11
+          AnchorSideTop.Side = asrCenter
+          AnchorSideRight.Control = Panel11
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 265
+          Height = 24
+          Hint = 'Help'
+          Top = 1
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Right = 3
+          Images = DataModule1.ImageList1
+          ImageIndex = 15
+          OnClick = BHelpPosturesClick
           ShowHint = True
           ParentShowHint = False
         end

@@ -27,6 +27,9 @@ type
     BDeletePosture: TSpeedButton;
     BBodyRedo: TSpeedButton;
     BBodyUndo: TSpeedButton;
+    BHelpPostures: TSpeedButton;
+    BHelpRootChilds: TSpeedButton;
+    BHelpCollisionBody: TSpeedButton;
     BRectangle: TSpeedButton;
     BCircle: TSpeedButton;
     BNewChild: TSpeedButton;
@@ -101,6 +104,9 @@ type
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
+    procedure BHelpCollisionBodyClick(Sender: TObject);
+    procedure BHelpPosturesClick(Sender: TObject);
+    procedure BHelpRootChildsClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BNewClick(Sender: TObject);
@@ -163,7 +169,7 @@ type
 
 implementation
 uses form_main, u_project, u_common, u_spritebank, u_screen_template,
-  LCLType;
+  form_showhelp, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -255,6 +261,106 @@ begin
                    [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageSpriteBank;
+end;
+
+procedure TFrameToolsSpriteBuilder.BHelpCollisionBodyClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('Here you can define the collision body for the sprite.'#10+
+  'It is made of one or several collision shape: point, line, circle, rectangle or polygon.'#10+
+  'In the game, you can test whether the collision body collides with other surfaces.'#10#10+
+  'ADD A POINT:'#10+
+  ' - click the Point button.'#10+
+  ' - click on the sprite to define its location.'#10#10+
+  'ADD A LINE:'#10+
+  ' - click the Line button'#10+
+  ' - click on the sprite to place the first point, drag the mouse to place the second point, release the mouse.'#10#10+
+  'ADD A CIRCLE:'#10+
+  ' - click the Circle button.'#10+
+  ' - click on the sprite to place the center of the circle, drag the mouse to define its radius, release the mouse.'#10#10+
+  'ADD A RECTANGLE:'#10+
+  ' - click the Rectangle button.'#10+
+  ' - click on the sprite to place the top/left corner, drag the mouse to place the bottom/right corner, release the mouse.'#10+
+  'NOTE: use a rectangle only if the sprite never rotate. If it rotate, use polygon instead.'#10#10+
+  'ADD A POLYGON:'#10+
+  ' - click the Polygon button.'#10+
+  ' - click on the sprite to place the first node, release the mouse.'#10+
+  ' - click on another place to place the second node, release the mouse.'#10+
+  ' - etc... repeat until the shape is done.'#10+
+  ' - press Backspace key to delete the last point.'#10+
+  ' - close the polygon by clicking on the first point.'#10+
+  'NOTE: its not obligatory to close a polygon, press ENTER to interrupt the node input.'#10+
+  'KEEP IN MIND: The more complex the polygon, the longer the collision test will take!'#10#10+
+  'CANCEL THE CURRENT SHAPE:'#10+
+  ' - press ESC key.'#10#10+
+  'SELECTING A NODE:'#10+
+  ' - left click on a node to select it.'#10#10+
+  'SELECTING SEVERAL NODES:'#10+
+  ' - left click + Shift key to add a node to the current selection.'#10+
+  ' OR'#10+
+  ' - place the mouse over a node and use the mouse wheel.'#10#10+
+  'DELETE THE SELECTED NODES:'#10+
+  ' - press Delete key.'#10#10+
+  'MOVE ONE NODE:'#10+
+  ' - simply drag the node with the mouse.'#10#10+
+  'MOVE SEVERAL NODES:'#10+
+  ' - select the nodes you want to move.'#10+
+  ' - hold down the Shift key and drag one of the selected nodes.'#10#10+
+
+  'SAVE AND EXIT TO SPRITE BANK:'#10+
+  ' - enter a name for the sprite at the bottom of the panel.'#10+
+  ' - then click ''Save to Sprite Bank''.'#10#10+
+  'EXIT TO SPRITE BANK WITHOUT SAVING:'#10+
+  '  click on the red cross on top right of the panel.');
+end;
+
+procedure TFrameToolsSpriteBuilder.BHelpPosturesClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp(
+  'SAVE AND EXIT TO SPRITE BANK:'#10+
+  ' - enter a name for the sprite at the bottom of the panel.'#10+
+  ' - then click ''Save to Sprite Bank''.'#10#10+
+  'EXIT TO SPRITE BANK WITHOUT SAVING:'#10+
+  '  click on the red cross on top right of the panel.');
+end;
+
+procedure TFrameToolsSpriteBuilder.BHelpRootChildsClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('A complex sprite is made of one root surface and one or several childs.'#10+
+  'The first surface is the root. It can be a TSprite or a TSpriteContainer.'#10+
+  'See at the end of this text how to choose.'#10+
+  'CREATING THE ROOT:'#10+
+  ' - select the type of the root surface: TSprite or TSpriteContainer'#10+
+  ' - if it''s a TSprite, choose a texture'#10+
+
+
+  'SAVE THE SPRITE:'#10+
+  ' - enter a name for the sprite at bottom of the panel.'#10+
+  ' - then click ''Save to Sprite Bank''.'#10#10+
+  'EXIT TO SPRITE BANK WITHOUT SAVING:'#10+
+  '  click on the red cross on top right of the panel.'#10#10+
+
+  'ROOT: TSPRITE OR TSPRITE CONTAINER ?'#10+
+  'Which one should I choose for the root ?'#10+
+  'To explain, let''s take some examples:'#10+
+  'First, let''s take the example of a ship in a shoot ''em up game.'#10+
+  'The ship is made of a body and two turret on his sides.'#10+
+  'When the ship moves or turns, both turrets must follow.'#10+
+  'So, we can choose the root as a TSprite with two childs: the left turret and the right turret.'#10#10+
+
+  'Now, let''s take another example: a character facing to the right.'#10+
+  'This character is made of a head, two arms, an abdomen and two legs.'#10+
+  'To animate it, it makes sense to have the head and the two arms childs of the abdomen.'#10+
+  'Because if the abdomen bend down for example, the head and arms follow. Its logical.'#10+
+  'If we sets also the two legs childs of the abdomen, they will follow. Its not logical.'#10+
+  'Look at your body: you can bend down but your legs stay on the same axis!'#10+
+  'So, we need an intermediary between the legs and the abdomen.'#10+
+  'A TSpriteContainer will be perfect because its a surface that don''t render anything except its childs.'#10+
+  'We build the character as follow:'#10+
+  ' - we start building our character with a TSpriteContainer as root.'#10+
+  ' - abdomen is child of the container, arms and head are child of abdomen.'#10+
+  ' - both legs are childs of the container.'#10+
+  'Adjusting the pivot of each part, we can rotate them to have a good animation.'#10+
+  'To move/rotate/scale the whole sprite, we can move/rotate/scale the container (root).');
 end;
 
 procedure TFrameToolsSpriteBuilder.BAddPostureToListClick(Sender: TObject);
