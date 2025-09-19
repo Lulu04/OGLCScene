@@ -15,6 +15,9 @@ TArrayOfArrayOfInteger = array of TArrayOfInteger;
 
 TMouseState = ( msIdle,
 
+                msMouseDownOnEmptyPlace,
+                msMouseDoingRectangularArea,
+
                 // sprite builder surface child
                 msOverSurface,
                 msMouseDownOnSurface,
@@ -76,7 +79,7 @@ private
 private
   FMouseState: TMouseState;
   FClickOrigin: TPointF;
-  FMoveRestriction: TPointF;
+  FMoveRestriction: TPointF; // (1,0) moves selection only horizontaly, (0,1) moves selection only verticaly
   procedure SetMouseState(AValue: TMouseState);
 public // callback from main form and openglcontrol to manage mouse and keyboard on the view
   procedure ProcessMouseUp({%H-}Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer); virtual;
@@ -115,14 +118,16 @@ end;
 TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
 //protected
   public
-  FSelected: ArrayOfPSurfaceDescriptor;
-  FAlternateOverlappedIndex: integer;  // used to chose between several overlapped objects
+  FSelected: ArrayOfPSurfaceDescriptor; // array that contain pointers to selected surface descriptor
+  FAlternateOverlappedIndex: integer;   // used to chose between several overlapped objects
   FScaleHandleType: TScaleHandle;
   function GetSelectedCount: integer;
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); virtual;
+  procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); virtual;
   function AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean; overload;
   function AlreadySelected(item: PSurfaceDescriptor): boolean; overload;
   procedure AddOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
+  procedure AddOrRemoveOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF); virtual;
   procedure AddOffsetToPivotOnSelection(aOffset: TPointF); virtual;
   procedure SetPivotValuesOnSelection(aLocalPosX, aLocalPosY: single);
@@ -140,6 +145,12 @@ TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
   function GetSelectedBounds: TRectF;
   function SortSelectedBySurfaceCenterXFromLeftToRight: ArrayOfPSurfaceDescriptor;
   function SortSelectedBySurfaceCenterYFromTopToBottom: ArrayOfPSurfaceDescriptor;
+private // selection by rectangular area
+  FRectangularSelectionSprite: TShapeOutline;
+public
+  procedure UpdateRectangularSelectionSprite(aCurrentMousePt: TPointF);
+  procedure KillRectangularSelectionSprite;
+  procedure LoopDoRectangularSelection;
 protected
   procedure LoopMoveSelection;
   procedure LoopMovePivotOnSelection;
@@ -239,6 +250,9 @@ WriteStr(debug, AValue);
 FScene.LogDebug('MouseState = '+debug);
   case FMouseState of
     msIdle: tex := texMouseNormal; // FormMain.OGL.Cursor := crDefault;
+
+    msMouseDownOnEmptyPlace: tex := texMouseNormal;
+    msMouseDoingRectangularArea: tex := texSelectSurfaceByRect;
 
     msOverSurface: tex := texMouseOverSurface;
     msMouseDownOnSurface: tex := texMouseOverSurface;
@@ -537,6 +551,22 @@ begin
   end;
 end;
 
+procedure TScreenWithSurfaceHandling.RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor);
+var i, j: integer;
+begin
+  if Length(aItems) = 0 then exit;
+  if Length(FSelected) = 0 then exit;
+
+  for i:=0 to High(aItems) do begin
+    for j:=0 to High(FSelected) do
+      if FSelected[j] = aItems[i] then begin
+        FSelected[j]^.Selected := False;
+        system.Delete(FSelected, j, 1);
+        break;
+      end;
+  end;
+end;
+
 function TScreenWithSurfaceHandling.AlreadySelected(aItems: ArrayOfPSurfaceDescriptor): boolean;
 var i: integer;
 begin
@@ -560,6 +590,15 @@ procedure TScreenWithSurfaceHandling.AddOnlyTheFirstToSelected(aItems: ArrayOfPS
 begin
   if Length(aItems) = 0 then exit;
   AddToSelected([aItems[FAlternateOverlappedIndex]]);
+end;
+
+procedure TScreenWithSurfaceHandling.AddOrRemoveOnlyTheFirstToSelected(aItems: ArrayOfPSurfaceDescriptor);
+begin
+  if Length(aItems) = 0 then exit;
+
+  if aItems[FAlternateOverlappedIndex]^.Selected
+    then RemoveItemsFromSelected([aItems[FAlternateOverlappedIndex]])
+    else AddToSelected([aItems[FAlternateOverlappedIndex]]);
 end;
 
 procedure TScreenWithSurfaceHandling.AddOffsetCoordinateToSelection(aOffset: TPointF);
@@ -757,6 +796,77 @@ begin
   until not flag;
 end;
 
+procedure TScreenWithSurfaceHandling.UpdateRectangularSelectionSprite(aCurrentMousePt: TPointF);
+var r: TRect;
+begin
+  if FRectangularSelectionSprite = NIL then begin
+    FRectangularSelectionSprite := TShapeOutline.Create(FScene);
+    FRectangularSelectionSprite.LineColor := BGRA(255,255,0);
+    FRectangularSelectionSprite.LineWidth := 3.0;
+    FScene.Add(FRectangularSelectionSprite, LAYER_UI);
+  end;
+
+  // compute the rectangular area
+  if aCurrentMousePt.x >= FClickOrigin.x then begin
+    r.Left := Round(FClickOrigin.x);
+    r.Right := Round(aCurrentMousePt.x);
+  end else begin
+    r.Left := Round(aCurrentMousePt.x);
+    r.Right := Round(FClickOrigin.x);
+  end;
+
+  if aCurrentMousePt.y >= FClickOrigin.y then begin
+    r.Top := Round(FClickOrigin.y);
+    r.Bottom := Round(aCurrentMousePt.y);
+  end else begin
+    r.Top := Round(aCurrentMousePt.y);
+    r.Bottom := Round(FClickOrigin.y);
+  end;
+
+  // adjust the sprite coord and size
+  FRectangularSelectionSprite.SetShapeRectangle(r.Left, r.Top, r.Width, r.Height);
+end;
+
+procedure TScreenWithSurfaceHandling.KillRectangularSelectionSprite;
+begin
+  if FRectangularSelectionSprite = NIL then exit;
+  FRectangularSelectionSprite.Kill;
+  FRectangularSelectionSprite := NIL;
+end;
+
+procedure TScreenWithSurfaceHandling.LoopDoRectangularSelection;
+var current: TPointF;
+  r: TRectF;
+  i: SizeUInt;
+begin
+  if MouseState = msMouseDoingRectangularArea then exit;
+  MouseState := msMouseDoingRectangularArea;
+
+  repeat
+    current := PointF(FormMain.OGL.ScreenToClient(Mouse.CursorPos));
+    UpdateRectangularSelectionSprite(current);
+    FScene.DoLoop;
+    Application.ProcessMessages;
+    Sleep(1);
+  until MouseState <> msMouseDoingRectangularArea;
+
+  // retrieves the rectangular area in scene coordinates
+  r.Left := FRectangularSelectionSprite.X.Value;
+  r.Top := FRectangularSelectionSprite.Y.Value;
+  r.Right := r.Left + FRectangularSelectionSprite.Width;
+  r.Bottom := r.Top + FRectangularSelectionSprite.Height;
+  //r.TopLeft := FCamera.ControlToWorld(r.TopLeft);
+  //r.BottomRight := FCamera.ControlToWorld(r.BottomRight);
+
+  // add to selected all surfaces in the area
+  if Surfaces.Size = 0 then exit;
+  for i:=0 to Surfaces.Size-1 do
+    if not Surfaces.Mutable[i]^.Selected and Surfaces.Mutable[i]^.IsContainedBy(r) then
+      AddToSelected([Surfaces.Mutable[i]]);
+
+  KillRectangularSelectionSprite;
+end;
+
 procedure TScreenWithSurfaceHandling.SelectNone;
 var i: integer;
 begin
@@ -795,7 +905,7 @@ begin
   ShowHintTextOnSelected('duplicated on the left');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
-  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 1.0, 0.0, 0.0, 0.0));
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 1.0, 0.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheRight;
@@ -805,7 +915,7 @@ begin
   ShowHintTextOnSelected('duplicated on the right');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
-  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 1.0, 0.0, 0.0));
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 1.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheTop;
@@ -815,7 +925,7 @@ begin
   ShowHintTextOnSelected('duplicated to the top');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
-  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 1.0, 0.0));
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 1.0, 0.0, FrameToolLevelEditor.OverlapValue));
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheBottom;
@@ -825,7 +935,7 @@ begin
   ShowHintTextOnSelected('duplicated to the bottom');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
-  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 0.0, 1.0));
+  AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 0.0, 1.0, FrameToolLevelEditor.OverlapValue));
 end;
 
 procedure TScreenWithSurfaceHandling.ShowHintTextOnSelected(const aTxt: string);

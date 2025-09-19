@@ -35,6 +35,8 @@ TProjectConfig = record
   // level bank
   LevelBankExportClassName,
   LevelBankExportUnitName: string;
+  // level editor
+  LevelEditorOverlap: single;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const data: string);
@@ -106,6 +108,8 @@ begin
 
   LevelBankExportClassName := 'TLevels';
   LevelBankExportUnitName := 'u_levels.pas';
+
+  LevelEditorOverlap := 0.5;
 end;
 
 function TProjectConfig.SaveToString: string;
@@ -122,6 +126,8 @@ begin
   //level bank
   prop.Add('LevelBankExportClassName', LevelBankExportClassName);
   prop.Add('LevelBankExportUnitName', LevelBankExportUnitName);
+  // level editor
+  prop.Add('LevelEditorOverlap', LevelEditorOverlap);
 
   Result := prop.PackedProperty;
 end;
@@ -142,6 +148,8 @@ begin
   //level bank
   prop.StringValueOf('LevelBankExportClassName', LevelBankExportClassName, LevelBankExportClassName);
   prop.StringValueOf('LevelBankExportUnitName', LevelBankExportUnitName, LevelBankExportUnitName);
+  // level editor
+  prop.SingleValueOf('LevelEditorOverlap', LevelEditorOverlap, 0.5);
 end;
 
 procedure TProjectConfig.SaveTo(t: TStringList);

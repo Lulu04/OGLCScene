@@ -28,6 +28,7 @@ private
   FSurfaces: TSpriteBuilderSurfaceList;
 protected
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
+  procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF); override;
   procedure AddOffsetToPivotOnSelection(aOffset: TPointF); override;
   procedure RotateSelection(aPreviousReferencePoint, aReferencePoint: TPointF; aUseIncrement: boolean); override;
@@ -113,6 +114,12 @@ begin
   FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
 end;
 
+procedure TScreenSpriteBuilder.RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor);
+begin
+  inherited RemoveItemsFromSelected(aItems);
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+end;
+
 procedure TScreenSpriteBuilder.SelectNone;
 begin
   inherited SelectNone;
@@ -184,6 +191,9 @@ begin
   case MouseState of
     msIdle: SelectNone;
 
+    msMouseDownOnEmptyPlace: MouseState := msIdle;
+    msMouseDoingRectangularArea: MouseState := msIdle;
+
     msMouseDownOnSurface: begin
       // item selection
       case Button of
@@ -201,7 +211,7 @@ begin
           end
           else
           if ssShift in Shift then begin
-            AddOnlyTheFirstToSelected(items);
+            AddOrRemoveOnlyTheFirstToSelected(items);
             MouseState := msOverSurface;
           end
           else begin
@@ -238,7 +248,11 @@ begin
   case MouseState of
     msIdle: begin
       if Button = mbLeft then begin
-        if items <> NIL then MouseState := msOverSurface;
+        if items <> NIL then MouseState := msOverSurface
+        else begin
+          if not (ssShift in Shift) then SelectNone;
+          MouseState := msMouseDownOnEmptyPlace;
+        end;
       end;
     end;
 
@@ -274,6 +288,10 @@ begin
       if Length(items) > 0 then
         MouseState := msOverSurface;
     end;
+
+    msMouseDownOnEmptyPlace:
+      if thresholdDone then
+        LoopDoRectangularSelection;
 
     msOverSurface:
       if items = NIL then mouseState := msIdle

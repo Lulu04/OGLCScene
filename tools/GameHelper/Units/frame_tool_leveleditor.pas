@@ -30,6 +30,7 @@ type
     ColorButton2: TColorButton;
     CBLayers: TComboBox;
     Edit1: TEdit;
+    FSEOverlap: TFloatSpinEdit;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -45,6 +46,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
+    Label23: TLabel;
     Label24: TLabel;
     Label25: TLabel;
     Label26: TLabel;
@@ -120,8 +122,11 @@ type
     procedure BDistributeHClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
     procedure BZoomAllClick(Sender: TObject);
+    procedure CBTexturesKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     procedure CBTexturesSelect(Sender: TObject);
     procedure BRotate90CCWClick(Sender: TObject);
+    procedure FSEOverlapChange(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpinEdit3Change(Sender: TObject);
   private
@@ -147,7 +152,7 @@ type
     procedure DoUpdateSurface(aForceRecreateSurface: boolean);
     procedure UpdateValuesToWorkingSurface;
   private
-    procedure SendParamToWorldBounds;
+    function GetOverlapValue: single;
   public
     FrameTextureList: TFrameTextureList;
     FrameViewLayerList: TFrameViewLayerList;
@@ -161,11 +166,16 @@ type
     procedure AddSurfaceFromCurrentData;
     procedure ExitModeAddMultiple;
 
+    procedure SendParamToWorldBounds;
+
+
     procedure FillListBoxTextureNames;
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 
     procedure EditLevelInLevelBank(const aName: string);
     property Modified: boolean read FModified write FModified;
+
+    property OverlapValue: single read GetOverlapValue;
   end;
 
 implementation
@@ -250,6 +260,11 @@ begin
   if Sender = BZoomOnSelection then ScreenLevelEditor.ZoomOnSelection;
 end;
 
+procedure TFrameToolLevelEditor.CBTexturesKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  Key := 0;
+end;
+
 procedure TFrameToolLevelEditor.CBTexturesSelect(Sender: TObject);
 var
   pTexItem: PTextureItem;
@@ -319,6 +334,12 @@ begin
 
 end;
 
+procedure TFrameToolLevelEditor.FSEOverlapChange(Sender: TObject);
+begin
+  Project.Config.LevelEditorOverlap := FSEOverlap.Value;
+  Project.SetModified;
+end;
+
 procedure TFrameToolLevelEditor.SpeedButton1Click(Sender: TObject);
 begin
   if CBAlignReference.ItemIndex = -1 then exit;
@@ -328,21 +349,21 @@ begin
     if ScreenLevelEditor.SelectedCount < 2 then exit;
     with ScreenLevelEditor do
       case TSpeedButton(Sender).ImageIndex of
-        0: AlignSelectedRightTo(GetFirstSelectedX);
+        0: AlignSelectedRightTo(GetFirstSelectedX + FSEOverlap.Value);
         1: AlignSelectedRightTo(GetFirstSelectedCenterX);
         2: AlignSelectedLeftTo(GetFirstSelectedX);
         3: AlignSelectedHCenterTo(GetFirstSelectedCenterX);
         4: AlignSelectedRightTo(GetFirstSelectedRightX);
         5: AlignSelectedLeftTo(GetFirstSelectedCenterX);
-        6: AlignSelectedLeftTo(GetFirstSelectedRightX);
+        6: AlignSelectedLeftTo(GetFirstSelectedRightX - FSEOverlap.Value);
 
-        7: AlignSelectedBottomTo(GetFirstSelectedY);
+        7: AlignSelectedBottomTo(GetFirstSelectedY + FSEOverlap.Value);
         8: AlignSelectedBottomTo(GetFirstSelectedCenterY);
         9: AlignSelectedTopTo(GetFirstSelectedY);
         10: AlignSelectedVCenterTo(GetFirstSelectedCenterY);
         11: AlignSelectedBottomTo(GetFirstSelectedBottomY);
         12: AlignSelectedTopTo(GetFirstSelectedCenterY);
-        13: AlignSelectedTopTo(GetFirstSelectedBottomY);
+        13: AlignSelectedTopTo(GetFirstSelectedBottomY - FSEOverlap.Value);
       end;
   end;
 end;
@@ -510,6 +531,11 @@ begin
   FWorkingChild^.UpdateHandlePosition;
 end;
 
+function TFrameToolLevelEditor.GetOverlapValue: single;
+begin
+  Result := FSEOverlap.Value;
+end;
+
 procedure TFrameToolLevelEditor.SendParamToWorldBounds;
 begin
   ScreenLevelEditor.UpdateWorldBounds(SpinEdit3.Value, SpinEdit4.Value,
@@ -558,6 +584,8 @@ end;
 
 procedure TFrameToolLevelEditor.OnShow;
 begin
+  FInitializingWidget := True;
+
   FillListBoxTextureNames;
   Textures.FillComboBox(CBTextures);
   Layers.FillComboBox(CBLayers);
@@ -567,7 +595,10 @@ begin
   PC1.PageIndex := PC1.IndexOf(PageSurfaces);
 
   FrameTextureList.UpdateTextureWidgetState;
-  SendParamToWorldBounds;
+
+  FSEOverlap.Value := Project.Config.LevelEditorOverlap;
+
+  FInitializingWidget := False;
 end;
 
 function TFrameToolLevelEditor.GetSpriteForAddMultiple: TSprite;

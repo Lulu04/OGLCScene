@@ -26,6 +26,7 @@ private
   FSpriteAddMultiple: TSprite;
 public
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
+  procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF); override;
   procedure AddOffsetToPivotOnSelection(aOffset: TPointF); override;
   procedure RotateSelection(aPreviousReferencePoint, aReferencePoint: TPointF; aUseIncrement: boolean); override;
@@ -104,6 +105,12 @@ end;
 procedure TScreenLevelEditor.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
 begin
   inherited AddToSelected(aItems);
+  FrameToolLevelEditor.ShowSelectionData(FSelected);
+end;
+
+procedure TScreenLevelEditor.RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor);
+begin
+  inherited RemoveItemsFromSelected(aItems);
   FrameToolLevelEditor.ShowSelectionData(FSelected);
 end;
 
@@ -287,6 +294,9 @@ begin
   case MouseState of
     msIdle: SelectNone;
 
+    msMouseDownOnEmptyPlace: MouseState := msIdle;
+    msMouseDoingRectangularArea: MouseState := msIdle;
+
     msMouseDownOnSurface: begin
       // item selection
       case Button of
@@ -304,7 +314,7 @@ begin
           end
           else
           if ssShift in Shift then begin
-            AddOnlyTheFirstToSelected(items);
+            AddOrRemoveOnlyTheFirstToSelected(items);
             MouseState := msOverSurface;
           end
           else begin
@@ -342,7 +352,11 @@ begin
   case MouseState of
     msIdle: begin
       if Button = mbLeft then begin
-        if items <> NIL then MouseState := msOverSurface;
+        if items <> NIL then MouseState := msOverSurface
+          else begin
+            if not (ssShift in Shift) then SelectNone;
+            MouseState := msMouseDownOnEmptyPlace;
+          end;
       end;
     end;
 
@@ -389,6 +403,10 @@ begin
       if Length(items) > 0 then
         MouseState := msOverSurface;
     end;
+
+    msMouseDownOnEmptyPlace:
+      if thresholdDone then
+        LoopDoRectangularSelection;
 
     msOverSurface:
       if items = NIL then mouseState := msIdle
@@ -509,12 +527,16 @@ begin
     end;
 
     VK_H: begin
-     if (Shift = []) and SpriteAddMultipleIsCreated then
+     if (Shift = []) and SpriteAddMultipleIsCreated then begin
        FSpriteAddMultiple.FlipH := not FSpriteAddMultiple.FlipH;
+       FrameToolLevelEditor.CBFlipH.Checked := FSpriteAddMultiple.FlipH;
+     end;
     end;
     VK_V: begin
-     if (Shift = []) and SpriteAddMultipleIsCreated then
+     if (Shift = []) and SpriteAddMultipleIsCreated then begin
        FSpriteAddMultiple.FlipV := not FSpriteAddMultiple.FlipV;
+       FrameToolLevelEditor.CBFlipV.Checked := FSpriteAddMultiple.FlipV;
+     end;
     end;
     VK_ESCAPE: begin
      if SpriteAddMultipleIsCreated then FrameToolLevelEditor.ExitModeAddMultiple;
@@ -541,7 +563,7 @@ begin
   system.Insert(LAYER_LEVELEDITOR, A, Length(A));
   system.Insert(LAYER_LEVELWORLDBOUNDS, A, Length(A));
   ShowLayers(A);
- // Layers.MakeUserLayersVisible(True);
+
   // camera
   A := Layers.GetUserLayerIndexes;
   system.Insert(LAYER_LEVELEDITOR, A, Length(A));
@@ -551,6 +573,7 @@ begin
   WorldBounds := TShapeOutline.Create(FScene);
   WorldBounds.LineWidth := 3.0;
   FScene.Add(WorldBounds, LAYER_LEVELWORLDBOUNDS);
+  FrameToolLevelEditor.SendParamToWorldBounds;
 
   // do zoom all
   ZoomAll;
