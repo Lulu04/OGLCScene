@@ -77,6 +77,7 @@ public
   procedure ComputeScale(aType: TScaleHandle; aDelta: TPointF; aKeepAspectRatio: boolean);
   procedure SaveCurrentPosAndSizeBeforeResizing;
   procedure AddDeltaToSpriteSize(aType: TScaleHandle; aDelta: TPoint; aKeepAspectRatio: boolean);
+  function IsContainedBy(const r: TRectF): boolean;
 
   property Selected: boolean read GetSelected write SetSelected;
   property Pivot: TPointF read GetPivot write SetPivot;
@@ -138,7 +139,7 @@ public
   procedure DeleteItemByID(aID: integer);
   function DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
   function DuplicateAndShiftItemsByID(aItems: ArrayOfPSurfaceDescriptor;
-    aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single): ArrayOfPSurfaceDescriptor;
+    aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom, aOverlapValue: single): ArrayOfPSurfaceDescriptor;
 
   function ItemsDescriptorToArrayOfID(aItems: ArrayOfPSurfaceDescriptor): TArrayOfInteger;
 
@@ -707,6 +708,14 @@ begin
   CreateCollisionBody;
 end;
 
+function TSurfaceDescriptor.IsContainedBy(const r: TRectF): boolean;
+begin
+  Result := r.Contains(surface.SurfaceToScene(PointF(0, 0))) and
+            r.Contains(surface.SurfaceToScene(PointF(surface.Width, 0))) and
+            r.Contains(surface.SurfaceToScene(PointF(surface.Width, surface.Height))) and
+            r.Contains(surface.SurfaceToScene(PointF(0, surface.Height)));
+end;
+
 procedure TSurfaceDescriptor.DuplicateTo(aSurface: PSurfaceDescriptor);
 begin
   aSurface^.parentID := parentID;
@@ -1142,8 +1151,9 @@ begin
   end;
 end;
 
-function TSurfaceList.DuplicateAndShiftItemsByID(aItems: ArrayOfPSurfaceDescriptor;
-  aCoeffLeft, aCoeffRight, aCoeffTop, aCoeffBottom: single): ArrayOfPSurfaceDescriptor;
+function TSurfaceList.DuplicateAndShiftItemsByID(
+  aItems: ArrayOfPSurfaceDescriptor; aCoeffLeft, aCoeffRight, aCoeffTop,
+  aCoeffBottom, aOverlapValue: single): ArrayOfPSurfaceDescriptor;
 var i: integer;
   ids: array of integer;
 begin
@@ -1158,10 +1168,10 @@ begin
     Result[i] := AddEmpty;
     with GetItemByID(ids[i])^ do begin
       DuplicateTo(Result[i]);
-      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value - Result[i]^.surface.Width * aCoeffLeft;
-      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value + Result[i]^.surface.Width * aCoeffRight;
-      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value - Result[i]^.surface.Height * aCoeffTop;
-      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value + Result[i]^.surface.Height * aCoeffBottom;
+      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value - (Result[i]^.surface.Width-aOverlapValue) * aCoeffLeft;
+      Result[i]^.surface.X.Value := Result[i]^.surface.X.Value + (Result[i]^.surface.Width-aOverlapValue) * aCoeffRight;
+      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value - (Result[i]^.surface.Height-aOverlapValue) * aCoeffTop;
+      Result[i]^.surface.Y.Value := Result[i]^.surface.Y.Value + (Result[i]^.surface.Height-aOverlapValue) * aCoeffBottom;
     end;
   end;
 end;

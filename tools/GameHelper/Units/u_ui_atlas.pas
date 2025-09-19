@@ -30,6 +30,7 @@ var
   texHandlePathNode: PTexture;
   // texture mouse cursor
   texMouseNormal,
+  texSelectSurfaceByRect,
   texMouseOverSurface, texMouseOverPivot, texMouseRotateSurface, texMouseScaleSurface,
   texMouseOverNode, texMouseMovingNode, texMouseAddNode,
   texMouseToolPoint, texMouseToolLine, texMouseToolCircle, texMouseToolRectangle, texMouseToolPolygon: PTexture;
@@ -42,7 +43,7 @@ uses u_common, u_app_pref;
 
 procedure TUIAtlas.InitDefault;
 begin
-  FillChar(Self, SizeOf(TUIAtlas), 0);
+  Self := Default(TUIAtlas);
 end;
 
 procedure TUIAtlas.CreateAtlas;
@@ -63,6 +64,7 @@ begin
   // mouse cursor
   path := GetCursorFolder;
   texMouseNormal := FAtlas.AddFromSVG(path+'Select.svg', PPIScale(32), -1);
+  texSelectSurfaceByRect := FAtlas.AddFromSVG(path+'SelectSurfaceByRect.svg', PPIScale(32), -1);
   texMouseOverSurface := FAtlas.AddFromSVG(path+'OverSurface.svg', PPIScale(32), -1);
   texMouseOverPivot := FAtlas.AddFromSVG(path+'OverPivot.svg', PPIScale(32), -1);
   texMouseRotateSurface := FAtlas.AddFromSVG(path+'RotateSurface.svg', PPIScale(32), -1);

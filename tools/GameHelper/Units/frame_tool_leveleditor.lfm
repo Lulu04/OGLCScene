@@ -2,12 +2,12 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
   Left = 0
   Height = 748
   Top = 0
-  Width = 300
+  Width = 296
   ClientHeight = 748
-  ClientWidth = 300
+  ClientWidth = 296
   TabOrder = 0
-  DesignLeft = 815
-  DesignTop = 35
+  DesignLeft = 498
+  DesignTop = 97
   object PC1: TPageControl
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Panel8
@@ -18,7 +18,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Left = 0
     Height = 620
     Top = 32
-    Width = 300
+    Width = 296
     ActivePage = PageSurfaces
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabIndex = 1
@@ -29,16 +29,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     object PageSurfaces: TTabSheet
       Caption = 'Surfaces'
       ClientHeight = 592
-      ClientWidth = 292
+      ClientWidth = 288
       object Panel1: TPanel
         Left = 0
         Height = 592
         Top = 0
-        Width = 292
+        Width = 288
         Align = alClient
         BevelOuter = bvNone
         ClientHeight = 592
-        ClientWidth = 292
+        ClientWidth = 288
         Color = 8289918
         ParentBackground = False
         ParentColor = False
@@ -50,10 +50,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 0
           Height = 216
           Top = 96
-          Width = 292
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 216
-          ClientWidth = 292
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 0
           object Label13: TLabel
@@ -135,6 +135,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             DecimalPlaces = 3
             Increment = 0.1
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 0
             Value = 0.5
           end
@@ -149,6 +150,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             DecimalPlaces = 3
             Increment = 0.05
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 1
             Value = 0.5
           end
@@ -178,6 +180,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             MaxValue = 360
             MinValue = -360
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 2
           end
           object Label18: TLabel
@@ -206,6 +209,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Left = 10
             MaxValue = 255
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 3
             Value = 255
           end
@@ -224,6 +228,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             MaxValue = 1000000
             MinValue = -1000000
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 4
           end
           object SE2: TFloatSpinEdit
@@ -240,6 +245,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             MaxValue = 1000000
             MinValue = -1000000
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 5
           end
           object CBFlipH: TCheckBox
@@ -253,6 +259,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             Caption = 'FlipH'
             TabOrder = 6
+            TabStop = False
             OnChange = CBTexturesSelect
           end
           object CBFlipV: TCheckBox
@@ -265,6 +272,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 44
             Caption = 'FlipV'
             TabOrder = 7
+            TabStop = False
             OnChange = CBTexturesSelect
           end
           object Label1: TLabel
@@ -306,7 +314,6 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Caption = 'Replace'
             Checked = True
             TabOrder = 10
-            TabStop = True
             OnChange = CBTexturesSelect
           end
           object RadioButton2: TRadioButton
@@ -364,6 +371,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Left = 10
             MaxValue = 255
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 9
           end
           object Label3: TLabel
@@ -391,6 +399,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             MaxValue = 100000
             MinValue = 1
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 11
             Value = 1
           end
@@ -406,6 +415,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             MaxValue = 100000
             MinValue = 1
             OnChange = CBTexturesSelect
+            TabStop = False
             TabOrder = 12
             Value = 1
           end
@@ -449,12 +459,12 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Control = Panel1
           AnchorSideBottom.Side = asrBottom
           Left = 0
-          Height = 102
+          Height = 132
           Top = 404
-          Width = 292
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
-          ClientHeight = 102
-          ClientWidth = 292
+          ClientHeight = 132
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 1
           object Label25: TLabel
@@ -462,7 +472,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Control = Panel3
             AnchorSideRight.Control = Panel3
             AnchorSideRight.Side = asrBottom
-            Left = 253
+            Left = 249
             Height = 15
             Top = 1
             Width = 28
@@ -504,7 +514,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 12
             Height = 26
-            Hint = 'Align right side on the left side of the reference'
+            Hint = 'Align right side on the left side of the reference'#13#10'Overlap value is used'
             Top = 32
             Width = 26
             Color = 4934475
@@ -600,7 +610,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 204
             Height = 26
-            Hint = 'Align left side on the right side of the reference'
+            Hint = 'Align left side on the right side of the reference'#13#10'Overlap value is used'
             Top = 32
             Width = 26
             Color = 4934475
@@ -616,7 +626,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 12
             Height = 26
-            Hint = 'Align bottom side on the top side of the reference'
+            Hint = 'Align bottom side on the top side of the reference'#13#10'Overlap value is used'
             Top = 64
             Width = 26
             Color = 4934475
@@ -712,7 +722,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Cursor = crHandPoint
             Left = 204
             Height = 26
-            Hint = 'Align top side on the bottom side of the reference'
+            Hint = 'Align top side on the bottom side of the reference'#13#10'Overlap value is used'
             Top = 64
             Width = 26
             Color = 4934475
@@ -723,6 +733,30 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+          end
+          object Label23: TLabel
+            Left = 32
+            Height = 15
+            Top = 104
+            Width = 82
+            Caption = 'Overlap in pixel'
+          end
+          object FSEOverlap: TFloatSpinEdit
+            AnchorSideLeft.Control = Label23
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label23
+            AnchorSideBottom.Side = asrBottom
+            Left = 119
+            Height = 23
+            Top = 96
+            Width = 41
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 5
+            DecimalPlaces = 1
+            MaxValue = 5
+            OnChange = FSEOverlapChange
+            TabOrder = 1
+            Value = 0.5
           end
         end
         object Label4: TLabel
@@ -754,6 +788,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           ShowHint = True
           Style = csDropDownList
           TabOrder = 2
+          TabStop = False
+          OnKeyDown = CBTexturesKeyDown
+          OnKeyUp = CBTexturesKeyDown
           OnSelect = CBTexturesSelect
         end
         object BNewSurface: TSpeedButton
@@ -777,10 +814,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 0
           Height = 46
           Top = 358
-          Width = 292
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
-          ClientWidth = 292
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 3
           object BRotate90CCW: TSpeedButton
@@ -921,10 +958,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 0
           Height = 46
           Top = 312
-          Width = 292
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
-          ClientWidth = 292
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 4
           object BZoomAll: TSpeedButton
@@ -982,6 +1019,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           ItemHeight = 15
           Style = csDropDownList
           TabOrder = 5
+          TabStop = False
+          OnKeyDown = CBTexturesKeyDown
+          OnKeyUp = CBTexturesKeyDown
           OnSelect = CBTexturesSelect
         end
         object BAddMultiple: TSpeedButton
@@ -1010,12 +1050,12 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 38
-          Top = 506
-          Width = 292
+          Top = 536
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
           BevelOuter = bvNone
           ClientHeight = 38
-          ClientWidth = 292
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 6
           object Label27: TLabel
@@ -1023,7 +1063,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Control = Panel11
             AnchorSideRight.Control = Panel11
             AnchorSideRight.Side = asrBottom
-            Left = 226
+            Left = 222
             Height = 15
             Top = 0
             Width = 56
@@ -1072,12 +1112,12 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     object PageLayers: TTabSheet
       Caption = 'Layers'
       ClientHeight = 592
-      ClientWidth = 292
+      ClientWidth = 288
       object Panel10: TPanel
         Left = 0
         Height = 592
         Top = 0
-        Width = 292
+        Width = 288
         Align = alClient
         BevelOuter = bvNone
         Color = 8289918
@@ -1089,16 +1129,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     object PageWorld: TTabSheet
       Caption = 'World'
       ClientHeight = 592
-      ClientWidth = 292
+      ClientWidth = 288
       object Panel7: TPanel
         Left = 0
         Height = 592
         Top = 0
-        Width = 292
+        Width = 288
         Align = alClient
         BevelOuter = bvNone
         ClientHeight = 592
-        ClientWidth = 292
+        ClientWidth = 288
         Color = 8289918
         ParentBackground = False
         ParentColor = False
@@ -1111,10 +1151,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 0
           Height = 154
           Top = 0
-          Width = 292
+          Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 154
-          ClientWidth = 292
+          ClientWidth = 288
           ParentBackground = False
           TabOrder = 0
           object SpinEdit2: TFloatSpinEdit
@@ -1204,7 +1244,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Control = Panel9
             AnchorSideRight.Control = Panel9
             AnchorSideRight.Side = asrBottom
-            Left = 144
+            Left = 140
             Height = 15
             Top = 3
             Width = 144
@@ -1295,10 +1335,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Left = 0
     Height = 32
     Top = 0
-    Width = 300
+    Width = 296
     Anchors = [akTop, akLeft, akRight]
     ClientHeight = 32
-    ClientWidth = 300
+    ClientWidth = 296
     Color = 1973790
     ParentBackground = False
     ParentColor = False
@@ -1308,7 +1348,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideLeft.Side = asrCenter
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
-      Left = 111
+      Left = 109
       Height = 15
       Top = 9
       Width = 78
@@ -1323,7 +1363,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideRight.Control = Panel8
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 275
+      Left = 271
       Height = 24
       Hint = 'Return to the main window'
       Top = 4
@@ -1348,10 +1388,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Left = 0
     Height = 96
     Top = 652
-    Width = 300
+    Width = 296
     Anchors = [akLeft, akRight, akBottom]
     ClientHeight = 96
-    ClientWidth = 300
+    ClientWidth = 296
     Color = 8289918
     ParentBackground = False
     ParentColor = False
@@ -1361,7 +1401,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     object Label5: TLabel
       AnchorSideLeft.Control = Edit1
       AnchorSideTop.Control = Panel4
-      Left = 18
+      Left = 16
       Height = 15
       Top = 9
       Width = 134
@@ -1373,7 +1413,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideLeft.Side = asrCenter
       AnchorSideTop.Control = Label5
       AnchorSideTop.Side = asrBottom
-      Left = 18
+      Left = 16
       Height = 23
       Top = 24
       Width = 265
@@ -1384,7 +1424,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideTop.Control = Panel4
       AnchorSideRight.Control = Panel4
       AnchorSideRight.Side = asrBottom
-      Left = 262
+      Left = 258
       Height = 15
       Top = 1
       Width = 27
@@ -1399,7 +1439,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideLeft.Control = Panel4
       AnchorSideLeft.Side = asrCenter
       Cursor = crHandPoint
-      Left = 50
+      Left = 48
       Height = 30
       Top = 56
       Width = 200
