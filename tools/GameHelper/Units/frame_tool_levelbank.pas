@@ -17,6 +17,7 @@ type
     BDuplicate: TSpeedButton;
     BEdit: TSpeedButton;
     BExportToPascalUnit: TSpeedButton;
+    BHelp: TSpeedButton;
     BRedo: TSpeedButton;
     BRename: TSpeedButton;
     BUndo: TSpeedButton;
@@ -34,6 +35,7 @@ type
     procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
     procedure BExportToPascalUnitClick(Sender: TObject);
+    procedure BHelpClick(Sender: TObject);
     procedure Edit2Change(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -55,7 +57,7 @@ type
 
 implementation
 
-uses u_screen_levelbank, u_project, form_main, u_surface_list;
+uses u_screen_levelbank, u_project, form_main, u_surface_list, form_showhelp;
 
 {$R *.lfm}
 
@@ -167,7 +169,7 @@ begin
             'interface'#10+#10+
             'uses'+LineEnding+
             '  Classes, SysUtils,'#10+
-            '  OGLCScene, BGRABitmap, BGRABitmapTypes;'#10#10+
+            '  OGLCScene;'#10#10+
             'type'#10#10+
             '{ '+nameClass+' }'#10+#10+
             nameClass+' = class(TOGLCDecorManager)'#10+
@@ -176,7 +178,7 @@ begin
             '  function ScaleHF(AValue: single): single; override;'#10+
             'public'#10+
             '  class procedure LoadTexture(aAtlas: TAtlas); override;'#10+
-            '  procedure LoadLevel(aIndex: integer);'#10+
+            '  procedure BuildLevel(aIndex: integer);'#10+
             'end;'#10#10);
   // implementation
   t.AddText('implementation'#10+
@@ -261,24 +263,15 @@ begin
     end;
   t.AddText('end;'#10+#10);
 
-  // procedure to load a level
-  t.AddText('procedure '+nameClass+'.LoadLevel(aIndex: integer);'#10+
+  // procedure to build a level
+  t.AddText('procedure '+nameClass+'.BuildLevel(aIndex: integer);'#10+
             'begin'#10+
             '  case aIndex of');
   for i:=0 to LevelBank.Size-1 do
-    t.Add('    '+i.ToString+': DoLoadLevel('+'Data_'+LevelBank.Mutable[i]^.name+');');
+    t.Add('    '+i.ToString+': DoBuildLevel('+'Data_'+LevelBank.Mutable[i]^.name+');');
   t.AddText('    else raise exception.create(''level index out of bounds'');'#10+
             '  end;'#10+
             'end;'#10#10);
-
-  // function GetWorldArea: TRectF;
-{  t.AddText('function '+nameClass+'.GetWorldArea: TRectF;'#10+
-            'begin'#10+
-            '  Result.Left := ScaleW(Round(FNonScaledWorldArea.Left));'#10+
-            '  Result.Top := ScaleH(Round(FNonScaledWorldArea.Top));'#10+
-            '  Result.Right := ScaleW(Round(FNonScaledWorldArea.Right));'#10+
-            '  Result.Bottom := ScaleH(Round(FNonScaledWorldArea.Bottom));'#10+
-            'end;'#10#10); }
 
   // end of file
   t.Add('end.');
@@ -288,6 +281,28 @@ begin
   finally
     t.Free;
   end;
+end;
+
+procedure TFrameToolLevelBank.BHelpClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('The Level Bank contains the levels that you have created for your game.'#10#10+
+  'TO ADD A NEW LEVEL:'#10+
+  ' - click ''LEVEL EDITOR'' button.'#10#10+
+  'TO EDIT AN EXISTING LEVEL:'#10+
+  ' - select the level in the list.'#10+
+  ' - click ''Edit in Level Editor''.'#10#10+
+  'EXPORT LEVELS TO PASCAL UNIT:'#10+
+  '  exporting to a Pascal unit allow to easily include the levels definition to your program.'#10+
+  ' - enter a class name, for example TGameLevels. Code will be generated to encapsulate the levels in a class with this name.'#10+
+  ' - enter a unit name, for example ''u_gamelevels.pas''. The code is saved in a Pascal unit with this name.'#10+
+  ' - click ''Export all levels to Pascal unit''.'#10#10+
+  'HOW TO USE THIS UNIT IN YOUR PROGRAM:'#10+
+  ' - under Lazarus, open the unit in the source editor.'#10+
+  ' - add it the to project: Project->Project Inspector->Add->Files from editor, select the unit and click ''Add files''.'#10#10+
+  'As you can see, the unit contains one class with:'#10+
+  ' - a nice procedure LoadTexture(aAtlas: TAtlas); to load the level textures in your atlas.'#10+
+  ' - a nice procedure BuildLevel(aIndex: integer); to build the level (index is 0 based).'#10+
+  ' - a property WorldArea: TRectF to retrieve the world size. This property is not directly visible because it is declared in the ancestor of the class.');
 end;
 
 procedure TFrameToolLevelBank.Edit2Change(Sender: TObject);

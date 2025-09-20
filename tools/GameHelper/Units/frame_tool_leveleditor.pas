@@ -216,18 +216,19 @@ end;
 procedure TFrameToolLevelEditor.BHelpLayersClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp('This the layer list for your project.'#10+
-  'You can show or hide a layer by clicking its eye icon.');
+  'You can show or hide a layer by clicking its eye icon.'#10+
+  'Hidden layers are still exported to the Pascal unit.');
 end;
 
 procedure TFrameToolLevelEditor.BHelpSurfacesClick(Sender: TObject);
 begin
-  form_showhelp.ShowHelp('When you have added some textures, you can add surfaces to construct the level.'#10+
+  form_showhelp.ShowHelp('After added some textures, start to construct the level.'#10+
      'TO ADD A SURFACE:'#10+
      ' - select a layer and a texture.'#10+
      ' - sets the values for coordinates, size, etc... or keep the default.'#10+
      ' - Click ''+'' button to add one instance of the surface at the specified coordinates.'#10+
      ' OR'#10+
-     '   Click ''+Multiple'' button, move the mouse on desired position and press ''A'' to add an instance of the surface. Repeat as you need.'#10+
+     '   Click ''+Multiple'' button, then move the mouse on desired position and press ''A'' to add an instance of the surface. Repeat as you need.'#10+
      '   Press ''ESC'' key when you''ve finished.'#10#10+
      'SELECTION:'#10+
      ' Left click on a surface to select it.'#10+
@@ -235,31 +236,31 @@ begin
      ' Left click + ALT key to alternate between overlaped surfaces.'#10#10+
      'When a surface is selected, another click on it will switch between sizing handles and rotating handles.'#10+
      'If the surface is hidden, select it with ALT key then press R key to switch sizing/rotating handles.'#10#10+
-     'When a surface is selected, you can modify its pivot dragging the small cross at the center of the surface or directly by entering x and y values in the right panel.'#10#10+
+     'When a surface is selected, you can modify its pivot dragging the small cross at its center or directly by entering x and y values in the right panel.'#10#10+
      'MODIFY A SURFACE:'#10+
      ' select a surface then modify its parameters (layer, coor, size, etc...). Texture can''t be changed.'#10#10+
      'MOVE A SURFACE:'#10+
      ' simply drag the surface with the mouse.'#10+
-     ' Hold Ctrl key to moves only horizontaly or only verticaly (the first that appears win).'#10#10+
+     ' Hold CTRL key to moves only horizontaly or only verticaly (the first that appears win).'#10#10+
      'ROTATE A SURFACE:'#10+
      ' select a surface, click another time on it then drag one of the rotate handles.'#10+
-     ' Hold Ctrl key to rotate by step of 15°.'#10#10+
+     ' Hold CTRL key to rotate by step of 15°.'#10#10+
      'RESIZE A SURFACE:'#10+
      ' select a surface then drag one of the resize handles.'#10+
-     ' Hold Ctrl key to keep aspect ratio.'#10#10+
+     ' Hold CTRL key to keep aspect ratio.'#10#10+
      'ALIGN, ROTATE 90, MIRROR, DISTRIBUTE:'#10+
      ' select one or several surfaces then click the appropriate button.'#10+
      ' NOTE: for some align button only, the overlap value specify the pixel overlaping when surfaces are aligned. This is usefull to avoid artifact when the game is running.'#10#10+
      'DUPLICATE:'#10+
      ' CTRL + D to duplicate the selected surfaces at the same place.'#10+
-     ' CTRL + Left key to duplicate the selected on their left (overlap value is used).'#10+
-     ' CTRL + Right key to duplicate the selected on their right (overlap value is used).'#10+
-     ' CTRL + Up key to duplicate the selected on their top (overlap value is used).'#10+
-     ' CTRL + Down key to duplicate the selected on their bottom (overlap value is used).'#10#10+
+     ' CTRL + LEFT key to duplicate the selected on their left (overlap value is used).'#10+
+     ' CTRL + RIGHT key to duplicate the selected on their right (overlap value is used).'#10+
+     ' CTRL + UP key to duplicate the selected on their top (overlap value is used).'#10+
+     ' CTRL + DOWN key to duplicate the selected on their bottom (overlap value is used).'#10#10+
      'VIEW:'#10+
      ' Mouse wheel to scroll up/down.'#10+
-     ' Mouse wheel + Shift key to scroll left/right.'#10+
-     ' Mouse wheel + Ctrl key to zoom in/out.'#10#10+
+     ' Mouse wheel + SHIFT key to scroll left/right.'#10+
+     ' Mouse wheel + CTRL key to zoom in/out.'#10#10+
      'SAVE THE LEVEL: enter the name of the level then click ''Save to Level Bank''.'#10#10+
      'EXIT THE LEVEL EDITOR WITHOUT SAVING: click on the red cross at top right of the panel.');
 
@@ -268,8 +269,8 @@ end;
 procedure TFrameToolLevelEditor.BHelpWorldClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp('Here you can define the world size for this level.'#10+
-  'The world is a rectangular area that is exported when you export the game levels to a Pascal unit.'#10+
-  'You can retrieve its coordinate and size in your game with a class property.'#10+
+  'The world is a rectangular area that is exported when you export the game levels to a Pascal unit and '+
+  'you can read its values in your game, for example to set the bounds of a camera.'#10+
   'So it''s important to define this area.'#10#10+
   'Click on ''Compute from surfaces'' to adjust the coord and size according to the area occupied by the surfaces on the screen.'#10+
   'Or simply fill the values with what you need.');

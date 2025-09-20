@@ -128,6 +128,7 @@ begin
   ' - if you''ve choosen an SVG file you have to enter the width or the height of the texture.'#10+
   '   enter the width and keep height to -1 if the texture width is greater than its height.'#10+
   '   enter the height and keep width to -1 if the texture height is greater than its width.'#10+
+  '   -1 means that GameHelper compute the value to keep the aspect ratio.'#10+
   '   this is to keep precision for long and thin textures.'#10+
   '   Off course, you can enter both width and height.'#10+
   ' - click on ''+'' button to add the texture to the list.'#10#10+

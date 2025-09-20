@@ -570,7 +570,7 @@ begin
     Application.ProcessMessages;
     FScene.DoLoop;
     if MouseState = msBackPressedOnPolygonCreation then begin
-      if Length(item^.Pts) = 1 then MouseState := msCancelShapeCreation
+      if Length(item^.Nodes) = 1 then MouseState := msCancelShapeCreation
       else begin
         item^.DeleteLastNode;
         MouseState := msWaitingForNextPolygonNode;

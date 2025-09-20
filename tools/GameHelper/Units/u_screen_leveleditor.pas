@@ -751,7 +751,7 @@ procedure TScreenLevelEditor.UpdateWorldBounds(aX, aY, aWidth,
 begin
   if WorldBounds = NIL then exit;
   WorldBounds.SetShapeRectangle(aX, aY, Ceil(aWidth), Ceil(aHeight));
-  WorldBounds.LineColor := ColorToBGRA(aColor, 180);
+  WorldBounds.LineColor := ColorToBGRA(aColor);
   WorldBounds.Visible := aVisible;
   ComputeWorldBoundsLineWidth;
 end;
