@@ -56,7 +56,7 @@ public
   constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
 
-  procedure DoLoadLevel(const s: string);
+  procedure DoBuildLevel(const s: string);
 
 
   property WorldArea: TRectF read FWorldArea;
@@ -218,7 +218,7 @@ begin
   FDecors.Clear;
 end;
 
-procedure TOGLCDecorManager.DoLoadLevel(const s: string);
+procedure TOGLCDecorManager.DoBuildLevel(const s: string);
 var prop: TProperties;
   v: single;
   c, i, layerIndex: integer;
