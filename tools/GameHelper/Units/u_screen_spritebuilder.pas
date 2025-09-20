@@ -904,6 +904,8 @@ begin
 
   if FrameToolsSpriteBuilder.SelectedTabIsChild then
     UpdateHandlePositionOnSelected;
+  if FrameToolsSpriteBuilder.SelectedTabIsPosture then
+    UpdateHandlePositionOnSelected;
   if FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
     Bodies.UpdateNodesPosition;
 end;
