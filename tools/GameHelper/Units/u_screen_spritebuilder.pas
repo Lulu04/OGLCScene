@@ -919,6 +919,8 @@ end;
 procedure TScreenSpriteBuilder.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_COLLISION_BODY, LAYER_SPRITEBUILDER]);
+  if not FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
+    FScene.Layer[LAYER_COLLISION_BODY].Visible := False;
   // camera
   CreateCamera([LAYER_SPRITEBUILDER]);
 end;

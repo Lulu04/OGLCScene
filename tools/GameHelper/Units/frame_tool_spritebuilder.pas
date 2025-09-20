@@ -923,7 +923,7 @@ begin
   FScene.Layer[LAYER_COLLISION_BODY].Visible := False;
   Bodies.UpdateNodesPosition;
 
-  self.FrameTextureList.UpdateTextureWidgetState;
+  FrameTextureList.UpdateTextureWidgetState;
   UpdatePostureWidgetState;
 end;
 
