@@ -100,6 +100,7 @@ type
     BUpdateposture: TSpeedButton;
     BReverseAngle: TSpeedButton;
     BResetPos: TSpeedButton;
+    SEDummy: TSpinEdit;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
@@ -116,6 +117,7 @@ type
     procedure LBPostureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
     procedure MIAddNodeClick(Sender: TObject);
     procedure PC1Change(Sender: TObject);
+    procedure SE1Enter(Sender: TObject);
   private // textures
     FInitializingWidget: boolean;
     procedure ProcessTextureListOnModified(Sender: TObject);
@@ -153,6 +155,8 @@ type
   public
     FrameTextureList: TFrameTextureList;
     constructor Create(TheOwner: TComponent); override;
+
+    procedure SetFocusToDummy;
 
     procedure OnShow;
     procedure FillListBoxTextureNames;
@@ -529,6 +533,11 @@ begin
 
 end;
 
+procedure TFrameToolsSpriteBuilder.SE1Enter(Sender: TObject);
+begin
+  LastClickedIsControl := True;
+end;
+
 procedure TFrameToolsSpriteBuilder.ProcessTextureListOnModified(Sender: TObject);
 begin
   FModified := True;
@@ -895,6 +904,11 @@ begin
   FrameTextureList.OnAskToDeleteTexture := @ProcessAskToDeleteTextureEvent;
   FrameTextureList.OnTextureChanged := @ProcessOnTextureChangedEvent;
   FrameTextureList.OnModified := @ProcessTextureListOnModified;
+end;
+
+procedure TFrameToolsSpriteBuilder.SetFocusToDummy;
+begin
+  SEDummy.SetFocus;
 end;
 
 procedure TFrameToolsSpriteBuilder.OnShow;

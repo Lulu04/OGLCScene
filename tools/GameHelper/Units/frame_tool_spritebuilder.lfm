@@ -18,9 +18,9 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 512
     Top = 32
     Width = 300
-    ActivePage = PageCollisionBody
+    ActivePage = PageChilds
     Anchors = [akTop, akLeft, akRight]
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet
@@ -152,6 +152,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akLeft, akBottom]
           TabOrder = 3
           OnChange = CBChildTypeSelect
+          OnEnter = SE1Enter
         end
         object Label17: TLabel
           AnchorSideRight.Control = Label4
@@ -256,6 +257,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             DecimalPlaces = 3
             Increment = 0.01
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 0
             Value = 0.5
           end
@@ -270,6 +272,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             DecimalPlaces = 3
             Increment = 0.01
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 1
             Value = 0.5
           end
@@ -302,6 +305,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 100000
             MinValue = 0.001
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 2
             Value = 1
           end
@@ -318,6 +322,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 100000
             MinValue = 0.001
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 3
             Value = 1
           end
@@ -347,6 +352,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 360
             MinValue = -360
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 4
           end
           object Label18: TLabel
@@ -376,6 +382,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 10000
             MinValue = -10000
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 5
           end
           object SE1: TFloatSpinEdit
@@ -392,6 +399,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 100000
             MinValue = -1000000
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 6
           end
           object SE2: TFloatSpinEdit
@@ -407,6 +415,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
             MaxValue = 100000
             MinValue = -1000000
             OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
             TabOrder = 7
           end
           object CBFlipH: TCheckBox
@@ -744,6 +753,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Width = 203
           TabOrder = 1
           OnChange = BAddPostureToListClick
+          OnEnter = SE1Enter
         end
         object BAddPostureToList: TSpeedButton
           AnchorSideLeft.Control = Panel10
@@ -783,6 +793,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Left = 5
           Increment = 0.1
           MaxValue = 1000000
+          OnEnter = SE1Enter
           TabOrder = 2
           Value = 0.5
         end
@@ -914,6 +925,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           MaxValue = 360
           MinValue = -360
           OnChange = ArrowUpClick
+          OnEnter = SE1Enter
           ParentShowHint = False
           ShowHint = True
           TabOrder = 3
@@ -1114,6 +1126,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         Anchors = [akTop, akLeft, akRight]
         BorderSpacing.Right = 10
         TabOrder = 0
+        OnEnter = SE1Enter
       end
     end
   end
@@ -1166,6 +1179,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
       ShowHint = True
       ParentShowHint = False
     end
+  end
+  object SEDummy: TSpinEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideBottom.Control = Owner
+    Left = 0
+    Height = 23
+    Top = -23
+    Width = 32
+    Anchors = [akLeft, akBottom]
+    TabOrder = 3
   end
   object OD1: TOpenDialog
     Title = 'Open image file'
