@@ -19,9 +19,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Height = 620
     Top = 32
     Width = 296
-    ActivePage = PageSurfaces
+    ActivePage = PageWorld
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 3
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
@@ -1354,7 +1354,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Left = 10
             BorderWidth = 2
             ButtonColorSize = 16
-            ButtonColor = clRed
+            ButtonColor = clSilver
             OnColorChanged = SpinEdit3Change
           end
           object CheckBox1: TCheckBox
