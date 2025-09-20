@@ -15,6 +15,7 @@ type
 
   TFrameToolSpriteBank = class(TFrame)
     BDuplicate: TSpeedButton;
+    BHelp: TSpeedButton;
     BRename: TSpeedButton;
     BUndo: TSpeedButton;
     BRedo: TSpeedButton;
@@ -41,6 +42,7 @@ type
     BDelete: TSpeedButton;
     procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
+    procedure BHelpClick(Sender: TObject);
     procedure CBShowCollisionBodyChange(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; {%H-}Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; {%H-}User: boolean);
@@ -64,8 +66,8 @@ type
 
 implementation
 
-uses LCLType, Graphics, form_main, u_project, OGLCScene, BGRABitmap,
-  BGRABitmapTypes;
+uses LCLType, Graphics, form_main, u_project, form_showhelp, OGLCScene,
+  BGRABitmap, BGRABitmapTypes;
 
 {$R *.lfm}
 
@@ -559,6 +561,22 @@ begin
   if i = -1 then exit;
   LB.ItemIndex := -1;
   FormMain.EditSpriteInSpriteBank(LB.Items.Strings[i]);
+end;
+
+procedure TFrameToolSpriteBank.BHelpClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('The Sprite Bank contains the definition of all sprites that you have defined in your project.'#10#10+
+  'CREATE A NEW SPRITE:'#10+
+  ' - click ''SPRITE BUILDER'' button.'#10#10+
+  'EDIT AN EXISTING SPRITE:'#10+
+  ' - select the sprite in the list.'#10+
+  ' -  click ''Edit in Sprite Builder''.'#10#10+
+  'EXPORT THE SELECTED SPRITE TO PASCAL UNIT:'#10+
+  ' - select the sprite in the list.'#10+
+  ' - enter a name for the class that be generated.'#10+
+  ' - check the options if needed.'#10+
+  ' - click ''Export sprite to Pascal unit''.'#10+
+  ' - in the save dialogs that open, enter the name of the unit.'#10);
 end;
 
 procedure TFrameToolSpriteBank.BDeleteClick(Sender: TObject);

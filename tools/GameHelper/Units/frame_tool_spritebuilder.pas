@@ -320,6 +320,20 @@ end;
 procedure TFrameToolsSpriteBuilder.BHelpPosturesClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp(
+  'Postures are used to construct smooth animations.'#10+
+  'For example, we can create 4 postures for a character with arms and legs to make it walk. '+
+  'Then in your game, chains these postures with the right timing to have a smooth animation of a walking character.'#10+
+  'The postures are also exported when you export the sprite to a Pascal unit.'#10#10+
+
+  'CREATE NEW POSTURE:'#10+
+  ' - from the sprite on the 2D view, move/rotate/scale the surfaces to create the desired posture.'#10+
+  ' - enter a name for the posture.'#10+
+  ' - click ''Add to posture list''.'#10#10+
+  'EDIT AN EXISTING POSTURE:'#10+
+  ' - select the posture in the list.'#10+
+  ' - modify the posture on the 2D view (position/rotation/scale of the surfaces).'#10+
+  ' - click ''Update posture''.'#10#10+
+
   'SAVE AND EXIT TO SPRITE BANK:'#10+
   ' - enter a name for the sprite at the bottom of the panel.'#10+
   ' - then click ''Save to Sprite Bank''.'#10#10+
@@ -330,12 +344,47 @@ end;
 procedure TFrameToolsSpriteBuilder.BHelpRootChildsClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp('A complex sprite is made of one root surface and one or several childs.'#10+
-  'The first surface is the root. It can be a TSprite or a TSpriteContainer.'#10+
+  'The first surface is the root. It can be a TSprite or a TSpriteContainer. Other type don''t work for now.'#10+
   'See at the end of this text how to choose.'#10+
   'CREATING THE ROOT:'#10+
   ' - select the type of the root surface: TSprite or TSpriteContainer'#10+
   ' - if it''s a TSprite, choose a texture'#10+
+  ' - enter a name for the root.'#10+
+  ' - click ''+'' button.'#10#10+
+  'CREATING A CHILD:'#10+
+  ' - click on empty part on the 2D view to unselect all.'#10+
+  ' - select the type of the surface (only TSprite work for now).'#10+
+  ' - select a texture.'#10+
+  ' - enter a name for the child. This name will be used later as variable name when you export the sprite to Pascal unit.'#10+
+  ' - select its parent.'#10+
+  ' - give a value to ZOrder: negative value means the child is behind its parent, positive value means the child is forward its parent.'#10+
+  ' - click ''+'' button.'#10#10+
+  'SELECTION:'#10+
+  ' Left click on a surface to select it.'#10+
+  ' Left click + SHIFT key to add/remove a surface to the current selection.'#10+
+  ' Left click on empty place then drag the mouse to draw a rectangle. The surface inside the rectangle are selected.'#10+
+  ' Left click + ALT key to alternate between overlaped surfaces.'#10#10+
+  'When a surface is selected, another click on it will switch between scale handles and rotate handles.'#10+
+  'If the surface is hidden, select it with ALT key then press R key to switch scale/rotate handles.'#10#10+
+  'When a surface is selected, you can modify its pivot dragging the small cross at its center or directly by entering x and y values in the right panel.'#10#10+
+  'MODIFY A SURFACE:'#10+
+  ' select a surface then modify its parameters (texture, name, parent, coor, scale, angle, etc...).'#10#10+
+  'MOVE A SURFACE:'#10+
+  ' simply drag the surface with the mouse.'#10+
+  ' Hold CTRL key to moves only horizontaly or only verticaly (the first that appears win).'#10#10+
+  'ROTATE A SURFACE:'#10+
+  ' select a surface, click another time on it then drag one of the rotate handles.'#10+
+  ' Hold CTRL key to rotate by step of 15°.'#10#10+
+  'SCALE A SURFACE:'#10+
+  ' select a surface then drag one of the scale handles.'#10+
+  ' Hold CTRL key to keep aspect ratio.'#10#10+
+  'FLIP A SURFACE:'#10+
+  ' select a surface then check the FlipH or FlipV.'#10#10+
 
+  'VIEW:'#10+
+  ' Mouse wheel to scroll up/down.'#10+
+  ' Mouse wheel + SHIFT key to scroll left/right.'#10+
+  ' Mouse wheel + CTRL key to zoom in/out.'#10#10+
 
   'SAVE THE SPRITE:'#10+
   ' - enter a name for the sprite at bottom of the panel.'#10+

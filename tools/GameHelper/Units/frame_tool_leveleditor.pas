@@ -233,6 +233,7 @@ begin
      'SELECTION:'#10+
      ' Left click on a surface to select it.'#10+
      ' Left click + SHIFT key to add/remove a surface to the current selection.'#10+
+     ' Left click on empty place then drag the mouse to draw a rectangle. The surfaces inside the rectangle are selected.'#10+
      ' Left click + ALT key to alternate between overlaped surfaces.'#10#10+
      'When a surface is selected, another click on it will switch between sizing handles and rotating handles.'#10+
      'If the surface is hidden, select it with ALT key then press R key to switch sizing/rotating handles.'#10#10+
