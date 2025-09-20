@@ -111,7 +111,7 @@ object FormMain: TFormMain
       ParentBackground = False
       ParentColor = False
       TabOrder = 0
-      object ToolBar1: TToolBar
+      object ToolBarMain: TToolBar
         AnchorSideTop.Control = Panel1
         Left = 1
         Height = 26
@@ -120,7 +120,7 @@ object FormMain: TFormMain
         BorderSpacing.Top = 2
         ButtonHeight = 22
         ButtonWidth = 22
-        Caption = 'ToolBar1'
+        Caption = 'ToolBarMain'
         Color = 3226172
         EdgeBorders = []
         EdgeInner = esNone

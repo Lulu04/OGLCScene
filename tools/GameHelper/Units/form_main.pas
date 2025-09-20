@@ -47,7 +47,7 @@ type
     BSpriteBuilder: TSpeedButton;
     Panel8: TPanel;
     Panel9: TPanel;
-    ToolBar1: TToolBar;
+    ToolBarMain: TToolBar;
     BNewScreen: TToolButton;
     BLoadScreen: TToolButton;
     BSaveScreen: TToolButton;
@@ -186,6 +186,7 @@ begin
     Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBank);
     FrameToolsSpriteBank.OnShow;
     UpdateWidgets;
+    ToolBarMain.Visible := True;
   end;
 
   if Sender = BSpriteBuilder then begin
@@ -193,6 +194,7 @@ begin
     Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
     FrameToolsSpriteBuilder.OnShow;
     UpdateWidgets;
+    ToolBarMain.Visible := False;
   end;
 
   if Sender = BLevelBank then begin
@@ -200,6 +202,7 @@ begin
     Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
     FrameToolLevelBank.OnShow;
     UpdateWidgets;
+    ToolBarMain.Visible := True;
   end;
 
   if Sender = BLevelEditor then begin
@@ -207,6 +210,7 @@ begin
     Notebook1.PageIndex := Notebook1.IndexOf(PageLevelEditor);
     FrameToolLevelEditor.OnShow;
     UpdateWidgets;
+    ToolBarMain.Visible := False;
   end;
 end;
 
@@ -365,6 +369,7 @@ begin
   FrameToolsSpriteBank.OnShow;
   FScene.RunScreen(ScreenSpriteBank);
   UpdateWidgets;
+  ToolBarMain.Visible := True;
 end;
 
 procedure TFormMain.ShowPageSpriteBuilder;
@@ -373,6 +378,7 @@ begin
   FrameToolsSpriteBuilder.OnShow;
   FScene.RunScreen(ScreenSpriteBuilder);
   UpdateWidgets;
+  ToolBarMain.Visible := False;
 end;
 
 procedure TFormMain.ShowPageLevelEditor;
@@ -381,6 +387,7 @@ begin
   FrameToolLevelEditor.OnShow;
   FScene.RunScreen(ScreenLevelEditor);
   UpdateWidgets;
+  ToolBarMain.Visible := False;
 end;
 
 procedure TFormMain.ShowPageLevelBank;
@@ -389,18 +396,21 @@ begin
   FrameToolLevelBank.OnShow;
   FScene.RunScreen(ScreenLevelBank);
   UpdateWidgets;
+  ToolBarMain.Visible := True;
 end;
 
 procedure TFormMain.EditSpriteInSpriteBank(const aName: string);
 begin
   FrameToolsSpriteBuilder.EditSpriteInSpriteBank(aName);
   ShowPageSpriteBuilder;
+  ToolBarMain.Visible := False;
 end;
 
 procedure TFormMain.EditLevelInLevelBank(const aName: string);
 begin
   FrameToolLevelEditor.EditLevelInLevelBank(aName);
   ShowPageLevelEditor;
+  ToolBarMain.Visible := False;
 end;
 
 
