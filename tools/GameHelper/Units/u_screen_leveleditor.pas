@@ -48,6 +48,8 @@ public
 
   procedure MoveSelectionToLayer(aLayerIndex: integer); override;
 
+  procedure ZoomAll; override;
+  procedure ZoomOnSelection; override;
 public
   FSurfaces: TLevelEditorSurfaceList;
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -84,6 +86,7 @@ public
   function Surfaces: TSurfaceList; override;
 
   procedure UpdateWorldBounds(aX, aY, aWidth, aHeight: single; aColor: TColor; aVisible: boolean);
+  procedure ComputeWorldBoundsLineWidth;
 end;
 
 var ScreenLevelEditor: TScreenLevelEditor;
@@ -277,6 +280,18 @@ begin
   if Length(FSelected) = 0 then exit;
   inherited MoveSelectionToLayer(aLayerIndex);
   FrameToolLevelEditor.ShowSelectionData(FSelected);
+end;
+
+procedure TScreenLevelEditor.ZoomAll;
+begin
+  inherited ZoomAll;
+  ComputeWorldBoundsLineWidth;
+end;
+
+procedure TScreenLevelEditor.ZoomOnSelection;
+begin
+  inherited ZoomOnSelection;
+  ComputeWorldBoundsLineWidth;
 end;
 
 procedure TScreenLevelEditor.ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -491,6 +506,7 @@ procedure TScreenLevelEditor.ProcessMouseWheel(Shift: TShiftState;
 begin
   inherited ProcessMouseWheel(Shift, WheelDelta, MousePos, Handled);
   UpdateHandlePositionOnSelected;
+  ComputeWorldBoundsLineWidth;
 end;
 
 procedure TScreenLevelEditor.ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
@@ -727,8 +743,15 @@ procedure TScreenLevelEditor.UpdateWorldBounds(aX, aY, aWidth,
 begin
   if WorldBounds = NIL then exit;
   WorldBounds.SetShapeRectangle(aX, aY, Ceil(aWidth), Ceil(aHeight));
-  WorldBounds.LineColor := ColorToBGRA(aColor);
+  WorldBounds.LineColor := ColorToBGRA(aColor, 180);
   WorldBounds.Visible := aVisible;
+  ComputeWorldBoundsLineWidth;
+end;
+
+procedure TScreenLevelEditor.ComputeWorldBoundsLineWidth;
+begin
+  if WorldBounds = NIL then exit;
+  WorldBounds.LineWidth := Max(1.0, 1.0/Zoom);
 end;
 
 end.

@@ -196,8 +196,8 @@ public // rotate 90, mirror, plane
   procedure SelectedToBackOneStep;
   procedure SelectedToBack;
 
-  procedure ZoomAll;
-  procedure ZoomOnSelection;
+  procedure ZoomAll; virtual;
+  procedure ZoomOnSelection; virtual;
 
   procedure MoveSelectionToLayer(aLayerIndex: integer); virtual;
 
