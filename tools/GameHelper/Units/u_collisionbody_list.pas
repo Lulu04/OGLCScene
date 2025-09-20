@@ -45,7 +45,7 @@ public
   ID: integer;
   Outline: TShapeOutline;
   ItemDescriptor: TOGLCBodyItem;
-  Pts: ArrayOfUINodeHandle;
+  {Pts}Nodes: ArrayOfUINodeHandle;
   ParentSurface: TSimpleSurfaceWithEffect;
   PolygonIsClosed: boolean;
   procedure InitDefault;
@@ -224,7 +224,7 @@ begin
   Outline.LineWidth := 2.0;
   Outline.LineColor := BGRA(255,255,50);
 
-  Pts := NIL;
+  Nodes := NIL;
 end;
 
 procedure TBodyItem.KillSprites;
@@ -232,8 +232,8 @@ var i: integer;
 begin
   Outline.Kill;
   Outline := NIL;
-  for i:=0 to High(Pts) do
-    Pts[i].KillSprite;
+  for i:=0 to High(Nodes) do
+    Nodes[i].KillSprite;
 end;
 
 procedure TBodyItem.UpdateNodesPosition;
@@ -245,14 +245,14 @@ begin
   case ItemDescriptor.BodyType of
     _btPoint: begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.pt);
-      Pts[0].UpdatePosition(p1);
+      Nodes[0].UpdatePosition(p1);
     end;
     _btLine: begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.pt1);
       p2 := ParentSurface.SurfaceToScene(ItemDescriptor.pt2);
       Outline.SetShapeLine(p1, p2);
-      Pts[0].UpdatePosition(p1);
-      Pts[1].UpdatePosition(p2);
+      Nodes[0].UpdatePosition(p1);
+      Nodes[1].UpdatePosition(p2);
     end;
     _btCircle: begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.center);
@@ -260,15 +260,15 @@ begin
       r := Distance(p1, p2); // Max(5, (p2.x - p1.x)); //Distance(p1, p2);
       path := ComputeEllipse(0, 0, r, r, 0.4);
       OutLine.SetShapeCustom(p1.x, p1.y, path);
-      Pts[0].UpdatePosition(p1);
-      Pts[1].UpdatePosition(p2);
+      Nodes[0].UpdatePosition(p1);
+      Nodes[1].UpdatePosition(p2);
     end;
     _btRect: begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.rect.TopLeft);
       p2 := ParentSurface.SurfaceToScene(ItemDescriptor.rect.BottomRight);
       Outline.SetShapeRectangle(p1.x, p1.y, Round(p2.x-p1.x), Round(p2.y-p1.y));
-      Pts[0].UpdatePosition(p1);
-      Pts[1].UpdatePosition(p2);
+      Nodes[0].UpdatePosition(p1);
+      Nodes[1].UpdatePosition(p2);
     end;
     _btPolygon: begin
       ps := NIL;
@@ -280,8 +280,8 @@ begin
    //   p1 := ParentSurface.SurfaceToScene(PointF(0, 0)); //ItemDescriptor.pts[0]);
       p1 := ParentSurface.GetXY;
       OutLine.SetShapeCustom(p1.x, p1.y, ps); // ItemDescriptor.pts); //ps);
-      for i:=0 to High(Pts) do
-        Pts[i].UpdatePosition(ps[i]);
+      for i:=0 to High(Nodes) do
+        Nodes[i].UpdatePosition(ps[i]);
     end
     else raise exception.create('forgot to implement!');
   end;
@@ -290,10 +290,10 @@ end;
 procedure TBodyItem.UpdateAsPoint(aWorldPt: TPointF);
 begin
   CreateSprites;
-  if Pts = NIL then begin
-    SetLength(Pts, 1);
-    Pts[0].InitDefault;
-    Pts[0].CreateSprite;
+  if Nodes = NIL then begin
+    SetLength(Nodes, 1);
+    Nodes[0].InitDefault;
+    Nodes[0].CreateSprite;
   end;
 
   ItemDescriptor.pt := ParentSurface.SceneToSurface(aWorldPt);
@@ -303,12 +303,12 @@ end;
 procedure TBodyItem.UpdateAsLine(aWorldPt1, aWorldPt2: TPointF);
 begin
   CreateSprites;
-  if Pts = NIL then begin
-    SetLength(Pts, 2);
-    Pts[0].InitDefault;
-    Pts[0].CreateSprite;
-    Pts[1].InitDefault;
-    Pts[1].CreateSprite;
+  if Nodes = NIL then begin
+    SetLength(Nodes, 2);
+    Nodes[0].InitDefault;
+    Nodes[0].CreateSprite;
+    Nodes[1].InitDefault;
+    Nodes[1].CreateSprite;
   end;
 
   ItemDescriptor.pt1 := ParentSurface.SceneToSurface(aWorldPt1);
@@ -320,12 +320,12 @@ procedure TBodyItem.UpdateAsCircle(aWorldCenter, aWorldPtRadius: TPointF);
 var localPtRadius: TPointF;
 begin
   CreateSprites;
-  if Pts = NIL then begin
-    SetLength(Pts, 2);
-    Pts[0].InitDefault;
-    Pts[0].CreateSprite;
-    Pts[1].InitDefault;
-    Pts[1].CreateSprite;
+  if Nodes = NIL then begin
+    SetLength(Nodes, 2);
+    Nodes[0].InitDefault;
+    Nodes[0].CreateSprite;
+    Nodes[1].InitDefault;
+    Nodes[1].CreateSprite;
   end;
 
   localPtRadius := ParentSurface.SceneToSurface(aWorldPtRadius);
@@ -341,12 +341,12 @@ end;
 procedure TBodyItem.UpdateAsRectangle(aWorldTopLeft, aWorldBottomRight: TPointF);
 begin
   CreateSprites;
-  if Pts = NIL then begin
-    SetLength(Pts, 2);
-    Pts[0].InitDefault;
-    Pts[0].CreateSprite;
-    Pts[1].InitDefault;
-    Pts[1].CreateSprite;
+  if Nodes = NIL then begin
+    SetLength(Nodes, 2);
+    Nodes[0].InitDefault;
+    Nodes[0].CreateSprite;
+    Nodes[1].InitDefault;
+    Nodes[1].CreateSprite;
   end;
 
   ItemDescriptor.rect.TopLeft := ParentSurface.SceneToSurface(aWorldTopLeft);
@@ -358,9 +358,9 @@ procedure TBodyItem.UpdateAsPolygon(aWorldPt: TPointF);
 var i: integer;
 begin
   CreateSprites;
-  SetLength(Pts, Length(Pts)+1);
-  Pts[High(Pts)].CreateSprite;
-  Pts[High(Pts)].UpdatePosition(aWorldPt);
+  SetLength(Nodes, Length(Nodes)+1);
+  Nodes[High(Nodes)].CreateSprite;
+  Nodes[High(Nodes)].UpdatePosition(aWorldPt);
 
   i := Length(ItemDescriptor.pts);
   SetLength(ItemDescriptor.pts, i+1);
@@ -372,10 +372,10 @@ procedure TBodyItem.DeleteLastNode;
 var i: integer;
 begin
   if BodyType <> _btPolygon then exit;
-  if Length(Pts) <= 1 then exit;
-  i := High(Pts);
-  Pts[i].KillSprite;
-  SetLength(Pts, i);
+  if Length(Nodes) <= 1 then exit;
+  i := High(Nodes);
+  Nodes[i].KillSprite;
+  SetLength(Nodes, i);
   SetLength(itemDescriptor.pts, i);
   UpdateNodesPosition;
 end;
@@ -388,70 +388,74 @@ end;
 
 function TBodyItem.IsOverTheFirstNode(aWorldPt: TPointF): boolean;
 begin
-  if Length(Pts) = 0 then exit(False)
-    else Result := Pts[0].IsOver(aWorldPt);
+  if Length(Nodes) = 0 then exit(False)
+    else Result := Nodes[0].IsOver(aWorldPt);
 end;
 
 procedure TBodyItem.SelectAllNodes;
 var i: integer;
 begin
-  for i:=0 to High(Pts) do
-    Pts[i].Selected := True;
+  for i:=0 to High(Nodes) do
+    Nodes[i].Selected := True;
 end;
 
 procedure TBodyItem.UnselectAllNodes;
 var i: integer;
 begin
-  for i:=0 to High(Pts) do
-    Pts[i].Selected := False;
+  for i:=0 to High(Nodes) do
+    Nodes[i].Selected := False;
 end;
 
 function TBodyItem.GetNodesAt(aWorldPt: TPointF): ArrayOfPUINodeHandle;
 var i: integer;
 begin
   Result := NIL;
-  if Length(Pts) = 0 then exit;
-FScene.LogDebug('TBodyItem.GetNodesAt: Pts length ='+Length(Pts).ToString);
-  for i:=0 to High(Pts) do
-    if Pts[i].IsOver(aWorldPt) then begin
+  if Length(Nodes) = 0 then exit;
+FScene.LogDebug('TBodyItem.GetNodesAt: Pts length ='+Length(Nodes).ToString);
+  for i:=0 to High(Nodes) do
+    if Nodes[i].IsOver(aWorldPt) then begin
       SetLength(Result, Length(Result)+1);
-      Result[High(Result)] := @Pts[i];
+      Result[High(Result)] := @Nodes[i];
     end;
 end;
 
 procedure TBodyItem.UpdateSelectedNodePosition(aWolrdOffset: TPointF);
 var i: integer;
 begin
-  if Length(Pts) = 0 then exit;
+  if Length(Nodes) = 0 then exit;
 
   case ItemDescriptor.BodyType of
+    _btPoint: begin
+      if Nodes[0].Selected then ItemDescriptor.pt := ItemDescriptor.pt + aWolrdOffset;
+      UpdateNodesPosition;
+    end;
     _btLine: begin
-      if Pts[0].Selected then ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
-      if Pts[1].Selected then ItemDescriptor.pt2 := ItemDescriptor.pt2 + aWolrdOffset;
+      if Nodes[0].Selected then ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
+      if Nodes[1].Selected then ItemDescriptor.pt2 := ItemDescriptor.pt2 + aWolrdOffset;
       UpdateNodesPosition;
     end;
     _btCircle: begin
-      if Pts[0].Selected then begin
+      if Nodes[0].Selected then begin
         ItemDescriptor.center := ItemDescriptor.center + aWolrdOffset;
         ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
       end
       else
-      if Pts[1].Selected then begin
+      if Nodes[1].Selected then begin
         ItemDescriptor.pt1 := ItemDescriptor.pt1 + aWolrdOffset;
         ItemDescriptor.pt1.y := ItemDescriptor.center.y;
       end;
       UpdateNodesPosition;
     end;
     _btRect: begin
-      if Pts[0].Selected then ItemDescriptor.rect.TopLeft := ItemDescriptor.rect.TopLeft + aWolrdOffset;
-      if Pts[1].Selected then ItemDescriptor.rect.BottomRight := ItemDescriptor.rect.BottomRight + aWolrdOffset;
+      if Nodes[0].Selected then ItemDescriptor.rect.TopLeft := ItemDescriptor.rect.TopLeft + aWolrdOffset;
+      if Nodes[1].Selected then ItemDescriptor.rect.BottomRight := ItemDescriptor.rect.BottomRight + aWolrdOffset;
       UpdateNodesPosition;
     end;
     _btPolygon: begin
-      for i:=0 to High(Pts) do
-        if Pts[i].Selected then
+      for i:=0 to High(Nodes) do
+        if Nodes[i].Selected then
           ItemDescriptor.pts[i] := ItemDescriptor.pts[i] + aWolrdOffset;
-      if PolygonIsClosed then ItemDescriptor.pts[High(Pts)] := ItemDescriptor.pts[0];
+      if PolygonIsClosed then ItemDescriptor.pts[High(Nodes)] := ItemDescriptor.pts[0];
       UpdateNodesPosition;
     end;
   end;//case
@@ -464,15 +468,15 @@ end;
 
 function TBodyItem.AllNodesAreSelected: boolean;
 begin
-  Result := GetNodeSelectedCount = Length(Pts);
+  Result := GetNodeSelectedCount = Length(Nodes);
 end;
 
 function TBodyItem.GetNodeSelectedCount: integer;
 var i: Integer;
 begin
   Result := 0;
-  for i:=0 to High(Pts) do
-    if Pts[i].Selected then inc(Result);
+  for i:=0 to High(Nodes) do
+    if Nodes[i].Selected then inc(Result);
 end;
 
 procedure TBodyItem.AddNodeBetweenSelectedOnPolygon;
@@ -482,15 +486,15 @@ var i, next: Integer;
 begin
   if BodyType <> _btPolygon then exit;
 
-i:=Length(Pts);
+i:=Length(Nodes);
 
-  for i:=High(Pts) downto 0 do begin
-    if i = High(Pts) then next := 0 else next := i + 1;
-    if Pts[i].Selected and Pts[next].Selected then begin
+  for i:=High(Nodes) downto 0 do begin
+    if i = High(Nodes) then next := 0 else next := i + 1;
+    if Nodes[i].Selected and Nodes[next].Selected then begin
       p.InitDefault;
       p.CreateSprite;
       p.Selected := True;
-      Insert(p, Pts, i+1);
+      Insert(p, Nodes, i+1);
       pos := MiddleOf(itemDescriptor.pts[i], itemDescriptor.pts[next]);
       Insert(pos, itemDescriptor.pts, i+1);
       p.UpdatePosition(ParentSurface.SurfaceToScene(pos));
@@ -504,9 +508,9 @@ begin
   Result := False;
   if BodyType <> _btPolygon then exit;
 
-  for i:=High(Pts) downto 0 do begin
-    if i = High(Pts) then next := 0 else next := i + 1;
-    if Pts[i].Selected and Pts[next].Selected then
+  for i:=High(Nodes) downto 0 do begin
+    if i = High(Nodes) then next := 0 else next := i + 1;
+    if Nodes[i].Selected and Nodes[next].Selected then
       exit(True);
   end;
 end;
@@ -516,12 +520,12 @@ var origin, left, right: integer;
   function NextIndex(aIndex: integer): integer;
   begin
     Result := aIndex + 1;
-    if Result = Length(Pts) then Result := 0;
+    if Result = Length(Nodes) then Result := 0;
   end;
   function PreviousIndex(aIndex: integer): integer;
   begin
     Result := aIndex - 1;
-    if Result = -1 then Result := High(Pts);
+    if Result = -1 then Result := High(Nodes);
   end;
 begin
   if aNode^.Selected <> aSelectState then begin
@@ -533,8 +537,8 @@ begin
   if not aSelectState and not SomeNodesAreSelected then exit;
 
   // retrieve the current node index
-  for origin:=0 to High(Pts) do
-    if @Pts[origin] = aNode then break;
+  for origin:=0 to High(Nodes) do
+    if @Nodes[origin] = aNode then break;
 
   if aSelectState then begin
     if not aNode^.Selected then begin
@@ -545,42 +549,42 @@ begin
     left := PreviousIndex(origin);
     repeat
       if right <> origin then begin
-        if not Pts[right].Selected then begin
-          Pts[right].Selected := True;
+        if not Nodes[right].Selected then begin
+          Nodes[right].Selected := True;
           exit;
         end;
         right := NextIndex(right);
       end;
       if left <> origin then begin
-        if not Pts[left].Selected then begin
-          Pts[left].Selected := True;
+        if not Nodes[left].Selected then begin
+          Nodes[left].Selected := True;
           exit;
         end;
         left := PreviousIndex(left);
       end;
     until (right = origin) and (left = origin);
   end else begin
-     right := origin + Length(Pts) div 2;
-     if right >= Length(Pts) then right := right - Length(Pts);
-     left := origin - Length(Pts) div 2;
-     if left < 0 then left := left + Length(Pts);
+     right := origin + Length(Nodes) div 2;
+     if right >= Length(Nodes) then right := right - Length(Nodes);
+     left := origin - Length(Nodes) div 2;
+     if left < 0 then left := left + Length(Nodes);
      repeat
        if right <> origin then begin
-         if Pts[right].Selected then begin
-           Pts[right].Selected := False;
+         if Nodes[right].Selected then begin
+           Nodes[right].Selected := False;
            exit;
          end;
          right := PreviousIndex(right);
        end;
        if left <> origin then begin
-         if Pts[left].Selected then begin
-           Pts[left].Selected := False;
+         if Nodes[left].Selected then begin
+           Nodes[left].Selected := False;
            exit;
          end;
          left := NextIndex(left);
        end;
      until (right = origin) and (left = origin);
-     Pts[origin].Selected := False;
+     Nodes[origin].Selected := False;
   end;
 end;
 
@@ -591,10 +595,10 @@ begin
     raise exception.create('node can be deleted only on polygon!');
 
   // delete the selected nodes
-  for i:=High(Pts) downto 0 do begin
-    if Pts[i].Selected then begin
-      Pts[i].KillSprite;
-      Delete(Pts, i, 1);
+  for i:=High(Nodes) downto 0 do begin
+    if Nodes[i].Selected then begin
+      Nodes[i].KillSprite;
+      Delete(Nodes, i, 1);
       Delete(ItemDescriptor.pts, i, 1);
     end;
   end;
@@ -663,34 +667,34 @@ begin
     _btPoint: begin
       if prop.StringValueOf('pt', s1, '') then
         ItemDescriptor.pt := StringToPointF(s1);
-      SetLength(Pts, 1);
+      SetLength(Nodes, 1);
     end;
     _btLine: begin
       if prop.StringValueOf('pt1', s1, '') then
         ItemDescriptor.pt1 := StringToPointF(s1);
       if prop.StringValueOf('pt2', s1, '') then
         ItemDescriptor.pt2 := StringToPointF(s1);
-      SetLength(Pts, 2);
+      SetLength(Nodes, 2);
     end;
     _btCircle: begin
       if prop.StringValueOf('center', s1, '') then
         ItemDescriptor.center := StringToPointF(s1);
       if prop.SingleValueOf('radius', vs, 0) then
         ItemDescriptor.radius := vs;
-      SetLength(Pts, 2);
+      SetLength(Nodes, 2);
     end;
     _btRect: begin
       if prop.StringValueOf('tl', s1, '') then
         ItemDescriptor.rect.TopLeft := StringToPointF(s1);
       if prop.StringValueOf('br', s1, '') then
         ItemDescriptor.rect.BottomRight := StringToPointF(s1);
-      SetLength(Pts, 2);
+      SetLength(Nodes, 2);
     end;
     _btPolygon: begin
       prop.BooleanValueOf('closed', PolygonIsClosed, False);
       prop.IntegerValueOf('count', c, 0);
       if c > 0 then begin
-        SetLength(Pts, c);
+        SetLength(Nodes, c);
         SetLength(ItemDescriptor.pts, c);
         prop.StringValueOf('pts', s1, '');
         A := s1.Split([' ']);
@@ -701,9 +705,9 @@ begin
     else raise exception.create('forgot to implement!');
   end;
 
-  for i:=0 to High(Pts) do begin
-    Pts[i].InitDefault;
-    Pts[i].CreateSprite;
+  for i:=0 to High(Nodes) do begin
+    Nodes[i].InitDefault;
+    Nodes[i].CreateSprite;
   end;
 end;
 
@@ -849,9 +853,9 @@ end;
 procedure TBodyItemList.DeleteByID(aID: integer);
 var i: SizeUInt;
 begin
-FScene.LogDebug('TBodyItemList.DeleteByID');
-FScene.LogDebug('BEFORE deletion size = '+Size.tostring);
-for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+//FScene.LogDebug('TBodyItemList.DeleteByID');
+//FScene.LogDebug('BEFORE deletion size = '+Size.tostring);
+//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have Nodes length='+Length(mutable[i]^.Nodes).tostring);
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     if Mutable[i]^.ID = aID then begin
@@ -859,8 +863,8 @@ for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts
       Erase(i);
 //      exit;
     end;
-FScene.LogDebug('AFTER deletion size = '+Size.tostring);
-for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+//FScene.LogDebug('AFTER deletion size = '+Size.tostring);
+//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
 end;
 
 procedure TBodyItemList.CreateItemByDescriptor(const aDescriptor: TOGLCBodyItem; aId: integer);
@@ -868,9 +872,9 @@ var o: TBodyItem;
   i: integer;
 debug: PBodyItem;
 begin
-FScene.LogDebug('TBodyItemList.CreateItemByDescriptor');
-FScene.LogDebug('BEFORE creation size = '+Size.tostring);
-for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+//FScene.LogDebug('TBodyItemList.CreateItemByDescriptor');
+//FScene.LogDebug('BEFORE creation size = '+Size.tostring);
+//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
   o.InitDefault;
   o.ID := aID;
   o.ItemDescriptor.BodyType := aDescriptor.BodyType;
@@ -896,10 +900,10 @@ for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts
     else raise exception.Create('forgot to implement!');
   end;//case
   PushBack(o);
-debug:=mutable[size-1];
-FScene.LogDebug('TBodyItemList.CreateItemByDescriptor: item created at index '+(size-1).tostring+' with Pts length='+Length(debug^.Pts).tostring);
-FScene.LogDebug('AFTER creation size = '+Size.tostring);
-for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
+//debug:=mutable[size-1];
+//FScene.LogDebug('TBodyItemList.CreateItemByDescriptor: item created at index '+(size-1).tostring+' with Pts length='+Length(debug^.Pts).tostring);
+//FScene.LogDebug('AFTER creation size = '+Size.tostring);
+//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
 end;
 
 procedure TBodyItemList.ReplaceNodes(const aDescriptor: TOGLCBodyItem; aId: integer);
@@ -926,16 +930,16 @@ begin
     end;
     _btPolygon: begin
       o^.ItemDescriptor.pts := Copy(aDescriptor.pts);
-      if Length(aDescriptor.pts) > Length(o^.Pts) then begin
-        i := Length(o^.Pts);
-        SetLength(o^.Pts, Length(aDescriptor.pts));
-        while i < High(o^.Pts) do begin
-          o^.Pts[i].CreateSprite;
+      if Length(aDescriptor.pts) > Length(o^.Nodes) then begin
+        i := Length(o^.Nodes);
+        SetLength(o^.Nodes, Length(aDescriptor.pts));
+        while i < High(o^.Nodes) do begin
+          o^.Nodes[i].CreateSprite;
           inc(i);
         end;
-      end else if Length(aDescriptor.pts) < Length(o^.Pts) then begin
-        for i:=High(o^.Pts) downto Length(aDescriptor.pts) do
-          o^.Pts[i].KillSprite;
+      end else if Length(aDescriptor.pts) < Length(o^.Nodes) then begin
+        for i:=High(o^.Nodes) downto Length(aDescriptor.pts) do
+          o^.Nodes[i].KillSprite;
       end;
       o^.UpdateNodesPosition;
     end;
@@ -957,10 +961,10 @@ var i: SizeUInt;
 begin
   Result := NIL;
   aBody := NIL;
-FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: Size='+Size.ToString);
+//FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: Size='+Size.ToString);
   if Size = 0 then exit;
   for i:=0 to Size-1 do begin
-FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: checking item index '+i.tostring+' with Pts Length='+Length(Mutable[i]^.Pts).tostring);
+//FScene.LogDebug('TBodyItemList.GetItemAndNodesAt: checking item index '+i.tostring+' with Nodes Length='+Length(Mutable[i]^.Nodes).tostring);
     Result := Mutable[i]^.GetNodesAt(aWorldPt);
     if Length(Result) > 0 then begin
       aBody := Mutable[i];
