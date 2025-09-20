@@ -31,6 +31,8 @@ var
   FAtlas: TAtlas;
   FHintFont: TTexturedFont; // font for hint
 
+  LastClickedIsControl: boolean=False;
+
 implementation
 
 

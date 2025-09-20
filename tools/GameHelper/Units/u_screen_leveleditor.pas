@@ -362,6 +362,10 @@ var items: ArrayOfPSurfaceDescriptor;
 begin
   inherited ProcessMouseDown(Button, Shift, X, Y);
 
+  // hack to avoid surface deletion when user erase a SpinEdit value with delete key
+  LastClickedIsControl := False;
+  FrameToolLevelEditor.SetFocusToDummy;
+
   items := Surfaces.GetItemsAt(X, Y);
   ClickOrigin := PointF(X, Y);
   case MouseState of
@@ -512,6 +516,10 @@ end;
 procedure TScreenLevelEditor.ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited ProcessOnKeyUp(Key, Shift);
+
+  // hack to avoid surface deletion when user erase a SpinEdit value with delete key
+  if LastClickedIsControl then exit;
+
   case Key of
     VK_DELETE: DeleteSelection;
 

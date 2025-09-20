@@ -121,6 +121,7 @@ type
     SpinEdit4: TFloatSpinEdit;
     PageWorld: TTabSheet;
     PageLayers: TTabSheet;
+    SEDummy: TSpinEdit;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
     procedure BDistributeHClick(Sender: TObject);
@@ -134,6 +135,7 @@ type
     procedure CBTexturesSelect(Sender: TObject);
     procedure BRotate90CCWClick(Sender: TObject);
     procedure FSEOverlapChange(Sender: TObject);
+    procedure SE1Enter(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpinEdit3Change(Sender: TObject);
   private
@@ -174,6 +176,8 @@ type
     procedure ExitModeAddMultiple;
 
     procedure SendParamToWorldBounds;
+
+    procedure SetFocusToDummy;
 
 
     procedure FillListBoxTextureNames;
@@ -409,6 +413,11 @@ begin
   Project.SetModified;
 end;
 
+procedure TFrameToolLevelEditor.SE1Enter(Sender: TObject);
+begin
+  LastClickedIsControl := True;
+end;
+
 procedure TFrameToolLevelEditor.SpeedButton1Click(Sender: TObject);
 begin
   if CBAlignReference.ItemIndex = -1 then exit;
@@ -610,6 +619,11 @@ begin
   ScreenLevelEditor.UpdateWorldBounds(SpinEdit3.Value, SpinEdit4.Value,
                                       SpinEdit1.Value, SpinEdit2.Value,
                                       ColorButton2.ButtonColor, CheckBox1.Checked);
+end;
+
+procedure TFrameToolLevelEditor.SetFocusToDummy;
+begin
+  SEDummy.SetFocus;
 end;
 
 constructor TFrameToolLevelEditor.Create(TheOwner: TComponent);

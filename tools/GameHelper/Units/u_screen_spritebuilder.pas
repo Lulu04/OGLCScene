@@ -675,6 +675,12 @@ procedure TScreenSpriteBuilder.ProcessMouseDownForCollisionBody(
 var items: ArrayOfPUINodeHandle;
   targetBody: PBodyItem;
 begin
+  inherited ProcessMouseDown(Button, Shift, X, Y);
+
+  // hack to avoid surface deletion when user erase a SpinEdit value with delete key
+  LastClickedIsControl := False;
+  FrameToolsSpriteBuilder.SetFocusToDummy;
+
   ClickOrigin := PointF(X, Y);
   items := Bodies.GetItemAndNodesAt(PointF(X, Y), targetBody);
 
@@ -844,6 +850,10 @@ procedure TScreenSpriteBuilder.ProcessMouseDown(Button: TMouseButton; Shift: TSh
 begin
   inherited ProcessMouseDown(Button, Shift, X, Y);
 
+  // hack to avoid surface deletion when user erase a SpinEdit value with delete key
+  LastClickedIsControl := False;
+  FrameToolsSpriteBuilder.SetFocusToDummy;
+
   if FrameToolsSpriteBuilder.SelectedTabIsChild or
      FrameToolsSpriteBuilder.SelectedTabIsPosture then
     ProcessMouseDownForChild(Button, Shift, X, Y);
@@ -867,6 +877,10 @@ end;
 procedure TScreenSpriteBuilder.ProcessOnKeyUp(var Key: Word; Shift: TShiftState);
 begin
   inherited ProcessOnKeyUp(Key, Shift);
+
+  // hack to avoid surface deletion when user erase a SpinEdit value with delete key
+  if LastClickedIsControl then exit;
+
   if FrameToolsSpriteBuilder.SelectedTabIsChild then
     ProcessKeyUpForChild(Key, Shift);
 
