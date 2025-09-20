@@ -686,7 +686,6 @@ begin
   DoUpdateChild(False);
   Postures.AddValueEntryOnEachPosture;
 
-  CBParent.Items.Add(FWorkingChild^.ID.ToString);
   FWorkingChild := NIL;
   FModified := True;
   Result := True;
