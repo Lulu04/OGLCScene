@@ -414,7 +414,6 @@
         <ComponentName Value="FrameToolsSpriteBuilder"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="983"/>
         <CursorPos X="3" Y="986"/>
@@ -428,9 +427,10 @@
         <ComponentName Value="FrameToolSpriteBank"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="12"/>
-        <TopLine Value="557"/>
-        <CursorPos X="55" Y="560"/>
+        <TopLine Value="155"/>
+        <CursorPos Y="169"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -665,8 +665,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="153"/>
-        <CursorPos X="91" Y="156"/>
+        <TopLine Value="146"/>
+        <CursorPos X="30" Y="162"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -837,123 +837,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="332" Column="3" TopLine="330"/>
+        <Caret Line="368" Column="3" TopLine="354"/>
       </Position1>
       <Position2>
         <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="272" Column="3" TopLine="270"/>
+        <Caret Line="339" Column="27" TopLine="327"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\frame_tool_leveleditor.pas"/>
-        <Caret Line="842" Column="41" TopLine="840"/>
-      </Position3>
-      <Position4>
-        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="368" Column="3" TopLine="354"/>
-      </Position4>
-      <Position5>
-        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="339" Column="27" TopLine="327"/>
-      </Position5>
-      <Position6>
         <Filename Value="Units\frame_tool_spritebuilder.pas"/>
         <Caret Line="353" Column="92" TopLine="335"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\u_screen_spritebuilder.pas"/>
+        <Caret Line="570" Column="33" TopLine="561"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\u_screen_spritebuilder.pas"/>
+        <Caret Line="57" Column="27" TopLine="40"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\u_screen_spritebuilder.pas"/>
+        <Caret Line="745" Column="3" TopLine="739"/>
       </Position6>
       <Position7>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="570" Column="33" TopLine="561"/>
+        <Caret Line="72" Column="26" TopLine="54"/>
       </Position7>
       <Position8>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="57" Column="27" TopLine="40"/>
+        <Caret Line="897" Column="3" TopLine="893"/>
       </Position8>
       <Position9>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="745" Column="3" TopLine="739"/>
+        <Caret Line="72" Column="13" TopLine="60"/>
       </Position9>
       <Position10>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="72" Column="26" TopLine="54"/>
+        <Caret Line="897" Column="3" TopLine="893"/>
       </Position10>
       <Position11>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="897" Column="3" TopLine="893"/>
+        <Caret Line="72" Column="13" TopLine="60"/>
       </Position11>
       <Position12>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="72" Column="13" TopLine="60"/>
+        <Caret Line="897" Column="3" TopLine="893"/>
       </Position12>
       <Position13>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="897" Column="3" TopLine="893"/>
+        <Caret Line="57" Column="26" TopLine="49"/>
       </Position13>
       <Position14>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="72" Column="13" TopLine="60"/>
+        <Caret Line="746" Column="3" TopLine="739"/>
       </Position14>
       <Position15>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="897" Column="3" TopLine="893"/>
+        <Caret Line="41" Column="23" TopLine="27"/>
       </Position15>
       <Position16>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="57" Column="26" TopLine="49"/>
+        <Caret Line="378" Column="35" TopLine="374"/>
       </Position16>
       <Position17>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="746" Column="3" TopLine="739"/>
+        <Caret Line="65" Column="20" TopLine="56"/>
       </Position17>
       <Position18>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="41" Column="23" TopLine="27"/>
+        <Caret Line="825" Column="34" TopLine="821"/>
       </Position18>
       <Position19>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="378" Column="35" TopLine="374"/>
+        <Caret Line="73" Column="22" TopLine="53"/>
       </Position19>
       <Position20>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="65" Column="20" TopLine="56"/>
+        <Caret Line="911" Column="20" TopLine="900"/>
       </Position20>
       <Position21>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="825" Column="34" TopLine="821"/>
+        <Caret Line="65" Column="13" TopLine="53"/>
       </Position21>
       <Position22>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="73" Column="22" TopLine="53"/>
+        <Caret Line="822" TopLine="812"/>
       </Position22>
       <Position23>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="911" Column="20" TopLine="900"/>
+        <Caret Line="72" Column="20" TopLine="54"/>
       </Position23>
       <Position24>
-        <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="65" Column="13" TopLine="53"/>
+        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
+        <Caret Line="321" Column="42" TopLine="319"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="822" TopLine="812"/>
+        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
+        <Caret Line="353" Column="64" TopLine="344"/>
       </Position25>
       <Position26>
-        <Filename Value="Units\u_screen_spritebuilder.pas"/>
-        <Caret Line="72" Column="20" TopLine="54"/>
+        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
+        <Caret Line="455" Column="19" TopLine="440"/>
       </Position26>
       <Position27>
         <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="321" Column="42" TopLine="319"/>
+        <Caret Line="163" Column="22" TopLine="149"/>
       </Position27>
       <Position28>
-        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="353" Column="64" TopLine="344"/>
+        <Filename Value="Units\frame_tool_spritebank.pas"/>
+        <Caret Line="560" Column="55" TopLine="557"/>
       </Position28>
       <Position29>
-        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="455" Column="19" TopLine="440"/>
+        <Filename Value="Units\frame_tool_levelbank.pas"/>
+        <Caret Line="156" Column="91" TopLine="153"/>
       </Position29>
       <Position30>
-        <Filename Value="Units\frame_tool_spritebuilder.pas"/>
-        <Caret Line="163" Column="22" TopLine="149"/>
+        <Filename Value="Units\frame_tool_spritebank.pas"/>
+        <Caret Line="568" Column="3" TopLine="557"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
