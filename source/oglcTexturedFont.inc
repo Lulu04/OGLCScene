@@ -158,10 +158,8 @@ begin
 
     if aPackerLoadedFromFile then
       FTexCharArray[i].Texture := aPacker.RetrieveTextureByFileName(CharPrefix+s)
-    else begin
-      FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate);
-      FTexCharArray[i].Texture^.Filename := CharPrefix+s; // '_'+s+'_';
-    end;
+    else
+      FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate, CharPrefix+s);
 
     FTexCharArray[i].Character := s;
     FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
