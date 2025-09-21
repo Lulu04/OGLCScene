@@ -1,6 +1,15 @@
 {$ifdef oglcINTERFACE}
 type
 
+{
+  Textures can be individual or contained in an atlas.
+  Using Atlas is faster.
+  A texture is associated with a name to retrieve it in the atlas. This is necessary when the atlas is loaded from file.
+  That's why a name is required in method that add a TBGRABitmap in the atlas.
+  The texture name must be UNIQUE.
+  For image loaded from file, the texture name is ExtractFilename(aFilename)
+}
+
 { TOGLCImagePackerItem }
 
 POGLCImagePackerItem = ^TOGLCImagePackerItem;
@@ -45,11 +54,15 @@ public
 
   function Add(const aFilename: string): PTexture; overload;
   function Add(const aFilename: string; AFrameWidth, AFrameHeight: integer): PTexture; overload;
+  // Add a texture from an image. You must give a UNIQUE name to the texture
+  // because a texture is associated with a name in order to retrieve it in the atlas (function RetrieveTextureByFileName).
   // Image Packer become the owner of aImage, don't free it in your code !
-  function Add(aImage: TBGRABitmap): PTexture; overload;
+  function Add(aImage: TBGRABitmap; const aName: string): PTexture; overload;
+  // Add a texture from an image with multiple frames. You must give a UNIQUE name to the texture
+  // because a texture is associated with a name in order to retrieve it in the atlas (function RetrieveTextureByFileName).
   // Image Packer become the owner of aImage, don't free it in your code !
-  function Add(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer): PTexture; overload;
-  // create a texture from an svg file.
+  function Add(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer; const aName: string): PTexture; overload;
+  // Add a texture from an svg file.
   // aWidth and aHeight = -1 => return an image with original size as described in svg.
   // aWidth and aHeight <> -1 => return a maximized image that fit in the given rectangle (keep aspect ratio).
   // Only aWidth = '-1' => the image width is computed from aHeight to keep aspect ratio.
@@ -68,6 +81,7 @@ public
   // aSVGFilenames is an array that contains the SVG files that represent one frame.
   function AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture; overload;
 
+  // Add a textured font.
   // Image Packer is the owner of the returned TTexturedFont, don't free it in your code !
   function AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont;
 
@@ -338,8 +352,7 @@ begin
     Result := RetrieveTextureByFileName(ExtractFilename(aFilename))
   else begin
     ima := TBGRABitmap.Create(aFilename);
-    Result := Add(ima);
-    Result^.Filename := ExtractFilename(aFilename);
+    Result := Add(ima, ExtractFilename(aFilename));
   end;
 end;
 
@@ -350,21 +363,20 @@ begin
     Result := RetrieveTextureByFileName(ExtractFilename(aFilename))
   else begin
     ima := TBGRABitmap.Create(aFilename);
-    Result := Add(ima, AFrameWidth, AFrameHeight);
-    Result^.Filename := ExtractFilename(aFilename);
+    Result := Add(ima, AFrameWidth, AFrameHeight, ExtractFilename(aFilename));
   end;
 end;
 
-function TOGLCImagePacker.Add(aImage: TBGRABitmap): PTexture;
+function TOGLCImagePacker.Add(aImage: TBGRABitmap; const aName: string): PTexture;
 begin
   Result := InitFromBitmap(aImage, aImage.Width, aImage.Height);
-  Result^.Filename := '';
+  Result^.Filename := aName;
 end;
 
-function TOGLCImagePacker.Add(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer): PTexture;
+function TOGLCImagePacker.Add(aImage: TBGRABitmap; AFrameWidth, AFrameHeight: integer; const aName: string): PTexture;
 begin
   Result := InitFromBitmap(aImage, AFrameWidth, AFrameHeight);
-  Result^.Filename := '';
+  Result^.Filename := aName;
 end;
 
 function TOGLCImagePacker.AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture;
@@ -374,8 +386,7 @@ begin
     Result := RetrieveTextureByFileName(ExtractFilename(aSVGFilename))
   else begin
     ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
-    Result := Add(ima);
-    Result^.Filename := ExtractFilename(aSVGFilename);
+    Result := Add(ima, ExtractFilename(aSVGFilename));
   end;
 end;
 
@@ -460,8 +471,7 @@ begin
         yy := yy + frameHeight;
       end else xx := xx + frameWidth;
     end;
-    Result := Add(imaWhole, frameWidth, frameHeight);
-    Result^.Filename := ExtractFilename(aSVGFilenames[0]);
+    Result := Add(imaWhole, frameWidth, frameHeight, ExtractFilename(aSVGFilenames[0]));
   end;
 end;
 
