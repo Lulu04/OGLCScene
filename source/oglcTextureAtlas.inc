@@ -52,17 +52,21 @@ public
   // create a texture from an svg file.
   // aWidth and aHeight = -1 => return an image with original size as described in svg.
   // aWidth and aHeight <> -1 => return a maximized image that fit in the given rectangle (keep aspect ratio).
-  // Only aImageWidth = '-1' => returned image width is computed from aHeight to keep aspect ratio.
-  // Only aImageHeight = '-1' => returned image height is computed from aWidth to keep aspect ratio.
+  // Only aWidth = '-1' => the image width is computed from aHeight to keep aspect ratio.
+  // Only aHeight = '-1' => the image height is computed from aWidth to keep aspect ratio.
   function AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture;
 
   // Construct a bitmap with several frames and add it to the Image Packer.
   // aFileNames is an array that contains the file images to use.
   // Each images must have the same size.
   function AddMultiFrameImage(const aFileNames: TStringArray; aXCount, aYCount, aSpacing: integer): PTexture;
+
+  // Create a texture from a svg file that contain an image with multiple frames.
+  function AddMultiFrameImageFromSVG(const aSVGFilename: string; aWidth, aHeight, aXCount, aYCount: integer): PTexture; overload;
+
   // Construct a bitmap with several frames and add it to the Image Packer.
-  // aSVGFilenames is an array that contains the SVG files to use.
-  function AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture;
+  // aSVGFilenames is an array that contains the SVG files that represent one frame.
+  function AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture; overload;
 
   // Image Packer is the owner of the returned TTexturedFont, don't free it in your code !
   function AddTexturedFont(aScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont;
@@ -406,8 +410,22 @@ begin
         yy := yy + frameHeight + aSpacing;
       end else xx := xx + frameWidth + aSpacing;
     end;
-    Result := Add(imaWhole, frameWidth, frameHeight);
-    Result^.Filename := ExtractFilename(aFileNames[0]);
+    Result := Add(imaWhole, frameWidth, frameHeight, ExtractFilename(aFileNames[0]));
+  end;
+end;
+
+function TOGLCImagePacker.AddMultiFrameImageFromSVG(const aSVGFilename: string;
+  aWidth, aHeight, aXCount, aYCount: integer): PTexture;
+var ima: TBGRABitmap;
+begin
+  if (aXCount = 0) and (aYCount = 0) then raise exception.Create('aXCount and aYCount can not be both null');
+  //if aXCount
+
+  if LoadedFromFile then
+    Result := RetrieveTextureByFileName(ExtractFilename(aSVGFilename))
+  else begin
+    ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
+    Result := Add(ima, ima.Width div aXcount, ima.Height div aYCount, ExtractFilename(aSVGFilename));
   end;
 end;
 
@@ -478,8 +496,7 @@ begin
         end;
       end;
 
-    Result := Add(wholeIma, aTileSize, aTileSize);
-    Result^.Filename := aName;
+    Result := Add(wholeIma, aTileSize, aTileSize, aName);
   end;
 end;
 
@@ -683,8 +700,7 @@ begin
   if LoadedFromFile then
     Result := RetrieveTextureByFileName(aString)
   else begin
-    Result := Add(aFont.StringToBitmap(aString, aFillTexture));
-    Result^.Filename := aString;
+    Result := Add(aFont.StringToBitmap(aString, aFillTexture), aString);
   end;
 end;
 
