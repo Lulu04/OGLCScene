@@ -30,6 +30,7 @@ var
   FScene: TOGLCScene;
   FAtlas: TAtlas;
   FHintFont: TTexturedFont; // font for hint
+  FErrorFont: TTexturedFont; // font for error message
 
   LastClickedIsControl: boolean=False;
 

@@ -27,7 +27,7 @@ TTextureUndoRedoManager = class(specialize TGenericUndoRedoManager<TTextureUndoR
   procedure AddActionAddTexture(const aName: string);
   procedure AddActionDeleteTexture(const aName: string);
   procedure AddActionModifyTexture(aItem: PTextureItem; const aFilename, aName: string;
-                  aWidth, aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
+                  aWidth, aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight, aFrameCount: integer);
 end;
 
 {$endif _INTERFACE}
@@ -48,14 +48,16 @@ begin
 
     turatDeleteTexture: begin
       ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
-                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
+                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight,
+                            aItem.data.framecount);
       FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Add(aItem.data.name);
     end;
 
     turatModifyTexture: begin
       item := ParentTexturelist.GetItemByName(aItem.newData.name);
       ParentTexturelist.Update(item, aItem.data.filename, aItem.data.name, aItem.data.width,
-                 aItem.data.height, aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
+                 aItem.data.height, aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight,
+                 aItem.data.framecount);
     end;
   end;
 end;
@@ -67,7 +69,8 @@ begin
   case aItem.Action of
     turatAddTexture: begin
       ParentTexturelist.Add(aItem.data.filename, aItem.data.name, aItem.data.width, aItem.data.height,
-                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight);
+                            aItem.data.isMultiFrame, aItem.data.frameWidth, aItem.data.frameHeight,
+                            aItem.data.framecount);
       FrameToolsSpriteBuilder.FrameTextureList.LBTextureNames.Items.Add(aItem.data.name);
     end;
 
@@ -81,7 +84,8 @@ begin
       item := ParentTexturelist.GetItemByName(aItem.data.name);
       ParentTexturelist.Update(item, aItem.newData.filename, aItem.newData.name, aItem.newData.width,
                                aItem.newData.height, aItem.newData.isMultiFrame,
-                               aItem.newData.frameWidth, aItem.newData.frameHeight);
+                               aItem.newData.frameWidth, aItem.newData.frameHeight,
+                               aItem.newData.frameCount);
     end;
   end;
 end;
@@ -108,7 +112,7 @@ end;
 
 procedure TTextureUndoRedoManager.AddActionModifyTexture(aItem: PTextureItem;
   const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
-  aFrameWidth, aFrameHeight: integer);
+  aFrameWidth, aFrameHeight, aFrameCount: integer);
 var o: TTextureUndoRedoItem;
 begin
   o.action := turatModifyTexture;
@@ -122,6 +126,7 @@ begin
   o.newData.isMultiFrame := aIsFramed;
   o.newData.frameWidth := aFrameWidth;
   o.newData.frameHeight := aFrameHeight;
+  o.newData.framecount := aFrameCount;
   AddItem(o);
 end;
 

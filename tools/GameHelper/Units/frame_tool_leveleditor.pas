@@ -1,7 +1,7 @@
 unit frame_tool_leveleditor;
 
 {$mode ObjFPC}{$H+}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
@@ -54,6 +54,7 @@ type
     Label25: TLabel;
     Label26: TLabel;
     Label27: TLabel;
+    Label28: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -79,6 +80,7 @@ type
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
     SE1: TFloatSpinEdit;
+    SE10: TSpinEdit;
     SE2: TFloatSpinEdit;
     SE4: TSpinEdit;
     SE5: TFloatSpinEdit;
@@ -351,6 +353,11 @@ begin
     if pTexItem <> NIL then begin
       SE3.Value := pTexItem^.texture^.FrameWidth;
       SE4.Value := pTexItem^.texture^.FrameHeight;
+
+      Label28.Visible := pTexItem^.isMultiFrame;
+      SE10.Visible := Label28.Visible;
+      SE10.MaxValue := pTexItem^.framecount;
+      SE10.MinValue := 1;
     end;
   end;
 
@@ -390,6 +397,9 @@ begin
   if (Sender = RadioButton1) or (Sender = RadioButton2) then
     if RadioButton1.Checked then ScreenLevelEditor.SetTintModeOnSelection(tmReplaceColor)
       else ScreenLevelEditor.SetTintModeOnSelection(tmMixColor);
+
+  if Sender = SE10 then
+    ScreenLevelEditor.SetFrameIndexOnSelection(SE10.Value);
 end;
 
 procedure TFrameToolLevelEditor.BRotate90CCWClick(Sender: TObject);
@@ -568,14 +578,16 @@ var recreateSurface: Boolean;
 begin
   if FWorkingChild = NIL then exit;
 
-  recreateSurface := aForceRecreateSurface or
-                     (FWorkingChild^.textureName <> CBToTextureName);
+  if FWorkingChild^.IsTextured then
+    recreateSurface := aForceRecreateSurface or
+                       (FWorkingChild^.textureName <> CBToTextureName);
 
   if recreateSurface then begin
     // create a new surface
     FWorkingChild^.KillSurface;
     FWorkingChild^.classtype := TSprite;
-    FWorkingChild^.textureName := CBToTextureName;
+    if FWorkingChild^.IsTextured then
+      FWorkingChild^.textureName := CBToTextureName;
     FWorkingChild^.layerindex := CBToLayerIndex;
 
     FWorkingChild^.width := SE3.Value;
@@ -604,6 +616,7 @@ begin
     Opacity.Value := SE8.Value;
     FlipH := CBFlipH.Checked;
     FlipV := CBFlipV.Checked;
+    Frame := SE10.Value;
     Tint.Value := ColorToBGRA(ColorButton1.ButtonColor, SE9.Value);
     if RadioButton1.Checked then TintMode := tmReplaceColor
       else TintMode := tmMixColor;
@@ -681,6 +694,7 @@ begin
 
   FrameTextureList.UpdateTextureWidgetState;
 
+  // retrieve the overlap value
   FSEOverlap.Value := Project.Config.LevelEditorOverlap;
 
   FInitializingWidget := False;
@@ -756,7 +770,20 @@ begin
     FWorkingChild := aSelected[0];
     with FWorkingChild^ do begin
       LayerIndexToCB(GetSurfaceLayerIndex);
-      TexturenameToCB(textureName);
+      if IsTextured then begin
+        CBTextures.Enabled := True;
+        TexturenameToCB(textureName);
+      end else begin
+        CBTextures.Enabled := False;
+        CBTextures.ItemIndex := -1;
+      end;
+      if HaveTextureWithMultipleFrame then begin
+        SE10.Value := Trunc(frameindex);
+        SE10.MaxValue := GetTextureFrameCount;
+      end else begin
+        SE10.Value := 1;
+        SE10.MaxValue := 1;
+      end;
       SE1.Value := surface.X.Value;
       SE2.Value := surface.Y.Value;
       SE3.Value := surface.Width;
@@ -818,6 +845,7 @@ begin
     CBFlipV.Checked := False;
     ColorButton1.ButtonColor := clBlack;
     SE9.Value := 0;
+    SE10.Value := 1;
     RadioButton1.Checked := True;
     BNewSurface.Enabled := True;
     Label8.Visible := False;

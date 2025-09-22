@@ -6,8 +6,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
   ClientHeight = 748
   ClientWidth = 296
   TabOrder = 0
-  DesignLeft = 498
-  DesignTop = 97
+  DesignLeft = 702
+  DesignTop = 15
   object PC1: TPageControl
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Panel8
@@ -48,18 +48,18 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 216
+          Height = 232
           Top = 96
           Width = 288
           Anchors = [akTop, akLeft, akRight]
-          ClientHeight = 216
+          ClientHeight = 232
           ClientWidth = 288
           ParentBackground = False
           TabOrder = 0
           object Label13: TLabel
             Left = 7
             Height = 15
-            Top = 32
+            Top = 24
             Width = 67
             BorderSpacing.Left = 10
             BorderSpacing.Top = 27
@@ -71,7 +71,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Control = SE1
             Left = 113
             Height = 15
-            Top = 9
+            Top = 1
             Width = 8
             Anchors = [akLeft, akBottom]
             BorderSpacing.Right = 5
@@ -87,7 +87,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Control = SE2
             Left = 191
             Height = 15
-            Top = 9
+            Top = 1
             Width = 7
             Anchors = [akLeft, akBottom]
             Caption = 'Y'
@@ -102,7 +102,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             Left = 51
             Height = 15
-            Top = 57
+            Top = 49
             Width = 23
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
@@ -115,7 +115,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             Left = 47
             Height = 15
-            Top = 82
+            Top = 74
             Width = 27
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
@@ -128,7 +128,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 84
             Height = 23
-            Top = 74
+            Top = 66
             Width = 58
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -146,7 +146,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrCenter
             Left = 161
             Height = 23
-            Top = 74
+            Top = 66
             Width = 58
             DecimalPlaces = 3
             Increment = 0.05
@@ -161,7 +161,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Side = asrBottom
             Left = 48
             Height = 15
-            Top = 107
+            Top = 99
             Width = 34
             BorderSpacing.Top = 10
             Caption = 'Angle:'
@@ -173,7 +173,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 92
             Height = 23
-            Top = 99
+            Top = 91
             Width = 58
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -193,7 +193,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             Left = 41
             Height = 15
-            Top = 132
+            Top = 124
             Width = 41
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
@@ -206,7 +206,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 92
             Height = 23
-            Top = 124
+            Top = 116
             Width = 58
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -224,7 +224,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 84
             Height = 23
-            Top = 24
+            Top = 16
             Width = 67
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -243,7 +243,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrCenter
             Left = 161
             Height = 23
-            Top = 24
+            Top = 16
             Width = 67
             BorderSpacing.Left = 10
             DecimalPlaces = 1
@@ -260,7 +260,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 161
             Height = 19
-            Top = 103
+            Top = 95
             Width = 46
             Anchors = [akLeft, akBottom]
             Caption = 'FlipH'
@@ -274,7 +274,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Side = asrBottom
             Left = 161
             Height = 19
-            Top = 122
+            Top = 114
             Width = 44
             Caption = 'FlipV'
             TabOrder = 7
@@ -286,7 +286,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             Left = 54
             Height = 15
-            Top = 184
+            Top = 176
             Width = 20
             Anchors = [akTop, akRight]
             Caption = 'Tint'
@@ -299,7 +299,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 209
             Height = 15
-            Top = 153
+            Top = 145
             Width = 29
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -314,7 +314,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 199
             Height = 19
-            Top = 171
+            Top = 163
             Width = 59
             BorderSpacing.Left = 15
             Caption = 'Replace'
@@ -329,7 +329,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Side = asrBottom
             Left = 199
             Height = 19
-            Top = 190
+            Top = 182
             Width = 38
             Caption = 'Mix'
             TabOrder = 8
@@ -340,7 +340,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 84
             Height = 31
-            Top = 168
+            Top = 160
             Width = 44
             Anchors = [akLeft, akBottom]
             BorderWidth = 2
@@ -357,7 +357,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 142
             Height = 15
-            Top = 153
+            Top = 145
             Width = 39
             Anchors = [akLeft, akBottom]
             BorderSpacing.Top = 15
@@ -372,7 +372,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrCenter
             Left = 138
             Height = 23
-            Top = 171
+            Top = 163
             Width = 46
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -388,7 +388,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Control = ColorButton1
             Left = 94
             Height = 15
-            Top = 153
+            Top = 145
             Width = 25
             Anchors = [akLeft, akBottom]
             Caption = 'color'
@@ -401,7 +401,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 84
             Height = 23
-            Top = 49
+            Top = 41
             Width = 58
             Anchors = [akLeft, akBottom]
             MaxValue = 100000
@@ -418,7 +418,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideBottom.Side = asrBottom
             Left = 161
             Height = 23
-            Top = 49
+            Top = 41
             Width = 58
             Anchors = [akLeft, akBottom]
             MaxValue = 100000
@@ -437,7 +437,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Left = 230
             Height = 19
             Hint = 'Set the texture size'
-            Top = 51
+            Top = 43
             Width = 35
             AutoSize = True
             BorderSpacing.Left = 11
@@ -460,24 +460,52 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             ParentFont = False
           end
           object BHelpSurfaces: TSpeedButton
-            AnchorSideTop.Control = Panel7
-            AnchorSideTop.Side = asrCenter
-            AnchorSideRight.Control = Panel7
+            AnchorSideTop.Control = Panel2
+            AnchorSideRight.Control = Panel2
             AnchorSideRight.Side = asrBottom
             Cursor = crHandPoint
-            Left = 264
+            Left = 260
             Height = 24
             Hint = 'Help'
-            Top = 9
+            Top = 4
             Width = 24
-            Anchors = [akTop]
+            Anchors = [akTop, akRight]
             BorderSpacing.Top = 3
             BorderSpacing.Right = 3
+            Flat = True
             Images = DataModule1.ImageList1
             ImageIndex = 15
             OnClick = BHelpSurfacesClick
             ShowHint = True
             ParentShowHint = False
+          end
+          object Label28: TLabel
+            AnchorSideRight.Control = Label1
+            AnchorSideRight.Side = asrBottom
+            Left = 38
+            Height = 15
+            Top = 208
+            Width = 36
+            Anchors = [akTop, akRight]
+            Caption = 'Frame:'
+          end
+          object SE10: TSpinEdit
+            AnchorSideLeft.Control = Label28
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label28
+            AnchorSideBottom.Side = asrBottom
+            Left = 84
+            Height = 23
+            Top = 200
+            Width = 58
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 10
+            MaxValue = 100000
+            MinValue = 1
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
+            TabOrder = 13
+            Value = 1
           end
         end
         object Panel3: TPanel
@@ -490,7 +518,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 0
           Height = 132
-          Top = 404
+          Top = 420
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 132
@@ -844,7 +872,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 358
+          Top = 374
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -988,7 +1016,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 312
+          Top = 328
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -1081,7 +1109,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 38
-          Top = 536
+          Top = 552
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           BevelOuter = bvNone
@@ -1187,6 +1215,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Anchors = [akTop]
           BorderSpacing.Top = 5
           BorderSpacing.Right = 5
+          Flat = True
           Images = DataModule1.ImageList1
           ImageIndex = 15
           OnClick = BHelpLayersClick
@@ -1412,6 +1441,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 5
           BorderSpacing.Right = 5
+          Flat = True
           Images = DataModule1.ImageList1
           ImageIndex = 15
           OnClick = BHelpWorldClick

@@ -1,13 +1,13 @@
 object FrameTextureList: TFrameTextureList
   Left = 0
-  Height = 491
+  Height = 531
   Top = 0
   Width = 292
-  ClientHeight = 491
+  ClientHeight = 531
   ClientWidth = 292
   TabOrder = 0
-  DesignLeft = 856
-  DesignTop = 250
+  DesignLeft = 851
+  DesignTop = 186
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -16,13 +16,13 @@ object FrameTextureList: TFrameTextureList
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 491
+    Height = 531
     Top = 0
     Width = 292
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelColor = 8388863
     BevelOuter = bvNone
-    ClientHeight = 491
+    ClientHeight = 531
     ClientWidth = 292
     Color = 8289918
     ParentBackground = False
@@ -34,14 +34,16 @@ object FrameTextureList: TFrameTextureList
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = BChooseImageFile
       Left = 2
-      Height = 216
+      Height = 241
       Top = 28
       Width = 288
-      Anchors = [akTop, akLeft, akRight]
+      Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Left = 2
       BorderSpacing.Top = 2
       BorderSpacing.Right = 2
+      BorderSpacing.Bottom = 5
       ItemHeight = 0
       TabOrder = 0
       OnMouseUp = LBTextureNamesMouseUp
@@ -66,10 +68,12 @@ object FrameTextureList: TFrameTextureList
     end
     object Label1: TLabel
       AnchorSideLeft.Control = Panel1
+      AnchorSideBottom.Control = Label2
       Left = 10
       Height = 15
-      Top = 264
+      Top = 285
       Width = 51
+      Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
       Caption = 'Filename:'
     end
@@ -82,7 +86,7 @@ object FrameTextureList: TFrameTextureList
       Left = 81
       Height = 26
       Hint = 'Choose an image file from the disk'
-      Top = 253
+      Top = 274
       Width = 26
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 20
@@ -98,11 +102,12 @@ object FrameTextureList: TFrameTextureList
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Label21
       Left = 10
       Height = 15
-      Top = 279
+      Top = 300
       Width = 272
-      Anchors = [akTop, akLeft, akRight]
+      Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Right = 10
       Caption = '---'
       WordWrap = True
@@ -110,23 +115,26 @@ object FrameTextureList: TFrameTextureList
     object Label5: TLabel
       AnchorSideRight.Control = Label6
       AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Label6
       Left = 14
       Height = 15
-      Top = 360
+      Top = 369
       Width = 35
-      Anchors = [akTop, akRight]
+      Anchors = [akRight, akBottom]
+      BorderSpacing.Bottom = 12
       Caption = 'Width:'
     end
     object Label6: TLabel
       AnchorSideLeft.Control = Panel1
-      AnchorSideTop.Control = Label5
       AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = CheckBox1
       Left = 10
       Height = 15
-      Top = 385
+      Top = 396
       Width = 39
+      Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
-      BorderSpacing.Top = 10
+      BorderSpacing.Bottom = 8
       Caption = 'Height:'
     end
     object BUpdateTexture: TSpeedButton
@@ -148,36 +156,15 @@ object FrameTextureList: TFrameTextureList
       ParentShowHint = False
     end
     object CheckBox1: TCheckBox
+      AnchorSideBottom.Control = Panel2
       Left = 8
       Height = 19
-      Top = 408
-      Width = 67
-      Caption = 'Is framed'
+      Top = 419
+      Width = 131
+      Anchors = [akLeft, akBottom]
+      Caption = 'Have multiple frames'
       TabOrder = 1
-    end
-    object Label7: TLabel
-      AnchorSideTop.Control = CheckBox1
-      AnchorSideTop.Side = asrBottom
-      Left = 18
-      Height = 15
-      Top = 432
-      Width = 64
-      BorderSpacing.Top = 5
-      Caption = 'frame width'
-      Enabled = False
-    end
-    object Label8: TLabel
-      AnchorSideRight.Control = Label7
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = SE12
-      AnchorSideBottom.Side = asrBottom
-      Left = 14
-      Height = 15
-      Top = 459
-      Width = 68
-      Anchors = [akRight, akBottom]
-      Caption = 'frame height'
-      Enabled = False
+      OnChange = CheckBox1Change
     end
     object SE9: TSpinEdit
       AnchorSideLeft.Control = Label5
@@ -186,7 +173,7 @@ object FrameTextureList: TFrameTextureList
       AnchorSideBottom.Side = asrBottom
       Left = 59
       Height = 23
-      Top = 352
+      Top = 361
       Width = 72
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -201,7 +188,7 @@ object FrameTextureList: TFrameTextureList
       AnchorSideBottom.Side = asrBottom
       Left = 59
       Height = 23
-      Top = 377
+      Top = 388
       Width = 72
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -209,55 +196,28 @@ object FrameTextureList: TFrameTextureList
       MinValue = -1
       TabOrder = 3
     end
-    object SE11: TSpinEdit
-      AnchorSideLeft.Control = Label7
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = CheckBox1
-      AnchorSideTop.Side = asrBottom
-      AnchorSideBottom.Side = asrBottom
-      Left = 87
-      Height = 23
-      Top = 427
-      Width = 72
-      BorderSpacing.Left = 5
-      Enabled = False
-      MaxValue = 10000
-      MinValue = -1
-      TabOrder = 4
-    end
-    object SE12: TSpinEdit
-      AnchorSideLeft.Control = SE11
-      AnchorSideTop.Control = SE11
-      AnchorSideTop.Side = asrBottom
-      AnchorSideBottom.Side = asrBottom
-      Left = 87
-      Height = 23
-      Top = 451
-      Width = 72
-      BorderSpacing.Top = 1
-      Enabled = False
-      MaxValue = 10000
-      MinValue = -1
-      TabOrder = 5
-    end
     object Label21: TLabel
       AnchorSideLeft.Control = Panel1
+      AnchorSideBottom.Control = Edit1
       Left = 10
       Height = 15
-      Top = 304
+      Top = 315
       Width = 77
+      Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
       Caption = 'Variable name:'
     end
     object Edit1: TEdit
       AnchorSideLeft.Control = Label21
-      AnchorSideTop.Control = Label21
       AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = SE9
       Left = 10
       Height = 23
-      Top = 319
+      Top = 330
       Width = 174
-      TabOrder = 6
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Bottom = 8
+      TabOrder = 4
     end
     object Panel7: TPanel
       AnchorSideLeft.Control = Panel1
@@ -275,13 +235,13 @@ object FrameTextureList: TFrameTextureList
       Color = 3158064
       ParentBackground = False
       ParentColor = False
-      TabOrder = 7
+      TabOrder = 5
       object BDeleteTexture: TSpeedButton
         AnchorSideTop.Control = Panel7
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = BTextureUndo
         Cursor = crHandPoint
-        Left = 132
+        Left = 148
         Height = 24
         Hint = 'Delete the selected texture'
         Top = 1
@@ -300,7 +260,7 @@ object FrameTextureList: TFrameTextureList
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = BTextureRedo
         Cursor = crHandPoint
-        Left = 171
+        Left = 187
         Height = 24
         Hint = 'Undo'
         Top = 1
@@ -320,7 +280,7 @@ object FrameTextureList: TFrameTextureList
         AnchorSideRight.Control = Panel7
         AnchorSideRight.Side = asrBottom
         Cursor = crHandPoint
-        Left = 200
+        Left = 216
         Height = 24
         Hint = 'Redo'
         Top = 1
@@ -357,7 +317,7 @@ object FrameTextureList: TFrameTextureList
         AnchorSideRight.Control = Panel7
         AnchorSideRight.Side = asrBottom
         Cursor = crHandPoint
-        Left = 248
+        Left = 264
         Height = 24
         Hint = 'Help'
         Top = 1
@@ -365,6 +325,7 @@ object FrameTextureList: TFrameTextureList
         Anchors = [akTop]
         BorderSpacing.Top = 3
         BorderSpacing.Right = 3
+        Flat = True
         Images = DataModule1.ImageList1
         ImageIndex = 15
         OnClick = BHelpClick
@@ -372,11 +333,139 @@ object FrameTextureList: TFrameTextureList
         ParentShowHint = False
       end
     end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = CheckBox1
+      AnchorSideTop.Control = CheckBox1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Panel1
+      AnchorSideBottom.Side = asrBottom
+      Left = 8
+      Height = 93
+      Top = 438
+      Width = 280
+      Anchors = [akLeft, akBottom]
+      BevelOuter = bvNone
+      ClientHeight = 93
+      ClientWidth = 280
+      Enabled = False
+      ParentBackground = False
+      TabOrder = 6
+      object Label7: TLabel
+        AnchorSideLeft.Control = Panel2
+        Left = 20
+        Height = 15
+        Top = 12
+        Width = 64
+        BorderSpacing.Left = 20
+        BorderSpacing.Top = 9
+        Caption = 'frame width'
+      end
+      object Label8: TLabel
+        AnchorSideRight.Control = Label7
+        AnchorSideRight.Side = asrBottom
+        AnchorSideBottom.Control = SE12
+        AnchorSideBottom.Side = asrBottom
+        Left = 16
+        Height = 15
+        Top = 36
+        Width = 68
+        Anchors = [akRight, akBottom]
+        Caption = 'frame height'
+      end
+      object SE11: TSpinEdit
+        AnchorSideLeft.Control = Label7
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = CheckBox1
+        AnchorSideTop.Side = asrBottom
+        AnchorSideBottom.Control = Label7
+        AnchorSideBottom.Side = asrBottom
+        Left = 89
+        Height = 23
+        Top = 4
+        Width = 67
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 5
+        MaxValue = 10000
+        OnChange = SE11Change
+        TabOrder = 0
+      end
+      object SE12: TSpinEdit
+        AnchorSideLeft.Control = SE11
+        AnchorSideTop.Control = SE11
+        AnchorSideTop.Side = asrBottom
+        AnchorSideBottom.Side = asrBottom
+        Left = 89
+        Height = 23
+        Top = 28
+        Width = 67
+        BorderSpacing.Top = 1
+        MaxValue = 10000
+        OnChange = SE11Change
+        TabOrder = 1
+      end
+      object Label3: TLabel
+        AnchorSideLeft.Control = SE11
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = SE11
+        AnchorSideTop.Side = asrCenter
+        Left = 157
+        Height = 15
+        Top = 8
+        Width = 107
+        BorderSpacing.Left = 1
+        Caption = '< value don''t match'
+        Color = 5855743
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+        Visible = False
+      end
+      object Label4: TLabel
+        AnchorSideLeft.Control = SE12
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = SE12
+        AnchorSideTop.Side = asrCenter
+        Left = 157
+        Height = 15
+        Top = 32
+        Width = 107
+        BorderSpacing.Left = 1
+        Caption = '< value don''t match'
+        Color = 5855743
+        ParentColor = False
+        ParentFont = False
+        Transparent = False
+        Visible = False
+      end
+      object Label9: TLabel
+        Left = 8
+        Height = 15
+        Top = 64
+        Width = 123
+        Caption = 'Frame count in texture:'
+      end
+      object SE13: TSpinEdit
+        AnchorSideLeft.Control = Label9
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label9
+        AnchorSideBottom.Side = asrBottom
+        Left = 136
+        Height = 23
+        Top = 56
+        Width = 51
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 5
+        MaxValue = 10000
+        MinValue = 2
+        TabOrder = 2
+        Value = 2
+      end
+    end
   end
   object OD1: TOpenDialog
     Title = 'Open image file'
     Filter = 'All files|*.*|Image files|*.svg;*.png;*.jpg;*.bmp'
     Left = 240
-    Top = 432
+    Top = 296
   end
 end

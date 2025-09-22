@@ -39,18 +39,18 @@ object FrameToolLevelBank: TFrameToolLevelBank
       ParentFont = False
     end
     object BHelp: TSpeedButton
+      AnchorSideLeft.Control = Panel8
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
-      AnchorSideRight.Control = Panel8
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 323
+      Left = 4
       Height = 24
       Hint = 'Help'
       Top = 4
       Width = 24
-      Anchors = [akTop, akRight]
-      BorderSpacing.Right = 5
+      BorderSpacing.Left = 3
+      Flat = True
       Images = DataModule1.ImageList1
       ImageIndex = 15
       OnClick = BHelpClick

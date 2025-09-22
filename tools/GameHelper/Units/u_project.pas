@@ -37,6 +37,8 @@ TProjectConfig = record
   LevelBankExportUnitName: string;
   // level editor
   LevelEditorOverlap: single;
+  // common
+  CommonShowFlyingTxt: boolean;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const data: string);
@@ -110,6 +112,8 @@ begin
   LevelBankExportUnitName := 'u_levels.pas';
 
   LevelEditorOverlap := 0.5;
+
+  CommonShowFlyingTxt := True;
 end;
 
 function TProjectConfig.SaveToString: string;
@@ -128,6 +132,8 @@ begin
   prop.Add('LevelBankExportUnitName', LevelBankExportUnitName);
   // level editor
   prop.Add('LevelEditorOverlap', LevelEditorOverlap);
+  // common
+  prop.Add('CommonShowFlyingTxt', CommonShowFlyingTxt);
 
   Result := prop.PackedProperty;
 end;
@@ -150,6 +156,8 @@ begin
   prop.StringValueOf('LevelBankExportUnitName', LevelBankExportUnitName, LevelBankExportUnitName);
   // level editor
   prop.SingleValueOf('LevelEditorOverlap', LevelEditorOverlap, 0.5);
+  // common
+  prop.BooleanValueOf('CommonShowFlyingTxt', CommonShowFlyingTxt, True);
 end;
 
 procedure TProjectConfig.SaveTo(t: TStringList);
@@ -238,7 +246,8 @@ procedure TProject.OnProjectReadyChange(aState: boolean);
 begin
   if IsReady then begin
     FrameToolsSpriteBuilder.FillListBoxTextureNames;
-    FormMain.ShowPageSpriteBank;
+    if LevelBank.Size > 0 then FormMain.ShowPageLevelBank
+      else FormMain.ShowPageSpriteBank;
   end else begin
   end;
 end;

@@ -12,6 +12,7 @@ uses
 
 // return the size of an png, jpg, bmp image
 function GetImageSize(const aFilename: string): TSize;
+function GetSVGImageSize(const aSVGFilename: string): TSize;
 
 function PPIScale(AValue: integer): integer;
 function PPIScaleF(AValue: single): single;
@@ -36,7 +37,7 @@ end;
 
 implementation
 
-uses u_common, Math;
+uses u_common, Math, BGRASVG;
 
 function GetImageSize(const aFilename: string): TSize;
 var ima: TBGRABitmap;
@@ -45,6 +46,15 @@ begin
   Result.cx := ima.Width;
   Result.cy := ima.Height;
   ima.Free;
+end;
+
+function GetSVGImageSize(const aSVGFilename: string): TSize;
+var svg: TBGRASVG;
+begin
+  svg := TBGRASVG.Create(aSVGFileName);
+  Result.cx := Round(svg.WidthAsPixel);
+  Result.cy := Round(svg.HeightAsPixel);
+  svg.Free;
 end;
 
 function PPIScale(AValue: integer): integer;

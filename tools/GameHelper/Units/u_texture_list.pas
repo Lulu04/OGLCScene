@@ -20,7 +20,7 @@ TTextureItem = record
   width, height: integer;
 
   isMultiFrame: boolean;
-  frameWidth, frameHeight: integer;
+  frameWidth, frameHeight, framecount: integer;
   procedure CreateTexture;
   procedure FreeTexture;
   function SaveToString: string;
@@ -38,15 +38,15 @@ TTextureList = class(specialize TVector<TTextureItem>)
 private
   FUndoRedoManager: TTextureUndoRedoManager;
   procedure DoUpdate(aItem: PTextureItem; const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
-                    aFrameWidth, aFrameHeight: integer);
+                    aFrameWidth, aFrameHeight, aFrameCount: integer);
 public
   constructor Create;
   destructor Destroy; override;
   procedure Clear; reintroduce;
   procedure Add(const aFilename, aName: string; aWidth, aHeight: integer; aIsFramed: boolean;
-                    aFrameWidth, aFrameHeight: integer);
+                    aFrameWidth, aFrameHeight, aFrameCount: integer);
   procedure Update(aItem: PTextureItem; const aFilename, aName: string; aWidth,
-    aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
+    aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight, aFrameCount: integer);
   function GetItemByFilename(const aFilename: string): PTextureItem;
   function GetItemByName(const aName: string): PTextureItem;
   function GetItemIndexByName(const aName: string): integer;
@@ -81,12 +81,11 @@ procedure TTextureItem.CreateTexture;
 begin
   case ExtractFileExt(filename) of
     '.svg': if not isMultiFrame then texture := FScene.TexMan.AddFromSVG(filename, width, height)
-             else raise exception.create('multi frame svg not yet implemented');
+             else texture := FScene.TexMan.AddMultiFrameImageFromSVG(filename, width, height, frameWidth, frameHeight);
 
     else if not isMultiFrame then texture := FScene.TexMan.Add(filename)
              else texture := FScene.TexMan.Add(filename, frameWidth, frameHeight);
   end;
-fscene.LogDebug('created texture "'+texture^.Filename+'" w='+texture^.FrameWidth.ToString+' h='+texture^.FrameHeight.ToString+' id='+texture^.ID.ToString);
 end;
 
 procedure TTextureItem.FreeTexture;
@@ -103,9 +102,12 @@ begin
   prop.Add('Name', name);
   prop.Add('Width', width);
   prop.Add('Height', height);
-  if isMultiFrame then prop.Add('IsMultiFrame', isMultiFrame);
-  if isMultiFrame then prop.Add('FrameWidth', frameWidth);
-  if isMultiFrame then prop.Add('FrameHeight', frameHeight);
+  if isMultiFrame then begin
+    prop.Add('IsMultiFrame', isMultiFrame);
+    prop.Add('FrameWidth', frameWidth);
+    prop.Add('FrameHeight', frameHeight);
+    prop.Add('FrameCount', framecount);
+  end;
   Result := prop.PackedProperty;
 end;
 
@@ -119,15 +121,16 @@ begin
   prop.IntegerValueOf('Width', width, width);
   prop.IntegerValueOf('Height', height, height);
   prop.BooleanValueOf('IsMultiFrame', isMultiFrame, False);
-  prop.IntegerValueOf('FrameWidth', frameWidth, frameWidth);
-  prop.IntegerValueOf('FrameHeight', frameHeight, frameHeight);
+  prop.IntegerValueOf('FrameWidth', frameWidth, 0);
+  prop.IntegerValueOf('FrameHeight', frameHeight, 0);
+  prop.IntegerValueOf('FrameCount', framecount, 0);
 end;
 
 { TTextureList }
 
 procedure TTextureList.DoUpdate(aItem: PTextureItem; const aFilename,
   aName: string; aWidth, aHeight: integer; aIsFramed: boolean; aFrameWidth,
-  aFrameHeight: integer);
+  aFrameHeight, aFrameCount: integer);
 begin
   aItem^.filename := aFilename;
   aItem^.name := aName;
@@ -136,6 +139,7 @@ begin
   aItem^.isMultiFrame := aIsFramed;
   aItem^.frameWidth := aFrameWidth;
   aItem^.frameHeight := aFrameHeight;
+  aItem^.framecount := aFrameCount;
   aItem^.CreateTexture;
 end;
 
@@ -165,29 +169,20 @@ begin
 end;
 
 procedure TTextureList.Add(const aFilename, aName: string; aWidth, aHeight: integer;
-  aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
+  aIsFramed: boolean; aFrameWidth, aFrameHeight, aFrameCount: integer);
 var o: TTextureItem;
 begin
-FScene.LogDebug('TTextureList.Add: BEFORE Textures.Size='+Size.tostring);
-
-  //o.InitDefault;
   o := Default(TTextureItem);
-  DoUpdate(@o, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight);
-{for i:=0 to Size-1 do
- FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name); }
+  DoUpdate(@o, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight, aFrameCount);
   PushBack(o);
-
-{FScene.LogDebug('TTextureList.Add: AFTER Textures.Size='+Size.tostring);
-for i:=0 to Size-1 do
- FScene.LogDebug('  Textures index '+i.tostring+' name='+mutable[i]^.name); }
 end;
 
 procedure TTextureList.Update(aItem: PTextureItem; const aFilename, aName: string; aWidth,
-  aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight: integer);
+  aHeight: integer; aIsFramed: boolean; aFrameWidth, aFrameHeight, aFrameCount: integer);
 begin
   if aItem^.texture <> NIL then
     FScene.TexMan.Delete(aItem^.texture);
-  DoUpdate(aItem, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight);
+  DoUpdate(aItem, aFilename, aName, aWidth, aHeight, aIsFramed, aFrameWidth, aFrameHeight, aFrameCount);
 end;
 
 function TTextureList.GetItemByFilename(const aFilename: string): PTextureItem;

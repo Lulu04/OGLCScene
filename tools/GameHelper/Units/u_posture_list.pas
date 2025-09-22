@@ -2,7 +2,7 @@ unit u_posture_list;
 
 {$mode ObjFPC}{$H+}
 {$modeswitch AdvancedRecords}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses

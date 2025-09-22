@@ -1,7 +1,7 @@
 unit form_projectconfig;
 
 {$mode ObjFPC}{$H+}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
@@ -13,10 +13,12 @@ type
   { TFormProjectConfig }
 
   TFormProjectConfig = class(TForm)
-    BLevelBank: TSpeedButton;
+    BEditors: TSpeedButton;
     BRenameLayer: TSpeedButton;
     BDeleteLayer: TSpeedButton;
+    CheckBox1: TCheckBox;
     Label1: TLabel;
+    Label10: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -24,8 +26,9 @@ type
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     Notebook1: TNotebook;
-    PageLevelBank: TPage;
+    PageEditors: TPage;
     PageLayers: TPage;
     PageScene: TPage;
     Panel1: TPanel;
@@ -84,7 +87,7 @@ begin
   NoteBookManager.SetDeactivatedColors(clBtnShadow, clBlack);
   NoteBookManager.LinkButtonToPage(BScene, PageScene);
   NoteBookManager.LinkButtonToPage(BLayers, PageLayers);
-  NoteBookManager.LinkButtonToPage(BLevelBank, PageLevelBank);
+  NoteBookManager.LinkButtonToPage(BEditors, PageEditors);
   NoteBookManager.ActivePage(PageScene);
   NoteBookManager.OnSelectionChange := @ProcessNoteBookPageSelection;
 
@@ -126,8 +129,9 @@ begin
   RBMaximizeSceneSize.Checked := Project.Config.MaximizeScene;
   // layers
   FrameViewLayerList.Fill;
-  // level bank
+  // level editor
   Label4.Caption := LevelBank.Size.ToString;
+  CheckBox1.Checked := Project.Config.CommonShowFlyingTxt;
 
   FInitializingWidget := False;
 end;
@@ -141,6 +145,9 @@ begin
 
   // layers
   FrameViewLayerList.SaveLayerConfigToLayerList;
+
+  // level editor
+  Project.Config.CommonShowFlyingTxt := CheckBox1.Checked;
 end;
 
 procedure TFormProjectConfig.BOkClick(Sender: TObject);

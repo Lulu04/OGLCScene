@@ -78,6 +78,7 @@ public
   procedure SetOriginalSizeOnSelection;
   procedure SetFlipHOnSelection(aValue: boolean);
   procedure SetFlipVOnSelection(aValue: boolean);
+  procedure SetFrameIndexOnSelection(aValue: integer);
   procedure SetOpacityOnSelection(aValue: single);
   procedure SetTintOnSelection(aValue: TBGRAPixel);
   procedure SetTintModeOnSelection(aValue: TTintMode);
@@ -702,6 +703,7 @@ begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.surface.FlipH := aValue;
+  SetFlagModified;
 end;
 
 procedure TScreenLevelEditor.SetFlipVOnSelection(aValue: boolean);
@@ -710,6 +712,18 @@ begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.surface.FlipV := aValue;
+  SetFlagModified;
+end;
+
+procedure TScreenLevelEditor.SetFrameIndexOnSelection(aValue: integer);
+var i: integer;
+begin
+  if Length(FSelected) = 0 then exit;
+  for i:=0 to High(FSelected) do begin
+    FSelected[i]^.surface.Frame := aValue;
+    FSelected[i]^.frameindex := aValue;
+  end;
+  SetFlagModified;
 end;
 
 procedure TScreenLevelEditor.SetOpacityOnSelection(aValue: single);
@@ -718,6 +732,7 @@ begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.surface.Opacity.Value := aValue;
+  SetFlagModified;
 end;
 
 procedure TScreenLevelEditor.SetTintOnSelection(aValue: TBGRAPixel);
@@ -725,7 +740,8 @@ var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
-    FSelected[i]^.surface.Tint.Value := aValue
+    FSelected[i]^.surface.Tint.Value := aValue;
+  SetFlagModified;
 end;
 
 procedure TScreenLevelEditor.SetTintModeOnSelection(aValue: TTintMode);
@@ -734,6 +750,7 @@ begin
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.surface.TintMode := aValue;
+  SetFlagModified;
 end;
 
 procedure TScreenLevelEditor.SetFlagModified;
