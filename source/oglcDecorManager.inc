@@ -6,7 +6,7 @@ type
 TOGLCDecorItem = record
   texture: PTexture;
   x, y, w, h, pivotX, pivotY, angle, opacity: single;
-  flipIndex: integer;
+  flipIndex, frameindex: integer;
   computedtint: TColorF;
   // return the layer index
   function LoadFromString(aAtlas: TAtlas; const s: string): integer;
@@ -95,6 +95,8 @@ begin
   prop.BGRAPixelValueOf('T', c, BGRA(0, 0, 0, 0));
   prop.IntegerValueOf('M', tm, Ord(tmReplaceColor));
   computedtint.InitFromTint(TTintMode(tm), c);
+
+  prop.SingleValueOf('I', frameindex, 1.0);
 end;
 
 { TOGLCDecorList }
@@ -117,6 +119,7 @@ end;
 procedure TOGLCDecorList.Draw(const aLayerPercentOpacity: single);
 var i: SizeUInt;
   modelArea: TQuadCoor;
+  fi: integer;
 begin
   if FItems.Size = 0 then exit;
 
@@ -133,9 +136,11 @@ begin
       FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
       FParentScene.ModelViewMatrix.AddTransform(x, y, 1.0, 1.0,
                            angle, w*pivotX, h*pivotY);
+      // frame index
+      fi := EnsureRange(Trunc(Frame), 0, High(FTexture^.FramesCoord));
       // render the quad
       FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
-      FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[0], flipIndex,
+      FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
                                                         NIL, FComputedOpacity, computedtint);
 
       // restore matrix
