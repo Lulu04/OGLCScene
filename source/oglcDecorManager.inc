@@ -72,6 +72,7 @@ var prop: TProperties;
   texName: string;
   c: TBGRAPixel;
   tm: integer;
+  v: single;
 begin
   Result := 0;
   Self := Default(TOGLCDecorItem);
@@ -92,11 +93,14 @@ begin
   opacity := opacity * OneDiv255;
   prop.IntegerValueOf('F', flipIndex, 0);
 
-  prop.BGRAPixelValueOf('T', c, BGRA(0, 0, 0, 0));
+  c := BGRA(0, 0, 0, 0);
+  prop.BGRAPixelValueOf('T', c, c);
   prop.IntegerValueOf('M', tm, Ord(tmReplaceColor));
   computedtint.InitFromTint(TTintMode(tm), c);
 
-  prop.SingleValueOf('I', frameindex, 1.0);
+  v := 1.0;
+  prop.SingleValueOf('I', v, v);
+  frameindex := Trunc(v);
 end;
 
 { TOGLCDecorList }
@@ -137,7 +141,7 @@ begin
       FParentScene.ModelViewMatrix.AddTransform(x, y, 1.0, 1.0,
                            angle, w*pivotX, h*pivotY);
       // frame index
-      fi := EnsureRange(Trunc(Frame), 0, High(FTexture^.FramesCoord));
+      fi := EnsureRange(frameindex, 0, High(texture^.FramesCoord));
       // render the quad
       FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
       FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
