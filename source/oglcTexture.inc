@@ -84,6 +84,9 @@ public
   // Or you can set aWidth=-1 to force TextureManager to calculates the right width to conserve aspect ratio.
   // Both aWidth and aHeight can not be equal to -1.
   function AddFromSVG(const aSVGFilename: string; aWidth, aHeight: integer): PTexture; overload;
+  // Create a texture from a svg file that contain an image with multiple frames.
+  function AddMultiFrameImageFromSVG(const aSVGFilename: string; aWidth, aHeight, AFrameWidth, AFrameHeight: integer): PTexture; overload;
+
   function TextToTexture(aCaption: string; const aFont: TFontDescriptor; aFillTexture: TBGRABitmap=NIL): PTexture;
 
 
@@ -489,6 +492,21 @@ begin
   try
     ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
     Result := Add(ima);
+    Result^.Filename := ExtractFilename(aSVGFilename);
+    ima.Free;
+  except
+    raise Exception.Create('Texture manager can''t create texture from SVG file '+aSVGFilename );
+    Result := NIL;
+  end;
+end;
+
+function TTextureManager.AddMultiFrameImageFromSVG(const aSVGFilename: string;
+  aWidth, aHeight, AFrameWidth, AFrameHeight: integer): PTexture;
+var ima: TBGRABitmap;
+begin
+  try
+    ima := LoadBitmapFromSVG(aSVGFilename, aWidth, aHeight);
+    Result := Add(ima, AFrameWidth, AFrameHeight);
     Result^.Filename := ExtractFilename(aSVGFilename);
     ima.Free;
   except
