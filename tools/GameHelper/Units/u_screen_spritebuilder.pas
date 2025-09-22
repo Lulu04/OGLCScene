@@ -26,7 +26,7 @@ TScreenSpriteBuilder = class(TScreenWithSurfaceHandling)
 private
   FTextures: TTextureList;
   FSurfaces: TSpriteBuilderSurfaceList;
-protected
+public
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure AddOffsetCoordinateToSelection(aOffset: TPointF); override;

@@ -1,13 +1,21 @@
 unit u_screen_template;
 
 {$mode ObjFPC}{$H+}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
   OGLCScene, u_surface_list, u_ui_handle;
+
+// message to user
+resourcestring
+// errors
+sCantMoveSurfacesBecauseSameLayer='Can''t move surfaces because they aren''t on the same layer';
+// hints
+sAligned='Aligned';
+sDuplicated='duplicated';
 
 type
 
@@ -110,6 +118,7 @@ public // mouse and keyboard interaction on view
 public // hint
   procedure ShowHintTextAtMousepos(const aTxt: string);
   procedure ShowHintText(aX, aY: single; const aTxt: string);
+  procedure ShowErrorText(const aTxt: string);
 end;
 
 
@@ -166,6 +175,7 @@ public
   procedure DuplicateSelectionToTheBottom; virtual;
 public // hint
   procedure ShowHintTextOnSelected(const aTxt: string);
+  procedure ShowHintTextOnFirstSelected(const aTxt: string);
 public // align
   function GetFirstSelectedX: single;
   function GetFirstSelectedCenterX: single;
@@ -218,7 +228,7 @@ end;
 
 implementation
 uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main, u_utils,
-  u_layerlist;
+  u_layerlist, u_project;
 
 { TCustomScreenTemplate }
 
@@ -420,6 +430,7 @@ end;
 procedure TCustomScreenTemplate.ShowHintTextAtMousepos(const aTxt: string);
 var p: TPoint;
 begin
+  if not Project.Config.CommonShowFlyingTxt then exit;
   p := FScene.Mouse.Position;
   ShowHintText(p.x, p.y, aTxt);
 end;
@@ -428,6 +439,7 @@ procedure TCustomScreenTemplate.ShowHintText(aX, aY: single; const aTxt: string)
 var o : TFreeText;
   rx, ry, time: single;
 begin
+  if not Project.Config.CommonShowFlyingTxt then exit;
   o := TFreeText.Create(FScene);
   o.TexturedFont := FHintFont;
   o.Caption := aTxt;
@@ -443,6 +455,28 @@ begin
     else ry := 100;
   o.MoveRelative(rx, ry, time, idcSinusoid);
   o.KillDefered(time);
+end;
+
+procedure TCustomScreenTemplate.ShowErrorText(const aTxt: string);
+var textArea: TUITextArea;
+begin
+  textArea := TUITextArea.Create(FScene);
+  FScene.Add(textArea, LAYER_TOP);
+  textArea.VScrollBarMode := sbmNeverShow;
+  textArea.HScrollBarMode := sbmNeverShow;
+  textArea.BodyShape.SetShapeRoundRect(FScene.Width div 3, FScene.Height div 3, PPIScale(8), PPIScale(8), 2.0);
+  textArea.BodyShape.Fill.Color := BGRA(0,0,0);
+  textArea.Text.TexturedFont := FErrorFont;
+  textArea.Text.Align := taTopCenter;
+  textArea.Text.Tint.Value := BGRA(0,0,0,0);
+  textArea.Text.Caption := aTxt;
+  textArea.BodyShape.ResizeCurrentShape(textArea.Text.DrawingSize.cx+PPIScale(20),
+                                        textArea.Text.DrawingSize.cy+PPIScale(20), True);
+  textArea.CenterOnScene;
+  textArea.AddAndPlayScenario('Wait 2.0'#10+
+                              'OpacityChange 0 2.0 idcLinear'#10+
+                              'Wait 2.0'#10+
+                              'Kill');
 end;
 
 { TScreenWithSurfaceHandling }
@@ -892,10 +926,10 @@ procedure TScreenWithSurfaceHandling.DuplicateSelection;
 var A: ArrayOfPSurfaceDescriptor;
 begin
   if Length(FSelected) = 0 then exit;
-  ShowHintTextOnSelected('duplicated');
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateItemsByID(A));
+  ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheLeft;
@@ -906,6 +940,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 1.0, 0.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
+  ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheRight;
@@ -916,6 +951,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 1.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
+  ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheTop;
@@ -926,6 +962,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 1.0, 0.0, FrameToolLevelEditor.OverlapValue));
+  ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheBottom;
@@ -936,18 +973,30 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 0.0, 1.0, FrameToolLevelEditor.OverlapValue));
+  ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.ShowHintTextOnSelected(const aTxt: string);
 var i: integer;
   p: TPointF;
 begin
+  if not Project.Config.CommonShowFlyingTxt then exit;
   if Length(FSelected) = 0 then exit;
   for i:=0 to High(FSelected) do begin
     with FSelected[i]^.surface do
       p := SurfaceToScene(PointF(Width*0.5, Height*0.5));
     ShowHintText(p.x, p.y, aTxt);
   end;
+end;
+
+procedure TScreenWithSurfaceHandling.ShowHintTextOnFirstSelected(const aTxt: string);
+var p: TPointF;
+begin
+  if not Project.Config.CommonShowFlyingTxt then exit;
+  if Length(FSelected) = 0 then exit;
+  with FSelected[0]^.surface do
+    p := SurfaceToScene(PointF(Width*0.5, Height*0.5));
+  ShowHintText(p.x, p.y, aTxt);
 end;
 
 function TScreenWithSurfaceHandling.GetFirstSelectedX: single;
@@ -986,6 +1035,7 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.X.Value := aX;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.AlignSelectedHCenterTo(aX: single);
@@ -994,6 +1044,7 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.CenterX := aX;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.AlignSelectedRightTo(aX: single);
@@ -1002,6 +1053,7 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.RightX := aX;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.AlignSelectedTopTo(aY: single);
@@ -1010,6 +1062,7 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.Y.Value := aY;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.AlignSelectedVCenterTo(aY: single);
@@ -1018,6 +1071,7 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.CenterY := aY;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.AlignSelectedBottomTo(aY: single);
@@ -1026,11 +1080,12 @@ begin
   for i:=1 to High(FSelected) do
     FSelected[i]^.surface.BottomY := aY;
   UpdateHandlePositionOnSelected;
+  ShowHintTextOnSelected(sAligned);
 end;
 
 procedure TScreenWithSurfaceHandling.DistributeSelectionHorizontalyWithSameSpacing;
 var i: integer;
-  xmin, xmax, delta, xx: single;
+  xmin, xmax, delta: single;
   A: ArrayOfPSurfaceDescriptor;
 begin
   if Length(FSelected) < 3 then exit;
@@ -1046,6 +1101,7 @@ begin
 
   UpdateHandlePositionOnSelected;
   SetFlagModified;
+  ShowHintTextOnSelected('Distributed');
 end;
 
 procedure TScreenWithSurfaceHandling.DistributeSelectionVerticalyWithSameSpacing;
@@ -1066,6 +1122,7 @@ begin
 
   UpdateHandlePositionOnSelected;
   SetFlagModified;
+  ShowHintTextOnSelected('Distributed');
 end;
 
 procedure TScreenWithSurfaceHandling.RotateSelectedCCW;
@@ -1093,7 +1150,8 @@ begin
       SetCenterCoordinate(centerXRect + xx * c + yy * s, centerYRect - xx * s  + c * yy);
     end;
 
-  UpdateHandlePositionOnSelected
+  UpdateHandlePositionOnSelected;
+  ShowHintTextOnFirstSelected('Selection rotated 90°CCW');
 end;
 
 procedure TScreenWithSurfaceHandling.RotateSelectedCW;
@@ -1115,7 +1173,8 @@ begin
       sincos(-90 * deg2rad, s, c);
       SetCenterCoordinate(centerXRect + xx * c + yy * s, centerYRect - xx * s  + c * yy);
     end;
-  UpdateHandlePositionOnSelected
+  UpdateHandlePositionOnSelected;
+  ShowHintTextOnFirstSelected('Selection rotated 90°CW');
 end;
 
 procedure TScreenWithSurfaceHandling.MirrorSelectedH;
@@ -1140,7 +1199,8 @@ begin
       FlipH := not FlipH;
       RightX := r.Left + xRectCenter - X.Value + halfWidthRect;
     end;
-  UpdateHandlePositionOnSelected
+  UpdateHandlePositionOnSelected;
+  ShowHintTextOnFirstSelected('Selection mirrored horizontally');
 end;
 
 procedure TScreenWithSurfaceHandling.MirrorSelectedV;
@@ -1165,7 +1225,8 @@ begin
       FlipV := not FlipV;
       BottomY := r.Top + yRectCenter - Y.Value + halfHeightRect;
     end;
-  UpdateHandlePositionOnSelected
+  UpdateHandlePositionOnSelected;
+  ShowHintTextOnFirstSelected('Selection mirrored vertically');
 end;
 
 function TScreenWithSurfaceHandling.GetLayerindexesInSelection: TArrayOfInteger;
@@ -1217,7 +1278,10 @@ var indexesInLayer, indexesInList, ids: TArrayOfInteger;
 begin
   if Length(FSelected) = 0 then exit;
   if Length(FSelected) = Surfaces.Size then exit;
-  if not SelectedAreOnTheSameLayer then exit;
+  if not SelectedAreOnTheSameLayer then begin
+    ShowErrorText(sCantMoveSurfacesBecauseSameLayer);
+    exit;
+  end;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
@@ -1260,7 +1324,10 @@ var indexesInLayer, indexesInList, allIndexesInList, ids: TArrayOfInteger;
 begin
   if Length(FSelected) = 0 then exit;
   if Length(FSelected) = Surfaces.Size then exit;
-  if not SelectedAreOnTheSameLayer then exit;
+  if not SelectedAreOnTheSameLayer then begin
+    ShowErrorText(sCantMoveSurfacesBecauseSameLayer);
+    exit;
+  end;
   layer := FSelected[0]^.surface.ParentLayer;
   if layer = NIL then exit;
 
@@ -1315,7 +1382,10 @@ var indexesInLayer, indexesInList, allIndexesInList, ids: TArrayOfInteger;
 begin
   if Length(FSelected) = 0 then exit;
   if Length(FSelected) = Surfaces.Size then exit;
-  if not SelectedAreOnTheSameLayer then exit;
+  if not SelectedAreOnTheSameLayer then begin
+    ShowErrorText(sCantMoveSurfacesBecauseSameLayer);
+    exit;
+  end;
   layer := FSelected[0]^.surface.ParentLayer;
   if layer = NIL then exit;
 
@@ -1404,7 +1474,10 @@ var indexesInLayer, indexesInList, ids: TArrayOfInteger;
 begin
   if Length(FSelected) = 0 then exit;
   if Length(FSelected) = Surfaces.Size then exit;
-  if not SelectedAreOnTheSameLayer then exit;
+  if not SelectedAreOnTheSameLayer then begin
+    ShowErrorText(sCantMoveSurfacesBecauseSameLayer);
+    exit;
+  end;
 
   // save the selected IDs
   ids := Surfaces.ItemsDescriptorToArrayOfID(FSelected);
@@ -1461,6 +1534,7 @@ begin
     FSelected[i]^.surface.MoveToLayer(aLayerIndex);
     FSelected[i]^.layerindex := aLayerIndex;
   end;
+  ShowHintTextOnSelected('moved to '+Layers.Names[aLayerIndex-APP_LAYER_COUNT]);
   SetFlagModified;
 end;
 

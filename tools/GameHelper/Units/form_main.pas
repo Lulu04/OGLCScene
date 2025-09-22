@@ -274,7 +274,10 @@ begin
   FAtlas.Spacing := 1;
 
   fd.Create('Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
-  FHintFont:= FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
+  FHintFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
+
+  fd.Create('Arial', 16, [], BGRA(255,155,155), BGRA(0,0,0,200), 3);
+  FErrorFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
   FAtlas.TryToPack;
   FAtlas.Build;
@@ -315,7 +318,8 @@ begin
   if AppPref.LastProjectFilename <> ''
     then Project.Load(AppPref.LastProjectFilename);
 
-  ShowPageSpriteBank;
+  if LevelBank.Size > 0 then ShowPageLevelBank
+    else ShowPageSpriteBank;
 end;
 
 procedure TFormMain.FreeCommonData;

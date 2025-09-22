@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 0
+    PageIndex = 2
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage
@@ -49,7 +49,7 @@ object FormProjectConfig: TFormProjectConfig
           ParentFont = False
         end
         object Label6: TLabel
-          Left = 84
+          Left = 40
           Height = 15
           Top = 40
           Width = 64
@@ -61,7 +61,7 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label6
           AnchorSideBottom.Side = asrBottom
-          Left = 158
+          Left = 114
           Height = 23
           Top = 32
           Width = 91
@@ -76,7 +76,7 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Label6
           AnchorSideRight.Side = asrBottom
-          Left = 80
+          Left = 36
           Height = 15
           Top = 70
           Width = 68
@@ -89,7 +89,7 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label7
           AnchorSideBottom.Side = asrBottom
-          Left = 158
+          Left = 114
           Height = 23
           Top = 62
           Width = 91
@@ -100,7 +100,7 @@ object FormProjectConfig: TFormProjectConfig
           Value = 768
         end
         object RadioButton1: TRadioButton
-          Left = 80
+          Left = 40
           Height = 19
           Top = 160
           Width = 68
@@ -108,7 +108,7 @@ object FormProjectConfig: TFormProjectConfig
           TabOrder = 2
         end
         object RBMaximizeSceneSize: TRadioButton
-          Left = 80
+          Left = 40
           Height = 19
           Top = 136
           Width = 209
@@ -204,7 +204,7 @@ object FormProjectConfig: TFormProjectConfig
         end
       end
     end
-    object PageLevelBank: TPage
+    object PageEditors: TPage
       object Panel6: TPanel
         Left = 0
         Height = 336
@@ -219,9 +219,9 @@ object FormProjectConfig: TFormProjectConfig
         ParentColor = False
         TabOrder = 0
         object Label3: TLabel
-          Left = 56
+          Left = 32
           Height = 15
-          Top = 64
+          Top = 216
           Width = 109
           Caption = 'This project contains'
         end
@@ -229,9 +229,9 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideLeft.Control = Label3
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = Label3
-          Left = 168
+          Left = 144
           Height = 15
-          Top = 64
+          Top = 216
           Width = 34
           BorderSpacing.Left = 3
           Caption = 'Label4'
@@ -240,26 +240,58 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideLeft.Control = Label4
           AnchorSideLeft.Side = asrBottom
           AnchorSideTop.Control = Label3
-          Left = 205
+          Left = 181
           Height = 15
-          Top = 64
+          Top = 216
           Width = 37
           BorderSpacing.Left = 3
           Caption = 'level(s)'
         end
         object BEraseLevelBank: TSpeedButton
           Cursor = crHandPoint
-          Left = 96
-          Height = 43
+          Left = 32
+          Height = 28
           Hint = 'Erase all levels defined in this project, and the associated textures.'#13#10'The textures used for the Sprite Bank are not affected.'
-          Top = 104
-          Width = 202
+          Top = 232
+          Width = 174
+          AutoSize = True
           Caption = 'Erase all levels and textures'
           Images = DataModule1.ImageList1
           ImageIndex = 5
           OnClick = BEraseLevelBankClick
           ShowHint = True
           ParentShowHint = False
+        end
+        object CheckBox1: TCheckBox
+          Left = 32
+          Height = 19
+          Top = 32
+          Width = 139
+          Caption = 'Show flying action text'
+          Checked = True
+          State = cbChecked
+          TabOrder = 0
+          OnChange = SE1Change
+        end
+        object Label9: TLabel
+          Left = 16
+          Height = 15
+          Top = 200
+          Width = 84
+          Caption = '- Game levels -'
+          Font.Color = clWhite
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label10: TLabel
+          Left = 16
+          Height = 15
+          Top = 16
+          Width = 44
+          Caption = '- Infos -'
+          Font.Color = clWhite
+          Font.Style = [fsBold]
+          ParentFont = False
         end
       end
     end
@@ -355,7 +387,7 @@ object FormProjectConfig: TFormProjectConfig
       Flat = True
       Transparent = False
     end
-    object BLevelBank: TSpeedButton
+    object BEditors: TSpeedButton
       AnchorSideLeft.Control = Panel2
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
@@ -367,7 +399,7 @@ object FormProjectConfig: TFormProjectConfig
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 2
       BorderSpacing.Right = 2
-      Caption = 'Level Editor'
+      Caption = 'Editors'
       Flat = True
       Transparent = False
     end

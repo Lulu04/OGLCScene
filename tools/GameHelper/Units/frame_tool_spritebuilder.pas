@@ -1,7 +1,7 @@
 unit frame_tool_spritebuilder;
 
 {$mode ObjFPC}{$H+}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
@@ -48,6 +48,7 @@ type
     Edit5: TEdit;
     FSE2: TFloatSpinEdit;
     FSE1: TFloatSpinEdit;
+    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -58,6 +59,7 @@ type
     Label17: TLabel;
     Label18: TLabel;
     Label19: TLabel;
+    Label2: TLabel;
     Label20: TLabel;
     Label22: TLabel;
     Label23: TLabel;
@@ -90,7 +92,6 @@ type
     SE6: TFloatSpinEdit;
     SE7: TFloatSpinEdit;
     SE8: TSpinEdit;
-    BNew: TSpeedButton;
     PageCollisionBody: TTabSheet;
     BLine: TSpeedButton;
     BSelect: TSpeedButton;
@@ -101,6 +102,7 @@ type
     BReverseAngle: TSpeedButton;
     BResetPos: TSpeedButton;
     SEDummy: TSpinEdit;
+    SE9: TSpinEdit;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
@@ -110,7 +112,6 @@ type
     procedure BHelpRootChildsClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
-    procedure BNewClick(Sender: TObject);
     procedure CBParentDrawItem({%H-}Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
@@ -211,13 +212,6 @@ begin
     if DoAddNewChild then
       ShowSelectionData(NIL);
   end;
-end;
-
-procedure TFrameToolsSpriteBuilder.BNewClick(Sender: TObject);
-begin
-  if QuestionDlg('Warning', 'if you continue, the modification will be lost',
-             mtWarning, [mrOk, 'Continue', mrCancel, 'Cancel'], 0) = mrCancel then exit;
-  DoClearAll;
 end;
 
 procedure TFrameToolsSpriteBuilder.BAddToSpriteBankClick(Sender: TObject);
@@ -497,10 +491,16 @@ begin
   if FInitializingWidget then exit;
 
   if Sender = CBTextures then begin
-    if Edit5.Text = '' then begin
-      texItem := Textures.GetItemByName(CBTextures.Text);
+    texItem := Textures.GetItemByName(CBTextures.Text);
+    if Edit5.Text = '' then
       if texItem <> NIL then
         Edit5.Text := ChangeFileExt(ExtractFilename(texItem^.filename), '');
+
+    if texItem <> NIL then begin
+      Label2.Visible := texItem^.isMultiFrame;
+      SE9.Visible := Label2.Visible;
+      SE9.MaxValue := texItem^.framecount;
+      SE9.MinValue := 1;
     end;
   end;
 
@@ -514,7 +514,8 @@ begin
                    (Pivot.x <> SE3.Value) or (Pivot.y <> SE4.Value) or
                    (Scale.x.Value <> SE5.Value) or (Scale.y.Value <> SE6.Value) or
                    (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value) or
-                   (FlipH <> CBFlipH.Checked) or (FlipV <> CBFlipV.Checked);
+                   (FlipH <> CBFlipH.Checked) or (FlipV <> CBFlipV.Checked) or
+                   (FWorkingChild^.IsTextured and (Trunc(Frame) <> SE9.Value));
     if chang then begin
       DoUpdateChild(False);
       FModified := True;
@@ -678,7 +679,7 @@ begin
   Result := False;
   if not CheckChildWidgets then exit;
   if Surfaces.NameExists(Trim(Edit5.Text)) then begin
-    ShowMessage('Duplicate name "'+Trim(Edit5.Text)+'"');
+    ShowMessage('Name already exists "'+Trim(Edit5.Text)+'"');
     exit;
   end;
 
@@ -894,6 +895,13 @@ begin
     SetZOrder(SE8.Value);
     FlipH := CBFlipH.Checked;
     FlipV := CBFlipV.Checked;
+    if FWorkingChild^.IsTextured then begin
+      FWorkingChild^.frameindex := SE9.Value;
+      Frame := SE9.Value;
+    end else begin
+      FWorkingChild^.frameindex := 1;
+      Frame := 1;
+    end;
   end;
   FWorkingChild^.UpdateHandlePosition;
 end;
@@ -981,6 +989,12 @@ begin
 end;
 
 procedure TFrameToolsSpriteBuilder.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
+var tex: PTexture;
+  procedure ShowFrameIndexWidget(AValue: boolean);
+  begin
+    Label2.Visible := AValue;
+    SE9.Visible := AValue;
+  end;
 begin
   FInitializingWidget := True;
   FWorkingChild := NIL;
@@ -1005,6 +1019,14 @@ begin
       SE8.Value := surface.ZOrderAsChild;
       CBFlipH.Checked := surface.FlipH;
       CBFlipV.Checked := surface.FlipV;
+      if IsTextured then begin
+        tex := GetTextureFromTextureName;
+        if tex <> NIL then begin
+          ShowFrameIndexWidget(tex^.FrameCount > 1);
+          SE9.Value := Trunc(surface.Frame);
+          SE9.MaxValue := tex^.FrameCount-1;
+        end else ShowFrameIndexWidget(False);
+      end else ShowFrameIndexWidget(False);
     end;
     CBChildType.Enabled := True;
     CBTextures.Enabled := True;
@@ -1045,6 +1067,7 @@ begin
     CBFlipH.Checked := False;
     CBFlipV.Checked := False;
     BNewChild.Enabled := True;
+    ShowFrameIndexWidget(False);
   end;
 
   FInitializingWidget := False;

@@ -870,11 +870,7 @@ end;
 procedure TBodyItemList.CreateItemByDescriptor(const aDescriptor: TOGLCBodyItem; aId: integer);
 var o: TBodyItem;
   i: integer;
-debug: PBodyItem;
 begin
-//FScene.LogDebug('TBodyItemList.CreateItemByDescriptor');
-//FScene.LogDebug('BEFORE creation size = '+Size.tostring);
-//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
   o.InitDefault;
   o.ID := aID;
   o.ItemDescriptor.BodyType := aDescriptor.BodyType;
@@ -900,10 +896,6 @@ begin
     else raise exception.Create('forgot to implement!');
   end;//case
   PushBack(o);
-//debug:=mutable[size-1];
-//FScene.LogDebug('TBodyItemList.CreateItemByDescriptor: item created at index '+(size-1).tostring+' with Pts length='+Length(debug^.Pts).tostring);
-//FScene.LogDebug('AFTER creation size = '+Size.tostring);
-//for i:=0 to Size-1 do FScene.LogDebug('    item at index '+i.tostring+' have pts length='+Length(mutable[i]^.Pts).tostring);
 end;
 
 procedure TBodyItemList.ReplaceNodes(const aDescriptor: TOGLCBodyItem; aId: integer);

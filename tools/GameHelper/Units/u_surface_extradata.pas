@@ -15,6 +15,7 @@ type
 // for TSprite, TSpriteWithElasticCorner, TTiledSprite, TScrollableSprite
 TSpriteExtra = record
   TextureName: string;   // the filename+extension without path
+  Frameindex: single;
   procedure SaveTo(const prop: TProperties);
   procedure LoadFrom(const prop: TProperties);
 end;

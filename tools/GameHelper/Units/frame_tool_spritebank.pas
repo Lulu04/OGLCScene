@@ -1,7 +1,7 @@
 unit frame_tool_spritebank;
 
 {$mode ObjFPC}{$H+}
-
+{$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
 interface
 
 uses
@@ -305,8 +305,7 @@ begin
     'TSpriteContainer': begin
       s := '  inherited Create(FScene);';
     end;
-    'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite',
-    'TPolarSprite', 'TScrollableSprite': begin
+    'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite', 'TPolarSprite', 'TScrollableSprite': begin
       s := '  inherited Create('+rootItem^.textureName + ', False);';
     end;
     'TShapeOutline': begin
@@ -341,6 +340,8 @@ begin
       t.Add('  FlipH := True;');
     if rootItem^.flipV then
       t.Add('  FlipV := True;');
+    if rootItem^.IsTextured and (rootItem^.frameindex <> 1.0) then
+      t.Add('  Frame := '+FormatFloatWithDot('0.0', rootItem^.frameindex)+';');
     t.Add('');
   end else t.Add('');
 
@@ -403,6 +404,8 @@ begin
       t.Add('    FlipH := True;');
     if current^.flipV then
       t.Add('    FlipV := True;');
+    if current^.IsTextured and (current^.frameindex <> 1.0) then
+      t.Add('    Frame := '+FormatFloatWithDot('0.0', current^.frameindex)+';');
     if CheckBox1.Checked then
       t.Add('    ApplySymmetryWhenFlip := True;');
     t.Add('  end;');

@@ -46,6 +46,7 @@ public
   tint: TBGRAPixel;
   tintMode: TTintMode;
   width, height, layerindex: integer;
+  frameindex: single;
   procedure InitDefault;
   procedure KillSurface;
   procedure CreateCollisionBody;
@@ -61,6 +62,9 @@ public
   procedure DuplicateValuesToTemporaryVariables;
 
   function IsRoot: boolean;
+  function IsTextured: boolean;
+  function HaveTextureWithMultipleFrame: boolean;
+  function GetTextureFrameCount: integer;
 
   function IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
   function IsOverRotateHandle(aWorldPt: TPointF): boolean;
@@ -222,9 +226,18 @@ begin
   id := -1;
   parentID := -1;
   textureName := '';
+  pivotX := 0.5;
+  pivotY := 0.5;
+  scaleX := 1.0;
+  scaleY := 1.0;
+  angle := 0.0;
   tint := BGRA(0,0,0,0);
   tintmode := tmReplaceColor;
   opacity := 255;
+  flipH := False;
+  flipV := False;
+  zOrder := 0;
+  frameindex := 1.0;
 
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
@@ -245,20 +258,17 @@ begin
 end;
 
 procedure TSurfaceDescriptor.CreateSurface(aCreateUIHandle: boolean=True);
-var //texItem: PTextureItem;
-  tex: PTexture;
+var tex: PTexture;
 begin
-{  texItem := ParentList.Textures.GetItemByName(textureName);
-  if texItem <> NIL then tex := texItem^.texture else tex := NIL;  }
   tex := GetTextureFromTextureName;
 
-  if classType = TSprite then
-begin
+  if classType = TSprite then begin
     surface := TSprite.Create(tex, False);
+    surface.Frame := frameindex;
     if ParentList.FModeForLevelEditor then
       TSprite(surface).SetSize(width, height);
 //fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
-end
+  end
   else
   if classType = TSpriteWithElasticCorner then
     surface := TSpriteWithElasticCorner.Create(tex, False)
@@ -363,6 +373,7 @@ begin
   surface.Opacity.Value := opacity;
   surface.Tint.Value := tint;
   surface.TintMode := tintmode;
+  surface.Frame := frameindex;
   if ParentList.FModeForLevelEditor then
     TSprite(surface).SetSize(width, height);
 end;
@@ -384,6 +395,7 @@ begin
   tintmode := surface.TintMode;
   width := surface.Width;
   height := surface.Height;
+  frameindex := Trunc(surface.Frame);
   if ParentList.ModeForLevelEditor then
     layerindex := FScene.LayerIndexOf(surface.ParentLayer);
 end;
@@ -391,6 +403,37 @@ end;
 function TSurfaceDescriptor.IsRoot: boolean;
 begin
   Result := parentID = -1;
+end;
+
+function TSurfaceDescriptor.IsTextured: boolean;
+begin
+  Result := (classtype = TSprite) or
+            (classtype = TSpriteWithElasticCorner) or
+            (classtype = TTiledSprite) or
+            (classtype = TPolarSprite) or
+            (classtype = TScrollableSprite) or
+            (classtype = TDeformationGrid);
+end;
+
+function TSurfaceDescriptor.HaveTextureWithMultipleFrame: boolean;
+var tex: PTexture;
+begin
+  Result := IsTextured;
+  if not Result then exit;
+  tex := GetTextureFromTextureName;
+  if tex = NIL then Result := False
+    else Result := tex^.FrameCount > 1;
+end;
+
+function TSurfaceDescriptor.GetTextureFrameCount: integer;
+var tex: PTexture;
+begin
+  if not IsTextured then exit(1);
+
+  tex := GetTextureFromTextureName;
+  if tex = NIL then exit(1);
+
+  Result := Max(tex^.FrameCount-1, 1);
 end;
 
 function TSurfaceDescriptor.IsOverScaleHandle(aWorldPt: TPointF; out aType: TScaleHandle): boolean;
@@ -816,6 +859,7 @@ begin
   if surface.Opacity.Value <> 255 then prop.Add('Opacity', surface.Opacity.Value);
   if surface.Tint.Value <> BGRA(0,0,0,0) then prop.Add('Tint', surface.Tint.Value);
   if surface.TintMode <> tmReplaceColor then prop.Add('TintMode', Ord(surface.TintMode));
+  if surface.Frame <> 1.0 then prop.Add('FrameIndex', surface.Frame);
   Result := prop.PackedProperty;
 end;
 
@@ -862,8 +906,11 @@ begin
   v := 0;
   prop.IntegerValueOf('TintMode', v, Ord(tmReplaceColor));
   tintmode := TTintMode(v);
+  prop.SingleValueOf('FrameIndex', frameindex, 1.0);
 end;
 
+// L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode
+// I=frameindex
 function TSurfaceDescriptor.ExportToPascalString(aTextureList: TTextureList): string;
 var prop: TProperties;
   f: integer;
@@ -872,9 +919,10 @@ begin
   prop.Init(',');
   prop.Add('L', layerindex-APP_LAYER_COUNT);
 
-  texItem := aTextureList.GetItemByName(textureName);
-
-  prop.Add('N', ExtractFilename(texItem^.filename)); // textureName);
+  if IsTextured then begin
+    texItem := aTextureList.GetItemByName(textureName);
+    prop.Add('N', ExtractFilename(texItem^.filename));
+  end;
   prop.Add('X', x);
   prop.Add('Y', y);
   prop.Add('W', width);
@@ -889,6 +937,7 @@ begin
   if f <> 0 then prop.Add('F', f);
   if tint <> BGRA(0,0,0,0) then prop.Add('T', tint);
   if tintmode <> tmReplaceColor then prop.Add('M', Ord(tintmode));
+  if frameindex <> 1.0 then prop.Add('I', frameindex);
   Result := prop.PackedProperty;
 end;
 
