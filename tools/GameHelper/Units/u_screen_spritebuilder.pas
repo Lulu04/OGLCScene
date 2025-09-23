@@ -72,6 +72,13 @@ public
   procedure ProcessMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean); override;
 public // selection
   procedure SetPivotOnSelection;
+
+  procedure AlignSelectedLeftTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedHCenterTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedRightTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedTopTo(aY: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedVCenterTo(aY: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedBottomTo(aY: single; aRef: PSurfaceDescriptor); override;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -916,6 +923,54 @@ begin
   if GetSelectedCount = 0 then exit;
   for i:=0 to High(FSelected) do
     FSelected[i]^.Pivot := ClickOrigin;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedLeftTo(aX: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedLeftTo(aX, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedHCenterTo(aX: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedHCenterTo(aX, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedRightTo(aX: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedRightTo(aX, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedTopTo(aY: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedTopTo(aY, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedVCenterTo(aY: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedVCenterTo(aY, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
+end;
+
+procedure TScreenSpriteBuilder.AlignSelectedBottomTo(aY: single; aRef: PSurfaceDescriptor);
+begin
+  inherited AlignSelectedBottomTo(aY, aRef);
+
+  FrameToolsSpriteBuilder.ShowSelectionData(FSelected);
+  FrameToolsSpriteBuilder.Modified := True;
 end;
 
 procedure TScreenSpriteBuilder.CreateObjects;

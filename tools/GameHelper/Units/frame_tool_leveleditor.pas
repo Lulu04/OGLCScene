@@ -431,31 +431,35 @@ begin
 end;
 
 procedure TFrameToolLevelEditor.SpeedButton1Click(Sender: TObject);
+var ref: PSurfaceDescriptor;
 begin
   if CBAlignReference.ItemIndex = -1 then exit;
-
-  // align to the first selected
-  if CBAlignReference.ItemIndex = 0 then begin
-    if ScreenLevelEditor.SelectedCount < 2 then exit;
-    with ScreenLevelEditor do
-      case TSpeedButton(Sender).ImageIndex of
-        0: AlignSelectedRightTo(GetFirstSelectedX + FSEOverlap.Value);
-        1: AlignSelectedRightTo(GetFirstSelectedCenterX);
-        2: AlignSelectedLeftTo(GetFirstSelectedX);
-        3: AlignSelectedHCenterTo(GetFirstSelectedCenterX);
-        4: AlignSelectedRightTo(GetFirstSelectedRightX);
-        5: AlignSelectedLeftTo(GetFirstSelectedCenterX);
-        6: AlignSelectedLeftTo(GetFirstSelectedRightX - FSEOverlap.Value);
-
-        7: AlignSelectedBottomTo(GetFirstSelectedY + FSEOverlap.Value);
-        8: AlignSelectedBottomTo(GetFirstSelectedCenterY);
-        9: AlignSelectedTopTo(GetFirstSelectedY);
-        10: AlignSelectedVCenterTo(GetFirstSelectedCenterY);
-        11: AlignSelectedBottomTo(GetFirstSelectedBottomY);
-        12: AlignSelectedTopTo(GetFirstSelectedCenterY);
-        13: AlignSelectedTopTo(GetFirstSelectedBottomY - FSEOverlap.Value);
-      end;
+  if ScreenLevelEditor.SelectedCount < 2 then exit;
+  ref := NIL;
+  case CBAlignReference.ItemIndex of
+    0: ref := ScreenLevelEditor.Selected[0]; // align to the first selected
+    1: ref := ScreenLevelEditor.Selected[ScreenLevelEditor.SelectedCount-1]; // align to the last selected
+    else raise exception.create('forgot to implement');
   end;
+
+  with ScreenLevelEditor do
+    case TSpeedButton(Sender).ImageIndex of
+      0: AlignSelectedRightTo(GetRefBoundsLeft(ref) + FSEOverlap.Value, ref);
+      1: AlignSelectedRightTo(GetRefBoundsCenterH(ref), ref);
+      2: AlignSelectedLeftTo(GetRefBoundsLeft(ref), ref);
+      3: AlignSelectedHCenterTo(GetRefBoundsCenterH(ref), ref);
+      4: AlignSelectedRightTo(GetRefBoundsRight(ref), ref);
+      5: AlignSelectedLeftTo(GetRefBoundsCenterH(ref), ref);
+      6: AlignSelectedLeftTo(GetRefBoundsRight(ref) - FSEOverlap.Value, ref);
+
+      7: AlignSelectedBottomTo(GetRefBoundsTop(ref) + FSEOverlap.Value, ref);
+      8: AlignSelectedBottomTo(GetRefBoundsCenterV(ref), ref);
+      9: AlignSelectedTopTo(GetRefBoundsTop(ref), ref);
+      10: AlignSelectedVCenterTo(GetRefBoundsCenterV(ref), ref);
+      11: AlignSelectedBottomTo(GetRefBoundsBottom(ref), ref);
+      12: AlignSelectedTopTo(GetRefBoundsCenterV(ref), ref);
+      13: AlignSelectedTopTo(GetRefBoundsBottom(ref) - FSEOverlap.Value, ref);
+    end;
 end;
 
 procedure TFrameToolLevelEditor.SpinEdit3Change(Sender: TObject);

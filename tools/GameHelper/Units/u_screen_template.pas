@@ -177,18 +177,18 @@ public // hint
   procedure ShowHintTextOnSelected(const aTxt: string);
   procedure ShowHintTextOnFirstSelected(const aTxt: string);
 public // align
-  function GetFirstSelectedX: single;
-  function GetFirstSelectedCenterX: single;
-  function GetFirstSelectedRightX: single;
-  function GetFirstSelectedY: single;
-  function GetFirstSelectedCenterY: single;
-  function GetFirstSelectedBottomY: single;
-  procedure AlignSelectedLeftTo(aX: single); virtual;
-  procedure AlignSelectedHCenterTo(aX: single); virtual;
-  procedure AlignSelectedRightTo(aX: single); virtual;
-  procedure AlignSelectedTopTo(aY: single); virtual;
-  procedure AlignSelectedVCenterTo(aY: single); virtual;
-  procedure AlignSelectedBottomTo(aY: single); virtual;
+  function GetRefBoundsLeft(aRef: PSurfaceDescriptor): single;
+  function GetRefBoundsCenterH(aRef: PSurfaceDescriptor): single;
+  function GetRefBoundsRight(aRef: PSurfaceDescriptor): single;
+  function GetRefBoundsTop(aRef: PSurfaceDescriptor): single;
+  function GetRefBoundsCenterV(aRef: PSurfaceDescriptor): single;
+  function GetRefBoundsBottom(aRef: PSurfaceDescriptor): single;
+  procedure AlignSelectedLeftTo(aX: single; aRef: PSurfaceDescriptor); virtual;
+  procedure AlignSelectedHCenterTo(aX: single; aRef: PSurfaceDescriptor); virtual;
+  procedure AlignSelectedRightTo(aX: single; aRef: PSurfaceDescriptor); virtual;
+  procedure AlignSelectedTopTo(aY: single; aRef: PSurfaceDescriptor); virtual;
+  procedure AlignSelectedVCenterTo(aY: single; aRef: PSurfaceDescriptor); virtual;
+  procedure AlignSelectedBottomTo(aY: single; aRef: PSurfaceDescriptor); virtual;
 public // distribute
   procedure DistributeSelectionHorizontalyWithSameSpacing;
   procedure DistributeSelectionVerticalyWithSameSpacing;
@@ -999,86 +999,111 @@ begin
   ShowHintText(p.x, p.y, aTxt);
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedX: single;
+function TScreenWithSurfaceHandling.GetRefBoundsLeft(aRef: PSurfaceDescriptor): single;
 begin
-  Result := FSelected[0]^.surface.X.Value;
+  Result := aRef^.surface.GetQuadAreaInWorldSpace.Bounds.Left;
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedCenterX: single;
+function TScreenWithSurfaceHandling.GetRefBoundsCenterV(aRef: PSurfaceDescriptor): single;
 begin
-  Result := FSelected[0]^.surface.CenterX;
+  with aRef^.surface.GetQuadAreaInWorldSpace.Bounds do
+    Result := Top + Height*0.5;
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedRightX: single;
+function TScreenWithSurfaceHandling.GetRefBoundsRight(aRef: PSurfaceDescriptor): single;
 begin
- Result := FSelected[0]^.surface.RightX;
+  Result := aRef^.surface.GetQuadAreaInWorldSpace.Bounds.Right;
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedY: single;
+function TScreenWithSurfaceHandling.GetRefBoundsCenterH(aRef: PSurfaceDescriptor): single;
 begin
-  Result := FSelected[0]^.surface.Y.Value;
+  with aRef^.surface.GetQuadAreaInWorldSpace.Bounds do
+    Result := Left + Width*0.5;
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedCenterY: single;
+function TScreenWithSurfaceHandling.GetRefBoundsTop(aRef: PSurfaceDescriptor): single;
 begin
-  Result := FSelected[0]^.surface.CenterY;
+  Result := aRef^.surface.GetQuadAreaInWorldSpace.Bounds.Top;
 end;
 
-function TScreenWithSurfaceHandling.GetFirstSelectedBottomY: single;
+function TScreenWithSurfaceHandling.GetRefBoundsBottom(aRef: PSurfaceDescriptor): single;
 begin
-  Result := FSelected[0]^.surface.BottomY;
+  Result := aRef^.surface.GetQuadAreaInWorldSpace.Bounds.Bottom;
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedLeftTo(aX: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedLeftTo(aX: single; aRef: PSurfaceDescriptor);
 var i: integer;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.X.Value := aX;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do
+        X.Value := X.Value + aX - GetQuadAreaInWorldSpace.Bounds.Left;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedHCenterTo(aX: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedHCenterTo(aX: single;
+  aRef: PSurfaceDescriptor);
 var i: integer;
+  r: TRectF;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.CenterX := aX;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do begin
+        r := GetQuadAreaInWorldSpace.Bounds;
+        CenterX := CenterX + aX - (r.Left + r.Width*0.5);
+    end;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedRightTo(aX: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedRightTo(aX: single;
+  aRef: PSurfaceDescriptor);
 var i: integer;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.RightX := aX;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do
+        RightX := RightX + aX - GetQuadAreaInWorldSpace.Bounds.Right;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedTopTo(aY: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedTopTo(aY: single;
+  aRef: PSurfaceDescriptor);
 var i: integer;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.Y.Value := aY;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do
+        Y.Value := Y.Value + aY - GetQuadAreaInWorldSpace.Bounds.Top;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedVCenterTo(aY: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedVCenterTo(aY: single;
+  aRef: PSurfaceDescriptor);
 var i: integer;
+  r: TRectF;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.CenterY := aY;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do begin
+        r := GetQuadAreaInWorldSpace.Bounds;
+        CenterY := CenterY + aY - (r.Top + r.Height*0.5);
+    end;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;
 
-procedure TScreenWithSurfaceHandling.AlignSelectedBottomTo(aY: single);
+procedure TScreenWithSurfaceHandling.AlignSelectedBottomTo(aY: single;
+  aRef: PSurfaceDescriptor);
 var i: integer;
 begin
-  for i:=1 to High(FSelected) do
-    FSelected[i]^.surface.BottomY := aY;
+  for i:=0 to High(FSelected) do
+    if FSelected[i] <> aRef then
+      with FSelected[i]^.surface do
+        BottomY := BottomY + aY - GetQuadAreaInWorldSpace.Bounds.Bottom;
   UpdateHandlePositionOnSelected;
   ShowHintTextOnSelected(sAligned);
 end;

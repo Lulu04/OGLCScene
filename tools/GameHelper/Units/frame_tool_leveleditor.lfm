@@ -551,18 +551,18 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           object CBAlignReference: TComboBox
             AnchorSideLeft.Control = Label7
             AnchorSideLeft.Side = asrBottom
-            AnchorSideBottom.Control = Label7
-            AnchorSideBottom.Side = asrBottom
+            AnchorSideTop.Control = Label7
+            AnchorSideTop.Side = asrCenter
             Left = 73
             Height = 23
-            Top = 0
+            Top = 4
             Width = 95
-            Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
             ItemHeight = 15
             ItemIndex = 0
             Items.Strings = (
               'First selected'
+              'Last selected'
             )
             Style = csDropDownList
             TabOrder = 0
@@ -811,6 +811,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 5
             DecimalPlaces = 1
+            Increment = 0.5
             MaxValue = 5
             OnChange = FSEOverlapChange
             OnEnter = SE1Enter

@@ -30,6 +30,8 @@ type
     BHelpPostures: TSpeedButton;
     BHelpRootChilds: TSpeedButton;
     BHelpCollisionBody: TSpeedButton;
+    BMirrorH: TSpeedButton;
+    BMirrorV: TSpeedButton;
     BRectangle: TSpeedButton;
     BCircle: TSpeedButton;
     BNewChild: TSpeedButton;
@@ -38,6 +40,11 @@ type
     BPoint: TSpeedButton;
     BPostureRedo: TSpeedButton;
     BPostureUndo: TSpeedButton;
+    BRotate90CCW: TSpeedButton;
+    BRotate90CW: TSpeedButton;
+    BZoomAll: TSpeedButton;
+    BZoomOnSelection: TSpeedButton;
+    CBAlignReference: TComboBox;
     CBParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
@@ -64,8 +71,10 @@ type
     Label22: TLabel;
     Label23: TLabel;
     Label24: TLabel;
+    Label25: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label7: TLabel;
     Label9: TLabel;
     LBPostureNames: TListBox;
     MIDeleteNode: TMenuItem;
@@ -78,9 +87,10 @@ type
     Panel11: TPanel;
     Panel12: TPanel;
     Panel2: TPanel;
+    Panel3: TPanel;
     Panel4: TPanel;
-    Panel5: TPanel;
     Panel6: TPanel;
+    Panel7: TPanel;
     Panel8: TPanel;
     PC1: TPageControl;
     PopupNode: TPopupMenu;
@@ -103,6 +113,20 @@ type
     BResetPos: TSpeedButton;
     SEDummy: TSpinEdit;
     SE9: TSpinEdit;
+    SpeedButton1: TSpeedButton;
+    SpeedButton10: TSpeedButton;
+    SpeedButton11: TSpeedButton;
+    SpeedButton12: TSpeedButton;
+    SpeedButton13: TSpeedButton;
+    SpeedButton14: TSpeedButton;
+    SpeedButton2: TSpeedButton;
+    SpeedButton3: TSpeedButton;
+    SpeedButton4: TSpeedButton;
+    SpeedButton5: TSpeedButton;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
+    SpeedButton8: TSpeedButton;
+    SpeedButton9: TSpeedButton;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
@@ -112,6 +136,7 @@ type
     procedure BHelpRootChildsClick(Sender: TObject);
     procedure BLineClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
+    procedure BZoomAllClick(Sender: TObject);
     procedure CBParentDrawItem({%H-}Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
@@ -119,6 +144,7 @@ type
     procedure MIAddNodeClick(Sender: TObject);
     procedure PC1Change(Sender: TObject);
     procedure SE1Enter(Sender: TObject);
+    procedure SpeedButton1Click(Sender: TObject);
   private // textures
     FInitializingWidget: boolean;
     procedure ProcessTextureListOnModified(Sender: TObject);
@@ -212,6 +238,16 @@ begin
     if DoAddNewChild then
       ShowSelectionData(NIL);
   end;
+end;
+
+procedure TFrameToolsSpriteBuilder.BZoomAllClick(Sender: TObject);
+begin
+  if Sender = BZoomAll then ScreenSpriteBuilder.ZoomAll;
+  if Sender = BZoomOnSelection then ScreenSpriteBuilder.ZoomOnSelection;
+  if Sender = BRotate90CCW then ScreenSpriteBuilder.RotateSelectedCCW;
+  if Sender = BRotate90CW then ScreenSpriteBuilder.RotateSelectedCW;
+  if Sender = BMirrorH then ScreenSpriteBuilder.MirrorSelectedH;
+  if Sender = BMirrorV then ScreenSpriteBuilder.MirrorSelectedV;
 end;
 
 procedure TFrameToolsSpriteBuilder.BAddToSpriteBankClick(Sender: TObject);
@@ -586,6 +622,68 @@ end;
 procedure TFrameToolsSpriteBuilder.SE1Enter(Sender: TObject);
 begin
   LastClickedIsControl := True;
+end;
+
+procedure TFrameToolsSpriteBuilder.SpeedButton1Click(Sender: TObject);
+var ref: PSurfaceDescriptor;
+  surfaceRef: TSimpleSurfaceWithEffect;
+  function TransformRefX(aX: single): single;
+  begin
+    Result := surfaceRef.SurfaceToWorld(PointF(aX, 0)).x;
+  end;
+  function TransformRefY(aY: single): single;
+  begin
+    Result := surfaceRef.SurfaceToWorld(PointF(0, aY)).y;
+  end;
+
+begin
+  if CBAlignReference.ItemIndex = -1 then exit;
+  if ScreenSpriteBuilder.SelectedCount < 2 then exit;
+  ref := NIL;
+  case CBAlignReference.ItemIndex of
+    0: ref := ScreenSpriteBuilder.Selected[0];
+    1: ref := ScreenSpriteBuilder.Selected[ScreenSpriteBuilder.SelectedCount-1];
+    else raise exception.create('forgot to implement');
+  end;
+
+  with ScreenSpriteBuilder do
+    case TSpeedButton(Sender).ImageIndex of
+      0: AlignSelectedRightTo(GetRefBoundsLeft(ref), ref);
+      1: AlignSelectedRightTo(GetRefBoundsCenterH(ref), ref);
+      2: AlignSelectedLeftTo(GetRefBoundsLeft(ref), ref);
+      3: AlignSelectedHCenterTo(GetRefBoundsCenterH(ref), ref);
+      4: AlignSelectedRightTo(GetRefBoundsRight(ref), ref);
+      5: AlignSelectedLeftTo(GetRefBoundsCenterH(ref), ref);
+      6: AlignSelectedLeftTo(GetRefBoundsRight(ref), ref);
+
+      7: AlignSelectedBottomTo(GetRefBoundsTop(ref), ref);
+      8: AlignSelectedBottomTo(GetRefBoundsCenterV(ref), ref);
+      9: AlignSelectedTopTo(GetRefBoundsTop(ref), ref);
+      10: AlignSelectedVCenterTo(GetRefBoundsCenterV(ref), ref);
+      11: AlignSelectedBottomTo(GetRefBoundsBottom(ref), ref);
+      12: AlignSelectedTopTo(GetRefBoundsCenterV(ref), ref);
+      13: AlignSelectedTopTo(GetRefBoundsBottom(ref), ref);
+    end;
+
+{  surfaceRef := ScreenSpriteBuilder.Selected[0]^.surface;
+  with ScreenSpriteBuilder do
+    case TSpeedButton(Sender).ImageIndex of
+      0: AlignSelectedRightTo(TransformRefX(0), ref); //AlignSelectedRightTo(GetFirstSelectedX);
+      1: AlignSelectedRightTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedRightTo(GetFirstSelectedCenterX);
+      2: AlignSelectedLeftTo(TransformRefX(0), ref); //AlignSelectedLeftTo(GetFirstSelectedX);
+      3: AlignSelectedHCenterTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedHCenterTo(GetFirstSelectedCenterX);
+      4: AlignSelectedRightTo(TransformRefX(surfaceRef.Width), ref); //AlignSelectedRightTo(GetFirstSelectedRightX);
+      5: AlignSelectedLeftTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedLeftTo(GetFirstSelectedCenterX);
+      6: AlignSelectedLeftTo(TransformRefX(surfaceRef.Width), ref); //AlignSelectedLeftTo(GetFirstSelectedRightX);
+
+      7: AlignSelectedBottomTo(TransformRefY(0), ref); //AlignSelectedBottomTo(GetFirstSelectedY);
+      8: AlignSelectedBottomTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedBottomTo(GetFirstSelectedCenterY);
+      9: AlignSelectedTopTo(TransformRefY(0), ref); //AlignSelectedTopTo(GetFirstSelectedY);
+      10: AlignSelectedVCenterTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedVCenterTo(GetFirstSelectedCenterY);
+      11: AlignSelectedBottomTo(TransformRefY(surfaceRef.Height), ref); //AlignSelectedBottomTo(GetFirstSelectedBottomY);
+      12: AlignSelectedTopTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedTopTo(GetFirstSelectedCenterY);
+      13: AlignSelectedTopTo(TransformRefY(surfaceRef.Height), ref); //AlignSelectedTopTo(GetFirstSelectedBottomY);
+    end;  }
 end;
 
 procedure TFrameToolsSpriteBuilder.ProcessTextureListOnModified(Sender: TObject);
