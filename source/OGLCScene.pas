@@ -431,6 +431,8 @@ TOGLCScene = class(TOGLCContext)
   property RequestedScreen: TScreenTemplate read FScreenRequested;
   // the current running screen
   property CurrentScreen: TScreenTemplate read FCurrentScreen;
+  // The duration of the fade when a new screen is started with RunScreen().
+  // default value is 0.5s
   property ScreenFadeTime: single read FScreenFadeTime write FScreenFadeTime;
 
   // Add a surface to a layer
@@ -960,7 +962,7 @@ begin
 
   FGlobalFadeColor:= TBGRAParam.Create;
   FGlobalFadeColor.Value := BGRA(0,0,0,0);
-  FScreenFadeTime:= 1.0;
+  FScreenFadeTime:= 0.5;
 
   FTextureManager := TTextureManager.Create(Self);
 
