@@ -21,6 +21,7 @@ private
   FPivot: TSprite;
   RotateHandle: array[TOGLCCorner] of TSprite;
   ScaleHandle: array[TScaleHandle] of TSprite;
+  FOutLine: TShapeOutline;
 public
   function IsVisible: boolean;
   function ScaleVisible: boolean;
@@ -30,6 +31,7 @@ public
   procedure KillSurfaces;
   procedure HideAll;
   procedure ShowPivotHandle(aSurface: TSimpleSurfaceWithEffect);
+  procedure ShowOutLine(aSurface: TSimpleSurfaceWithEffect);
   procedure ToogleScaledAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
   procedure ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
   procedure ShowRotateHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
@@ -72,8 +74,15 @@ begin
   FPivot.Visible := True;
 end;
 
-procedure TUIHandleManager.ToogleScaledAndRotatedHandle(
-  aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.ShowOutLine(aSurface: TSimpleSurfaceWithEffect);
+var r: TRectF;
+begin
+  r := aSurface.GetQuadAreaInSceneSpace.Bounds;
+  FOutLine.Visible := True;
+  FOutLine.SetShapeRectangle(Round(r.Left), Round(r.Top), Round(r.Width), Round(r.Height));
+end;
+
+procedure TUIHandleManager.ToogleScaledAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
 begin
   if IsVisible then begin
     if ScaleVisible then ShowRotateHandleAndPivot(aSurface)
@@ -119,7 +128,9 @@ begin
     RotateHandle[i].Visible := False;
 
   for j in TScaleHandle do
-    ScaleHandle[j].Visible := False;;
+    ScaleHandle[j].Visible := False;
+
+  FOutLine.Visible := False;
 end;
 
 procedure TUIHandleManager.ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
@@ -131,8 +142,11 @@ begin
   // pivot
   ShowPivotHandle(aSurface);
 
+  // outline
+  ShowOutLine(aSurface);
+
   // scale handle
-  r := aSurface.GetRectAreaInSceneSpace(True);
+  r := aSurface.GetQuadAreaInSceneSpace.Bounds;
   w := ScaleHandle[shTopLeft].Width;
   h := ScaleHandle[shTopLeft].Height;
 
@@ -167,9 +181,10 @@ var w, h: single;
 begin
   HideAll;
   ShowPivotHandle(aSurface);
+  ShowOutLine(aSurface);
 
   // rotated handle
-  r := aSurface.GetRectAreaInSceneSpace(True);
+  r := aSurface.GetQuadAreaInSceneSpace.Bounds;
   w := RotateHandle[cTR].Width;
   h := RotateHandle[cTR].Height;
 
@@ -265,6 +280,9 @@ begin
     if ScaleHandle[j] <> NIL then ScaleHandle[j].Kill;
     ScaleHandle[j] := NIL;
   end;
+
+  if FOutLine <> NIL then FOutLine.Kill;
+  FOutLine := NIL;
 end;
 
 { TUIHandle }
@@ -309,6 +327,13 @@ begin
       ScaleHandle[i].Angle.Value := 45*(Ord(i)+1);
       CreateCollisionRectangle(ScaleHandle[i]);
     end;
+
+    FOutLine := TShapeOutline.Create(FScene);
+    FScene.Add(FOutLine, TargetLayer);
+    FOutLine.LineColor := BGRA(180,180,180);
+    FOutLine.LineWidth := 1.5;
+    FOutLine.Antialiasing := True;
+    FOutLine.LinePosition := lpInside;
   end;
 end;
 
