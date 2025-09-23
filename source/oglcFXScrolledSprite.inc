@@ -96,7 +96,7 @@ public
   procedure Prepare(aTriangleType: TTriangleType; aTexture: PTexture; aTextureUnit: integer; aBlendMode: byte);
 
   // Set aModelViewMatrix to NIL to use the parent scene model view matrix
-  procedure PushQuad(const aModelArea, aTexBounds: TQuadCoor; aOffsetUV: TPointF;
+  procedure PushQuad(const aModelArea, aTexBounds: TQuadF; aOffsetUV: TPointF;
                      aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44;
                      const aOpacity: single; const aComputedTint: TColorF); overload;
 end;
@@ -185,17 +185,17 @@ begin
 end;
 
 procedure TOGLCScrollableTextureRenderer.PushQuad(const aModelArea,
-  aTexBounds: TQuadCoor; aOffsetUV: TPointF; aFlipIndex: integer;
+  aTexBounds: TQuadF; aOffsetUV: TPointF; aFlipIndex: integer;
   aModelViewMatrix: POGLCMatrix44; const aOpacity: single;
   const aComputedTint: TColorF);
 var tci: PQuadCornerIndexes;
     p: PTScrollableTextureVertexAttribs;
     pIndex: PVertexIndex;
     currentIndex: TVertexIndex;
-    texCoor: TQuadCoor;
+    texCoor: TQuadF;
     deltaU, deltaV: Single;
 debug:tpointf;
-debug1: tquadcoor;
+debug1: tquadF;
 begin
   tci := @FLIP_INDEXES[aFlipIndex];
   currentIndex := FIndexInAttribsArray;
@@ -297,10 +297,10 @@ begin
   Offset.SetBoundary(PointF(0,0), PointF(Texture^.FrameWidth, Texture^.FrameHeight), True);
   Offset.Value := PointF(0, 0);
 
-  SetShape(QuadCoor(PointF(0,0),
-                    PointF(Texture^.FrameWidth, 0),
-                    PointF(Texture^.FrameWidth, Texture^.FrameHeight),
-                    PointF(0,Texture^.FrameHeight)));
+  SetShape(QuadF(PointF(0,0),
+                 PointF(Texture^.FrameWidth, 0),
+                 PointF(Texture^.FrameWidth, Texture^.FrameHeight),
+                 PointF(0,Texture^.FrameHeight)));
 end;
 
 function TScrollableSprite.GetWidth: integer;

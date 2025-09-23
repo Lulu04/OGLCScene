@@ -332,7 +332,7 @@ procedure TOGLCTileRenderer.PushFrame(const aFrameIndex, aFlipIndex: integer; co
 var deltax, deltay: single;
     p: Pxyuv;
     tci: PQuadCornerIndexes;
-    texCoord: TQuadCoor;
+    texCoord: TQuadF;
     fi: Integer;
     clippedRect: TRectF;
     tex: PTexture;

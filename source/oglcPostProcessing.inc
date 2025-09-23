@@ -518,7 +518,7 @@ var w, h: single;
     p: Pxyuv;
     pIndex: PVertexIndex;
     tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
+    texCoord: PQuadF;
     fi: Integer;
     currentIndex: Int64;
     tex: PTexture;

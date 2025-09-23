@@ -7,7 +7,7 @@ TSprite = class(TSimpleSurfaceWithEffect)
 private
   FTextureOwner: boolean;
   FTexture: PTexture;
-  FModelArea: TQuadCoor;
+  FModelArea: TQuadF;
   FWidth, FHeight: integer;
   procedure Init; virtual;
   procedure SetTexture(AValue: PTexture); virtual;
@@ -32,7 +32,7 @@ public
   procedure SetSize(aWidth, aHeight: integer);
   // Allow to resize or stretch the sprite by specifying the corner position in local space.
   procedure SetShape(aTopLeft, aTopRight, aBottomRight, aBottomLeft: TPointF); overload;
-  procedure SetShape(const aQuad: TQuadCoor); overload;
+  procedure SetShape(const aQuad: TQuadF); overload;
   // Set the size of the sprite with the default texture size.
   procedure SetSizeSameAsTexture;
   property Texture: PTexture read FTexture write SetTexture;
@@ -138,7 +138,7 @@ end;
 TQuad4Color = class(TSimpleSurfaceWithEffect)
 private
   FQuadCornerColors: TQuadColorF;
-  FModelArea: TQuadCoor;
+  FModelArea: TQuadF;
   procedure CreateColorObjects;
 protected
   FWidth, FHeight: integer;
@@ -149,7 +149,7 @@ public
   // construct the quad as rectangular area
   Constructor Create(aWidth, aHeight: integer); deprecated 'use Create instead then SetSize()';
   // construct the quad as quadrilateral area (must be convex)
-  Constructor Create(const aQuad: TQuadCoor); deprecated 'use Create instead then SetSize()';
+  Constructor Create(const aQuad: TQuadF); deprecated 'use Create instead then SetSize()';
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
   procedure DoDraw; override;
@@ -161,7 +161,7 @@ public
   // Set the shape as rectangular area
   procedure SetSize(aWidth, aHeight: integer); overload;
   // Set the shape as a quadrilateral area
-  procedure SetSize(const aQuad: TQuadCoor); overload;
+  procedure SetSize(const aQuad: TQuadF); overload;
 
   procedure SetAllColorsTo(AColor: TBGRAPixel);
   procedure SetLeftColors(AColor: TBGRAPixel);
@@ -400,7 +400,7 @@ begin
   FModelArea.Create(aTopLeft, aTopRight, aBottomRight, aBottomLeft);
 end;
 
-procedure TSprite.SetShape(const aQuad: TQuadCoor);
+procedure TSprite.SetShape(const aQuad: TQuadF);
 begin
   SetShape(aQuad[cTL], aQuad[cTR], aQuad[cBR], aQuad[cBL]);
 end;
@@ -433,7 +433,7 @@ begin
 end;
 
 procedure TSpriteWithElasticCorner.DoDraw;
-var modelArea: TQuadCoor;
+var modelArea: TQuadF;
   fi: integer;
 begin
   if FTexture = NIL then exit;
@@ -588,7 +588,7 @@ begin
   CreateColorObjects;
 end;
 
-constructor TQuad4Color.Create(const aQuad: TQuadCoor);
+constructor TQuad4Color.Create(const aQuad: TQuadF);
 begin
   inherited Create;
   SetSize(aQuad);
@@ -668,7 +668,7 @@ begin
   FModelArea.SetAsRectangle(aWidth, aHeight);
 end;
 
-procedure TQuad4Color.SetSize(const aQuad: TQuadCoor);
+procedure TQuad4Color.SetSize(const aQuad: TQuadF);
 var r: TRectF;
 begin
   FModelArea.CopyFrom(aQuad);

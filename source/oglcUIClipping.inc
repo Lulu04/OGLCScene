@@ -48,7 +48,7 @@ function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect): boolea
 //   > return False if the surface is completely outside.
 // If only a part is visible, the function 'cut' the surface area and its
 // texture coordinates in respect of the clipping area.
-function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
+function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect; var aTexCoor: TQuadF): boolean;
 
 // Check if the specified surface area is visible in the given clipped rectangle.
 //   > return True if at least one part of the surface is visible (the object can be drawn)
@@ -56,7 +56,7 @@ function CheckAndAdjust(const aClipRect: TRect; var aSurfaceArea: TRect; var aTe
 // If only a part is visible, the function 'cut' the surface area and its
 // texture coordinates in respect of the clipping area.
 // TRectF version
-function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean; overload;
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadF): boolean; overload;
 
 
 // Check if the specified surface area is visible in the given clipped rectangle.
@@ -65,7 +65,7 @@ function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var 
 // If only a part is visible, the function 'cut' the surface area and its
 // texture coordinates in respect of the clipping area.
 // TRectF version with
-function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor;
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadF;
                          aFlipIndex: integer): boolean; overload;
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
@@ -170,7 +170,7 @@ begin
 end;
 
 function CheckAndAdjust(const aClipRect: TRect;
-  var aSurfaceArea: TRect; var aTexCoor: TQuadCoor): boolean;
+  var aSurfaceArea: TRect; var aTexCoor: TQuadF): boolean;
 var delta, surfaceAreaWidth, surfaceAreaHeight: integer;
   uvHorizontalRange, uvVerticalRange, pc: single;
 begin
@@ -222,7 +222,7 @@ begin
   end;
 end;
 
-function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadCoor): boolean;
+function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF; var aTexCoor: TQuadF): boolean;
 var delta, uvHorizontalRange, uvVerticalRange, pc, surfaceAreaWidth, surfaceAreaHeight: single;
 begin
   surfaceAreaWidth := aSurfaceArea.Width;
@@ -274,7 +274,7 @@ begin
 end;
 
 function CheckAndAdjustF(const aClipRect: TRectF; var aSurfaceArea: TRectF;
-  var aTexCoor: TQuadCoor; aFlipIndex: integer): boolean;
+  var aTexCoor: TQuadF; aFlipIndex: integer): boolean;
 var delta, uvHorizontalRange, uvVerticalRange, pc, surfaceAreaWidth, surfaceAreaHeight: single;
   flipH, flipV: boolean;
 begin

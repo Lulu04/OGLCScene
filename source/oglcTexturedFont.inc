@@ -220,7 +220,7 @@ procedure TTexturedFont.DrawChar(aCharIdx: integer; aX, aY, aFlipIndex: integer;
   const aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF; aBlendMode: byte);
 var tc: PTexturedChar;
   modelArea: TRect;
-  texCoor: TQuadCoor;
+  texCoor: TQuadF;
 begin
   FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangles, FAtlas.Texture, 0, aBlendMode);
   tc := GetCharByIndex(aCharIdx);
@@ -240,7 +240,7 @@ procedure TTexturedFont.DrawChars(const aCharIdx: TTexturedCharIndexes; aX, aY, 
 var i, xx, yy: integer;
   tc: PTexturedChar;
   modelArea: TRect;
-  texCoor: TQuadCoor;
+  texCoor: TQuadF;
   spaceCoef: single;
   flagDraw: Boolean;
 begin

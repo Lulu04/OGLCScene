@@ -357,10 +357,10 @@ var p: PLineVertexAttributes;
           p^.x := FPath[i].x; p^.y := FPath[i].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
           p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
           // quad1 topleft, topright, bottomright, bottomleft
-          p^.x := quad1[0].x; p^.y := quad1[0].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[3].x; p^.y := quad1[3].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cTL].x; p^.y := quad1[cTL].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cTR].x; p^.y := quad1[cTR].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cBR].x; p^.y := quad1[cBR].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cBL].x; p^.y := quad1[cBL].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
           // indices for triangle 1
           pIndice[0] := currentIndice;
           pIndice[1] := currentIndice+1;
@@ -387,10 +387,10 @@ var p: PLineVertexAttributes;
           p^.x := FPath[i].x; p^.y := FPath[i].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
           p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 1; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
           // quad1 topleft, topright, bottomright, bottomleft
-          p^.x := quad1[0].x; p^.y := quad1[0].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
-          p^.x := quad1[3].x; p^.y := quad1[3].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cTL].x; p^.y := quad1[cTL].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cTR].x; p^.y := quad1[cTR].y; p^.distance := 0; p^.threshold := FThreshold1; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cBR].x; p^.y := quad1[cBR].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
+          p^.x := quad1[cBL].x; p^.y := quad1[cBL].y; p^.distance := 1; p^.threshold := FThreshold2; p^.c.CopyFrom(col); inc(p);
           // indices for triangle 1
           pIndice[0] := currentIndice+2;
           pIndice[1] := currentIndice;
