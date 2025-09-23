@@ -8,16 +8,16 @@ uses
   Classes, SysUtils,
   OGLCScene;
 
-// Change this values to define the size of the screen when you design the graphics
-const
-  SCREEN_WIDTH_AT_DESIGN_TIME: single = 1024;
-  SCREEN_HEIGHT_AT_DESIGN_TIME: single = 768;
-
+  // return the path to Data folder
   function DataFolder: string;
 
-  // in case you use ALSound to play musics and sounds
-  function ALSoundLibrariesSubFolder: string;
+const
+  // Change this values according to the size and ppi of the window when you designed the graphics
+   SCREEN_WIDTH_AT_DESIGN_TIME: single = 1024;
+   SCREEN_HEIGHT_AT_DESIGN_TIME: single = 768;
+   SCREEN_PPI_AT_DESIGN_TIME: integer = 96;
 
+  // Scaling
   function PPIScale(AValue: integer): integer;
   function ScaleW(AValue: integer): integer;
   function ScaleH(AValue: integer): integer;
@@ -58,11 +58,6 @@ end;
 function DataFolder: string;
 begin
   Result := FScene.App.DataFolder;
-end;
-
-function ALSoundLibrariesSubFolder: string;
-begin
-  Result := FScene.App.ALSoundLibrariesSubFolder;
 end;
 
 
