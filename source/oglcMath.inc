@@ -10,10 +10,10 @@ TQuadCornerIndexes = array[ 0..3 ] of TOGLCCorner;
 PQuadCornerIndexes = ^TQuadCornerIndexes;
 
 // quad definition for texture coordinates or other quadrilateral area
-TQuadCoor = array[TOGLCCorner] of TPointF;
-PQuadCoor = ^TQuadCoor;
+TQuadF = array[TOGLCCorner] of TPointF;
+PQuadF = ^TQuadF;
 const
-NoFlipQuadUV: TQuadCoor=((x:0.0; y:1.0), (x:1.0; y:1.0), (x:1.0; y:0.0), (x:0.0; y:0.0));
+NoFlipQuadUV: TQuadF=((x:0.0; y:1.0), (x:1.0; y:1.0), (x:1.0; y:0.0), (x:0.0; y:0.0));
 
 // indexes to flip a texture
 FLIP_INDEXES: array[ 0..3 ] of TQuadCornerIndexes = (
@@ -23,20 +23,23 @@ FLIP_INDEXES: array[ 0..3 ] of TQuadCornerIndexes = (
                (cTR, cBR, cTL, cBL));// flip HV
 
 type
+//TQuadF = array[0..3] of TPointF;
+TQuadCoor = TQuadF deprecated 'use TQuadF instead';
+PQuadCoor = PQuadF deprecated 'use PQuadF instead';
 
 { TQuadCoorHelper }
 
-TQuadCoorHelper = type helper for TQuadCoor
+TQuadFHelper = type helper for TQuadF
   procedure SetAsEmpty; inline;
   procedure Create(const aTL, aTR, aBR, aBL: TPointF);
   procedure SetAsRectangle(aWidth, aHeight: single); inline;
   procedure SetAsRectangle(aX, aY, aWidth, aHeight: single); inline;
-  procedure CopyFrom(const aQuad: TQuadCoor); inline;
+  procedure CopyFrom(const aQuad: TQuadF); inline;
   procedure AddOffset(const aOffsets: TQuadParamF); inline;
   procedure Translate(dx, dy: single);
   function Bounds: TRectF;
 end;
-function QuadCoor(const aTL, aTR, aBR, aBL: TPointF): TQuadCoor;
+function QuadF(const aTL, aTR, aBR, aBL: TPointF): TQuadF;
 
 type
   { TStraightLineEquation }
@@ -52,7 +55,7 @@ TStraightLineEquation = record
   function ComputeAngle(const aLine: TStraightLineEquation): single;
 end;
 
-TQuadF = array[0..3] of TPointF;
+
 
 
 //   q0                   q1    ￪        antialiasing is done here
@@ -139,7 +142,7 @@ begin
     else Result := ArcTan((a-aLine.a)/(1+a*aLine.a))*rad2deg;
 end;
 
-function QuadCoor(const aTL, aTR, aBR, aBL: TPointF): TQuadCoor;
+function QuadF(const aTL, aTR, aBR, aBL: TPointF): TQuadF;
 begin
   Result[cTL] := aTL;
   Result[cTR] := aTR;
@@ -154,12 +157,12 @@ begin
   v.Normalize;                      //   |                    |    width1
   vv := v * aWidth1;                //  pt1.......line.......pt2
   normal := PointF(vv.y, -vv.x);   //   |                    |    width2
-  Result[0] := pt1 + normal;        //   q3                   q2    ￬
-  Result[1] := pt2 + normal;
+  Result[cTL] := pt1 + normal;        //   q3                   q2    ￬
+  Result[cTR] := pt2 + normal;
   vv := v * aWidth2;
   normal := PointF(-vv.y, vv.x);
-  Result[2] := pt2 + normal;
-  Result[3] := pt1 + normal;
+  Result[cBR] := pt2 + normal;
+  Result[cBL] := pt1 + normal;
 end;
 
 function LineSegmentToQuadF_PosInside(const pt1, pt2: TPointF; const aWidth1, aWidth2: single): TQuadF;
@@ -169,29 +172,29 @@ begin
   v.Normalize;
   vv := v * aWidth1;
   normal := PointF(vv.y, -vv.x);
-  Result[0] := pt1 + normal;
-  Result[1] := pt2 + normal;
+  Result[cTL] := pt1 + normal;
+  Result[cTR] := pt2 + normal;
   vv := v * aWidth2;
   normal := PointF(vv.y, -vv.x);
-  Result[2] := Result[1] + normal;
-  Result[3] := Result[0] + normal;
+  Result[cBR] := Result[cTR] + normal;
+  Result[cBL] := Result[cTL] + normal;
 end;
 
 procedure AdjustCornerOnConsecutiveQuadF(var Q1, Q2: TQuadF);
 var F1, F2: TStraightLineEquation;
 begin
-  F1.InitFrom(Q1[0], Q1[1]);
-  F2.InitFrom(Q2[0], Q2[1]);
+  F1.InitFrom(Q1[cTL], Q1[cTR]);
+  F2.InitFrom(Q2[cTL], Q2[cTR]);
   if not F1.IsParallelWith(F2) then begin
-    Q1[1] := F1.ComputeIntersectionPoint(F2);
-    Q2[0] := Q1[1];
+    Q1[cTR] := F1.ComputeIntersectionPoint(F2);
+    Q2[cTL] := Q1[cTR];
   end;
 
-  F1.InitFrom(Q1[3], Q1[2]);
-  F2.InitFrom(Q2[3], Q2[2]);
+  F1.InitFrom(Q1[cBL], Q1[cBR]);
+  F2.InitFrom(Q2[cBL], Q2[cBR]);
   if not F1.IsParallelWith(F2) then begin
-    Q1[2] := F1.ComputeIntersectionPoint(F2);
-    Q2[3] := Q1[2];
+    Q1[cBR] := F1.ComputeIntersectionPoint(F2);
+    Q2[cBL] := Q1[cBR];
   end;
 end;
 
@@ -252,14 +255,14 @@ begin
   Result := x * (1 - a) + y * a;
 end;
 
-{ TQuadCoorHelper }
+{ TQuadFHelper }
 
-procedure TQuadCoorHelper.SetAsEmpty;
+procedure TQuadFHelper.SetAsEmpty;
 begin
   FillChar(Self, SizeOf(TPointF)*4, 0);
 end;
 
-procedure TQuadCoorHelper.Create(const aTL, aTR, aBR, aBL: TPointF);
+procedure TQuadFHelper.Create(const aTL, aTR, aBR, aBL: TPointF);
 begin
   Self[cTL] := aTL;
   Self[cTR] := aTR;
@@ -267,7 +270,7 @@ begin
   Self[cBL] := aBL;
 end;
 
-procedure TQuadCoorHelper.SetAsRectangle(aWidth, aHeight: single);
+procedure TQuadFHelper.SetAsRectangle(aWidth, aHeight: single);
 begin
   FillChar(Self, SizeOf(TPointF)*4, 0);
   Self[cTL] := PointF(0, 0);
@@ -277,7 +280,7 @@ begin
   Self[cBL].y := aHeight;
 end;
 
-procedure TQuadCoorHelper.SetAsRectangle(aX, aY, aWidth, aHeight: single);
+procedure TQuadFHelper.SetAsRectangle(aX, aY, aWidth, aHeight: single);
 begin
   Self[cTL].x := aX;
   Self[cTL].y := aY;
@@ -289,12 +292,12 @@ begin
   Self[cBL].y := aY+aHeight;
 end;
 
-procedure TQuadCoorHelper.CopyFrom(const aQuad: TQuadCoor);
+procedure TQuadFHelper.CopyFrom(const aQuad: TQuadF);
 begin
-  Move(aQuad, Self, SizeOf(TQuadCoor));
+  Move(aQuad, Self, SizeOf(TQuadF));
 end;
 
-procedure TQuadCoorHelper.AddOffset(const aOffsets: TQuadParamF);
+procedure TQuadFHelper.AddOffset(const aOffsets: TQuadParamF);
 begin
   Self[cTL] := Self[cTL] + aOffsets.TopLeft.Value;
   Self[cTR] := Self[cTR] + aOffsets.TopRight.Value;
@@ -302,7 +305,7 @@ begin
   Self[cBL] := Self[cBL] + aOffsets.BottomLeft.Value;
 end;
 
-procedure TQuadCoorHelper.Translate(dx, dy: single);
+procedure TQuadFHelper.Translate(dx, dy: single);
 begin
   Self[cTL].x := Self[cTL].x + dx;  Self[cTL].y := Self[cTL].y + dy;
   Self[cTR].x := Self[cTR].x + dx;  Self[cTR].y := Self[cTR].y + dy;
@@ -310,7 +313,7 @@ begin
   Self[cBL].x := Self[cBL].x + dx;  Self[cBL].y := Self[cBL].y + dy;
 end;
 
-function TQuadCoorHelper.Bounds: TRectF;
+function TQuadFHelper.Bounds: TRectF;
 begin
   Result.Left := Min(Min(Min(Self[cTL].x, Self[cTR].x), Self[cBR].x), Self[cBL].x);
   Result.Right := Max(Max(Max(Self[cTL].x, Self[cTR].x), Self[cBR].x), Self[cBL].x);

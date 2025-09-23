@@ -212,7 +212,7 @@ begin
 end;
 
 procedure TDeformationGrid.DoDraw;
-var WholeTexCoor, PartTexCoor, ScreenCellCoor: TQuadCoor;
+var WholeTexCoor, PartTexCoor, ScreenCellCoor: TQuadF;
     tx, ty, tw, th: single;
     ix, iy, ixf, iyf: integer;
     pt1, pt2: TPointF;

@@ -122,7 +122,7 @@ end;
 
 procedure TOGLCDecorList.Draw(const aLayerPercentOpacity: single);
 var i: SizeUInt;
-  modelArea: TQuadCoor;
+  modelArea: TQuadF;
   fi: integer;
 begin
   if FItems.Size = 0 then exit;

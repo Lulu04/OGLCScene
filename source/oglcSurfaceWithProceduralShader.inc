@@ -18,7 +18,7 @@ private
   FGLErrorSent: boolean;
   FAttribsArray: TArrayOfxyuv;
   FWidth, FHeight: integer;
-  FModelArea: TQuadCoor;
+  FModelArea: TQuadF;
   FTimeAccu: single;
   FRefreshContinuously, FRefreshOneTime: boolean;
   procedure CreateID;

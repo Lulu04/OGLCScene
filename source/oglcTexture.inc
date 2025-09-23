@@ -23,7 +23,7 @@ public
   FrameHeight: integer;   // the height of one frame in this texture (same as TextureHeight if there is only 1 frame)
   FrameCount: integer;    // = 1 minimum = length(FramesCoord)
   FramePerRow: integer;   // the number of frame per row in a tileset.
-  FramesCoord: array of TQuadCoor;  // [0] is whole texture or sub-texture, [1] is first frame, [2] is second frame, ...
+  FramesCoord: array of TQuadF;  // [0] is whole texture or sub-texture, [1] is first frame, [2] is second frame, ...
 
   // convert a texture pixel coordinates into its UV equivalent
   // texture coordinates (0,0) is the top/left of the (sub-)texture. (local space)

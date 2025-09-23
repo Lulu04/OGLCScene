@@ -282,10 +282,10 @@ var p: Pxydistance;
        p^.x := FPath[i].x; p^.y := FPath[i].y; p^.distance := 0;  inc(p);
        p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 0;  inc(p);
        // quad1 topleft, topright, bottomright, bottomleft
-       p^.x := quad1[0].x; p^.y := quad1[0].y; p^.distance := 1;  inc(p);
-       p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 1;  inc(p);
-       p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1;  inc(p);
-       p^.x := quad1[3].x; p^.y := quad1[3].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cTL].x; p^.y := quad1[cTL].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cTR].x; p^.y := quad1[cTR].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cBR].x; p^.y := quad1[cBR].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cBL].x; p^.y := quad1[cBL].y; p^.distance := 1;  inc(p);
 
        // indices for triangle strip
        pIndice[0] := currentIndice+2;
@@ -300,8 +300,8 @@ var p: Pxydistance;
        // path point pt2
        p^.x := FPath[i+1].x; p^.y := FPath[i+1].y; p^.distance := 0;  inc(p);
        // quad1 topright, bottomright
-       p^.x := quad1[1].x; p^.y := quad1[1].y; p^.distance := 1;  inc(p);
-       p^.x := quad1[2].x; p^.y := quad1[2].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cTR].x; p^.y := quad1[cTR].y; p^.distance := 1;  inc(p);
+       p^.x := quad1[cBR].x; p^.y := quad1[cBR].y; p^.distance := 1;  inc(p);
 
        if iterationCount = 1 then begin
          // indices for triangle strip

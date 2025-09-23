@@ -317,7 +317,7 @@ procedure TOGLCParticleRenderer.PushQuad(const aFrameIndex,
   aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
 var w, h: single;
     tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
+    texCoord: PQuadF;
     p: Pxyuvtintopacitymatrix;
     fi: Integer;
     pIndex: PVertexIndex;

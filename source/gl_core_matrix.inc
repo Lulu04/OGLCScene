@@ -33,7 +33,7 @@ TOGLCMatrix = record
 
   function Transform(const aPt: TPointF): TPointF; overload; inline;
   function Transform(const aRect: TRectF): TRectF; overload;
-  function Transform(const aQuad: TQuadCoor): TQuadCoor; overload;
+  function Transform(const aQuad: TQuadF): TQuadF; overload;
   function Transform(const aPts: ArrayOfTPointF): ArrayOfTPointF; overload;
 
   function Inverse: TOGLCMatrix;
@@ -184,7 +184,7 @@ begin
   Result.BottomRight := Transform(aRect.BottomRight);
 end;
 
-function TOGLCMatrix.Transform(const aQuad: TQuadCoor): TQuadCoor;
+function TOGLCMatrix.Transform(const aQuad: TQuadF): TQuadF;
 begin
   Result[cTL] := Transform(aQuad[cTL]);
   Result[cTR] := Transform(aQuad[cTR]);

@@ -392,7 +392,7 @@ private
 public
   procedure Prepare(aTriangleType: TTriangleType; const aProjectionMatrix: TOGLCMatrix; aBlendMode: byte);
 
-  procedure PushQuad(const aModelArea: TQuadCoor; const aColors: TQuadColorF; aFlipIndex: integer;
+  procedure PushQuad(const aModelArea: TQuadF; const aColors: TQuadColorF; aFlipIndex: integer;
                      aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
 end;
 
@@ -462,7 +462,7 @@ public
                                       aCornerOffset: TQuadParamF);
   procedure PushFrameClipped(const aFrameIndex, aFlipIndex: integer; const aXPosOffset, aYPosOffset: single;
                              const aClipRect: TRectF);
-  procedure PushQuad(const aTexCoord: TQuadCoor; aFlipIndex: integer; const aRect: TRectF);
+  procedure PushQuad(const aTexCoord: TQuadF; aFlipIndex: integer; const aRect: TRectF);
 end;
 
 
@@ -534,11 +534,11 @@ public
                      const aXPosOffset, aYPosOffset, aOpacity: single; const aComputedTint: TColorF); overload;
 
   // Set aModelViewMatrix to NIL to use the parent scene model view matrix
-  procedure PushQuad2(const aModelArea, aTexCoor: TQuadCoor; aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44;
+  procedure PushQuad2(const aModelArea, aTexCoor: TQuadF; aFlipIndex: integer; aModelViewMatrix: POGLCMatrix44;
                      const aOpacity: single; const aComputedTint: TColorF); overload;
 
   // Set aModelViewMatrix to NIL to use the parent scene model view matrix
-  procedure PushQuad3(const aModelArea: TRect; const aTexCoor: TQuadCoor; aFlipIndex: integer;
+  procedure PushQuad3(const aModelArea: TRect; const aTexCoor: TQuadF; aFlipIndex: integer;
                       aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF); overload;
 end;
 
@@ -990,23 +990,23 @@ begin
   // push the 4 vertex        // vertex coord      24
   p := QueryVertex(4);        //                   13
   with p[0] do begin
-    x := aQuad[3].x;
-    y := aQuad[3].y;
+    x := aQuad[cBL].x;
+    y := aQuad[cBL].y;
     c.CopyFrom(aColor);
   end;
   with p[1] do begin
-    x := aQuad[0].x;
-    y := aQuad[0].y;
+    x := aQuad[cTL].x;
+    y := aQuad[cTL].y;
     c.CopyFrom(aColor);
   end;
   with p[2] do begin
-    x := aQuad[2].x;
-    y := aQuad[2].y;
+    x := aQuad[cBR].x;
+    y := aQuad[cBR].y;
     c.CopyFrom(aColor);
   end;
   with p[3] do begin
-    x := aQuad[1].x;
-    y := aQuad[1].y;
+    x := aQuad[cTR].x;
+    y := aQuad[cTR].y;
     c.CopyFrom(aColor);
   end;
 end;
@@ -1028,8 +1028,8 @@ begin
     lpMiddle: quad := LineSegmentToQuadF_PosMiddle(pt1, pt2, w*0.5, w*0.5);
     lpInside: begin
       quad := LineSegmentToQuadF_PosInside(pt1, pt2, w*0.5, w*0.5);
-      quad[0] := pt1;
-      quad[1] := pt2;
+      quad[cTL] := pt1;
+      quad[cTR] := pt2;
     end;
   end;
   cf.InitFromBGRA(aColor);
@@ -1235,7 +1235,7 @@ begin
   FProjectionMatrix.CopyFrom(aProjectionMatrix);
 end;
 
-procedure TOGLCThreeColorMVTriangleRenderer.PushQuad(const aModelArea: TQuadCoor; const aColors: TQuadColorF; aFlipIndex: integer;
+procedure TOGLCThreeColorMVTriangleRenderer.PushQuad(const aModelArea: TQuadF; const aColors: TQuadColorF; aFlipIndex: integer;
   aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
 var tci: PQuadCornerIndexes;
     p: Pxyopacitycolortintmatrix;
@@ -1369,7 +1369,7 @@ var w, h: single;
     p: Pxyuv;
     pIndex: PVertexIndex;
     tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
+    texCoord: PQuadF;
     fi: Integer;
     currentIndex: Int64;
     tex: PTexture;
@@ -1470,7 +1470,7 @@ var w, h: single;
     p: Pxyuv;
     pIndex: PVertexIndex;
     tci: PQuadCornerIndexes;
-    texCoord: PQuadCoor;
+    texCoord: PQuadF;
     fi: Integer;
     currentIndex: Int64;
     tex: PTexture;
@@ -1570,7 +1570,7 @@ procedure TOGLCTexturedTriangleRenderer.PushFrameClipped(const aFrameIndex,
 var p: Pxyuv;
     pIndex: PVertexIndex;
     tci: PQuadCornerIndexes;
-    texCoord: TQuadCoor;
+    texCoord: TQuadF;
     fi: Integer;
     clippedRect: TRectF;
     tex: PTexture;
@@ -1667,7 +1667,7 @@ begin
   end;
 end;
 
-procedure TOGLCTexturedTriangleRenderer.PushQuad(const aTexCoord: TQuadCoor;
+procedure TOGLCTexturedTriangleRenderer.PushQuad(const aTexCoord: TQuadF;
   aFlipIndex: integer; const aRect: TRectF);
 var p: Pxyuv;
     pIndex: PVertexIndex;
@@ -1818,7 +1818,7 @@ procedure TOGLCTexturedMVTriangleRenderer.PushQuad(const aFrameIndex, aFlipIndex
   const aModelViewMatrix: POGLCMatrix44; const aXPosOffset, aYPosOffset, aOpacity: single; const aComputedTint: TColorF);
 var w, h: single;
     fi: Integer;
-    area: {TRect;} TQuadCoor;
+    area: TQuadF;
     tex: PTexture;
 begin
   tex := FBatch^.CurrentTexture;
@@ -1839,7 +1839,7 @@ begin
   PushQuad2(area, tex^.FramesCoord[fi], aFlipIndex, aModelViewMatrix, aOpacity, aComputedTint);
 end;
 
-procedure TOGLCTexturedMVTriangleRenderer.PushQuad2(const aModelArea, aTexCoor: TQuadCoor; aFlipIndex: integer;
+procedure TOGLCTexturedMVTriangleRenderer.PushQuad2(const aModelArea, aTexCoor: TQuadF; aFlipIndex: integer;
   aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
 var tci: PQuadCornerIndexes;
     p: Pxyuvtintopacitymatrix;
@@ -1911,7 +1911,7 @@ begin
   end;
 end;
 
-procedure TOGLCTexturedMVTriangleRenderer.PushQuad3(const aModelArea: TRect; const aTexCoor: TQuadCoor; aFlipIndex: integer;
+procedure TOGLCTexturedMVTriangleRenderer.PushQuad3(const aModelArea: TRect; const aTexCoor: TQuadF; aFlipIndex: integer;
   aModelViewMatrix: POGLCMatrix44; const aOpacity: single; const aComputedTint: TColorF);
 var tci: PQuadCornerIndexes;
     p: Pxyuvtintopacitymatrix;
