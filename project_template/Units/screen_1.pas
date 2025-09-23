@@ -10,17 +10,19 @@ uses
   OGLCScene,
   u_common;
 
-type
+{
+  About game screen, keep in mind this concept:
+   - there is one screen for one part of the game, for example: screen_title, screen_game,
+     screen_halloffame, etc... each ones in a separate unit and encapsulated in a class
+     descendant of TScreenTemplate.
+}
 
+type
 { TScreen1 }
 
 TScreen1 = class(TScreenTemplate)
 private
   FAtlas: TOGLCTextureAtlas;
-
-  // if you use UI elements that can be clicked (buttons...) redirects their OnClick event to this method.
-  // If you don't have any UI in your game, you can remove this method.
-  procedure ProcessUIClick(Sender: TSimpleSurfaceWithEffect);
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -36,12 +38,6 @@ uses Forms;
 
 { TScreen1 }
 
-procedure TScreen1.ProcessUIClick(Sender: TSimpleSurfaceWithEffect);
-begin
-  // Manage here the click on your UI elements
-  // ...
-end;
-
 procedure TScreen1.CreateObjects;
 var ima: TBGRABitmap;
 begin
@@ -52,13 +48,13 @@ begin
   // Add your images to the atlas here
   // example:
       ima := TBGRABitmap.Create(100,100,BGRA(255,255,0));
-      FAtlas.Add(ima); // don't freed 'ima' because FAtlas become its owner !
+      FAtlas.Add(ima, 'MyYellowRectangle'); // don't freed 'ima' because FAtlas become its owner !
   // ...
 
   FAtlas.TryToPack;
   FAtlas.Build;
   // for debug purpose, we save the packed image just to see if all is fine.
-  ima := FAtlas.GetPackedImage(True, True);
+  ima := FAtlas.GetPackedImage(False, False);
   ima.SaveToFile(Application.Location+'atlas.png');
   ima.Free;
   FAtlas.FreeItemImages; // free some memory because we no longer need individual images
@@ -74,11 +70,10 @@ begin
 end;
 
 procedure TScreen1.Update(const AElapsedTime: single);
-var truck: TSprite;
 begin
   inherited Update(AElapsedTime);
 
-  // Put here the code to manage this screen. This method is called every frames.
+  // Put here the logic to manage this screen. This method is called every frames.
   // ...
 end;
 
@@ -87,9 +82,6 @@ begin
   // uncomment and handle your messages here
 {
   case UserValue of
-    YourFirstUserValue: begin
-
-    end;
   ...
   end;//case
 }

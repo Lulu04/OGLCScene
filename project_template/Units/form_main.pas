@@ -38,8 +38,8 @@ uses OGLCScene, u_common, u_app, screen_1;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
-  FScene.DesignPPI := 96;
+  FScene := TOGLCScene.Create(OpenGLControl1, SCREEN_WIDTH_AT_DESIGN_TIME/SCREEN_HEIGHT_AT_DESIGN_TIME);
+  FScene.DesignPPI := SCREEN_PPI_AT_DESIGN_TIME;
   FScene.LayerCount := LAYER_COUNT;
   FScene.ScreenFadeTime := 0.5;
 
@@ -74,7 +74,7 @@ procedure TFormMain.LoadCommonData;
 begin
   FScene.CreateLogFile(Application.Location+'scene.log', True, NIL, NIL);
 
-  // create the screens here
+  // create your game screens here
   Screen1 := TScreen1.Create;
 
   FScene.RunScreen(Screen1);
@@ -82,6 +82,7 @@ end;
 
 procedure TFormMain.FreeCommonData;
 begin
+  // free your game screens here
   FreeAndNil(Screen1);
 end;
 
