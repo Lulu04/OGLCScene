@@ -34,12 +34,12 @@ public
   procedure DeleteSelection; override;
   procedure LoopScaleSelection; override; // change size instead scale
 
-  procedure AlignSelectedLeftTo(aX: single); override;
-  procedure AlignSelectedHCenterTo(aX: single); override;
-  procedure AlignSelectedRightTo(aX: single); override;
-  procedure AlignSelectedTopTo(aY: single); override;
-  procedure AlignSelectedVCenterTo(aY: single); override;
-  procedure AlignSelectedBottomTo(aY: single); override;
+  procedure AlignSelectedLeftTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedHCenterTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedRightTo(aX: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedTopTo(aY: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedVCenterTo(aY: single; aRef: PSurfaceDescriptor); override;
+  procedure AlignSelectedBottomTo(aY: single; aRef: PSurfaceDescriptor); override;
 
   procedure RotateSelectedCCW; override;
   procedure RotateSelectedCW; override;
@@ -176,61 +176,67 @@ begin
   until MouseState <> msScalingSelection;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedLeftTo(aX: single);
+procedure TScreenLevelEditor.AlignSelectedLeftTo(aX: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedLeftTo(aX);
+  inherited AlignSelectedLeftTo(aX, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedHCenterTo(aX: single);
+procedure TScreenLevelEditor.AlignSelectedHCenterTo(aX: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedHCenterTo(aX);
+  inherited AlignSelectedHCenterTo(aX, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedRightTo(aX: single);
+procedure TScreenLevelEditor.AlignSelectedRightTo(aX: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedRightTo(aX);
+  inherited AlignSelectedRightTo(aX, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedTopTo(aY: single);
+procedure TScreenLevelEditor.AlignSelectedTopTo(aY: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedTopTo(aY);
+  inherited AlignSelectedTopTo(aY, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedVCenterTo(aY: single);
+procedure TScreenLevelEditor.AlignSelectedVCenterTo(aY: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedVCenterTo(aY);
+  inherited AlignSelectedVCenterTo(aY, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
 end;
 
-procedure TScreenLevelEditor.AlignSelectedBottomTo(aY: single);
+procedure TScreenLevelEditor.AlignSelectedBottomTo(aY: single;
+  aRef: PSurfaceDescriptor);
 begin
   if Length(FSelected) = 0 then exit;
 
-  inherited AlignSelectedBottomTo(aY);
+  inherited AlignSelectedBottomTo(aY, aRef);
 
   FrameToolLevelEditor.ShowSelectionData(FSelected);
   FrameToolLevelEditor.Modified := True;
