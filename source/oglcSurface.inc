@@ -287,12 +287,13 @@ public // Local <-> World
   // (don't take in acount the camera assigned to the parent layer of the surface)
   function GetMatrixSurfaceToWorld: TOGLCMatrix;
   // Returns the rectangular area that contains the transformed surface in scene coordinate.
-  function GetRectAreaInSceneSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF;
+  function GetRectAreaInSceneSpace(aGiveRectThatContainRotatedBounds: boolean): TRectF; deprecated 'use GetQuadAreaInSceneSpace.Bounds instead';
   // Returns the rectangular area that contains the transformed surface area in world coordinate.
-  function GetRectAreaInWorldSpace: TRectF;
+  function GetRectAreaInWorldSpace: TRectF; deprecated 'use GetQuadAreaInWorldSpace.Bounds instead';
   // Return a Quad that represent the transformed rectangular surface area in world coordinate.
   function GetQuadAreaInWorldSpace: TQuadF;
-
+  // Return a Quad that represent the transformed rectangular surface area in scene coordinate.
+  function GetQuadAreaInSceneSpace: TQuadF;
   // The rectangular area (single) of the surface expressed in the surface space (TopLeft=0,0)
   // and without applying model view matrix.
   function GetRectAreaInLocalSpace: TRectF;
@@ -641,6 +642,16 @@ function TSimpleSurfaceWithEffect.GetQuadAreaInWorldSpace: TQuadF;
 var m: TOGLCMatrix;
 begin
   m := GetMatrixSurfaceToWorld;
+  Result[cTL] := m.Transform(PointF(0, 0));
+  Result[cTR] := m.Transform(PointF(Width, 0));
+  Result[cBR] := m.Transform(PointF(Width, Height));
+  Result[cBL] := m.Transform(PointF(0, Height));
+end;
+
+function TSimpleSurfaceWithEffect.GetQuadAreaInSceneSpace: TQuadF;
+var m: TOGLCMatrix;
+begin
+  m := GetMatrixSurfaceToScene;
   Result[cTL] := m.Transform(PointF(0, 0));
   Result[cTR] := m.Transform(PointF(Width, 0));
   Result[cBR] := m.Transform(PointF(Width, Height));
