@@ -275,7 +275,7 @@ public // Local <-> World
   // Transform local coordinates to world coordinates.
   // (don't take in acount the camera assigned to the parent layer of the surface)
   function SurfaceToWorld(aPt: TPointF): TPointF;
-  function SceneToSurfaceWorld(aPt: TPointF): TPointF;
+  function WorldToSurface(aPt: TPointF): TPointF;
   function SurfaceToParent(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   function ParentToSurface(aPt: TPointF; aParent: TSimpleSurfaceWithEffect=NIL): TPointF;
   // Apply surface transformations (translation, scale, rotation+pivot) on the given matrix.
@@ -922,7 +922,7 @@ var p: TPointF;
 begin
   if aParentSurface = NIL then exit;
 
-  p := aParentSurface.SceneToSurfaceWorld(GetXY); // aParentSurface.SceneToSurface(GetXY);
+  p := aParentSurface.WorldToSurface(GetXY); // aParentSurface.SceneToSurface(GetXY);
   ParentLayer.Remove(Self);
   aParentSurface.AddChild(Self, aZOrder);
   SetCoordinate(p);
@@ -1060,7 +1060,7 @@ begin
   until s = NIL;
 end;
 
-function TSimpleSurfaceWithEffect.SceneToSurfaceWorld(aPt: TPointF): TPointF;
+function TSimpleSurfaceWithEffect.WorldToSurface(aPt: TPointF): TPointF;
 var s: TSimpleSurfaceWithEffect;
 begin
   s := Self;
