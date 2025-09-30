@@ -29,6 +29,8 @@ PQuadCoor = PQuadF deprecated 'use PQuadF instead';
 
 { TQuadCoorHelper }
 
+{ TQuadFHelper }
+
 TQuadFHelper = type helper for TQuadF
   procedure SetAsEmpty; inline;
   procedure Create(const aTL, aTR, aBR, aBL: TPointF);
@@ -38,6 +40,7 @@ TQuadFHelper = type helper for TQuadF
   procedure AddOffset(const aOffsets: TQuadParamF); inline;
   procedure Translate(dx, dy: single);
   function Bounds: TRectF;
+  function isVisibleIn(const aRect: TRectF): boolean; inline;
 end;
 function QuadF(const aTL, aTR, aBR, aBL: TPointF): TQuadF;
 
@@ -319,6 +322,12 @@ begin
   Result.Right := Max(Max(Max(Self[cTL].x, Self[cTR].x), Self[cBR].x), Self[cBL].x);
   Result.Top := Min(Min(Min(Self[cTL].y, Self[cTR].y), Self[cBR].y), Self[cBL].y);
   Result.Bottom := Max(Max(Max(Self[cTL].y, Self[cTR].y), Self[cBR].y), Self[cBL].y);
+end;
+
+function TQuadFHelper.isVisibleIn(const aRect: TRectF): boolean;
+begin
+  Result := aRect.Contains(Self[cTL]) or aRect.Contains(Self[cTR]) or
+            aRect.Contains(Self[cBR]) or aRect.Contains(Self[cBL]);
 end;
 
 {$endif oglcIMPLEMENTATION}
