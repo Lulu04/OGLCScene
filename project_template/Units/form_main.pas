@@ -30,7 +30,7 @@ var
   FormMain: TFormMain;
 
 implementation
-uses OGLCScene, u_common, u_app, screen_1;
+uses OGLCScene, u_common, screen_1;
 
 {$R *.lfm}
 
