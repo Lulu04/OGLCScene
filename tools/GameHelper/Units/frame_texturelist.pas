@@ -96,6 +96,7 @@ begin
   if Sender = BChooseImageFile then begin
     if not OD1.Execute then exit;
     Label2.Caption := OD1.FileName;
+    Label2.Hint := OD1.FileName;
     Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
     if LowerCase(ExtractFileExt(OD1.FileName)) = '.svg' then begin
       s := GetSVGImageSize(OD1.FileName);
@@ -176,6 +177,7 @@ begin
   i := LBTextureNames.ItemIndex;
   if i = -1 then begin
     Label2.Caption := '';
+    Label2.Hint := '';
     Edit1.Text := '';
     SE9.Value := 0;
     SE10.Value := 0;
@@ -185,6 +187,7 @@ begin
   end else begin
     texItem := Textures.GetItemByName(LBTextureNames.Items.Strings[i]);
     Label2.Caption := texItem^.filename;
+    Label2.Hint := texItem^.filename;
     Edit1.Text := texItem^.name;
     SE9.Value := texItem^.width;
     SE10.Value := texItem^.height;

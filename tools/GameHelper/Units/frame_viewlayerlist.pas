@@ -57,7 +57,7 @@ type
 
 implementation
 uses LCLType, LCLHelper, u_project, u_utils, u_datamodule,
-  u_layerlist, Math;
+  u_layerlist, u_common, Math;
 
 {$R *.lfm}
 
@@ -110,6 +110,13 @@ begin
                   ARect.Bottom),
                   ARect.Left, ARect.Top, Index.ToString+'-'+LB.Items.Strings[Index], FTextStyleForTextRect);
 
+    // render if layer is empty
+    i := FScene.Layer[Index+APP_LAYER_COUNT].SurfaceCount;
+    if i = 0 then begin
+      xx := ARect.Right-DataModule1.ILIconLayerList.Width-PPIScale(5)-TextWidth('empty');
+      TextOut(xx, ARect.Top, 'empty');
+    end;
+
     // render icon visible or not
     if FShowIconEye then begin
       xx := ARect.Right-DataModule1.ILIconLayerList.Width;
@@ -142,22 +149,6 @@ begin
       end else FLeftClickedIndex := -1;
     end;
   end;
-
-
-{  if (Button = mbLeft) and (i = -1) then
-    LB.ItemIndex := -1;
-
-  // prepare for drag
-  if (Button = mbLeft) and (i <> -1) and FMouseCanMoveItem and
-     (LB.Count > 1) then begin
-    FLeftClickedIndex := i;
-    FMouseOrigin := LB.ClientToScreen(Point(X,Y));
-  end else FLeftClickedIndex := -1;   }
-
-{  // right click on item = select it (except if it is already selected)
-  if (Button = mbRight) and (i <> -1) then
-    if not LB.Selected[i] then
-      LB.ItemIndex := i; }
 end;
 
 procedure TFrameViewLayerList.LBMouseLeave(Sender: TObject);

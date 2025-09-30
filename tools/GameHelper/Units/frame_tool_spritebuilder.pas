@@ -11,7 +11,7 @@ uses
   OGLCScene,
   u_surface_list, u_texture_list, Types,
   u_screen_spritebuilder, u_collisionbody_list, u_posture_list, u_undo_redo,
-  frame_texturelist;
+  frame_texturelist, LCL_utils;
 
 type
 
@@ -50,6 +50,11 @@ type
     CBTextures: TComboBox;
     CBFlipH: TCheckBox;
     CBFlipV: TCheckBox;
+    ColorButton1: TColorButton;
+    ColorButton2: TColorButton;
+    ColorButton3: TColorButton;
+    ColorButton4: TColorButton;
+    ColorButton5: TColorButton;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit5: TEdit;
@@ -68,34 +73,102 @@ type
     Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
+    Label21: TLabel;
     Label22: TLabel;
     Label23: TLabel;
     Label24: TLabel;
     Label25: TLabel;
+    Label26: TLabel;
+    Label27: TLabel;
+    Label28: TLabel;
+    Label29: TLabel;
     Label3: TLabel;
+    Label30: TLabel;
+    Label31: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    Label35: TLabel;
+    Label36: TLabel;
+    Label37: TLabel;
+    Label38: TLabel;
+    Label39: TLabel;
     Label4: TLabel;
+    Label40: TLabel;
+    Label41: TLabel;
+    Label42: TLabel;
+    Label43: TLabel;
+    Label44: TLabel;
+    Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Label48: TLabel;
+    Label49: TLabel;
+    Label5: TLabel;
+    Label50: TLabel;
+    Label6: TLabel;
     Label7: TLabel;
+    Label8: TLabel;
     Label9: TLabel;
     LBPostureNames: TListBox;
     MIDeleteNode: TMenuItem;
     MIAddNode: TMenuItem;
+    NotebookExtra: TNotebook;
     OD1: TOpenDialog;
+    PageTSprite: TPage;
+    PageTShapeOutline: TPage;
+    PageTGradientRectangle: TPage;
+    PageTDeformationGrid: TPage;
+    PageTScrollableSprite: TPage;
+    PageTPolarSprite: TPage;
+    PageTSpriteWithElasticCorner: TPage;
+    PageExtraTQuad4Color: TPage;
+    PageExtraEmpty: TPage;
     PageChilds: TTabSheet;
     PageTextures: TTabSheet;
     Panel1: TPanel;
     Panel10: TPanel;
     Panel11: TPanel;
     Panel12: TPanel;
+    Panel13: TPanel;
+    Panel14: TPanel;
+    Panel15: TPanel;
+    Panel16: TPanel;
+    Panel17: TPanel;
+    Panel18: TPanel;
+    Panel19: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
+    Panel5: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
     Panel8: TPanel;
+    Panel9: TPanel;
     PC1: TPageControl;
     PopupNode: TPopupMenu;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
     SE1: TFloatSpinEdit;
+    SE10: TSpinEdit;
+    SE11: TSpinEdit;
+    SE12: TSpinEdit;
+    SE13: TSpinEdit;
+    SE14: TSpinEdit;
+    SE15: TSpinEdit;
+    SE18: TSpinEdit;
+    SE19: TSpinEdit;
     SE2: TFloatSpinEdit;
+    SE20: TSpinEdit;
+    SE21: TSpinEdit;
+    SE22: TSpinEdit;
+    SE23: TSpinEdit;
+    SE24: TSpinEdit;
+    SE25: TSpinEdit;
+    SE26: TSpinEdit;
+    SE27: TSpinEdit;
+    SE28: TSpinEdit;
+    SE29: TSpinEdit;
     SE3: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
     SE5: TFloatSpinEdit;
@@ -112,7 +185,6 @@ type
     BReverseAngle: TSpeedButton;
     BResetPos: TSpeedButton;
     SEDummy: TSpinEdit;
-    SE9: TSpinEdit;
     SpeedButton1: TSpeedButton;
     SpeedButton10: TSpeedButton;
     SpeedButton11: TSpeedButton;
@@ -127,6 +199,9 @@ type
     SpeedButton7: TSpeedButton;
     SpeedButton8: TSpeedButton;
     SpeedButton9: TSpeedButton;
+    SE9: TSpinEdit;
+    SE16: TSpinEdit;
+    SE17: TSpinEdit;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
@@ -153,6 +228,7 @@ type
   private // childs
     procedure ClassTypeToCB(aClass: classOfSimpleSurfaceWithEffect);
     function CBToClassType: classOfSimpleSurfaceWithEffect;
+    function CBChildTypeIsTextured: boolean;
     procedure TexturenameToCB(aName: string);
     function CBToTextureName: string;
     procedure ParentIDToCB(aID: integer);
@@ -160,6 +236,8 @@ type
     function CheckChildWidgets: boolean;
     function DoAddNewChild: boolean;
     procedure DoUpdateChild(aForceRecreateSurface: boolean);
+    function GetWidgetTintMode: TTintMode;
+    function GetWidgetTint: TBGRAPixel;
   private // postures
     FPostureTabIsActive, FAddingPosture: boolean;
     function LBSelectedToName: string;
@@ -172,6 +250,7 @@ type
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure UpdateValuesToWorkingSurface;
+    procedure UpdateExtraPropertiesToWorkingTemporary;
     function Textures: TTextureList;
     function Surfaces: TSpriteBuilderSurfaceList;
     function Bodies: TBodyItemList;
@@ -179,10 +258,11 @@ type
     procedure DoClearAll;
   private
     FModified: boolean;
+  private
+    procedure ShowExtraPropertyPanel;
   public
     FrameTextureList: TFrameTextureList;
     constructor Create(TheOwner: TComponent); override;
-
     procedure SetFocusToDummy;
 
     procedure OnShow;
@@ -200,7 +280,7 @@ type
 
 implementation
 uses form_main, u_project, u_common, u_spritebank, u_screen_template,
-  form_showhelp, LCLType;
+  form_showhelp, u_utils, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -256,7 +336,6 @@ var o: PSpriteBankItem;
 begin
   nam := Trim(Edit2.Text);
   if nam = '' then exit;
-  if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
   if not Surfaces.RootIsDefined then exit;
 
@@ -526,6 +605,12 @@ var texItem: PTextureItem;
 begin
   if FInitializingWidget then exit;
 
+  if Sender = CBChildType then begin
+    CBTextures.Enabled := CBChildTypeIsTextured;
+    if not CBTextures.Enabled then CBTextures.ItemIndex := -1;
+    Label4.Enabled := CBTextures.Enabled;
+  end;
+
   if Sender = CBTextures then begin
     texItem := Textures.GetItemByName(CBTextures.Text);
     if Edit5.Text = '' then
@@ -537,6 +622,20 @@ begin
       SE9.Visible := Label2.Visible;
       SE9.MaxValue := texItem^.framecount;
       SE9.MinValue := 1;
+
+      SE16.Value := texItem^.GetTextureWidth;  // TQuad4Color
+      SE17.Value := texItem^.GetTextureHeight;
+      SE18.Value := texItem^.GetTextureWidth;  // TSprite
+      SE19.Value := texItem^.GetTextureHeight;
+      SE20.Value := texItem^.GetTextureWidth;  // TSpriteWithElecticCorner
+      SE21.Value := texItem^.GetTextureHeight;
+      SE22.Value := texItem^.GetTextureWidth;  // TPolarSprite
+      SE23.Value := texItem^.GetTextureHeight;
+      SE24.Value := texItem^.GetTextureWidth;  // TScrollableSprite
+      SE25.Value := texItem^.GetTextureHeight;
+      SE26.Value := texItem^.GetTextureWidth;  // TDeformationGrid
+      SE27.Value := texItem^.GetTextureHeight;
+
     end;
   end;
 
@@ -551,11 +650,33 @@ begin
                    (Scale.x.Value <> SE5.Value) or (Scale.y.Value <> SE6.Value) or
                    (Angle.Value <> SE7.Value) or (ZOrderAsChild <> SE8.Value) or
                    (FlipH <> CBFlipH.Checked) or (FlipV <> CBFlipV.Checked) or
-                   (FWorkingChild^.IsTextured and (Trunc(Frame) <> SE9.Value));
+                   (FWorkingChild^.IsTextured and (Trunc(Frame) <> SE9.Value)) or
+                   (Round(Opacity.Value) <> SE10.Value) or
+                   (TintMode <> GetWidgetTintMode) or
+                   (Tint.Value <> GetWidgetTint);
+
+    if FWorkingChild^.surface is TSprite then
+      with TSprite(FWorkingChild^.surface) do
+        chang := chang or (Width <> SE18.Value) or (Height <> SE19.Value);
+
+    if FWorkingChild^.surface is TQuad4Color then
+      with TQuad4Color(FWorkingChild^.surface) do
+        chang := chang or (Width <> SE16.Value) or (Height <> SE17.Value) or
+                 (BGRAToColor(TopLeftColor.Value) <> ColorButton1.ButtonColor) or
+                 (Trunc(TopLeftColor.Alpha.Value) <> SE12.Value) or
+                 (BGRAToColor(TopRightColor.Value) <> ColorButton2.ButtonColor) or
+                 (Trunc(TopRightColor.Alpha.Value) <> SE13.Value) or
+                 (BGRAToColor(BottomRightColor.Value) <> ColorButton4.ButtonColor) or
+                 (Trunc(BottomRightColor.Alpha.Value) <> SE15.Value) or
+                 (BGRAToColor(BottomLeftColor.Value) <> ColorButton3.ButtonColor) or
+                 (Trunc(BottomLeftColor.Alpha.Value) <> SE14.Value);
+
     if chang then begin
       DoUpdateChild(False);
       FModified := True;
     end;
+  end else begin
+    ShowExtraPropertyPanel;
   end;
 end;
 
@@ -626,16 +747,6 @@ end;
 
 procedure TFrameToolsSpriteBuilder.SpeedButton1Click(Sender: TObject);
 var ref: PSurfaceDescriptor;
-  surfaceRef: TSimpleSurfaceWithEffect;
-  function TransformRefX(aX: single): single;
-  begin
-    Result := surfaceRef.SurfaceToWorld(PointF(aX, 0)).x;
-  end;
-  function TransformRefY(aY: single): single;
-  begin
-    Result := surfaceRef.SurfaceToWorld(PointF(0, aY)).y;
-  end;
-
 begin
   if CBAlignReference.ItemIndex = -1 then exit;
   if ScreenSpriteBuilder.SelectedCount < 2 then exit;
@@ -664,26 +775,6 @@ begin
       12: AlignSelectedTopTo(GetRefBoundsCenterV(ref), ref);
       13: AlignSelectedTopTo(GetRefBoundsBottom(ref), ref);
     end;
-
-{  surfaceRef := ScreenSpriteBuilder.Selected[0]^.surface;
-  with ScreenSpriteBuilder do
-    case TSpeedButton(Sender).ImageIndex of
-      0: AlignSelectedRightTo(TransformRefX(0), ref); //AlignSelectedRightTo(GetFirstSelectedX);
-      1: AlignSelectedRightTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedRightTo(GetFirstSelectedCenterX);
-      2: AlignSelectedLeftTo(TransformRefX(0), ref); //AlignSelectedLeftTo(GetFirstSelectedX);
-      3: AlignSelectedHCenterTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedHCenterTo(GetFirstSelectedCenterX);
-      4: AlignSelectedRightTo(TransformRefX(surfaceRef.Width), ref); //AlignSelectedRightTo(GetFirstSelectedRightX);
-      5: AlignSelectedLeftTo(TransformRefX(surfaceRef.Width*0.5), ref); //AlignSelectedLeftTo(GetFirstSelectedCenterX);
-      6: AlignSelectedLeftTo(TransformRefX(surfaceRef.Width), ref); //AlignSelectedLeftTo(GetFirstSelectedRightX);
-
-      7: AlignSelectedBottomTo(TransformRefY(0), ref); //AlignSelectedBottomTo(GetFirstSelectedY);
-      8: AlignSelectedBottomTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedBottomTo(GetFirstSelectedCenterY);
-      9: AlignSelectedTopTo(TransformRefY(0), ref); //AlignSelectedTopTo(GetFirstSelectedY);
-      10: AlignSelectedVCenterTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedVCenterTo(GetFirstSelectedCenterY);
-      11: AlignSelectedBottomTo(TransformRefY(surfaceRef.Height), ref); //AlignSelectedBottomTo(GetFirstSelectedBottomY);
-      12: AlignSelectedTopTo(TransformRefY(surfaceRef.Height*0.5), ref); //AlignSelectedTopTo(GetFirstSelectedCenterY);
-      13: AlignSelectedTopTo(TransformRefY(surfaceRef.Height), ref); //AlignSelectedTopTo(GetFirstSelectedBottomY);
-    end;  }
 end;
 
 procedure TFrameToolsSpriteBuilder.ProcessTextureListOnModified(Sender: TObject);
@@ -737,6 +828,14 @@ begin
   end;
 end;
 
+function TFrameToolsSpriteBuilder.CBChildTypeIsTextured: boolean;
+var i: integer;
+begin
+  i := CBChildType.ItemIndex;
+  if i = -1 then exit(False);
+  Result := ChildClassTypeIsTextured(CBChildType.Items.Strings[i]);
+end;
+
 procedure TFrameToolsSpriteBuilder.TexturenameToCB(aName: string);
 begin
   CBTextures.ItemIndex := Textures.GetItemIndexByName(aName);
@@ -762,14 +861,18 @@ end;
 function TFrameToolsSpriteBuilder.CheckChildWidgets: boolean;
 var definingRoot: boolean;
 begin
+  if CBChildType.ItemIndex = -1 then exit(False);
+
+  if CBChildTypeIsTextured and (CBTextures.ItemIndex = -1) then exit(False);
+
+  if Trim(Edit5.Text) = '' then exit(False);
+
   definingRoot := Surfaces.Size = 0;
+  if not definingRoot  and (CBParent.ItemIndex = -1) then exit(False);
 
-  Result := (CBChildType.ItemIndex <> -1) and
-            (Trim(Edit5.Text) <> '');
+  // check extra properties
 
-  if not definingRoot then
-    Result := Result and (CBTextures.ItemIndex <> -1) and
-                         (CBParent.ItemIndex <> -1);
+  Result := True;
 end;
 
 function TFrameToolsSpriteBuilder.DoAddNewChild: boolean;
@@ -782,7 +885,7 @@ begin
   end;
 
   FWorkingChild := Surfaces.AddEmpty;
-  DoUpdateChild(False);
+  DoUpdateChild(True);
   Postures.AddValueEntryOnEachPosture;
 
   FWorkingChild := NIL;
@@ -795,15 +898,19 @@ var recreateSurface: Boolean;
 begin
   if FWorkingChild = NIL then exit;
 
-  recreateSurface := aForceRecreateSurface;
-  if not (FWorkingChild^.surface is CBToClassType) then
-    recreateSurface := True;
+  UpdateExtraPropertiesToWorkingTemporary;
 
-  if FWorkingChild^.textureName <> CBToTextureName then
-    recreateSurface := True;
+  recreateSurface := aForceRecreateSurface or
+                     not (FWorkingChild^.surface is CBToClassType) or
+                     (CBTextures.Enabled and (FWorkingChild^.textureName <> CBToTextureName)) or
+                     (FWorkingChild^.parentID <> CBToParentID);
 
-  if FWorkingChild^.parentID <> CBToParentID then
-    recreateSurface := True;
+  // we need to recreate the surface if the size changed (to recreate the collision body)
+  if FWorkingChild^.IsTextured then
+    recreateSurface := recreateSurface or
+                       (FWorkingChild^.surface.Width <> FWorkingChild^.width) or
+                       (FWorkingChild^.surface.Height <> FWorkingChild^.height);
+
 
   FWorkingChild^.name := Trim(Edit5.Text);
 
@@ -828,6 +935,17 @@ begin
 
   // in case the name was changed, we update the combobox parent
   Surfaces.ReplaceNameInComboBox(CBParent);
+end;
+
+function TFrameToolsSpriteBuilder.GetWidgetTintMode: TTintMode;
+begin
+  if RadioButton1.Checked then Result := tmReplaceColor
+    else Result := tmMixColor;
+end;
+
+function TFrameToolsSpriteBuilder.GetWidgetTint: TBGRAPixel;
+begin
+  Result := ColorToBGRA(ColorButton5.ButtonColor, SE11.Value);
 end;
 
 function TFrameToolsSpriteBuilder.LBSelectedToName: string;
@@ -993,6 +1111,10 @@ begin
     SetZOrder(SE8.Value);
     FlipH := CBFlipH.Checked;
     FlipV := CBFlipV.Checked;
+    Opacity.Value := SE10.Value;
+    TintMode := GetWidgetTintMode;
+    Tint.Value := GetWidgetTint;
+
     if FWorkingChild^.IsTextured then begin
       FWorkingChild^.frameindex := SE9.Value;
       Frame := SE9.Value;
@@ -1001,7 +1123,44 @@ begin
       Frame := 1;
     end;
   end;
+
+  if FWorkingChild^.surface is TSprite then
+    TSprite(FWorkingChild^.surface).SetSize(SE18.Value, SE19.Value);
+
+  if FWorkingChild^.surface is TQuad4Color then begin
+    with TQuad4Color(FWorkingChild^.surface) do begin
+      SetSize(SE16.Value, SE17.Value);
+      TopLeftColor.Value := ColorToBGRA(ColorButton1.ButtonColor, SE12.Value);
+      TopRightColor.Value := ColorToBGRA(ColorButton2.ButtonColor, SE13.Value);
+      BottomRightColor.Value := ColorToBGRA(ColorButton4.ButtonColor, SE15.Value);
+      BottomLeftColor.Value := ColorToBGRA(ColorButton3.ButtonColor, SE14.Value);
+    end;
+  end;
+
   FWorkingChild^.UpdateHandlePosition;
+end;
+
+procedure TFrameToolsSpriteBuilder.UpdateExtraPropertiesToWorkingTemporary;
+var selectedClass: classOfSimpleSurfaceWithEffect;
+begin
+  // init extra properties to temporary variable
+  if FWorkingChild = NIL then exit;
+  selectedClass := CBToClassType;
+
+  if selectedClass = TSprite then begin
+    FWorkingChild^.width := SE18.Value;
+    FWorkingChild^.height := SE19.Value;
+  end
+  else
+  if selectedClass = TQuad4Color then begin
+    FWorkingChild^.width := SE16.Value;
+    FWorkingChild^.height := SE17.Value;
+    FWorkingChild^.TopLeftColor := ColorToBGRA(ColorButton1.ButtonColor, SE12.Value);
+    FWorkingChild^.TopRightColor := ColorToBGRA(ColorButton2.ButtonColor, SE13.Value);
+    FWorkingChild^.BottomRightColor := ColorToBGRA(ColorButton4.ButtonColor, SE15.Value);
+    FWorkingChild^.BottomLeftColor := ColorToBGRA(ColorButton3.ButtonColor, SE14.Value);
+  end
+  else raise exception.Create('forgot to implement '+selectedClass.ClassName);
 end;
 
 function TFrameToolsSpriteBuilder.Textures: TTextureList;
@@ -1047,6 +1206,26 @@ begin
   FInitializingWidget := False;
 end;
 
+procedure TFrameToolsSpriteBuilder.ShowExtraPropertyPanel;
+var i: integer;
+begin
+  i := CBChildType.ItemIndex;
+  if i = -1 then NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraEmpty)
+  else
+    case CBChildType.Items.Strings[i] of
+      'TSprite', 'TTiledSprite': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTSprite);
+      'TSpriteWithElasticCorner': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTSpriteWithElasticCorner);
+      'TPolarSprite': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTPolarSprite);
+      'TScrollableSprite': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTScrollableSprite);
+      'TShapeOutline': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTShapeOutline);
+      'TGradientRectangle': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTGradientRectangle);
+      'TQuad4Color': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraTQuad4Color);
+      'TSpriteContainer': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraEmpty);
+      'TDeformationGrid': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTDeformationGrid);
+      else raise exception.create('forgot to implement '+CBChildType.Items.Strings[i]);
+    end;
+end;
+
 constructor TFrameToolsSpriteBuilder.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
@@ -1090,7 +1269,7 @@ procedure TFrameToolsSpriteBuilder.ShowSelectionData(aSelected: ArrayOfPSurfaceD
 var tex: PTexture;
   procedure ShowFrameIndexWidget(AValue: boolean);
   begin
-    Label2.Visible := AValue;
+    Label32.Visible := AValue;
     SE9.Visible := AValue;
   end;
 begin
@@ -1115,16 +1294,44 @@ begin
       SE6.Value := surface.Scale.y.Value;
       SE7.Value := surface.Angle.Value;
       SE8.Value := surface.ZOrderAsChild;
+      SE10.Value := Round(surface.Opacity.Value);
+      ColorButton5.ButtonColor := BGRAToColor(surface.Tint.Value);
+      SE11.Value := Round(surface.Tint.Alpha.Value);
+      RadioButton1.Checked := surface.TintMode = tmReplaceColor;
       CBFlipH.Checked := surface.FlipH;
       CBFlipV.Checked := surface.FlipV;
+
+      ShowFrameIndexWidget(False);
+      SE9.Value := 1;
+      SE9.MaxValue := 1;
       if IsTextured then begin
         tex := GetTextureFromTextureName;
         if tex <> NIL then begin
           ShowFrameIndexWidget(tex^.FrameCount > 1);
           SE9.Value := Trunc(surface.Frame);
           SE9.MaxValue := tex^.FrameCount-1;
-        end else ShowFrameIndexWidget(False);
-      end else ShowFrameIndexWidget(False);
+        end;
+      end;
+
+      if surface is TSprite then begin
+        SE18.Value := surface.Width;
+        SE19.Value := surface.Height;
+      end;
+
+     if surface is TQuad4Color then
+       with TQuad4Color(surface) do begin
+         SE16.Value := Width;
+         SE17.Value := Height;
+         ColorButton1.ButtonColor := BGRAToColor(TopLeftColor.Value);
+         SE12.Value := Round(TopLeftColor.Alpha.Value);
+         ColorButton2.ButtonColor := BGRAToColor(TopRightColor.Value);
+         SE13.Value := Round(TopRightColor.Alpha.Value);
+         ColorButton3.ButtonColor := BGRAToColor(BottomLeftColor.Value);
+         SE14.Value := Round(BottomLeftColor.Alpha.Value);
+         ColorButton4.ButtonColor := BGRAToColor(BottomRightColor.Value);
+         SE15.Value := Round(BottomRightColor.Alpha.Value);
+       end;
+
     end;
     CBChildType.Enabled := True;
     CBTextures.Enabled := True;
@@ -1132,6 +1339,7 @@ begin
     CBParent.Enabled := True;
     Panel4.Visible := True;
     BNewChild.Enabled := False;
+    ShowExtraPropertyPanel;
   end
   else
   if Length(aSelected) > 1 then begin
@@ -1146,6 +1354,7 @@ begin
     CBParent.ItemIndex := -1;
     Panel4.Visible := False;
     BNewChild.Enabled := False;
+    ShowExtraPropertyPanel;
   end
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
@@ -1166,6 +1375,7 @@ begin
     CBFlipV.Checked := False;
     BNewChild.Enabled := True;
     ShowFrameIndexWidget(False);
+    ShowExtraPropertyPanel;
   end;
 
   FInitializingWidget := False;
