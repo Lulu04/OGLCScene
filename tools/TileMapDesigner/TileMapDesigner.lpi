@@ -938,7 +938,7 @@
       <Unit113>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="24"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos Y="30"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1230,10 +1230,9 @@
         <ComponentName Value="Form_Tools"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="544"/>
-        <CursorPos Y="555"/>
+        <CursorPos X="48" Y="546"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1533,8 +1532,8 @@
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="83"/>
-        <CursorPos Y="94"/>
+        <TopLine Value="42"/>
+        <CursorPos X="48" Y="56"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit187>
@@ -1542,8 +1541,7 @@
         <Filename Value="Units\tileset_manager.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="19"/>
-        <CursorPos X="15" Y="48"/>
+        <CursorPos X="12" Y="10"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
       </Unit188>
@@ -1889,8 +1887,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="70"/>
-        <CursorPos X="18" Y="81"/>
+        <CursorPos X="43" Y="82"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit226>
@@ -1936,8 +1933,8 @@
         <Filename Value="Units\umaps.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="431"/>
-        <CursorPos X="68" Y="439"/>
+        <TopLine Value="63"/>
+        <CursorPos Y="77"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit232>
@@ -2044,7 +2041,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="3"/>
         <CursorPos X="33" Y="15"/>
-        <UsageCount Value="175"/>
+        <UsageCount Value="176"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit245>
@@ -2054,7 +2051,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="393"/>
         <CursorPos X="25" Y="407"/>
-        <UsageCount Value="160"/>
+        <UsageCount Value="161"/>
         <Loaded Value="True"/>
       </Unit246>
       <Unit247>
@@ -2077,9 +2074,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="92"/>
-        <CursorPos X="63" Y="98"/>
-        <UsageCount Value="109"/>
+        <TopLine Value="87"/>
+        <CursorPos X="3" Y="91"/>
+        <UsageCount Value="110"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit249>
@@ -2098,7 +2095,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="16"/>
         <CursorPos X="11" Y="30"/>
-        <UsageCount Value="98"/>
+        <UsageCount Value="99"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit251>
@@ -2123,7 +2120,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="237"/>
         <CursorPos Y="249"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="35"/>
         <Loaded Value="True"/>
       </Unit254>
       <Unit255>
@@ -2139,7 +2136,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="27"/>
         <CursorPos X="86" Y="41"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit256>
       <Unit257>
@@ -2161,7 +2158,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="480"/>
         <CursorPos X="33" Y="492"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="32"/>
         <Loaded Value="True"/>
       </Unit259>
       <Unit260>
@@ -2171,7 +2168,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="585"/>
         <CursorPos X="45" Y="594"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit260>
       <Unit261>
@@ -2185,7 +2182,7 @@
         <EditorIndex Value="2"/>
         <WindowIndex Value="2"/>
         <TopLine Value="79"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="29"/>
         <Loaded Value="True"/>
       </Unit262>
       <Unit263>
@@ -2201,7 +2198,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="10"/>
         <CursorPos Y="30"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit264>
       <Unit265>
@@ -2209,7 +2206,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="152"/>
         <CursorPos X="13" Y="165"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit265>
       <Unit266>
@@ -2217,7 +2214,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="249"/>
         <CursorPos Y="267"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
       </Unit266>
     </Units>
@@ -2226,124 +2223,124 @@
     </OtherDefines>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="292" Column="54" TopLine="277"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="52" Column="31" TopLine="32"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="273" Column="50" TopLine="257"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="175" Column="2" TopLine="155"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="175" Column="31" TopLine="152"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="31" Column="15" TopLine="31"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1102" TopLine="1097"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="30" Column="15" TopLine="30"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1104" TopLine="1097"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="31" Column="15" TopLine="31"/>
       </Position5>
       <Position6>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1102" TopLine="1097"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="33" Column="15" TopLine="32"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1103" Column="7" TopLine="1097"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="192" Column="24" TopLine="165"/>
       </Position7>
       <Position8>
         <Filename Value="Units\u_main.pas"/>
-        <Caret Line="146" Column="23" TopLine="132"/>
+        <Caret Line="1265" Column="55" TopLine="1251"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1261" TopLine="1255"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="185" TopLine="158"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1260" Column="33" TopLine="1255"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="184" TopLine="157"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1261" Column="33" TopLine="1256"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="183" TopLine="156"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1260" Column="33" TopLine="1255"/>
+        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Caret Line="11" Column="40"/>
       </Position12>
       <Position13>
         <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1259" Column="33" TopLine="1254"/>
+        <Caret Line="543" Column="49" TopLine="536"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1260" Column="33" TopLine="1255"/>
-      </Position14>
-      <Position15>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1259" Column="33" TopLine="1254"/>
-      </Position15>
-      <Position16>
-        <Filename Value="..\..\source\oglcTileEngine.inc"/>
-        <Caret Line="151" Column="15" TopLine="147"/>
-      </Position16>
-      <Position17>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="52" Column="31" TopLine="32"/>
-      </Position17>
-      <Position18>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="175" Column="2" TopLine="155"/>
-      </Position18>
-      <Position19>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="31" Column="15" TopLine="31"/>
-      </Position19>
-      <Position20>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="30" Column="15" TopLine="30"/>
-      </Position20>
-      <Position21>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="31" Column="15" TopLine="31"/>
-      </Position21>
-      <Position22>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="33" Column="15" TopLine="32"/>
-      </Position22>
-      <Position23>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="192" Column="24" TopLine="165"/>
-      </Position23>
-      <Position24>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="1265" Column="55" TopLine="1251"/>
-      </Position24>
-      <Position25>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="185" TopLine="158"/>
-      </Position25>
-      <Position26>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="184" TopLine="157"/>
-      </Position26>
-      <Position27>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="183" TopLine="156"/>
-      </Position27>
-      <Position28>
-        <Filename Value="Units\uaskeventvalue.pas"/>
-        <Caret Line="11" Column="40"/>
-      </Position28>
-      <Position29>
-        <Filename Value="Units\u_main.pas"/>
-        <Caret Line="543" Column="49" TopLine="536"/>
-      </Position29>
-      <Position30>
         <Filename Value="Units\u_tool_window.pas"/>
         <Caret Line="152" Column="15" TopLine="139"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\tileset_manager.pas"/>
+        <Caret Line="27" Column="18" TopLine="4"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\tileset_manager.pas"/>
+        <Caret Line="215" Column="3" TopLine="206"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\tileset_manager.pas"/>
+        <Caret Line="53" Column="16" TopLine="31"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\tileset_manager.pas"/>
+        <Caret Line="152" Column="3" TopLine="150"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\u_tool_minimap.pas"/>
+        <Caret Line="98" Column="63" TopLine="55"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\u_tool_minimap.pas"/>
+        <Caret Line="131" Column="16" TopLine="119"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\u_tool_minimap.pas"/>
+        <Caret Line="32" Column="15" TopLine="18"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="434" Column="35" TopLine="431"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\u_tool_window.pas"/>
+        <Caret Line="546" Column="48" TopLine="544"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="50" Column="18" TopLine="36"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="281" Column="19" TopLine="264"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="43" Column="13" TopLine="28"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="63" Column="18" TopLine="41"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="486" Column="24" TopLine="479"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="40" Column="13" TopLine="26"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="152" Column="3" TopLine="149"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

@@ -52,7 +52,7 @@ begin
 
   ima := TBGRABitmap.Create(FScene.Width, FScene.Height);
   ima.Fill(FImageBackGround);
-  TexGrid := FAtlas.Add(ima);
+  TexGrid := FAtlas.Add(ima, 'background');
 
   FAtlas.TryToPack;
   FAtlas.Build;
