@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene;
+  OGLCScene, u_surface_list;
 
 // return the size of an png, jpg, bmp image
 function GetImageSize(const aFilename: string): TSize;
@@ -34,6 +34,17 @@ TArrayOfIntegerHelper = type helper for TArrayOfInteger
   procedure SortFromSmallToHigh;
 end;
 
+// return True if the passed class type use a texture
+function ChildClassTypeIsTextured(const aClassName: string): boolean;
+
+
+// utils to export pascal unit
+function PointFToPascal(const aX, aY: single): string; overload;
+function PointFToPascal(const aPt: TPointF): string; overload;
+function BGRAToPascal(aColor: TBGRAPixel): string;
+
+function CommonPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+function ExtraPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
 
 implementation
 
@@ -82,6 +93,84 @@ begin
   g := EnsureRange(Round(g + ( g * percent )), 0, 255);
   b := EnsureRange(Round(b + ( b * percent )), 0, 255);
   Result := RGBToColor(r, g, b);
+end;
+
+function ChildClassTypeIsTextured(const aClassName: string): boolean;
+begin
+  case aClassName of
+    'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite', 'TPolarSprite',
+    'TScrollableSprite', 'TDeformationGrid': Result := True;
+
+     'TShapeOutline', 'TGradientRectangle', 'TQuad4Color', 'TSpriteContainer': Result := False;
+
+     else raise exception.create('"'+aClassName+'" not implemented');
+  end;
+end;
+
+function PointFToPascal(const aX, aY: single): string;
+begin
+  Result := 'PointF('+FormatFloatWithDot('0.00', aX)+', '+FormatFloatWithDot('0.00', aY)+')';
+end;
+
+function PointFToPascal(const aPt: TPointF): string;
+begin
+  Result := PointFToPascal(aPt.x, aPt.y);
+end;
+
+function BGRAToPascal(aColor: TBGRAPixel): string;
+begin
+  Result := 'BGRA('+aColor.red.ToString+','+aColor.green.ToString+','+aColor.blue.ToString;
+  if aColor.alpha <> 255 then Result := Result + ','+aColor.alpha.ToString;
+  Result := Result + ')';
+end;
+
+function CommonPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+begin
+  Result := '';
+  if (aSurface^.pivotX <> 0.5) or (aSurface^.pivotY <> 0.5) then
+    Result := Result+aSpacePrefix+'Pivot := '+PointFToPascal(aSurface^.pivotX, aSurface^.pivotY)+';';
+  if aSurface^.angle <> 0.0 then
+    Result := Result+aSpacePrefix+'Angle.Value := '+FormatFloatWithDot('0.00', aSurface^.angle)+';';
+  if (aSurface^.scaleX <> 1.0) or (aSurface^.scaleY <> 1.0) then
+    Result := Result+aSpacePrefix+'Scale.Value := '+PointFToPascal(aSurface^.scaleX, aSurface^.scaleY)+';';
+  if aSurface^.flipH then
+    Result := Result+aSpacePrefix+'FlipH := True;';
+  if aSurface^.flipV then
+    Result := Result+aSpacePrefix+'FlipV := True;';
+  if aSurface^.opacity <> 255 then
+    Result := Result+aSpacePrefix+'Opacity.Value := '+ Round(aSurface^.opacity).ToString+';';
+  if aSurface^.tint <> BGRA(0,0,0,0) then
+    Result := Result+aSpacePrefix+'Tint.Value := '+BGRAToPascal(aSurface^.tint)+';';
+  if aSurface^.tintMode <> tmReplaceColor then
+    Result := Result+aSpacePrefix+'TintMode := tmMixColor;';
+  if aSurface^.IsTextured and (aSurface^.frameindex <> 1.0) then
+    Result := Result+aSpacePrefix+'Frame := '+FormatFloatWithDot('0.0', aSurface^.frameindex)+';';
+end;
+
+function ExtraPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+begin
+  case aSurface^.classtype.ClassName of
+    'TSprite': begin
+      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+
+                aSurface^.height.ToString+'));';
+    end;
+
+    'TQuad4Color': begin
+      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));'#10;
+      if (aSurface^.TopLeftColor = aSurface^.TopRightColor) and
+         (aSurface^.TopRightColor = aSurface^.BottomRightColor) and
+         (aSurface^.BottomRightColor = aSurface^.BottomLeftColor) then begin
+        Result := Result + aSpacePrefix+'SetAllColorsTo('+BGRAToPascal(aSurface^.TopLeftColor)+');';
+      end else begin
+        Result := Result + aSpacePrefix+'TopLeftColor.Value := '+BGRAToPascal(aSurface^.TopLeftColor)+');'#10+
+                 aSpacePrefix+'TopRightColor.Value := '+BGRAToPascal(aSurface^.TopRightColor)+');'#10+
+                 aSpacePrefix+'BottomRightColor.Value := '+BGRAToPascal(aSurface^.BottomRightColor)+');'#10+
+                 aSpacePrefix+'BottomLeftColor.Value := '+BGRAToPascal(aSurface^.BottomLeftColor)+');';
+      end;
+    end;
+
+    else raise exception.Create('forgot to implement '+aSurface^.classtype.ClassName);
+  end;
 end;
 
 { TArrayOfIntegerHelper }

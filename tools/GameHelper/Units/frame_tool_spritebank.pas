@@ -66,7 +66,7 @@ type
 
 implementation
 
-uses LCLType, Graphics, form_main, u_project, form_showhelp, OGLCScene,
+uses LCLType, Graphics, form_main, u_project, form_showhelp, u_utils, OGLCScene,
   BGRABitmap, BGRABitmapTypes;
 
 {$R *.lfm}
@@ -101,14 +101,6 @@ var t: TStringlist;
   function GetClassType: string;
   begin
     Result := rootItem^.surface.ClassName;
-  end;
-  function PointFToString(const aX, aY: single): string; overload;
-  begin
-    Result := 'PointF('+FormatFloatWithDot('0.00', aX)+', '+FormatFloatWithDot('0.00', aY)+')';
-  end;
-  function PointFToString(const aPt: TPointF): string; overload;
-  begin
-    Result := 'PointF('+FormatFloatWithDot('0.00', aPt.x)+', '+FormatFloatWithDot('0.00', aPt.y)+')';
   end;
   function Generate_AngleChangeTo(aAngle: single; const aSurfaceName: string): string;
   begin
@@ -182,15 +174,17 @@ begin
             GetClassName+' = class('+GetClassType+')');
 
   // textures declaration
-  t.AddText('private');
-  s := '  class var ';
-  for i:=0 to Textures.Size-1 do begin
-    s := s + Textures.Mutable[i]^.name;
-    if i < Textures.Size-1 then s := s +', ';
-    if (i mod 4 = 0) and (i > 0) and (i < Textures.Size-1) then s := s + #10'  ';
+  if Textures.Size > 0 then begin
+    t.AddText('private');
+    s := '  class var ';
+    for i:=0 to Textures.Size-1 do begin
+      s := s + Textures.Mutable[i]^.name;
+      if i < Textures.Size-1 then s := s +', ';
+      if (i mod 4 = 0) and (i > 0) and (i < Textures.Size-1) then s := s + #10'  ';
+    end;
+    s := s + ': PTexture;';
+    t.AddText(s);
   end;
-  s := s + ': PTexture;';
-  t.AddText(s);
 
   // child variables declaration
   t.Add('private');
@@ -210,12 +204,14 @@ begin
               '  procedure SetFlipV(AValue: boolean); override;');
 
   // oglc methods declaration
-  if CheckBox2.Checked then s := '  procedure ProcessMessage(UserValue: TUserMessageValue); override;'#10
-    else s := '';
-  t.AddText('public'#10+
-            '  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
-            '  constructor Create(aLayerIndex: integer=-1);'#10+
-            s);
+  t.Add('public');
+  if Textures.Size > 0 then
+    t.Add('  class procedure LoadTexture(aAtlas: TOGLCTextureAtlas);');
+
+  t.Add('  constructor Create(aLayerIndex: integer=-1);');
+  if CheckBox2.Checked then
+    t.Add('  procedure ProcessMessage(UserValue: TUserMessageValue); override;');
+
 
   // methods declaration for posture
   if Postures.Size > 0 then begin
@@ -231,48 +227,51 @@ begin
   t.Add('end;');   // end of class declaration
   t.Add('');
   t.AddText('implementation'#10+
+            'uses u_common;'#10+
             #10+
             '{ '+GetClassName+' }'#10+
             #10);
 
   // procedure load Texture
-  t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
-            'var dataFolder: string;'#10+
-            'begin'#10+
-            '  dataFolder := FScene.App.DataFolder;');
-  for i:=0 to Textures.Size-1 do begin
-    // texture filename must be relative to application Data folder
-    texFilename := Textures.Mutable[i]^.filename;
-    p := texFilename.LastIndexOf(DirectorySeparator+'Data'+DirectorySeparator);
-    texFilename := texFilename.Remove(0, p+6);
-    texFilename := 'dataFolder+'''+texFilename+'''';
+  if Textures.Size > 0 then begin
+    t.AddText('class procedure '+GetClassName+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
+              'var dataFolder: string;'#10+
+              'begin'#10+
+              '  dataFolder := FScene.App.DataFolder;');
+    for i:=0 to Textures.Size-1 do begin
+      // texture filename must be relative to application Data folder
+      texFilename := Textures.Mutable[i]^.filename;
+      p := texFilename.LastIndexOf(DirectorySeparator+'Data'+DirectorySeparator);
+      texFilename := texFilename.Remove(0, p+6);
+      texFilename := 'dataFolder+'''+texFilename+'''';
 
-    s := '  '+Textures.Mutable[i]^.name + ' := ';
-    if ExtractFileExt(Textures.Mutable[i]^.filename) = '.svg' then begin
-      if Textures.Mutable[i]^.width = -1 then sw := '-1'
-        else sw := 'ScaleW('+Textures.Mutable[i]^.width.ToString+')';
-      if Textures.Mutable[i]^.height = -1 then sh := '-1'
-        else sh := 'ScaleH('+Textures.Mutable[i]^.height.ToString+')';
+      s := '  '+Textures.Mutable[i]^.name + ' := ';
+      if ExtractFileExt(Textures.Mutable[i]^.filename) = '.svg' then begin
+        if Textures.Mutable[i]^.width = -1 then sw := '-1'
+          else sw := 'ScaleW('+Textures.Mutable[i]^.width.ToString+')';
+        if Textures.Mutable[i]^.height = -1 then sh := '-1'
+          else sh := 'ScaleH('+Textures.Mutable[i]^.height.ToString+')';
 
-      if Textures.Mutable[i]^.isMultiFrame then
-        s := s + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
-           ', '+sw+', '+sh+
-           ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
-           ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+
-           ', 0);'
-      else
-        s := s + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
-    end else begin
-      if Textures.Mutable[i]^.isMultiFrame then
-        s := s + 'aAtlas.AddMultiFrameImage('+texFilename+
-        ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
-        ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+');'
-      else
-        s := s + 'aAtlas.Add('+texFilename+');';
+        if Textures.Mutable[i]^.isMultiFrame then
+          s := s + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
+             ', '+sw+', '+sh+
+             ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
+             ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+
+             ', 0);'
+        else
+          s := s + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
+      end else begin
+        if Textures.Mutable[i]^.isMultiFrame then
+          s := s + 'aAtlas.AddMultiFrameImage('+texFilename+
+          ', '+(Textures.Mutable[i]^.width div Textures.Mutable[i]^.frameWidth).ToString+
+          ', '+(Textures.Mutable[i]^.height div Textures.Mutable[i]^.frameHeight).ToString+');'
+        else
+          s := s + 'aAtlas.Add('+texFilename+');';
+      end;
+      t.Add(s);
     end;
-    t.Add(s);
+    t.AddText('end;'#10+#10);
   end;
-  t.AddText('end;'#10+#10);
 
   // procedure SetFlipH and SetFlipV
   if CheckBox1.Checked then begin
@@ -316,7 +315,7 @@ begin
     end;
     'TQuad4Color': begin
       s := '  inherited Create(FScene);'#10+
-           '  SetSize(...);';
+           ExtraPropertiesToPascalCode(rootItem, '  ');
     end;
     'TDeformationGrid': begin
       s := '  inherited Create('+rootItem^.textureName + ', False);';
@@ -330,18 +329,8 @@ begin
     if (rootItem^.x <> 0.0) or (rootItem^.y <> 0.0) then
       t.Add('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
                                FormatFloatWithDot('0.00', rootItem^.y)+');');
-    if (rootItem^.pivotX <> 0.5) or (rootItem^.pivotY <> 0.5) then
-      t.Add('  Pivot := '+PointFToString(rootItem^.pivotX, rootItem^.pivotY)+';');
-    if rootitem^.angle <> 0.0 then
-      t.Add('  Angle.Value := '+FormatFloatWithDot('0.00', rootItem^.angle)+';');
-    if (rootItem^.scaleX <> 1.0) or (rootItem^.scaleY <> 1.0) then
-      t.Add('  Scale.Value := '+PointFToString(rootItem^.scaleX, rootItem^.scaleY)+';');
-    if rootItem^.flipH then
-      t.Add('  FlipH := True;');
-    if rootItem^.flipV then
-      t.Add('  FlipV := True;');
-    if rootItem^.IsTextured and (rootItem^.frameindex <> 1.0) then
-      t.Add('  Frame := '+FormatFloatWithDot('0.0', rootItem^.frameindex)+';');
+
+    t.AddText(CommonPropertiesToPascalCode(rootItem, '  '));
     t.Add('');
   end else t.Add('');
 
@@ -353,16 +342,15 @@ begin
 
     if (rootItem <> NIL) and (current = rootItem) then continue;
 
-    if current^.classtype = TSpriteContainer then begin
-      s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
+    case current^.classtype.ClassName of
+      'TSpriteContainer': s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
+      'TSprite': s := '  '+current^.name+' := TSprite.Create('+current^.textureName+', False);';
+      'TQuad4Color': s := '  '+current^.name+' := TQuad4Color.Create(FScene);';
+      'TDeformationGrid': s := '  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);';
 
-    end else
-    if current^.classtype = TSprite then begin
-      s := '  '+current^.name+' := TSprite.Create('+current^.textureName+', False);';
-    end else
-    if current^.classtype = TDeformationGrid then begin
-      s := '  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);';
-    end else raise exception.create('forgot to implement!');
+      else raise exception.create('forgot to implement '+current^.classtype.ClassName);
+    end;
+
     t.Add(s);
     // set child dependency and values
     _parent := Surfaces.GetItemByID(current^.parentID);
@@ -394,18 +382,8 @@ begin
       t.Add('    SetCoordinate('+sx+', '+sy+');');
     end;
 
-    if (current^.pivotX <> 0.5) or (current^.pivotY <> 0.5) then
-      t.Add('    Pivot := '+PointFToString(current^.pivotX, current^.pivotY)+';');
-    if current^.angle <> 0 then
-      t.Add('    Angle.Value := '+FormatFloatWithDot('0.00', current^.angle)+';');
-    if (current^.scaleX <> 1.0) or (current^.scaleY <> 1.0) then
-      t.Add('    Scale.Value := '+PointFToString(current^.scaleX, current^.scaleY)+';');
-    if current^.flipH then
-      t.Add('    FlipH := True;');
-    if current^.flipV then
-      t.Add('    FlipV := True;');
-    if current^.IsTextured and (current^.frameindex <> 1.0) then
-      t.Add('    Frame := '+FormatFloatWithDot('0.0', current^.frameindex)+';');
+    t.AddText(CommonPropertiesToPascalCode(current, '    '));
+    t.AddText(ExtraPropertiesToPascalCode(current, '    '));
     if CheckBox1.Checked then
       t.Add('    ApplySymmetryWhenFlip := True;');
     t.Add('  end;');
@@ -444,8 +422,8 @@ begin
                    '));';
           t.Add(s);
 
-{          t.Add('  CollisionBody.AddLine('+PointFToString(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
-                                    PointFToString(bodyItem^.ItemDescriptor.pt2)+'*FAdditionalScale);');  }
+{          t.Add('  CollisionBody.AddLine('+PointFToPascal(bodyItem^.ItemDescriptor.pt1)+'*FAdditionalScale, '+
+                                    PointFToPascal(bodyItem^.ItemDescriptor.pt2)+'*FAdditionalScale);');  }
         end;
         _btCircle: begin
           pf := bodyItem^.ItemDescriptor.center;
@@ -456,7 +434,7 @@ begin
           s := s + FormatXCoorRelativeToParentWidth(bodyItem^.ItemDescriptor.radius, '')+');';
           t.Add(s);
 
-        //  t.Add('  CollisionBody.AddCircle('+PointFToString(bodyItem^.ItemDescriptor.center)+'*FAdditionalScale, '+
+        //  t.Add('  CollisionBody.AddCircle('+PointFToPascal(bodyItem^.ItemDescriptor.center)+'*FAdditionalScale, '+
         //                              FormatFloatWithDot('0.00', bodyItem^.ItemDescriptor.radius)+'*FAdditionalScale);');
         end;
         _btRect: begin
@@ -471,8 +449,8 @@ begin
                    '));';
           t.Add(s);
 
-         // t.Add('  CollisionBody.AddRect(RectF('+PointFToString(bodyItem^.ItemDescriptor.rect.TopLeft)+'*FAdditionalScale, '+
-         //                                 PointFToString(bodyItem^.ItemDescriptor.rect.BottomRight)+'*FAdditionalScale));');
+         // t.Add('  CollisionBody.AddRect(RectF('+PointFToPascal(bodyItem^.ItemDescriptor.rect.TopLeft)+'*FAdditionalScale, '+
+         //                                 PointFToPascal(bodyItem^.ItemDescriptor.rect.BottomRight)+'*FAdditionalScale));');
         end;
         _btPolygon: begin
           if Length(bodyItem^.ItemDescriptor.pts) = 0 then continue;
@@ -483,7 +461,7 @@ begin
             s := s + 'PointF('+FormatXCoorRelativeToParentWidth(pf.x/rootItem^.surface.Width, '')+
                      ', '+FormatYCoorRelativeToParentHeight(pf.y/rootItem^.surface.Height, '')+
                      ')';
-            //s := s + PointFToString(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
+            //s := s + PointFToPascal(bodyItem^.ItemDescriptor.pts[j])+'*FAdditionalScale';
             if j < High(bodyItem^.ItemDescriptor.pts) then s := s+', ';
             inc(c);
             if (c mod 2 = 0) and (j > 0) and (j < Length(bodyItem^.ItemDescriptor.pts)-1) then s := s + #10'    ';

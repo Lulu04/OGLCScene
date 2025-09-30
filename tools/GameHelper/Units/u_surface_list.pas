@@ -47,6 +47,16 @@ public
   tintMode: TTintMode;
   width, height, layerindex: integer;
   frameindex: single;
+  // EXTRA properties
+  // TSpriteWithElasticCorner
+  TopLeftOffsetX, TopLeftOffsetY,
+  TopRightOffsetX, TopRightOffsetY,
+  BottomRightOffsetX, BottomRightOffsetY,
+  BottomLeftOffsetX, BottomLeftOffsetY: single;
+  // TQuad4Color
+  TopLeftColor, TopRightColor, BottomRightColor,BottomLeftColor: TBGRAPixel;
+
+
   procedure InitDefault;
   procedure KillSurface;
   procedure CreateCollisionBody;
@@ -239,6 +249,17 @@ begin
   zOrder := 0;
   frameindex := 1.0;
 
+  // TSpriteWithElasticCorner
+  TopLeftOffsetX := 0; TopLeftOffsetY := 0;
+  TopRightOffsetX := 0; TopRightOffsetY := 0;
+  BottomRightOffsetX := 0; BottomRightOffsetY := 0;
+  BottomLeftOffsetX := 0; BottomLeftOffsetY := 0;
+  //TQuad4Color
+  TopLeftColor := BGRA(255,0,0);
+  TopRightColor := BGRA(0,255,0);
+  BottomRightColor := BGRA(0,0,255);
+  BottomLeftColor := BGRA(255,255,0);
+
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
 end;
@@ -262,43 +283,72 @@ var tex: PTexture;
 begin
   tex := GetTextureFromTextureName;
 
-  if classType = TSprite then begin
+  if (classType = TSprite) then begin
     surface := TSprite.Create(tex, False);
     surface.Frame := frameindex;
-    if ParentList.FModeForLevelEditor then
+   // if ParentList.FModeForLevelEditor then
       TSprite(surface).SetSize(width, height);
-//fscene.LogDebug('created sprite from texture "'+tex^.Filename+'" w='+tex^.FrameWidth.ToString+' h='+tex^.FrameHeight.ToString+ 'id='+tex^.ID.ToString);
   end
   else
-  if classType = TSpriteWithElasticCorner then
-    surface := TSpriteWithElasticCorner.Create(tex, False)
-  else
-  if classType = TTiledSprite then
-    surface := TTiledSprite.Create(tex, False)
-  else
-  if classType = TPolarSprite then
-    surface := TPolarSprite.Create(tex, False)
-  else
-  if classType = TScrollableSprite then
-    surface := TScrollableSprite.Create(tex, False)
-  else
-  if classType = TShapeOutline then
+  if classType = TSpriteWithElasticCorner then begin
+    surface := TSpriteWithElasticCorner.Create(tex, False);
+    surface.Frame := frameindex;
+   // if ParentList.FModeForLevelEditor then
+      TSpriteWithElasticCorner(surface).SetSize(width, height);
+    with TSpriteWithElasticCorner(surface) do begin
+      CornerOffset.TopLeft.x.Value := TopLeftOffsetX;
+      CornerOffset.TopLeft.y.Value := TopLeftOffsetY;
+      CornerOffset.TopRight.x.Value := TopRightOffsetX;
+      CornerOffset.TopRight.y.Value := TopRightOffsetY;
+      CornerOffset.BottomRight.x.Value := BottomRightOffsetX;
+      CornerOffset.BottomRight.y.Value := BottomRightOffsetY;
+      CornerOffset.BottomLeft.x.Value := BottomLeftOffsetX;
+      CornerOffset.BottomLeft.y.Value := BottomLeftOffsetY;
+    end;
+  end else
+  if classType = TTiledSprite then begin
+    surface := TTiledSprite.Create(tex, False);
+    surface.Frame := frameindex;
+   // if ParentList.FModeForLevelEditor then
+      TTiledSprite(surface).SetSize(width, height)
+  end else
+  if classType = TPolarSprite then begin
+    surface := TPolarSprite.Create(tex, False);
+    surface.Frame := frameindex;
+  //  if ParentList.FModeForLevelEditor then
+      TPolarSprite(surface).SetSize(width, height);
+  end else
+  if classType = TScrollableSprite then begin
+    surface := TScrollableSprite.Create(tex, False);
+    surface.Frame := frameindex;
+  //  if ParentList.FModeForLevelEditor then
+      TScrollableSprite(surface).SetSize(width, height);
+  end else
+  if classType = TShapeOutline then begin
     surface := TShapeOutline.Create(FScene)
-  else
-  if classType = TGradientRectangle then
-    surface := TGradientRectangle.Create(FScene)
-  else
+  end else
+  if classType = TGradientRectangle then begin
+    surface := TGradientRectangle.Create(FScene);
+  end else
   if classType = TQuad4Color then begin
     surface := TQuad4Color.Create(FScene);
-    TQuad4Color(surface).SetSize(10, 10);
+    TQuad4Color(surface).SetSize(width, height);
+    with TQuad4Color(surface) do begin
+      TopLeftColor.Value := Self.TopLeftColor;
+      TopRightColor.Value := Self.TopRightColor;
+      BottomRightColor.Value := Self.BottomRightColor;
+      BottomLeftColor.Value := Self.BottomLeftColor;
+    end;
   end else
-  if classType = TDeformationGrid then
-    surface := TDeformationGrid.Create(tex, False)
-  else
+  if classType = TDeformationGrid then begin
+    surface := TDeformationGrid.Create(tex, False);
+    surface.Frame := frameindex;
+   // if ParentList.FModeForLevelEditor then
+      TDeformationGrid(surface).SetSize(width, height);
+  end else
   if classType = TSpriteContainer then begin
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
-fscene.LogDebug('created sprite_container');
   end
   else raise exception.create('forgot to implement!');
 
@@ -837,9 +887,12 @@ begin
     prop.Add('Name', name);
 
   if not ParentList.FModeForLevelEditor then
-  if classtype <> TSprite then prop.Add('Classtype', classtype.ClassName);
+    if classtype <> TSprite then
+      prop.Add('Classtype', classtype.ClassName);
 
-  prop.Add('TextureName', textureName);
+  if IsTextured then
+    prop.Add('TextureName', textureName);
+
   if surface.Pivot.x <> 0.5 then prop.Add('PivotX', surface.Pivot.x);
   if surface.Pivot.y <> 0.5 then prop.Add('PivotY', surface.Pivot.y);
   if surface.Angle.Value <> 0 then prop.Add('Angle', surface.Angle.Value);
@@ -849,10 +902,10 @@ begin
   if not ParentList.FModeForLevelEditor then begin
     if surface.Scale.X.Value <> 1.0 then prop.Add('ScaleX', surface.Scale.X.Value);
     if surface.Scale.Y.Value <> 1.0 then prop.Add('ScaleY', surface.Scale.Y.Value);
-  end else begin
-    prop.Add('Width', surface.Width);
-    prop.Add('Height', surface.Height);
   end;
+
+  prop.Add('Width', surface.Width);
+  prop.Add('Height', surface.Height);
 
   if surface.FlipH then prop.Add('FlipH', surface.FlipH);
   if surface.FlipV then prop.Add('FlipV', surface.FlipV);
@@ -860,6 +913,27 @@ begin
   if surface.Tint.Value <> BGRA(0,0,0,0) then prop.Add('Tint', surface.Tint.Value);
   if surface.TintMode <> tmReplaceColor then prop.Add('TintMode', Ord(surface.TintMode));
   if surface.Frame <> 1.0 then prop.Add('FrameIndex', surface.Frame);
+
+  // TSpriteWithElasticCorner
+  if surface is TSpriteWithElasticCorner then begin
+    if TopLeftOffsetX <> 0 then prop.Add('TopLeftOffsetX', TopLeftOffsetX);
+    if TopLeftOffsetY <> 0 then prop.Add('TopLeftOffsetY', TopLeftOffsetY);
+    if TopRightOffsetX <> 0 then prop.Add('TopRightOffsetX', TopRightOffsetX);
+    if TopRightOffsetY <> 0 then prop.Add('TopRightOffsetY', TopRightOffsetY);
+    if BottomRightOffsetX <> 0 then prop.Add('BottomRightOffsetX', BottomRightOffsetX);
+    if BottomRightOffsetY <> 0 then prop.Add('BottomRightOffsetY', BottomRightOffsetY);
+    if BottomLeftOffsetX <> 0 then prop.Add('BottomLeftOffsetX', BottomLeftOffsetX);
+    if BottomLeftOffsetY <> 0 then prop.Add('BottomLeftOffsetY', BottomLeftOffsetY);
+  end;
+
+  // TQuad4Color
+  if surface is TQuad4Color then begin
+    prop.Add('TopLeftColor', TopLeftColor);
+    prop.Add('TopRightColor', TopRightColor);
+    prop.Add('BottomRightColor', BottomRightColor);
+    prop.Add('BottomLeftColor', BottomLeftColor);
+  end;
+
   Result := prop.PackedProperty;
 end;
 
@@ -873,8 +947,8 @@ begin
   prop.Split(s, '~');
   prop.IntegerValueOf('ID', id, -1);
   prop.IntegerValueOf('ParentID', parentID, -1);
-  if not ParentList.ModeForLevelEditor then prop.IntegerValueOf('ZOrder', zOrder, 0)
-    else prop.IntegerValueOf('LayerIndex', layerindex, 0);
+  {if not ParentList.ModeForLevelEditor then} prop.IntegerValueOf('ZOrder', zOrder, 0);
+    {else} prop.IntegerValueOf('LayerIndex', layerindex, 0);
 
   prop.StringValueOf('Name', name, 'noname');
   prop.StringValueOf('Classtype', s1, 'TSprite');
@@ -882,6 +956,8 @@ begin
     'TSprite': classtype := TSprite;
     'TDeformationGrid': classtype := TDeformationGrid;
     'TSpriteContainer': classtype := TSpriteContainer;
+    'TQuad4Color': classtype := TQuad4Color;
+    'TSpriteWithElasticCorner': classtype := TSpriteWithElasticCorner;
     else exception.create('forgot to implement!');
   end;
   prop.StringValueOf('TextureName', textureName, textureName);
@@ -894,10 +970,8 @@ begin
   prop.SingleValueOf('ScaleX', scaleX, 1.0);
   prop.SingleValueOf('ScaleY', scaleY, 1.0);
 
-  if ParentList.FModeForLevelEditor then begin
-    prop.IntegerValueOf('Width', width, 100);
-    prop.IntegerValueOf('Height', height, 100);
-  end;
+  prop.IntegerValueOf('Width', width, 0);
+  prop.IntegerValueOf('Height', height, 0);
 
   prop.BooleanValueOf('FlipH', flipH, False);
   prop.BooleanValueOf('FlipV', flipV, False);
@@ -907,6 +981,22 @@ begin
   prop.IntegerValueOf('TintMode', v, Ord(tmReplaceColor));
   tintmode := TTintMode(v);
   prop.SingleValueOf('FrameIndex', frameindex, 1.0);
+
+  // TSpriteWithElasticCorner
+  prop.SingleValueOf('TopLeftOffsetX', TopLeftOffsetX, 0);
+  prop.SingleValueOf('TopLeftOffsetY', TopLeftOffsetY, 0);
+  prop.SingleValueOf('TopRightOffsetX', TopRightOffsetX, 0);
+  prop.SingleValueOf('TopRightOffsetY', TopRightOffsetY, 0);
+  prop.SingleValueOf('BottomRightOffsetX', BottomRightOffsetX, 0);
+  prop.SingleValueOf('BottomRightOffsetY', BottomRightOffsetY, 0);
+  prop.SingleValueOf('BottomLeftOffsetX', BottomLeftOffsetX, 0);
+  prop.SingleValueOf('BottomLeftOffsetY', BottomLeftOffsetY, 0);
+
+  // TQuad4Color
+  prop.BGRAPixelValueOf('TopLeftColor', TopLeftColor, BGRA(255,0,0));
+  prop.BGRAPixelValueOf('TopRightColor', TopRightColor, BGRA(0,255,0));
+  prop.BGRAPixelValueOf('BottomRightColor', BottomRightColor, BGRA(0,0,255));
+  prop.BGRAPixelValueOf('BottomLeftColor', BottomLeftColor, BGRA(255,255,0));
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode

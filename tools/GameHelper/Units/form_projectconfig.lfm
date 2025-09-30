@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 2
+    PageIndex = 0
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage

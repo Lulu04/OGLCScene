@@ -110,6 +110,8 @@ object FrameTextureList: TFrameTextureList
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Right = 10
       Caption = '---'
+      ParentShowHint = False
+      ShowHint = True
       WordWrap = True
     end
     object Label5: TLabel

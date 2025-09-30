@@ -48,28 +48,30 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
           Left = 0
-          Height = 232
+          Height = 224
           Top = 96
           Width = 288
           Anchors = [akTop, akLeft, akRight]
-          ClientHeight = 232
+          ClientHeight = 224
           ClientWidth = 288
           ParentBackground = False
           TabOrder = 0
           object Label13: TLabel
-            Left = 7
+            Left = 24
             Height = 15
             Top = 24
-            Width = 67
+            Width = 36
             BorderSpacing.Left = 10
             BorderSpacing.Top = 27
-            Caption = 'Coordinates:'
+            Caption = 'Coord:'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object Label11: TLabel
             AnchorSideLeft.Control = SE1
             AnchorSideLeft.Side = asrCenter
             AnchorSideBottom.Control = SE1
-            Left = 113
+            Left = 99
             Height = 15
             Top = 1
             Width = 8
@@ -85,7 +87,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrCenter
             AnchorSideTop.Control = Label11
             AnchorSideBottom.Control = SE2
-            Left = 191
+            Left = 177
             Height = 15
             Top = 1
             Width = 7
@@ -100,33 +102,37 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label13
             AnchorSideRight.Side = asrBottom
-            Left = 51
+            Left = 34
             Height = 15
             Top = 49
-            Width = 23
+            Width = 26
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
             Caption = 'Size:'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object Label15: TLabel
             AnchorSideTop.Control = Label14
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label14
             AnchorSideRight.Side = asrBottom
-            Left = 47
+            Left = 31
             Height = 15
             Top = 74
-            Width = 27
+            Width = 29
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
             Caption = 'Pivot'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object SE5: TFloatSpinEdit
             AnchorSideLeft.Control = Label15
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label15
             AnchorSideBottom.Side = asrBottom
-            Left = 84
+            Left = 70
             Height = 23
             Top = 66
             Width = 58
@@ -144,7 +150,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = SE2
             AnchorSideTop.Control = SE5
             AnchorSideBottom.Side = asrCenter
-            Left = 161
+            Left = 147
             Height = 23
             Top = 66
             Width = 58
@@ -159,19 +165,24 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           object Label16: TLabel
             AnchorSideTop.Control = Label15
             AnchorSideTop.Side = asrBottom
-            Left = 48
+            AnchorSideRight.Control = Label13
+            AnchorSideRight.Side = asrBottom
+            Left = 25
             Height = 15
             Top = 99
-            Width = 34
+            Width = 35
+            Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
             Caption = 'Angle:'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object SE7: TFloatSpinEdit
             AnchorSideLeft.Control = Label16
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label16
             AnchorSideBottom.Side = asrBottom
-            Left = 92
+            Left = 70
             Height = 23
             Top = 91
             Width = 58
@@ -191,20 +202,22 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label16
             AnchorSideRight.Side = asrBottom
-            Left = 41
+            Left = 18
             Height = 15
             Top = 124
-            Width = 41
+            Width = 42
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 10
             Caption = 'Opacity'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object SE8: TSpinEdit
             AnchorSideLeft.Control = Label18
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label18
             AnchorSideBottom.Side = asrBottom
-            Left = 92
+            Left = 70
             Height = 23
             Top = 116
             Width = 58
@@ -222,7 +235,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label13
             AnchorSideBottom.Side = asrBottom
-            Left = 84
+            Left = 70
             Height = 23
             Top = 16
             Width = 67
@@ -241,7 +254,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = SE1
             AnchorSideBottom.Side = asrCenter
-            Left = 161
+            Left = 147
             Height = 23
             Top = 16
             Width = 67
@@ -255,15 +268,17 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             TabOrder = 5
           end
           object CBFlipH: TCheckBox
-            AnchorSideLeft.Control = SE2
+            AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = SE7
             AnchorSideBottom.Side = asrBottom
-            Left = 161
+            Left = 192
             Height = 19
             Top = 95
             Width = 46
             Anchors = [akLeft, akBottom]
             Caption = 'FlipH'
+            Font.Style = [fsBold]
+            ParentFont = False
             TabOrder = 6
             TabStop = False
             OnChange = CBTexturesSelect
@@ -272,11 +287,13 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = CBFlipH
             AnchorSideTop.Control = CBFlipH
             AnchorSideTop.Side = asrBottom
-            Left = 161
+            Left = 192
             Height = 19
             Top = 114
-            Width = 44
+            Width = 45
             Caption = 'FlipV'
+            Font.Style = [fsBold]
+            ParentFont = False
             TabOrder = 7
             TabStop = False
             OnChange = CBTexturesSelect
@@ -284,12 +301,14 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           object Label1: TLabel
             AnchorSideRight.Control = Label13
             AnchorSideRight.Side = asrBottom
-            Left = 54
+            Left = 38
             Height = 15
-            Top = 176
-            Width = 20
+            Top = 195
+            Width = 22
             Anchors = [akTop, akRight]
             Caption = 'Tint'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object Label2: TLabel
             AnchorSideLeft.Control = RadioButton1
@@ -297,9 +316,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             AnchorSideBottom.Control = Label3
             AnchorSideBottom.Side = asrBottom
-            Left = 209
+            Left = 195
             Height = 15
-            Top = 145
+            Top = 164
             Width = 29
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -312,9 +331,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = SE9
             AnchorSideBottom.Side = asrBottom
-            Left = 199
+            Left = 185
             Height = 19
-            Top = 163
+            Top = 182
             Width = 59
             BorderSpacing.Left = 15
             Caption = 'Replace'
@@ -327,9 +346,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = RadioButton1
             AnchorSideTop.Control = RadioButton1
             AnchorSideTop.Side = asrBottom
-            Left = 199
+            Left = 185
             Height = 19
-            Top = 182
+            Top = 201
             Width = 38
             Caption = 'Mix'
             TabOrder = 8
@@ -338,9 +357,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = SE1
             AnchorSideBottom.Control = Label1
             AnchorSideBottom.Side = asrBottom
-            Left = 84
+            Left = 70
             Height = 31
-            Top = 160
+            Top = 179
             Width = 44
             Anchors = [akLeft, akBottom]
             BorderWidth = 2
@@ -355,9 +374,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideRight.Side = asrBottom
             AnchorSideBottom.Control = Label3
             AnchorSideBottom.Side = asrBottom
-            Left = 142
+            Left = 128
             Height = 15
-            Top = 145
+            Top = 164
             Width = 39
             Anchors = [akLeft, akBottom]
             BorderSpacing.Top = 15
@@ -370,9 +389,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = ColorButton1
             AnchorSideBottom.Side = asrCenter
-            Left = 138
+            Left = 124
             Height = 23
-            Top = 163
+            Top = 182
             Width = 46
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -386,9 +405,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = ColorButton1
             AnchorSideLeft.Side = asrCenter
             AnchorSideBottom.Control = ColorButton1
-            Left = 94
+            Left = 80
             Height = 15
-            Top = 145
+            Top = 164
             Width = 25
             Anchors = [akLeft, akBottom]
             Caption = 'color'
@@ -399,7 +418,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = SE1
             AnchorSideBottom.Control = Label14
             AnchorSideBottom.Side = asrBottom
-            Left = 84
+            Left = 70
             Height = 23
             Top = 41
             Width = 58
@@ -416,7 +435,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Control = SE2
             AnchorSideBottom.Control = Label14
             AnchorSideBottom.Side = asrBottom
-            Left = 161
+            Left = 147
             Height = 23
             Top = 41
             Width = 58
@@ -434,7 +453,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = SE4
             AnchorSideTop.Side = asrCenter
-            Left = 230
+            Left = 216
             Height = 19
             Hint = 'Set the texture size'
             Top = 43
@@ -480,23 +499,28 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             ParentShowHint = False
           end
           object Label28: TLabel
+            AnchorSideTop.Control = Label18
+            AnchorSideTop.Side = asrBottom
             AnchorSideRight.Control = Label1
             AnchorSideRight.Side = asrBottom
-            Left = 38
+            Left = 22
             Height = 15
-            Top = 208
-            Width = 36
+            Top = 149
+            Width = 38
             Anchors = [akTop, akRight]
+            BorderSpacing.Top = 10
             Caption = 'Frame:'
+            Font.Style = [fsBold]
+            ParentFont = False
           end
           object SE10: TSpinEdit
             AnchorSideLeft.Control = Label28
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label28
             AnchorSideBottom.Side = asrBottom
-            Left = 84
+            Left = 70
             Height = 23
-            Top = 200
+            Top = 141
             Width = 58
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
@@ -518,7 +542,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 0
           Height = 132
-          Top = 420
+          Top = 412
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 132
@@ -825,9 +849,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 32
           Height = 15
           Top = 58
-          Width = 41
+          Width = 47
           Anchors = [akTop, akRight]
           Caption = 'Texture:'
+          Font.Style = [fsBold]
+          ParentFont = False
           ParentShowHint = False
           ShowHint = True
         end
@@ -836,12 +862,12 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label4
           AnchorSideBottom.Side = asrBottom
-          Left = 78
+          Left = 81
           Height = 23
           Top = 50
           Width = 154
           Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 5
+          BorderSpacing.Left = 2
           DropDownCount = 15
           ItemHeight = 15
           ParentShowHint = False
@@ -873,7 +899,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 374
+          Top = 366
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -1017,7 +1043,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 46
-          Top = 328
+          Top = 320
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           ClientHeight = 46
@@ -1061,20 +1087,22 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Left = 8
           Height = 15
           Top = 24
-          Width = 65
+          Width = 71
           Caption = 'Layer target:'
+          Font.Style = [fsBold]
+          ParentFont = False
         end
         object CBLayers: TComboBox
           AnchorSideLeft.Control = Label6
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label6
           AnchorSideBottom.Side = asrBottom
-          Left = 78
+          Left = 81
           Height = 23
           Top = 16
           Width = 154
           Anchors = [akLeft, akBottom]
-          BorderSpacing.Left = 5
+          BorderSpacing.Left = 2
           DropDownCount = 15
           ItemHeight = 15
           Style = csDropDownList
@@ -1110,7 +1138,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideRight.Side = asrBottom
           Left = 0
           Height = 38
-          Top = 552
+          Top = 544
           Width = 288
           Anchors = [akTop, akLeft, akRight]
           BevelOuter = bvNone

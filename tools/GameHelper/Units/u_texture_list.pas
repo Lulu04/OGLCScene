@@ -23,6 +23,10 @@ TTextureItem = record
   frameWidth, frameHeight, framecount: integer;
   procedure CreateTexture;
   procedure FreeTexture;
+
+  function GetTextureWidth: integer;
+  function GetTextureHeight: integer;
+
   function SaveToString: string;
   procedure LoadFromString(const s: string);
 end;
@@ -92,6 +96,18 @@ procedure TTextureItem.FreeTexture;
 begin
   if texture <> NIL then
     FScene.TexMan.Delete(texture);
+end;
+
+function TTextureItem.GetTextureWidth: integer;
+begin
+  if texture <> NIL then Result := texture^.FrameWidth
+    else Result := 0;
+end;
+
+function TTextureItem.GetTextureHeight: integer;
+begin
+  if texture <> NIL then Result := texture^.FrameHeight
+    else Result := 0;
 end;
 
 function TTextureItem.SaveToString: string;
