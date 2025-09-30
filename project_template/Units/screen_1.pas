@@ -22,6 +22,10 @@ type
 
 TScreen1 = class(TScreenTemplate)
 private
+  // declare a texture atlas here if you need one atlas per screen.
+  // In case you need only a single atlas for the whole game shared by different screens,
+  // its better to declare it as global variable in 'u_common', initialize it in FormMain.LoadCommonData and
+  // free it in FormMain.FreeCommonData
   FAtlas: TOGLCTextureAtlas;
 public
   procedure CreateObjects; override;
