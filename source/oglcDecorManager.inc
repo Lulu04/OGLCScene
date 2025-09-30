@@ -22,14 +22,16 @@ private
   FItems: TDecorItemList;
   FLayerIndex: integer;
   procedure Add(const aItem: TOGLCDecorItem);
+private
+  FWorldArea: TRectF;
 protected
   function GetWidth: integer; override;
   function GetHeight: integer; override;
 public
-  procedure Draw(const aLayerPercentOpacity: single);  override;
+  //procedure Draw(const aLayerPercentOpacity: single);  override;
   procedure DoDraw; override;
 public
-  constructor Create(aParentScene: TOGLCScene; aLayerIndex: integer);
+  constructor Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
   destructor Destroy; override;
 
   // The target layer index where to render the decor.
@@ -120,24 +122,130 @@ begin
   Result := 1;
 end;
 
-procedure TOGLCDecorList.Draw(const aLayerPercentOpacity: single);
+{procedure TOGLCDecorList.Draw(const aLayerPercentOpacity: single);
+begin
+  FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
+  if (FComputedOpacity = 0) and FChildsUseParentOpacity then exit;
+  FComputedTint.InitFromTint(TintMode, Tint.Value);
+  PushAndPrepareSceneMV;
+
+  if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
+    else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
+
+  // draw is done in descendant classes throught DoDraw.
+  // If you don't want this mecanism override Draw(const aLayerPercentOpacity : single)
+  DoDraw();
+
+  if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
+    else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
+
+  {$IFDEF DEBUG_MODE_ON}
+    FParentScene.BlendMode := FX_BLEND_NORMAL;
+    DrawBox(FParentScene, 0, 0, Width, Height, BGRA(255,0,0));
+  {$ENDIF}
+
+  // restore the parent scene modelview matrix
+  PopSceneMV;
+end;  }
+
+procedure TOGLCDecorList.DoDraw;
 var i: SizeUInt;
   modelArea: TQuadF;
   fi: integer;
+  viewRect: TRectF;
+  oldMatrix: TOGLCMatrix;
+  newComputedOpacity, v: single;
+  offsetCoor: TPointF;
+  itemIndex: integer;
 begin
   if FItems.Size = 0 then exit;
+  //retrieve the view offset and size
+  viewRect := ParentLayer.GetViewRect;
 
+  // adjust the view rect to the world bounds (loop the view)
+  v := viewRect.Width;
+  while viewRect.Left < FWorldArea.Left do viewRect.Left := viewRect.Left + FWorldArea.Width;
+  while viewRect.Left > FWorldArea.Right do viewRect.Left := viewRect.Left - FWorldArea.Width;
+{  v := viewRect.Width;
+  viewRect.Left := Frac(viewRect.Left / FWorldArea.Width) * FWorldArea.Width;
+  viewRect.Width := v;
+  v := viewRect.Height;
+  viewRect.Top := Frac(viewRect.Top / FWorldArea.Height) * FWorldArea.Height;
+  viewRect.Height := v;   }
+
+  // retrieve the first item visible
+  itemIndex := -1;
   for i:=0 to FItems.Size-1 do begin
-    with FItems.Mutable[i]^ do begin
-      FComputedOpacity := aLayerPercentOpacity*opacity*Self.Opacity.Value*OneDiv255;
-      if FComputedOpacity = 0 then continue;
-      {%H-}modelArea.SetAsRectangle(0, 0, w, h);
+    with FItems.Mutable[i]^ do
+      {%H-}modelArea.SetAsRectangle(x, y, w, h);
+      if modelArea.isVisibleIn(viewRect) then begin
+        itemIndex := i;
+        break;
+      end;
+  end;
 
-      // draw child with negative Zorder
-      if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
-        else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
+  if itemIndex = -1 then begin
+    itemIndex := 0;  // devrait être l'index du premier element visible (qui n'est pas forcément 0)
+   // offsetCoor := PointF(FItems.Mutable[i]^.x-(FWorldArea.Right-viewRect.Left), 0);
+    //offsetCoor.x := viewRect.Width;
+    offsetCoor.x := Min(viewRect.Width, FWorldArea.Width);
+
+    offsetCoor.y := 0;
+  end else offsetCoor := PointF(0, 0);
+
+  while (itemIndex < FItems.Size) and
+        (FItems.Mutable[itemIndex]^.x+offsetCoor.x - viewRect.Left < viewRect.Width)
+        {(FItems.Mutable[itemIndex]^.y+offsetCoor.y - viewRect.Top < viewRect.Height)}  do begin
+
+    // render the item
+    with FItems.Mutable[itemIndex]^ do begin
+      newComputedOpacity := FComputedOpacity * opacity;
+      if newComputedOpacity = 0 then continue;
+
+      modelArea.SetAsRectangle(0, 0, w, h);
+
       // save and prepare matrix
-      FPreviousModelViewMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+      oldMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+      FParentScene.ModelViewMatrix.AddTransform(x+offsetCoor.x, y+offsetCoor.y, 1.0, 1.0,
+                         angle, w*pivotX, h*pivotY);
+      // frame index
+      fi := EnsureRange(frameindex, 0, High(texture^.FramesCoord));
+      // render the quad
+    {  FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
+      FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
+                                                     NIL, newComputedOpacity, computedtint);  }
+      with FParentScene.TexturedMVTriangleRenderer do begin
+        Prepare(ptTriangleStrip, texture, 0, BlendMode);
+        PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex, NIL, newComputedOpacity, computedtint);
+      end;
+
+      // restore matrix
+      FParentScene.ModelViewMatrix.CopyFrom(oldMatrix);
+    end;
+
+    if itemIndex < FItems.Size-1 then inc(itemIndex)
+      else begin
+        itemIndex := 0;
+        //offsetCoor.x := offsetCoor.x + viewRect.Width;
+        //offsetCoor.x := offsetCoor.x + FWorldArea.Width;
+        offsetCoor.x := offsetCoor.x + Min(viewRect.Width, FWorldArea.Width);
+
+     //   offsetCoor.y := offsetCoor.y + //viewRect.Height; // FWorldArea.Height;
+      end;
+  end;
+
+
+
+{  for i:=0 to FItems.Size-1 do begin
+    with FItems.Mutable[i]^ do begin
+       newComputedOpacity := FComputedOpacity * opacity;
+      if newComputedOpacity = 0 then continue;
+
+      {%H-}modelArea.SetAsRectangle(x, y, w, h);
+      if not modelArea.isVisibleIn(viewRect) then continue;
+
+      // save and prepare matrix
+      oldMatrix.CopyFrom(FParentScene.ModelViewMatrix);
       FParentScene.ModelViewMatrix.AddTransform(x, y, 1.0, 1.0,
                            angle, w*pivotX, h*pivotY);
       // frame index
@@ -145,23 +253,16 @@ begin
       // render the quad
       FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
       FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
-                                                        NIL, FComputedOpacity, computedtint);
-
+                                                        NIL, newComputedOpacity, computedtint);
       // restore matrix
-      FParentScene.ModelViewMatrix.CopyFrom(FPreviousModelViewMatrix);
-      // draw child with positive Zorder
-      if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
-        else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
+      FParentScene.ModelViewMatrix.CopyFrom(oldMatrix);
+      while FOffsetValue.y >= FWorldArea.Bottom do
+        FOffsetValue.y := FOffsetValue.y - FWorldArea.Bottom;
     end;
-  end;
+  end;     }
 end;
 
-procedure TOGLCDecorList.DoDraw;
-begin
-  // nothing here
-end;
-
-constructor TOGLCDecorList.Create(aParentScene: TOGLCScene; aLayerIndex: integer);
+constructor TOGLCDecorList.Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
 begin
   inherited Create;
   FParentScene := aParentScene;
@@ -170,6 +271,8 @@ begin
   ChildsUseParentOpacity := True;
 
   FItems := TDecorItemList.Create;
+
+  FWorldArea := aWorldArea;
 end;
 
 destructor TOGLCDecorList.Destroy;
@@ -184,6 +287,7 @@ end;
 
 function TOGLCDecorManager.GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorList;
 var i: SizeUInt;
+  o: TOGLCDecorList;
 begin
   // search if there is a TOGLCDecorList assigned to the layer
   if FDecors.Size > 0 then
@@ -194,7 +298,8 @@ begin
       end;
 
   // not found -> create a new instance for the layer
-  FDecors.PushBack(TOGLCDecorList.Create(FParentScene, aLayerIndex));
+  o := TOGLCDecorList.Create(FParentScene, aLayerIndex, WorldArea);
+  FDecors.PushBack(o);
   Result := FDecors.Mutable[FDecors.Size-1]^;
 end;
 
