@@ -227,7 +227,7 @@ public // rotate 90, mirror, plane
 end;
 
 implementation
-uses Forms, LCLType, Controls, Math, u_common, u_ui_atlas, form_main, u_utils,
+uses Forms, LCLType, Controls, Math, u_common, form_main, u_utils,
   u_layerlist, u_project;
 
 { TCustomScreenTemplate }

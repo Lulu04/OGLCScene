@@ -55,6 +55,8 @@ public
   BottomLeftOffsetX, BottomLeftOffsetY: single;
   // TQuad4Color
   TopLeftColor, TopRightColor, BottomRightColor,BottomLeftColor: TBGRAPixel;
+  // TDeformationGrid
+  DeformationGridData: string;
 
 
   procedure InitDefault;
@@ -221,7 +223,7 @@ begin
   p.y := p.y / surface.Height;
   surface.Pivot.x := p.x;
   surface.Pivot.y := p.y;
-  HandleManager.ShowPivotHandle(surface);
+  HandleManager.UpdatePivotHandle(surface);
 end;
 
 procedure TSurfaceDescriptor.SetSelected(AValue: boolean);
@@ -259,6 +261,8 @@ begin
   TopRightColor := BGRA(0,255,0);
   BottomRightColor := BGRA(0,0,255);
   BottomLeftColor := BGRA(255,255,0);
+  // TDeformationGrid
+  DeformationGridData := '';
 
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
@@ -286,15 +290,13 @@ begin
   if (classType = TSprite) then begin
     surface := TSprite.Create(tex, False);
     surface.Frame := frameindex;
-   // if ParentList.FModeForLevelEditor then
-      TSprite(surface).SetSize(width, height);
+    TSprite(surface).SetSize(width, height);
   end
   else
   if classType = TSpriteWithElasticCorner then begin
     surface := TSpriteWithElasticCorner.Create(tex, False);
     surface.Frame := frameindex;
-   // if ParentList.FModeForLevelEditor then
-      TSpriteWithElasticCorner(surface).SetSize(width, height);
+    TSpriteWithElasticCorner(surface).SetSize(width, height);
     with TSpriteWithElasticCorner(surface) do begin
       CornerOffset.TopLeft.x.Value := TopLeftOffsetX;
       CornerOffset.TopLeft.y.Value := TopLeftOffsetY;
@@ -309,20 +311,17 @@ begin
   if classType = TTiledSprite then begin
     surface := TTiledSprite.Create(tex, False);
     surface.Frame := frameindex;
-   // if ParentList.FModeForLevelEditor then
-      TTiledSprite(surface).SetSize(width, height)
+    TTiledSprite(surface).SetSize(width, height)
   end else
   if classType = TPolarSprite then begin
     surface := TPolarSprite.Create(tex, False);
     surface.Frame := frameindex;
-  //  if ParentList.FModeForLevelEditor then
-      TPolarSprite(surface).SetSize(width, height);
+    TPolarSprite(surface).SetSize(width, height);
   end else
   if classType = TScrollableSprite then begin
     surface := TScrollableSprite.Create(tex, False);
     surface.Frame := frameindex;
-  //  if ParentList.FModeForLevelEditor then
-      TScrollableSprite(surface).SetSize(width, height);
+    TScrollableSprite(surface).SetSize(width, height);
   end else
   if classType = TShapeOutline then begin
     surface := TShapeOutline.Create(FScene)
@@ -343,8 +342,9 @@ begin
   if classType = TDeformationGrid then begin
     surface := TDeformationGrid.Create(tex, False);
     surface.Frame := frameindex;
-   // if ParentList.FModeForLevelEditor then
-      TDeformationGrid(surface).SetSize(width, height);
+    TDeformationGrid(surface).SetSize(width, height);
+    if DeformationGridData <> '' then
+      TDeformationGrid(surface).LoadDeformationDataFromString(DeformationGridData);
   end else
   if classType = TSpriteContainer then begin
     surface := TSpriteContainer.Create(FScene);
@@ -934,6 +934,11 @@ begin
     prop.Add('BottomLeftColor', BottomLeftColor);
   end;
 
+  // TDeformationGrid
+  if surface is TDeformationGrid then begin
+    prop.Add('DeformationGridData', DeformationGridData);
+  end;
+
   Result := prop.PackedProperty;
 end;
 
@@ -941,26 +946,33 @@ procedure TSurfaceDescriptor.LoadFromString(const s: string);
 var prop: TProperties;
   s1: string;
   v: integer;
+  tex: PTexture;
 begin
   s1 := '';
   InitDefault;
   prop.Split(s, '~');
   prop.IntegerValueOf('ID', id, -1);
   prop.IntegerValueOf('ParentID', parentID, -1);
-  {if not ParentList.ModeForLevelEditor then} prop.IntegerValueOf('ZOrder', zOrder, 0);
-    {else} prop.IntegerValueOf('LayerIndex', layerindex, 0);
+  prop.IntegerValueOf('ZOrder', zOrder, 0);
+  prop.IntegerValueOf('LayerIndex', layerindex, 0);
 
   prop.StringValueOf('Name', name, 'noname');
   prop.StringValueOf('Classtype', s1, 'TSprite');
   case s1 of
     'TSprite': classtype := TSprite;
+    'TTiledSprite': classtype := TTiledSprite;
+    'TSpriteWithElasticCorner': classtype := TSpriteWithElasticCorner;
     'TDeformationGrid': classtype := TDeformationGrid;
+    'TScrollableSprite': classtype := TScrollableSprite;
+    'TPolarSprite': classtype := TPolarSprite;
+    'TShapeOutline': classtype := TShapeOutline;
     'TSpriteContainer': classtype := TSpriteContainer;
     'TQuad4Color': classtype := TQuad4Color;
-    'TSpriteWithElasticCorner': classtype := TSpriteWithElasticCorner;
+    'TGradientRectangle': classtype := TGradientRectangle;
     else exception.create('forgot to implement!');
   end;
   prop.StringValueOf('TextureName', textureName, textureName);
+  tex := GetTextureFromTextureName;
 
   prop.SingleValueOf('PivotX', pivotX, 0.5);
   prop.SingleValueOf('PivotY', pivotY, 0.5);
@@ -970,8 +982,10 @@ begin
   prop.SingleValueOf('ScaleX', scaleX, 1.0);
   prop.SingleValueOf('ScaleY', scaleY, 1.0);
 
-  prop.IntegerValueOf('Width', width, 0);
-  prop.IntegerValueOf('Height', height, 0);
+  if tex <> NIL then v := tex^.FrameWidth else v := 1;
+  prop.IntegerValueOf('Width', width, v);
+  if tex <> NIL then v := tex^.FrameHeight else v := 1;
+  prop.IntegerValueOf('Height', height, v);
 
   prop.BooleanValueOf('FlipH', flipH, False);
   prop.BooleanValueOf('FlipV', flipV, False);
@@ -997,6 +1011,9 @@ begin
   prop.BGRAPixelValueOf('TopRightColor', TopRightColor, BGRA(0,255,0));
   prop.BGRAPixelValueOf('BottomRightColor', BottomRightColor, BGRA(0,0,255));
   prop.BGRAPixelValueOf('BottomLeftColor', BottomLeftColor, BGRA(255,255,0));
+
+  // TDeformationGrid
+  prop.StringValueOf('DeformationGridData', DeformationGridData, '');
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode
@@ -1432,8 +1449,7 @@ begin
   Result := prop.PackedProperty;
 end;
 
-procedure TSurfaceList.LoadFromString(const s: string; aCreateSurfaces: boolean
-  );
+procedure TSurfaceList.LoadFromString(const s: string; aCreateSurfaces: boolean);
 var prop: TProperties;
   i: SizeUInt;
   c: integer;

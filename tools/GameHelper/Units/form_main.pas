@@ -99,7 +99,7 @@ var
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
-  u_spritebank, u_ui_handle, u_screen_spritebank, u_ui_atlas,
+  u_spritebank, u_ui_handle, u_screen_spritebank,
   u_screen_levelbank, u_screen_leveleditor, u_levelbank, form_projectconfig,
   BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
@@ -268,8 +268,9 @@ end;
 
 procedure TFormMain.CreateAppTextureAtlas;
 var fd: TFontDescriptor;
+  path: String;
 begin
-  // create an atlas for the app with a font
+  // create an atlas for the app with font and mouse cursor
   FAtlas := FScene.CreateAtlas;
   FAtlas.Spacing := 1;
 
@@ -279,8 +280,37 @@ begin
   fd.Create('Arial', 16, [], BGRA(255,155,155), BGRA(0,0,0,200), 3);
   FErrorFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
+  path := GetHandleFolder;
+  texHandlePivot := FAtlas.AddFromSVG(path+'Pivot.svg', PPIScale(12), -1);
+  texHandleRotate := FAtlas.AddFromSVG(path+'Rotate.svg', PPIScale(19), -1);
+  texArrowH := FAtlas.AddFromSVG(path+'ArrowH.svg', PPIScale(19), -1);
+
+  texHandlePathNode := FAtlas.AddMultiFrameImageFromSVG([path+'PathNode.svg',
+                                                      path+'PathNodeSelected.svg'],
+                                                      PPIScale(12), -1, 2, 1, 2);
+
+  // mouse cursor
+  path := GetCursorFolder;
+  texMouseNormal := FAtlas.AddFromSVG(path+'Select.svg', PPIScale(32), -1);
+  texSelectSurfaceByRect := FAtlas.AddFromSVG(path+'SelectSurfaceByRect.svg', PPIScale(32), -1);
+  texMouseOverSurface := FAtlas.AddFromSVG(path+'OverSurface.svg', PPIScale(32), -1);
+  texMouseOverPivot := FAtlas.AddFromSVG(path+'OverPivot.svg', PPIScale(32), -1);
+  texMouseRotateSurface := FAtlas.AddFromSVG(path+'RotateSurface.svg', PPIScale(32), -1);
+  texMouseScaleSurface := FAtlas.AddFromSVG(path+'ScaleSurface.svg', PPIScale(32), -1);
+
+  texMouseOverNode := FAtlas.AddFromSVG(path+'OverNode.svg', PPIScale(32), -1);
+  texMouseMovingNode := FAtlas.AddFromSVG(path+'MovingNode.svg', PPIScale(32), -1);
+  texMouseAddNode := FAtlas.AddFromSVG(path+'AddNode.svg', PPIScale(32), -1);
+  texMouseToolPoint := FAtlas.AddFromSVG(path+'Point.svg', PPIScale(32), -1);
+  texMouseToolLine := FAtlas.AddFromSVG(path+'Line.svg', PPIScale(32), -1);
+  texMouseToolCircle := FAtlas.AddFromSVG(path+'Circle.svg', PPIScale(32), -1);
+  texMouseToolRectangle := FAtlas.AddFromSVG(path+'Rectangle.svg', PPIScale(32), -1);
+  texMouseToolPolygon := FAtlas.AddFromSVG(path+'Polygon.svg', PPIScale(32), -1);
+
+
   FAtlas.TryToPack;
   FAtlas.Build;
+  FAtlas.FreeItemImages;
 end;
 
 procedure TFormMain.FreeAppTextureAtlas;
@@ -293,9 +323,6 @@ procedure TFormMain.LoadCommonData;
 begin
   CreateAppTextureAtlas;
   Project.Config.InitDefault;
-
-  UIAtlas.InitDefault;
-  UIAtlas.CreateAtlas;
 
   ScreenSpriteBuilder := TScreenSpriteBuilder.Create;
   ScreenSpriteBuilder.Initialize;
@@ -328,7 +355,6 @@ begin
 
   FScene.Mouse.DeleteCursorSprite;
   FScene.ClearAllLayer;
-  UIAtlas.FreeAtlas;
 
   SpriteBank.Free;
   SpriteBank := NIL;

@@ -1093,7 +1093,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 136
           Top = 352
           Width = 290
-          PageIndex = 1
+          PageIndex = 0
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 7
           object PageExtraEmpty: TPage
@@ -1600,7 +1600,6 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
               Top = 0
               Width = 290
               Align = alClient
-              Caption = 'Panel17'
               ClientHeight = 136
               ClientWidth = 290
               Color = 8355711
@@ -1658,6 +1657,14 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
                 OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+              end
+              object BEditDeformationGrid: TSpeedButton
+                Left = 80
+                Height = 31
+                Top = 53
+                Width = 121
+                Caption = 'Edit grid'
+                OnClick = BEditDeformationGridClick
               end
             end
           end

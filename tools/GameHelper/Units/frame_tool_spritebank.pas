@@ -331,6 +331,7 @@ begin
                                FormatFloatWithDot('0.00', rootItem^.y)+');');
 
     t.AddText(CommonPropertiesToPascalCode(rootItem, '  '));
+    t.AddText(ExtraPropertiesToPascalCode(rootItem, '  '));
     t.Add('');
   end else t.Add('');
 

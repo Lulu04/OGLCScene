@@ -50,12 +50,13 @@ object FrameTextureList: TFrameTextureList
       OnSelectionChange = LBTextureNamesSelectionChange
     end
     object BAddTexture: TSpeedButton
+      AnchorSideTop.Control = BUpdateTexture
       AnchorSideRight.Control = BUpdateTexture
       Cursor = crHandPoint
       Left = 186
       Height = 28
       Hint = 'Add the texture to the list'
-      Top = 360
+      Top = 361
       Width = 28
       Anchors = [akTop, akRight]
       AutoSize = True
@@ -141,12 +142,13 @@ object FrameTextureList: TFrameTextureList
     end
     object BUpdateTexture: TSpeedButton
       AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = SE9
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
       Left = 244
       Height = 28
-      Top = 360
+      Top = 361
       Width = 28
       Anchors = [akTop, akRight]
       AutoSize = True

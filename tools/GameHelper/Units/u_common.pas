@@ -34,6 +34,16 @@ var
 
   LastClickedIsControl: boolean=False;
 
+  // handle textures
+  texHandlePivot, texHandleRotate, texArrowH,
+  texHandlePathNode: PTexture;
+  // mouse cursor textures
+  texMouseNormal,
+  texSelectSurfaceByRect,
+  texMouseOverSurface, texMouseOverPivot, texMouseRotateSurface, texMouseScaleSurface,
+  texMouseOverNode, texMouseMovingNode, texMouseAddNode,
+  texMouseToolPoint, texMouseToolLine, texMouseToolCircle, texMouseToolRectangle, texMouseToolPolygon: PTexture;
+
 implementation
 
 

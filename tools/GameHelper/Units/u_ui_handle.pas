@@ -30,10 +30,10 @@ public
   procedure InitDefault;
   procedure KillSurfaces;
   procedure HideAll;
-  procedure ShowPivotHandle(aSurface: TSimpleSurfaceWithEffect);
+  procedure UpdatePivotHandle(aSurface: TSimpleSurfaceWithEffect);
   procedure ShowOutLine(aSurface: TSimpleSurfaceWithEffect);
   procedure ToogleScaledAndRotatedHandle(aSurface: TSimpleSurfaceWithEffect);
-  procedure ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
+  procedure ShowScaleHandle(aSurface: TSimpleSurfaceWithEffect);
   procedure ShowRotateHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
 
   procedure UpdateHandlePosition(aSurface: TSimpleSurfaceWithEffect);
@@ -61,17 +61,16 @@ end;
 var UIHandle: TUIHandle;
 
 implementation
-uses u_common, u_ui_atlas;
+uses u_common;
 
 { TUIHandleManager }
 
-procedure TUIHandleManager.ShowPivotHandle(aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.UpdatePivotHandle(aSurface: TSimpleSurfaceWithEffect);
 var p: TPointF;
 begin
   with aSurface do
     p := GetMatrixSurfaceToScene.Transform(PointF(Width*Pivot.x, Height*Pivot.y));
   FPivot.SetCenterCoordinate(p);
-  FPivot.Visible := True;
 end;
 
 procedure TUIHandleManager.ShowOutLine(aSurface: TSimpleSurfaceWithEffect);
@@ -86,8 +85,8 @@ procedure TUIHandleManager.ToogleScaledAndRotatedHandle(aSurface: TSimpleSurface
 begin
   if IsVisible then begin
     if ScaleVisible then ShowRotateHandleAndPivot(aSurface)
-      else ShowScaleHandleAndPivot(aSurface);
-  end else ShowScaleHandleAndPivot(aSurface);
+      else ShowScaleHandle(aSurface);
+  end else ShowScaleHandle(aSurface);
 end;
 
 function TUIHandleManager.IsVisible: boolean;
@@ -133,14 +132,14 @@ begin
   FOutLine.Visible := False;
 end;
 
-procedure TUIHandleManager.ShowScaleHandleAndPivot(aSurface: TSimpleSurfaceWithEffect);
+procedure TUIHandleManager.ShowScaleHandle(aSurface: TSimpleSurfaceWithEffect);
 var w, h: single;
   r: TRectF;
 begin
   HideAll;
 
   // pivot
-  ShowPivotHandle(aSurface);
+  //ShowPivotHandle(aSurface);
 
   // outline
   ShowOutLine(aSurface);
@@ -180,7 +179,8 @@ var w, h: single;
   r: TRectF;
 begin
   HideAll;
-  ShowPivotHandle(aSurface);
+  UpdatePivotHandle(aSurface);
+  FPivot.Visible := True;
   ShowOutLine(aSurface);
 
   // rotated handle
@@ -205,7 +205,7 @@ end;
 procedure TUIHandleManager.UpdateHandlePosition(aSurface: TSimpleSurfaceWithEffect);
 begin
   if not IsVisible then exit;
-  if ScaleVisible then ShowScaleHandleAndPivot(aSurface);
+  if ScaleVisible then ShowScaleHandle(aSurface);
   if RotateVisible then ShowRotateHandleAndPivot(aSurface);
 end;
 
