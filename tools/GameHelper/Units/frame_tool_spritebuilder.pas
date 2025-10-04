@@ -191,6 +191,7 @@ type
     SpeedButton12: TSpeedButton;
     SpeedButton13: TSpeedButton;
     SpeedButton14: TSpeedButton;
+    BEditDeformationGrid: TSpeedButton;
     SpeedButton2: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
@@ -206,6 +207,7 @@ type
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
+    procedure BEditDeformationGridClick(Sender: TObject);
     procedure BHelpCollisionBodyClick(Sender: TObject);
     procedure BHelpPosturesClick(Sender: TObject);
     procedure BHelpRootChildsClick(Sender: TObject);
@@ -280,7 +282,7 @@ type
 
 implementation
 uses form_main, u_project, u_common, u_spritebank, u_screen_template,
-  form_showhelp, u_utils, LCLType;
+  form_showhelp, u_utils, form_editdeformationgrid, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -374,6 +376,21 @@ begin
                    [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageSpriteBank;
+end;
+
+procedure TFrameToolsSpriteBuilder.BEditDeformationGridClick(Sender: TObject);
+var form: TFormEditDeformationGrid;
+begin
+  if ScreenSpriteBuilder.SelectedCount <> 1 then exit;
+  if not (FWorkingChild^.surface is TDeformationGrid) then exit;
+  form := TFormEditDeformationGrid.Create(NIL);
+  try
+    form.Edit(FWorkingChild); //TDeformationGrid(FWorkingChild^.surface));
+    form.ShowModal;
+    if form.Modified then Modified:= True;
+  finally
+    form.Free;
+  end;
 end;
 
 procedure TFrameToolsSpriteBuilder.BHelpCollisionBodyClick(Sender: TObject);
@@ -1159,6 +1176,11 @@ begin
     FWorkingChild^.TopRightColor := ColorToBGRA(ColorButton2.ButtonColor, SE13.Value);
     FWorkingChild^.BottomRightColor := ColorToBGRA(ColorButton4.ButtonColor, SE15.Value);
     FWorkingChild^.BottomLeftColor := ColorToBGRA(ColorButton3.ButtonColor, SE14.Value);
+  end
+  else
+  if selectedClass = TDeformationGrid then begin
+    FWorkingChild^.width := SE26.Value;
+    FWorkingChild^.height := SE27.Value;
   end
   else raise exception.Create('forgot to implement '+selectedClass.ClassName);
 end;

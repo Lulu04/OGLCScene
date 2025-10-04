@@ -138,7 +138,7 @@ end;
 
 implementation
 
-uses u_common, u_ui_atlas, u_screen_spritebuilder, BGRAPath;
+uses u_common, u_screen_spritebuilder, BGRAPath;
 
 {$define _IMPLEMENTATION}
 {$I u_collisionbody_undoredo.inc}
@@ -177,7 +177,7 @@ end;
 function TUINodeHandle.IsOver(aWorldPt: TPointF): boolean;
 var r: TRectF;
 begin
-  r := FSprite.GetRectAreaInSceneSpace(False);
+  r := FSprite.GetQuadAreaInSceneSpace.Bounds;
   Result := FScene.Collision.PointRectF(aWorldPt, r);
 end;
 

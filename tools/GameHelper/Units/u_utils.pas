@@ -169,6 +169,12 @@ begin
       end;
     end;
 
+    'TDeformationGrid': begin
+      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));'#10+
+                aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');';
+
+    end
+
     else raise exception.Create('forgot to implement '+aSurface^.classtype.ClassName);
   end;
 end;
