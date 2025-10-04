@@ -30,6 +30,12 @@ private
   FTimeCount: single;
   FCellHeight, FCellWidth: single;
   procedure Init; override;
+public // for tool GameHelper
+  function SaveDeformationDataToString: string;
+  procedure LoadDeformationDataFromString(const s: string);
+  // Move grid's nodes to their default positions.
+  procedure ResetNodePositions;
+  procedure ResetNodeCoeffs;
 public
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
@@ -67,6 +73,7 @@ public
   property ShowGrid: boolean read FShowGrid write FShowGrid;
   property RowCount: integer read FRowCount;
   property ColumnCount: integer read FColumnCount;
+  property DeformationType: TDeformationType read FDeformationType write ApplyDeformation;
 end;
   {$endif oglcINTERFACE}
   {$ifdef oglcIMPLEMENTATION}
@@ -95,6 +102,59 @@ begin
 
   Amplitude := TPointFParam.Create;
   Amplitude.Value := PointF(1,1);
+
+  SetGrid(2, 2);
+end;
+
+function TDeformationGrid.SaveDeformationDataToString: string;
+var ix, iy: integer;
+  p: PDeformedPoint;
+begin
+  Result := Ord(FDeformationType).ToString + ' '+
+            FormatFloatWithDot('0.000', DeformationSpeed.X.Value) + ' ' +
+            FormatFloatWithDot('0.000', DeformationSpeed.Y.Value) + ' ' +
+            FormatFloatWithDot('0.000', Amplitude.X.Value) + ' ' +
+            FormatFloatWithDot('0.000', Amplitude.X.Value) + ' ' +
+            FRowCount.ToString + ' ' +
+            FColumnCount.ToString;
+  for iy:=0 to RowCount do
+   for ix:=0 to ColumnCount do begin
+    p := @Grid[iy][ix];
+    Result := Result + ' ' + FormatFloatWithDot('0.000', p^.x) + ' ' +
+                             FormatFloatWithDot('0.000', p^.y) + ' ' +
+                             FormatFloatWithDot('0.000', p^.DeformationAmount) + ' ' +
+                             FormatFloatWithDot('0.000', p^.TimeMultiplicator);
+
+   end;
+end;
+
+procedure TDeformationGrid.LoadDeformationDataFromString(const s: string);
+var ix, iy, k: integer;
+  A: TStringArray;
+begin
+  FGridInitialized := False;
+  A := s.Split([' ']);
+  if Length(A) = 0 then exit;
+  try
+    DeformationType := TDeformationType(A[0].ToInteger);
+    DeformationSpeed.X.Value := StringToSingle(A[1]);
+    DeformationSpeed.Y.Value := StringToSingle(A[2]);
+    Amplitude.X.Value := StringToSingle(A[3]);
+    Amplitude.Y.Value := StringToSingle(A[4]);
+    SetGrid(A[5].ToInteger, A[6].ToInteger);
+    k := 7;
+    for iy:=0 to RowCount do
+      for ix:=0 to ColumnCount do begin
+        FGridPts[iy][ix].x := StringToSingle(A[k]);
+        FGridPts[iy][ix].y := StringToSingle(A[k+1]);
+        FGridPts[iy][ix].DeformationAmount := StringToSingle(A[k+2]);
+        FGridPts[iy][ix].TimeMultiplicator := StringToSingle(A[k+3]);
+        inc(k, 4);
+      end;
+    FGridInitialized := True;
+  except
+    FGridInitialized := False;
+  end;
 end;
 
 procedure TDeformationGrid.Update(const aElapsedTime: single);
@@ -214,11 +274,12 @@ end;
 procedure TDeformationGrid.DoDraw;
 var WholeTexCoor, PartTexCoor, ScreenCellCoor: TQuadF;
     tx, ty, tw, th: single;
-    ix, iy, ixf, iyf: integer;
+    ix, iy, ixf, iyf, fi: integer;
     pt1, pt2: TPointF;
 begin
   if not FGridInitialized then exit;
-  WholeTexCoor := FTexture^.FramesCoord[trunc(FFrame)];
+  fi := Min(Length(FTexture^.FramesCoord)-1, Trunc(FFrame));
+  WholeTexCoor := FTexture^.FramesCoord[fi];
 
   ty := WholeTexCoor[cTL].y;
   tw := (WholeTexCoor[cTR].x - WholeTexCoor[cTL].x)/FColumnCount;
@@ -354,6 +415,30 @@ begin
   SetTimeMultiplicatorOnRow(FRowCount, aTimeMultiplicator);
   SetTimeMultiplicatorOnColumn(0, aTimeMultiplicator);
   SetTimeMultiplicatorOnColumn(FColumnCount, aTimeMultiplicator);
+end;
+
+procedure TDeformationGrid.ResetNodePositions;
+var ix, iy: integer;
+begin
+  for iy:=0 to High(FGridPts) do
+   for ix:=0 to High(FGridPts[0]) do begin
+    with FGridPts[iy][ix] do begin
+      x := ix*FCellWidth;
+      y := iy*FCellHeight;
+    end;
+   end;
+end;
+
+procedure TDeformationGrid.ResetNodeCoeffs;
+var ix, iy: integer;
+begin
+  for iy:=0 to High(FGridPts) do
+   for ix:=0 to High(FGridPts[0]) do begin
+    with FGridPts[iy][ix] do begin
+     DeformationAmount := 1.0;
+     TimeMultiplicator := 1.0;
+    end;
+   end;
 end;
 
 procedure TDeformationGrid.ApplyDeformation(aType: TDeformationType);
