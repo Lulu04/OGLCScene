@@ -30,7 +30,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="Units;..\..\source"/>
+            <OtherUnitFiles Value="Units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -64,20 +64,23 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="LazOpenGLContext"/>
+        <PackageName Value="OGLCScenePackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="BGRABitmapPack"/>
-        <MinVersion Major="9" Valid="True"/>
+        <PackageName Value="LazOpenGLContext"/>
       </Item2>
       <Item3>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
       </Item3>
       <Item4>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazUtils"/>
       </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
     </RequiredPackages>
     <Units Count="5">
       <Unit0>
@@ -93,7 +96,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="16" Y="13"/>
         <UsageCount Value="200"/>
@@ -103,8 +105,10 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="40" Y="17"/>
+        <TopLine Value="8"/>
+        <CursorPos Y="22"/>
         <UsageCount Value="55"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -112,7 +116,8 @@
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="2" Y="11"/>
+        <TopLine Value="101"/>
+        <CursorPos X="13" Y="100"/>
         <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -122,11 +127,39 @@
         <Loaded Value="True"/>
       </Unit4>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="8" HistoryIndex="7">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="11" Column="7"/>
       </Position1>
+      <Position2>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="13" Column="16"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="72" Column="17" TopLine="60"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="594" TopLine="577"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="73" Column="13" TopLine="59"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="99" Column="18" TopLine="90"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="464" Column="21" TopLine="444"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\u_sprite_def.pas"/>
+        <Caret Line="100" Column="13" TopLine="101"/>
+      </Position8>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -137,7 +170,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="Units;..\..\source"/>
+      <OtherUnitFiles Value="Units"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
