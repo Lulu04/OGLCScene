@@ -27,6 +27,7 @@ type
     BDeletePosture: TSpeedButton;
     BBodyRedo: TSpeedButton;
     BBodyUndo: TSpeedButton;
+    BEditGradient: TSpeedButton;
     BHelpPostures: TSpeedButton;
     BHelpRootChilds: TSpeedButton;
     BHelpCollisionBody: TSpeedButton;
@@ -208,6 +209,7 @@ type
     procedure BAddToSpriteBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
     procedure BEditDeformationGridClick(Sender: TObject);
+    procedure BEditGradientClick(Sender: TObject);
     procedure BHelpCollisionBodyClick(Sender: TObject);
     procedure BHelpPosturesClick(Sender: TObject);
     procedure BHelpRootChildsClick(Sender: TObject);
@@ -282,7 +284,7 @@ type
 
 implementation
 uses form_main, u_project, u_common, u_spritebank, u_screen_template,
-  form_showhelp, u_utils, form_editdeformationgrid, LCLType;
+  form_showhelp, u_utils, form_editdeformationgrid, form_editgradient, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -385,11 +387,26 @@ begin
   if not (FWorkingChild^.surface is TDeformationGrid) then exit;
   form := TFormEditDeformationGrid.Create(NIL);
   try
-    form.Edit(FWorkingChild); //TDeformationGrid(FWorkingChild^.surface));
+    form.Edit(FWorkingChild);
     form.ShowModal;
     if form.Modified then Modified:= True;
   finally
     form.Free;
+  end;
+end;
+
+procedure TFrameToolsSpriteBuilder.BEditGradientClick(Sender: TObject);
+begin
+  if ScreenSpriteBuilder.SelectedCount <> 1 then exit;
+  if not (FWorkingChild^.surface is TGradientRectangle) then exit;
+  FormEditGradient := TFormEditGradient.Create(NIL);
+  try
+    FormEditGradient.Edit(FWorkingChild);
+    FormEditGradient.ShowModal;
+    if FormEditGradient.Modified then Modified:= True;
+  finally
+    FormEditGradient.Free;
+    FormEditGradient := NIL;
   end;
 end;
 
@@ -652,7 +669,6 @@ begin
       SE25.Value := texItem^.GetTextureHeight;
       SE26.Value := texItem^.GetTextureWidth;  // TDeformationGrid
       SE27.Value := texItem^.GetTextureHeight;
-
     end;
   end;
 
@@ -676,6 +692,10 @@ begin
       with TSprite(FWorkingChild^.surface) do
         chang := chang or (Width <> SE18.Value) or (Height <> SE19.Value);
 
+    if FWorkingChild^.surface is TDeformationGrid then
+      with TDeformationGrid(FWorkingChild^.surface) do
+        chang := chang or (Width <> SE26.Value) or (Height <> SE27.Value);
+
     if FWorkingChild^.surface is TQuad4Color then
       with TQuad4Color(FWorkingChild^.surface) do
         chang := chang or (Width <> SE16.Value) or (Height <> SE17.Value) or
@@ -687,6 +707,10 @@ begin
                  (Trunc(BottomRightColor.Alpha.Value) <> SE15.Value) or
                  (BGRAToColor(BottomLeftColor.Value) <> ColorButton3.ButtonColor) or
                  (Trunc(BottomLeftColor.Alpha.Value) <> SE14.Value);
+
+    if FWorkingChild^.surface is TGradientRectangle then
+      with TGradientRectangle(FWorkingChild^.surface) do
+        chang := chang or (Width <> SE28.Value) or (Height <> SE29.Value);
 
     if chang then begin
       DoUpdateChild(False);
@@ -833,14 +857,13 @@ begin
   case CBChildType.Items.Strings[CBChildType.ItemIndex] of
     'TSprite': Result := TSprite;
     'TSpriteWithElasticCorner': Result := TSpriteWithElasticCorner;
-    'TTiledSprite': Result := TTiledSprite;
     'TPolarSprite': Result := TPolarSprite;
     'TScrollableSprite': Result := TScrollableSprite;
+    'TDeformationGrid': Result := TDeformationGrid;
     'TShapeOutline': Result := TShapeOutline;
     'TGradientRectangle': Result := TGradientRectangle;
     'TQuad4Color': Result := TQuad4Color;
     'TSpriteContainer': Result := TSpriteContainer;
-    'TDeformationGrid': Result := TDeformationGrid;
       else raise exception.create('forgot to implement!');
   end;
 end;
@@ -1144,7 +1167,10 @@ begin
   if FWorkingChild^.surface is TSprite then
     TSprite(FWorkingChild^.surface).SetSize(SE18.Value, SE19.Value);
 
-  if FWorkingChild^.surface is TQuad4Color then begin
+  if FWorkingChild^.surface is TDeformationGrid then
+    TDeformationGrid(FWorkingChild^.surface).SetSize(SE26.Value, SE27.Value);
+
+  if FWorkingChild^.surface is TQuad4Color then
     with TQuad4Color(FWorkingChild^.surface) do begin
       SetSize(SE16.Value, SE17.Value);
       TopLeftColor.Value := ColorToBGRA(ColorButton1.ButtonColor, SE12.Value);
@@ -1152,7 +1178,12 @@ begin
       BottomRightColor.Value := ColorToBGRA(ColorButton4.ButtonColor, SE15.Value);
       BottomLeftColor.Value := ColorToBGRA(ColorButton3.ButtonColor, SE14.Value);
     end;
-  end;
+
+
+  if FWorkingChild^.surface is TGradientRectangle then
+    with TGradientRectangle(FWorkingChild^.surface) do begin
+      SetSize(SE28.Value, SE29.Value);
+    end;
 
   FWorkingChild^.UpdateHandlePosition;
 end;
@@ -1176,6 +1207,11 @@ begin
     FWorkingChild^.TopRightColor := ColorToBGRA(ColorButton2.ButtonColor, SE13.Value);
     FWorkingChild^.BottomRightColor := ColorToBGRA(ColorButton4.ButtonColor, SE15.Value);
     FWorkingChild^.BottomLeftColor := ColorToBGRA(ColorButton3.ButtonColor, SE14.Value);
+  end
+  else
+  if selectedClass = TGradientRectangle then begin
+    FWorkingChild^.width := SE28.Value;
+    FWorkingChild^.height := SE29.Value;
   end
   else
   if selectedClass = TDeformationGrid then begin
@@ -1340,6 +1376,11 @@ begin
         SE19.Value := surface.Height;
       end;
 
+      if surface is TDeformationGrid then begin
+        SE26.Value := surface.Width;
+        SE27.Value := surface.Height;
+      end;
+
      if surface is TQuad4Color then
        with TQuad4Color(surface) do begin
          SE16.Value := Width;
@@ -1354,6 +1395,10 @@ begin
          SE15.Value := Round(BottomRightColor.Alpha.Value);
        end;
 
+     if surface is TGradientRectangle then begin
+       SE28.Value := surface.Width;
+       SE29.Value := surface.Height;
+     end;
     end;
     CBChildType.Enabled := True;
     CBTextures.Enabled := True;

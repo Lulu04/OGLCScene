@@ -17,7 +17,8 @@ uses
   u_undoredo_spritebuilder, u_posture_list, frame_tool_leveleditor,
   u_screen_levelbank, u_levelbank, u_surface_extradata, frame_texturelist,
   u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,
-  form_projectconfig, form_showhelp, form_editdeformationgrid;
+  form_projectconfig, form_showhelp, form_editdeformationgrid,
+form_editgradient, frame_gradientrow;
 
 {$R *.res}
 
@@ -30,6 +31,7 @@ begin
     Application.CreateForm(TFormMain, FormMain);
     Application.CreateForm(TDataModule1, DataModule1);
     Application.CreateForm(TFormProjectConfig, FormProjectConfig);
+  Application.CreateForm(TFormEditGradient, FormEditGradient);
   Application.Run;
 
   AppPref.Free;

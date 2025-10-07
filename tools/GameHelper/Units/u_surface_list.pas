@@ -55,6 +55,8 @@ public
   BottomLeftOffsetX, BottomLeftOffsetY: single;
   // TQuad4Color
   TopLeftColor, TopRightColor, BottomRightColor,BottomLeftColor: TBGRAPixel;
+  // TGradientRectangle
+  GradientData: string;
   // TDeformationGrid
   DeformationGridData: string;
 
@@ -261,6 +263,8 @@ begin
   TopRightColor := BGRA(0,255,0);
   BottomRightColor := BGRA(0,0,255);
   BottomLeftColor := BGRA(255,255,0);
+  // TGradientRectangle
+  GradientData := '2 0.000 2 0.000 FF0000FF 1.000 FF0000FF 1.000 2 0.000 00FF00FF 1.000 00FF00FF';
   // TDeformationGrid
   DeformationGridData := '';
 
@@ -287,13 +291,13 @@ var tex: PTexture;
 begin
   tex := GetTextureFromTextureName;
 
-  if (classType = TSprite) then begin
+  if (classType = TSprite) then begin                  // TSprite
     surface := TSprite.Create(tex, False);
     surface.Frame := frameindex;
     TSprite(surface).SetSize(width, height);
   end
   else
-  if classType = TSpriteWithElasticCorner then begin
+  if classType = TSpriteWithElasticCorner then begin   // TSpriteWithElasticCorner
     surface := TSpriteWithElasticCorner.Create(tex, False);
     surface.Frame := frameindex;
     TSpriteWithElasticCorner(surface).SetSize(width, height);
@@ -326,10 +330,12 @@ begin
   if classType = TShapeOutline then begin
     surface := TShapeOutline.Create(FScene)
   end else
-  if classType = TGradientRectangle then begin
+  if classType = TGradientRectangle then begin         // TGradientRectangle
     surface := TGradientRectangle.Create(FScene);
+    TGradientRectangle(surface).Gradient.LoadGradientDataFromString(GradientData);
+    TGradientRectangle(surface).SetSize(width, height);
   end else
-  if classType = TQuad4Color then begin
+  if classType = TQuad4Color then begin                // TQuad4Color
     surface := TQuad4Color.Create(FScene);
     TQuad4Color(surface).SetSize(width, height);
     with TQuad4Color(surface) do begin
@@ -339,14 +345,14 @@ begin
       BottomLeftColor.Value := Self.BottomLeftColor;
     end;
   end else
-  if classType = TDeformationGrid then begin
+  if classType = TDeformationGrid then begin           // TDeformationGrid
     surface := TDeformationGrid.Create(tex, False);
     surface.Frame := frameindex;
     TDeformationGrid(surface).SetSize(width, height);
     if DeformationGridData <> '' then
       TDeformationGrid(surface).LoadDeformationDataFromString(DeformationGridData);
   end else
-  if classType = TSpriteContainer then begin
+  if classType = TSpriteContainer then begin  // TSpriteContainer
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
   end
@@ -934,6 +940,9 @@ begin
     prop.Add('BottomLeftColor', BottomLeftColor);
   end;
 
+  // TGradientRectangle
+  prop.Add('GradientData', GradientData);
+
   // TDeformationGrid
   if surface is TDeformationGrid then begin
     prop.Add('DeformationGridData', DeformationGridData);
@@ -1011,6 +1020,9 @@ begin
   prop.BGRAPixelValueOf('TopRightColor', TopRightColor, BGRA(0,255,0));
   prop.BGRAPixelValueOf('BottomRightColor', BottomRightColor, BGRA(0,0,255));
   prop.BGRAPixelValueOf('BottomLeftColor', BottomLeftColor, BGRA(255,255,0));
+
+  // TGradientRectangle
+  prop.StringValueOf('GradientData', GradientData, '');
 
   // TDeformationGrid
   prop.StringValueOf('DeformationGridData', DeformationGridData, '');
