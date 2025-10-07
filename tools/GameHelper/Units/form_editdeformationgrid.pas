@@ -67,7 +67,7 @@ type
     procedure SelectLabel(aLabel: TLabel);
     procedure UnselectLabel(aLabel: TLabel);
   public
-    procedure Edit(aSurface: PSurfaceDescriptor); //TDeformationGrid);
+    procedure Edit(aSurface: PSurfaceDescriptor);
     property Modified: boolean read FModified;
   end;
 
