@@ -2,182 +2,182 @@
 <CONFIG>
   <ProjectGroup FileVersion="2">
     <Targets>
-      <Target FileName="01-HelloWorld\HelloWorld.lpi">
+      <Target FileName="examples\01-HelloWorld\HelloWorld.lpi">
         <BuildModes>
           <Mode Name="Debug"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="02-SimpleSprites\SimpleSprite.lpi">
+      <Target FileName="examples\02-SimpleSprites\SimpleSprite.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="03-SceneLayers\SceneLayers.lpi">
+      <Target FileName="examples\03-SceneLayers\SceneLayers.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="04-ComplexSprite\ComplexSprite.lpi">
+      <Target FileName="examples\04-ComplexSprite\ComplexSprite.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="05-DeformationGrid\DeformationGrid.lpi">
+      <Target FileName="examples\05-DeformationGrid\DeformationGrid.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="06-VeryComplexSpriteWithDeformation\VeryComplexSprite.lpi">
+      <Target FileName="examples\06-VeryComplexSpriteWithDeformation\VeryComplexSprite.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="07-ElectricalBeam\ElectricalBeam.lpi">
+      <Target FileName="examples\07-ElectricalBeam\ElectricalBeam.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="08-TexturedFont\TexturedFont.lpi">
+      <Target FileName="examples\08-TexturedFont\TexturedFont.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="09-TintMode\TintMode.lpi">
+      <Target FileName="examples\09-TintMode\TintMode.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="10-SpriteAndTextOnPath\SpriteAndTextOnPath.lpi">
+      <Target FileName="examples\10-SpriteAndTextOnPath\SpriteAndTextOnPath.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="11-UI-Elements\UIElements.lpi">
+      <Target FileName="examples\11-UI-Elements\UIElements.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="12-UI-Animation\UIAnimation.lpi">
+      <Target FileName="examples\12-UI-Animation\UIAnimation.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="13-UI-ModalPanel\UIModalPanel.lpi">
+      <Target FileName="examples\13-UI-ModalPanel\UIModalPanel.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="14-Particles\Particles.lpi">
+      <Target FileName="examples\14-Particles\Particles.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="15-TileEngine\TileEngine.lpi">
+      <Target FileName="examples\15-TileEngine\TileEngine.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="16-MessageAndScenario\MessageAndScenario.lpi">
+      <Target FileName="examples\16-MessageAndScenario\MessageAndScenario.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="17-VelocityCurve\VelocityCurve.lpi">
+      <Target FileName="examples\17-VelocityCurve\VelocityCurve.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="18-Camera\Camera.lpi">
+      <Target FileName="examples\18-Camera\Camera.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="19-Collision\Collision.lpi">
+      <Target FileName="examples\19-Collision\Collision.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="20-MultiScenes\MultiScenes.lpi">
+      <Target FileName="examples\20-MultiScenes\MultiScenes.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="21-SurfaceWithProceduralShader\SurfaceWithProceduralShader.lpi">
+      <Target FileName="examples\21-SurfaceWithProceduralShader\SurfaceWithProceduralShader.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="22-PostProcessing\PostProcessing.lpi">
+      <Target FileName="examples\22-PostProcessing\PostProcessing.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="23-CustomPostProcessing\CustomPostProcessing.lpi">
+      <Target FileName="examples\23-CustomPostProcessing\CustomPostProcessing.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\GameHelper\GameHelper.lpi">
+      <Target FileName="tools\GameHelper\GameHelper.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\ParticleEditor\OGLC_Particles_Editor.lpi">
+      <Target FileName="tools\ParticleEditor\OGLC_Particles_Editor.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\TileMapDesigner\TileMapDesigner.lpi">
+      <Target FileName="tools\TileMapDesigner\TileMapDesigner.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\PathEditor\PathEditor.lpi">
+      <Target FileName="tools\PathEditor\PathEditor.lpi">
         <BuildModes>
           <Mode Name="Default" Compile="True"/>
           <Mode Name="Debug"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\PlanetDesigner\PlanetDesigner.lpi">
+      <Target FileName="tools\PlanetDesigner\PlanetDesigner.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\CloudDesigner\CloudDesigner.lpi">
+      <Target FileName="tools\CloudDesigner\CloudDesigner.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
         </BuildModes>
       </Target>
-      <Target FileName="..\tools\StarNestDesigner\StarNestdesigner.lpi">
+      <Target FileName="tools\StarNestDesigner\StarNestdesigner.lpi">
         <BuildModes>
           <Mode Name="Debug" Compile="True"/>
           <Mode Name="Release"/>
