@@ -19,7 +19,6 @@ private
   FAtlas: TOGLCTextureAtlas; // we need an atlas to contains all images in a single texture
 
   FLittleRed: TLRFrontView;
-  FTimeAccu: single;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;

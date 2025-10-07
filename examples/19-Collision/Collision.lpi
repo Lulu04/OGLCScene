@@ -29,7 +29,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="Units;..\..\source"/>
+            <OtherUnitFiles Value="Units"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -62,20 +62,23 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <RequiredPackages Count="4">
+    <RequiredPackages Count="5">
       <Item1>
-        <PackageName Value="LazOpenGLContext"/>
+        <PackageName Value="OGLCScenePackage"/>
       </Item1>
       <Item2>
-        <PackageName Value="BGRABitmapPack"/>
-        <MinVersion Major="9" Valid="True"/>
+        <PackageName Value="LazOpenGLContext"/>
       </Item2>
       <Item3>
-        <PackageName Value="LazUtils"/>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
       </Item3>
       <Item4>
-        <PackageName Value="LCL"/>
+        <PackageName Value="LazUtils"/>
       </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
     </RequiredPackages>
     <Units Count="30">
       <Unit0>
@@ -225,7 +228,7 @@
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="28" Y="14"/>
+        <CursorPos Y="14"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
       </Unit19>
@@ -262,7 +265,7 @@
         <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
         <EditorIndex Value="4"/>
         <TopLine Value="60"/>
-        <CursorPos X="51" Y="64"/>
+        <CursorPos X="30" Y="64"/>
         <UsageCount Value="15"/>
         <Loaded Value="True"/>
       </Unit24>
@@ -424,7 +427,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="Units;..\..\source"/>
+      <OtherUnitFiles Value="Units"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

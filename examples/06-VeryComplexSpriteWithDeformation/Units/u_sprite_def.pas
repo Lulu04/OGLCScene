@@ -68,11 +68,12 @@ private
   Hair: TDeformationGrid;
   MouthNotHappy, MouthOpen, MouthSmile,
   WhiteBG: TSprite;
+  protected
+  procedure SetFlipH(AValue: boolean); override;
+  procedure SetFlipV(AValue: boolean); override;
 public
   procedure SetFaceType(AValue: TLRFaceType); override;
   constructor Create;
-  procedure SetFlipH(AValue: boolean);
-  procedure SetFlipV(AValue: boolean);
 end;
 
 
@@ -94,15 +95,16 @@ private
   FDress: TLRDress;
   FBasket: TSprite;
   procedure SetDeformationOnHood;
+protected
+  procedure SetFlipH(AValue: boolean); override;
+  procedure SetFlipV(AValue: boolean); override;
 public
   Face: TLRFace;
   RightArm, LeftArm, RightLeg, LeftLeg: TSprite;
   constructor Create;
   procedure ProcessMessage({%H-}UserValue: TUserMessageValue); override;
   procedure ToogleFlipH;
-  procedure SetFlipH(AValue: boolean);
   procedure ToogleFlipV;
-  procedure SetFlipV(AValue: boolean);
   procedure HideBasket;
   procedure SetWindSpeed(AValue: single);
   procedure MoveArmsAsWinner;
@@ -441,6 +443,7 @@ end;
 
 procedure TLRFrontView.SetFlipH(AValue: boolean);
 begin
+  inherited SetFlipH(AValue);
   FHood.FlipH := AValue;
   Face.SetFlipH(AValue);
   FDress.FlipH := AValue;
@@ -458,6 +461,7 @@ end;
 
 procedure TLRFrontView.SetFlipV(AValue: boolean);
 begin
+  inherited SetFlipV(AValue);
   FHood.FlipV := AValue;
   Face.SetFlipV(AValue);
   FDress.FlipV := AValue;
@@ -576,7 +580,7 @@ end;
 
 procedure TLRFace.SetFlipH(AValue: boolean);
 begin
-  FlipH := AValue;
+  inherited SetFlipH(AValue);
   LeftEye.FlipH := AValue;
   RightEye.FlipH := AValue;
   Hair.FlipH := AValue;
@@ -589,7 +593,7 @@ end;
 
 procedure TLRFace.SetFlipV(AValue: boolean);
 begin
-  FlipV := AValue;
+  inherited SetFlipV(AValue);
   LeftEye.FlipV := AValue;
   RightEye.FlipV := AValue;
   Hair.FlipV := AValue;
