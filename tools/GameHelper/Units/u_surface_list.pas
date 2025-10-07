@@ -153,6 +153,7 @@ public
 
   function NameExists(const aName: string): boolean;
   function TextureNameisUsedByASurface(const aTextureName: string): boolean;
+  function UseTexture: boolean;
 
   procedure DeleteItemByID(aID: integer);
   function DuplicateItemsByID(aItems: ArrayOfPSurfaceDescriptor): ArrayOfPSurfaceDescriptor;
@@ -1289,6 +1290,15 @@ begin
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     if Mutable[i]^.textureName = aTextureName then exit(True);
+end;
+
+function TSurfaceList.UseTexture: boolean;
+var i: SizeUInt;
+begin
+  Result := False;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.IsTextured then exit(True);
 end;
 
 procedure TSurfaceList.DeleteItemByID(aID: integer);
