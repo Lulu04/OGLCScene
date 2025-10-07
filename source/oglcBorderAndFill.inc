@@ -76,7 +76,9 @@ TGradientItem = record
   XPosition: single;
   Color: TBGRAPixel;
 end;
+PGradientItem = ^TGradientItem;
 ArrayOfGradientItem = array of TGradientItem;
+PArrayOfGradientItem = ^ArrayOfGradientItem;
 type
 TGradientRow = record
   YPosition: single;
@@ -94,6 +96,9 @@ private
   procedure AddRowItem(const aItem: TGradientRow);
   function CreateArrayOfGradientItem(const aColors: ArrayOfTBGRAPixel; const aPos: ArrayOfSingle): ArrayOfGradientItem;
   function GradientRow(aYPos: single; const Items: ArrayOfGradientItem): TGradientRow;
+public // for tool GameHelper
+  function SaveGradientDataToString: string;
+  procedure LoadGradientDataFromString(const s: string);
 public
   Rows: TArrayOfGradientRow;
   Vertices: TArrayOfxycolor;
@@ -534,6 +539,47 @@ function TGradientDescriptor.GradientRow(aYPos: single; const Items: ArrayOfGrad
 begin
   Result.YPosition := aYPos;
   Result.Items := Copy(Items);
+end;
+
+function TGradientDescriptor.SaveGradientDataToString: string;
+var i, j: integer;
+begin
+  Result := Length(Rows).ToString;    // row count
+  for i:=0 to High(Rows) do begin
+    Result := Result + ' ' + FormatFloatWithDot('0.000', Rows[i].YPosition) +             // y value
+                       ' ' + integer(Length(Rows[i].Items)).ToString;                     // item count
+    for j:=0 to High(Rows[i].Items) do
+      Result := Result + ' ' + FormatFloatWithDot('0.000', Rows[i].Items[j].XPosition) +  // x value
+                         ' ' + BGRAPixelToHex(Rows[i].Items[j].Color);                    // color
+
+  end;
+end;
+
+procedure TGradientDescriptor.LoadGradientDataFromString(const s: string);
+var i, j, k: integer;
+  A: TStringArray;
+begin
+  if s = '' then exit;
+  A := s.Split([' ']);
+  if Length(A) = 0 then exit;
+
+  try
+    SetLength(Rows, A[0].ToInteger);
+    k := 1;
+    for i:=0 to High(Rows) do begin
+      Rows[i].YPosition := StringToSingle(A[k]);
+      SetLength(Rows[i].Items, A[k+1].ToInteger);
+      inc(k, 2);
+      for j:=0 to High(Rows[i].Items) do begin
+        Rows[i].Items[j].XPosition := StringToSingle(A[k]);
+        inc(k);
+        Rows[i].Items[j].Color := HexToBGRAPixel(A[k]);
+        inc(k);
+      end;
+    end;
+  except
+    Clear;
+  end;
 end;
 
 procedure TGradientDescriptor.InitDefault;
