@@ -889,7 +889,7 @@
         <LoadedDesigner Value="True"/>
       </Unit83>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="Units\frame_gradientrow.pas"/>
         <Caret Line="125" TopLine="110"/>
@@ -951,65 +951,61 @@
         <Caret Line="284" Column="3" TopLine="272"/>
       </Position15>
       <Position16>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="29" Column="15" TopLine="40"/>
+        <Filename Value="Units\frame_gradientrow.pas"/>
+        <Caret Line="129" Column="53" TopLine="123"/>
       </Position16>
       <Position17>
         <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="129" Column="53" TopLine="123"/>
+        <Caret Line="92" Column="32" TopLine="83"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="92" Column="32" TopLine="83"/>
+        <Filename Value="Units\form_editgradient.pas"/>
+        <Caret Line="274" Column="35" TopLine="266"/>
       </Position18>
       <Position19>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="274" Column="35" TopLine="266"/>
+        <Caret Line="28" Column="15" TopLine="15"/>
       </Position19>
       <Position20>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="28" Column="15" TopLine="15"/>
+        <Caret Line="319" Column="36" TopLine="316"/>
       </Position20>
       <Position21>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="319" Column="36" TopLine="316"/>
+        <Caret Line="318" Column="36" TopLine="315"/>
       </Position21>
       <Position22>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="318" Column="36" TopLine="315"/>
+        <Caret Line="319" Column="34" TopLine="315"/>
       </Position22>
       <Position23>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="319" Column="34" TopLine="315"/>
+        <Caret Line="55" Column="17" TopLine="36"/>
       </Position23>
       <Position24>
         <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="55" Column="17" TopLine="36"/>
+        <Caret Line="337" Column="22" TopLine="331"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="337" Column="22" TopLine="331"/>
-      </Position25>
-      <Position26>
         <Filename Value="Units\u_utils.pas"/>
         <Caret Line="181" Column="41" TopLine="157"/>
-      </Position26>
-      <Position27>
+      </Position25>
+      <Position26>
         <Filename Value="Units\frame_tool_spritebank.pas"/>
         <Caret Line="145" Column="26" TopLine="134"/>
-      </Position27>
-      <Position28>
+      </Position26>
+      <Position27>
         <Filename Value="Units\u_surface_list.pas"/>
         <Caret Line="156" Column="32" TopLine="142"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\frame_tool_spritebank.pas"/>
+        <Caret Line="162" Column="13" TopLine="152"/>
       </Position28>
       <Position29>
         <Filename Value="Units\frame_tool_spritebank.pas"/>
-        <Caret Line="162" Column="13" TopLine="152"/>
-      </Position29>
-      <Position30>
-        <Filename Value="Units\frame_tool_spritebank.pas"/>
         <Caret Line="159" Column="64" TopLine="147"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
