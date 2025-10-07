@@ -169,6 +169,11 @@ begin
       end;
     end;
 
+    'TGradientRectangle': begin
+      Result := aSpacePrefix+'LoadGradientDataFromString('''+aSurface^.GradientData+''');'#10+
+                aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));';
+    end;
+
     'TDeformationGrid': begin
       Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));'#10+
                 aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');';
