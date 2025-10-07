@@ -59,14 +59,13 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Items.Strings = (
             'TSprite'
             'TSpriteWithElasticCorner'
-            'TTiledSprite'
             'TPolarSprite'
             'TScrollableSprite'
+            'TDeformationGrid'
             'TShapeOutline'
             'TGradientRectangle'
             'TQuad4Color'
             'TSpriteContainer'
-            'TDeformationGrid'
           )
           Style = csDropDownList
           TabOrder = 0
@@ -1093,7 +1092,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 136
           Top = 352
           Width = 290
-          PageIndex = 0
+          PageIndex = 6
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 7
           object PageExtraEmpty: TPage
@@ -1732,6 +1731,14 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
                 OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+              end
+              object BEditGradient: TSpeedButton
+                Left = 80
+                Height = 31
+                Top = 53
+                Width = 121
+                Caption = 'Edit gradient'
+                OnClick = BEditGradientClick
               end
             end
           end

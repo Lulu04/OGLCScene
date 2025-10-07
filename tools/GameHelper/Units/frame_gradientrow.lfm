@@ -1,0 +1,95 @@
+object FrameGradientRow: TFrameGradientRow
+  Left = 0
+  Height = 60
+  Top = 0
+  Width = 320
+  ClientHeight = 60
+  ClientWidth = 320
+  Color = clDefault
+  ParentBackground = False
+  ParentColor = False
+  TabOrder = 0
+  DesignLeft = 605
+  DesignTop = 350
+  object Panel1: TPanel
+    Left = 0
+    Height = 60
+    Top = 0
+    Width = 320
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 60
+    ClientWidth = 320
+    Color = 5855577
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    OnMouseDown = Panel1MouseDown
+    object FSE1: TFloatSpinEdit
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel1
+      AnchorSideTop.Side = asrCenter
+      Left = 2
+      Height = 23
+      Top = 19
+      Width = 52
+      BorderSpacing.Left = 2
+      Font.Style = [fsBold]
+      Increment = 0.1
+      MaxValue = 1
+      OnChange = FSE1Change
+      OnEnter = FSE1Enter
+      ParentFont = False
+      TabOrder = 0
+    end
+    object PB: TPaintBox
+      AnchorSideLeft.Control = FSE1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Panel1
+      AnchorSideBottom.Side = asrBottom
+      Left = 56
+      Height = 56
+      Top = 2
+      Width = 262
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BorderSpacing.Left = 2
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 2
+      BorderSpacing.Bottom = 2
+      OnMouseDown = PBMouseDown
+      OnMouseMove = PBMouseMove
+      OnMouseUp = PBMouseUp
+      OnPaint = PBPaint
+    end
+  end
+  object CD1: TColorDialog
+    Title = 'Choose a color'
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    Left = 208
+  end
+end
