@@ -70,7 +70,9 @@ TMouseState = ( msIdle,
                 msWaitingForNextPolygonNode,
                 msBackPressedOnPolygonCreation,
 
-                msCancelShapeCreation  // used when user pess ESCAPE while creating a collision shape
+                msCancelShapeCreation,  // used when user pess ESCAPE while creating a collision shape
+
+                msLevelEditorAddingMultiple   // used by level editor
               );
 
 { TCustomScreenTemplate }

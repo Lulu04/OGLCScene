@@ -117,7 +117,7 @@
       <Unit3>
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="595"/>
         <CursorPos X="31" Y="617"/>
         <UsageCount Value="202"/>
@@ -144,7 +144,7 @@
       <Unit6>
         <Filename Value="Units\u_texture_list.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="26"/>
+        <EditorIndex Value="25"/>
         <TopLine Value="101"/>
         <CursorPos X="56" Y="109"/>
         <UsageCount Value="200"/>
@@ -152,7 +152,7 @@
       </Unit6>
       <Unit7>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\fcl-stl\src\gvector.pp"/>
-        <EditorIndex Value="24"/>
+        <EditorIndex Value="23"/>
         <TopLine Value="117"/>
         <CursorPos Y="134"/>
         <UsageCount Value="101"/>
@@ -276,8 +276,8 @@
         <Filename Value="Units\u_utils.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="16"/>
-        <TopLine Value="62"/>
-        <CursorPos Y="74"/>
+        <TopLine Value="188"/>
+        <CursorPos Y="201"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit20>
@@ -285,8 +285,8 @@
         <Filename Value="Units\u_screen_template.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="101"/>
-        <CursorPos X="12" Y="114"/>
+        <TopLine Value="59"/>
+        <CursorPos X="27" Y="76"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit21>
@@ -374,7 +374,7 @@
       <Unit31>
         <Filename Value="Units\u_ui_handle.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="31"/>
+        <EditorIndex Value="30"/>
         <TopLine Value="51"/>
         <CursorPos X="14" Y="64"/>
         <UsageCount Value="201"/>
@@ -391,7 +391,7 @@
       <Unit33>
         <Filename Value="Units\u_screen_spritebank.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="30"/>
+        <EditorIndex Value="29"/>
         <TopLine Value="75"/>
         <CursorPos X="5" Y="94"/>
         <UsageCount Value="201"/>
@@ -403,7 +403,7 @@
         <ComponentName Value="FrameToolsSpriteBuilder"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="505"/>
         <CursorPos X="29" Y="409"/>
         <UsageCount Value="201"/>
@@ -416,7 +416,6 @@
         <ComponentName Value="FrameToolSpriteBank"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="15"/>
         <TopLine Value="147"/>
         <CursorPos X="64" Y="159"/>
@@ -482,7 +481,7 @@
       <Unit42>
         <Filename Value="Units\u_collisionbody_list.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="28"/>
+        <EditorIndex Value="27"/>
         <TopLine Value="128"/>
         <CursorPos X="16" Y="141"/>
         <UsageCount Value="206"/>
@@ -536,9 +535,9 @@
       <Unit48>
         <Filename Value="Units\u_posture_list.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="21"/>
+        <EditorIndex Value="20"/>
         <TopLine Value="228"/>
-        <CursorPos X="3" Y="233"/>
+        <CursorPos X="54" Y="230"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit48>
@@ -555,7 +554,7 @@
       <Unit50>
         <Filename Value="Units\u_texture_undoredo.inc"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="27"/>
+        <EditorIndex Value="26"/>
         <TopLine Value="75"/>
         <CursorPos X="58" Y="88"/>
         <UsageCount Value="202"/>
@@ -563,7 +562,7 @@
       </Unit50>
       <Unit51>
         <Filename Value="Units\u_posture_undoredo.inc"/>
-        <EditorIndex Value="23"/>
+        <EditorIndex Value="22"/>
         <TopLine Value="45"/>
         <CursorPos X="3" Y="37"/>
         <UsageCount Value="101"/>
@@ -572,14 +571,14 @@
       <Unit52>
         <Filename Value="Units\u_surface_undoredo.inc"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="22"/>
+        <EditorIndex Value="21"/>
         <CursorPos X="32" Y="3"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit52>
       <Unit53>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
-        <EditorIndex Value="25"/>
+        <EditorIndex Value="24"/>
         <TopLine Value="320"/>
         <CursorPos X="24" Y="322"/>
         <UsageCount Value="101"/>
@@ -591,9 +590,10 @@
         <ComponentName Value="FrameToolLevelEditor"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="8"/>
-        <TopLine Value="441"/>
-        <CursorPos Y="444"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="838"/>
+        <CursorPos X="11" Y="843"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -601,7 +601,7 @@
       <Unit55>
         <Filename Value="Units\u_screen_levelbank.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="29"/>
+        <EditorIndex Value="28"/>
         <TopLine Value="70"/>
         <CursorPos Y="83"/>
         <UsageCount Value="206"/>
@@ -618,12 +618,10 @@
       </Unit56>
       <Unit57>
         <Filename Value="Units\u_surface_extradata.pas"/>
-        <IsPartOfProject Value="True"/>
-        <EditorIndex Value="20"/>
-        <TopLine Value="46"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="13"/>
         <CursorPos X="15" Y="57"/>
         <UsageCount Value="201"/>
-        <Loaded Value="True"/>
       </Unit57>
       <Unit58>
         <Filename Value="Units\frame_texturelist.pas"/>
@@ -642,8 +640,8 @@
         <Filename Value="Units\u_screen_leveleditor.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="45"/>
-        <CursorPos X="37" Y="63"/>
+        <TopLine Value="349"/>
+        <CursorPos X="48" Y="365"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit59>
@@ -796,7 +794,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="1787"/>
         <CursorPos Y="1803"/>
-        <UsageCount Value="86"/>
+        <UsageCount Value="87"/>
         <Loaded Value="True"/>
       </Unit74>
       <Unit75>
@@ -813,7 +811,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="94"/>
         <CursorPos X="8" Y="69"/>
-        <UsageCount Value="59"/>
+        <UsageCount Value="60"/>
         <Loaded Value="True"/>
       </Unit76>
       <Unit77>
@@ -822,10 +820,10 @@
         <ComponentName Value="FormEditDeformationGrid"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="99"/>
         <CursorPos X="22" Y="104"/>
-        <UsageCount Value="112"/>
+        <UsageCount Value="115"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit77>
@@ -865,10 +863,10 @@
         <ComponentName Value="FormEditGradient"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="331"/>
         <CursorPos X="22" Y="337"/>
-        <UsageCount Value="73"/>
+        <UsageCount Value="76"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit82>
@@ -878,10 +876,10 @@
         <ComponentName Value="FrameGradientRow"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="532"/>
         <CursorPos X="17" Y="553"/>
-        <UsageCount Value="67"/>
+        <UsageCount Value="70"/>
         <Bookmarks Count="1">
           <Item0 X="18" Y="120"/>
         </Bookmarks>
@@ -889,123 +887,127 @@
         <LoadedDesigner Value="True"/>
       </Unit83>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="125" TopLine="110"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="59" Column="13" TopLine="44"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="126" TopLine="110"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="580" Column="80" TopLine="565"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="127" TopLine="110"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="178" Column="15" TopLine="167"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="240" TopLine="232"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="581" Column="13" TopLine="565"/>
       </Position4>
       <Position5>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="242" TopLine="232"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="73" Column="13" TopLine="61"/>
       </Position5>
       <Position6>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="243" TopLine="232"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="758" Column="28" TopLine="754"/>
       </Position6>
       <Position7>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="242" TopLine="232"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="178" Column="15" TopLine="166"/>
       </Position7>
       <Position8>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="243" TopLine="232"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="330" Column="17" TopLine="318"/>
       </Position8>
       <Position9>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="242" TopLine="232"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="147" Column="15" TopLine="135"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="243" TopLine="232"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="649" Column="32" TopLine="642"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="242" TopLine="232"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="74" Column="14" TopLine="60"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="240" TopLine="232"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="662" Column="11" TopLine="658"/>
       </Position12>
       <Position13>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="241" TopLine="233"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="331" Column="6" TopLine="318"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="243" TopLine="235"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="133" Column="15" TopLine="147"/>
       </Position14>
       <Position15>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="284" Column="3" TopLine="272"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="147" Column="44" TopLine="134"/>
       </Position15>
       <Position16>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="129" Column="53" TopLine="123"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="333" Column="36" TopLine="312"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\frame_gradientrow.pas"/>
-        <Caret Line="92" Column="32" TopLine="83"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="484" Column="62" TopLine="463"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="274" Column="35" TopLine="266"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="825" Column="34" TopLine="811"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="28" Column="15" TopLine="15"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="841" Column="34" TopLine="821"/>
       </Position19>
       <Position20>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="319" Column="36" TopLine="316"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="865" Column="34" TopLine="845"/>
       </Position20>
       <Position21>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="318" Column="36" TopLine="315"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="147" Column="44" TopLine="135"/>
       </Position21>
       <Position22>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="319" Column="34" TopLine="315"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="330" Column="13" TopLine="312"/>
       </Position22>
       <Position23>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="55" Column="17" TopLine="36"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="147" Column="15" TopLine="135"/>
       </Position23>
       <Position24>
-        <Filename Value="Units\form_editgradient.pas"/>
-        <Caret Line="337" Column="22" TopLine="331"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="488" Column="2" TopLine="480"/>
       </Position24>
       <Position25>
-        <Filename Value="Units\u_utils.pas"/>
-        <Caret Line="181" Column="41" TopLine="157"/>
+        <Filename Value="Units\u_screen_leveleditor.pas"/>
+        <Caret Line="55" Column="22" TopLine="50"/>
       </Position25>
       <Position26>
-        <Filename Value="Units\frame_tool_spritebank.pas"/>
-        <Caret Line="145" Column="26" TopLine="134"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="487" TopLine="480"/>
       </Position26>
       <Position27>
-        <Filename Value="Units\u_surface_list.pas"/>
-        <Caret Line="156" Column="32" TopLine="142"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="178" Column="25" TopLine="162"/>
       </Position27>
       <Position28>
-        <Filename Value="Units\frame_tool_spritebank.pas"/>
-        <Caret Line="162" Column="13" TopLine="152"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="757" Column="3" TopLine="754"/>
       </Position28>
       <Position29>
-        <Filename Value="Units\frame_tool_spritebank.pas"/>
-        <Caret Line="159" Column="64" TopLine="147"/>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="232" Column="40" TopLine="225"/>
       </Position29>
+      <Position30>
+        <Filename Value="Units\frame_tool_leveleditor.pas"/>
+        <Caret Line="186" Column="25" TopLine="167"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

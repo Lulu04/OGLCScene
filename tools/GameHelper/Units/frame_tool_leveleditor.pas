@@ -230,8 +230,8 @@ begin
      ' - sets the values for coordinates, size, etc... or keep the default.'#10+
      ' - Click ''+'' button to add one instance of the surface at the specified coordinates.'#10+
      ' OR'#10+
-     '   Click ''+Multiple'' button, then move the mouse on desired position and press ''A'' to add an instance of the surface. Repeat as you need.'#10+
-     '   Press ''ESC'' key when you''ve finished.'#10#10+
+     '   Click ''+Multiple'' button, then move the mouse on desired position and press ''A'' or LEFT click to add an instance of the surface. Repeat as you need.'#10+
+     '   Press ''ESC'' key or RIGHT click when you''ve finished.'#10#10+
      'SELECTION:'#10+
      ' Left click on a surface to select it.'#10+
      ' Left click + SHIFT key to add/remove a surface to the current selection.'#10+
@@ -480,9 +480,10 @@ end;
 
 procedure TFrameToolLevelEditor.CheckCreationOfSpriteMultiple;
 begin
-  if ToggleSpeedButtonManager.Checked[BAddMultiple] and
-     not ScreenLevelEditor.SpriteAddMultipleIsCreated then ScreenLevelEditor.CreateSpriteAddMultiple
-  else ScreenLevelEditor.KillSpriteAddMultiple;
+  with ToggleSpeedButtonManager do begin
+    if Checked[BAddMultiple] then ScreenLevelEditor.EnterModeAddMultiple;
+    Checked[BAddMultiple] := Checked[BAddMultiple] and ScreenLevelEditor.IsInModeAddMultiple;
+  end;
 end;
 
 procedure TFrameToolLevelEditor.ProcessTextureListOnModified(Sender: TObject);
@@ -706,6 +707,7 @@ end;
 
 function TFrameToolLevelEditor.GetSpriteForAddMultiple: TSprite;
 var texItem: PTextureItem;
+  r: TRectF;
 begin
   Result := NIL;
   if not ToggleSpeedButtonManager.Checked[BAddMultiple] then exit;
@@ -724,6 +726,8 @@ begin
   Result.Tint.Value := ColorToBGRA(ColorButton1.ButtonColor, SE9.Value);
   if RadioButton1.Checked then Result.TintMode := tmReplaceColor
     else Result.TintMode := tmMixColor;
+  r := ScreenLevelEditor.Camera.GetViewRect;
+  Result.SetCoordinate(r.Left, r.Top);
 end;
 
 procedure TFrameToolLevelEditor.SetCenterCoordinates(aX, aY: single);
@@ -750,8 +754,8 @@ end;
 
 procedure TFrameToolLevelEditor.ExitModeAddMultiple;
 begin
-  ScreenLevelEditor.KillSpriteAddMultiple;
   ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
+  ShowSelectionData(NIL);
 end;
 
 procedure TFrameToolLevelEditor.FillListBoxTextureNames;
@@ -836,6 +840,7 @@ begin
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
     CBTextures.ItemIndex := -1;
+    CBTextures.Enabled := True;
     Panel2.Visible := True;
     SE1.Value := 0;
     SE2.Value := 0;
