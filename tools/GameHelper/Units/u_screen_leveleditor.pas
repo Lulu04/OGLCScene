@@ -65,10 +65,13 @@ public
 
   procedure Initialize;
   procedure Finalize;
-
-public
+private
   procedure CreateSpriteAddMultiple;
   procedure KillSpriteAddMultiple;
+public
+  procedure EnterModeAddMultiple;
+  procedure ExitModeAddMultiple;
+  function IsInModeAddMultiple: boolean;
   function SpriteAddMultipleIsCreated: boolean;
 public
   procedure SelectNone; override;
@@ -306,11 +309,6 @@ var items: ArrayOfPSurfaceDescriptor;
 begin
   inherited ProcessMouseUp(Button, Shift, X, Y);
 
-  if SpriteAddMultipleIsCreated then begin
-    FrameToolLevelEditor.AddSurfaceFromCurrentData;
-    exit;
-  end;
-
   items := Surfaces.GetItemsAt(X, Y);
 
   case MouseState of
@@ -361,6 +359,11 @@ begin
     msRotatingSelection: MouseState := msIdle;
 
     msMovePivotOnSelection: MouseState := msOverPivot;
+
+    msLevelEditorAddingMultiple: if Button = mbRight then begin
+      ExitModeAddMultiple;
+      FrameToolLevelEditor.ExitModeAddMultiple;
+    end;
   end;//case
 end;
 
@@ -390,6 +393,10 @@ begin
     msOverScaleHandle: MouseState := msMouseDownOnScaleHandle;
     msOverRotateHandle: MouseState := msMouseDownOnRotateHandle;
     msOverPivot: MouseState := msMouseDownOnPivot;
+
+    msLevelEditorAddingMultiple:
+      if (Button = mbLeft) and SpriteAddMultipleIsCreated then
+        FrameToolLevelEditor.AddSurfaceFromCurrentData;
 
   end;//case
 end;
@@ -537,7 +544,8 @@ begin
     VK_A: begin
      if ssCtrl in Shift then SelectAll
      else if ssAlt in Shift then ZoomAll
-     else if (Shift = []) and SpriteAddMultipleIsCreated then FrameToolLevelEditor.AddSurfaceFromCurrentData;
+     else if (Shift = []) and SpriteAddMultipleIsCreated and
+             (MouseState = msLevelEditorAddingMultiple) then FrameToolLevelEditor.AddSurfaceFromCurrentData;
     end;
 
     VK_D: begin
@@ -569,9 +577,11 @@ begin
        FrameToolLevelEditor.CBFlipV.Checked := FSpriteAddMultiple.FlipV;
      end;
     end;
-    VK_ESCAPE: begin
-     if SpriteAddMultipleIsCreated then FrameToolLevelEditor.ExitModeAddMultiple;
-    end;
+    VK_ESCAPE:
+     if MouseState = msLevelEditorAddingMultiple then begin
+       ExitModeAddMultiple;
+       FrameToolLevelEditor.ExitModeAddMultiple;
+     end;
 
 
     VK_Z: begin
@@ -633,11 +643,29 @@ begin
   FSurfaces := NIL;
 end;
 
+procedure TScreenLevelEditor.EnterModeAddMultiple;
+begin
+  CreateSpriteAddMultiple;
+  if FSpriteAddMultiple <> NIL then MouseState := msLevelEditorAddingMultiple
+    else MouseState := msIdle;
+end;
+
+procedure TScreenLevelEditor.ExitModeAddMultiple;
+begin
+  KillSpriteAddMultiple;
+  MouseState := msIdle;
+end;
+
+function TScreenLevelEditor.IsInModeAddMultiple: boolean;
+begin
+  Result := (MouseState = msLevelEditorAddingMultiple) and
+            (FSpriteAddMultiple <> NIL);
+end;
+
 procedure TScreenLevelEditor.CreateSpriteAddMultiple;
 begin
   KillSpriteAddMultiple;
   FSpriteAddMultiple := FrameToolLevelEditor.GetSpriteForAddMultiple;
-  if FSpriteAddMultiple = NIL then exit;
 end;
 
 procedure TScreenLevelEditor.KillSpriteAddMultiple;
