@@ -48,6 +48,7 @@ private
   FParentScene: TOGLCScene;
   FDecors: TDecors;
   FWorldArea: TRectF;
+  FSkyGradient: TGradientRectangle;
   function GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorList;
   procedure Clear;
 protected
@@ -60,8 +61,11 @@ public
 
   procedure DoBuildLevel(const s: string);
 
-
+  // The coordinates and size of the world for the current level
   property WorldArea: TRectF read FWorldArea;
+  // The gradient instance to render the sky.
+  // If the level don't define a gradient for the sky, this property is NIL
+  property SkyGradient: TGradientRectangle read FSkyGradient;
 end;
 
 {$endif oglcINTERFACE}
@@ -335,6 +339,10 @@ end;
 procedure TOGLCDecorManager.DoBuildLevel(const s: string);
 var prop: TProperties;
   v: single;
+  vb: boolean;
+  skyx, skyy: single;
+  skywidth, skyheight, skylayer: integer;
+  skygradientdata: string;
   c, i, layerIndex: integer;
   data: string;
   o: TOGLCDecorItem;
@@ -342,6 +350,7 @@ begin
   Clear;
   prop.Split(s, '|');
   v := 0;
+  vb := False;
   data := '';
 
   prop.SingleValueOf('WorldX', v, 0);
@@ -352,6 +361,29 @@ begin
   FWorldArea.Width := ScaleWF(v);
   prop.SingleValueOf('WorldHeight', v, 0);
   FWorldArea.Height := ScaleHF(v);
+  prop.BooleanValueOf('UseSkyGradient', vb, False);
+  if vb then begin
+    // use sky gradient
+    skyx := 0;
+    skyy := 0;
+    skywidth := 0;
+    skyheight := 0;
+    skylayer := 0;
+    skygradientdata := '';
+    if prop.SingleValueOf('SkyX', skyx, 0.0) and
+       prop.SingleValueOf('SkyY', skyy, 0.0) and
+       prop.IntegerValueOf('SkyLayer', skylayer, FParentScene.LayerCount-1) and
+       prop.IntegerValueOf('SkyWidth', skywidth, 0) and
+       prop.IntegerValueOf('SkyHeight', skyheight, 0) and
+       prop.StringValueOf('SkyGradientData', skygradientdata, '') then begin
+      FSkyGradient := TGradientRectangle.Create(FParentScene);
+      FSkyGradient.MoveToLayer(skylayer);
+      FSkyGradient.SetCoordinate(skyx, skyy);
+      FSkyGradient.Gradient.LoadGradientDataFromString(skygradientdata);
+      FSkyGradient.SetSize(skywidth, skyheight);
+    end else FSkyGradient := NIL;
+  end;
+
 
   c := 0;
   prop.IntegerValueOf('Count', c, 0);
