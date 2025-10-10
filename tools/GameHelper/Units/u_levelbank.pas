@@ -21,6 +21,10 @@ TWorldInfo = record
   x, y, width, height: single;
   boundscolor: TBGRAPixel;
   showbounds: boolean;
+  useskygradient: boolean;
+  skyx, skyy: single;
+  skywidth, skyheight, skylayer: integer;
+  skygradientdata: string;
   procedure InitDefault;
   function SaveToString(aSaveAllProperties: boolean=True): string;
   procedure LoadFromString(const s: string);
@@ -84,13 +88,15 @@ end;
 
 implementation
 
-uses frame_tool_levelbank, form_main, u_common;
+uses frame_tool_levelbank, form_main, u_common, u_layerlist;
 
 { TWorldInfo }
 
 procedure TWorldInfo.InitDefault;
 begin
   Self := Default(TWorldInfo);
+  useskygradient := True;
+  skygradientdata := DEFAULT_SKY_GRADIENT;
 end;
 
 function TWorldInfo.SaveToString(aSaveAllProperties: boolean): string;
@@ -105,6 +111,17 @@ begin
     prop.Add('WorldBoundsColor', boundscolor);
     prop.Add('WorldShowBounds', showbounds);
   end;
+
+  prop.Add('UseSkyGradient', useskygradient);
+  if useskygradient then begin
+    prop.Add('SkyX', skyx);
+    prop.Add('SkyY', skyy);
+    prop.Add('SkyLayer', skylayer);
+    prop.Add('SkyWidth', skywidth);
+    prop.Add('SkyHeight', skyheight);
+    prop.Add('SkyGradientData', skygradientdata);
+  end;
+
   Result := prop.PackedProperty;
 end;
 
@@ -118,6 +135,13 @@ begin
   prop.SingleValueOf('WorldHeight', height, FScene.Height);
   prop.BGRAPixelValueOf('WorldBoundsColor', boundscolor, BGRA(255,0,0));
   prop.BooleanValueOf('WorldShowBounds', showbounds, True);
+  prop.BooleanValueOf('UseSkyGradient', useskygradient, False);
+  prop.IntegerValueOf('SkyLayer', skylayer, Layers.Count-1);
+  prop.SingleValueOf('SkyX', skyx, 0.0);
+  prop.SingleValueOf('SkyY', skyy, 0.0);
+  prop.IntegerValueOf('SkyWidth', skywidth, 1);
+  prop.IntegerValueOf('SkyHeight', skyheight, 1);
+  prop.StringValueOf('SkyGradientData', skygradientdata, DEFAULT_SKY_GRADIENT);
 end;
 
 { TLevelBankItem }

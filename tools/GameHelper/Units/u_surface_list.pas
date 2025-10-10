@@ -982,7 +982,8 @@ begin
     else exception.create('forgot to implement!');
   end;
   prop.StringValueOf('TextureName', textureName, textureName);
-  tex := GetTextureFromTextureName;
+  if not ParentList.ModeForLevelEditor then
+    tex := GetTextureFromTextureName;
 
   prop.SingleValueOf('PivotX', pivotX, 0.5);
   prop.SingleValueOf('PivotY', pivotY, 0.5);
@@ -992,9 +993,11 @@ begin
   prop.SingleValueOf('ScaleX', scaleX, 1.0);
   prop.SingleValueOf('ScaleY', scaleY, 1.0);
 
-  if tex <> NIL then v := tex^.FrameWidth else v := 1;
+  if not ParentList.ModeForLevelEditor then
+    if tex <> NIL then v := tex^.FrameWidth else v := 100;
   prop.IntegerValueOf('Width', width, v);
-  if tex <> NIL then v := tex^.FrameHeight else v := 1;
+  if not ParentList.ModeForLevelEditor then
+    if tex <> NIL then v := tex^.FrameHeight else v := 100;
   prop.IntegerValueOf('Height', height, v);
 
   prop.BooleanValueOf('FlipH', flipH, False);

@@ -401,8 +401,10 @@ begin
   if not (FWorkingChild^.surface is TGradientRectangle) then exit;
   FormEditGradient := TFormEditGradient.Create(NIL);
   try
-    FormEditGradient.Edit(FWorkingChild);
+    FormEditGradient.Edit(@TGradientRectangle(FWorkingChild^.surface).Gradient,
+                          FWorkingChild^.surface.Width, FWorkingChild^.surface.Height);
     FormEditGradient.ShowModal;
+    FWorkingChild^.GradientData := FormEditGradient.NewGradientData;
     if FormEditGradient.Modified then Modified:= True;
   finally
     FormEditGradient.Free;

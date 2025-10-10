@@ -108,10 +108,11 @@ begin
   AddImageToImageList('ShiftBack.svg', ILIconAlign);
 
   // 22
-  AddImageToImageList('ZoomAll.svg', ILIconAlign);
+  AddImageToImageList('ZoomWorld.svg', ILIconAlign);
+  AddImageToImageList('ZoomScene.svg', ILIconAlign);
   AddImageToImageList('ZoomOnSelection.svg', ILIconAlign);
 
-  // 24
+  // 25
   AddImageToImageList('DistributeRegularlyH.svg', ILIconAlign);
   AddImageToImageList('DistributeRegularlyV.svg', ILIconAlign);
 end;

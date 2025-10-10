@@ -24,6 +24,8 @@ end;
 TScreenLevelEditor = class(TScreenWithSurfaceHandling)
 private
   FSpriteAddMultiple: TSprite;
+  procedure ProcessOnBeforePaintLayerSkyGradient(Sender: TLayer; const aLayerOpacity: single);
+  procedure RemoveAllBeforePaintCallback;
 public
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); override;
@@ -49,6 +51,7 @@ public
   procedure MoveSelectionToLayer(aLayerIndex: integer); override;
 
   procedure ZoomAll; override;
+  procedure ZoomOnSceneSize(const aWorldArea: TRectF); override;
   procedure ZoomOnSelection; override;
 public
   FSurfaces: TLevelEditorSurfaceList;
@@ -57,6 +60,9 @@ public
   procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseWheel({%H-}Shift: TShiftState; {%H-}WheelDelta: Integer; {%H-}MousePos: TPoint; var {%H-}Handled: Boolean); override;
   procedure ProcessOnKeyUp(var Key: Word; {%H-}Shift: TShiftState); override;
+public
+  SkyGradient: TGradientRectangle;
+  procedure SetLayerForSkyGradient(aLayerIndex: integer);
 public
   WorldBounds: TShapeOutline;
 
@@ -108,6 +114,23 @@ begin
 end;
 
 { TScreenLevelEditor }
+
+procedure TScreenLevelEditor.ProcessOnBeforePaintLayerSkyGradient(
+  Sender: TLayer; const aLayerOpacity: single);
+begin
+  if not Assigned(SkyGradient) then exit;
+
+  if Assigned(Sender.Camera) then Sender.Camera.Use;
+  SkyGradient.Draw(aLayerOpacity);
+  if Assigned(Sender.Camera) then Sender.Camera.Release;
+end;
+
+procedure TScreenLevelEditor.RemoveAllBeforePaintCallback;
+var i: integer;
+begin
+  for i:=APP_LAYER_COUNT to Layers.Count-1 do
+    FScene.Layer[i].OnBeforePaint := NIL;
+end;
 
 procedure TScreenLevelEditor.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
 begin
@@ -295,6 +318,12 @@ end;
 procedure TScreenLevelEditor.ZoomAll;
 begin
   inherited ZoomAll;
+  ComputeWorldBoundsLineWidth;
+end;
+
+procedure TScreenLevelEditor.ZoomOnSceneSize(const aWorldArea: TRectF);
+begin
+  inherited ZoomOnSceneSize(aWorldArea);
   ComputeWorldBoundsLineWidth;
 end;
 
@@ -594,6 +623,12 @@ begin
 
 end;
 
+procedure TScreenLevelEditor.SetLayerForSkyGradient(aLayerIndex: integer);
+begin
+  RemoveAllBeforePaintCallback;
+  FScene.Layer[aLayerIndex].OnBeforePaint := @ProcessOnBeforePaintLayerSkyGradient;
+end;
+
 procedure TScreenLevelEditor.CreateObjects;
 var
   A: TArrayOfInteger;
@@ -610,6 +645,7 @@ begin
   system.Insert(LAYER_LEVELEDITOR, A, Length(A));
   system.Insert(LAYER_LEVELWORLDBOUNDS, A, Length(A));
   CreateCamera(A);
+
   // world bounds
   WorldBounds := TShapeOutline.Create(FScene);
   WorldBounds.LineWidth := 3.0;
@@ -622,6 +658,8 @@ end;
 
 procedure TScreenLevelEditor.FreeObjects;
 begin
+  RemoveAllBeforePaintCallback;
+
   WorldBounds.Kill;
   WorldBounds := NIL;
   //SelectNone;
@@ -635,12 +673,19 @@ begin
   FSurfaces := TLevelEditorSurfaceList.Create;
   FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELEDITOR;
+
+  SkyGradient := TGradientRectangle.Create(FScene);
+  SkyGradient.Gradient.LoadGradientDataFromString(DEFAULT_SKY_GRADIENT);
 end;
 
 procedure TScreenLevelEditor.Finalize;
 begin
   FSurfaces.Free;
   FSurfaces := NIL;
+
+  SkyGradient.RemoveFromScene;
+  SkyGradient.Free;
+  SkyGradient := NIL;
 end;
 
 procedure TScreenLevelEditor.EnterModeAddMultiple;
