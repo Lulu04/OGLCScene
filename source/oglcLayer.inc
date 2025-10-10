@@ -55,6 +55,10 @@ public
   property Surface[aIndex:integer]:TSimpleSurfaceWithEffect read GetSurface; default;
 end;
 
+TLayerEvent = procedure(Sender: TLayer) of object;
+TLayerBeforePaintEvent = procedure(Sender: TLayer; const aLayerOpacity: single) of object;
+TLayerBeforeUpdateEvent = procedure(Sender: TLayer; const aElapsedTime: single) of object;
+
 { TLayer }
 
 TLayer = class(TOGLCSurfaceList)
@@ -67,8 +71,10 @@ private
   FCamera: TOGLCCamera;
 private
   FOnSortCompare: TListSortCompare;
-  FOnBeforePaint, FOnAfterPaint,
-  FOnBeforeUpdate, FOnAfterUpdate: TOGLCEvent;
+  FOnBeforePaint: TLayerBeforePaintEvent;
+  FOnAfterPaint: TLayerEvent;
+  FOnBeforeUpdate: TLayerBeforeUpdateEvent;
+  FOnAfterUpdate: TLayerEvent;
 public
   Constructor Create;
   Destructor Destroy; override;
@@ -132,14 +138,14 @@ public
 
   // Assign this callback if you want to do some initializations before surfaces are rendered on the layer.
   // For example, you can bind a TOGLCRenderToTexture to render the layer in a target texture
-  property OnBeforePaint: TOGLCEvent read FOnBeforePaint write FOnBeforePaint;
+  property OnBeforePaint: TLayerBeforePaintEvent read FOnBeforePaint write FOnBeforePaint;
   // Assign this callback if you want to do some finalizations after the layer is rendered.
   // For example, you can unbind a TOGLCRenderToTexture and render its texture with a specific shader
-  property OnAfterPaint: TOGLCEvent read FOnAfterPaint write FOnAfterPaint;
+  property OnAfterPaint: TLayerEvent read FOnAfterPaint write FOnAfterPaint;
   // Called before layer update.
-  property OnBeforeUpdate: TOGLCEvent read FOnBeforeUpdate write FOnBeforeUpdate;
+  property OnBeforeUpdate: TLayerBeforeUpdateEvent read FOnBeforeUpdate write FOnBeforeUpdate;
   // called at the end of layer update.
-  property OnAfterUpdate: TOGLCEvent read FOnAfterUpdate write FOnAfterUpdate;
+  property OnAfterUpdate: TLayerEvent read FOnAfterUpdate write FOnAfterUpdate;
 end;
 
 
@@ -296,12 +302,13 @@ begin
   if FParentScene.FPostProcessingEngine.FRenderToTexture <> NIL then
     FParentScene.FPostProcessingEngine.ApplyFX(@PostProcessing);
 
+  computedOpacity := Opacity.Value*OneDiv255;
+
   // Before paint CallBack
-  if Assigned(FOnBeforePaint) then FOnBeforePaint;
+  if Assigned(FOnBeforePaint) then FOnBeforePaint(Self, computedOpacity);
 
   if FCamera <> NIL then FCamera.Use;
 
-  computedOpacity := Opacity.Value*OneDiv255;
   if computedOpacity > 0 then
     for i:=0 to FList.Count-1 do
      with TSimpleSurfaceWithEffect(FList.Items[i]) do
@@ -310,13 +317,13 @@ begin
   if FCamera <> NIL then FCamera.Release;
 
   // After paint CallBack
-  if Assigned(FOnAfterPaint) then FOnAfterPaint;
+  if Assigned(FOnAfterPaint) then FOnAfterPaint(Self);
 end;
 
 procedure TLayer.Update(const aElapsedTime: single);
 var i: integer;
 begin
-  if FOnBeforeUpdate <> NIL then FOnBeforeUpdate();
+  if FOnBeforeUpdate <> NIL then FOnBeforeUpdate(Self, aElapsedTime);
   if FFreeze then exit;
   // Do Blink
   with FBlink do
@@ -346,7 +353,7 @@ begin
   // sort the surface
   if FOnSortCompare <> NIL then FList.Sort(FOnSortCompare);
 
-  if FOnAfterUpdate <> NIL then FOnAfterUpdate();
+  if FOnAfterUpdate <> NIL then FOnAfterUpdate(Self);
 end;
 
 procedure TLayer.Clear;
