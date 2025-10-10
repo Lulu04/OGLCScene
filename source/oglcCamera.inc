@@ -124,7 +124,7 @@ TOGLCCamera = class
   constructor Create;
   destructor Destroy; override;
   procedure Update(const AElapsedTime: single);
-protected
+public
   procedure Use;
   procedure Release;
 public
