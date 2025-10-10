@@ -23,16 +23,22 @@ type
     BHelpSurfaces: TSpeedButton;
     BHelpLayers: TSpeedButton;
     BNewSurface: TSpeedButton;
+    BSkyWorldSize: TSpeedButton;
+    BZoomScene: TSpeedButton;
     BZoomOnSelection: TSpeedButton;
     CBFlipH: TCheckBox;
     CBFlipV: TCheckBox;
     CBTextures: TComboBox;
     CheckBox1: TCheckBox;
+    CBUseGradientForSky: TCheckBox;
     ColorButton1: TColorButton;
     CBAlignReference: TComboBox;
     ColorButton2: TColorButton;
     CBLayers: TComboBox;
+    ComboBox1: TComboBox;
     Edit1: TEdit;
+    FloatSpinEdit1: TFloatSpinEdit;
+    FloatSpinEdit2: TFloatSpinEdit;
     FSEOverlap: TFloatSpinEdit;
     Label1: TLabel;
     Label10: TLabel;
@@ -55,7 +61,14 @@ type
     Label26: TLabel;
     Label27: TLabel;
     Label28: TLabel;
+    Label29: TLabel;
     Label3: TLabel;
+    Label30: TLabel;
+    Label31: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    Label35: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -66,6 +79,8 @@ type
     Panel10: TPanel;
     Panel11: TPanel;
     Panel12: TPanel;
+    Panel13: TPanel;
+    Panel14: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
@@ -81,6 +96,7 @@ type
     RadioButton2: TRadioButton;
     SE1: TFloatSpinEdit;
     SE10: TSpinEdit;
+    SE12: TSpinEdit;
     SE2: TFloatSpinEdit;
     SE4: TSpinEdit;
     SE5: TFloatSpinEdit;
@@ -104,11 +120,13 @@ type
     BAddMultiple: TSpeedButton;
     BDistributeH: TSpeedButton;
     BDistributeV: TSpeedButton;
+    BSkyEditGradient: TSpeedButton;
+    BSkySceneSize: TSpeedButton;
     SpeedButton2: TSpeedButton;
     BMoveToTopOneStep: TSpeedButton;
     BMoveToBottomOneStep: TSpeedButton;
     BMoveToBottom: TSpeedButton;
-    BZoomAll: TSpeedButton;
+    BZoomWorld: TSpeedButton;
     SpeedButton23: TSpeedButton;
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
@@ -124,6 +142,7 @@ type
     PageWorld: TTabSheet;
     PageLayers: TTabSheet;
     SEDummy: TSpinEdit;
+    SE11: TSpinEdit;
     procedure BAddToLevelBankClick(Sender: TObject);
     procedure BCancelClick(Sender: TObject);
     procedure BDistributeHClick(Sender: TObject);
@@ -131,11 +150,12 @@ type
     procedure BHelpSurfacesClick(Sender: TObject);
     procedure BHelpWorldClick(Sender: TObject);
     procedure BNewSurfaceClick(Sender: TObject);
-    procedure BZoomAllClick(Sender: TObject);
+    procedure BZoomWorldClick(Sender: TObject);
     procedure CBTexturesKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure CBTexturesSelect(Sender: TObject);
     procedure BRotate90CCWClick(Sender: TObject);
+    procedure CBUseGradientForSkyChange(Sender: TObject);
     procedure FSEOverlapChange(Sender: TObject);
     procedure SE1Enter(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
@@ -164,6 +184,8 @@ type
     procedure UpdateValuesToWorkingSurface;
   private
     function GetOverlapValue: single;
+  private
+    function GetWorldRect: TRectF;
   public
     FrameTextureList: TFrameTextureList;
     FrameViewLayerList: TFrameViewLayerList;
@@ -194,7 +216,7 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  u_layerlist, form_showhelp, Graphics;
+  u_layerlist, form_showhelp, form_editgradient, Graphics;
 
 {$R *.lfm}
 
@@ -306,6 +328,13 @@ begin
   wi.height := SpinEdit2.Value;
   wi.boundscolor := ColorToBGRA(ColorButton2.ButtonColor);
   wi.showbounds := CheckBox1.Checked;
+  wi.useskygradient := CBUseGradientForSky.Checked;
+  wi.skyx := FloatSpinEdit1.Value;
+  wi.skyy := FloatSpinEdit2.Value;
+  wi.skywidth := SE11.Value;
+  wi.skyheight := SE12.Value;
+  wi.skylayer := ComboBox1.ItemIndex+APP_LAYER_COUNT;
+  wi.skygradientdata := ScreenLevelEditor.SkyGradient.Gradient.SaveGradientDataToString;
   o^.worldinfo := wi.SaveToString;
 
   Project.SetModified;
@@ -331,9 +360,14 @@ begin
   end;
 end;
 
-procedure TFrameToolLevelEditor.BZoomAllClick(Sender: TObject);
+procedure TFrameToolLevelEditor.BZoomWorldClick(Sender: TObject);
 begin
-  if Sender = BZoomAll then ScreenLevelEditor.ZoomAll;
+  if Sender = BZoomWorld then begin
+    ScreenLevelEditor.ZoomViewToFit(GetWorldRect, 0.9);
+    ScreenLevelEditor.ComputeWorldBoundsLineWidth;
+  end;
+  if Sender = BZoomScene then
+    ScreenLevelEditor.ZoomOnSceneSize(GetWorldRect);
   if Sender = BZoomOnSelection then ScreenLevelEditor.ZoomOnSelection;
 end;
 
@@ -417,6 +451,60 @@ begin
     21: ScreenLevelEditor.SelectedToBack;
   end;
 
+end;
+
+procedure TFrameToolLevelEditor.CBUseGradientForSkyChange(Sender: TObject);
+begin
+  if FInitializingWidget then exit;
+
+  if Sender = CBUseGradientForSky then begin
+    Panel14.Enabled := CBUseGradientForSky.Checked;
+    ScreenLevelEditor.SkyGradient.Visible := CBUseGradientForSky.Checked;
+    if CBUseGradientForSky.Checked then begin
+      ScreenLevelEditor.SkyGradient.SetSize(SE11.Value, SE12.Value);
+    end;
+    FModified := True;
+  end;
+
+  if (Sender = FloatSpinEdit1) or (Sender = FloatSpinEdit2) then begin
+    ScreenLevelEditor.SkyGradient.SetCoordinate(FloatSpinEdit1.Value, FloatSpinEdit2.Value);
+    FModified := True;
+  end;
+
+  if (Sender =SE11) or (Sender =SE12) then begin
+    ScreenLevelEditor.SkyGradient.SetSize(SE11.Value, SE12.Value);
+    FModified := True;
+  end;
+
+  if Sender = BSkySceneSize then begin
+    SE11.Value := Project.Config.SceneWidth;
+    SE12.Value := Project.Config.SceneHeight;
+    FModified := True;
+  end;
+
+  if Sender = BSkyWorldSize then begin
+    SE11.Value := SpinEdit1.Value;
+    SE12.Value := SpinEdit2.Value;
+    FModified := True;
+  end;
+
+  if Sender = ComboBox1 then begin
+    ScreenLevelEditor.SetLayerForSkyGradient(ComboBox1.ItemIndex+APP_LAYER_COUNT);
+    //ScreenLevelEditor.SkyGradient.MoveToLayer(ComboBox1.ItemIndex+APP_LAYER_COUNT);
+    FModified := True;
+  end;
+
+  if Sender = BSkyEditGradient then begin
+    FormEditGradient := TFormEditGradient.Create(NIL);
+    try
+      FormEditGradient.Edit(@ScreenLevelEditor.SkyGradient.Gradient, SE11.Value, SE12.Value);
+      FormEditGradient.ShowModal;
+      if FormEditGradient.Modified then FModified := True;
+    finally
+      FormEditGradient.Free;
+      FormEditGradient := NIL;
+    end;
+  end;
 end;
 
 procedure TFrameToolLevelEditor.FSEOverlapChange(Sender: TObject);
@@ -634,6 +722,12 @@ begin
   Result := FSEOverlap.Value;
 end;
 
+function TFrameToolLevelEditor.GetWorldRect: TRectF;
+begin
+  Result := RectF(SpinEdit3.Value, SpinEdit4.Value,
+                  SpinEdit3.Value+SpinEdit1.Value, SpinEdit4.Value+SpinEdit2.Value);
+end;
+
 procedure TFrameToolLevelEditor.SendParamToWorldBounds;
 begin
   ScreenLevelEditor.UpdateWorldBounds(SpinEdit3.Value, SpinEdit4.Value,
@@ -692,6 +786,7 @@ begin
   FillListBoxTextureNames;
   Textures.FillComboBox(CBTextures);
   Layers.FillComboBox(CBLayers);
+  Layers.FillComboBox(ComboBox1);
   FrameViewLayerList.Fill;
 
   ShowSelectionData(NIL);
@@ -873,6 +968,8 @@ begin
   o := LevelBank.GetItemByName(aName);
   if o = NIL then exit;
 
+  Layers.FillComboBox(ComboBox1);
+
   Edit1.Text := o^.name;
   Surfaces.LoadFromString(o^.surfaces);
 
@@ -886,6 +983,19 @@ begin
     SpinEdit2.Value := wi.height;
     ColorButton2.ButtonColor := wi.boundscolor.ToColor;
     CheckBox1.Checked := wi.showbounds;
+    CBUseGradientForSky.Checked := wi.useskygradient;
+    Panel14.Enabled := CBUseGradientForSky.Checked;
+
+    FloatSpinEdit1.Value := wi.skyx;
+    FloatSpinEdit2.Value := wi.skyy;
+    SE11.Value := wi.skywidth;
+    SE12.Value := wi.skyheight;
+    ComboBox1.ItemIndex := wi.skylayer-APP_LAYER_COUNT;
+    ScreenLevelEditor.SkyGradient.Gradient.LoadGradientDataFromString(wi.skygradientdata);
+    ScreenLevelEditor.SkyGradient.SetSize(wi.skywidth, wi.skyheight);
+    //ScreenLevelEditor.SkyGradient.MoveToLayer(wi.skylayer);
+    ScreenLevelEditor.SkyGradient.Visible := wi.useskygradient;
+    ScreenLevelEditor.SetLayerForSkyGradient(wi.skylayer);
   end else begin
     SpinEdit3.Value := 0;
     SpinEdit4.Value := 0;

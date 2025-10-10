@@ -33,9 +33,10 @@ type
     procedure BDeleteFrameClick(Sender: TObject);
   private
     FModified: boolean;
-    FSurfaceDescriptor: PSurfaceDescriptor;
     FGradient: PGradientDescriptor;
+    FGWidth, FGHeight: integer;
     FInitializing: boolean;
+    FNewGradientData: string;
   private
     Frames: array of TFrameGradientRow;
     FIDName: integer;
@@ -52,8 +53,9 @@ type
   public
     procedure SelectNone;
 
-    procedure Edit(aSurface: PSurfaceDescriptor);
+    procedure Edit(aGradient: PGradientDescriptor; aWidth, aHeight: integer);
     property Modified: boolean read FModified;
+    property NewGradientData: string read FNewGradientData;
   end;
 
 var
@@ -132,7 +134,7 @@ begin
                      FGradient^.Rows[k-1].YPosition;
   clone.Items := Copy(FGradient^.Rows[k-1].Items, 0, Length(FGradient^.Rows[k-1].Items));
   system.Insert(clone, FGradient^.Rows, k);
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
 
   // because the insertion have relocated the array in memory, we have to re-init the pointers
   for i:=0 to High(Frames) do
@@ -166,7 +168,7 @@ begin
 
   // delete in gradient
   system.Delete(FGradient^.Rows, aIndex, 1);
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
 
   FrameToolsSpriteBuilder.Modified := True;
 end;
@@ -187,7 +189,7 @@ begin
   fr := TFrameGradientRow(Sender);
   FGradient^.Rows[fr.Index].YPosition := fr.YPosition;
 
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   FModified := True;
 end;
 
@@ -212,7 +214,7 @@ begin
       Frames[i].PB.Invalidate;
     end;
 
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   FModified := True;
 end;
 
@@ -228,7 +230,7 @@ begin
       Frames[i].PB.Invalidate;
     end;
 
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   FModified := True;
 end;
 
@@ -252,7 +254,7 @@ begin
       Frames[i].PB.Invalidate;
     end;
 
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   FModified := True;
 end;
 
@@ -265,7 +267,7 @@ end;
 
 procedure TFormEditGradient.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
-  FSurfaceDescriptor^.GradientData := FGradient^.SaveGradientDataToString;
+  FNewGradientData := FGradient^.SaveGradientDataToString;
 end;
 
 procedure TFormEditGradient.BAddRowClick(Sender: TObject);
@@ -281,7 +283,7 @@ begin
   if k = -1 then exit;
   Frames[k].SetSameColorOnAllNodes(ColorButton1.ButtonColor);
 
-  FGradient^.ComputeVerticesAndIndices(FSurfaceDescriptor^.surface.Width, FSurfaceDescriptor^.surface.Height);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   FModified := True;
 end;
 
@@ -324,12 +326,13 @@ begin
       ProcessFrameNodeModifiedEvent(Frames[i], j);
 end;
 
-procedure TFormEditGradient.Edit(aSurface: PSurfaceDescriptor);
+procedure TFormEditGradient.Edit(aGradient: PGradientDescriptor; aWidth, aHeight: integer);
 var i, j: integer;
   sameXPos, sameColor: boolean;
 begin
-  FSurfaceDescriptor := aSurface;
-  FGradient := @TGradientRectangle(aSurface^.surface).Gradient;
+  FGradient := aGradient;
+  FGWidth := aWidth;
+  FGHeight := aHeight;
   Clear;
 
   FInitializing := True;

@@ -26,6 +26,9 @@ APP_LAYER_COUNT = 10;
    FIRST_LAYER_USER       = 10;  // this is the layer index 0 for the user
 
 
+DEFAULT_SKY_GRADIENT = '2 0.000 2 0.000 0080FFFF 1.000 0080FFFF 1.000 2 0.000 000080FF 1.000 000080FF';
+
+
 var
   FScene: TOGLCScene;
   FAtlas: TAtlas;

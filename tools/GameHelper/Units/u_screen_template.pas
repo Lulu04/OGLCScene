@@ -209,6 +209,7 @@ public // rotate 90, mirror, plane
   procedure SelectedToBack;
 
   procedure ZoomAll; virtual;
+  procedure ZoomOnSceneSize(const aWorldArea: TRectF); virtual;
   procedure ZoomOnSelection; virtual;
 
   procedure MoveSelectionToLayer(aLayerIndex: integer); virtual;
@@ -1544,6 +1545,17 @@ procedure TScreenWithSurfaceHandling.ZoomAll;
 begin
   ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
   UpdateHandlePositionOnSelected;
+end;
+
+procedure TScreenWithSurfaceHandling.ZoomOnSceneSize(const aWorldArea: TRectF);
+var r: TRectF;
+begin
+  r := FCamera.GetViewRect;
+  if r.Left < aWorldArea.Left then r.Left := aWorldArea.Left;
+  if r.Top < aWorldArea.Top then r.Top := aWorldArea.Top;
+  if r.Left+FScene.Width > aWorldArea.Right then r.Left := aWorldArea.Right-FScene.Width;
+  if r.Top+FScene.Height > aWorldArea.Bottom then r.Top := aWorldArea.Bottom-FScene.Height;
+  ZoomViewToFit(RectF(r.Left, r.Top, r.Left+FScene.Width, r.Top+FScene.Height), 1.0);
 end;
 
 procedure TScreenWithSurfaceHandling.ZoomOnSelection;

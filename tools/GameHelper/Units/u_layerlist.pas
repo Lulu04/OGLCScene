@@ -201,15 +201,19 @@ begin
 
   for i:=0 to High(A) do
     Add(A[i]);
-fscene.LogDebug('layer list loaded: count='+integer(Length(FNames)).tostring);
 end;
 
 procedure TLayerList.FillComboBox(aCB: TComboBox);
 var i: integer;
 begin
-  aCB.Clear;
-  for i:=APP_LAYER_COUNT to High(FNames) do
-    aCB.Items.Add(FNames[i]);
+  if aCB.Items.Count <> Length(FNames)-APP_LAYER_COUNT then begin
+    aCB.Clear;
+    for i:=APP_LAYER_COUNT to High(FNames) do
+      aCB.Items.Add(FNames[i]);
+  end else begin
+    for i:=APP_LAYER_COUNT to High(FNames) do
+      aCB.Items.Strings[i-APP_LAYER_COUNT] := FNames[i];
+  end;
 end;
 
 procedure TLayerList.FillListBox(aLB: TListBox);
