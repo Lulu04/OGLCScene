@@ -333,6 +333,9 @@ public // Childs
   // Extract the surface from its owner (another layer or parent surface)
   // then insert it to a layer at the specified index.
   procedure InsertToLayer(aSurfaceIndex, aLayerIndex: integer);
+  // Extract the surface from the scene. The surface can be on a layer or child of another surface.
+  // The surface is not freed, its coodinates are not modified.
+  procedure RemoveFromScene;
   // if the surface is child of another, its Z order is changed so that is on top of the other childs.
   // if the surface is on layer, it is moved to be on top of the other surface in this layer.
   procedure MoveToTop;
@@ -991,6 +994,12 @@ begin
       ParentLayer.Remove(Self);
     FParentScene.Insert(aSurfaceIndex, Self, aLayerIndex);
   end;
+end;
+
+procedure TSimpleSurfaceWithEffect.RemoveFromScene;
+begin
+  if ParentSurface <> NIL then ParentSurface.RemoveChild(Self)
+    else if ParentLayer <> NIL then ParentLayer.Remove(Self);
 end;
 
 procedure TSimpleSurfaceWithEffect.MoveToTop;
