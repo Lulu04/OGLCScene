@@ -36,6 +36,10 @@ public // for tool GameHelper
   // Move grid's nodes to their default positions.
   procedure ResetNodePositions;
   procedure ResetNodeCoeffs;
+  procedure GridFlipH;
+  procedure GridFlipV;
+  procedure GridRotate90CW;
+  procedure GridRotate90CCW;
 public
   Destructor Destroy; override;
   procedure Update(const aElapsedTime: single); override;
@@ -46,7 +50,7 @@ public
   // apply a prebuild deformation on the grid
   procedure ApplyDeformation(aType: TDeformationType);
 public
-  // set grid size.
+  // Set grid size.
   // Row index range is 0 to aRowCount
   // Column index range is 0 to aColumnCount
   procedure SetGrid(aRowCount, aColumnCount: integer);
@@ -439,6 +443,116 @@ begin
      TimeMultiplicator := 1.0;
     end;
    end;
+end;
+
+procedure TDeformationGrid.GridFlipH;
+var ix, iy, ixRight, ixLeft: integer;
+    v: single;
+begin
+  if Length(FGridPts) = 0 then exit;
+
+  ixLeft := Length(FGridPts[0]) div 2 - 1;
+  for iy:=0 to High(FGridPts) do begin
+   ixRight := ixLeft + 1;
+   if Odd(Length(FGridPts[0])) then inc(ixRight);
+   for ix:=ixLeft downto 0 do begin
+     v := FGridPts[iy][ix].DeformationAmount;
+     FGridPts[iy][ix].DeformationAmount := FGridPts[iy][ixRight].DeformationAmount;
+     FGridPts[iy][ixRight].DeformationAmount := v;
+
+     v := FGridPts[iy][ix].TimeMultiplicator;
+     FGridPts[iy][ix].TimeMultiplicator := FGridPts[iy][ixRight].TimeMultiplicator;
+     FGridPts[iy][ixRight].TimeMultiplicator := v;
+
+     inc(ixRight);
+   end;
+  end;
+end;
+
+procedure TDeformationGrid.GridFlipV;
+var ix, iy, iyTop, iyBottom: integer;
+    v: single;
+begin
+  if Length(FGridPts) = 0 then exit;
+
+  for ix:=0 to High(FGridPts[0]) do begin
+   iyTop := Length(FGridPts) div 2 - 1;
+   iyBottom := iyTop + 1;
+   if Odd(Length(FGridPts)) then inc(iyTop);
+   for iy:=iyTop downto 0 do begin
+     v := FGridPts[iy][ix].DeformationAmount;
+     FGridPts[iy][ix].DeformationAmount := FGridPts[iyBottom][ix].DeformationAmount;
+     FGridPts[iyBottom][ix].DeformationAmount := v;
+
+     v := FGridPts[iy][ix].TimeMultiplicator;
+     FGridPts[iy][ix].TimeMultiplicator := FGridPts[iyBottom][ix].TimeMultiplicator;
+     FGridPts[iyBottom][ix].TimeMultiplicator := v;
+
+     inc(iyBottom);
+   end;
+  end;
+end;
+
+procedure TDeformationGrid.GridRotate90CW;
+var newGrid: ArrayOfArrayOfDeformedPoint;
+    ix, iy, destRowIndex, destColIndex: integer;
+begin
+  if Length(FGridPts) = 0 then exit;
+
+  // create a new inverted grid
+  newGrid := NIL;
+  SetLength(newGrid, Length(FGridPts[0]), Length(FGridPts));
+  destRowIndex := 0;
+  for ix:=0 to High(FGridPts[0]) do begin
+    destColIndex := 0;
+    for iy:=High(FGridPts) downto 0 do begin
+      newGrid[destRowIndex][destColIndex].DeformationAmount := FGridPts[iy][ix].DeformationAmount;
+      newGrid[destRowIndex][destColIndex].TimeMultiplicator := FGridPts[iy][ix].TimeMultiplicator;
+      newGrid[destRowIndex][destColIndex].x := FGridPts[iy][ix].x;
+      newGrid[destRowIndex][destColIndex].y := FGridPts[iy][ix].y;
+      inc(destColIndex);
+    end;
+    inc(destRowIndex);
+  end;
+
+  FGridPts := Copy(newGrid);
+  ix := FRowCount;
+  FRowCount := FColumnCount;
+  FColumnCount := ix;
+
+  FCellHeight := Height/FRowCount;
+  FCellWidth := Width/FColumnCount;
+end;
+
+procedure TDeformationGrid.GridRotate90CCW;
+var newGrid: ArrayOfArrayOfDeformedPoint;
+    ix, iy, destRowIndex, destColIndex: integer;
+begin
+  if Length(FGridPts) = 0 then exit;
+
+  // create a new inverted grid
+  newGrid := NIL;
+  SetLength(newGrid, Length(FGridPts[0]), Length(FGridPts));
+  destRowIndex := 0;
+  for ix:=High(FGridPts[0]) downto 0 do begin
+    destColIndex := 0;
+    for iy:=0 to High(FGridPts) do begin
+      newGrid[destRowIndex][destColIndex].DeformationAmount := FGridPts[iy][ix].DeformationAmount;
+      newGrid[destRowIndex][destColIndex].TimeMultiplicator := FGridPts[iy][ix].TimeMultiplicator;
+      newGrid[destRowIndex][destColIndex].x := FGridPts[iy][ix].x;
+      newGrid[destRowIndex][destColIndex].y := FGridPts[iy][ix].y;
+      inc(destColIndex);
+    end;
+    inc(destRowIndex);
+  end;
+
+  FGridPts := Copy(newGrid);
+  ix := FRowCount;
+  FRowCount := FColumnCount;
+  FColumnCount := ix;
+
+  FCellHeight := Height/FRowCount;
+  FCellWidth := Width/FColumnCount;
 end;
 
 procedure TDeformationGrid.ApplyDeformation(aType: TDeformationType);
