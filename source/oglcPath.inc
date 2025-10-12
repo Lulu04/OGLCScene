@@ -282,7 +282,6 @@ var t: TStringList;
     prop: TProperties;
     activateSplineMode: boolean;
     splineStyle: TSplineStyle;
-    spline: TOGLCPath;
 begin
   Self := NIL;
   t := TStringList.Create;
@@ -291,6 +290,7 @@ begin
    c := 0;
    k := 0;
    s := '';
+   activateSplineMode := False;
    prop.SplitFrom(t, '[OGLC_PATH]', '|');
    prop.IntegerValueOf('NodeCount', c, 0);
    SetLength(Self, c);
@@ -323,7 +323,6 @@ var t: TStringList;
     prop: TProperties;
     activateSplineMode: boolean;
     splineStyle: TSplineStyle;
-    spline: TOGLCPath;
 begin
   Self := NIL;
   t := TStringList.Create;
@@ -332,6 +331,7 @@ begin
    c := 0;
    k := 0;
    s := '';
+   activateSplineMode := False;
    prop.SplitFrom(t, '[OGLC_PATH]', '|');
    prop.IntegerValueOf('NodeCount', c, 0);
    SetLength(Self, c);
