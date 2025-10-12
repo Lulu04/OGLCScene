@@ -129,6 +129,17 @@ public
   // Must be called after the last call to AddRow(...).
   procedure EndUpdate;
 
+  // Flip horizontaly the gradient. After this, don't forget to call ComputeVerticesAndIndices.
+  procedure FlipH;
+  // Flip verticaly the gradient. After this, don't forget to call ComputeVerticesAndIndices.
+  procedure FlipV;
+  // Rotate 90 degrees CCW the gradient. After this, don't forget to call ComputeVerticesAndIndices.
+  // Note: work only on gradient with aligned nodes.
+  procedure Rotate90CCW;
+  // Rotate 90 degrees CW the gradient. After this, don't forget to call ComputeVerticesAndIndices.
+  // Note: work only on gradient with aligned nodes.
+  procedure Rotate90CW;
+
   // Compute the mesh using triangle strip to apply the gradient on the specified rectangular area.
   procedure ComputeVerticesAndIndices(aWidth, aHeight: integer);
   // This event is fired when the gradient colors are modified with one of the Createxxxx(...) method or AddRow(...).
@@ -584,7 +595,7 @@ end;
 
 procedure TGradientDescriptor.InitDefault;
 begin
-  FillChar(Self, SizeOf(TGradientDescriptor), 0);
+  Self := Default(TGradientDescriptor);
 end;
 
 procedure TGradientDescriptor.Clear;
@@ -652,6 +663,104 @@ begin
     FUpdating := False;
     if FOnChange <> NIL then FOnChange;
   end;
+end;
+
+procedure TGradientDescriptor.FlipH;
+var newItems: ArrayOfGradientItem;
+  r, c, k: integer;
+begin
+  if Length(Rows) = 0 then exit;
+
+  for r:=0 to High(Rows) do begin
+    newItems := NIL;
+    SetLength(newItems, Length(Rows[r].Items));
+    k := 0;
+    // invert row data
+    for c:=High(Rows[r].Items) downto 0 do begin
+      newItems[k].Color := Rows[r].Items[c].Color;
+      newItems[k].XPosition := 1.0 - Rows[r].Items[c].XPosition;
+      inc(k);
+    end;
+    // copy the inverted data
+    for c:=0 to High(Rows[r].Items) do begin
+      Rows[r].Items[c].Color := newItems[c].Color;
+      Rows[r].Items[c].XPosition := newItems[c].XPosition;
+    end;
+  end;
+end;
+
+procedure TGradientDescriptor.FlipV;
+var newRows: TArrayOfGradientRow;
+  r, k: integer;
+begin
+  if Length(Rows) < 2 then exit;
+
+  newRows := NIL;
+  SetLength(newRows, Length(Rows));
+  // invert the rows
+  k := 0;
+  for r:=High(Rows) downto 0 do begin
+    newRows[k].YPosition := 1.0 - Rows[r].YPosition;
+    newRows[k].Items := Copy(Rows[r].Items, 0, Length(Rows[r].Items));
+    inc(k);
+  end;
+  // copy the inverted rows
+  for r:=0 to High(Rows) do begin
+    Rows[r].YPosition := newRows[r].YPosition;
+    Rows[r].Items := Copy(newRows[r].Items, 0, Length(newRows[r].Items));
+  end;
+end;
+
+procedure TGradientDescriptor.Rotate90CCW;
+var newRows: TArrayOfGradientRow;
+  originColIndex, originRowIndex, destRowIndex, destColIndex: integer;
+begin
+  if Length(Rows) < 2 then exit;
+
+  newRows := NIL;
+  SetLength(newRows, Length(Rows[0].Items));
+
+  destRowIndex := 0;
+  for originColIndex:=High(Rows[0].Items) downto 0 do begin
+    SetLength(newRows[destRowIndex].Items, Length(Rows));
+
+    newRows[destRowIndex].YPosition := 1.0 - Rows[0].Items[originColIndex].XPosition;
+    destColIndex := 0;
+    for originRowIndex:=0 to High(Rows) do begin
+      newRows[destRowIndex].Items[destColIndex].Color := Rows[originRowIndex].Items[originColIndex].Color;
+      newRows[destRowIndex].Items[destColIndex].XPosition := Rows[originRowIndex].YPosition;
+      inc(destColIndex);
+    end;
+    inc(destRowIndex);
+  end;
+
+  Rows := Copy(newRows);
+end;
+
+procedure TGradientDescriptor.Rotate90CW;
+var newRows: TArrayOfGradientRow;
+  originColIndex, originRowIndex, destRowIndex, destColIndex: integer;
+begin
+  if Length(Rows) < 2 then exit;
+
+  newRows := NIL;
+  SetLength(newRows, Length(Rows[0].Items));
+
+  destRowIndex := 0;
+  for originColIndex:=0 to High(Rows[0].Items) do begin
+    SetLength(newRows[destRowIndex].Items, Length(Rows));
+
+    newRows[destRowIndex].YPosition := Rows[0].Items[originColIndex].XPosition;
+    destColIndex := 0;
+    for originRowIndex:=High(Rows) downto 0 do begin
+      newRows[destRowIndex].Items[destColIndex].Color := Rows[originRowIndex].Items[originColIndex].Color;
+      newRows[destRowIndex].Items[destColIndex].XPosition := 1.0 - Rows[originRowIndex].YPosition;
+      inc(destColIndex);
+    end;
+    inc(destRowIndex);
+  end;
+
+  Rows := Copy(newRows);
 end;
 
 procedure TGradientDescriptor.ComputeVerticesAndIndices(aWidth, aHeight: integer);
