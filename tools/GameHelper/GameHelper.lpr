@@ -13,7 +13,7 @@ uses
   u_screen_spritebuilder, u_project, u_texture_list, u_app_pref, Dialogs,
   u_surface_list, u_utils, u_screen_template, u_spritebank, u_ui_handle,
   u_screen_spritebank, frame_tool_spritebuilder, frame_tool_spritebank,
-  u_collisionbody_list, u_datamodule, u_undo_redo,
+  u_collisionbody_list, u_datamodule, u_undo_redo, u_presetmanager,
   u_undoredo_spritebuilder, u_posture_list, frame_tool_leveleditor,
   u_screen_levelbank, u_levelbank, frame_texturelist,
   u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,

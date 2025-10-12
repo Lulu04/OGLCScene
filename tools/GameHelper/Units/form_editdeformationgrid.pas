@@ -7,13 +7,18 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, StdCtrls,
   Spin, ComCtrls, Buttons,
-  OGLCScene, u_surface_list;
+  OGLCScene, u_surface_list, u_presetmanager;
 
 type
 
   { TFormEditDeformationGrid }
 
   TFormEditDeformationGrid = class(TForm)
+    BFlipH: TSpeedButton;
+    BFlipV: TSpeedButton;
+    BPreset: TSpeedButton;
+    BRotate90CCW: TSpeedButton;
+    BRotate90CW: TSpeedButton;
     CBType: TComboBox;
     CheckBox1: TCheckBox;
     FSE5: TFloatSpinEdit;
@@ -39,6 +44,7 @@ type
     SE2: TSpinEdit;
     SpeedButton1: TSpeedButton;
     SpeedButton2: TSpeedButton;
+    procedure BFlipHClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
@@ -57,6 +63,7 @@ type
     FRowLabel: array of TLabel;
     FColumnLabel:array of TLabel;
     FNodeLabel:  array of array of TLabel;
+    procedure DoCreateNode;
     procedure ComputeWorkingRect;
     procedure KillObjects;
     procedure CreateObjects;
@@ -66,13 +73,17 @@ type
     procedure ProcessLabelMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SelectLabel(aLabel: TLabel);
     procedure UnselectLabel(aLabel: TLabel);
+  private
+    FPresets: TPresetManager;
+    procedure PresetToWidget(const A: TStringArray);
+    function WidgetToPreset: string;
   public
     procedure Edit(aSurface: PSurfaceDescriptor);
     property Modified: boolean read FModified;
   end;
 
 implementation
-uses BGRABitmap, BGRABitmapTypes, form_main;
+uses BGRABitmap, BGRABitmapTypes, form_main, u_app_pref;
 
 {$R *.lfm}
 
@@ -84,6 +95,11 @@ begin
   FillCBType;
   CBType.ItemIndex := 0;
   FInitializing := False;
+
+  FPresets := TPresetManager.Create(Self);
+  FPresets.Init1('Deformation grid presets', BPreset, GetPresetFolder+'DeformationGrid.preset');
+  FPresets.Init2(@PresetToWidget, @WidgetToPreset);
+  FPresets.Load;
 end;
 
 procedure TFormEditDeformationGrid.FormResize(Sender: TObject);
@@ -100,6 +116,43 @@ end;
 procedure TFormEditDeformationGrid.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   FSurfaceDescriptor^.DeformationGridData := FDeformationGrid.SaveDeformationDataToString;
+end;
+
+procedure TFormEditDeformationGrid.BFlipHClick(Sender: TObject);
+var v: integer;
+begin
+  if Sender = BFlipH then begin
+    FDeformationGrid.GridFlipH;
+    FDeformationGrid.ResetNodePositions;
+    DoCreateNode;
+    FModified := True;
+  end;
+
+  if Sender = BFlipV then begin
+    FDeformationGrid.GridFlipV;
+    FDeformationGrid.ResetNodePositions;
+    DoCreateNode;
+    FModified := True;
+  end;
+
+  if Sender = BRotate90CCW then begin
+    FDeformationGrid.GridRotate90CCW;
+    FDeformationGrid.ResetNodePositions;
+    DoCreateNode;
+    FModified := True;
+  end;
+
+  if Sender = BRotate90CW then begin
+    FDeformationGrid.GridRotate90CW;
+   // FDeformationGrid.ResetNodePositions;
+    FInitializing := True;
+    v := SE1.Value;
+    SE1.Value :=  SE2.Value;
+    SE2.Value := v;
+    FInitializing := False;
+    DoCreateNode;
+    FModified := True;
+  end;
 end;
 
 procedure TFormEditDeformationGrid.SE1Change(Sender: TObject);
@@ -155,6 +208,24 @@ begin
     WriteStr(value, i);
     CBType.Items.Add(value);
   end;
+end;
+
+procedure TFormEditDeformationGrid.DoCreateNode;
+begin
+  FInitializing := True;
+
+  SE1.Value := FDeformationGrid.RowCount;
+  SE2.Value := FDeformationGrid.ColumnCount;
+  CBType.ItemIndex := Ord(FDeformationGrid.DeformationType);
+  CheckBox1.Checked := FDeformationGrid.ShowGrid;
+  FSE1.Value := FDeformationGrid.Amplitude.x.Value;
+  FSE2.Value := FDeformationGrid.Amplitude.y.Value;
+  FSE3.Value := FDeformationGrid.DeformationSpeed.x.Value;
+  FSE4.Value := FDeformationGrid.DeformationSpeed.y.Value;
+
+  FInitializing := False;
+
+  CreateObjects;
 end;
 
 procedure TFormEditDeformationGrid.ComputeWorkingRect;
@@ -351,25 +422,24 @@ begin
   aLabel.Font.Color := clWhite;
 end;
 
+procedure TFormEditDeformationGrid.PresetToWidget(const A: TStringArray);
+begin
+  FDeformationGrid.ResetNodePositions;
+  FDeformationGrid.LoadDeformationDataFromString(A[0]);
+  DoCreateNode;
+  FModified := True;
+end;
+
+function TFormEditDeformationGrid.WidgetToPreset: string;
+begin
+  Result := FDeformationGrid.SaveDeformationDataToString;
+end;
+
 procedure TFormEditDeformationGrid.Edit(aSurface: PSurfaceDescriptor);
 begin
   FSurfaceDescriptor := aSurface;
   FDeformationGrid := aSurface^.surface as TDeformationGrid;
-
-  FInitializing := True;
-
-  SE1.Value := FDeformationGrid.RowCount;
-  SE2.Value := FDeformationGrid.ColumnCount;
-  CBType.ItemIndex := Ord(FDeformationGrid.DeformationType);
-  CheckBox1.Checked := FDeformationGrid.ShowGrid;
-  FSE1.Value := FDeformationGrid.Amplitude.x.Value;
-  FSE2.Value := FDeformationGrid.Amplitude.y.Value;
-  FSE3.Value := FDeformationGrid.DeformationSpeed.x.Value;
-  FSE4.Value := FDeformationGrid.DeformationSpeed.y.Value;
-
-  FInitializing := False;
-
-  CreateObjects;
+  DoCreateNode;
   FModified := False;
 end;
 

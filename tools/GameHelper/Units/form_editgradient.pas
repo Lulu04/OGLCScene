@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, OGLCScene, BGRABitmap, BGRABitmapTypes, u_surface_list,
-  frame_gradientrow;
+  StdCtrls, OGLCScene, BGRABitmap, BGRABitmapTypes,
+  frame_gradientrow, u_presetmanager;
 
 type
 
@@ -15,6 +15,10 @@ type
 
   TFormEditGradient = class(TForm)
     BHelp: TSpeedButton;
+    BFlipH: TSpeedButton;
+    BFlipV: TSpeedButton;
+    BRotate90CCW: TSpeedButton;
+    BRotate90CW: TSpeedButton;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     ColorButton1: TColorButton;
@@ -24,11 +28,14 @@ type
     BDeleteFrame: TSpeedButton;
     BColorToRow: TSpeedButton;
     BAddRow: TSpeedButton;
+    BPreset: TSpeedButton;
     procedure BAddRowClick(Sender: TObject);
     procedure BColorToRowClick(Sender: TObject);
     procedure BHelpClick(Sender: TObject);
+    procedure BFlipHClick(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure BDeleteFrameClick(Sender: TObject);
   private
@@ -37,6 +44,10 @@ type
     FGWidth, FGHeight: integer;
     FInitializing: boolean;
     FNewGradientData: string;
+    procedure DoFlipH;
+    procedure DoFlipV;
+    procedure DoRotate90CCW;
+    procedure DoRotate90CW;
   private
     Frames: array of TFrameGradientRow;
     FIDName: integer;
@@ -50,6 +61,11 @@ type
     procedure ProcessFrameNodeModifiedEvent(Sender: TObject; aNodeIndex: integer);
     procedure ProcessFrameDeleteNodeEvent(Sender: TObject; aNodeIndex: integer);
     procedure ProcessFrameAddNodeEvent(Sender: TObject; aNodeIndex: integer; const aColor: TBGRAPixel);
+  private
+    FPresets: TPresetManager;
+    procedure PresetToWidget(const A: TStringArray);
+    function WidgetToPreset: string;
+    procedure DoGradientToFrame;
   public
     procedure SelectNone;
 
@@ -82,11 +98,44 @@ begin
   DeleteFrame(i);
 end;
 
+procedure TFormEditGradient.DoFlipH;
+begin
+  if Length(FGradient^.Rows) = 0 then exit;
+  FGradient^.FlipH;
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  FModified := True;
+end;
+
+procedure TFormEditGradient.DoFlipV;
+begin
+  if Length(FGradient^.Rows) < 2 then exit;
+  FGradient^.FlipV;
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  FModified := True;
+end;
+
+procedure TFormEditGradient.DoRotate90CCW;
+begin
+  if Length(FGradient^.Rows) = 0 then exit;
+  FGradient^.Rotate90CCW;
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  FModified := True;
+end;
+
+procedure TFormEditGradient.DoRotate90CW;
+begin
+  if Length(FGradient^.Rows) = 0 then exit;
+  FGradient^.Rotate90CW;
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  FModified := True;
+end;
+
 procedure TFormEditGradient.Clear;
 var i: integer;
 begin
   for i:=0 to High(Frames) do
     Frames[i].Free;
+  Frames := NIL;
 end;
 
 function TFormEditGradient.AddFrame: integer;
@@ -258,6 +307,48 @@ begin
   FModified := True;
 end;
 
+procedure TFormEditGradient.PresetToWidget(const A: TStringArray);
+begin
+  FGradient^.LoadGradientDataFromString(A[0]);
+  FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  DoGradientToFrame;
+  FModified := True;
+end;
+
+function TFormEditGradient.WidgetToPreset: string;
+begin
+  Result := FGradient^.SaveGradientDataToString;
+end;
+
+procedure TFormEditGradient.DoGradientToFrame;
+var i, j: integer;
+  sameXPos, sameColor: boolean;
+begin
+  Clear;
+
+  FInitializing := True;
+  // check options
+  sameXPos := True;
+  sameColor := True;
+  for i:=0 to High(FGradient^.Rows[0].Items) do
+    for j:=0 to High(FGradient^.Rows)-1 do begin
+      sameXPos := sameXPos and (FGradient^.Rows[j].Items[i].XPosition = FGradient^.Rows[j+1].Items[i].XPosition);
+      sameColor := sameColor and (FGradient^.Rows[j].Items[i].Color = FGradient^.Rows[j+1].Items[i].Color);
+    end;
+  CheckBox1.Checked := sameColor;
+  CheckBox2.Checked := sameXPos;
+
+
+  for i:=0 to High(FGradient^.Rows) do begin
+    AddFrame;
+    Frames[i].Edit(FGradient^.Rows[i].YPosition, @(FGradient^.Rows[i].Items));
+    Frames[i].FSE1.ReadOnly := (i = 0) or (i = High(FGradient^.Rows));
+  end;
+  UpdateFramesPosition;
+
+  FInitializing := False;
+end;
+
 procedure TFormEditGradient.SelectNone;
 var i: integer;
 begin
@@ -270,6 +361,14 @@ begin
   FNewGradientData := FGradient^.SaveGradientDataToString;
 end;
 
+procedure TFormEditGradient.FormCreate(Sender: TObject);
+begin
+  FPresets := TPresetManager.Create(Self);
+  FPresets.Init1('Gradient presets', BPreset, GetPresetFolder+'Gradient.preset');
+  FPresets.Init2(@PresetToWidget, @WidgetToPreset);
+  FPresets.Load;
+end;
+
 procedure TFormEditGradient.BAddRowClick(Sender: TObject);
 begin
   InsertFrame;
@@ -277,7 +376,7 @@ begin
 end;
 
 procedure TFormEditGradient.BColorToRowClick(Sender: TObject);
-var i, k: integer;
+var k: integer;
 begin
   k := GetSelectedFrameIndex;
   if k = -1 then exit;
@@ -314,6 +413,14 @@ begin
      ' - select the row to delete and click "Delete row".'#10#10);
 end;
 
+procedure TFormEditGradient.BFlipHClick(Sender: TObject);
+begin
+  if Sender = BFlipH then DoFlipH;
+  if Sender = BFlipV then DoFlipV;
+  if Sender = BRotate90CCW then DoRotate90CCW;
+  if Sender = BRotate90CW then DoRotate90CW;
+end;
+
 procedure TFormEditGradient.CheckBox1Change(Sender: TObject);
 var i, j: integer;
 begin
@@ -327,35 +434,11 @@ begin
 end;
 
 procedure TFormEditGradient.Edit(aGradient: PGradientDescriptor; aWidth, aHeight: integer);
-var i, j: integer;
-  sameXPos, sameColor: boolean;
 begin
   FGradient := aGradient;
   FGWidth := aWidth;
   FGHeight := aHeight;
-  Clear;
-
-  FInitializing := True;
-  // check options
-  sameXPos := True;
-  sameColor := True;
-  for i:=0 to High(FGradient^.Rows[0].Items) do
-    for j:=0 to High(FGradient^.Rows)-1 do begin
-      sameXPos := sameXPos and (FGradient^.Rows[j].Items[i].XPosition = FGradient^.Rows[j+1].Items[i].XPosition);
-      sameColor := sameColor and (FGradient^.Rows[j].Items[i].Color = FGradient^.Rows[j+1].Items[i].Color);
-    end;
-  CheckBox1.Checked := sameColor;
-  CheckBox2.Checked := sameXPos;
-
-
-  for i:=0 to High(FGradient^.Rows) do begin
-    AddFrame;
-    Frames[i].Edit(FGradient^.Rows[i].YPosition, @(FGradient^.Rows[i].Items));
-    Frames[i].FSE1.ReadOnly := (i = 0) or (i = High(FGradient^.Rows));
-  end;
-  UpdateFramesPosition;
-
-  FInitializing := False;
+  DoGradientToFrame;
 end;
 
 end.
