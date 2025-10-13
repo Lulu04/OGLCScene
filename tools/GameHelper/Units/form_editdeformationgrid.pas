@@ -11,6 +11,12 @@ uses
 
 type
 
+  TLabelGrid = class(TLabel)
+  public
+    Row: integer;
+    Col: integer;
+  end;
+
   { TFormEditDeformationGrid }
 
   TFormEditDeformationGrid = class(TForm)
@@ -60,9 +66,9 @@ type
   private
     FModified: boolean;
     FRect: TRect;
-    FRowLabel: array of TLabel;
-    FColumnLabel:array of TLabel;
-    FNodeLabel:  array of array of TLabel;
+    FRowLabel: array of TLabelGrid;
+    FColumnLabel:array of TLabelGrid;
+    FNodeLabel:  array of array of TLabelGrid;
     procedure DoCreateNode;
     procedure ComputeWorkingRect;
     procedure KillObjects;
@@ -71,8 +77,8 @@ type
     procedure PlaceObjects;
     procedure ProcessLabelMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure ProcessLabelMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure SelectLabel(aLabel: TLabel);
-    procedure UnselectLabel(aLabel: TLabel);
+    procedure SelectLabel(aLabel: TLabelGrid);
+    procedure UnselectLabel(aLabel: TLabelGrid);
   private
     FPresets: TPresetManager;
     procedure PresetToWidget(const A: TStringArray);
@@ -119,7 +125,16 @@ begin
 end;
 
 procedure TFormEditDeformationGrid.BFlipHClick(Sender: TObject);
-var v: integer;
+   procedure SwapRowColumnCount;
+   var v: integer;
+   begin
+     FInitializing := True;
+     v := SE1.Value;
+     SE1.Value :=  SE2.Value;
+     SE2.Value := v;
+     FInitializing := False;
+   end;
+
 begin
   if Sender = BFlipH then begin
     FDeformationGrid.GridFlipH;
@@ -144,12 +159,7 @@ begin
 
   if Sender = BRotate90CW then begin
     FDeformationGrid.GridRotate90CW;
-   // FDeformationGrid.ResetNodePositions;
-    FInitializing := True;
-    v := SE1.Value;
-    SE1.Value :=  SE2.Value;
-    SE2.Value := v;
-    FInitializing := False;
+    SwapRowColumnCount;
     DoCreateNode;
     FModified := True;
   end;
@@ -271,7 +281,7 @@ begin
 
   SetLength(FRowLabel, FDeformationGrid.RowCount+1);
   for i:=0 to High(FRowLabel) do begin
-    FRowLabel[i] := TLabel.Create(Self);
+    FRowLabel[i] := TLabelGrid.Create(Self);
     FRowLabel[i].Name := 'RowLabel'+i.ToString;
     FRowLabel[i].Parent := Panel2;
     FRowLabel[i].Caption := '▶';
@@ -281,13 +291,14 @@ begin
     FRowLabel[i].Hint := 'Set node values on whole row';
     FRowLabel[i].OnMouseDown := @ProcessLabelMouseDown;
     FRowLabel[i].OnMouseUp := @ProcessLabelMouseUp;
-    FRowLabel[i].Tag := 1000+i;
+    FRowLabel[i].Row := i;
+    FRowLabel[i].Col := -1;
     UnselectLabel(FRowLabel[i]);
   end;
 
   SetLength(FColumnLabel, FDeformationGrid.ColumnCount+1);
   for i:=0 to High(FColumnLabel) do begin
-    FColumnLabel[i] := TLabel.Create(Self);
+    FColumnLabel[i] := TLabelGrid.Create(Self);
     FColumnLabel[i].Name := 'ColumnLabel'+i.ToString;
     FColumnLabel[i].Parent := Panel2;
     FColumnLabel[i].Caption := '▼';
@@ -297,7 +308,8 @@ begin
     FColumnLabel[i].Transparent := False;
     FColumnLabel[i].ShowHint := True;
     FColumnLabel[i].Hint := 'Set node values on whole column';
-    FColumnLabel[i].Tag := 2000+i;
+    FColumnLabel[i].Row := -1;
+    FColumnLabel[i].Col := i;
     UnselectLabel(FColumnLabel[i]);
   end;
 
@@ -306,14 +318,15 @@ begin
   co := 0;
   for ro:=0 to High(FRowLabel) do
     for co:=0 to High(FColumnLabel) do begin
-      FNodeLabel[ro, co] := TLabel.Create(Self);
+      FNodeLabel[ro, co] := TLabelGrid.Create(Self);
       FNodeLabel[ro, co].Name := 'NodeLabel'+ro.ToString+'_'+co.ToString;
       FNodeLabel[ro, co].Parent := Panel2;
-      FNodeLabel[ro, co].Caption := '■';
+      FNodeLabel[ro, co].Caption := '⚫';
       FNodeLabel[ro, co].OnMouseDown := @ProcessLabelMouseDown;
       FNodeLabel[ro, co].OnMouseUp := @ProcessLabelMouseUp;
       FNodeLabel[ro, co].Cursor := crHandPoint;
-      FNodeLabel[ro, co].Tag := (ro shl 16) or co;
+      FNodeLabel[ro, co].Row := ro;
+      FNodeLabel[ro, co].Col := co;
       FNodeLabel[ro, co].Transparent := False;
       FNodeLabel[ro, co].ShowHint := True;
       SetNodeLabelHint(ro, co);
@@ -369,57 +382,60 @@ end;
 procedure TFormEditDeformationGrid.ProcessLabelMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-  SelectLabel(Sender as TLabel);
+  SelectLabel(Sender as TLabelGrid);
 end;
 
 procedure TFormEditDeformationGrid.ProcessLabelMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var lab: TLabel;
+var lab: TLabelGrid;
    ro, co: integer;
 begin
-  lab := Sender as TLabel;
+  lab := Sender as TLabelGrid;
   UnselectLabel(lab);
-  if lab.Tag < 1000 then begin
-    // node label
-    ro := lab.Tag shr 16;
-    co := lab.Tag and $FFFF;
-    FDeformationGrid.Grid[ro, co].DeformationAmount := FSE5.Value;
-    FDeformationGrid.Grid[ro, co].TimeMultiplicator := FSE6.Value;
-    SetNodeLabelHint(ro, co);
-    FModified := True;
-  end else if lab.Tag < 2000 then begin
+
+  if lab.Col = -1 then begin
     // row label
-    ro := lab.Tag - 1000;
+    ro := lab.Row;
     for co:=0 to High(FDeformationGrid.Grid[ro]) do begin
       FDeformationGrid.Grid[ro, co].DeformationAmount := FSE5.Value;
       FDeformationGrid.Grid[ro, co].TimeMultiplicator := FSE6.Value;
       SetNodeLabelHint(ro, co);
     end;
     FModified := True;
-  end else begin
+  end else if lab.Row = -1 then begin
     // column label
-    co := lab.Tag - 2000;
+    co := lab.Col;
     for ro:=0 to High(FRowLabel) do begin
       FDeformationGrid.Grid[ro, co].DeformationAmount := FSE5.Value;
       FDeformationGrid.Grid[ro, co].TimeMultiplicator := FSE6.Value;
       SetNodeLabelHint(ro, co);
     end;
     FModified := True;
+  end else begin
+    // node label
+    ro := lab.Row;
+    co := lab.Col;
+    FDeformationGrid.Grid[ro, co].DeformationAmount := FSE5.Value;
+    FDeformationGrid.Grid[ro, co].TimeMultiplicator := FSE6.Value;
+    SetNodeLabelHint(ro, co);
+    FModified := True;
   end;
 end;
 
-procedure TFormEditDeformationGrid.SelectLabel(aLabel: TLabel);
+procedure TFormEditDeformationGrid.SelectLabel(aLabel: TLabelGrid);
 begin
   if aLabel = NIL then exit;
   aLabel.Color := clHighlight;
-  aLabel.Font.Color := clWhite;
+  if (aLabel.Row = -1) or (aLabel.Col = -1) then aLabel.Font.Color := $005B00B7
+    else aLabel.Font.Color := clWhite;
 end;
 
-procedure TFormEditDeformationGrid.UnselectLabel(aLabel: TLabel);
+procedure TFormEditDeformationGrid.UnselectLabel(aLabel: TLabelGrid);
 begin
   if aLabel = NIL then exit;
   aLabel.Color := Panel2.Color;
-  aLabel.Font.Color := clWhite;
+  if (aLabel.Row = -1) or (aLabel.Col = -1) then aLabel.Font.Color := $005B00B7
+    else aLabel.Font.Color := clWhite;
 end;
 
 procedure TFormEditDeformationGrid.PresetToWidget(const A: TStringArray);
