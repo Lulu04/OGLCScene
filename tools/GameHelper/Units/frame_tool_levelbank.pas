@@ -57,7 +57,8 @@ type
 
 implementation
 
-uses u_screen_levelbank, u_project, form_main, u_surface_list, form_showhelp;
+uses u_screen_levelbank, u_project, form_main, u_surface_list, form_showhelp,
+  u_common;
 
 {$R *.lfm}
 
@@ -189,6 +190,7 @@ begin
   for i:=0 to LevelBank.Size-1 do begin
     wi := Default(TWorldInfo);
     wi.LoadFromString(LevelBank.Mutable[i]^.worldinfo);
+    wi.skylayer := wi.skylayer - APP_LAYER_COUNT; // adjust the layer index
     s := 'Data_'+LevelBank.Mutable[i]^.name+'='''+ wi.SaveToString(False)+'|';
     sl := TSurfaceList.Create;
     sl.SetModeForLevelEditor;
