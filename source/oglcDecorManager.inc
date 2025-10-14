@@ -21,6 +21,7 @@ private
   var
   FItems: TDecorItemList;
   FLayerIndex: integer;
+  FDecorBounds: TRectF;
   procedure Add(const aItem: TOGLCDecorItem);
 private
   FWorldArea: TRectF;
@@ -31,11 +32,14 @@ public
   //procedure Draw(const aLayerPercentOpacity: single);  override;
   procedure DoDraw; override;
 public
+  // the bounds of the decors in world coordinates.
+  DecorBounds: TRectF;
   constructor Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
   destructor Destroy; override;
 
   // The target layer index where to render the decor.
   property LayerIndex: integer read FLayerIndex;
+
 end;
 
 
@@ -114,6 +118,12 @@ end;
 procedure TOGLCDecorList.Add(const aItem: TOGLCDecorItem);
 begin
   FItems.PushBack(aItem);
+
+  // update decor bounds
+  DecorBounds.Left := Min(FDecorBounds.Left, aItem.x);
+  DecorBounds.Right := Max(FDecorBounds.Right, aItem.x + aItem.w);
+  DecorBounds.Top := Min(FDecorBounds.Top, aItem.y);
+  DecorBounds.Bottom := Max(FDecorBounds.Bottom, aItem.y + aItem.h);
 end;
 
 function TOGLCDecorList.GetWidth: integer;
@@ -170,6 +180,7 @@ begin
   v := viewRect.Width;
   while viewRect.Left < FWorldArea.Left do viewRect.Left := viewRect.Left + FWorldArea.Width;
   while viewRect.Left > FWorldArea.Right do viewRect.Left := viewRect.Left - FWorldArea.Width;
+  viewRect.Width := v;
 {  v := viewRect.Width;
   viewRect.Left := Frac(viewRect.Left / FWorldArea.Width) * FWorldArea.Width;
   viewRect.Width := v;
@@ -189,10 +200,10 @@ begin
   end;
 
   if itemIndex = -1 then begin
-    itemIndex := 0;  // devrait être l'index du premier element visible (qui n'est pas forcément 0)
+    itemIndex := 0;
    // offsetCoor := PointF(FItems.Mutable[i]^.x-(FWorldArea.Right-viewRect.Left), 0);
     //offsetCoor.x := viewRect.Width;
-    offsetCoor.x := Min(viewRect.Width, FWorldArea.Width);
+    offsetCoor.x := DecorBounds.Width; // Min(viewRect.Width, FWorldArea.Width);
 
     offsetCoor.y := 0;
   end else offsetCoor := PointF(0, 0);
@@ -232,7 +243,7 @@ begin
         itemIndex := 0;
         //offsetCoor.x := offsetCoor.x + viewRect.Width;
         //offsetCoor.x := offsetCoor.x + FWorldArea.Width;
-        offsetCoor.x := offsetCoor.x + Min(viewRect.Width, FWorldArea.Width);
+        offsetCoor.x := offsetCoor.x + DecorBounds.Width; // Min(viewRect.Width, FWorldArea.Width);
 
      //   offsetCoor.y := offsetCoor.y + //viewRect.Height; // FWorldArea.Height;
       end;
@@ -277,6 +288,11 @@ begin
   FItems := TDecorItemList.Create;
 
   FWorldArea := aWorldArea;
+
+  DecorBounds.Left := MaxSingle;
+  DecorBounds.Right := MinSingle;
+  DecorBounds.Top := MaxSingle;
+  DecorBounds.Bottom := MinSingle;
 end;
 
 destructor TOGLCDecorList.Destroy;
@@ -380,7 +396,7 @@ begin
       FSkyGradient.MoveToLayer(skylayer);
       FSkyGradient.SetCoordinate(skyx, skyy);
       FSkyGradient.Gradient.LoadGradientDataFromString(skygradientdata);
-      FSkyGradient.SetSize(skywidth, skyheight);
+      FSkyGradient.SetSize(Round(ScaleWF(skywidth)), Round(ScaleHF(skyheight)));
     end else FSkyGradient := NIL;
   end;
 
