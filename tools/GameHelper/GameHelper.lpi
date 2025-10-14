@@ -128,7 +128,7 @@
         <Filename Value="Units\u_common.pas"/>
         <IsPartOfProject Value="True"/>
         <TopLine Value="10"/>
-        <CursorPos X="29" Y="15"/>
+        <CursorPos X="38" Y="16"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -198,8 +198,8 @@
         <Filename Value="Units\u_surface_list.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="18"/>
-        <TopLine Value="255"/>
-        <CursorPos X="3" Y="240"/>
+        <TopLine Value="1034"/>
+        <CursorPos X="45" Y="1043"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit12>
@@ -613,8 +613,8 @@
         <Filename Value="Units\u_levelbank.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="102"/>
-        <CursorPos X="54" Y="111"/>
+        <TopLine Value="128"/>
+        <CursorPos X="73" Y="133"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
       </Unit56>
@@ -655,8 +655,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="13"/>
-        <TopLine Value="184"/>
-        <CursorPos Y="196"/>
+        <TopLine Value="181"/>
+        <CursorPos X="34" Y="193"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -760,8 +760,8 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="529"/>
-        <CursorPos Y="548"/>
+        <TopLine Value="7"/>
+        <CursorPos X="13" Y="42"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit70>
@@ -780,7 +780,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="94"/>
         <CursorPos X="8" Y="69"/>
-        <UsageCount Value="99"/>
+        <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit72>
       <Unit73>
@@ -791,9 +791,9 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="316"/>
-        <CursorPos X="43" Y="324"/>
-        <UsageCount Value="188"/>
+        <TopLine Value="439"/>
+        <CursorPos X="40" Y="455"/>
+        <UsageCount Value="190"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit73>
@@ -813,7 +813,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="106"/>
         <CursorPos X="25" Y="122"/>
-        <UsageCount Value="149"/>
+        <UsageCount Value="151"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit75>
@@ -826,7 +826,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="532"/>
         <CursorPos X="17" Y="553"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="145"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit76>
@@ -839,7 +839,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="44"/>
         <CursorPos X="40" Y="58"/>
-        <UsageCount Value="61"/>
+        <UsageCount Value="63"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit77>
@@ -861,123 +861,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="405" TopLine="393"/>
+        <Caret Line="79" Column="15" TopLine="63"/>
       </Position1>
       <Position2>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="406" TopLine="393"/>
+        <Caret Line="416" Column="35" TopLine="407"/>
       </Position2>
       <Position3>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="384" TopLine="371"/>
+        <Caret Line="395" Column="37" TopLine="381"/>
       </Position3>
       <Position4>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="407" Column="5" TopLine="395"/>
+        <Caret Line="75" Column="15" TopLine="68"/>
       </Position4>
       <Position5>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="69" Column="20" TopLine="62"/>
+        <Caret Line="315" Column="12" TopLine="306"/>
       </Position5>
       <Position6>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="319" Column="48" TopLine="306"/>
+        <Caret Line="81" Column="15" TopLine="70"/>
       </Position6>
       <Position7>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="73" Column="29" TopLine="60"/>
+        <Caret Line="427" Column="66" TopLine="423"/>
       </Position7>
       <Position8>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="386" Column="20" TopLine="375"/>
+        <Caret Line="387" Column="39" TopLine="374"/>
       </Position8>
       <Position9>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="396" Column="25" TopLine="375"/>
+        <Caret Line="75" Column="15" TopLine="66"/>
       </Position9>
       <Position10>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="288" Column="29" TopLine="276"/>
+        <Filename Value="Units\frame_tool_levelbank.pas"/>
+        <Caret Line="192" Column="60" TopLine="184"/>
       </Position10>
       <Position11>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="386" Column="20" TopLine="374"/>
+        <Filename Value="Units\u_levelbank.pas"/>
+        <Caret Line="29" Column="12" TopLine="17"/>
       </Position11>
       <Position12>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="396" Column="25" TopLine="375"/>
+        <Filename Value="Units\u_levelbank.pas"/>
+        <Caret Line="105" Column="3" TopLine="102"/>
       </Position12>
       <Position13>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="15" Column="7" TopLine="2"/>
+        <Filename Value="Units\frame_tool_levelbank.pas"/>
+        <Caret Line="191" Column="16" TopLine="184"/>
       </Position13>
       <Position14>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="16" Column="5" TopLine="2"/>
+        <Filename Value="Units\u_levelbank.pas"/>
+        <Caret Line="30" Column="13" TopLine="18"/>
       </Position14>
       <Position15>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="14" Column="13" TopLine="62"/>
+        <Filename Value="Units\u_surface_list.pas"/>
+        <Caret Line="253" Column="33" TopLine="243"/>
       </Position15>
       <Position16>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="284" Column="8" TopLine="273"/>
+        <Filename Value="Units\u_surface_list.pas"/>
+        <Caret Line="108" Column="20" TopLine="91"/>
       </Position16>
       <Position17>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="72" Column="21" TopLine="57"/>
+        <Filename Value="Units\u_surface_list.pas"/>
+        <Caret Line="916" Column="12" TopLine="900"/>
       </Position17>
       <Position18>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="238" Column="13" TopLine="222"/>
+        <Filename Value="Units\u_surface_list.pas"/>
+        <Caret Line="111" Column="12" TopLine="96"/>
       </Position18>
       <Position19>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="75" Column="15" TopLine="63"/>
+        <Filename Value="Units\frame_tool_levelbank.pas"/>
+        <Caret Line="192" Column="76" TopLine="184"/>
       </Position19>
       <Position20>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="294" Column="27" TopLine="283"/>
+        <Caret Line="318" Column="24" TopLine="316"/>
       </Position20>
       <Position21>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="79" Column="15" TopLine="63"/>
+        <Caret Line="75" Column="15" TopLine="63"/>
       </Position21>
       <Position22>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="416" Column="35" TopLine="407"/>
+        <Caret Line="173" Column="41" TopLine="167"/>
       </Position22>
       <Position23>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="397" Column="13" TopLine="403"/>
+        <Caret Line="174" Column="18" TopLine="160"/>
       </Position23>
       <Position24>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="395" Column="37" TopLine="381"/>
+        <Caret Line="58" Column="20" TopLine="46"/>
       </Position24>
       <Position25>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="75" Column="15" TopLine="68"/>
+        <Caret Line="174" Column="10" TopLine="168"/>
       </Position25>
       <Position26>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="315" Column="12" TopLine="306"/>
+        <Caret Line="82" Column="15" TopLine="71"/>
       </Position26>
       <Position27>
-        <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="81" Column="15" TopLine="70"/>
+        <Filename Value="..\..\source\oglcDeformationGrid.inc"/>
+        <Caret Line="534" Column="40" TopLine="529"/>
       </Position27>
       <Position28>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="427" Column="66" TopLine="423"/>
+        <Caret Line="461" Column="19" TopLine="437"/>
       </Position28>
       <Position29>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="387" Column="39" TopLine="374"/>
+        <Caret Line="452" Column="11" TopLine="439"/>
       </Position29>
       <Position30>
         <Filename Value="Units\form_editdeformationgrid.pas"/>
-        <Caret Line="75" Column="15" TopLine="66"/>
+        <Caret Line="93" Column="62" TopLine="79"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
