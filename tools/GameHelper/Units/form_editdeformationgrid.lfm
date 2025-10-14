@@ -437,7 +437,7 @@ object FormEditDeformationGrid: TFormEditDeformationGrid
       Cursor = crHandPoint
       Left = 83
       Height = 26
-      Hint = 'rotate the selection 90° CCW'#13#10'Note: after, nodes are aligned'
+      Hint = 'rotate the grid 90° CCW'
       Top = 162
       Width = 26
       BorderSpacing.Left = 15
@@ -458,7 +458,7 @@ object FormEditDeformationGrid: TFormEditDeformationGrid
       Cursor = crHandPoint
       Left = 114
       Height = 26
-      Hint = 'rotate the selection 90° CW'#13#10'Note: after, nodes are aligned'
+      Hint = 'rotate the grid 90° CW'
       Top = 162
       Width = 26
       BorderSpacing.Left = 5

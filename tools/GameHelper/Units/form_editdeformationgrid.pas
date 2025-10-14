@@ -79,6 +79,7 @@ type
     procedure ProcessLabelMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure SelectLabel(aLabel: TLabelGrid);
     procedure UnselectLabel(aLabel: TLabelGrid);
+    procedure DoSetGridSize;
   private
     FPresets: TPresetManager;
     procedure PresetToWidget(const A: TStringArray);
@@ -89,7 +90,7 @@ type
   end;
 
 implementation
-uses BGRABitmap, BGRABitmapTypes, form_main, u_app_pref;
+uses BGRABitmap, BGRABitmapTypes, form_main, u_app_pref, Math;
 
 {$R *.lfm}
 
@@ -170,7 +171,7 @@ begin
   if FInitializing then exit;
 
   if (Sender = SE1) or (Sender = SE2) then begin
-    FDeformationGrid.SetGrid(SE1.Value, SE2.Value);
+    DoSetGridSize;
     CreateObjects;
     FModified := True;
   end;
@@ -436,6 +437,28 @@ begin
   aLabel.Color := Panel2.Color;
   if (aLabel.Row = -1) or (aLabel.Col = -1) then aLabel.Font.Color := $005B00B7
     else aLabel.Font.Color := clWhite;
+end;
+
+procedure TFormEditDeformationGrid.DoSetGridSize;
+var grid: ArrayOfArrayOfDeformedPoint;
+   ix, iy, len1, len2: integer;
+begin
+  // save grid values
+  grid := Copy(FDeformationGrid.Grid);
+
+  FDeformationGrid.SetGrid(SE1.Value, SE2.Value);
+
+  // rewrite saved values because they are reseted
+  len1 := Min(Length(grid), Length(FDeformationGrid.Grid)) - 1;
+  len2 := Min(Length(grid[0]), Length(FDeformationGrid.Grid[0])) - 1;
+
+  for iy:=0 to len1 do
+    for ix:=0 to len2 do begin
+      FDeformationGrid.Grid[iy][ix].DeformationAmount := grid[iy][ix].DeformationAmount;
+      FDeformationGrid.Grid[iy][ix].TimeMultiplicator := grid[iy][ix].TimeMultiplicator;
+      FDeformationGrid.Grid[iy][ix].x := grid[iy][ix].x;
+      FDeformationGrid.Grid[iy][ix].y := grid[iy][ix].y;
+    end;
 end;
 
 procedure TFormEditDeformationGrid.PresetToWidget(const A: TStringArray);
