@@ -12,16 +12,19 @@ TOGLCDecorItem = record
   function LoadFromString(aAtlas: TAtlas; const s: string): integer;
 end;
 
-{ TOGLCDecorList }
+TOGLCDecorLoopMode = (dlmNone,               // decor is displayed only once
+                      dlmRepeatOnDecorSize,  // decor is repeated when its end is reached
+                      dlmRepeatOnWorldSize); // decor is repeated only when the end of the world is reached (preserve space at end)
 
-TOGLCDecorList = class(TSimpleSurfaceWithEffect)
+{ TOGLCDecorContainer }
+
+TOGLCDecorContainer = class(TSimpleSurfaceWithEffect)
 private
  type
   TDecorItemList = class(specialize TVector<TOGLCDecorItem>);
   var
   FItems: TDecorItemList;
   FLayerIndex: integer;
-  FDecorBounds: TRectF;
   procedure Add(const aItem: TOGLCDecorItem);
 private
   FWorldArea: TRectF;
@@ -34,6 +37,9 @@ public
 public
   // the bounds of the decors in world coordinates.
   DecorBounds: TRectF;
+  // The loop mode when the decor is rendered
+  LoopMode: TOGLCDecorLoopMode;
+
   constructor Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
   destructor Destroy; override;
 
@@ -46,14 +52,16 @@ end;
 { TOGLCDecorManager }
 
 TOGLCDecorManager = class
-private type TDecors = class(specialize TVector<TOGLCDecorList>);
+private type TDecors = class(specialize TVector<TOGLCDecorContainer>);
 private class var FAtlas: TAtlas;
 private
   FParentScene: TOGLCScene;
   FDecors: TDecors;
   FWorldArea: TRectF;
   FSkyGradient: TGradientRectangle;
-  function GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorList;
+  function GetDecor(index: integer): TOGLCDecorContainer;
+  function GetDecorCount: integer;
+  function GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorContainer;
   procedure Clear;
 protected
   function ScaleWF(AValue: single): single; virtual; abstract;
@@ -65,11 +73,17 @@ public
 
   procedure DoBuildLevel(const s: string);
 
+  // return the indexes of the layers used by the decors
+  function GetUsedLayerIndexes: TArrayOfInteger;
+
   // The coordinates and size of the world for the current level
   property WorldArea: TRectF read FWorldArea;
   // The gradient instance to render the sky.
   // If the level don't define a gradient for the sky, this property is NIL
   property SkyGradient: TGradientRectangle read FSkyGradient;
+
+  property DecorCount: integer read GetDecorCount;
+  property Decors[index:integer]: TOGLCDecorContainer read GetDecor;
 end;
 
 {$endif oglcINTERFACE}
@@ -113,30 +127,30 @@ begin
   frameindex := Trunc(v);
 end;
 
-{ TOGLCDecorList }
+{ TOGLCDecorContainer }
 
-procedure TOGLCDecorList.Add(const aItem: TOGLCDecorItem);
+procedure TOGLCDecorContainer.Add(const aItem: TOGLCDecorItem);
 begin
   FItems.PushBack(aItem);
 
   // update decor bounds
-  DecorBounds.Left := Min(FDecorBounds.Left, aItem.x);
-  DecorBounds.Right := Max(FDecorBounds.Right, aItem.x + aItem.w);
-  DecorBounds.Top := Min(FDecorBounds.Top, aItem.y);
-  DecorBounds.Bottom := Max(FDecorBounds.Bottom, aItem.y + aItem.h);
+  DecorBounds.Left := Min(DecorBounds.Left, aItem.x);
+  DecorBounds.Right := Max(DecorBounds.Right, aItem.x + aItem.w);
+  DecorBounds.Top := Min(DecorBounds.Top, aItem.y);
+  DecorBounds.Bottom := Max(DecorBounds.Bottom, aItem.y + aItem.h);
 end;
 
-function TOGLCDecorList.GetWidth: integer;
+function TOGLCDecorContainer.GetWidth: integer;
 begin
   Result := 1;
 end;
 
-function TOGLCDecorList.GetHeight: integer;
+function TOGLCDecorContainer.GetHeight: integer;
 begin
   Result := 1;
 end;
 
-{procedure TOGLCDecorList.Draw(const aLayerPercentOpacity: single);
+{procedure TOGLCDecorContainer.Draw(const aLayerPercentOpacity: single);
 begin
   FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
   if (FComputedOpacity = 0) and FChildsUseParentOpacity then exit;
@@ -162,25 +176,65 @@ begin
   PopSceneMV;
 end;  }
 
-procedure TOGLCDecorList.DoDraw;
-var i: SizeUInt;
-  modelArea: TQuadF;
-  fi: integer;
+procedure TOGLCDecorContainer.DoDraw;
+var fi, j: integer;
   viewRect: TRectF;
-  oldMatrix: TOGLCMatrix;
-  newComputedOpacity, v: single;
+  v: single;
   offsetCoor: TPointF;
-  itemIndex: integer;
+  procedure RenderItems;
+  var previousMatrix: TOGLCMatrix;
+    newComputedOpacity: single;
+    modelArea: TQuadF;
+    i: SizeUInt;
+  begin
+    for i:=0 to FItems.Size-1 do
+      with FItems.Mutable[i]^ do begin
+        newComputedOpacity := FComputedOpacity * opacity;
+        if newComputedOpacity = 0 then continue;
+
+        modelArea.SetAsRectangle(x+offsetCoor.x, y+offsetCoor.y, w, h);
+        if not modelArea.isVisibleIn(viewRect) then continue;
+
+        //modelArea.SetAsRectangle(0, 0, w, h);
+        // save and prepare matrix
+        previousMatrix.CopyFrom(FParentScene.ModelViewMatrix);
+        FParentScene.ModelViewMatrix.AddTransform(0, 0{x+offsetCoor.x, y+offsetCoor.y}, 1.0, 1.0,
+                         angle, w*pivotX, h*pivotY);
+        // frame index
+        fi := EnsureRange(frameindex, 0, High(texture^.FramesCoord));
+        // render the quad
+       with FParentScene.NoFilterTexturedMVTriangleRenderer do begin
+         Prepare(ptTriangleStrip, texture, 0, BlendMode);
+         PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex, NIL, newComputedOpacity, computedtint);
+       end;
+       { with FParentScene.TexturedMVTriangleRenderer do begin
+          Prepare(ptTriangleStrip, texture, 0, BlendMode);
+          PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex, NIL, newComputedOpacity, computedtint);
+        end; }
+
+        // restore matrix
+        FParentScene.ModelViewMatrix.CopyFrom(previousMatrix);
+      end;// for
+  end;
+
 begin
   if FItems.Size = 0 then exit;
-  //retrieve the view offset and size
+  //retrieve the current view bounds
   viewRect := ParentLayer.GetViewRect;
+  offsetCoor := PointF(0, 0);
 
   // adjust the view rect to the world bounds (loop the view)
   v := viewRect.Width;
-  while viewRect.Left < FWorldArea.Left do viewRect.Left := viewRect.Left + FWorldArea.Width;
-  while viewRect.Left > FWorldArea.Right do viewRect.Left := viewRect.Left - FWorldArea.Width;
+  while viewRect.Left < FWorldArea.Left - FWorldArea.Width do begin
+   viewRect.Left := viewRect.Left + FWorldArea.Width;
+   //offsetCoor.x := offsetCoor.x + FWorldArea.Width;
+  end;
+  while viewRect.Left > FWorldArea.Right do begin
+   viewRect.Left := viewRect.Left - FWorldArea.Width;
+   //offsetCoor.x := offsetCoor.x - FWorldArea.Width;
+  end;
   viewRect.Width := v;
+
 {  v := viewRect.Width;
   viewRect.Left := Frac(viewRect.Left / FWorldArea.Width) * FWorldArea.Width;
   viewRect.Width := v;
@@ -188,96 +242,26 @@ begin
   viewRect.Top := Frac(viewRect.Top / FWorldArea.Height) * FWorldArea.Height;
   viewRect.Height := v;   }
 
-  // retrieve the first item visible
-  itemIndex := -1;
-  for i:=0 to FItems.Size-1 do begin
-    with FItems.Mutable[i]^ do
-      {%H-}modelArea.SetAsRectangle(x, y, w, h);
-      if modelArea.isVisibleIn(viewRect) then begin
-        itemIndex := i;
-        break;
+    case LoopMode of
+      dlmNone: begin
+       RenderItems;
+       exit;
       end;
-  end;
-
-  if itemIndex = -1 then begin
-    itemIndex := 0;
-   // offsetCoor := PointF(FItems.Mutable[i]^.x-(FWorldArea.Right-viewRect.Left), 0);
-    //offsetCoor.x := viewRect.Width;
-    offsetCoor.x := DecorBounds.Width; // Min(viewRect.Width, FWorldArea.Width);
-
-    offsetCoor.y := 0;
-  end else offsetCoor := PointF(0, 0);
-
-  while (itemIndex < FItems.Size) and
-        (FItems.Mutable[itemIndex]^.x+offsetCoor.x - viewRect.Left < viewRect.Width)
-        {(FItems.Mutable[itemIndex]^.y+offsetCoor.y - viewRect.Top < viewRect.Height)}  do begin
-
-    // render the item
-    with FItems.Mutable[itemIndex]^ do begin
-      newComputedOpacity := FComputedOpacity * opacity;
-      if newComputedOpacity = 0 then continue;
-
-      modelArea.SetAsRectangle(0, 0, w, h);
-
-      // save and prepare matrix
-      oldMatrix.CopyFrom(FParentScene.ModelViewMatrix);
-      FParentScene.ModelViewMatrix.AddTransform(x+offsetCoor.x, y+offsetCoor.y, 1.0, 1.0,
-                         angle, w*pivotX, h*pivotY);
-      // frame index
-      fi := EnsureRange(frameindex, 0, High(texture^.FramesCoord));
-      // render the quad
-    {  FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
-      FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
-                                                     NIL, newComputedOpacity, computedtint);  }
-      with FParentScene.TexturedMVTriangleRenderer do begin
-        Prepare(ptTriangleStrip, texture, 0, BlendMode);
-        PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex, NIL, newComputedOpacity, computedtint);
+      dlmRepeatOnDecorSize: begin
+        RenderItems;
+        offsetCoor.x := offsetCoor.x + DecorBounds.Right{Width};
       end;
-
-      // restore matrix
-      FParentScene.ModelViewMatrix.CopyFrom(oldMatrix);
-    end;
-
-    if itemIndex < FItems.Size-1 then inc(itemIndex)
-      else begin
-        itemIndex := 0;
-        //offsetCoor.x := offsetCoor.x + viewRect.Width;
-        //offsetCoor.x := offsetCoor.x + FWorldArea.Width;
-        offsetCoor.x := offsetCoor.x + DecorBounds.Width; // Min(viewRect.Width, FWorldArea.Width);
-
-     //   offsetCoor.y := offsetCoor.y + //viewRect.Height; // FWorldArea.Height;
+      dlmRepeatOnWorldSize: begin
+        RenderItems;
+        offsetCoor.x := offsetCoor.x + FWorldArea.Width;
+        RenderItems;
       end;
-  end;
+    end;// case
 
 
-
-{  for i:=0 to FItems.Size-1 do begin
-    with FItems.Mutable[i]^ do begin
-       newComputedOpacity := FComputedOpacity * opacity;
-      if newComputedOpacity = 0 then continue;
-
-      {%H-}modelArea.SetAsRectangle(x, y, w, h);
-      if not modelArea.isVisibleIn(viewRect) then continue;
-
-      // save and prepare matrix
-      oldMatrix.CopyFrom(FParentScene.ModelViewMatrix);
-      FParentScene.ModelViewMatrix.AddTransform(x, y, 1.0, 1.0,
-                           angle, w*pivotX, h*pivotY);
-      // frame index
-      fi := EnsureRange(frameindex, 0, High(texture^.FramesCoord));
-      // render the quad
-      FParentScene.NoFilterTexturedMVTriangleRenderer.Prepare(ptTriangleStrip, texture, 0, BlendMode);
-      FParentScene.NoFilterTexturedMVTriangleRenderer.PushQuad2(modelArea, texture^.FramesCoord[fi], flipIndex,
-                                                        NIL, newComputedOpacity, computedtint);
-      // restore matrix
-      FParentScene.ModelViewMatrix.CopyFrom(oldMatrix);
-      while FOffsetValue.y >= FWorldArea.Bottom do
-        FOffsetValue.y := FOffsetValue.y - FWorldArea.Bottom;
-    end;
-  end;     }
 end;
 
-constructor TOGLCDecorList.Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
+constructor TOGLCDecorContainer.Create(aParentScene: TOGLCScene; aLayerIndex: integer; const aWorldArea: TRectF);
 begin
   inherited Create;
   FParentScene := aParentScene;
@@ -293,9 +277,11 @@ begin
   DecorBounds.Right := MinSingle;
   DecorBounds.Top := MaxSingle;
   DecorBounds.Bottom := MinSingle;
+
+  LoopMode := dlmNone;
 end;
 
-destructor TOGLCDecorList.Destroy;
+destructor TOGLCDecorContainer.Destroy;
 begin
   FItems.Clear;
   FItems.Free;
@@ -305,11 +291,11 @@ end;
 
 { TOGLCDecorManager }
 
-function TOGLCDecorManager.GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorList;
+function TOGLCDecorManager.GetDecorWithLayerIndexOf(aLayerIndex: integer): TOGLCDecorContainer;
 var i: SizeUInt;
-  o: TOGLCDecorList;
+  o: TOGLCDecorContainer;
 begin
-  // search if there is a TOGLCDecorList assigned to the layer
+  // search if there is a TOGLCDecorContainer assigned to the layer
   if FDecors.Size > 0 then
     for i:=0 to FDecors.Size-1 do
       if FDecors.Mutable[i]^.LayerIndex = aLayerIndex then begin
@@ -318,9 +304,19 @@ begin
       end;
 
   // not found -> create a new instance for the layer
-  o := TOGLCDecorList.Create(FParentScene, aLayerIndex, WorldArea);
+  o := TOGLCDecorContainer.Create(FParentScene, aLayerIndex, WorldArea);
   FDecors.PushBack(o);
   Result := FDecors.Mutable[FDecors.Size-1]^;
+end;
+
+function TOGLCDecorManager.GetDecor(index: integer): TOGLCDecorContainer;
+begin
+  Result := FDecors.Mutable[index]^;
+end;
+
+function TOGLCDecorManager.GetDecorCount: integer;
+begin
+  Result := FDecors.Size;
 end;
 
 class procedure TOGLCDecorManager.LoadTexture(aAtlas: TAtlas);
@@ -362,6 +358,7 @@ var prop: TProperties;
   c, i, layerIndex: integer;
   data: string;
   o: TOGLCDecorItem;
+  A: TStringArray;
 begin
   Clear;
   prop.Split(s, '|');
@@ -400,9 +397,13 @@ begin
     end else FSkyGradient := NIL;
   end;
 
+  // layer loop mode
+  prop.StringValueOf('LayerLoopMode', data, '');
+  if data = '' then A := NIL
+    else A := data.Split([' ']);
 
   c := 0;
-  prop.IntegerValueOf('Count', c, 0);
+  prop.IntegerValueOf('SurfaceCount', c, 0);
   if c = 0 then exit;
 
   for i:=0 to c-1 do begin
@@ -414,9 +415,23 @@ begin
       o.y := ScaleHF(o.y);
       o.w := ScaleWF(o.w);
       o.h := ScaleHF(o.h);
-      GetDecorWithLayerIndexOf(layerIndex).Add(o);
+      with GetDecorWithLayerIndexOf(layerIndex) do begin
+        Add(o);
+        // loop mode
+        if layerIndex < Length(A) then
+          LoopMode := TOGLCDecorLoopMode(A[layerIndex].ToInteger);
+      end;
     end;
   end;
+end;
+
+function TOGLCDecorManager.GetUsedLayerIndexes: TArrayOfInteger;
+var i: integer;
+begin
+  Result := NIL;
+  SetLength(Result, DecorCount);
+  for i:=0 to DecorCount-1 do
+    Result[i] := Decors[i].LayerIndex;
 end;
 
 {$endif oglcIMPLEMENTATION}
