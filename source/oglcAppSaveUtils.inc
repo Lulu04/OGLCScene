@@ -286,6 +286,7 @@ begin
     exit;
   end;
   Split(t.Strings[k+1], aSeparator);
+  Result := True;
 end;
 
 function TProperties.Split(const s: string; aSeparator: Char): integer;
