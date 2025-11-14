@@ -2,7 +2,7 @@ In the Data folder, put all files relative to your project. Organize it as you w
 
 .
 .Data
-  .Sprites
+  .Textures
   .Particles
   .Maps
   .UI
