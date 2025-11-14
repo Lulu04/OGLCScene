@@ -749,8 +749,8 @@ begin
      w := Trunc(h*FAspectRatio);
     end;
   end;
-   xx := (p.ClientWidth-w) div 2;
-   yy := (p.ClientHeight-h) div 2;
+  xx := (p.ClientWidth-w) div 2;
+  yy := (p.ClientHeight-h) div 2;
   FOGLC.SetBounds(xx, yy, w, h);
 end;
 
