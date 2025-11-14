@@ -72,6 +72,9 @@ function GetDirectoryContent(const aDirectoryPath: string;
 // Le répertoire 'Cible' doit être existant.
 procedure CopieRepertoire (const aSrc , aDest : string ; aCopierLesSousRepertoires , aEcraserLesFichiersExistants : boolean ) ;
 
+// copy the content of aSrcDirectory in aDstDirectory. Both directory must exists.
+procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string);
+
 // remplit un TREE VIEW avec le contenu d'un répertoire
 // aFiltre est un tableau contenant tous les filtres des fichiers qu'on veut garder. ex : ['.exe','.txt']. [] pour tous les fichiers
 // pour avoir tous les fichiers, mettre aFiltre = []
@@ -312,6 +315,29 @@ begin
            end;
    end;
  t.Free ;
+end;
+
+procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string);
+var t: TStringList;
+  i: integer;
+  src, dst: string;
+begin
+  if not RepertoireExistant(aSrcDirectory) then exit;
+  if not RepertoireExistant(aDstDirectory) then exit;
+
+  src := IncludeTrailingPathDelimiter(aSrcDirectory);
+  t := GetDirectoryContent(src, NIL, True, MaxInt);
+  dst := IncludeTrailingPathDelimiter(aDstDirectory);
+
+  try
+    for i:=0 to t.Count-1 do
+      if IsFolder(src+t.Strings[i]) then CreerRepertoire(aDstDirectory+t.Strings[i])
+      else
+      if IsFile(src+t.Strings[i]) then
+        CopieFichier(src+t.Strings[i], dst+t.Strings[i], True);
+  finally
+    t.Free;
+  end;
 end;
 
 procedure RemplitTTreeViewAvecUnRepertoire(const aRepertoire: string;
