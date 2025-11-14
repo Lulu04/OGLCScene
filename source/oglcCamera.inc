@@ -88,6 +88,9 @@ public
   // Use this property to initialize the bounds of the camera.
   // Default value is the bounds of the parent scene
   Bounds: TRectF;
+  // Use this method to initialize Bounds property from a world size.
+  // The bounds are computed as (world rect) minus (half size of parent scene).
+  procedure ComputeBoundsFromWorldArea(const aWorldArea: TRectF);
 
   // Ask the camera to follow a surface.
   // if aMoveImmediately is True the camera moves immediately to the target and continue to follow it.
@@ -384,6 +387,14 @@ begin
     Result.x := EnsureRange(aPt.x, Bounds.Left, Bounds.Right);
     Result.y := EnsureRange(aPt.y, Bounds.Top, Bounds.Bottom);
   end;
+end;
+
+procedure TOGLCCameraAutoFollow.ComputeBoundsFromWorldArea(const aWorldArea: TRectF);
+begin
+  Bounds.Left := aWorldArea.Left + FParentScene.Width*0.5;
+  Bounds.Top := aWorldArea.Top + FParentScene.Height*0.5;
+  Bounds.Right := aWorldArea.Right - FParentScene.Width*0.5;
+  Bounds.Bottom := aWorldArea.Bottom - FParentScene.Height*0.5;
 end;
 
 procedure TOGLCCameraAutoFollow.SetTargetSurface(aSurface: TSimpleSurfaceWithEffect; aMoveImmediately: boolean);
