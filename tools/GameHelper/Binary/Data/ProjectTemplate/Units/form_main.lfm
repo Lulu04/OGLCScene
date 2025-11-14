@@ -1,0 +1,25 @@
+object FormMain: TFormMain
+  Left = 359
+  Height = 240
+  Top = 196
+  Width = 320
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsSingle
+  Caption = 'FormMain'
+  ClientHeight = 240
+  ClientWidth = 320
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  OnUTF8KeyPress = FormUTF8KeyPress
+  Position = poWorkAreaCenter
+  LCLVersion = '3.8.0.0'
+  WindowState = wsMaximized
+  object OpenGLControl1: TOpenGLControl
+    Left = 16
+    Height = 188
+    Top = 16
+    Width = 256
+  end
+end

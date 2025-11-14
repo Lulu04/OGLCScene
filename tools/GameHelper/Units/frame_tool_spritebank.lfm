@@ -290,9 +290,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Left = 6
       Height = 19
       Top = 83
-      Width = 255
+      Width = 251
       BorderSpacing.Left = 5
-      Caption = 'Generate code for override ProcessMessage()'
+      Caption = 'Generate code to override ProcessMessage()'
       Checked = True
       State = cbChecked
       TabOrder = 2

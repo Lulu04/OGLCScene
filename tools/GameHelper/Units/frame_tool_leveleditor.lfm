@@ -1287,6 +1287,27 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           ShowHint = True
           ParentShowHint = False
         end
+        object Label36: TLabel
+          AnchorSideLeft.Control = Panel12
+          AnchorSideBottom.Control = Panel12
+          Left = 3
+          Height = 15
+          Top = 14
+          Width = 61
+          Anchors = [akLeft, akBottom]
+          BorderSpacing.Left = 3
+          Caption = 'Layer name'
+        end
+        object Label37: TLabel
+          AnchorSideBottom.Control = Label36
+          AnchorSideBottom.Side = asrBottom
+          Left = 200
+          Height = 30
+          Top = -1
+          Width = 36
+          Anchors = [akLeft, akBottom]
+          Caption = 'Repeat'#13#10'mode'
+        end
       end
     end
     object PageWorld: TTabSheet
@@ -1416,14 +1437,14 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Control = Panel9
             AnchorSideRight.Control = Panel9
             AnchorSideRight.Side = asrBottom
-            Left = 140
+            Left = 207
             Height = 15
             Top = 3
-            Width = 144
+            Width = 77
             Anchors = [akTop, akRight]
             BorderSpacing.Top = 2
             BorderSpacing.Right = 3
-            Caption = 'World coordinate and size'
+            Caption = 'World bounds'
             Font.Color = clWhite
             Font.Style = [fsBold]
             ParentFont = False
@@ -1887,5 +1908,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Width = 37
     Anchors = [akRight, akBottom]
     TabOrder = 3
+  end
+  object SaveDialog1: TSaveDialog
+    Filter = 'Pascal unit|*.pas|All files|*.*'
+    Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
+    Left = 248
+    Top = 608
   end
 end

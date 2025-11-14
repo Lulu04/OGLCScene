@@ -2,6 +2,7 @@ unit u_layerlist;
 
 {$mode ObjFPC}{$H+}
 {$modeswitch AdvancedRecords}
+{$modeswitch TypeHelpers}
 
 interface
 
@@ -22,8 +23,10 @@ private
   FNames: TStringArray;
   function GetCount: integer;
   function GetName(index: integer): string;
+  function GetUserCount: integer;
   procedure SetName(index: integer; AValue: string);
   function FormatName(const aName: string): string;
+  procedure UpdateSceneLayerCount;
 public
   procedure InitDefault;
   procedure AddDefaultLayersForUser;
@@ -33,7 +36,7 @@ public
 
   procedure InitWith(A: TStringArray);
   procedure Add(aName: string);
-  procedure Delete(aUserIndex: integer);
+  procedure Delete(aLayerUserIndex: integer);
 
   function UserIndexCanBeDecremented(aLayerUserIndex: integer): boolean;
   function UserIndexCanBeIncremented(aLayerUserIndex: integer): boolean;
@@ -44,17 +47,34 @@ public
 
   function SaveToString: string;
   procedure LoadFromString(const s: string);
+
   procedure FillComboBox(aCB: TComboBox);
   procedure FillListBox(aLB: TListBox);
 
   // index is 0 based (user index)
   property Names[index:integer]: string read GetName write SetName;
-  // return the number of user layer.
+  // return the number of layer for the user
+  property UserCount: integer read GetUserCount;
+  // return the number of layer (app + user)
   property Count: integer read GetCount;
 end;
 
 var
   Layers: TLayerList;
+
+
+type
+
+TArrayOfDecorLoopMode = array of TOGLCDecorLoopMode;
+PArrayOfDecorLoopMode = ^TArrayOfDecorLoopMode;
+
+{ TArrayOfDecorLoopModeHelper }
+
+TArrayOfDecorLoopModeHelper = type helper for TArrayOfDecorLoopMode
+  procedure InitDefaultFromLayersCount;
+  function SaveToString: string;
+  procedure LoadFromString(const s: string);
+end;
 
 implementation
 
@@ -72,6 +92,11 @@ begin
   Result := FNames[index+APP_LAYER_COUNT];
 end;
 
+function TLayerList.GetUserCount: integer;
+begin
+  Result := Length(FNames) - APP_LAYER_COUNT;
+end;
+
 procedure TLayerList.SetName(index: integer; AValue: string);
 begin
   FNames[index+APP_LAYER_COUNT] := FormatName(AValue);
@@ -82,6 +107,11 @@ begin
   Result := aName.Replace(' ', '_', [rfReplaceAll]);
 end;
 
+procedure TLayerList.UpdateSceneLayerCount;
+begin
+  FScene.LayerCount := Length(FNames);
+end;
+
 procedure TLayerList.InitDefault;
 var i: integer;
 begin
@@ -89,6 +119,7 @@ begin
   SetLength(FNames, APP_LAYER_COUNT);
   for i:=0 to APP_LAYER_COUNT-1 do
     FNames[i] := 'RESERVED_FOR_GAMEHELPER_'+i.ToString;
+  UpdateSceneLayerCount;
 end;
 
 procedure TLayerList.AddDefaultLayersForUser;
@@ -102,12 +133,13 @@ begin
   Add('LAYER_BG1');
   Add('LAYER_BG2');
   Add('LAYER_BG3');
+  UpdateSceneLayerCount;
 end;
 
 procedure TLayerList.MakeUserLayersVisible(aValue: boolean);
 var i: integer;
 begin
-  for i:= APP_LAYER_COUNT to High(FNames) do
+  for i:=APP_LAYER_COUNT to High(FNames) do
     FScene.Layer[i].Visible := aValue;
 end;
 
@@ -130,31 +162,31 @@ begin
   SetLength(FNames, Length(FNames)+Length(A));
   for i:=0 to High(A) do
     FNames[k+i] := A[i];
+  UpdateSceneLayerCount;
 end;
 
 procedure TLayerList.Add(aName: string);
 begin
   SetLength(FNames, Length(FNames)+1);
   FNames[High(FNames)] := FormatName(aName);
-
-  FScene.LayerCount := FScene.LayerCount + 1;
+  UpdateSceneLayerCount;
 end;
 
-procedure TLayerList.Delete(aUserIndex: integer);
+procedure TLayerList.Delete(aLayerUserIndex: integer);
 var i, j: integer;
 begin
-  aUserIndex := aUserIndex + APP_LAYER_COUNT;
+  aLayerUserIndex := aLayerUserIndex + APP_LAYER_COUNT;
   // we don't erase the reserved layer
-  if aUserIndex < APP_LAYER_COUNT then exit;
+  if aLayerUserIndex < APP_LAYER_COUNT then exit;
 
   // shift the surfaces on their previous layer
-  FScene.Layer[aUserIndex].Clear;
-  for i:=aUserIndex+1 to High(FNames) do
+  FScene.Layer[aLayerUserIndex].Clear;
+  for i:=aLayerUserIndex+1 to High(FNames) do
     for j:=0 to FScene.Layer[i].SurfaceCount-1 do
       FScene.Layer[i].Surface[j].MoveToLayer(i-1);
 
   SetLength(FNames, Length(FNames)-1);
-  FScene.LayerCount := FScene.LayerCount - 1;
+  UpdateSceneLayerCount;
 end;
 
 function TLayerList.UserIndexCanBeDecremented(aLayerUserIndex: integer): boolean;
@@ -222,6 +254,40 @@ begin
   aLB.Clear;
   for i:=APP_LAYER_COUNT to High(FNames) do
     aLB.Items.Add(FNames[i]);
+end;
+
+{ TArrayOfDecorLoopModeHelper }
+
+procedure TArrayOfDecorLoopModeHelper.InitDefaultFromLayersCount;
+var i: integer;
+begin
+  Self := NIL;
+  SetLength(Self, Layers.UserCount);
+  for i:=0 to High(Self) do
+    Self[i] := dlmNone;
+end;
+
+function TArrayOfDecorLoopModeHelper.SaveToString: string;
+var i: integer;
+begin
+  Result := '';
+  for i:=0 to High(Self) do begin
+    Result := Result + Ord(Self[i]).ToString;
+    if i < High(Self) then Result := Result + ' ';
+  end;
+end;
+
+procedure TArrayOfDecorLoopModeHelper.LoadFromString(const s: string);
+var i: integer;
+  A: TStringArray;
+begin
+  Self := NIL;
+  if s = '' then exit;
+
+  A := s.Split([' ']);
+  SetLength(Self, Length(A));
+  for i:=0 to High(A) do
+    Self[i] := TOGLCDecorLoopMode(A[i].ToInteger);
 end;
 
 end.

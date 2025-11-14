@@ -30,7 +30,7 @@ object FrameViewLayerList: TFrameViewLayerList
       Top = 0
       Width = 292
       Align = alClient
-      Color = 8026746
+      Color = 6118749
       ItemHeight = 0
       Style = lbOwnerDrawFixed
       TabOrder = 0
@@ -41,6 +41,23 @@ object FrameViewLayerList: TFrameViewLayerList
       OnMouseLeave = LBMouseLeave
       OnMouseMove = LBMouseMove
       OnMouseUp = LBMouseUp
+    end
+    object CBLoopMode: TComboBox
+      Left = 98
+      Height = 23
+      Top = 40
+      Width = 114
+      ItemHeight = 15
+      Items.Strings = (
+        'no repeat'
+        'repeat on decor size'
+        'repeat on world size'
+      )
+      Style = csDropDownList
+      TabOrder = 1
+      Visible = False
+      OnCloseUp = CBLoopModeCloseUp
+      OnSelect = CBLoopModeSelect
     end
   end
 end

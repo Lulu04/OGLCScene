@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils,
   project_util,
-  OGLCScene, u_layerlist;
+  OGLCScene, u_layerlist, u_target_lazarusproject;
 
 var
   LayerNames: TStringArray;
@@ -25,6 +25,7 @@ var
   function PPIScale(AValue: integer): integer;
 
 type
+
 
 { TProjectConfig }
 
@@ -44,6 +45,9 @@ TProjectConfig = record
   procedure LoadFromString(const data: string);
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
+
+public // utils to modify target lazarus project files
+  TargetLazarusProject: TTargetLazarusProject;
 end;
 
 { TProject }
@@ -64,8 +68,9 @@ end;
 var Project: TProject;
 
 implementation
-uses Forms, Dialogs, u_common, form_main, u_texture_list, u_surface_list,
-  u_spritebank, u_screen_spritebuilder, u_levelbank;
+uses Forms, Dialogs, Controls, u_common, form_main, u_texture_list,
+  u_surface_list, u_spritebank, u_screen_spritebuilder, u_levelbank,
+  form_newproject, u_app_pref, u_utils, utilitaire_fichier;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -124,9 +129,9 @@ begin
   prop.Add('SceneWidth', SceneWidth);
   prop.Add('SceneHeight', SceneHeight);
   prop.Add('MaximizeScene', MaximizeScene);
-  // layers
-  prop.Add('Layers', Layers.SaveToString);
-  Result := prop.PackedProperty;
+  // layers names NOT NECESSARY because they are read from u_common.pas
+  //prop.Add('Layers', Layers.SaveToString);
+
   //level bank
   prop.Add('LevelBankExportClassName', LevelBankExportClassName);
   prop.Add('LevelBankExportUnitName', LevelBankExportUnitName);
@@ -149,8 +154,8 @@ begin
   prop.IntegerValueOf('SceneHeight', SceneHeight, 768);
   prop.BooleanValueOf('MaximizeScene', MaximizeScene, True);
   // layers
-  prop.StringValueOf('Layers', s, 'LAYER_TOP');
-  Layers.LoadFromString(s);
+  //prop.StringValueOf('Layers', s, 'LAYER_TOP');
+  //Layers.LoadFromString(s);
   //level bank
   prop.StringValueOf('LevelBankExportClassName', LevelBankExportClassName, LevelBankExportClassName);
   prop.StringValueOf('LevelBankExportUnitName', LevelBankExportUnitName, LevelBankExportUnitName);
@@ -186,8 +191,35 @@ begin
 end;
 
 function TProject.DoNew: boolean;
+var folderProjectTemplate, lazProjectFolder,
+  lazProjectName: string;
 begin
+  if FormNewProject.ShowModal <> mrOk then exit(False);
+
+  // retrieve the project template folder
+  folderProjectTemplate := GetSourceProjectTemplateFolder;
+
+  lazProjectFolder := FormNewProject.GetLazarusProjectFolder;
+  lazProjectName := FormNewProject.GetLazarusProjectName;
+
+  CopyDirectoryContent(folderProjectTemplate, lazProjectFolder);
+
+  // rename project files
+  RenommeFichier(lazProjectFolder+'project_oglcscene.ico',
+                 lazProjectFolder+lazProjectName+'.ico');
+  RenommeFichier(lazProjectFolder+'project_oglcscene.lpi',
+                 lazProjectFolder+lazProjectName+'.lpi');
+  RenommeFichier(lazProjectFolder+'project_oglcscene.lpr',
+                 lazProjectFolder+lazProjectName+'.lpr');
+
+  // replace project name in lazarus files
+  ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpi', 'project_oglcscene', lazProjectName);
+  ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpr', 'project_oglcscene', lazProjectName);
+
   Config.InitDefault;
+
+  SaveAs(lazProjectFolder + lazProjectName + '.oglc');
+
   Result := true;
 end;
 
@@ -204,6 +236,8 @@ begin
   finally
     t.Free;
   end;
+
+  AppPref.LastProjectFilename := aFilename;
 end;
 
 function TProject.DoLoad(const aFilename: string): boolean;
@@ -226,6 +260,8 @@ begin
   finally
     t.Free;
   end;
+
+  if Result then AppPref.LastProjectFilename := aFilename;
 end;
 
 procedure TProject.DoClose;
@@ -248,6 +284,7 @@ begin
     FrameToolsSpriteBuilder.FillListBoxTextureNames;
     if LevelBank.Size > 0 then FormMain.ShowPageLevelBank
       else FormMain.ShowPageSpriteBank;
+    Layers.InitWith(Config.TargetLazarusProject.UCommonGetLayerNames);
   end else begin
   end;
 end;

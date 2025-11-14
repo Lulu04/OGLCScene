@@ -10,7 +10,7 @@ uses
   OGLCScene,
   BGRABitmap, BGRABitmapTypes,
   frame_texturelist, u_texture_list, u_surface_list, frame_viewlayerlist,
-  lcl_utils;
+  lcl_utils, u_layerlist;
 
 type
 
@@ -69,6 +69,8 @@ type
     Label33: TLabel;
     Label34: TLabel;
     Label35: TLabel;
+    Label36: TLabel;
+    Label37: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -94,6 +96,7 @@ type
     PageSurfaces: TTabSheet;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
+    SaveDialog1: TSaveDialog;
     SE1: TFloatSpinEdit;
     SE10: TSpinEdit;
     SE12: TSpinEdit;
@@ -186,6 +189,9 @@ type
     function GetOverlapValue: single;
   private
     function GetWorldRect: TRectF;
+  private
+    FDecorLoopModes: TArrayOfDecorLoopMode;
+    procedure ProcessDecorLoopModeChange(Sender: TObject);
   public
     FrameTextureList: TFrameTextureList;
     FrameViewLayerList: TFrameViewLayerList;
@@ -216,7 +222,7 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  u_layerlist, form_showhelp, form_editgradient, Graphics;
+  form_showhelp, form_editgradient, Graphics;
 
 {$R *.lfm}
 
@@ -239,9 +245,22 @@ end;
 
 procedure TFrameToolLevelEditor.BHelpLayersClick(Sender: TObject);
 begin
-  form_showhelp.ShowHelp('This the layer list for your project.'#10+
-  'You can show or hide a layer by clicking its eye icon.'#10+
-  'Hidden layers are still exported to the Pascal unit.');
+  form_showhelp.ShowHelp('This the layer list for your project.'#10#10+
+  'Label "used" is displayed when the layer contain at least one surface.'#10#10+
+  'SHOW/HIDE A LAYER'#10+
+  ' - click on the eye icon.'#10+
+  ' - Hidden layers are still exported to the Pascal unit.'#10+
+  'CHANGE REPEAT MODE'#10+
+  ' - click on the text mode: a list appear, choose what you want.'#10+
+  ' Repeat mode is used only if you plan to use the level for parallax scrolling.'#10+
+  '  NO REPEAT: decor is not repeated.'#10+
+  '  REPEAT ON DECOR SIZE: decor is repeated from beginning ignoring the empty space between the last decor item and the right side of the world area.'#10+
+  '  REPEAT ON WORLD SIZE: decor is repeated when the view reach the end of the world, keeping the empty space between the last decor item and the right side of the world area.'#10#10+
+
+  'YOU WANT TO USE THE DECOR TO PRODUCE PARALLAX SCROLLING'#10+
+  ' You can use the decor to produce a parallax scrolling.'#10+
+  ' In a parallax scrolling, decor is repeated to simulate endless landscape.'#10+
+  ' You must use two layers.');
 end;
 
 procedure TFrameToolLevelEditor.BHelpSurfacesClick(Sender: TObject);
@@ -337,6 +356,8 @@ begin
   wi.skygradientdata := ScreenLevelEditor.SkyGradient.Gradient.SaveGradientDataToString;
   o^.worldinfo := wi.SaveToString;
 
+  o^.layerloopinfo := FDecorLoopModes.SaveToString;
+
   Project.SetModified;
   Project.Save;
   Modified := False;
@@ -365,10 +386,18 @@ begin
   if Sender = BZoomWorld then begin
     ScreenLevelEditor.ZoomViewToFit(GetWorldRect, 0.9);
     ScreenLevelEditor.ComputeWorldBoundsLineWidth;
+    ScreenLevelEditor.UpdateHandlePositionOnSelected;
   end;
-  if Sender = BZoomScene then
+
+  if Sender = BZoomScene then begin
     ScreenLevelEditor.ZoomOnSceneSize(GetWorldRect);
-  if Sender = BZoomOnSelection then ScreenLevelEditor.ZoomOnSelection;
+    ScreenLevelEditor.UpdateHandlePositionOnSelected;
+  end;
+
+  if Sender = BZoomOnSelection then begin
+    ScreenLevelEditor.ZoomOnSelection;
+    ScreenLevelEditor.UpdateHandlePositionOnSelected;
+  end;
 end;
 
 procedure TFrameToolLevelEditor.CBTexturesKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -728,6 +757,11 @@ begin
                   SpinEdit3.Value+SpinEdit1.Value, SpinEdit4.Value+SpinEdit2.Value);
 end;
 
+procedure TFrameToolLevelEditor.ProcessDecorLoopModeChange(Sender: TObject);
+begin
+  FModified := True;
+end;
+
 procedure TFrameToolLevelEditor.SendParamToWorldBounds;
 begin
   ScreenLevelEditor.UpdateWorldBounds(SpinEdit3.Value, SpinEdit4.Value,
@@ -763,6 +797,8 @@ begin
   FrameViewLayerList := TFrameViewLayerList.Create(Self);
   FrameViewLayerList.Parent := Panel12;
   FrameViewLayerList.Align := alClient;
+  FrameViewLayerList.LoopModes := @FDecorLoopModes;
+  FrameViewLayerList.OnDecorLoopModeChange := @ProcessDecorLoopModeChange;
 
   ToggleSpeedButtonManager := TToggleSpeedButtonManager.Create;
   ToggleSpeedButtonManager.ToggleType := tsbLikeCheckBox;
@@ -796,6 +832,10 @@ begin
 
   // retrieve the overlap value
   FSEOverlap.Value := Project.Config.LevelEditorOverlap;
+
+  // init loop mode array
+  if Length(FDecorLoopModes) <> Layers.UserCount then
+    FDecorLoopModes.InitDefaultFromLayersCount;
 
   FInitializingWidget := False;
 end;
@@ -1003,6 +1043,12 @@ begin
     SpinEdit2.Value := FScene.Height;
     CheckBox1.Checked := True;
   end;
+
+  // init layer loop mode
+  if o^.layerloopinfo = '' then FDecorLoopModes.InitDefaultFromLayersCount
+    else FDecorLoopModes.LoadFromString(o^.layerloopinfo);
+  if Length(FDecorLoopModes) <> Layers.UserCount then FDecorLoopModes.InitDefaultFromLayersCount;
+
   FInitializingWidget := False;
 
   FModified := False;

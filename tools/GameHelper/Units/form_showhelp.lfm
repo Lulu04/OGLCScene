@@ -16,6 +16,7 @@ object FormShowHelp: TFormShowHelp
     Top = 0
     Width = 493
     Align = alClient
+    ReadOnly = True
     ScrollBars = ssAutoBoth
     TabOrder = 0
   end

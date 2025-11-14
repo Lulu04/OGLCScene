@@ -212,7 +212,6 @@ begin
 end;
 
 procedure TFrameTextureList.UpdateTextureWidgetState;
-var siz: TSize;
 begin
   if not FileExists(Label2.Caption) then begin
     BUpdateTexture.Enabled := False;
