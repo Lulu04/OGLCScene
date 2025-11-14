@@ -9,7 +9,7 @@ uses
   Classes, SysUtils,
   OGLCScene, gvector,
   BGRABitmap, BGRABitmapTypes,
-  u_undo_redo, u_texture_list;
+  u_undo_redo, u_texture_list, u_layerlist;
 
 //  Bank level have a single texture list shared by all level items.
 
@@ -30,13 +30,21 @@ TWorldInfo = record
   procedure LoadFromString(const s: string);
 end;
 
+{ TLevelBankItem }
+
 TLevelBankItem = record
   name,
   worldinfo,
+  layerloopinfo,
   surfaces : string;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const s: string);
+
+  // return an array with the index of user layer used in this level
+  function GetUserLayerIndexesUsed: TArrayOfInteger;
+  // export pascal code to declare the level as constant
+  procedure ExportToPascalConst(t: TStringList);
 end;
 PLevelBankItem = ^TLevelBankItem;
 
@@ -88,7 +96,7 @@ end;
 
 implementation
 
-uses frame_tool_levelbank, form_main, u_common, u_layerlist;
+uses frame_tool_levelbank, form_main, u_common, u_surface_list, u_utils;
 
 { TWorldInfo }
 
@@ -153,7 +161,7 @@ end;
 
 function TLevelBankItem.SaveToString: string;
 begin
-  Result := name+'#'+surfaces+'#'+worldinfo;
+  Result := name+'#'+surfaces+'#'+worldinfo+'#'+layerloopinfo;
 end;
 
 procedure TLevelBankItem.LoadFromString(const s: string);
@@ -163,6 +171,56 @@ begin
   name := A[0];
   surfaces := A[1];
   if Length(A) > 2 then worldinfo := A[2] else worldinfo := '';
+  if Length(A) > 3 then layerloopinfo := A[3] else layerloopinfo := '';
+end;
+
+function TLevelBankItem.GetUserLayerIndexesUsed: TArrayOfInteger;
+var i: integer;
+  sl: TSurfaceList;
+begin
+  Result := NIL;
+  sl := TSurfaceList.Create;
+  sl.SetModeForLevelEditor;
+  try
+    sl.LoadFromString(surfaces, False);
+    if sl.Size > 0 then
+      for i:=0 to sl.Size-1 do
+        Result.AddOnlyOneTime(sl.Mutable[i]^.layerindex-APP_LAYER_COUNT);
+  finally
+    sl.Free;
+  end;
+end;
+
+procedure TLevelBankItem.ExportToPascalConst(t: TStringList);
+var wi: TWorldInfo;
+  s: string;
+  sl: TSurfaceList;
+  j: SizeUInt;
+begin
+  wi := Default(TWorldInfo);
+  wi.LoadFromString(worldinfo);
+  wi.skylayer := wi.skylayer - APP_LAYER_COUNT; // adjust the layer index
+  s := 'Data_'+name+'='''+ wi.SaveToString(False)+'|''+'#10+
+       '  ''LayerLoopMode|'+layerloopinfo+'|''+'#10;
+  sl := TSurfaceList.Create;
+  sl.SetModeForLevelEditor;
+  try
+    sl.LoadFromString(surfaces, False);
+    s := s + '  ''SurfaceCount|'+sl.Size.ToString+'|''+';
+    t.Add(s);
+    if sl.Size > 0 then begin
+      s := '';
+      for j:=0 to sl.Size-1 do begin
+        s := s+'  ''S'+j.ToString+'|'+sl.Mutable[j]^.ExportToPascalString(LevelBank.Textures);
+        if j < sl.Size-1 then s := s + '|''+'#10
+          else s := s + ''';';
+      end;
+    end;
+    t.AddText(s);
+    t.Add('');
+  finally
+    sl.Free;
+  end;
 end;
 
 constructor TLevelBank.Create;
@@ -228,42 +286,55 @@ end;
 
 procedure TLevelBank.SaveTo(t: TStringList);
 var i: SizeUInt;
+  prop: TProperties;
 begin
-  t.Add('[LEVEL BANK]');
-  t.Add(Textures.SaveToString);
-  t.Add(integer(Size).ToString);
+  prop.Init('#');
+  prop.Add('LevelTextures', Textures.SaveToString);
+  prop.Add('LevelCount', integer(Size));
   if Size > 0 then
     for i:=0 to Size-1 do begin
-      t.Add(Mutable[i]^.name);
-      t.Add(Mutable[i]^.surfaces);
-      t.Add(Mutable[i]^.worldinfo);
+      prop.Add('LevelName'+i.ToString, Mutable[i]^.name);
+      prop.Add('Surfaces'+i.ToString, Mutable[i]^.surfaces);
+      prop.Add('WorldInfo'+i.ToString, Mutable[i]^.worldinfo);
+      prop.Add('LayerLoopMode'+i.ToString, Mutable[i]^.layerloopinfo);
     end;
+
+  t.Add('[LEVEL BANK]');
+  t.Add(prop.PackedProperty);
 end;
 
 procedure TLevelBank.LoadFrom(t: TStringList);
-var k, c, i: integer;
+var c, i: integer;
   o: TLevelBankItem;
+  prop: TProperties;
+  s, level_Name, level_Surfaces, level_WorldInfo, level_LayerLoopInfo: string;
 begin
   Clear;
-  k := t.IndexOf('[LEVEL BANK]');
-  if (k = -1) or (k = t.Count-1) then exit;
+  if not prop.SplitFrom(t, '[LEVEL BANK]', '#') then exit;
 
-  inc(k);
-  Textures.LoadFromString(t.Strings[k]);
+  s := '';
+  level_Name := '';
+  level_Surfaces := '';
+  level_WorldInfo := '';
+  level_LayerLoopInfo := '';
+  prop.StringValueOf('LevelTextures', s, '');
+  Textures.LoadFromString(s);
+  c := 0;
 
-  inc(k);
-  c := t.Strings[k].ToInteger;
-
+  prop.IntegerValueOf('LevelCount', c, 0);
   if c = 0 then exit;
   for i:=0 to c-1 do begin
-    inc(k);
     o.InitDefault;
-    o.name := t.Strings[k];
-    inc(k);
-    o.surfaces := t.Strings[k];
-    inc(k);
-    o.worldinfo := t.Strings[k];
-    PushBack(o);
+    if prop.StringValueOf('LevelName'+i.ToString, level_name, '') and
+       prop.StringValueOf('Surfaces'+i.ToString, level_Surfaces, '') and
+       prop.StringValueOf('WorldInfo'+i.ToString, level_WorldInfo, '') and
+       prop.StringValueOf('LayerLoopMode'+i.ToString, level_LayerLoopInfo, '') then begin
+      o.name := level_name;
+      o.surfaces := level_Surfaces;
+      o.worldinfo := level_WorldInfo;
+      o.layerloopinfo := level_LayerLoopInfo;
+      PushBack(o);
+    end else FScene.LogError('Error while loading Level index '+i.ToString+' : one or more properties are missing...');
   end;
 end;
 

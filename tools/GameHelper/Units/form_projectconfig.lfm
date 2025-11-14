@@ -122,11 +122,50 @@ object FormProjectConfig: TFormProjectConfig
           Left = 24
           Height = 15
           Top = 112
-          Width = 45
-          Caption = '- Scale -'
+          Width = 165
+          Caption = '- Texture scaling at run time -'
           Font.Color = clWhite
           Font.Style = [fsBold]
           ParentFont = False
+        end
+        object Label11: TLabel
+          Left = 24
+          Height = 15
+          Top = 208
+          Width = 90
+          Caption = '- Screen mode -'
+          Font.Color = clWhite
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Panel7: TPanel
+          Left = 33
+          Height = 65
+          Top = 231
+          Width = 111
+          ClientHeight = 65
+          ClientWidth = 111
+          ParentBackground = False
+          TabOrder = 4
+          object RadioButton2: TRadioButton
+            Left = 11
+            Height = 19
+            Top = 32
+            Width = 74
+            Caption = 'Full screen'
+            TabOrder = 0
+          end
+          object RBWindowed: TRadioButton
+            Left = 11
+            Height = 19
+            Top = 8
+            Width = 75
+            Caption = 'Windowed'
+            Checked = True
+            TabOrder = 1
+            TabStop = True
+            OnChange = SE1Change
+          end
         end
       end
     end
@@ -148,10 +187,13 @@ object FormProjectConfig: TFormProjectConfig
           AnchorSideLeft.Control = Label2
           AnchorSideTop.Control = Label2
           AnchorSideTop.Side = asrBottom
+          AnchorSideBottom.Control = Panel4
+          AnchorSideBottom.Side = asrBottom
           Left = 25
-          Height = 235
+          Height = 303
           Top = 33
           Width = 281
+          Anchors = [akTop, akLeft, akBottom]
           ParentBackground = False
           TabOrder = 0
         end

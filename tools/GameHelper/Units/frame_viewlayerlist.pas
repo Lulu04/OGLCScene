@@ -6,15 +6,19 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, Types,
-  Graphics;
+  Graphics,
+  u_layerlist;
 
 type
 
   { TFrameViewLayerList }
 
   TFrameViewLayerList = class(TFrame)
+    CBLoopMode: TComboBox;
     LB: TListBox;
     Panel1: TPanel;
+    procedure CBLoopModeCloseUp(Sender: TObject);
+    procedure CBLoopModeSelect(Sender: TObject);
     procedure LBDrawItem(Control: TWinControl; Index: Integer; ARect: TRect;
       State: TOwnerDrawState);
     procedure LBKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -29,14 +33,26 @@ type
     FMouseOrigin: TPoint;
     FLeftClickedIndex: integer;
     FItemIndexUnderMouse: integer;
+    FShowDecorLoopMode: boolean;
     FShowIconEye: boolean;
     FTextStyleForTextRect: TTextStyle;
+    FTextWidth_Used,
+    FTextWidth_WorldSize: integer;
     function GetCount: integer;
     function GetNames(index: integer): string;
     function NameExists(const aName: string): boolean;
     function GetSelectedCount: integer;
     procedure SetNames(index: integer; AValue: string);
+    procedure SetShowDecorLoopMode(AValue: boolean);
     procedure SetShowIconEye(AValue: boolean);
+  private // LB item utils
+    function GetUsedLabelArea: TRect;
+    function GetLoopModeArea: TRect;
+    function XIsInLoopModeArea(aX: integer): boolean;
+  private
+    FLoopModes: PArrayOfDecorLoopMode;
+    FOnDecorLoopModeChange: TNotifyEvent;
+    procedure ShowCBLoopMode;
   public
     constructor Create(TheOwner: TComponent); override;
 
@@ -53,11 +69,16 @@ type
     property SelectedCount: integer read GetSelectedCount;
     // default is true
     property ShowIconEye: boolean read FShowIconEye write SetShowIconEye;
+    // default is true
+    property ShowDecorLoopMode: boolean read FShowDecorLoopMode write SetShowDecorLoopMode;
+
+    property LoopModes: PArrayOfDecorLoopMode read FLoopModes write FLoopModes;
+    property OnDecorLoopModeChange: TNotifyEvent read FOnDecorLoopModeChange write FOnDecorLoopModeChange;
   end;
 
 implementation
 uses LCLType, LCLHelper, u_project, u_utils, u_datamodule,
-  u_layerlist, u_common, Math;
+  u_common, Math, OGLCScene;
 
 {$R *.lfm}
 
@@ -66,22 +87,23 @@ uses LCLType, LCLHelper, u_project, u_utils, u_datamodule,
 procedure TFrameViewLayerList.LBDrawItem(Control: TWinControl; Index: Integer;
   ARect: TRect; State: TOwnerDrawState);
 var p: TPoint;
- i, xx, yy: integer;
+ i, xx, xx1, yy, yy1: integer;
 begin
   with LB.Canvas do
   begin
+    Brush.Style := bsSolid;
     if State >= [odSelected] then begin
       Brush.Color := RGBToColor(94,128,130);
       Font.Color := clWhite;
     end else begin
-      if Index Mod 2 = 0 then Brush.Color := LB.Color
-        else Brush.Color := PercentColor(LB.Color,0.07);
+      if Index and 1 = 0 then Brush.Color := LB.Color
+        else Brush.Color := u_utils.PercentColor(LB.Color, 0.15);
       Font.Color := clWhite;
     end;
     // render dot rectangle if mouse is over item
     if Index = FItemIndexUnderMouse then begin
       Pen.Style := psDot;
-      Pen.Color := PercentColor(LB.Color,0.95);
+      Pen.Color := clHighLight; // PercentColor(LB.Color, 0.5);
       Rectangle(ARect.Left-1, ARect.Top, ARect.Right+1, ARect.Bottom);
     end else FillRect(ARect);
 
@@ -101,20 +123,40 @@ begin
     end;
     Brush.Style := bsClear;
 
-    // render text
+    // render layer name
     xx := ARect.Left;
-    if FShowIconEye then yy := ARect.Right-Round(DataModule1.ILIconLayerList.Width*1.3)
-      else yy := ARect.Right;
-    TextRect(Rect(xx, ARect.Top,
-                  yy,
-                  ARect.Bottom),
-                  ARect.Left, ARect.Top, Index.ToString+'-'+LB.Items.Strings[Index], FTextStyleForTextRect);
+    if FShowIconEye then xx1 := ARect.Right-DataModule1.ILIconLayerList.Width-PPIScale(5)-
+                                FTextWidth_Used-PPIScale(5)-FTextWidth_WorldSize-PPIScale(5)
+      else xx1 := ARect.Right;
+    TextRect(Rect(xx, ARect.Top, xx1, ARect.Bottom),
+             0, 0, Index.ToString+'-'+LB.Items.Strings[Index]{Layers.Names[Index]}, FTextStyleForTextRect);
 
-    // render if layer is empty
+    // render if layer is used
     i := FScene.Layer[Index+APP_LAYER_COUNT].SurfaceCount;
-    if i = 0 then begin
-      xx := ARect.Right-DataModule1.ILIconLayerList.Width-PPIScale(5)-TextWidth('empty');
-      TextOut(xx, ARect.Top, 'empty');
+    if i <> 0 then begin
+      xx := ARect.Right - DataModule1.ILIconLayerList.Width - PPIScale(5) - FTextWidth_Used;
+      TextOut(xx, ARect.Top+(ARect.Height-TextHeight('used')) div 2, 'used');
+    end;
+
+    // render the decor loop mode
+    if FShowDecorLoopMode and (FLoopModes <> NIL) then begin
+      Brush.Style := bsClear;
+      Pen.Style := psSolid;
+      xx1 := xx;
+      xx := xx - PPIScale(5) - FTextWidth_WorldSize;
+      yy1 := ARect.Top + ARect.Height div 2;
+      yy := yy1 - TextHeight('T');
+      case FLoopModes^[Index] of
+        dlmNone: TextOut(xx, ARect.Top, 'no loop');
+        dlmRepeatOnDecorSize: begin
+          TextOut(xx, yy, 'repeat on');
+          TextOut(xx, yy1, 'decor size');
+        end;
+        dlmRepeatOnWorldSize: begin
+          TextOut(xx, yy, 'repeat on');
+          TextOut(xx, yy1, 'world size');
+        end;
+      end;
     end;
 
     // render icon visible or not
@@ -127,9 +169,34 @@ begin
   end;
 end;
 
+procedure TFrameViewLayerList.CBLoopModeSelect(Sender: TObject);
+var i: integer;
+begin
+  CBLoopMode.Visible := False;
+  if CBLoopMode.ItemIndex = -1 then exit;
+
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  FLoopModes^[i] := TOGLCDecorLoopMode(CBLoopMode.ItemIndex);
+  LB.Invalidate;
+
+  if Assigned(FOnDecorLoopModeChange) then
+    FOnDecorLoopModeChange(Self);
+end;
+
+procedure TFrameViewLayerList.CBLoopModeCloseUp(Sender: TObject);
+begin
+  CBLoopMode.Visible := False;
+end;
+
 procedure TFrameViewLayerList.LBKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  if Key = VK_SPACE then Key := VK_UNKNOWN;
+  if (Key = VK_SPACE) or
+     (Key = VK_UP) or
+     (Key = VK_DOWN) or
+     (Key = VK_Left) or
+     (Key = VK_Right) then Key := VK_UNKNOWN;
 end;
 
 procedure TFrameViewLayerList.LBMouseDown(Sender: TObject;
@@ -202,12 +269,18 @@ begin
       LB.Invalidate;
     end else begin
       // click on eye icon
-      if X >= LB.ClientWidth-DataModule1.ILIconLayerList.Width then begin
+      if FShowIconEye and
+         (X >= LB.ClientWidth-DataModule1.ILIconLayerList.Width) then begin
         i := LB.GetIndexAtXY(X, Y);
         if i <> -1 then begin
           Layers.SetUserLayerVisible(i, not Layers.UserLayerIsVisible(i));
           LB.Invalidate;
         end;
+      end
+      else
+      // click on loop mode area       Round(DataModule1.ILIconLayerList.Width*1.3)
+      if FShowDecorLoopMode and XIsInLoopModeArea(X) then begin
+        ShowCBLoopMode;
       end;
     end;
   end;
@@ -221,6 +294,13 @@ end;
 procedure TFrameViewLayerList.SetNames(index: integer; AValue: string);
 begin
   LB.Items.Strings[index] := AValue;
+end;
+
+procedure TFrameViewLayerList.SetShowDecorLoopMode(AValue: boolean);
+begin
+  if FShowDecorLoopMode=AValue then Exit;
+  FShowDecorLoopMode:=AValue;
+  LB.Invalidate;
 end;
 
 function TFrameViewLayerList.GetCount: integer;
@@ -245,7 +325,49 @@ procedure TFrameViewLayerList.SetShowIconEye(AValue: boolean);
 begin
   if FShowIconEye = AValue then Exit;
   FShowIconEye := AValue;
+
+  if FShowIconEye then LB.ItemHeight := ScaleDesignToForm(35)
+    else LB.ItemHeight := ScaleDesignToForm(20);
+
   LB.Invalidate;
+end;
+
+function TFrameViewLayerList.GetUsedLabelArea: TRect;
+begin
+  Result.Right := LB.ClientWidth - DataModule1.ILIconLayerList.Width - PPIScale(5);
+  Result.Left := Result.Right - FTextWidth_Used;
+end;
+
+function TFrameViewLayerList.GetLoopModeArea: TRect;
+begin
+  Result.Right := GetUsedLabelArea.Left - PPIScale(5);
+  Result.Left := Result.Right - FTextWidth_WorldSize;
+end;
+
+function TFrameViewLayerList.XIsInLoopModeArea(aX: integer): boolean;
+var r: TRect;
+begin
+  r := GetLoopModeArea;
+  Result := InRange(aX, r.Left, r.Right);
+end;
+
+procedure TFrameViewLayerList.ShowCBLoopMode;
+var i: integer;
+  r: TRect;
+  p: TPoint;
+begin
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  r := LB.ItemRect(i);
+  p.x := GetLoopModeArea.Left;
+  p.y := r.Top;
+  p := LB.ClientToParent(p);
+  CBLoopMode.Left := p.x;
+  CBLoopMode.Top := p.y;
+  CBLoopMode.Visible := True;
+  CBLoopMode.ItemIndex := Ord(FLoopModes^[i]);
+  CBLoopMode.DroppedDown := True;
 end;
 
 constructor TFrameViewLayerList.Create(TheOwner: TComponent);
@@ -253,8 +375,10 @@ begin
   inherited Create(TheOwner);
   FItemIndexUnderMouse := -1;
   FLeftClickedIndex := -1;
-  LB.ItemHeight := 20;
+  LB.ItemHeight := ScaleDesignToForm(35);
+
   FShowIconEye := True;
+  FShowDecorLoopMode := True;
 
   FTextStyleForTextRect.Alignment := taLeftJustify;
   FTextStyleForTextRect.Layout := Graphics.tlCenter;
@@ -267,6 +391,9 @@ end;
 
 procedure TFrameViewLayerList.Fill;
 begin
+  FTextWidth_Used := LB.Canvas.TextWidth('used');
+  FTextWidth_WorldSize := LB.Canvas.TextWidth('world size');
+
   Layers.FillListBox(LB);
   LB.Invalidate;
 end;

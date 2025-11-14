@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Spin, lcl_utils, frame_viewlayerlist;
+  StdCtrls, Spin, lcl_utils, OGLCScene, frame_viewlayerlist;
 
 type
 
@@ -19,6 +19,7 @@ type
     CheckBox1: TCheckBox;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -43,7 +44,10 @@ type
     BAddLayer: TSpeedButton;
     Panel6: TPanel;
     BEraseLevelBank: TSpeedButton;
+    Panel7: TPanel;
     RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
+    RBWindowed: TRadioButton;
     RBMaximizeSceneSize: TRadioButton;
     SE1: TSpinEdit;
     SE2: TSpinEdit;
@@ -95,6 +99,7 @@ begin
   FrameViewLayerList.Parent := Panel5;
   FrameViewLayerList.Align := alClient;
   FrameViewLayerList.ShowIconEye := False;
+  FrameViewLayerList.ShowDecorLoopMode := False;
 
 end;
 
@@ -120,13 +125,20 @@ begin
 end;
 
 procedure TFormProjectConfig.ConfigToWidget;
+var A: TArrayOfInteger;
 begin
   FInitializingWidget := True;
 
   // scene
-  SE1.Value := Project.Config.SceneWidth;
-  SE2.Value := Project.Config.SceneHeight;
-  RBMaximizeSceneSize.Checked := Project.Config.MaximizeScene;
+  A := Project.Config.TargetLazarusProject.UCommonGetDesignValues;
+  SE1.Value := A[0]; // Project.Config.SceneWidth;
+  SE2.Value := A[1]; // Project.Config.SceneHeight;
+  if Project.Config.TargetLazarusProject.ProjectConfig_MaximizeSceneOnMonitor
+    then RBMaximizeSceneSize.Checked := True
+    else RadioButton1.Checked := True;
+  if Project.Config.TargetLazarusProject.ProjectConfig_WindowedMode
+    then RBWindowed.Checked := True
+    else RadioButton2.Checked := True;
   // layers
   FrameViewLayerList.Fill;
   // level editor
@@ -139,12 +151,16 @@ end;
 procedure TFormProjectConfig.WidgetToConfig;
 begin
   // scene
-  Project.Config.SceneWidth := SE1.Value;
-  Project.Config.SceneHeight := SE2.Value;
-  Project.Config.MaximizeScene := RBMaximizeSceneSize.Checked;
+  Project.Config.TargetLazarusProject.UCommonSetDesignValues([SE1.Value, SE2.Value, Self.Monitor.PixelsPerInch]);
+  {Project.Config.SceneWidth := SE1.Value;
+  Project.Config.SceneHeight := SE2.Value;}
+  Project.Config.TargetLazarusProject.ProjectConfig_MaximizeSceneOnMonitor := RBMaximizeSceneSize.Checked;
+  Project.Config.TargetLazarusProject.ProjectConfig_WindowedMode := RBWindowed.Checked;
 
   // layers
   FrameViewLayerList.SaveLayerConfigToLayerList;
+  // set also the layer names in unit u_common.pas
+  Project.Config.TargetLazarusProject.UCommonSetLayerNames(FrameViewLayerList.LB.Items.ToStringArray);
 
   // level editor
   Project.Config.CommonShowFlyingTxt := CheckBox1.Checked;

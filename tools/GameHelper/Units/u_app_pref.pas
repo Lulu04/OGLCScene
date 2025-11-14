@@ -16,6 +16,7 @@ function GetHandleFolder: string;
 function GetCursorFolder: string;
 function GetIconFolder: string;
 function GetPresetFolder: string;
+function GetSourceProjectTemplateFolder: string;
 
 
 type
@@ -80,6 +81,11 @@ end;
 function GetPresetFolder: string;
 begin
   Result := GetDataFolder+'UserPresets'+DirectorySeparator;
+end;
+
+function GetSourceProjectTemplateFolder: string;
+begin
+  Result := GetDataFolder+'ProjectTemplate'+DirectorySeparator;
 end;
 
 { TAppPref }

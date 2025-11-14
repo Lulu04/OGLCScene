@@ -29,7 +29,9 @@ type
 
   TFormMain = class(TForm)
     BLevelBank: TSpeedButton;
+    BScreenBank: TSpeedButton;
     BLevelEditor: TSpeedButton;
+    BScreenEditor: TSpeedButton;
     Label1: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
@@ -38,6 +40,7 @@ type
     PageSpriteBuilder: TPage;
     PageSpriteBank: TPage;
     Panel1: TPanel;
+    Panel10: TPanel;
     Panel2: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
@@ -48,15 +51,15 @@ type
     Panel8: TPanel;
     Panel9: TPanel;
     ToolBarMain: TToolBar;
-    BNewScreen: TToolButton;
-    BLoadScreen: TToolButton;
-    BSaveScreen: TToolButton;
+    BNewProject: TToolButton;
+    BLoadProject: TToolButton;
+    BSaveProject: TToolButton;
     ToolButton1: TToolButton;
     BProjectConfig: TToolButton;
-    procedure BLoadScreenClick(Sender: TObject);
-    procedure BNewScreenClick(Sender: TObject);
+    procedure BLoadProjectClick(Sender: TObject);
+    procedure BNewProjectClick(Sender: TObject);
     procedure BProjectConfigClick(Sender: TObject);
-    procedure BSaveScreenClick(Sender: TObject);
+    procedure BSaveProjectClick(Sender: TObject);
     procedure BSpriteBankClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -99,8 +102,8 @@ var
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
-  u_spritebank, u_ui_handle, u_screen_spritebank,
-  u_screen_levelbank, u_screen_leveleditor, u_levelbank, form_projectconfig,
+  u_spritebank, u_ui_handle, u_screen_spritebank, u_screen_levelbank,
+  u_screen_leveleditor, u_levelbank, form_projectconfig,
   BGRABitmap, BGRABitmapTypes;
 {$R *.lfm}
 
@@ -163,7 +166,7 @@ begin
   CanClose := Project.DoUserPromptToSaveProject;
 end;
 
-procedure TFormMain.BNewScreenClick(Sender: TObject);
+procedure TFormMain.BNewProjectClick(Sender: TObject);
 begin
   Project.New;
 end;
@@ -173,10 +176,9 @@ begin
   FormProjectConfig.ShowModal;
 end;
 
-procedure TFormMain.BSaveScreenClick(Sender: TObject);
+procedure TFormMain.BSaveProjectClick(Sender: TObject);
 begin
   Project.Save;
-  if Project.IsReady then AppPref.LastProjectFilename := Project.Filename;
 end;
 
 procedure TFormMain.BSpriteBankClick(Sender: TObject);
@@ -214,10 +216,9 @@ begin
   end;
 end;
 
-procedure TFormMain.BLoadScreenClick(Sender: TObject);
+procedure TFormMain.BLoadProjectClick(Sender: TObject);
 begin
   Project.Load;
-  if Project.IsReady then AppPref.LastProjectFilename := Project.Filename;
 end;
 
 procedure TFormMain.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

@@ -1,8 +1,6 @@
 program GameHelper;
 
 {$mode objfpc}{$H+}
-{$DEFINE ProgrammePrincipal}
-
 
 uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
@@ -18,7 +16,8 @@ uses
   u_screen_levelbank, u_levelbank, frame_texturelist,
   u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,
   form_projectconfig, form_showhelp, form_editdeformationgrid,
-form_editgradient, frame_gradientrow;
+  form_editgradient, frame_gradientrow, u_screen_list, form_newproject,
+u_target_lazarusproject;
 
 {$R *.res}
 
@@ -32,6 +31,7 @@ begin
     Application.CreateForm(TDataModule1, DataModule1);
     Application.CreateForm(TFormProjectConfig, FormProjectConfig);
   Application.CreateForm(TFormEditGradient, FormEditGradient);
+  Application.CreateForm(TFormNewProject, FormNewProject);
   Application.Run;
 
   AppPref.Free;

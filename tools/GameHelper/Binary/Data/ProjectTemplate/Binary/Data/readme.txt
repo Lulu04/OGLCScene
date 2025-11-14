@@ -1,0 +1,1 @@
+Please, put your textures files in the subfolder 'Textures'

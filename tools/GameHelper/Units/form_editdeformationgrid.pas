@@ -448,7 +448,7 @@ begin
 
   FDeformationGrid.SetGrid(SE1.Value, SE2.Value);
 
-  // rewrite saved values because they are reseted
+  // rewrite saved values because they are reseted to default
   len1 := Min(Length(grid), Length(FDeformationGrid.Grid)) - 1;
   len2 := Min(Length(grid[0]), Length(FDeformationGrid.Grid[0])) - 1;
 
