@@ -122,6 +122,7 @@ end;
 
 procedure TFormEditDeformationGrid.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
+  CloseAction := CloseAction;
   FSurfaceDescriptor^.DeformationGridData := FDeformationGrid.SaveDeformationDataToString;
 end;
 
@@ -383,6 +384,10 @@ end;
 procedure TFormEditDeformationGrid.ProcessLabelMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  Button := Button;
+  Shift := Shift;
+  X := X;
+  Y := Y;
   SelectLabel(Sender as TLabelGrid);
 end;
 
@@ -391,6 +396,10 @@ procedure TFormEditDeformationGrid.ProcessLabelMouseUp(Sender: TObject; Button: 
 var lab: TLabelGrid;
    ro, co: integer;
 begin
+  Button := Button;
+  Shift := Shift;
+  X := X;
+  Y := Y;
   lab := Sender as TLabelGrid;
   UnselectLabel(lab);
 

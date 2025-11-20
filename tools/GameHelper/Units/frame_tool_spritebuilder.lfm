@@ -1,9 +1,9 @@
 object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
   Left = 0
-  Height = 835
+  Height = 738
   Top = 0
   Width = 300
-  ClientHeight = 835
+  ClientHeight = 738
   ClientWidth = 300
   TabOrder = 0
   DesignLeft = 924
@@ -14,30 +14,33 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Panel2
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 707
+    Height = 706
     Top = 32
     Width = 300
-    ActivePage = PageChilds
+    ActivePage = PageSave
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    MultiLine = True
+    TabIndex = 4
     TabOrder = 0
     OnChange = PC1Change
+    Options = [nboMultiLine]
     object PageTextures: TTabSheet
       Caption = 'Textures'
     end
     object PageChilds: TTabSheet
       Caption = 'Root/Childs'
-      ClientHeight = 679
+      ClientHeight = 658
       ClientWidth = 292
       object Panel1: TPanel
         Left = 0
-        Height = 679
+        Height = 658
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 679
+        ClientHeight = 658
         ClientWidth = 292
         Color = 9671571
         ParentBackground = False
@@ -1092,7 +1095,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 136
           Top = 352
           Width = 290
-          PageIndex = 6
+          PageIndex = 0
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 7
           object PageExtraEmpty: TPage
@@ -1827,7 +1830,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PageCollisionBody: TTabSheet
       Caption = 'Collision body'
-      ClientHeight = 679
+      ClientHeight = 658
       ClientWidth = 292
       object Panel6: TPanel
         AnchorSideTop.Control = Panel12
@@ -1835,12 +1838,12 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         AnchorSideBottom.Control = PageCollisionBody
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 653
+        Height = 632
         Top = 26
         Width = 292
         Anchors = [akTop, akLeft, akBottom]
         BevelOuter = bvNone
-        ClientHeight = 653
+        ClientHeight = 632
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -2060,7 +2063,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PagePostures: TTabSheet
       Caption = 'Postures'
-      ClientHeight = 679
+      ClientHeight = 658
       ClientWidth = 292
       object Panel10: TPanel
         AnchorSideLeft.Control = PagePostures
@@ -2406,6 +2409,190 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         end
       end
     end
+    object PageSave: TTabSheet
+      Caption = 'Save'
+      ClientHeight = 658
+      ClientWidth = 292
+      object Panel20: TPanel
+        Left = 0
+        Height = 658
+        Top = 0
+        Width = 292
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 658
+        ClientWidth = 292
+        Color = 8289918
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+        object Label3: TLabel
+          AnchorSideLeft.Control = Panel20
+          Left = 10
+          Height = 15
+          Top = 16
+          Width = 173
+          BorderSpacing.Left = 10
+          Caption = 'Name of the sprite in SpriteBank:'
+        end
+        object Edit2: TEdit
+          AnchorSideLeft.Control = Label3
+          AnchorSideTop.Control = Label3
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Control = Panel20
+          AnchorSideRight.Side = asrBottom
+          Left = 10
+          Height = 23
+          Top = 31
+          Width = 272
+          Anchors = [akTop, akLeft, akRight]
+          BorderSpacing.Right = 10
+          TabOrder = 0
+          OnChange = Edit2Change
+          OnEnter = SE1Enter
+        end
+        object BAddToSpriteBank: TSpeedButton
+          AnchorSideLeft.Control = Panel20
+          AnchorSideLeft.Side = asrCenter
+          AnchorSideTop.Control = CheckBox3
+          AnchorSideTop.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 46
+          Height = 30
+          Hint = 'save the sprite in the SpriteBank and (re)create a Pascal unit into the Lazarus project, folder Units/Sprites'
+          Top = 262
+          Width = 200
+          BorderSpacing.Top = 15
+          Caption = 'Save into project'
+          Images = DataModule1.ImageList1
+          ImageIndex = 2
+          OnClick = BAddToSpriteBankClick
+        end
+        object CheckBox1: TCheckBox
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = Label56
+          AnchorSideTop.Side = asrBottom
+          AnchorSideRight.Side = asrBottom
+          Left = 5
+          Height = 19
+          Top = 190
+          Width = 199
+          BorderSpacing.Left = 5
+          BorderSpacing.Top = 10
+          BorderSpacing.Right = 5
+          Caption = 'Activate ApplySymmetryWhenFlip'
+          TabOrder = 1
+        end
+        object CheckBox2: TCheckBox
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = CheckBox1
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 19
+          Top = 209
+          Width = 160
+          BorderSpacing.Left = 5
+          Caption = 'Override ProcessMessage()'
+          Checked = True
+          State = cbChecked
+          TabOrder = 2
+        end
+        object Label51: TLabel
+          AnchorSideRight.Control = Panel20
+          AnchorSideRight.Side = asrBottom
+          Left = 224
+          Height = 15
+          Top = 120
+          Width = 63
+          Anchors = [akRight]
+          BorderSpacing.Right = 5
+          Caption = 'Pascal code'
+          Font.Color = clWhite
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label52: TLabel
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = Label51
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 15
+          Top = 135
+          Width = 57
+          BorderSpacing.Left = 5
+          Caption = 'unit name:'
+        end
+        object Label53: TLabel
+          AnchorSideLeft.Control = Label57
+          AnchorSideTop.Control = Label52
+          Left = 120
+          Height = 15
+          Top = 135
+          Width = 43
+          Caption = 'Label53'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label54: TLabel
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = Label52
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 15
+          Top = 150
+          Width = 94
+          BorderSpacing.Left = 5
+          Caption = 'Sprite class name:'
+        end
+        object Label55: TLabel
+          AnchorSideLeft.Control = Label57
+          AnchorSideTop.Control = Label54
+          Left = 120
+          Height = 15
+          Top = 150
+          Width = 43
+          Caption = 'Label55'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label56: TLabel
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = Label54
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 15
+          Top = 165
+          Width = 110
+          BorderSpacing.Left = 5
+          Caption = 'Sprite variable name:'
+        end
+        object Label57: TLabel
+          AnchorSideLeft.Control = Label56
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label56
+          Left = 120
+          Height = 15
+          Top = 165
+          Width = 43
+          BorderSpacing.Left = 5
+          Caption = 'Label57'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object CheckBox3: TCheckBox
+          AnchorSideLeft.Control = Panel20
+          AnchorSideTop.Control = CheckBox2
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 19
+          Top = 228
+          Width = 112
+          BorderSpacing.Left = 5
+          Caption = 'Override Update()'
+          TabOrder = 3
+        end
+      end
+    end
   end
   object Panel8: TPanel
     AnchorSideLeft.Control = Owner
@@ -2466,61 +2653,6 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Width = 32
     Anchors = [akLeft, akBottom]
     TabOrder = 2
-  end
-  object Panel2: TPanel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
-    Left = 0
-    Height = 96
-    Top = 739
-    Width = 300
-    Anchors = [akLeft, akRight, akBottom]
-    BevelOuter = bvNone
-    ClientHeight = 96
-    ClientWidth = 300
-    Color = 6908265
-    ParentBackground = False
-    ParentColor = False
-    TabOrder = 3
-    object BAddToSpriteBank: TSpeedButton
-      AnchorSideLeft.Control = Panel2
-      AnchorSideLeft.Side = asrCenter
-      Cursor = crHandPoint
-      Left = 50
-      Height = 30
-      Top = 56
-      Width = 200
-      Caption = 'Save to Sprite Bank'
-      Images = DataModule1.ImageList1
-      ImageIndex = 2
-      OnClick = BAddToSpriteBankClick
-    end
-    object Label3: TLabel
-      AnchorSideLeft.Control = Panel2
-      Left = 10
-      Height = 15
-      Top = 8
-      Width = 101
-      BorderSpacing.Left = 10
-      Caption = 'Name of the sprite:'
-    end
-    object Edit2: TEdit
-      AnchorSideLeft.Control = Label3
-      AnchorSideRight.Control = Panel2
-      AnchorSideRight.Side = asrBottom
-      Left = 10
-      Height = 23
-      Top = 24
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Right = 10
-      TabOrder = 0
-      OnEnter = SE1Enter
-    end
   end
   object OD1: TOpenDialog
     Title = 'Open image file'

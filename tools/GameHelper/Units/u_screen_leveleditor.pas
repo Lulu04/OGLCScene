@@ -110,7 +110,7 @@ uses Forms, u_levelbank, frame_tool_leveleditor, form_main, u_app_pref,
 
 function TLevelEditorSurfaceList.Textures: TTextureList;
 begin
-  Result := LevelBank.Textures;
+  Result := WorkingLevelGroup.Textures;
 end;
 
 { TScreenLevelEditor }

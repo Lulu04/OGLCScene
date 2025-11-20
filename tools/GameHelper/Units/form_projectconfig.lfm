@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 0
+    PageIndex = 2
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage
@@ -285,9 +285,9 @@ object FormProjectConfig: TFormProjectConfig
           Left = 181
           Height = 15
           Top = 216
-          Width = 37
+          Width = 73
           BorderSpacing.Left = 3
-          Caption = 'level(s)'
+          Caption = 'group of level'
         end
         object BEraseLevelBank: TSpeedButton
           Cursor = crHandPoint
@@ -295,9 +295,9 @@ object FormProjectConfig: TFormProjectConfig
           Height = 28
           Hint = 'Erase all levels defined in this project, and the associated textures.'#13#10'The textures used for the Sprite Bank are not affected.'
           Top = 232
-          Width = 174
+          Width = 247
           AutoSize = True
-          Caption = 'Erase all levels and textures'
+          Caption = 'Erase all groups, all levels and all textures'
           Images = DataModule1.ImageList1
           ImageIndex = 5
           OnClick = BEraseLevelBankClick

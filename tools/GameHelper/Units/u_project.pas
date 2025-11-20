@@ -33,9 +33,6 @@ TProjectConfig = record
   // scene
   SceneWidth, SceneHeight: integer;
   MaximizeScene: boolean;
-  // level bank
-  LevelBankExportClassName,
-  LevelBankExportUnitName: string;
   // level editor
   LevelEditorOverlap: single;
   // common
@@ -113,9 +110,6 @@ begin
   SceneHeight := 768;
   MaximizeScene := True;
 
-  LevelBankExportClassName := 'TLevels';
-  LevelBankExportUnitName := 'u_levels.pas';
-
   LevelEditorOverlap := 0.5;
 
   CommonShowFlyingTxt := True;
@@ -132,9 +126,6 @@ begin
   // layers names NOT NECESSARY because they are read from u_common.pas
   //prop.Add('Layers', Layers.SaveToString);
 
-  //level bank
-  prop.Add('LevelBankExportClassName', LevelBankExportClassName);
-  prop.Add('LevelBankExportUnitName', LevelBankExportUnitName);
   // level editor
   prop.Add('LevelEditorOverlap', LevelEditorOverlap);
   // common
@@ -145,10 +136,8 @@ end;
 
 procedure TProjectConfig.LoadFromString(const data: string);
 var prop: TProperties;
-  s: string;
 begin
   prop.Split(data, '|');
-  s := '';
   // scene
   prop.IntegerValueOf('SceneWidth', SceneWidth, 1024);
   prop.IntegerValueOf('SceneHeight', SceneHeight, 768);
@@ -156,9 +145,6 @@ begin
   // layers
   //prop.StringValueOf('Layers', s, 'LAYER_TOP');
   //Layers.LoadFromString(s);
-  //level bank
-  prop.StringValueOf('LevelBankExportClassName', LevelBankExportClassName, LevelBankExportClassName);
-  prop.StringValueOf('LevelBankExportUnitName', LevelBankExportUnitName, LevelBankExportUnitName);
   // level editor
   prop.SingleValueOf('LevelEditorOverlap', LevelEditorOverlap, 0.5);
   // common
@@ -272,14 +258,18 @@ begin
   SpriteBank.Clear;
   LevelBank.Clear;
   Config.InitDefault;
+  WorkingLevelGroup := NIL;
 end;
 
 procedure TProject.OnModifiedChange(aState: boolean);
 begin
+  aState := aState;
 end;
 
 procedure TProject.OnProjectReadyChange(aState: boolean);
 begin
+  aState := aState;
+
   if IsReady then begin
     FrameToolsSpriteBuilder.FillListBoxTextureNames;
     if LevelBank.Size > 0 then FormMain.ShowPageLevelBank

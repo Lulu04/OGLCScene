@@ -89,6 +89,8 @@ procedure TFrameViewLayerList.LBDrawItem(Control: TWinControl; Index: Integer;
 var p: TPoint;
  i, xx, xx1, yy, yy1: integer;
 begin
+  Control := Control;
+
   with LB.Canvas do
   begin
     Brush.Style := bsSolid;
@@ -192,6 +194,8 @@ end;
 
 procedure TFrameViewLayerList.LBKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  Shift := Shift;
+
   if (Key = VK_SPACE) or
      (Key = VK_UP) or
      (Key = VK_DOWN) or
@@ -203,6 +207,8 @@ procedure TFrameViewLayerList.LBMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var i: integer;
 begin
+  Shift := Shift;
+
   i := LB.GetIndexAtY(Y);
 
   if Button = mbLeft then begin
@@ -230,6 +236,9 @@ end;
 procedure TFrameViewLayerList.LBMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
 var i: integer;
 begin
+  Shift := Shift;
+  X := X;
+
   // dragging an item
   if (FLeftClickedIndex <> -1) and (LB.ItemIndex <> FLeftClickedIndex) then begin
     LB.ItemIndex := FLeftClickedIndex;
@@ -254,6 +263,7 @@ procedure TFrameViewLayerList.LBMouseUp(Sender: TObject; Button: TMouseButton;
 var i: integer;
  flagCanMove: boolean;
 begin
+  Shift := Shift;
   if Button = mbLeft then begin
     if FLeftClickedIndex <> -1 then begin
       Y := EnsureRange(Y, 0, LB.ClientHeight);

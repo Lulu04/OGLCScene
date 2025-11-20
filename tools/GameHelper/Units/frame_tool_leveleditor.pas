@@ -222,7 +222,7 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  form_showhelp, form_editgradient, Graphics;
+  form_showhelp, form_editgradient, u_target_lazarusproject, Graphics;
 
 {$R *.lfm}
 
@@ -330,13 +330,13 @@ begin
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
 
-  o := LevelBank.GetItemByName(nam);
+  o := WorkingLevelGroup.GetItemByName(nam);
   if o <> NIL then
     if QuestionDlg('','a level named "'+nam+'" already exists in the bank.'+LineEnding+
                 'Would you like to replace it ?',
                 mtWarning, [mrOk, 'Replace', mrCancel, 'Cancel'],0) = mrCancel then exit;
 
-  if o = NIL then o := LevelBank.AddEmpty;
+  if o = NIL then o := WorkingLevelGroup.AddEmpty;
   o^.name := nam;
   o^.surfaces := Surfaces.SaveToString;
 
@@ -358,6 +358,11 @@ begin
 
   o^.layerloopinfo := FDecorLoopModes.SaveToString;
 
+  // generate the new levels unit file and add it to target Lazarus project
+  LevelBank.ExportToFileGameLevel;
+  Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+
+  // save the game helper project
   Project.SetModified;
   Project.Save;
   Modified := False;
@@ -402,6 +407,7 @@ end;
 
 procedure TFrameToolLevelEditor.CBTexturesKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  Shift := Shift;
   Key := 0;
 end;
 
@@ -631,7 +637,7 @@ end;
 
 function TFrameToolLevelEditor.Textures: TTextureList;
 begin
-  Result := LevelBank.Textures;
+  Result := WorkingLevelGroup.Textures;
 end;
 
 procedure TFrameToolLevelEditor.LayerIndexToCB(aIndex: integer);
@@ -1005,7 +1011,7 @@ procedure TFrameToolLevelEditor.EditLevelInLevelBank(const aName: string);
 var o: PLevelBankItem;
   wi: TWorldInfo;
 begin
-  o := LevelBank.GetItemByName(aName);
+  o := WorkingLevelGroup.GetItemByName(aName);
   if o = NIL then exit;
 
   Layers.FillComboBox(ComboBox1);

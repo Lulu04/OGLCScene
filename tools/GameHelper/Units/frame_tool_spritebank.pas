@@ -20,37 +20,32 @@ type
     BUndo: TSpeedButton;
     BRedo: TSpeedButton;
     CBShowCollisionBody: TCheckBox;
-    CheckBox1: TCheckBox;
-    CheckBox2: TCheckBox;
-    Edit1: TEdit;
-    Label1: TLabel;
     Label24: TLabel;
-    Label25: TLabel;
     LB: TListBox;
     MIRedo: TMenuItem;
     MIUndo: TMenuItem;
+    Panel2: TPanel;
+    Panel3: TPanel;
     Panel8: TPanel;
     Separator2: TMenuItem;
     Separator1: TMenuItem;
     MIDuplicate: TMenuItem;
     MIDelete: TMenuItem;
-    Panel1: TPanel;
-    Panel2: TPanel;
     SD1: TSaveDialog;
     BEdit: TSpeedButton;
-    BExportToPascalUnit: TSpeedButton;
     BDelete: TSpeedButton;
+    Splitter1: TSplitter;
     procedure BDeleteClick(Sender: TObject);
     procedure BEditClick(Sender: TObject);
     procedure BHelpClick(Sender: TObject);
     procedure CBShowCollisionBodyChange(Sender: TObject);
     procedure LBMouseUp(Sender: TObject; {%H-}Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer);
     procedure LBSelectionChange(Sender: TObject; {%H-}User: boolean);
-    procedure BExportToPascalUnitClick(Sender: TObject);
   private
     procedure FillLB;
     procedure ShowSprite(aIndex: integer);
     procedure UpdateWidgetState;
+    procedure DoDeleteSelectedSprite;
   private
     FUndoRedoManager: TSpriteBankUndoRedoManager;
   public
@@ -66,45 +61,17 @@ type
 
 implementation
 
-uses LCLType, Graphics, form_main, u_project, form_showhelp, u_utils, OGLCScene,
-  BGRABitmap, BGRABitmapTypes;
+uses LCLType, Graphics, form_main, u_project, form_showhelp,
+  u_target_lazarusproject, OGLCScene, BGRABitmap, BGRABitmapTypes;
 
 {$R *.lfm}
 
 { TFrameToolSpriteBank }
 
 procedure TFrameToolSpriteBank.LBSelectionChange(Sender: TObject; User: boolean);
-var i: integer;
 begin
   UpdateWidgetState;
   ShowSprite(LB.ItemIndex);
-
-  i := LB.ItemIndex;
-  if i = -1 then Edit1.Text := ''
-    else Edit1.Text := 'T'+SpriteBank.Mutable[i]^.name;
-end;
-
-procedure TFrameToolSpriteBank.BExportToPascalUnitClick(Sender: TObject);
-var t: TStringlist;
-  nameClass: string;
-begin
-  if LB.ItemIndex = -1 then exit;
-
-  nameClass := Trim(Edit1.Text);
-  if Length(nameClass) < 2 then exit;
-  if nameClass[1] <> 'T' then nameClass := 'T'+nameClass;
-  SD1.FileName := Copy(nameClass, 2, Length(Edit1.Text));
-  if not SD1.Execute then exit;
-
-  t := TStringlist.Create;
-  ExportSpriteToPascalUnit(t, Textures, Surfaces, Postures, LB.Items.Strings[LB.ItemIndex], nameClass, SD1.FileName,
-    CheckBox1.Checked, CheckBox2.Checked);
-  try
-    t.SaveToFile(SD1.FileName);
-    ShowMessage('Pascal unit created');
-  finally
-    t.Free;
-  end;
 end;
 
 procedure TFrameToolSpriteBank.LBMouseUp(Sender: TObject; Button: TMouseButton;
@@ -149,12 +116,7 @@ begin
     if i = -1 then exit;
     if QuestionDlg('','Delete this sprite ?', mtWarning,
                    [mrOk, 'Delete', mrCancel, 'Cancel'], 0) = mrCancel then exit;
-    FUndoRedoManager.AddActionDeleteSprite(i);
-    SpriteBank.DeleteByIndex(i);
-    LB.Items.Delete(i);
-    ScreenSpriteBank.ClearView;
-    Project.SetModified;
-    UpdateWidgetState;
+    DoDeleteSelectedSprite;
   end;
 
   if Sender = BDuplicate then begin
@@ -231,6 +193,27 @@ begin
   BDelete.Enabled := BDuplicate.Enabled;
   BUndo.Enabled := FUndoRedoManager.CanUndo;
   BRedo.Enabled := FUndoRedoManager.CanRedo;
+end;
+
+procedure TFrameToolSpriteBank.DoDeleteSelectedSprite;
+var i: integer;
+  nameUnit: string;
+begin
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  // remove unit from target lazarus project
+  nameUnit := 'u_sprite_'+LowerCase(SpriteBank.Mutable[i]^.name);
+  Project.Config.TargetLazarusProject.Unit_RemoveFromProject(nameUnit, ulSprites, uePas);
+  // delete file in Units folder
+  Project.Config.TargetLazarusProject.Unit_DeleteFile(nameUnit, ulSprites, uePas);
+
+  FUndoRedoManager.AddActionDeleteSprite(i);
+  SpriteBank.DeleteByIndex(i);
+  LB.Items.Delete(i);
+  ScreenSpriteBank.ClearView;
+  Project.SetModified;
+  UpdateWidgetState;
 end;
 
 constructor TFrameToolSpriteBank.Create(aOwner: TComponent);

@@ -1,0 +1,263 @@
+object FrameViewLevelBank: TFrameViewLevelBank
+  Left = 0
+  Height = 240
+  Top = 0
+  Width = 320
+  ClientHeight = 240
+  ClientWidth = 320
+  TabOrder = 0
+  DesignLeft = 448
+  DesignTop = 224
+  object TV: TTreeView
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 320
+    Align = alClient
+    BackgroundColor = 3947580
+    Color = 3947580
+    ExpandSignType = tvestArrowFill
+    Font.Color = 14803425
+    Font.Height = 16
+    HotTrack = True
+    Images = DataModule1.ILLevelTreeView
+    ParentFont = False
+    ReadOnly = True
+    RightClickSelect = True
+    ScrollBars = ssAutoVertical
+    ShowRoot = False
+    TabOrder = 0
+    OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
+    OnMouseDown = TVMouseDown
+    OnMouseUp = TVMouseUp
+    OnMouseWheel = TVMouseWheel
+    OnResize = TVResize
+    OnSelectionChanged = TVSelectionChanged
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoToolTips, tvoThemedDraw]
+  end
+  object PanelRoot: TPanel
+    Left = 232
+    Height = 18
+    Top = 8
+    Width = 32
+    BevelOuter = bvNone
+    ClientHeight = 18
+    ClientWidth = 32
+    Color = 3947580
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    Visible = False
+    object BAddGroup: TSpeedButton
+      AnchorSideLeft.Control = PanelRoot
+      AnchorSideTop.Control = PanelRoot
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Add a new group'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 2
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object PanelGroup: TPanel
+    Left = 232
+    Height = 18
+    Top = 32
+    Width = 72
+    BevelOuter = bvNone
+    ClientHeight = 18
+    ClientWidth = 72
+    Color = 3947580
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 2
+    Visible = False
+    object BAddLevel: TSpeedButton
+      AnchorSideLeft.Control = PanelGroup
+      AnchorSideTop.Control = PanelGroup
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Add a new level to this group'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 2
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BRenameGroup: TSpeedButton
+      AnchorSideLeft.Control = BAddLevel
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelGroup
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 20
+      Height = 16
+      Hint = 'Rename the group'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 4
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BDeleteGroup: TSpeedButton
+      AnchorSideLeft.Control = BRenameGroup
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelGroup
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = PanelGroup
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 56
+      Height = 16
+      Hint = 'Delete the group'
+      Top = 1
+      Width = 16
+      Anchors = [akTop, akRight]
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 3
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object PanelLevel: TPanel
+    Left = 232
+    Height = 18
+    Top = 60
+    Width = 72
+    BevelOuter = bvNone
+    ClientHeight = 18
+    ClientWidth = 72
+    Color = 3947580
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 3
+    Visible = False
+    object BRenameLevel: TSpeedButton
+      AnchorSideLeft.Control = PanelLevel
+      AnchorSideTop.Control = PanelLevel
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Rename the level'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 4
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BDuplicateLevel: TSpeedButton
+      AnchorSideLeft.Control = BRenameLevel
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelLevel
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 20
+      Height = 16
+      Hint = 'Duplicate this level'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 5
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BDeleteLevel: TSpeedButton
+      AnchorSideLeft.Control = BDuplicateLevel
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelLevel
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = PanelLevel
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 56
+      Height = 16
+      Hint = 'Delete this level'
+      Top = 1
+      Width = 16
+      Anchors = [akTop, akRight]
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 3
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object PopupGroup: TPopupMenu
+    Images = DataModule1.ILLevelTreeView
+    Left = 58
+    Top = 53
+    object MIAddLevel: TMenuItem
+      Caption = 'Add level to this group'
+      ImageIndex = 2
+      OnClick = BAddGroupClick
+    end
+    object MIRenameGroup: TMenuItem
+      Caption = 'Rename group'
+      ImageIndex = 4
+      OnClick = BAddGroupClick
+    end
+    object MIDeleteGroup: TMenuItem
+      Caption = 'Delete group'
+      ImageIndex = 3
+      OnClick = BAddGroupClick
+    end
+  end
+  object PopupLevel: TPopupMenu
+    Images = DataModule1.ILLevelTreeView
+    Left = 173
+    Top = 80
+    object MIRenameLevel: TMenuItem
+      Caption = 'Rename'
+      ImageIndex = 4
+      OnClick = BAddGroupClick
+    end
+    object MIDuplicateLevel: TMenuItem
+      Caption = 'Duplicate'
+      ImageIndex = 5
+      OnClick = BAddGroupClick
+    end
+    object MIDeleteLevel: TMenuItem
+      Caption = 'Delete'
+      ImageIndex = 3
+      OnClick = BAddGroupClick
+    end
+  end
+  object PopupEmpty: TPopupMenu
+    Images = DataModule1.ILLevelTreeView
+    Left = 110
+    Top = 177
+    object MINewGroup: TMenuItem
+      Caption = 'New group'
+      ImageIndex = 2
+      OnClick = BAddGroupClick
+    end
+  end
+end

@@ -14,8 +14,8 @@ TSpriteBuilderUndoRedoActionType = (
                           );
 TSpriteBuilderUndoRedoItem = record
   action: TSpriteBuilderUndoRedoActionType;
-  name, textures, surfaces, collisionbodies: string;
-  oldName: string;
+  name, textures, surfaces, collisionbodies, postures, codeoptions: string;
+  oldName, oldtextures, oldsurfaces, oldcollisionbodies, oldpostures, oldcodeoptions: string;
 end;
 
 {TSpriteBuilderUndoRedoManager = class(specialize TGenericUndoRedoManager<TSpriteBuilderUndoRedoItem>)

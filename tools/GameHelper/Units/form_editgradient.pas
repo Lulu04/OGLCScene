@@ -358,6 +358,8 @@ end;
 
 procedure TFormEditGradient.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
+  CloseAction := CloseAction;
+
   FNewGradientData := FGradient^.SaveGradientDataToString;
 end;
 
