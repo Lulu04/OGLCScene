@@ -39,8 +39,8 @@ type
     procedure Panel1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PBMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-    procedure PBMouseMove(Sender: TObject; {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure PBMouseUp(Sender: TObject; Button: TMouseButton; {%H-}Shift: TShiftState; {%H-}X, {%H-}Y: Integer);
+    procedure PBMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure PBMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure PBPaint(Sender: TObject);
   private
     FClickOrigin: TPoint;
@@ -185,6 +185,10 @@ end;
 procedure TFrameGradientRow.Panel1MouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
+  Button := Button;
+  Shift := Shift;
+  X := X;
+  Y := Y;
   DoSelectSelf;
 end;
 
@@ -192,6 +196,8 @@ procedure TFrameGradientRow.PBMouseMove(Sender: TObject; Shift: TShiftState; X, 
 var nodeIndexUnderMouse: integer;
     thresholdDone: boolean;
 begin
+  Shift := Shift;
+
   nodeIndexUnderMouse := GetNodeIndexAt(X);
   thresholdDone := Distance(PointF(ClickOrigin), PointF(X, Y)) > PPIScale(3);
 
@@ -240,6 +246,10 @@ end;
 procedure TFrameGradientRow.PBMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var nodeIndexUnderMouse: integer;
 begin
+  Button := Button;
+  Shift := Shift;
+  Y := Y;
+
   nodeIndexUnderMouse := GetNodeIndexAt(X);
 
   case MouseState of

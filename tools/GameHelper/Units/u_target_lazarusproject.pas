@@ -7,27 +7,71 @@ interface
 
 uses
   Classes, SysUtils,
+  laz2_DOM, laz2_XMLRead, laz2_XMLWrite,
   OGLCScene;
+
+type
+TUnitLocation = (ulUnits, ulSprites, ulLevels);
+TUnitExtension = (uePas, ueInc, ueLpr);
+const
+UNIT_PREFIX: array[TUnitLocation] of string = ('Units\', 'Units\Sprites\', 'Units\Levels\');
+UNIT_EXT: array[TUnitExtension] of string = ('.pas', '.inc', '.lpr');
 
 type
 
 { TTargetLazarusProject }
 
 TTargetLazarusProject = record
-private // config
+private // LPI file utils
+  function LPI_ReadUnitsSection: TStringArray;
+  function LPI_CheckIfHaveUnit(const aUnitName: string;
+                               aUnitLocation: TUnitLocation;
+                               aUnitExtension: TUnitExtension): boolean;
+public // LPI file
+  function LPI_ExpandUnitName(const aUnitName: string;
+                              aUnitLocation: TUnitLocation;
+                              aUnitExtension: TUnitExtension): string;
+  procedure LPI_AddUnit(const aUnitName: string;
+                        aUnitLocation: TUnitLocation;
+                        aUnitExtension: TUnitExtension);
+  procedure LPI_RemoveUnit(const aUnitName: string;
+                           aUnitLocation: TUnitLocation;
+                           aUnitExtension: TUnitExtension);
+public // string utils
+  // return True if the char is found -> IndexFound is the index
+  function FindIndexOfNextChar(const Src: string; aChar: char;
+                               aStartIndex: integer; out IndexFound: integer): boolean;
+  // return True if the char is found -> IndexFound is the index
+  function FindIndexOfPreviousChar(const Src: string; aChar: char;
+                                   aStartIndex: integer; out IndexFound: integer): boolean;
+  procedure RemoveNextConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
+  procedure RemovePreviousConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
+public // folder and files
+  function GetFolderUnits: string;
+  function GetFolderUnitsSprites: string;
+  function GetFolderUnitsLevels: string;
+  function GetFilenameGameLevels: string;
   function GetFilenameProject_Config: string;
-  function CreateStringListFromFile(const aFilename: string): TStringList;
-  function LineIsActive(const s: string): boolean; overload;
-  procedure SetLineActive(var s: string; aValue: boolean); overload;
-  function LineIsActive(const aFilename: string; aLineIndex: integer): boolean; overload;
-  procedure SetLineActive(const aFilename: string; aLineIndex: integer; aValue: boolean); overload;
-  function GetProjectConfig_MaximizeSceneOnMonitor: boolean;
-  procedure SetProjectConfig_MaximizeSceneOnMonitor(AValue: boolean);
-  function GetProjectConfig_WindowedMode: boolean;
-  procedure SetProjectConfig_WindowedMode(AValue: boolean);
+  function GetFilenameProject_LPR: string;
+  function GetFilenameProject_LPI: string;
+private // TStringList utils
+  function StringList_CreateFromFile(const aFilename: string): TStringList;
+  // -1 if not found
+  function StringList_SearchLineThatContain(t: TStringList; const aStringToSearch: string;
+                                 aSearchFromLineIndex: integer;
+                                 aSearchToLineIndex: integer=MaxInt): integer;
+  procedure StringList_RemoveUnitNameOnLine(t: TStringList; aLineIndex: integer; const aUnitName: string);
+
+private // project options in configuration file
+  function ConfigOption_IsActive(const aFilename, aOptionName: string): boolean;
+  procedure ConfigOption_SetActive(const aFilename, aOptionName: string; aValue: boolean);
+  function ConfigOption_GetMaximizeSceneOnMonitor: boolean;
+  procedure ConfigOption_SetMaximizeSceneOnMonitor(AValue: boolean);
+  function ConfigOption_GetWindowedMode: boolean;
+  procedure ConfigOption_SetWindowedMode(AValue: boolean);
 public // config
-  property ProjectConfig_MaximizeSceneOnMonitor: boolean read GetProjectConfig_MaximizeSceneOnMonitor write SetProjectConfig_MaximizeSceneOnMonitor;
-  property ProjectConfig_WindowedMode: boolean read GetProjectConfig_WindowedMode write SetProjectConfig_WindowedMode;
+  property ProjectConfig_MaximizeSceneOnMonitor: boolean read ConfigOption_GetMaximizeSceneOnMonitor write ConfigOption_SetMaximizeSceneOnMonitor;
+  property ProjectConfig_WindowedMode: boolean read ConfigOption_GetWindowedMode write ConfigOption_SetWindowedMode;
 private // unit utils
   function SearchTags(const aUnitFilename, aTagName: string; out FirstTagIndex, LastTagIndex: integer): TStringList;
   function ReadTagContent(const aUnitFilename, aTagName: string): TStringArray;
@@ -39,12 +83,114 @@ public // u_common
   procedure UCommonSetLayerNames(const aNames: TStringArray);
   function UCommonGetDesignValues: TArrayOfInteger;
   procedure UCommonSetDesignValues(const aValues: TArrayOfInteger);
+
+private // entry in USES clause into an unit
+  function Unit_USES_CheckIfHaveEntry(t: TStringList; const aUnitNameToCheck: string;
+          aCheckInInterface, aCheckInImplementation: boolean): boolean;
+public // entry in USES clause into an unit
+
+  procedure Unit_USES_AddEntry(const aTargetUnit, aUnitNameToAdd: string; aAddInInterface: boolean);
+  procedure Unit_USES_RemoveEntry(const aTargetUnit, aUnitNameToRemove: string;
+                                  aRemoveInInterface, aRemoveInImplementation: boolean);
+
+public // add/remove unit to project
+  function Unit_ExpandUnitName(const aUnitName: string;
+                               aUnitLocation: TUnitLocation;
+                               aUnitExtension: TUnitExtension): string;
+  procedure Unit_AddToProject(const aUnitName: string;
+                              aUnitLocation: TUnitLocation;
+                              aUnitExtension: TUnitExtension);
+  procedure Unit_RemoveFromProject(const aUnitName: string;
+                                   aUnitLocation: TUnitLocation;
+                                   aUnitExtension: TUnitExtension);
+  procedure Unit_DeleteFile(const aUnitName: string;
+                            aUnitLocation: TUnitLocation;
+                            aUnitExtension: TUnitExtension);
+public // formated unit name
+  function GetUnitNameForSprite(const aNameOfTheSprite: string): string;
+public // formated path and filename
+  function GetUnitFileNameForSprite(const aNameOfTheSprite: string): string;
 end;
 
 implementation
-uses u_project, Math;
+uses u_project, u_common, Math, utilitaire_fichier;
 
 { TTargetLazarusProject }
+
+function TTargetLazarusProject.FindIndexOfNextChar(const Src: string;
+  aChar: char; aStartIndex: integer; out IndexFound: integer): boolean;
+var i: integer;
+begin
+  if aStartIndex = 0 then aStartIndex := 1;
+  for i:=aStartIndex to Length(Src) do
+    if Src[i] = aChar then begin
+      IndexFound := i;
+      exit(True);
+    end;
+  IndexFound := -1;
+  Result := False;
+end;
+
+function TTargetLazarusProject.FindIndexOfPreviousChar(const Src: string;
+  aChar: char; aStartIndex: integer; out IndexFound: integer): boolean;
+var i: integer;
+begin
+  for i:=aStartIndex downto 1 do
+    if Src[i] = aChar then begin
+      IndexFound := i;
+      exit(True);
+    end;
+  IndexFound := -1;
+  Result := False;
+end;
+
+procedure TTargetLazarusProject.RemoveNextConsecutiveChar(var Src: string;
+  aChar: char; aFromIndex: integer);
+ var i: integer;
+begin
+  if Src = '' then exit;
+  if (aFromIndex < 1) or (aFromIndex > Length(Src)) then raise exception.create('aFromIndex: bad value');
+
+  i := aFromIndex;
+  while (i <= Length(Src)) and (Src[i] = aChar) do
+    inc(i);
+  system.Delete(Src, aFromIndex, i-aFromIndex+1);
+end;
+
+procedure TTargetLazarusProject.RemovePreviousConsecutiveChar(var Src: string;
+  aChar: char; aFromIndex: integer);
+var i: integer;
+begin
+  if Src = '' then exit;
+  if (aFromIndex < 1) or (aFromIndex > Length(Src)) then raise exception.create('aFromIndex: bad value');
+
+  i := aFromIndex;
+  while (i >= 1) and (Src[i] = aChar) do
+    dec(i);
+  if i <> aFromIndex then
+    system.Delete(Src, i, aFromIndex-i+1);
+end;
+
+function TTargetLazarusProject.GetFolderUnits: string;
+begin
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(Project.Filename)) +
+            'Units' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderUnitsSprites: string;
+begin
+  Result := GetFolderUnits + 'Sprites' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderUnitsLevels: string;
+begin
+  Result := GetFolderUnits + 'Levels' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFilenameGameLevels: string;
+begin
+  Result := GetFolderUnitsLevels + LEVEL_UNIT_NAME+'.pas';
+end;
 
 function TTargetLazarusProject.GetFilenameProject_Config: string;
 begin
@@ -52,7 +198,146 @@ begin
             'Units' + DirectorySeparator + 'project_config.cfg';
 end;
 
-function TTargetLazarusProject.CreateStringListFromFile(const aFilename: string): TStringList;
+function TTargetLazarusProject.GetFilenameProject_LPR: string;
+begin
+  Result := ChangeFileExt(Project.Filename, '.lpr');
+end;
+
+function TTargetLazarusProject.GetFilenameProject_LPI: string;
+begin
+  Result := ChangeFileExt(Project.Filename, '.lpi');
+end;
+
+function TTargetLazarusProject.LPI_ReadUnitsSection: TStringArray;
+var doc: TXMLDocument;
+  projectoptionNode, unitsNode, childUnit, childFileName, childValue: TDOMNode;
+  i, j: integer;
+begin
+  Result := NIL;
+  if not FileExists(GetFilenameProject_LPI) then raise exception.create('Project LPI file not found');
+  ReadXMLFile(doc, GetFilenameProject_LPI);
+  try
+    projectoptionNode := doc.DocumentElement.FindNode('ProjectOptions');
+    if projectoptionNode = NIL then raise exception.create('section ProjectOptions not found');
+
+    unitsNode := projectoptionNode.FindNode('Units');
+    if unitsNode = NIL then raise exception.create('section UNITS not found');
+
+    childUnit := unitsNode.FirstChild;
+    while Assigned(childUnit) do begin
+      childFileName := childUnit.FindNode('Filename');
+      if Assigned(childFileName) then begin
+        childValue := childFileName.Attributes.GetNamedItem('Value');
+        if Assigned(childValue) then begin
+          SetLength(Result, Length(Result)+1);
+          Result[High(Result)] := childValue.NodeValue;
+        end;
+      end;
+      childUnit := childUnit.NextSibling;
+    end;
+
+  finally
+    doc.Free;
+  end;
+end;
+
+procedure TTargetLazarusProject.LPI_AddUnit(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+var doc: TXMLDocument;
+  projectoptionNode, unitsNode, newUnitNode, newFilenameNode, newIsPartOfProjectNode: TDOMNode;
+  fullname: string;
+begin
+  if LPI_CheckIfHaveUnit(aUnitName, aUnitLocation, aUnitExtension) then exit;
+
+  fullname := LPI_ExpandUnitName(aUnitName, aUnitLocation, aUnitExtension);
+
+  ReadXMLFile(doc, GetFilenameProject_LPI);
+  try
+    projectoptionNode := doc.DocumentElement.FindNode('ProjectOptions');
+    if projectoptionNode = NIL then raise exception.create('section ProjectOptions not found');
+
+    unitsNode := projectoptionNode.FindNode('Units');
+    if unitsNode = NIL then raise exception.create('section UNITS not found');
+
+    newUnitNode := doc.CreateElement('Unit');
+    unitsNode.AppendChild(newUnitNode);
+
+    newFilenameNode := doc.CreateElement('Filename');
+    TDOMElement(newFilenameNode).SetAttribute('Value', fullname);
+    newUnitNode.AppendChild(newFilenameNode);
+
+    newIsPartOfProjectNode := doc.CreateElement('IsPartOfProject');
+    TDOMElement(newIsPartOfProjectNode).SetAttribute('Value', 'True');
+    newUnitNode.AppendChild(newIsPartOfProjectNode);
+
+    writeXMLFile(doc, GetFilenameProject_LPI);
+  finally
+    doc.Free;
+  end;
+end;
+
+procedure TTargetLazarusProject.LPI_RemoveUnit(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+var doc: TXMLDocument;
+  projectoptionNode, unitsNode, childUnit, childFileName, childValue: TDOMNode;
+  fullname: string;
+begin
+  if not LPI_CheckIfHaveUnit(aUnitName, aUnitLocation, aUnitExtension) then exit;
+
+  fullname := LPI_ExpandUnitName(aUnitName, aUnitLocation, aUnitExtension);
+
+  ReadXMLFile(doc, GetFilenameProject_LPI);
+  try
+    projectoptionNode := doc.DocumentElement.FindNode('ProjectOptions');
+    if projectoptionNode = NIL then raise exception.create('section ProjectOptions not found');
+
+    unitsNode := projectoptionNode.FindNode('Units');
+    if unitsNode = NIL then raise exception.create('section UNITS not found');
+
+    childUnit := unitsNode.FirstChild;
+    while Assigned(childUnit) do begin
+      childFileName := childUnit.FindNode('Filename');
+      if Assigned(childFileName) then begin
+        childValue := childFileName.Attributes.GetNamedItem('Value');
+        if Assigned(childValue) then begin
+          if childValue.NodeValue = fullname then begin
+            unitsNode.RemoveChild(childUnit);
+            writeXMLFile(doc, GetFilenameProject_LPI);
+            break;
+          end;
+        end;
+      end;
+      childUnit := childUnit.NextSibling;
+    end;
+
+  finally
+    doc.Free;
+  end;
+end;
+
+function TTargetLazarusProject.LPI_CheckIfHaveUnit(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): boolean;
+var A: TStringArray;
+  i{, k}: integer;
+  fullname, s: string;
+begin
+  Result := False;
+  A := LPI_ReadUnitsSection;
+  if Length(A) = 0 then raise exception.create('LPI_ReadUnitsSection have returned 0 items');
+
+  fullname := LPI_ExpandUnitName(aUnitName, aUnitLocation, aUnitExtension);
+
+  for i:=0 to High(A) do
+    if A[i] = fullname then exit(True);
+end;
+
+function TTargetLazarusProject.LPI_ExpandUnitName(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): string;
+begin
+  Result := UNIT_PREFIX[aUnitLocation] + aUnitName + UNIT_EXT[aUnitExtension];
+end;
+
+function TTargetLazarusProject.StringList_CreateFromFile(const aFilename: string): TStringList;
 begin
   if not FileExists(aFilename)
     then raise exception.Create('File "'+aFilename+'" not found !')
@@ -62,57 +347,110 @@ begin
     end;
 end;
 
-function TTargetLazarusProject.LineIsActive(const s: string): boolean;
+function TTargetLazarusProject.StringList_SearchLineThatContain(t: TStringList;
+  const aStringToSearch: string; aSearchFromLineIndex: integer; aSearchToLineIndex: integer): integer;
+var i: integer;
 begin
-  Result := Copy(s, 1, 2) <> '//';
+  if aSearchToLineIndex > t.Count-1 then
+    aSearchToLineIndex := t.Count-1;
+
+  for i:=aSearchFromLineIndex to aSearchToLineIndex do
+    if Pos(aStringToSearch, t.Strings[i]) <> 0 then exit(i);
+  Result := -1;
 end;
 
-procedure TTargetLazarusProject.SetLineActive(var s: string; aValue: boolean);
+procedure TTargetLazarusProject.StringList_RemoveUnitNameOnLine(t: TStringList;
+  aLineIndex: integer; const aUnitName: string);
+var i, icoma: integer;
+  s: string;
 begin
-  case aValue of
-    True: if not LineIsActive(s) then system.Delete(s, 1, 2);
-    False: if LineIsActive(s) then s := '//'+s;
+  s := t.Strings[aLineIndex];
+  i := Pos(aUnitName, s);
+  system.Delete(s, i, Length(aUnitName)); // delete the unit name
+
+  // search next coma
+  if FindIndexOfNextChar(s, ',', i, icoma) then begin
+    system.Delete(s, i, icoma-i); // delete the next coma
+    RemoveNextConsecutiveChar(s, ' ', i);
+    t.Strings[aLineIndex] := s;
+  end
+  else
+  if FindIndexOfPreviousChar(s, ',', i, icoma) then begin
+    system.Delete(s, icoma, i-icoma); // delete the previous coma
+    RemovePreviousConsecutiveChar(s, ' ', icoma-1);
+    t.Strings[aLineIndex] := s;
+  end
+  else
+  if Pos(';', s) <> 0 then begin
+    //delete the line
+    t.Delete(aLineIndex);
+    dec(aLineIndex);
+    s := t.Strings[aLineIndex];
+    if not FindIndexOfPreviousChar(s, ',', Length(s), icoma) then raise exception.create('bug');
+    system.Delete(s, icoma, 1);
+    RemovePreviousConsecutiveChar(s, ' ', icoma-1);
+    t.Strings[aLineIndex] := s+';';
   end;
 end;
 
-function TTargetLazarusProject.LineIsActive(const aFilename: string; aLineIndex: integer): boolean;
+function TTargetLazarusProject.ConfigOption_IsActive(const aFilename, aOptionName: string): boolean;
+var line: integer;
+  t: TStringList;
+  s: string;
 begin
-  with CreateStringListFromFile(aFilename) do begin
-    Result := LineIsActive(Strings[aLineIndex]);
-    Free;
+  t := StringList_CreateFromFile(aFilename);
+  try
+    line := StringList_SearchLineThatContain(t, aOptionName, 0);
+    if line = -1 then raise exception.create('line with option '+aOptionName+' not found!');
+    s := t.Strings[line];
+    RemoveNextConsecutiveChar(s, ' ', 1);
+    Result := Copy(s, 1, 2) <> '//';
+  finally
+    t.Free;
   end;
 end;
 
-procedure TTargetLazarusProject.SetLineActive(const aFilename: string; aLineIndex: integer; aValue: boolean);
-var line: string;
+procedure TTargetLazarusProject.ConfigOption_SetActive(const aFilename, aOptionName: string; aValue: boolean);
+var line: integer;
+  t: TStringList;
+  s: string;
 begin
-  with CreateStringListFromFile(aFilename) do begin
-    line := Strings[aLineIndex];
-    SetLineActive(line, aValue);
-    Strings[aLineIndex] := line;
-    SaveToFile(aFilename);
-    Free;
+  t := StringList_CreateFromFile(aFilename);
+  try
+    line := StringList_SearchLineThatContain(t, aOptionName, 0);
+    if line = -1 then raise exception.create('line with option '+aOptionName+' not found!');
+    s := t.Strings[line];
+    RemoveNextConsecutiveChar(s, ' ', 1);
+    if aValue then begin
+      while s[1] = '/' do system.Delete(s, 1, 1);
+    end else begin
+      if Copy(s, 1, 2) <> '//' then s := '//'+s;
+    end;
+    t.Strings[line] := s;
+    t.SaveToFile(aFilename);
+  finally
+    t.Free;
   end;
 end;
 
-function TTargetLazarusProject.GetProjectConfig_MaximizeSceneOnMonitor: boolean;
+function TTargetLazarusProject.ConfigOption_GetMaximizeSceneOnMonitor: boolean;
 begin
-  Result := LineIsActive(GetFilenameProject_Config, 0);
+  Result := ConfigOption_IsActive(GetFilenameProject_Config, 'MAXIMIZE_SCENE_ON_MONITOR');
 end;
 
-procedure TTargetLazarusProject.SetProjectConfig_MaximizeSceneOnMonitor(AValue: boolean);
+procedure TTargetLazarusProject.ConfigOption_SetMaximizeSceneOnMonitor(AValue: boolean);
 begin
-  SetLineActive(GetFilenameProject_Config, 0, AValue);
+  ConfigOption_SetActive(GetFilenameProject_Config, 'MAXIMIZE_SCENE_ON_MONITOR', AValue);
 end;
 
-function TTargetLazarusProject.GetProjectConfig_WindowedMode: boolean;
+function TTargetLazarusProject.ConfigOption_GetWindowedMode: boolean;
 begin
-  Result := LineIsActive(GetFilenameProject_Config, 1);
+  Result := ConfigOption_IsActive(GetFilenameProject_Config, 'WINDOWED_MODE');
 end;
 
-procedure TTargetLazarusProject.SetProjectConfig_WindowedMode(AValue: boolean);
+procedure TTargetLazarusProject.ConfigOption_SetWindowedMode(AValue: boolean);
 begin
-  SetLineActive(GetFilenameProject_Config, 1, AValue);
+  ConfigOption_SetActive(GetFilenameProject_Config, 'WINDOWED_MODE', AValue);
 end;
 
 function TTargetLazarusProject.SearchTags(const aUnitFilename,
@@ -241,6 +579,228 @@ begin
   A[1] := '  SCREEN_HEIGHT_AT_DESIGN_TIME: single = '+aValues[1].ToString+';';
   A[2] := '  SCREEN_PPI_AT_DESIGN_TIME: integer = '+aValues[2].ToString+';';
   ReplaceTagContentBy(GetFilenameUCommon, '//DESIGN', A);
+end;
+
+function TTargetLazarusProject.Unit_USES_CheckIfHaveEntry(t: TStringList;
+  const aUnitNameToCheck: string; aCheckInInterface, aCheckInImplementation: boolean): boolean;
+var usesLine, implementationLine, semicolonLine, i: integer;
+begin
+  Result := True;
+  if aUnitNameToCheck = '' then raise exception.create('unit name to check is empty');
+
+  Result := False;
+  implementationLine := StringList_SearchLineThatContain(t, 'implementation', 0);
+  if implementationLine = -1 then raise exception.create('implementation not found! unit malformed');
+
+  if aCheckInInterface then begin
+    usesLine := StringList_SearchLineThatContain(t, 'uses', 0);
+    if (usesLine <> -1) and (usesLine < implementationLine) then begin
+      semicolonLine := StringList_SearchLineThatContain(t, ';', usesLine);
+      if semicolonLine <> -1 then begin
+        i := StringList_SearchLineThatContain(t, aUnitNameToCheck, usesLine, semicolonLine);
+        if i <> -1 then exit(True);
+      end;
+    end;
+  end;
+
+  if aCheckInImplementation then begin
+    usesLine := StringList_SearchLineThatContain(t, 'uses', implementationLine);
+    if usesLine = -1 then exit(False);
+    semicolonLine := StringList_SearchLineThatContain(t, ';', usesLine);
+    if semicolonLine <> -1 then begin
+      i := StringList_SearchLineThatContain(t, aUnitNameToCheck, usesLine, semicolonLine);
+      if i <> -1 then exit(True);
+    end;
+  end;
+end;
+
+procedure TTargetLazarusProject.Unit_USES_AddEntry(const aTargetUnit,
+  aUnitNameToAdd: string; aAddInInterface: boolean);
+var usesLine, implementationLine, semicolonLine, i: integer;
+  t: TStringList;
+  s: string;
+begin
+  if not FileExists(aTargetUnit) then raise exception.create('target unit not found');
+  if aUnitNameToAdd = '' then raise exception.create('unit name to add is empty');
+
+  t := StringList_CreateFromFile(aTargetUnit);
+  try
+
+    // check if unit name is already present
+    if aAddInInterface then begin
+      if Unit_USES_CheckIfHaveEntry(t, aUnitNameToAdd, False, True) then
+        Unit_USES_RemoveEntry(aTargetUnit, aUnitNameToAdd, False, True);
+      if Unit_USES_CheckIfHaveEntry(t, aUnitNameToAdd, True, False) then exit;
+    end else begin
+      if Unit_USES_CheckIfHaveEntry(t, aUnitNameToAdd, True, False) then
+        Unit_USES_RemoveEntry(aTargetUnit, aUnitNameToAdd, True, False);
+      if Unit_USES_CheckIfHaveEntry(t, aUnitNameToAdd, False, True) then exit;
+    end;
+
+    // want in implementation area ?
+    if not aAddInInterface then begin
+      implementationLine := StringList_SearchLineThatContain(t, 'implementation',  0);
+      if implementationLine = -1 then raise exception.create('section "implementation" not found! unit malformed');
+      usesLine := StringList_SearchLineThatContain(t, 'uses',  implementationLine);
+      if usesLine = -1 then begin
+        // create uses section in implementation
+        t.Insert(implementationLine+1, '');
+        t.Insert(implementationLine+1, 'uses '+aTargetUnit+';');
+        t.SaveToFile(aTargetUnit);
+        exit;
+      end;
+    end else begin
+      usesLine := StringList_SearchLineThatContain(t, 'uses', 0);
+      if usesLine = -1 then raise exception.create('interface uses clause not found!');
+    end;
+
+    // search next line that contain semicolon (can be on same line than USES)
+    semicolonLine := StringList_SearchLineThatContain(t, ';', usesLine);
+    if semicolonLine = -1 then raise exception.create('semicolon of end of USES not found! unit malformed');
+    s := t.Strings[semicolonLine];
+    i := Pos(';', s);
+    if i < 60 then begin
+      system.Insert(', '+aUnitNameToAdd, s, i);
+      t.Strings[semicolonLine] := s;
+    end else begin
+      // add a new line to avoid very long line
+      s[i] := ',';
+      t.Strings[semicolonLine] := s;
+      t.Insert(semicolonLine+1, aUnitNameToAdd+';');
+    end;
+    t.SaveToFile(aTargetUnit);
+  finally
+    t.Free;
+  end;
+end;
+
+procedure TTargetLazarusProject.Unit_USES_RemoveEntry(const aTargetUnit,
+  aUnitNameToRemove: string; aRemoveInInterface, aRemoveInImplementation: boolean);
+var implementationLine, line: integer;
+  t: TStringList;
+begin
+  if not FileExists(aTargetUnit) then raise exception.create('target unit not found');
+  if aUnitNameToRemove = '' then raise exception.create('unit name to remove is empty');
+
+  t := StringList_CreateFromFile(aTargetUnit);
+  try
+
+    // remove in interface area
+    if aRemoveInInterface then begin
+      implementationLine := StringList_SearchLineThatContain(t, 'implementation',  0);
+      if implementationLine = -1 then raise exception.create('section "implementation" not found! unit malformed');
+      line := StringList_SearchLineThatContain(t, aUnitNameToRemove, 0, implementationLine);
+      if line <> -1 then begin
+        StringList_RemoveUnitNameOnLine(t, line, aUnitNameToRemove);
+        t.SaveToFile(aTargetUnit);
+      end;
+    end;
+
+    // remove in implementation area
+    if aRemoveInImplementation then begin
+      implementationLine := StringList_SearchLineThatContain(t, 'implementation',  0);
+      if implementationLine = -1 then raise exception.create('section "implementation" not found! unit malformed');
+      line := StringList_SearchLineThatContain(t, aUnitNameToRemove, implementationLine);
+      if line <> -1 then begin
+        StringList_RemoveUnitNameOnLine(t, line, aUnitNameToRemove);
+        t.SaveToFile(aTargetUnit);
+      end;
+    end;
+  finally
+    t.Free;
+  end;
+end;
+
+function TTargetLazarusProject.Unit_ExpandUnitName(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): string;
+begin
+  case aUnitLocation of
+    ulUnits: Result := GetFolderUnits + aUnitName + UNIT_EXT[aUnitExtension];
+    ulSprites: Result := GetFolderUnitsSprites + aUnitName + UNIT_EXT[aUnitExtension];
+    ulLevels: Result := GetFolderUnitsLevels + aUnitName + UNIT_EXT[aUnitExtension];
+    else raise exception.create('forget to implement');
+  end;
+end;
+
+procedure TTargetLazarusProject.Unit_AddToProject(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+var t: TStringList;
+  usesLine, semicolonLine, i: integer;
+  s: string;
+begin
+  // two things:
+  //  - add unit name in USES clause of LPR file
+  //  - add XML entry in LPI file
+
+  if aUnitName = '' then raise exception.create('unit name to add is empty');
+
+  t := StringList_CreateFromFile(GetFilenameProject_LPR);
+  try
+    usesLine := StringList_SearchLineThatContain(t, 'uses',  0);
+    semicolonLine := StringList_SearchLineThatContain(t, ';',  usesLine);
+    i := StringList_SearchLineThatContain(t, aUnitName, usesLine, semicolonLine);
+    if i <> -1 then exit; // already present
+
+    s := t.Strings[semicolonLine];
+    i := Pos(';', s);
+    s[i] := ',';
+    if i < 60 then begin
+      s := s+' '+aUnitName+';';
+      t.Strings[semicolonLine] := s;
+    end else begin
+      // add a new line
+      t.Strings[semicolonLine] := s;
+      t.Insert(semicolonLine+1, '  '+aUnitName+';');
+    end;
+    t.SaveToFile(GetFilenameProject_LPR);
+  finally
+    t.Free;
+  end;
+
+  LPI_AddUnit(aUnitName, aUnitLocation, aUnitExtension);
+end;
+
+procedure TTargetLazarusProject.Unit_RemoveFromProject(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+var t: TStringList;
+  lineIndex: integer;
+begin
+  if aUnitName = '' then raise exception.create('unit name to remove is empty');
+
+  // remove entry in USES clause of LPR file
+  t := StringList_CreateFromFile(GetFilenameProject_LPR);
+  try
+    lineIndex := StringList_SearchLineThatContain(t, aUnitName, 0);
+    if lineIndex <> -1 then begin
+      StringList_RemoveUnitNameOnLine(t, lineIndex, aUnitName);
+      t.SaveToFile(GetFilenameProject_LPR);
+    end;
+  finally
+    t.Free;
+  end;
+
+  // remove from LPI file
+  LPI_RemoveUnit(aUnitName, aUnitLocation, aUnitExtension);
+end;
+
+procedure TTargetLazarusProject.Unit_DeleteFile(const aUnitName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+var unitFilename: String;
+begin
+  unitFilename := Unit_ExpandUnitName(aUnitName, aUnitLocation, aUnitExtension);
+
+  if FileExists(unitFilename) then
+    SupprimeFichier(unitFilename);
+end;
+
+function TTargetLazarusProject.GetUnitNameForSprite(const aNameOfTheSprite: string): string;
+begin
+  Result := PREFIX_FOR_SPRITE_UNIT_NAME + LowerCase(aNameOfTheSprite);
+end;
+
+function TTargetLazarusProject.GetUnitFileNameForSprite(const aNameOfTheSprite: string): string;
+begin
+  Result := GetFolderUnitsSprites + GetUnitNameForSprite(aNameOfTheSprite);
 end;
 
 end.

@@ -12,6 +12,16 @@ uses
 
 type
 
+{ TSpriteCodeGenerationOptions }
+
+TSpriteCodeGenerationOptions = record
+  useapplysymetrywhenflip,
+  overrideProcessMessage,
+  overrideUpdate: boolean;
+  function SaveToString: string;
+  procedure LoadFromString(const s: string);
+end;
+
 { TSpriteBankItem }
 
 TSpriteBankItem = record
@@ -19,7 +29,8 @@ TSpriteBankItem = record
   textures,
   surfaces,
   collisionbodies,
-  postures: string;
+  postures,
+  codeoptions: string;
   procedure InitDefault;
   function SaveToString: string;
   procedure LoadFromString(const s: string);
@@ -71,6 +82,27 @@ implementation
 
 uses form_main;
 
+{ TSpriteCodeGenerationOptions }
+
+function TSpriteCodeGenerationOptions.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('|');
+  prop.Add('UseApplySymetryWhenFlip',  useapplysymetrywhenflip);
+  prop.Add('OverrideProcessMessage', overrideProcessMessage);
+  prop.Add('OverrideUpdate', overrideUpdate);
+  Result := prop.PackedProperty;
+end;
+
+procedure TSpriteCodeGenerationOptions.LoadFromString(const s: string);
+var prop: TProperties;
+begin
+  prop.Split(s, '|');
+  prop.BooleanValueOf('UseApplySymetryWhenFlip', useapplysymetrywhenflip, False);
+  prop.BooleanValueOf('OverrideProcessMessage', overrideProcessMessage, False);
+  prop.BooleanValueOf('OverrideUpdate', overrideUpdate, False);
+end;
+
 { TSpriteBankItem }
 
 procedure TSpriteBankItem.InitDefault;
@@ -81,7 +113,8 @@ end;
 
 function TSpriteBankItem.SaveToString: string;
 begin
-  Result := name+'#'+textures+'#'+surfaces+'#'+collisionbodies+'#'+postures;
+  Result := name+'#'+textures+'#'+surfaces+'#'+collisionbodies+'#'+postures+
+            '#'+codeoptions;
 end;
 
 procedure TSpriteBankItem.LoadFromString(const s: string);
@@ -95,6 +128,8 @@ begin
     else collisionbodies := '';
   if Length(A) = 5 then postures := A[4]
     else postures := '';
+  if Length(A) = 6 then codeoptions := A[5]
+    else codeoptions := '';
 end;
 
 { TSpriteBank }

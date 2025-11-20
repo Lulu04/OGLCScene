@@ -63,6 +63,7 @@ procedure AddDeclarationOfProtectedFlipHAndFlipVForApplySymmetryWhenFlip(t: TStr
 procedure AddDeclarationOfClassLoadTexture(t: TStringList);
 procedure AddDeclarationOfSurfaceConstructor(t: TStringList);
 procedure AddDeclarationOfProcessMessage(t: TStringList);
+procedure AddDeclarationOfUpdate(t: TStringList);
 // add implementation + lineending
 procedure AddImplementation(t: TStringList);
 // add the implementation of ScaleWF and ScaleHF
@@ -70,12 +71,13 @@ procedure AddImplementationOfDecorProtectedMethod(t: TStringList; const aDecorCl
 
 procedure AddImplementationOfDecorBuildLevel(t: TStringList; const aDecorClassName: string);
 procedure AddImplementationOfProcessMessage(t: TStringList; const aClassName: string);
+procedure AddImplementationOfUpdate(t: TStringList; const aClassName: string);
 
 
 procedure ExportSpriteToPascalUnit(t: TStringList; aTextures: TTextureList;
      aSurfaces: TSurfaceList; aPostures: TPostureList;
-     aSpriteNameInBank, aSpriteClassName, aTargetFilename: string;
-     aApplySymmetryWhenFlip, aOverrideProcessMessage: boolean);
+     aSpriteNameInBank, aSpriteClassName, aUnitName: string;
+     aApplySymmetryWhenFlip, aOverrideProcessMessage, aOverrideUpdate: boolean);
 
 
 implementation
@@ -278,7 +280,7 @@ begin
   t.AddText('unit '+aUnitName+';'#10#10+
             '{$mode ObjFPC}{$H+}'#10#10+
             'interface'#10#10+
-            'uses'#10#10+
+            'uses'#10+
             '  Classes, SysUtils,'#10+
             '  OGLCScene, BGRABitmap, BGRABitmapTypes, u_common;'#10#10+
             'type'#10#10);
@@ -294,7 +296,7 @@ begin
             '  function ScaleHF(AValue: single): single; override;'#10+
             'public'#10+
             '  class procedure LoadTexture(aAtlas: TAtlas); override;');
-  if LevelBank.Size > 1 then t.Add('  procedure BuildLevel(aIndex: integer);')
+  if WorkingLevelGroup.Size > 1 then t.Add('  procedure BuildLevel(aIndex: integer);')
     else t.Add('  procedure BuildLevel;');
   t.Add('end;'#10);
 end;
@@ -320,6 +322,11 @@ begin
   t.Add('  procedure ProcessMessage(UserValue: TUserMessageValue); override;');
 end;
 
+procedure AddDeclarationOfUpdate(t: TStringList);
+begin
+  t.Add('  procedure Update(const aElapsedtime: single); override;');
+end;
+
 procedure AddImplementation(t: TStringList);
 begin
   t.Add('implementation');
@@ -341,13 +348,13 @@ end;
 procedure AddImplementationOfDecorBuildLevel(t: TStringList; const aDecorClassName: string);
 var i: SizeUInt;
 begin
-  if LevelBank.Size > 1 then begin
+  if WorkingLevelGroup.Size > 1 then begin
     // several decors
     t.AddText('procedure '+aDecorClassName+'.BuildLevel(aIndex: integer);'#10+
               'begin'#10+
               '  case aIndex of');
-    for i:=0 to LevelBank.Size-1 do
-      t.Add('    '+i.ToString+': DoBuildLevel('+'Data_'+LevelBank.Mutable[i]^.name+');');
+    for i:=0 to WorkingLevelGroup.Size-1 do
+      t.Add('    '+i.ToString+': DoBuildLevel('+'Data_'+WorkingLevelGroup.Mutable[i]^.name+');');
     t.AddText('    else raise exception.create(''level index out of bounds'');'#10+
               '  end;'#10+
               'end;'#10#10);
@@ -355,7 +362,7 @@ begin
     // only one decor
     t.AddText('procedure '+aDecorClassName+'.BuildLevel;'#10+
               'begin'#10+
-              '  DoBuildLevel('+'Data_'+LevelBank.Mutable[0]^.name+');'#10+
+              '  DoBuildLevel('+'Data_'+WorkingLevelGroup.Mutable[0]^.name+');'#10+
               'end;');
   end;
 end;
@@ -368,13 +375,24 @@ begin
             '    0: begin'#10+
             '    end;'#10+
             '  end;//case'#10+
-            'end;'#10);
+            'end;');
+  t.Add('');
+end;
+
+procedure AddImplementationOfUpdate(t: TStringList; const aClassName: string);
+begin
+  t.AddText('procedure '+aClassName+'.Update(const aElapsedTime: single);'#10+
+            'begin'#10+
+            '  inherited Update(aElapsedtime);'#10+
+            '  // Add your code here'#10+
+            'end;');
+  t.Add('');
 end;
 
 procedure ExportSpriteToPascalUnit(t: TStringList;
   aTextures: TTextureList; aSurfaces: TSurfaceList;  aPostures: TPostureList;
-  aSpriteNameInBank, aSpriteClassName, aTargetFilename: string;
-  aApplySymmetryWhenFlip, aOverrideProcessMessage: boolean);
+  aSpriteNameInBank, aSpriteClassName, aUnitName: string;
+  aApplySymmetryWhenFlip, aOverrideProcessMessage, aOverrideUpdate: boolean);
 var i, j, c: integer;
   s, sw, sh, sx, sy, texFilename, spriteClassType: string;
   rootItem, current, _parent: PSurfaceDescriptor;
@@ -433,7 +451,7 @@ begin
   t.AddText('    - create an instance of the sprite as usual.'#10+
            '}');
   t.Add('');
-  AddInterface(t, ChangeFileExt(ExtractFilename(aTargetFilename), ''));
+  AddInterface(t, aUnitName);
 
   // class declaration
   t.Add(aSpriteClassName+' = class('+spriteClassType+')');
@@ -475,6 +493,8 @@ begin
   AddDeclarationOfSurfaceConstructor(t);
   if aOverrideProcessMessage then
     AddDeclarationOfProcessMessage(t);
+  if aOverrideUpdate then
+    AddDeclarationOfUpdate(t);
 
   // methods declaration for posture
   if aPostures.Size > 0 then begin
@@ -561,7 +581,7 @@ begin
   // constructor
   t.AddText('constructor '+aSpriteClassName+'.Create(aLayerIndex: integer);'#10+
             'begin'#10);
-  case aSpriteClassName of
+  case spriteClassType of
     'TSpriteContainer': begin
       s := '  inherited Create(FScene);';
     end;
@@ -581,19 +601,18 @@ begin
     'TDeformationGrid': begin
       s := '  inherited Create('+rootItem^.textureName + ', False);';
     end;
-    else raise exception.create('forgot to implement '+aSpriteClassName);
+    else raise exception.create('forgot to implement '+spriteClassType);
   end;
   t.Add(s);
   t.AddText('  if aLayerIndex <> -1 then'#10+
             '    FScene.Add(Self, aLayerIndex);'#10);
   if rootItem <> NIL then begin
     if (rootItem^.x <> 0.0) or (rootItem^.y <> 0.0) then
-      t.Add('  SetCoordinate('+FormatFloatWithDot('0.00', rootItem^.x)+', '+
-                               FormatFloatWithDot('0.00', rootItem^.y)+');');
+      t.Add('  SetCoordinate(ScaleWF('+FormatFloatWithDot('0.00', rootItem^.x)+'), ScaleHF('+
+                               FormatFloatWithDot('0.00', rootItem^.y)+'));');
 
     t.AddText(CommonPropertiesToPascalCode(rootItem, '  '));
     t.AddText(ExtraPropertiesToPascalCode(rootItem, '  '));
-    t.Add('');
   end else t.Add('');
 
   // creating childs
@@ -741,6 +760,10 @@ begin
   // method ProcessMessage()
   if aOverrideProcessMessage then
     AddImplementationOfProcessMessage(t, aSpriteClassName);
+
+  // method update()
+  if aOverrideUpdate then
+    AddImplementationOfUpdate(t, aSpriteClassName);
 
   // methods for postures
   if aPostures.Size > 0 then begin

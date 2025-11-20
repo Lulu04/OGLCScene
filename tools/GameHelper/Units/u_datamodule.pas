@@ -16,14 +16,16 @@ type
     ImageList1: TImageList;
     ILIconAlign: TImageList;
     ILIconLayerList: TImageList;
+    ILLevelTreeView: TImageList;
     procedure DataModuleCreate(Sender: TObject);
   private
     FPath: string;
     procedure AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
-  public
     procedure RedrawImageForCursor;
     procedure RedrawImageForIconAlign;
     procedure RedrawImageForIconLayerList;
+    procedure RedrawImageForIconLevelTreeView;
+  public
   end;
 
 var
@@ -42,6 +44,7 @@ begin
   RedrawImageForCursor;
   RedrawImageForIconAlign;
   RedrawImageForIconLayerList;
+  RedrawImageForIconLevelTreeView;
 end;
 
 procedure TDataModule1.AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
@@ -115,6 +118,8 @@ begin
   // 25
   AddImageToImageList('DistributeRegularlyH.svg', ILIconAlign);
   AddImageToImageList('DistributeRegularlyV.svg', ILIconAlign);
+
+  ILIconAlign.EndUpdate;
 end;
 
 procedure TDataModule1.RedrawImageForIconLayerList;
@@ -127,6 +132,26 @@ begin
   FPath := GetIconFolder;
   AddImageToImageList('LayerVisible.svg', ILIconLayerList);
   AddImageToImageList('LayerNotVisible.svg', ILIconLayerList);
+
+  ILIconLayerList.EndUpdate;
+end;
+
+procedure TDataModule1.RedrawImageForIconLevelTreeView;
+begin
+  ILLevelTreeView.BeginUpdate;
+  ILLevelTreeView.Clear;
+  ILLevelTreeView.Width := FormMain.ScaleDesignToForm(16);
+  ILLevelTreeView.Height := ILLevelTreeView.Width;
+
+  FPath := GetIconFolder;
+  AddImageToImageList('Folder.svg', ILLevelTreeView);
+  AddImageToImageList('Landscape.svg', ILLevelTreeView);
+  AddImageToImageList('Add.svg', ILLevelTreeView);
+  AddImageToImageList('TrashCan.svg', ILLevelTreeView);
+  AddImageToImageList('Rename.svg', ILLevelTreeView);
+  AddImageToImageList('Duplicate.svg', ILLevelTreeView);
+
+  ILLevelTreeView.EndUpdate;
 end;
 
 end.

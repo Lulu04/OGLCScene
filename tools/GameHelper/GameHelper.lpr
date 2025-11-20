@@ -17,7 +17,7 @@ uses
   u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,
   form_projectconfig, form_showhelp, form_editdeformationgrid,
   form_editgradient, frame_gradientrow, u_screen_list, form_newproject,
-u_target_lazarusproject;
+u_target_lazarusproject, frame_viewlevelbank, frame_tool_screenbank;
 
 {$R *.res}
 

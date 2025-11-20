@@ -162,6 +162,8 @@ procedure TFrameTextureList.LBTextureNamesMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var lb: TListBox;
 begin
+  Button := Button;
+  Shift := Shift;
   lb := Sender as TListBox;
   lb.ItemIndex := lb.GetIndexAtXY(X, Y);
 end;
@@ -171,6 +173,7 @@ procedure TFrameTextureList.LBTextureNamesSelectionChange(Sender: TObject;
 var i: integer;
   texItem: PTextureItem;
 begin
+  User := User;
   if FInitializingWidget then exit;
   FInitializingWidget := True;
 

@@ -9,7 +9,7 @@ uses
   BGRABitmap, BGRABitmapTypes,
   //OGLCScene,
   u_common, u_screen_template,
-  u_surface_list, u_texture_list, OGLCScene;
+  u_surface_list, u_texture_list, OGLCScene, u_levelbank;
 
 type
 
@@ -41,7 +41,7 @@ public
   procedure Finalize;
 
   procedure ClearView;
-  procedure ShowLevel(aIndex: integer);
+  procedure ShowLevel(aLevel: PLevelBankItem);
 
   property Surfaces: TLevelBankSurfaceList read FSurfaces;
 end;
@@ -50,13 +50,13 @@ var ScreenLevelBank: TScreenLevelBank;
 
 implementation
 
-uses u_levelbank, u_layerlist;
+uses u_layerlist;
 
 { TLevelBankSurfaceList }
 
 function TLevelBankSurfaceList.Textures: TTextureList;
 begin
-  Result := LevelBank.Textures;
+  Result := WorkingLevelGroup.Textures;
 end;
 
 { TScreenLevelBank }
@@ -96,12 +96,13 @@ end;
 
 procedure TScreenLevelBank.ClearView;
 begin
-  FSurfaces.Clear;
+  if Assigned(FSurfaces) then
+    FSurfaces.Clear;
 end;
 
-procedure TScreenLevelBank.ShowLevel(aIndex: integer);
+procedure TScreenLevelBank.ShowLevel(aLevel: PLevelBankItem);
 begin
-  FSurfaces.LoadFromString(LevelBank.Mutable[aIndex]^.surfaces);
+  FSurfaces.LoadFromString(aLevel^.surfaces);
   ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
 end;
 

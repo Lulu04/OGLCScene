@@ -1,9 +1,9 @@
 object FrameToolLevelEditor: TFrameToolLevelEditor
   Left = 0
-  Height = 748
+  Height = 754
   Top = 0
   Width = 296
-  ClientHeight = 748
+  ClientHeight = 754
   ClientWidth = 296
   TabOrder = 0
   DesignLeft = 892
@@ -16,28 +16,28 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Panel4
     Left = 0
-    Height = 620
+    Height = 612
     Top = 32
     Width = 296
-    ActivePage = PageWorld
+    ActivePage = PageSurfaces
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 3
+    TabIndex = 1
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
     end
     object PageSurfaces: TTabSheet
       Caption = 'Surfaces'
-      ClientHeight = 592
+      ClientHeight = 584
       ClientWidth = 288
       object Panel1: TPanel
         Left = 0
-        Height = 592
+        Height = 584
         Top = 0
         Width = 288
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 592
+        ClientHeight = 584
         ClientWidth = 288
         Color = 8289918
         ParentBackground = False
@@ -1235,16 +1235,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     end
     object PageLayers: TTabSheet
       Caption = 'Layers'
-      ClientHeight = 592
+      ClientHeight = 584
       ClientWidth = 288
       object Panel10: TPanel
         Left = 0
-        Height = 592
+        Height = 584
         Top = 0
         Width = 288
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 592
+        ClientHeight = 584
         ClientWidth = 288
         Color = 8289918
         ParentBackground = False
@@ -1259,7 +1259,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           AnchorSideBottom.Control = Panel10
           AnchorSideBottom.Side = asrBottom
           Left = 0
-          Height = 558
+          Height = 550
           Top = 34
           Width = 288
           Anchors = [akTop, akLeft, akRight, akBottom]
@@ -1312,16 +1312,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     end
     object PageWorld: TTabSheet
       Caption = 'World'
-      ClientHeight = 592
+      ClientHeight = 584
       ClientWidth = 288
       object Panel7: TPanel
         Left = 0
-        Height = 592
+        Height = 584
         Top = 0
         Width = 288
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 592
+        ClientHeight = 584
         ClientWidth = 288
         Color = 8289918
         ParentBackground = False
@@ -1833,11 +1833,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 96
-    Top = 652
+    Height = 110
+    Top = 644
     Width = 296
     Anchors = [akLeft, akRight, akBottom]
-    ClientHeight = 96
+    ClientHeight = 110
     ClientWidth = 296
     Color = 8289918
     ParentBackground = False
@@ -1850,8 +1850,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideTop.Control = Panel4
       Left = 16
       Height = 15
-      Top = 9
+      Top = 16
       Width = 145
+      Anchors = [akLeft]
       BorderSpacing.Top = 8
       Caption = 'Enter a name for the level'
       Font.Style = [fsBold]
@@ -1864,7 +1865,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       AnchorSideTop.Side = asrBottom
       Left = 16
       Height = 23
-      Top = 24
+      Top = 31
       Width = 265
       TabOrder = 0
       OnEnter = SE1Enter
@@ -1891,9 +1892,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       Cursor = crHandPoint
       Left = 48
       Height = 30
-      Top = 56
+      Hint = 'save the level in the LevelBank and (re)create a Pascal unit into the Lazarus project'
+      Top = 64
       Width = 200
-      Caption = 'Save to Level Bank'
+      Caption = 'Save into project'
       Images = DataModule1.ImageList1
       ImageIndex = 2
       OnClick = BAddToLevelBankClick

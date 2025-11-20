@@ -33,7 +33,7 @@ var
 
 implementation
 
-uses u_utils, u_project;
+uses u_utils;
 
 {$R *.lfm}
 

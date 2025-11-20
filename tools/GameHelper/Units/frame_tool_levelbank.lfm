@@ -8,107 +8,30 @@ object FrameToolLevelBank: TFrameToolLevelBank
   TabOrder = 0
   DesignLeft = 733
   DesignTop = 15
-  object Panel8: TPanel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
+  object Panel1: TPanel
+    AnchorSideBottom.Control = Splitter1
     Left = 0
-    Height = 32
+    Height = 408
     Top = 0
     Width = 353
-    Anchors = [akTop, akLeft, akRight]
-    ClientHeight = 32
-    ClientWidth = 353
-    Color = 1973790
-    ParentBackground = False
-    ParentColor = False
-    TabOrder = 0
-    object Label24: TLabel
-      AnchorSideLeft.Control = Panel8
-      AnchorSideLeft.Side = asrCenter
-      AnchorSideTop.Control = Panel8
-      AnchorSideTop.Side = asrCenter
-      Left = 142
-      Height = 15
-      Top = 9
-      Width = 68
-      Caption = 'LEVEL BANK'
-      Font.Color = 1424112
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object BHelp: TSpeedButton
-      AnchorSideLeft.Control = Panel8
-      AnchorSideTop.Control = Panel8
-      AnchorSideTop.Side = asrCenter
-      AnchorSideRight.Side = asrBottom
-      Cursor = crHandPoint
-      Left = 4
-      Height = 24
-      Hint = 'Help'
-      Top = 4
-      Width = 24
-      BorderSpacing.Left = 3
-      Flat = True
-      Images = DataModule1.ImageList1
-      ImageIndex = 15
-      OnClick = BHelpClick
-      ShowHint = True
-      ParentShowHint = False
-    end
-  end
-  object Panel1: TPanel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = Panel8
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Panel2
-    Left = 0
-    Height = 272
-    Top = 32
-    Width = 353
+    Align = alTop
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 272
+    ClientHeight = 408
     ClientWidth = 353
     Color = 8289918
     ParentBackground = False
     ParentColor = False
-    TabOrder = 1
-    object LB: TListBox
-      AnchorSideLeft.Control = Panel1
-      AnchorSideTop.Control = BDuplicate
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = Panel1
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = BEdit
-      Left = 3
-      Height = 210
-      Top = 30
-      Width = 347
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      BorderSpacing.Left = 3
-      BorderSpacing.Top = 3
-      BorderSpacing.Right = 3
-      BorderSpacing.Bottom = 5
-      ItemHeight = 0
-      MultiSelect = True
-      TabOrder = 0
-      OnMouseUp = LBMouseUp
-      OnSelectionChange = LBSelectionChange
-    end
+    TabOrder = 0
     object BEdit: TSpeedButton
       AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = LB
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = Panel1
       AnchorSideBottom.Side = asrBottom
       Cursor = crHandPoint
       Left = 249
       Height = 19
-      Top = 245
+      Top = 381
       Width = 101
       Anchors = [akRight, akBottom]
       AutoSize = True
@@ -116,651 +39,109 @@ object FrameToolLevelBank: TFrameToolLevelBank
       Caption = 'Edit in Level Editor'
       OnClick = BEditClick
     end
-    object BDelete: TSpeedButton
-      AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = BUndo
-      Cursor = crHandPoint
-      Left = 258
-      Height = 24
-      Hint = 'Delete the selected sprite'
-      Top = 3
-      Width = 24
-      Anchors = [akTop, akRight]
-      BorderSpacing.Top = 3
-      BorderSpacing.Right = 15
-      Images = DataModule1.ImageList1
-      ImageIndex = 5
-      OnClick = BDeleteClick
-      ShowHint = True
-      ParentShowHint = False
-    end
-    object BUndo: TSpeedButton
-      AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = BRedo
-      Cursor = crHandPoint
-      Left = 297
-      Height = 24
-      Hint = 'Undo'
-      Top = 3
-      Width = 24
-      Anchors = [akTop, akRight]
-      BorderSpacing.Top = 3
-      BorderSpacing.Right = 5
-      Images = DataModule1.ImageList1
-      ImageIndex = 9
-      OnClick = BDeleteClick
-      ShowHint = True
-      ParentShowHint = False
-    end
-    object BRedo: TSpeedButton
-      AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = LB
+    object Panel6: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      Cursor = crHandPoint
-      Left = 326
-      Height = 24
-      Hint = 'Redo'
-      Top = 3
-      Width = 24
-      Anchors = [akTop, akRight]
-      BorderSpacing.Top = 3
-      Images = DataModule1.ImageList1
-      ImageIndex = 10
-      OnClick = BDeleteClick
-      ShowHint = True
-      ParentShowHint = False
+      AnchorSideBottom.Control = BEdit
+      Left = 0
+      Height = 344
+      Top = 32
+      Width = 353
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BorderSpacing.Bottom = 5
+      BevelOuter = bvNone
+      Color = 6447714
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 0
     end
-    object BDuplicate: TSpeedButton
-      AnchorSideLeft.Control = LB
+    object Panel8: TPanel
+      AnchorSideLeft.Control = Panel1
       AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = BDelete
-      Cursor = crHandPoint
-      Left = 8
-      Height = 24
-      Hint = 'Duplicate the selected sprite'
-      Top = 3
-      Width = 24
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 3
-      Images = DataModule1.ImageList1
-      ImageIndex = 11
-      OnClick = BDeleteClick
-      ShowHint = True
-      ParentShowHint = False
-    end
-    object BRename: TSpeedButton
-      AnchorSideLeft.Control = BDuplicate
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = Panel1
-      Cursor = crHandPoint
-      Left = 37
-      Height = 24
-      Hint = 'Rename the selected sprite'
-      Top = 3
-      Width = 24
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 3
-      Images = DataModule1.ImageList1
-      ImageIndex = 12
-      OnClick = BDeleteClick
-      ShowHint = True
-      ParentShowHint = False
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 0
+      Height = 32
+      Top = 0
+      Width = 353
+      Anchors = [akTop, akLeft, akRight]
+      ClientHeight = 32
+      ClientWidth = 353
+      Color = 1973790
+      ParentBackground = False
+      ParentColor = False
+      TabOrder = 1
+      object Label24: TLabel
+        AnchorSideLeft.Control = Panel8
+        AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Control = Panel8
+        AnchorSideTop.Side = asrCenter
+        Left = 142
+        Height = 15
+        Top = 9
+        Width = 68
+        Caption = 'LEVEL BANK'
+        Font.Color = 1424112
+        Font.Style = [fsBold]
+        ParentFont = False
+      end
+      object BHelp: TSpeedButton
+        AnchorSideLeft.Control = Panel8
+        AnchorSideTop.Control = Panel8
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = Panel8
+        AnchorSideRight.Side = asrBottom
+        Cursor = crHandPoint
+        Left = 328
+        Height = 24
+        Hint = 'Help'
+        Top = 4
+        Width = 24
+        Anchors = [akTop, akRight]
+        BorderSpacing.Left = 3
+        Flat = True
+        Images = DataModule1.ImageList1
+        ImageIndex = 15
+        OnClick = BHelpClick
+        ShowHint = True
+        ParentShowHint = False
+      end
     end
   end
   object Panel2: TPanel
     AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Splitter1
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 501
-    Top = 304
+    Height = 392
+    Top = 413
     Width = 353
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 501
-    ClientWidth = 353
     Color = 8289918
     ParentBackground = False
     ParentColor = False
-    TabOrder = 2
-    object Label25: TLabel
-      AnchorSideLeft.Side = asrCenter
-      AnchorSideTop.Control = Panel2
-      AnchorSideRight.Control = Panel2
-      AnchorSideRight.Side = asrBottom
-      Left = 229
-      Height = 15
-      Top = 1
-      Width = 113
-      Anchors = [akTop, akRight]
-      BorderSpacing.Right = 10
-      Caption = 'Export to Pascal unit'
-      Font.Color = clWhite
-      Font.Style = [fsBold]
-      ParentFont = False
-    end
-    object RadioGroup1: TRadioGroup
-      AnchorSideLeft.Control = Panel2
-      AnchorSideTop.Control = Label25
-      AnchorSideTop.Side = asrBottom
-      Left = 6
-      Height = 46
-      Top = 16
-      Width = 178
-      AutoFill = True
-      BorderSpacing.Left = 5
-      Caption = 'Target levels'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
-      ClientHeight = 26
-      ClientWidth = 174
-      Columns = 2
-      ItemIndex = 0
-      Items.Strings = (
-        'selected'
-        'all'
-      )
-      ParentBackground = False
-      TabOrder = 0
-    end
-    object RadioGroup2: TRadioGroup
-      AnchorSideLeft.Control = RadioGroup1
-      AnchorSideTop.Control = RadioGroup1
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = Panel2
-      AnchorSideRight.Side = asrBottom
-      Left = 6
-      Height = 47
-      Top = 69
-      Width = 242
-      AutoFill = True
-      BorderSpacing.Top = 7
-      BorderSpacing.Right = 5
-      Caption = 'Generate code for'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
-      ClientHeight = 27
-      ClientWidth = 238
-      Columns = 2
-      ItemIndex = 0
-      Items.Strings = (
-        'Level only'
-        'Screen+Level'
-      )
-      OnSelectionChanged = BExportToLevelAndScreenClick
-      ParentBackground = False
-      TabOrder = 1
-    end
-    object Notebook1: TNotebook
-      AnchorSideLeft.Control = Panel2
-      AnchorSideTop.Control = RadioGroup2
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = Panel2
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = Panel2
-      AnchorSideBottom.Side = asrBottom
-      Left = 1
-      Height = 384
-      Top = 116
-      Width = 351
-      PageIndex = 1
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      TabOrder = 2
-      object PageLevelOnly: TPage
-        object Panel3: TPanel
-          Left = 0
-          Height = 384
-          Top = 0
-          Width = 351
-          Align = alClient
-          BevelOuter = bvNone
-          ClientHeight = 384
-          ClientWidth = 351
-          Color = 9408399
-          ParentBackground = False
-          ParentColor = False
-          TabOrder = 0
-          object BExportLevelOnly: TSpeedButton
-            AnchorSideLeft.Control = Panel3
-            AnchorSideLeft.Side = asrCenter
-            Cursor = crHandPoint
-            Left = 77
-            Height = 30
-            Top = 120
-            Width = 197
-            Caption = 'Export levels to Pascal unit'
-            ImageIndex = 8
-            OnClick = BExportLevelOnlyClick
-          end
-          object Label2: TLabel
-            AnchorSideLeft.Control = Panel3
-            Left = 5
-            Height = 15
-            Top = 24
-            Width = 91
-            BorderSpacing.Left = 5
-            Caption = 'Level class name:'
-          end
-          object Edit2: TEdit
-            AnchorSideLeft.Control = Label2
-            AnchorSideTop.Control = Label2
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Panel3
-            AnchorSideRight.Side = asrBottom
-            Left = 5
-            Height = 23
-            Top = 39
-            Width = 341
-            Anchors = [akTop, akLeft, akRight]
-            BorderSpacing.Right = 5
-            TabOrder = 0
-            Text = 'TLevels'
-            OnChange = Edit2Change
-          end
-          object Label1: TLabel
-            AnchorSideLeft.Control = Panel3
-            AnchorSideTop.Control = Edit2
-            AnchorSideTop.Side = asrBottom
-            Left = 5
-            Height = 15
-            Top = 67
-            Width = 58
-            BorderSpacing.Left = 5
-            BorderSpacing.Top = 5
-            Caption = 'Unit name:'
-          end
-          object Edit1: TEdit
-            AnchorSideLeft.Control = Label1
-            AnchorSideTop.Control = Label1
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Panel3
-            AnchorSideRight.Side = asrBottom
-            Left = 5
-            Height = 23
-            Top = 82
-            Width = 341
-            Anchors = [akTop, akLeft, akRight]
-            BorderSpacing.Right = 5
-            TabOrder = 1
-            Text = 'u_levels.pas'
-            OnChange = Edit2Change
-          end
-        end
-      end
-      object PageLevelAndScreen: TPage
-        object Panel4: TPanel
-          Left = 0
-          Height = 384
-          Top = 0
-          Width = 351
-          Align = alClient
-          BevelOuter = bvNone
-          ClientHeight = 384
-          ClientWidth = 351
-          Color = 9408399
-          ParentBackground = False
-          ParentColor = False
-          TabOrder = 0
-          object CheckBox2: TCheckBox
-            AnchorSideLeft.Control = Panel16
-            AnchorSideTop.Control = Panel4
-            Left = 5
-            Height = 19
-            Hint = 'Check if you want to use camera(s) to scroll the view.'#13#10'Unckeck for static view.'
-            Top = 5
-            Width = 171
-            BorderSpacing.Left = 5
-            BorderSpacing.Top = 5
-            Caption = 'Generate code to use camera'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            OnChange = BExportToLevelAndScreenClick
-          end
-          object Panel16: TPanel
-            AnchorSideLeft.Control = Panel4
-            AnchorSideTop.Control = CheckBox2
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Panel4
-            AnchorSideRight.Side = asrBottom
-            Left = 0
-            Height = 85
-            Top = 24
-            Width = 351
-            Anchors = [akTop, akLeft, akRight]
-            ClientHeight = 85
-            ClientWidth = 351
-            Enabled = False
-            ParentBackground = False
-            TabOrder = 1
-            object RadioButton3: TCheckBox
-              AnchorSideTop.Control = RadioGroup3
-              AnchorSideTop.Side = asrBottom
-              Left = 16
-              Height = 19
-              Hint = 'Check this option if you want to force camera(s) to stay into the world bounds.'
-              Top = 58
-              Width = 188
-              Caption = 'Keep camera(s) in world bounds'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 0
-            end
-            object RadioGroup3: TRadioGroup
-              AnchorSideTop.Control = Label38
-              AnchorSideTop.Side = asrBottom
-              Left = 16
-              Height = 40
-              Hint = 'Single: check this option if you want same scrolling speed on all layers.'#13#10'One per layer: check this option if you want to implement different scrolling speed per layer (parallax).'
-              Top = 18
-              Width = 240
-              AutoFill = True
-              Caption = 'Camera count'
-              ChildSizing.LeftRightSpacing = 6
-              ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-              ChildSizing.EnlargeVertical = crsHomogenousChildResize
-              ChildSizing.ShrinkHorizontal = crsScaleChilds
-              ChildSizing.ShrinkVertical = crsScaleChilds
-              ChildSizing.Layout = cclLeftToRightThenTopToBottom
-              ChildSizing.ControlsPerLine = 2
-              ClientHeight = 20
-              ClientWidth = 236
-              Columns = 2
-              ItemIndex = 0
-              Items.Strings = (
-                'Single'
-                'One per layer (parallax)'
-              )
-              ParentBackground = False
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 1
-            end
-            object Label38: TLabel
-              AnchorSideTop.Control = Panel16
-              AnchorSideRight.Control = Panel16
-              AnchorSideRight.Side = asrBottom
-              Left = 261
-              Height = 15
-              Top = 3
-              Width = 86
-              Anchors = [akTop, akRight]
-              BorderSpacing.Top = 2
-              BorderSpacing.Right = 3
-              Caption = 'Camera options'
-              Font.Color = clWhite
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-          end
-          object Panel17: TPanel
-            AnchorSideLeft.Control = Panel4
-            AnchorSideTop.Control = Panel5
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Panel4
-            AnchorSideRight.Side = asrBottom
-            Left = 0
-            Height = 182
-            Top = 156
-            Width = 351
-            Anchors = [akTop, akLeft, akRight]
-            ClientHeight = 182
-            ClientWidth = 351
-            ParentBackground = False
-            TabOrder = 2
-            object Label39: TLabel
-              AnchorSideTop.Control = Label42
-              AnchorSideTop.Side = asrBottom
-              AnchorSideRight.Control = Label44
-              AnchorSideRight.Side = asrBottom
-              Left = 9
-              Height = 15
-              Top = 71
-              Width = 99
-              Anchors = [akTop]
-              Caption = 'Screen class name:'
-            end
-            object BExportToLevelAndScreen: TSpeedButton
-              AnchorSideLeft.Control = Panel17
-              AnchorSideLeft.Side = asrCenter
-              Left = 69
-              Height = 26
-              Top = 152
-              Width = 213
-              Caption = 'Export level(s) and screen unit'
-              OnClick = BExportToLevelAndScreenClick
-            end
-            object Label41: TLabel
-              AnchorSideLeft.Control = Label39
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label39
-              Left = 118
-              Height = 15
-              Top = 71
-              Width = 43
-              BorderSpacing.Left = 10
-              Caption = 'Label41'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label42: TLabel
-              AnchorSideRight.Control = Label44
-              AnchorSideRight.Side = asrBottom
-              Left = 83
-              Height = 15
-              Top = 56
-              Width = 25
-              Anchors = [akTop, akRight]
-              Caption = 'Unit:'
-            end
-            object Label43: TLabel
-              AnchorSideLeft.Control = Label42
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label42
-              Left = 118
-              Height = 15
-              Top = 56
-              Width = 43
-              BorderSpacing.Left = 10
-              Caption = 'Label43'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label44: TLabel
-              AnchorSideTop.Control = Label39
-              AnchorSideTop.Side = asrBottom
-              Left = 26
-              Height = 15
-              Top = 86
-              Width = 82
-              BorderSpacing.Left = 5
-              Caption = 'Screen variable:'
-            end
-            object Label45: TLabel
-              AnchorSideLeft.Control = Label44
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label44
-              Left = 118
-              Height = 15
-              Top = 86
-              Width = 43
-              BorderSpacing.Left = 10
-              Caption = 'Label45'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label5: TLabel
-              AnchorSideLeft.Control = Panel17
-              AnchorSideTop.Control = Panel17
-              Left = 6
-              Height = 15
-              Top = 9
-              Width = 131
-              BorderSpacing.Left = 5
-              BorderSpacing.Top = 8
-              Caption = 'Enter a name for the unit'
-              ParentFont = False
-            end
-            object Edit3: TEdit
-              AnchorSideLeft.Control = Label3
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label5
-              AnchorSideTop.Side = asrBottom
-              Left = 59
-              Height = 23
-              Top = 24
-              Width = 184
-              Font.Style = [fsBold]
-              ParentFont = False
-              TabOrder = 0
-              OnChange = BExportToLevelAndScreenClick
-            end
-            object Label46: TLabel
-              AnchorSideTop.Control = Label44
-              AnchorSideTop.Side = asrBottom
-              Left = 4
-              Height = 15
-              Top = 101
-              Width = 104
-              BorderSpacing.Left = 5
-              Caption = 'Level(s) class name:'
-            end
-            object Label47: TLabel
-              AnchorSideLeft.Control = Label46
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label46
-              Left = 118
-              Height = 15
-              Top = 101
-              Width = 43
-              BorderSpacing.Left = 10
-              Caption = 'Label47'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label48: TLabel
-              AnchorSideTop.Control = Label46
-              AnchorSideTop.Side = asrBottom
-              Left = 21
-              Height = 15
-              Top = 116
-              Width = 87
-              BorderSpacing.Left = 5
-              Caption = 'Level(s) variable:'
-            end
-            object Label49: TLabel
-              AnchorSideLeft.Control = Label48
-              AnchorSideLeft.Side = asrBottom
-              AnchorSideTop.Control = Label48
-              Left = 118
-              Height = 15
-              Top = 116
-              Width = 43
-              BorderSpacing.Left = 10
-              Caption = 'Label49'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label3: TLabel
-              Left = 17
-              Height = 15
-              Top = 35
-              Width = 42
-              Caption = 'screen_'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label4: TLabel
-              AnchorSideLeft.Control = Edit3
-              AnchorSideLeft.Side = asrBottom
-              Left = 243
-              Height = 15
-              Top = 32
-              Width = 21
-              Caption = '.pas'
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object Label40: TLabel
-              AnchorSideTop.Control = Panel17
-              AnchorSideRight.Control = Panel17
-              AnchorSideRight.Side = asrBottom
-              Left = 284
-              Height = 15
-              Top = 1
-              Width = 63
-              Anchors = [akTop, akRight]
-              BorderSpacing.Right = 3
-              Caption = 'Pascal code'
-              Font.Color = clWhite
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-          end
-          object Panel5: TPanel
-            AnchorSideLeft.Control = Panel4
-            AnchorSideTop.Control = Panel16
-            AnchorSideTop.Side = asrBottom
-            AnchorSideRight.Control = Panel4
-            AnchorSideRight.Side = asrBottom
-            Left = 0
-            Height = 47
-            Top = 109
-            Width = 351
-            Anchors = [akTop, akLeft, akRight]
-            ClientHeight = 47
-            ClientWidth = 351
-            ParentBackground = False
-            TabOrder = 3
-            object Label50: TLabel
-              AnchorSideTop.Control = Panel5
-              AnchorSideRight.Control = Panel5
-              AnchorSideRight.Side = asrBottom
-              Left = 266
-              Height = 15
-              Top = 3
-              Width = 81
-              Anchors = [akTop, akRight]
-              BorderSpacing.Top = 2
-              BorderSpacing.Right = 3
-              Caption = 'Level textures'
-              Font.Color = clWhite
-              Font.Style = [fsBold]
-              ParentFont = False
-            end
-            object CheckBox1: TCheckBox
-              AnchorSideLeft.Control = Panel5
-              AnchorSideTop.Control = Label50
-              AnchorSideTop.Side = asrBottom
-              Left = 6
-              Height = 19
-              Top = 18
-              Width = 243
-              BorderSpacing.Left = 5
-              Caption = 'Use a local atlas and add level textures to it'
-              TabOrder = 0
-            end
-          end
-        end
-      end
-    end
+    TabOrder = 1
   end
-  object SD1: TSaveDialog
-    Filter = 'pascal unit|*.pas|all files|*.*'
-    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    Left = 304
-    Top = 672
+  object Splitter1: TSplitter
+    AnchorSideLeft.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Cursor = crVSplit
+    Left = 0
+    Height = 5
+    Top = 408
+    Width = 353
+    Align = alNone
+    Anchors = [akTop, akLeft, akRight]
+    Color = 4674396
+    ParentColor = False
+    ResizeAnchor = akTop
   end
 end

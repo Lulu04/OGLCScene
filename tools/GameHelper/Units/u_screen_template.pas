@@ -397,9 +397,12 @@ var i: integer;
     Result := False;
   end;
 begin
-
+  // all layers not visible
   for i:=0 to Layers.Count-1 do
-    FScene.Layer[i].Visible := IndexInArray(i);
+    FScene.Layer[i].Visible := False; //IndexInArray(i);
+  // only wanted layers are visible
+  for i:=0 to High(aLayerIndexList) do
+    FScene.Layer[aLayerIndexList[i]].Visible := True;
 end;
 
 function TCustomScreenTemplate.TransformCoor(aControlPt: TPointF): TPointF;

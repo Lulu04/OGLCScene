@@ -42,14 +42,21 @@ begin
 {$ifdef MAXIMIZE_SCENE_ON_MONITOR}
   FScene := TOGLCScene.Create(OpenGLControl1, SCREEN_WIDTH_AT_DESIGN_TIME/SCREEN_HEIGHT_AT_DESIGN_TIME);
  {$ifdef WINDOWED_MODE}
+  //ShowWindow(Handle, SW_SHOWNORMAL);
   WindowState := wsMaximized;
+  BorderIcons := [biSystemMenu,biMinimize,biMaximize];
  {$else}
+  BorderIcons := [];
+  BorderStyle := bsNone;
   WindowState := wsFullScreen;
+  ShowWindow(Handle, SW_SHOWFULLSCREEN);
  {$endif}
 {$else}
-  ClientWidth := SCREEN_WIDTH_AT_DESIGN_TIME;
-  ClientHeight := SCREEN_HEIGHT_AT_DESIGN_TIME;
+  ClientWidth := Trunc(SCREEN_WIDTH_AT_DESIGN_TIME);
+  ClientHeight := Trunc(SCREEN_HEIGHT_AT_DESIGN_TIME);
   FScene := TOGLCScene.Create(OpenGLControl1, -1);
+  BorderIcons := [biSystemMenu];
+  BorderStyle := bsSingle;
   WindowState := wsNormal;
 {$endif}
   FScene.DesignPPI := SCREEN_PPI_AT_DESIGN_TIME;
