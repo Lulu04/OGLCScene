@@ -117,6 +117,8 @@ ArrayOfPSurfaceDescriptor = array of PSurfaceDescriptor;
 {$I u_surface_undoredo.inc}
 {$undef _INTERFACE}
 
+TOnGetTextureEvent = function(): TTextureList of object;
+
 { TSurfaceList }
 
 TSurfaceList = class(specialize TVector<TSurfaceDescriptor>)
@@ -129,6 +131,9 @@ private
   FWorkingLayer: integer;
 private
   FModeForLevelEditor: boolean;
+  FTextures: TTextureList;
+  FOnGetTexture: TOnGetTextureEvent;
+  function GetTextures: TTextureList;
 public
   constructor Create;
   destructor Destroy; override;
@@ -189,7 +194,10 @@ public
   procedure ReplaceNameInComboBox(aCB: TComboBox);
   procedure FillListBox(aLB: TListBox);
 
-  function Textures: TTextureList; virtual; abstract;
+  // to access the texture list with a direct property, either a callback
+  property Textures: TTextureList read GetTextures write FTextures;
+  // to access the texture list with a callback (use always property Textures
+  property OnGetTexture: TOnGetTextureEvent read FOnGetTexture write FOnGetTexture;
 
   property WorkingLayer: integer read FWorkingLayer write FWorkingLayer;
   property UndoRedoManager: TSurfaceUndoRedoManager read FUndoRedoManager;
@@ -959,6 +967,8 @@ var prop: TProperties;
   tex: PTexture;
 begin
   s1 := '';
+  v := 0;
+  tex := NIL;
   InitDefault;
   prop.Split(s, '~');
   prop.IntegerValueOf('ID', id, -1);
@@ -1117,6 +1127,13 @@ begin
     end;
 end;
 
+function TSurfaceList.GetTextures: TTextureList;
+begin
+  if Assigned(FTextures) then Result := FTextures
+    else if Assigned(FOnGetTexture) then Result := FOnGetTexture()
+      else raise exception.create('forgot to inialize either the property, either the callback to retrieve the texture list');
+end;
+
 procedure TSurfaceList.MoveItemTo(aCurrentIndex, aNewindex: integer);
 var o: TSurfaceDescriptor;
 begin
@@ -1144,6 +1161,9 @@ constructor TSurfaceList.Create;
 begin
   inherited Create;
   FUndoRedoManager := TSurfaceUndoRedoManager.Create;
+
+  FOnGetTexture := NIL;
+  FTextures := NIL;
 end;
 
 destructor TSurfaceList.Destroy;

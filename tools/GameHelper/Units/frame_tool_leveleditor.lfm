@@ -492,8 +492,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Top = 3
             BorderSpacing.Right = 3
             Flat = True
-            Images = DataModule1.ImageList1
-            ImageIndex = 15
+            Images = DataModule1.ILIconUI
+            ImageIndex = 8
             OnClick = BHelpSurfacesClick
             ShowHint = True
             ParentShowHint = False
@@ -889,7 +889,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Height = 28
           Top = 5
           Width = 30
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 4
           OnClick = BNewSurfaceClick
           ShowHint = True
@@ -1158,7 +1158,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Caption = 'Multiple'
           Color = 11382189
           Flat = True
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 4
           Layout = blGlyphTop
           Transparent = False
@@ -1281,8 +1281,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           BorderSpacing.Top = 5
           BorderSpacing.Right = 5
           Flat = True
-          Images = DataModule1.ImageList1
-          ImageIndex = 15
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
           OnClick = BHelpLayersClick
           ShowHint = True
           ParentShowHint = False
@@ -1540,8 +1540,8 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           BorderSpacing.Top = 5
           BorderSpacing.Right = 5
           Flat = True
-          Images = DataModule1.ImageList1
-          ImageIndex = 15
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
           OnClick = BHelpWorldClick
           ShowHint = True
           ParentShowHint = False
@@ -1817,7 +1817,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       Width = 24
       Anchors = [akTop, akRight]
       Flat = True
-      Images = DataModule1.ImageList1
+      Images = DataModule1.ILIconUI
       ImageIndex = 13
       OnClick = BCancelClick
       ShowHint = True
@@ -1896,7 +1896,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       Top = 64
       Width = 200
       Caption = 'Save into project'
-      Images = DataModule1.ImageList1
+      Images = DataModule1.ILIconUI
       ImageIndex = 2
       OnClick = BAddToLevelBankClick
     end

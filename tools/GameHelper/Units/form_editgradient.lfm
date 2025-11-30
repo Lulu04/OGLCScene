@@ -115,8 +115,8 @@ object FormEditGradient: TFormEditGradient
       BorderSpacing.Top = 3
       BorderSpacing.Right = 3
       Flat = True
-      Images = DataModule1.ImageList1
-      ImageIndex = 15
+      Images = DataModule1.ILIconUI
+      ImageIndex = 8
       OnClick = BHelpClick
       ShowHint = True
       ParentShowHint = False

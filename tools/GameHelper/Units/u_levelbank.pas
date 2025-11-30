@@ -34,14 +34,13 @@ end;
 
 PLevelBankItem = ^TLevelBankItem;
 TLevelBankItem = record
-  name,
+  name,        // the name of the level
+  description, // the description of the level to display in game
   worldinfo,
   layerloopinfo,
   surfaces : string;
   procedure InitDefault;
   procedure DuplicateTo(aItem: PLevelBankItem);
-  function SaveToString: string;
-  procedure LoadFromString(const s: string);
 
   // return an array with the index of user layer used in this level
   function GetUserLayerIndexesUsed: TArrayOfInteger;
@@ -53,7 +52,7 @@ end;
 
 TLevelGroup = class(specialize TVector<TLevelBankItem>)
 private
-  FGroupName: string;
+  FGroupName, FGroupDescription: string;
 public
   Textures: TTextureList;
   constructor Create;
@@ -70,6 +69,7 @@ public
   function SaveToString: string;
   procedure LoadFromString(const data: string);
   property GroupName: string read FGroupName write FGroupName;
+  property GroupDescription: string read FGroupDescription write FGroupDescription;
 end;
 
 TLevelBank = class(specialize TVector<TLevelGroup>)
@@ -87,6 +87,9 @@ TLevelBank = class(specialize TVector<TLevelGroup>)
 
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
+  // save into file \GameHelperSave\LevelBank.oglc
+  procedure SaveToPath(const aPath: string);
+  procedure LoadFromPath(const aPath: string);
 
   procedure ExportToFileGameLevel;
 end;
@@ -121,8 +124,7 @@ end;
 
 implementation
 
-uses u_common, u_surface_list, u_utils,
-  u_project;
+uses u_common, u_surface_list, u_utils, u_project, LazFileUtils;
 
 { TWorldInfo }
 
@@ -191,21 +193,6 @@ begin
   aItem^.worldinfo := worldinfo;
   aItem^.surfaces := surfaces;
   aItem^.layerloopinfo := layerloopinfo;
-end;
-
-function TLevelBankItem.SaveToString: string;
-begin
-  Result := name+'#'+surfaces+'#'+worldinfo+'#'+layerloopinfo;
-end;
-
-procedure TLevelBankItem.LoadFromString(const s: string);
-var A: TStringArray;
-begin
-  A := s.Split(['#']);
-  name := A[0];
-  surfaces := A[1];
-  if Length(A) > 2 then worldinfo := A[2] else worldinfo := '';
-  if Length(A) > 3 then layerloopinfo := A[3] else layerloopinfo := '';
 end;
 
 function TLevelBankItem.GetUserLayerIndexesUsed: TArrayOfInteger;
@@ -325,11 +312,14 @@ var i: SizeUInt;
 begin
   prop.Init('#');
   prop.Add('GroupName', FGroupName);
+  prop.Add('GroupDescription', FGroupDescription);
   prop.Add('GroupTextures', Textures.SaveToString);
   prop.Add('LevelCount', integer(Size));
   if Size > 0 then
     for i:=0 to Size-1 do begin
       prop.Add('LevelName'+i.ToString, Mutable[i]^.name);
+      if Mutable[i]^.description <> '' then
+        prop.Add('LevelDescription'+i.ToString, Mutable[i]^.description);
       prop.Add('Surfaces'+i.ToString, Mutable[i]^.surfaces);
       prop.Add('WorldInfo'+i.ToString, Mutable[i]^.worldinfo);
       prop.Add('LayerLoopMode'+i.ToString, Mutable[i]^.layerloopinfo);
@@ -342,17 +332,19 @@ procedure TLevelGroup.LoadFromString(const data: string);
 var c, i: integer;
   o: TLevelBankItem;
   prop: TProperties;
-  s, level_Name, level_Surfaces, level_WorldInfo, level_LayerLoopInfo: string;
+  s, level_Name, level_Desc, level_Surfaces, level_WorldInfo, level_LayerLoopInfo: string;
 begin
   Clear;
   prop.Split(data, '#');
 
   s := '';
   level_Name := '';
+  level_Desc := '';
   level_Surfaces := '';
   level_WorldInfo := '';
   level_LayerLoopInfo := '';
   prop.StringValueOf('GroupName', FGroupName, 'Level');
+  prop.StringValueOf('GroupDescription', FGroupDescription, '');
   prop.StringValueOf('GroupTextures', s, '');
   Textures.LoadFromString(s);
   c := 0;
@@ -361,11 +353,13 @@ begin
   if c = 0 then exit;
   for i:=0 to c-1 do begin
     o.InitDefault;
+    prop.StringValueOf('LevelDescription'+i.ToString, level_Desc, '');
     if prop.StringValueOf('LevelName'+i.ToString, level_name, '') and
        prop.StringValueOf('Surfaces'+i.ToString, level_Surfaces, '') and
        prop.StringValueOf('WorldInfo'+i.ToString, level_WorldInfo, '') and
        prop.StringValueOf('LayerLoopMode'+i.ToString, level_LayerLoopInfo, '') then begin
       o.name := level_name;
+      o.description := level_Desc;
       o.surfaces := level_Surfaces;
       o.worldinfo := level_WorldInfo;
       o.layerloopinfo := level_LayerLoopInfo;
@@ -443,7 +437,7 @@ procedure TLevelBank.SaveTo(t: TStringList);
 var i: SizeUInt;
   prop: TProperties;
 begin
-  prop.Init('!');
+  prop.Init('{');
   prop.Add('GroupCount', integer(Size));
   if Size > 0 then
     for i:=0 to Size-1 do
@@ -461,7 +455,7 @@ var i: SizeUInt;
   s: string;
 begin
   Clear;
-  if not prop.SplitFrom(t, '[LEVEL BANK]', '!') then exit;
+  if not prop.SplitFrom(t, '[LEVEL BANK]', '{') then exit;
 
   s := '';
   c := 0;
@@ -477,40 +471,86 @@ begin
   end;
 end;
 
+procedure TLevelBank.SaveToPath(const aPath: string);
+var t: TStringList;
+  var filename: string;
+begin
+  filename := aPath + 'LevelBank.oglc';
+  FScene.LogInfo('Saving Level Bank to '+filename, 1);
+  t := TStringList.Create;
+  try
+    try
+      SaveTo(t);
+      t.SaveToFile(filename);
+      FScene.LogInfo('success', 2);
+    except
+      On E :Exception do begin
+        FScene.logError(E.Message, 2);
+     end;
+    end;
+  finally
+    t.Free;
+  end;
+end;
+
+procedure TLevelBank.LoadFromPath(const aPath: string);
+var t: TStringList;
+  filename: string;
+begin
+  Clear;
+  filename := aPath + 'LevelBank.oglc';
+  if not FileExistsUTF8(filename) then begin
+    FScene.LogInfo('No Level Bank found', 1);
+    exit;
+  end;
+
+  FScene.LogInfo('Found Level Bank, loading...', 1);
+  t := TStringList.Create;
+  try
+    try
+      t.LoadFromFile(filename);
+      LoadFrom(t);
+      FScene.LogInfo('success', 2);
+    except
+      On E :Exception do begin
+        FScene.logError(E.Message, 2);
+     end;
+    end;
+  finally
+    t.Free;
+  end;
+end;
+
 procedure TLevelBank.ExportToFileGameLevel;
 var t: TStringlist;
   nameUnit, nameClass, unitFileName: string;
   i, j: integer;
-  s, texFilename, sw, sh: string;
-  p: SizeInt;
+  prefixSpace: string;
   haveSingleGroup: Boolean;
   group: TLevelGroup;
-  item: PTextureItem;
 begin
   {
      on exporte tous les groupes de level dans un même fichier u_game_levels.pas
      gérés par une seule classe:
 
      TGamelevels = class(TOGLCDecorManager)
-     private
-       function GetGroupCount: integer;
-       function GetGroupName(groupindex: integer): string;
-       function GetLevelCount(groupindex: integer): integer;
      public
        class procedure LoadTexture(aAtlas: TAtlas; aGroupIndex: integer); override;
-       // return the number of level group as defined in Game Helper
+       // return the number of group of level as defined in Game Helper
        function GetGroupCount: integer;
-       // return the name of the group as defined in Game Helper
+       // return the name of a group as defined in Game Helper
        function GetGroupName(aGroupIndex: integer): string;
+       // return the description of the group of level as defined in Game Helper
+       function GetGroupDescription(aGroupIndex: integer): string;
        // return the number of level in the specified level group as defined in Game Helper
        function GetLevelCount(aGroupIndex: integer): integer;
        // return the name of the level as defined in Game Helper
        function GetLevelName(aGroupIndex, aLevelIndex: integer): string;
+       // return the level description as defined in Game Helper
+       function GetLevelDescription(aGroupIndex, aLevelIndex: integer): string;
 
        // Load a level
        procedure LoadLevel(aGroupIndex, aLevelIndex: integer);
-       // After a call to LoadLevel, retrieve the world bounds with this property
-       function GetWorldArea: TRectF;
      end;
 
   IMPLEMENTATION
@@ -532,22 +572,16 @@ begin
 
   //unit interface
   t.Add('{');
-  AddFileGeneratedByGameHelper(t);
+  CodeGen.AddFileGeneratedByGameHelper(t);
   t.AddText('  Usage:'#10+
             '    - call '+nameClass+'.LoadTexture() when you construct your texture atlas.'#10+
             '    - call LoadLevel() to load the needed game level.'#10+
             '    - retrieve the world area with property WordArea.'#10+
             '}');
   t.Add('');
-  AddInterface(t, nameUnit);
+  CodeGen.AddInterface(t, nameUnit);
   t.AddText('{ '+nameClass+' }'#10#10+
             nameClass+' = class(TOGLCDecorManager)');
-
-  if not haveSingleGroup then
-    t.AddText('private'#10+
-              '  function GetGroupCount: integer;'#10+
-              '  function GetGroupName(groupindex: integer): string;'#10+
-              '  function GetLevelCount(groupindex: integer): integer;');
 
   t.AddText('protected'#10+
             '  function ScaleWF(AValue: single): single; override;'#10+
@@ -555,117 +589,88 @@ begin
             'public');
 
   if haveSingleGroup then
-    t.AddText('  class procedure LoadTexture(aAtlas: TAtlas); override;'#10#10+
+    t.AddText('  class procedure LoadTexture(aAtlas: TAtlas);'#10#10+
               '  // call this method to build the needed level'#10+
-              '  procedure BuildLevel(aIndex: integer);')
+              '  procedure BuildLevel(aIndex: integer; aAtlas: TAtlas);')
   else
-    t.AddText('  class procedure LoadTexture(aAtlas: TAtlas; aGroupIndex: integer);'#10+
-              '  // return the number of level group as defined in Game Helper'#10+
-              '  function GetGroupCount: integer;'#10+
-              '  // return the name of the group as defined in Game Helper'#10+
-              '  function GetGroupName(aGroupIndex: integer): string;'#10+
-              '  // return the number of level in the specified level group as defined in Game Helper'#10+
-              '  function GetLevelCount(aGroupIndex: integer): integer;'#10+
-              '  // return the name of the level as defined in Game Helper'#10+
-              '  function GetLevelName(aGroupIndex, aLevelIndex: integer): string;'#10#10+
-              '  // call this method to build the needed level'#10+
-              '  procedure BuildLevel(aGroupIndex, aLevelIndex: integer);');
+    t.AddText('  // Use this method to load the textures used by the specified group index in an atlas'#10+
+              '  // If needed, you can call this method several time with a different group index'#10+
+              '  class procedure LoadTexture(aAtlas: TAtlas; aGroupIndex: integer);'#10+
+              '  // Use this method to load in a single call textures of all groups'#10+
+              '  class procedure LoadTexturesForAllGroups(aAtlas: TAtlas);'#10#10+
+              '  // return the number of level group as defined in Game Helper');
 
-  T.AddText('  // After a call to BuildLevel, retrieve the world bounds with this property'#10+
-            '  function GetWorldArea: TRectF;'#10+
-            'end;');
+  t.AddText('  class function GetGroupCount: integer;'#10+
+            '  // return the name of the group as defined in Game Helper'#10+
+            '  class function GetGroupName(aGroupIndex: integer): string;'#10+
+            '  // return the description of the group of level as defined in Game Helper'#10+
+            '  class function GetGroupDescription(aGroupIndex: integer): string;'#10+
+            '  // return the number of level in the specified level group as defined in Game Helper'#10+
+            '  class function GetLevelCount(aGroupIndex: integer): integer;'#10+
+            '  // return the name of the level as defined in Game Helper'#10+
+            '  class function GetLevelName(aGroupIndex, aLevelIndex: integer): string;'#10+
+            '  // return the level description as defined in Game Helper'#10+
+            '  class function GetLevelDescription(aGroupIndex, aLevelIndex: integer): string;'#10#10+
+            '  // call this method to build the needed level'#10+
+            '  procedure BuildLevel(aGroupIndex, aLevelIndex: integer; aAtlas: TAtlas);');
+
+  t.AddText('public // defined in ancestor'#10+
+            '{'+#10+
+            '  // return the indexes of the layers used by the decors'#10+
+            '  function GetUsedLayerIndexes: TArrayOfInteger;'#10#10+
+            '  // The world bounds as defined in the level'#10+
+            '  property WorldArea: TRectF read FWorldArea;'#10#10+
+            '  // The gradient instance to render the sky.'#10+
+            '  // If the level don''t define a gradient for the sky, this property is NIL'#10+
+            '  property SkyGradient: TGradientRectangle read FSkyGradient;'#10#10+
+            '  property DecorCount: integer read GetDecorCount;'#10+
+            '  // access to the decor instances'#10+
+            '  property Decors[index:integer]: TOGLCDecorContainer read GetDecor;'#10+
+            '}');
+  t.Add('end;');
   t.Add('');
   // implementation
-  AddImplementation(t);
+  CodeGen.AddImplementation(t);
   // CONST level data in string format
   t.Add('const');
   for i:=0 to Size-1 do begin
     group := Mutable[i]^;
-    for j:=0 to group.Size-1 do begin
-      group.Mutable[j]^.ExportToPascalConst(t, group.GroupName, group.Textures);
-      t.Add('');
-    end;
+    if group.Size > 0 then
+      for j:=0 to group.Size-1 do begin
+        group.Mutable[j]^.ExportToPascalConst(t, group.GroupName, group.Textures);
+        t.Add('');
+      end;
  end;
 
   t.AddText('{ '+nameClass+' }'+#10);
 
-  if not haveSingleGroup then begin
-    t.AddText('function '+nameClass+'.GetGroupCount: integer;'#10+
-              'begin'#10+
-              '  Result := '+integer(Size).ToString+';'#10+
-              'end;'#10#10+
-              'function '+nameClass+'.GetGroupName(groupindex: integer): string;'#10+
-              'begin'#10+
-              '  case groupindex of');
-    for i:=0 to Size-1 do
-        t.Add('    '+i.ToString+': Result := '''+Mutable[i]^.GroupName+''';');
-    t.AddText('  end;//case'#10+
-              'end;'#10#10+
-              '  function '+nameClass+'.GetLevelCount(groupindex: integer): integer;'#10+
-              'begin'#10+
-              '  case groupindex of');
-    for i:=0 to Size-1 do
-        t.Add('    '+i.ToString+': Result := '+integer(Mutable[i]^.Size).ToString+';');
-    t.AddText('  end;//case'#10+
-              'end;');
-    t.Add('');
-  end;
-
   // decor protected method
-  AddImplementationOfDecorProtectedMethod(t, nameClass);
+  CodeGen.AddImplementationOfDecorProtectedMethod(t, nameClass);
+  t.Add('');
 
-  // method for class LoadTexture()
+  // class method LoadTexture()
   if haveSingleGroup
     then t.Add('class procedure '+nameClass+'.LoadTexture(aAtlas: TAtlas);')
     else t.Add('class procedure '+nameClass+'.LoadTexture(aAtlas: TAtlas; aGroupIndex: integer);');
-  t.AddText('var dataFolder: string;'#10+
+  t.AddText('var texFolder: string;'#10+
             'begin'#10+
-            '  dataFolder := u_common.DataFolder;');
+            '  texFolder := u_common.TexturesFolder;');
 
   if not haveSingleGroup then
     t.Add('  case aGroupIndex of');
 
   for i:=0 to Size-1 do begin
-    if not haveSingleGroup then
-      t.Add('    '+i.ToString+': begin');
     group := Mutable[i]^;
+    if not haveSingleGroup then
+      t.Add('    '+i.ToString+': begin  // '+group.GroupName);
 
+    if haveSingleGroup then prefixSpace := '  '
+      else prefixSpace := '      ';
     if group.Size > 0 then begin
-      with group.Textures do
-        for j:=0 to Size-1 do begin
-          item := Mutable[j];
-          // texture filename must be relative to application Data folder
-          texFilename := item^.filename;
-          p := texFilename.LastIndexOf(DirectorySeparator+'Data'+DirectorySeparator);
-          texFilename := texFilename.Remove(0, p+6);
-          texFilename := 'dataFolder+'''+texFilename+'''';
+      for j:=0 to group.Size-1 do
+        t.Add(prefixSpace+group.Textures.Mutable[j]^.PascalCodeToAddTextureToAtlas(False))
+    end else t.Add(prefixSpace+'// this group is empty');
 
-          s := '  ';
-          if ExtractFileExt(item^.filename) = '.svg' then begin
-            if item^.width = -1 then sw := '-1'
-              else sw := 'u_common.ScaleW('+item^.width.ToString+')';
-            if item^.height = -1 then sh := '-1'
-              else sh := 'u_common.ScaleH('+item^.height.ToString+')';
-
-            if item^.isMultiFrame then
-              s := s + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
-                 ', '+sw+', '+sh+
-                 ', '+(item^.width div item^.frameWidth).ToString+
-                 ', '+(item^.height div item^.frameHeight).ToString+
-                 ', 0);'
-            else
-              s := s + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
-          end else begin
-            if item^.isMultiFrame then
-              s := s + 'aAtlas.AddMultiFrameImage('+texFilename+
-              ', '+(item^.width div item^.frameWidth).ToString+
-              ', '+(item^.height div item^.frameHeight).ToString+');'
-            else
-              s := s + 'aAtlas.Add('+texFilename+');';
-          end;
-          t.Add(s);
-        end;// for j
-    end;
     if not haveSingleGroup then
       t.Add('    end;');
   end;// for i
@@ -674,29 +679,106 @@ begin
   t.Add('end;');
   t.Add('');
 
+  // class procedure LoadTexturesForAllGroups(aAtlas: TAtlas);
+  if not haveSingleGroup then begin
+    t.AddText('class procedure '+nameClass+'.LoadTexturesForAllGroups(aAtlas: TAtlas);'#10+
+              'var i: integer;'#10+
+              'begin'#10+
+              '  for i:=0 to GetGroupCount-1 do'#10+
+              '    LoadTexture(aAtlas, i);'#10+
+              'end;');
+    t.Add('');
+  end;
+
+  // function GetGroupCount
+  t.AddText('class function '+nameClass+'.GetGroupCount: integer;'#10+
+            'begin'#10+
+            '  Result := '+integer(Size).ToString+';'#10+
+            'end;');
+  // function GetGroupName
+  t.AddText('class function '+nameClass+'.GetGroupName(aGroupIndex: integer): string;'#10+
+            'begin'#10+
+            '  case aGroupIndex of');
+  for i:=0 to Size-1 do
+      t.Add('    '+i.ToString+': Result := '''+Mutable[i]^.GroupName+''';');
+  t.AddText('  end;//case'#10+
+            'end;');
+  // function GetGroupDescription
+  t.AddText('class function '+nameClass+'.GetGroupDescription(aGroupIndex: integer): string;'#10+
+            'begin'#10+
+            '  case aGroupIndex of');
+  for i:=0 to Size-1 do
+      t.Add('    '+i.ToString+': Result := '''+Mutable[i]^.GroupDescription+''';');
+  t.AddText('  end;//case'#10+
+            'end;');
+  // function GetLevelCount
+  t.AddText('class function '+nameClass+'.GetLevelCount(aGroupIndex: integer): integer;'#10+
+            'begin'#10+
+            '  case aGroupIndex of');
+  for i:=0 to Size-1 do
+    t.Add('    '+i.ToString+': Result := '+integer(Mutable[i]^.Size).ToString+';');
+  t.AddText('  end;//case'#10+
+              'end;');
+  // function GetLevelName
+  t.AddText('class function '+nameClass+'.GetLevelName(aGroupIndex, aLevelIndex: integer): string;'#10+
+            'begin'#10+
+            '  case aGroupIndex of');
+  for i:=0 to Size-1 do begin
+    group := Mutable[i]^;
+    t.Add('    '+i.ToString+': begin  // '+group.GroupName);
+    if group.Size > 0 then begin
+      t.Add('      case aLevelIndex of');
+      for j:=0 to group.Size-1 do
+        t.Add('        '+j.ToString+': Result := '''+group.Mutable[j]^.name+''';');
+      t.Add('      end;');
+    end else t.Add('      Result := ''''; // this group is empty');
+    t.Add('    end;');
+  end;
+  t.AddText('  end;'#10+
+            'end;');
+    t.Add('');
+  // function GetLevelDescription
+  t.AddText('class function '+nameClass+'.GetLevelDescription(aGroupIndex, aLevelIndex: integer): string;'#10+
+            'begin'#10+
+            '  case aGroupIndex of');
+  for i:=0 to Size-1 do begin
+    group := Mutable[i]^;
+    t.Add('    '+i.ToString+': begin  // '+group.GroupName);
+    if group.Size > 0 then begin
+      t.Add('      case aLevelIndex of');
+      for j:=0 to group.Size-1 do
+        t.Add('      '+j.ToString+': Result := '''+group.Mutable[j]^.description+''';');
+      t.Add('      end;');
+    end else t.Add('      Result := ''''; // this group is empty');
+    t.Add('    end;');
+  end;
+  t.AddText('  end;'#10+
+            'end;');
+  t.Add('');
+
   // procedure to build a level
   if haveSingleGroup then begin
     group := Mutable[0]^;
-    t.AddText('procedure '+nameClass+'.BuildLevel(aIndex: integer);'#10+
+    t.AddText('procedure '+nameClass+'.BuildLevel(aIndex: integer; aAtlas: TAtlas);'#10+
               'begin');
     if group.Size > 0 then begin
       t.Add('  case aIndex of');
       for i:=0 to group.Size-1 do
-        t.Add('    '+i.ToString+': DoBuildLevel(DATA_'+group.GroupName+'_'+group.Mutable[i]^.name+');');
+        t.Add('    '+i.ToString+': DoBuildLevel(DATA_'+group.GroupName+'_'+group.Mutable[i]^.name+', aAtlas);');
       t.Add('  end;');
     end;
   end else begin
-    t.AddText('procedure '+nameClass+'.BuildLevel(aGroupIndex, aLevelIndex: integer);'#10+
+    t.AddText('procedure '+nameClass+'.BuildLevel(aGroupIndex, aLevelIndex: integer; aAtlas: TAtlas);'#10+
               'begin'#10+
               '  case aGroupIndex of');
     for i:=0 to Size-1 do begin
       group := Mutable[i]^;
       if group.Size = 0 then t.Add('    '+i.ToString+': ; // this group is empty')
       else begin
-        t.AddText('    '+i.ToString+':'#10+
-                  '      case aLevelIndex Of');
+        t.AddText('    '+i.ToString+':  // '+group.GroupName+#10+
+                  '      case aLevelIndex of');
         for j:=0 to group.Size-1 do
-          t.Add('        '+j.ToString+': DoBuildLevel(DATA_'+group.GroupName+'_'+group.Mutable[j]^.name+');');
+          t.Add('        '+j.ToString+': DoBuildLevel(DATA_'+group.GroupName+'_'+group.Mutable[j]^.name+', aAtlas);');
         t.AddText('        else raise exception.create(''level index out of bounds'');'#10+
                   '      end;');
       end;
@@ -705,15 +787,6 @@ begin
               '  end;//case');
   end;
   t.Add('end;');
-
-  // GetWorldArea
-  t.AddText('function '+nameClass+'.GetWorldArea: TRectF;'#10+
-            'begin'#10+
-            '  Result.Left := ScaleW(Round(FNonScaledWorldArea.Left));'#10+
-            '  Result.Top := ScaleH(Round(FNonScaledWorldArea.Top));'#10+
-            '  Result.Right := ScaleW(Round(FNonScaledWorldArea.Right));'#10+
-            '  Result.Bottom := ScaleH(Round(FNonScaledWorldArea.Bottom));'#10+
-            'end;');
   t.Add('');
 
   // end of file

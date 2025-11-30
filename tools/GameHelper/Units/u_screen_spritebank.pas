@@ -13,18 +13,12 @@ uses
 
 type
 
-{ TSpriteBankSurfaceList }
-
-TSpriteBankSurfaceList = class(TSurfaceList)
-  function Textures: TTextureList; override;
-end;
-
 { TScreenSpriteBank }
 
 TScreenSpriteBank = class(TCustomScreenTemplate)
 private
   FTextures: TTextureList;
-  FSurfaces: TSpriteBankSurfaceList;
+  FSurfaces: TSurfaceList;
   FBodies: TBodyItemList;
   FPostures: TPosturelist;
 private
@@ -46,8 +40,9 @@ public
   procedure ClearView;
   procedure ShowSprite(aIndex: integer);
 
-  property Textures: TTextureList read FTextures;
-  property Surfaces: TSpriteBankSurfaceList read FSurfaces;
+  function Textures: TTextureList; override;
+  function Surfaces: TSurfaceList; override;
+
   property Bodies: TBodyItemList read FBodies;
   property Postures: TPosturelist read FPostures;
 end;
@@ -57,13 +52,6 @@ var ScreenSpriteBank: TScreenSpriteBank;
 implementation
 
 uses form_main;
-
-{ TSpriteBankSurfaceList }
-
-function TSpriteBankSurfaceList.Textures: TTextureList;
-begin
-  Result := ScreenSpriteBank.Textures;
-end;
 
 { TScreenSpriteBank }
 
@@ -96,7 +84,8 @@ end;
 procedure TScreenSpriteBank.Initialize;
 begin
   FTextures := TTextureList.Create;
-  FSurfaces := TSpriteBankSurfaceList.Create;
+  FSurfaces := TSurfaceList.Create;
+  FSurfaces.Textures := FTextures;
   FSurfaces.WorkingLayer := LAYER_SPRITEBANK;
   FBodies := TBodyItemList.Create;
   FPostures := TPostureList.Create;
@@ -132,6 +121,16 @@ begin
     FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);
   end else FBodies.Clear;
   FPostures.LoadFromString(SpriteBank.Mutable[aIndex]^.postures);
+end;
+
+function TScreenSpriteBank.Textures: TTextureList;
+begin
+  Result := FTextures;
+end;
+
+function TScreenSpriteBank.Surfaces: TSurfaceList;
+begin
+  Result := FSurfaces;
 end;
 
 end.

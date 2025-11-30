@@ -57,11 +57,13 @@ function ContenuDuRepertoire(const aFolder: string;
                              aListerLesRepertoires,
                              aListerLesSousRepertoires: boolean): TStringList;
 // Gives the content of the given directory
+// files and directories are relative to the given path
 function GetDirectoryContent(const aDirectoryPath: string;
-                             const aMasksExt: TStringArray; //NIL for all files or ['.doc', '.exe',...]
+                             const aMasksExt: TStringArray; //[] for all files or ['.doc', '.exe',...]
+                             aListFile,  // set to True to include files in the list (if false, aMasksExt is ignored)
                              aListSubFolder: boolean; // set to True to include sub-folder in the list
                                                       // if False, aListSubFolderUntilLevel is ignored
-                             aListSubFolderUntilLevel: integer=0) // 0 means explore only 'aDirectoryPath'
+                             aListSubFolderUntilLevel: integer=MaxInt) // 0 means explore only 'aDirectoryPath'
                                                                   // 1 means explore one level of sub-folder of 'aDirectoryPath'
                                                                   // 2 means explore two levels of sub-folder. and so on...
                              : TStringList;
@@ -229,43 +231,40 @@ begin
 end;
 
 function GetDirectoryContent(const aDirectoryPath: string;
-  const aMasksExt: TStringArray; aListSubFolder: boolean;
+  const aMasksExt: TStringArray; aListFile, aListSubFolder: boolean;
   aListSubFolderUntilLevel: integer): TStringList;
 var currentLevel: integer;
   function FileHaveOneOfMaskExt(const afile: string): boolean;
   var i: integer;
   begin
-   Result := True;
-   if Length(aMasksExt) = 0 then exit;
-
+   if Length(aMasksExt) = 0 then exit(True);
    for i:=0 to High(aMasksExt) do
-     if UpCase( ExtractFileExt( afile )) = UpCase(aMasksExt[i]) then exit;
+     if LowerCase( ExtractFileExt( afile )) = LowerCase(aMasksExt[i]) then exit(True);
    Result := False;
   end;
+
   procedure ScanFolder(aFolder: string; aSubFolder: string; aSL: TStringList);
   var
     Sr: TSearchRec;
     sd: string;
   begin
    inc(currentLevel);
-   if LazFileUtils.FindFirstUTF8(aFolder + string(DIRECTORYSEPARATOR + '*') , faAnyFile , Sr ) = 0 then begin
+   if LazFileUtils.FindFirstUTF8(aFolder + string(PathDelim + '*') , faAnyFile , Sr ) = 0 then begin
      repeat
-      if (Sr.Attr and faDirectory)=faDirectory then begin
-        if ( not((Sr.Name = '.') or (Sr.Name = '..')) ) and
-           aListSubFolder then begin
+      if (Sr.Attr and faDirectory) = faDirectory then begin
+        if aListSubFolder and (not((Sr.Name = '.') or (Sr.Name = '..')) ) then begin
           // we find a folder
           if aSubFolder = ''
             then sd := Sr.Name
-            else sd := aSubFolder + DIRECTORYSEPARATOR + Sr.Name;
+            else sd := aSubFolder + PathDelim + Sr.Name;
           aSL.Add( sd );
           if currentLevel <= aListSubFolderUntilLevel then
-            ScanFolder(aFolder + DIRECTORYSEPARATOR + Sr.Name, sd, aSL);
+            ScanFolder(aFolder + PathDelim + Sr.Name, sd, aSL);
         end;
-      end else if FileHaveOneOfMaskExt( Sr.Name ) then begin
-                 // we find a file
-                 if aSubFolder = ''
-                   then aSL.Add(Sr.Name)
-                   else aSL.Add(aSubFolder + DIRECTORYSEPARATOR + Sr.Name);
+      end else if aListFile and FileHaveOneOfMaskExt( Sr.Name ) then begin
+          // we find a file
+          if aSubFolder = '' then aSL.Add(Sr.Name)
+            else aSL.Add(aSubFolder + PathDelim + Sr.Name);
       end;
      until LazFileUtils.FindNextUTF8(Sr) <> 0;
    end;
@@ -326,7 +325,7 @@ begin
   if not RepertoireExistant(aDstDirectory) then exit;
 
   src := IncludeTrailingPathDelimiter(aSrcDirectory);
-  t := GetDirectoryContent(src, NIL, True, MaxInt);
+  t := GetDirectoryContent(src, NIL, True, True, MaxInt);
   dst := IncludeTrailingPathDelimiter(aDstDirectory);
 
   try

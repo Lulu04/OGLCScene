@@ -28,14 +28,13 @@ APP_LAYER_COUNT = 10;
 
 DEFAULT_SKY_GRADIENT = '2 0.000 2 0.000 0080FFFF 1.000 0080FFFF 1.000 2 0.000 000080FF 1.000 000080FF';
 
-PREFIX_FOR_SPRITE_UNIT_NAME = 'u_sprite_';
 LEVEL_UNIT_NAME = 'u_gamelevels';
 
 var
   FScene: TOGLCScene;
   FAtlas: TAtlas;
-  FHintFont: TTexturedFont; // font for hint
-  FErrorFont: TTexturedFont; // font for error message
+  FHintFont: TTexturedFont;  // font for volatile hints
+  FErrorFont: TTexturedFont; // font for error messages
 
   LastClickedIsControl: boolean=False;
 

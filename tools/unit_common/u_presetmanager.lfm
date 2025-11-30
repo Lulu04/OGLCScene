@@ -51,7 +51,7 @@ object PresetManager: TPresetManager
     BorderSpacing.Right = 5
     Constraints.MinWidth = 110
     Caption = 'Update'
-    Images = DataModule1.ImageList1
+    Images = DataModule1.ILIconUI
     ImageIndex = 9
     OnClick = BUpdateClick
     ShowHint = True
@@ -72,7 +72,7 @@ object PresetManager: TPresetManager
     Anchors = [akTop, akRight]
     AutoSize = True
     Caption = 'Delete'
-    Images = DataModule1.ImageList1
+    Images = DataModule1.ILIconUI
     ImageIndex = 41
     OnClick = BDeleteClick
     ShowHint = True
@@ -96,7 +96,7 @@ object PresetManager: TPresetManager
     BorderSpacing.Right = 5
     Constraints.MinWidth = 110
     Caption = 'Rename'
-    Images = DataModule1.ImageList1
+    Images = DataModule1.ILIconUI
     ImageIndex = 6
     OnClick = BRenameClick
     ShowHint = True

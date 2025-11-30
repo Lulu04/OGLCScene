@@ -14,18 +14,12 @@ uses
 
 type
 
-{ TSpriteBuilderSurfaceList }
-
-TSpriteBuilderSurfaceList = class(TSurfaceList)
-  function Textures: TTextureList; override;
-end;
-
 { TScreenSpriteBuilder }
 
 TScreenSpriteBuilder = class(TScreenWithSurfaceHandling)
 private
   FTextures: TTextureList;
-  FSurfaces: TSpriteBuilderSurfaceList;
+  FSurfaces: TSurfaceList;
 public
   procedure AddToSelected(aItems: ArrayOfPSurfaceDescriptor); override;
   procedure RemoveItemsFromSelected(aItems: ArrayOfPSurfaceDescriptor); override;
@@ -90,7 +84,7 @@ public
   procedure SelectAll; override;
   procedure SetFlagModified; override;
   function Surfaces: TSurfaceList; override;
-  property Textures: TTextureList read FTextures;
+  function Textures: TTextureList; override;
   //property Surfaces: TSpriteBuilderSurfaceList read FSurfaces;
   property Bodies: TBodyItemList read FBodyList;
   property Postures: TPostureList read FPostures;
@@ -101,18 +95,16 @@ var ScreenSpriteBuilder: TScreenSpriteBuilder;
 implementation
 uses LCLType, Forms, Dialogs, Controls, u_project, u_app_pref, form_main;
 
-{ TSpriteBuilderSurfaceList }
-
-function TSpriteBuilderSurfaceList.Textures: TTextureList;
-begin
-  Result := ScreenSpriteBuilder.Textures;
-end;
-
 { TScreenSpriteBuilder }
 
 function TScreenSpriteBuilder.Surfaces: TSurfaceList;
 begin
   Result := FSurfaces;
+end;
+
+function TScreenSpriteBuilder.Textures: TTextureList;
+begin
+  Result := FTextures;
 end;
 
 procedure TScreenSpriteBuilder.AddToSelected(aItems: ArrayOfPSurfaceDescriptor);
@@ -996,7 +988,8 @@ procedure TScreenSpriteBuilder.Initialize;
 begin
   FTextures := TTextureList.Create;
 
-  FSurfaces := TSpriteBuilderSurfaceList.Create;
+  FSurfaces := TSurfaceList.Create;
+  FSurfaces.Textures := Textures;
   FSurfaces.WorkingLayer := LAYER_SPRITEBUILDER;
 
   FBodyList := TBodyItemList.Create;

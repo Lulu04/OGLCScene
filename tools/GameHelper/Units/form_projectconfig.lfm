@@ -295,10 +295,10 @@ object FormProjectConfig: TFormProjectConfig
           Height = 28
           Hint = 'Erase all levels defined in this project, and the associated textures.'#13#10'The textures used for the Sprite Bank are not affected.'
           Top = 232
-          Width = 247
+          Width = 301
           AutoSize = True
-          Caption = 'Erase all groups, all levels and all textures'
-          Images = DataModule1.ImageList1
+          Caption = 'Erase all (groups, levels and textures used by levels)'
+          Images = DataModule1.ILIconUI
           ImageIndex = 5
           OnClick = BEraseLevelBankClick
           ShowHint = True
@@ -364,7 +364,7 @@ object FormProjectConfig: TFormProjectConfig
       Top = 12
       Width = 108
       Caption = 'Cancel'
-      Images = DataModule1.ImageList1
+      Images = DataModule1.ILIconUI
       ImageIndex = 13
       OnClick = BOkClick
     end
@@ -375,7 +375,7 @@ object FormProjectConfig: TFormProjectConfig
       Top = 12
       Width = 108
       Caption = 'Ok'
-      Images = DataModule1.ImageList1
+      Images = DataModule1.ILIconUI
       ImageIndex = 14
       OnClick = BOkClick
     end

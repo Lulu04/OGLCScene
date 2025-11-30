@@ -12,6 +12,7 @@ object FormMain: TFormMain
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
+  OnShow = FormShow
   OnUTF8KeyPress = FormUTF8KeyPress
   Position = poWorkAreaCenter
   LCLVersion = '3.8.0.0'

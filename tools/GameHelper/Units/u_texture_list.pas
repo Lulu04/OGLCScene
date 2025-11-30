@@ -16,7 +16,8 @@ type
 
 TTextureItem = record
   texture: PTexture;
-  filename, name: string;
+  filename, // the absolute path + filename + ext
+  name: string;
   width, height: integer;
 
   isMultiFrame: boolean;
@@ -29,6 +30,8 @@ TTextureItem = record
 
   function SaveToString: string;
   procedure LoadFromString(const s: string);
+
+  function PascalCodeToAddTextureToAtlas(aGenerateTexVariableName: boolean): string;
 end;
 PTextureItem = ^TTextureItem;
 
@@ -73,7 +76,7 @@ end;
 
 implementation
 
-uses u_common, form_main;
+uses u_common, form_main, u_project, u_utils, LazFileUtils;
 
 {$define _IMPLEMENTATION}
 {$I u_texture_undoredo.inc}
@@ -112,9 +115,11 @@ end;
 
 function TTextureItem.SaveToString: string;
 var prop: TProperties;
+  shortFilename: string;
 begin
   prop.Init('~');
-  prop.Add('Filename', filename);
+  shortFilename := ExtractRelativePath(Project.Config.TargetLazarusProject.GetFolderDataTextures, filename);
+  prop.Add('Filename', shortFilename);
   prop.Add('Name', name);
   prop.Add('Width', width);
   prop.Add('Height', height);
@@ -133,6 +138,8 @@ begin
   Self := Default(TTextureItem);
   prop.Split(s, '~');
   prop.StringValueOf('Filename', filename, filename);
+  filename := GetForcedPathDelims(Project.Config.TargetLazarusProject.GetFolderDataTextures + filename);
+
   prop.StringValueOf('Name', name, ChangeFileExt(ExtractFilename(filename), ''));
   prop.IntegerValueOf('Width', width, width);
   prop.IntegerValueOf('Height', height, height);
@@ -140,6 +147,42 @@ begin
   prop.IntegerValueOf('FrameWidth', frameWidth, 0);
   prop.IntegerValueOf('FrameHeight', frameHeight, 0);
   prop.IntegerValueOf('FrameCount', framecount, 0);
+end;
+
+function TTextureItem.PascalCodeToAddTextureToAtlas(aGenerateTexVariableName: boolean): string;
+var texFilename, sw, sh: string;
+begin
+  // texture filename must be relative to application Data folder
+  texFilename := filename;
+  texFilename := ExtractRelativePath(Project.Config.TargetLazarusProject.GetFolderDataTextures, filename);
+  texFilename := GetCrossPlatformShortFilename(texFilename);
+  texFilename := 'texFolder+'''+texFilename+'''';
+
+  if aGenerateTexVariableName then Result := name + ' := '
+    else Result := '';
+
+  if ExtractFileExt(filename) = '.svg' then begin
+    if width = -1 then sw := '-1'
+      else sw := 'ScaleW('+width.ToString+')';
+    if height = -1 then sh := '-1'
+      else sh := 'ScaleH('+height.ToString+')';
+
+    if isMultiFrame then
+      Result := Result + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
+         ', '+sw+', '+sh+
+         ', '+(width div frameWidth).ToString+
+         ', '+(height div frameHeight).ToString+
+         ', 0);'
+    else
+      Result := Result + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
+  end else begin
+    if isMultiFrame then
+      Result := Result + 'aAtlas.AddMultiFrameImage('+texFilename+
+      ', '+(width div frameWidth).ToString+
+      ', '+(height div frameHeight).ToString+');'
+    else
+      Result := Result + 'aAtlas.Add('+texFilename+');';
+  end;
 end;
 
 { TTextureList }

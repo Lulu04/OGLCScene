@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, u_surface_list, u_ui_handle;
+  OGLCScene, u_surface_list, u_texture_list, u_ui_handle;
 
 // message to user
 resourcestring
@@ -121,6 +121,9 @@ public // hint
   procedure ShowHintTextAtMousepos(const aTxt: string);
   procedure ShowHintText(aX, aY: single; const aTxt: string);
   procedure ShowErrorText(const aTxt: string);
+
+  function Surfaces: TSurfaceList; virtual; abstract;
+  function Textures: TTextureList; virtual; abstract;
 end;
 
 
@@ -220,9 +223,6 @@ public // rotate 90, mirror, plane
   procedure SetAngleOnSelection(aAngle: single);
   procedure ResetValuesOnSelection;
 
-
-
-  function Surfaces: TSurfaceList; virtual; abstract;
   procedure SetFlagModified; virtual; abstract;
 
   property Selected: ArrayOfPSurfaceDescriptor read FSelected;
@@ -255,14 +255,14 @@ end;
 
 procedure TCustomScreenTemplate.SetMouseState(AValue: TMouseState);
 var tex: PTexture;
-debug:string;
+//debug:string;
 begin
   if FMouseState = AValue then Exit;
   FMouseState := AValue;
-WriteStr(debug, AValue);
-FScene.LogDebug('MouseState = '+debug);
+//WriteStr(debug, AValue);
+//FScene.LogDebug('MouseState = '+debug);
   case FMouseState of
-    msIdle: tex := texMouseNormal; // FormMain.OGL.Cursor := crDefault;
+    msIdle: tex := texMouseNormal;
 
     msMouseDownOnEmptyPlace: tex := texMouseNormal;
     msMouseDoingRectangularArea: tex := texSelectSurfaceByRect;
@@ -302,6 +302,7 @@ FScene.LogDebug('MouseState = '+debug);
     else tex := texMouseNormal;
   end;
 
+  FScene.MakeCurrent;
   FScene.Mouse.SetCursorSprite(tex, False, PointF(0,0));
 end;
 

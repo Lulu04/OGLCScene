@@ -61,11 +61,13 @@ type
     procedure BProjectConfigClick(Sender: TObject);
     procedure BSaveProjectClick(Sender: TObject);
     procedure BSpriteBankClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
     procedure OGLMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure OGLMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -89,6 +91,7 @@ type
     procedure ShowPageLevelBank;
 
     procedure EditSpriteInSpriteBank(const aName: string);
+    procedure EditNewSprite;
     procedure EditLevelInLevelBank(const aName: string);
   end;
 
@@ -100,19 +103,18 @@ var
   FrameToolLevelEditor: TFrameToolLevelEditor;
   FrameToolLevelBank: TFrameToolLevelBank;
 
+
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_screen_levelbank,
   u_screen_leveleditor, u_levelbank, form_projectconfig,
-  BGRABitmap, BGRABitmapTypes;
+  BGRABitmap, BGRABitmapTypes, u_connection_to_ide;
 {$R *.lfm}
 
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
-  Project := TProject.Create;
-
   FScene := TOGLCScene.Create(OGL, -1);
   FScene.DesignPPI := 96;
   FScene.LayerCount := APP_LAYER_COUNT;
@@ -122,6 +124,11 @@ begin
 
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
+
+  // check if the app was started from the IDE
+  IdeConnect.CheckCommandLine;
+
+  Project := TProject.Create;
 
   Application.OnIdle := @ProcessApplicationIdle;
 
@@ -173,7 +180,12 @@ end;
 
 procedure TFormMain.BProjectConfigClick(Sender: TObject);
 begin
-  FormProjectConfig.ShowModal;
+  FormProjectConfig := TFormProjectConfig.Create(NIL);
+  try
+    FormProjectConfig.ShowModal;
+  finally
+    FormProjectConfig.Free;
+  end;
 end;
 
 procedure TFormMain.BSaveProjectClick(Sender: TObject);
@@ -216,6 +228,14 @@ begin
   end;
 end;
 
+procedure TFormMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  CloseAction := CloseAction;
+  // if needed, save the respons file for the IDE and free the respons buffer
+  //ResponsToIde.Send;
+  IdeConnect.InformIDEThatGameHelperTerminate;
+end;
+
 procedure TFormMain.BLoadProjectClick(Sender: TObject);
 begin
   Project.Load;
@@ -233,6 +253,14 @@ begin
   if (FScene = NIL) or (FScene.CurrentScreen = NIL) then exit;
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessOnKeyUp(Key, Shift);
   FScene.ProcessOnKeyUp(Key, Shift);
+end;
+
+procedure TFormMain.FormShow(Sender: TObject);
+begin
+  if not FScene.OpenGLLibLoaded then
+  ShowMessage('ERROR: OpenGL library could not be loaded...'+LineEnding+
+      'Check if your system is compatible with OpenGL 3.3 core'+LineEnding+
+      'and if the library is well installed on your computer');
 end;
 
 procedure TFormMain.OGLMouseDown(Sender: TObject; Button: TMouseButton;
@@ -271,7 +299,7 @@ procedure TFormMain.CreateAppTextureAtlas;
 var fd: TFontDescriptor;
   path: String;
 begin
-  // create an atlas for the app with font and mouse cursor
+  // create an atlas for the app with fonts and mouse cursors
   FAtlas := FScene.CreateAtlas;
   FAtlas.Spacing := 1;
 
@@ -311,7 +339,7 @@ begin
 
   FAtlas.TryToPack;
   FAtlas.Build;
-  FAtlas.FreeItemImages;
+  //FAtlas.FreeItemImages;
 end;
 
 procedure TFormMain.FreeAppTextureAtlas;
@@ -342,9 +370,13 @@ begin
   // level bank
   ScreenLevelBank := TScreenLevelBank.Create;
 
-  // load last project
-  if AppPref.LastProjectFilename <> ''
-    then Project.Load(AppPref.LastProjectFilename);
+  // check if the program was launched by the IDE: if yes, load the appropriate oglc project
+  if IdeConnect.Activated then
+    Project.Load(IdeConnect.TargetOGLCProjectFilename)
+  else
+  // else load the last project
+  if AppPref.LastProjectFilename <> '' then
+    Project.Load(AppPref.LastProjectFilename);
 
   if LevelBank.Size > 0 then ShowPageLevelBank
     else ShowPageSpriteBank;
@@ -392,6 +424,10 @@ begin
 
   BSpriteBuilder.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
   BLevelEditor.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
+
+  // project button relative to project disabled if Game Helper is started from the IDE
+  BNewProject.Enabled := not IdeConnect.Activated;
+  BLoadProject.Enabled := not IdeConnect.Activated;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
@@ -434,6 +470,15 @@ procedure TFormMain.EditSpriteInSpriteBank(const aName: string);
 begin
   FrameToolsSpriteBuilder.EditSpriteInSpriteBank(aName);
   ShowPageSpriteBuilder;
+  ToolBarMain.Visible := False;
+end;
+
+procedure TFormMain.EditNewSprite;
+begin
+  FScene.RunScreen(ScreenSpriteBuilder);
+  Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
+  FrameToolsSpriteBuilder.OnShow;
+  UpdateWidgets;
   ToolBarMain.Visible := False;
 end;
 

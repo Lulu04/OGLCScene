@@ -31,16 +31,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
       Caption = 'Textures'
     end
     object PageChilds: TTabSheet
-      Caption = 'Root/Childs'
-      ClientHeight = 658
+      Caption = 'Surfaces'
+      ClientHeight = 678
       ClientWidth = 292
       object Panel1: TPanel
         Left = 0
-        Height = 658
+        Height = 678
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 658
+        ClientHeight = 678
         ClientWidth = 292
         Color = 9671571
         ParentBackground = False
@@ -81,7 +81,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 25
           Top = 104
           Width = 30
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 4
           OnClick = BNewChildClick
         end
@@ -201,8 +201,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Top = 3
           BorderSpacing.Right = 3
           Flat = True
-          Images = DataModule1.ImageList1
-          ImageIndex = 15
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
           OnClick = BHelpRootChildsClick
           ShowHint = True
           ParentShowHint = False
@@ -1829,8 +1829,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
       end
     end
     object PageCollisionBody: TTabSheet
-      Caption = 'Collision body'
-      ClientHeight = 658
+      Caption = 'Collision'
+      ClientHeight = 678
       ClientWidth = 292
       object Panel6: TPanel
         AnchorSideTop.Control = Panel12
@@ -1838,12 +1838,12 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
         AnchorSideBottom.Control = PageCollisionBody
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 632
+        Height = 652
         Top = 26
         Width = 292
         Anchors = [akTop, akLeft, akBottom]
         BevelOuter = bvNone
-        ClientHeight = 632
+        ClientHeight = 652
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -1998,7 +1998,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 15
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 5
           ShowHint = True
           ParentShowHint = False
@@ -2016,7 +2016,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 5
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 9
           ShowHint = True
           ParentShowHint = False
@@ -2034,7 +2034,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 20
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 10
           ShowHint = True
           ParentShowHint = False
@@ -2053,8 +2053,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Right = 3
           Flat = True
-          Images = DataModule1.ImageList1
-          ImageIndex = 15
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
           OnClick = BHelpCollisionBodyClick
           ShowHint = True
           ParentShowHint = False
@@ -2063,7 +2063,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PagePostures: TTabSheet
       Caption = 'Postures'
-      ClientHeight = 658
+      ClientHeight = 678
       ClientWidth = 292
       object Panel10: TPanel
         AnchorSideLeft.Control = PagePostures
@@ -2133,7 +2133,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           BorderSpacing.Left = 10
           BorderSpacing.Top = 10
           Caption = 'Add to posture list'
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 4
           OnClick = BAddPostureToListClick
         end
@@ -2173,7 +2173,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AutoSize = True
           BorderSpacing.Right = 10
           Caption = 'Update posture'
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 6
           OnClick = BAddPostureToListClick
         end
@@ -2325,7 +2325,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 15
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 5
           OnClick = BAddPostureToListClick
           ShowHint = True
@@ -2344,7 +2344,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 5
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 9
           OnClick = BAddPostureToListClick
           ShowHint = True
@@ -2363,7 +2363,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 3
           BorderSpacing.Right = 20
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 10
           OnClick = BAddPostureToListClick
           ShowHint = True
@@ -2381,7 +2381,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Width = 24
           BorderSpacing.Left = 5
           BorderSpacing.Top = 3
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 12
           OnClick = BAddPostureToListClick
           ShowHint = True
@@ -2401,8 +2401,8 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Anchors = [akTop, akRight]
           BorderSpacing.Right = 3
           Flat = True
-          Images = DataModule1.ImageList1
-          ImageIndex = 15
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
           OnClick = BHelpPosturesClick
           ShowHint = True
           ParentShowHint = False
@@ -2411,16 +2411,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     end
     object PageSave: TTabSheet
       Caption = 'Save'
-      ClientHeight = 658
+      ClientHeight = 678
       ClientWidth = 292
       object Panel20: TPanel
         Left = 0
-        Height = 658
+        Height = 678
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 658
+        ClientHeight = 678
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -2460,28 +2460,29 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Left = 46
           Height = 30
           Hint = 'save the sprite in the SpriteBank and (re)create a Pascal unit into the Lazarus project, folder Units/Sprites'
-          Top = 262
+          Top = 251
           Width = 200
           BorderSpacing.Top = 15
           Caption = 'Save into project'
-          Images = DataModule1.ImageList1
+          Images = DataModule1.ILIconUI
           ImageIndex = 2
           OnClick = BAddToSpriteBankClick
         end
         object CheckBox1: TCheckBox
           AnchorSideLeft.Control = Panel20
-          AnchorSideTop.Control = Label56
+          AnchorSideTop.Control = Label54
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Side = asrBottom
           Left = 5
           Height = 19
-          Top = 190
+          Top = 179
           Width = 199
           BorderSpacing.Left = 5
           BorderSpacing.Top = 10
           BorderSpacing.Right = 5
           Caption = 'Activate ApplySymmetryWhenFlip'
           TabOrder = 1
+          OnChange = CheckBox1Change
         end
         object CheckBox2: TCheckBox
           AnchorSideLeft.Control = Panel20
@@ -2489,20 +2490,21 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 19
-          Top = 209
+          Top = 198
           Width = 160
           BorderSpacing.Left = 5
           Caption = 'Override ProcessMessage()'
           Checked = True
           State = cbChecked
           TabOrder = 2
+          OnChange = CheckBox1Change
         end
         object Label51: TLabel
           AnchorSideRight.Control = Panel20
           AnchorSideRight.Side = asrBottom
           Left = 224
           Height = 15
-          Top = 120
+          Top = 124
           Width = 63
           Anchors = [akRight]
           BorderSpacing.Right = 5
@@ -2517,17 +2519,16 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 15
-          Top = 135
+          Top = 139
           Width = 57
           BorderSpacing.Left = 5
           Caption = 'unit name:'
         end
         object Label53: TLabel
-          AnchorSideLeft.Control = Label57
           AnchorSideTop.Control = Label52
           Left = 120
           Height = 15
-          Top = 135
+          Top = 139
           Width = 43
           Caption = 'Label53'
           Font.Style = [fsBold]
@@ -2539,43 +2540,18 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 15
-          Top = 150
+          Top = 154
           Width = 94
           BorderSpacing.Left = 5
           Caption = 'Sprite class name:'
         end
         object Label55: TLabel
-          AnchorSideLeft.Control = Label57
           AnchorSideTop.Control = Label54
           Left = 120
           Height = 15
-          Top = 150
+          Top = 154
           Width = 43
           Caption = 'Label55'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
-        object Label56: TLabel
-          AnchorSideLeft.Control = Panel20
-          AnchorSideTop.Control = Label54
-          AnchorSideTop.Side = asrBottom
-          Left = 5
-          Height = 15
-          Top = 165
-          Width = 110
-          BorderSpacing.Left = 5
-          Caption = 'Sprite variable name:'
-        end
-        object Label57: TLabel
-          AnchorSideLeft.Control = Label56
-          AnchorSideLeft.Side = asrBottom
-          AnchorSideTop.Control = Label56
-          Left = 120
-          Height = 15
-          Top = 165
-          Width = 43
-          BorderSpacing.Left = 5
-          Caption = 'Label57'
           Font.Style = [fsBold]
           ParentFont = False
         end
@@ -2585,11 +2561,12 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 19
-          Top = 228
+          Top = 217
           Width = 112
           BorderSpacing.Left = 5
           Caption = 'Override Update()'
           TabOrder = 3
+          OnChange = CheckBox1Change
         end
       end
     end
@@ -2637,7 +2614,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
       Width = 24
       Anchors = [akTop, akRight]
       Flat = True
-      Images = DataModule1.ImageList1
+      Images = DataModule1.ILIconUI
       ImageIndex = 13
       OnClick = BCancelClick
       ShowHint = True

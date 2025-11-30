@@ -1,0 +1,92 @@
+object FormEnterDescription: TFormEnterDescription
+  Left = 356
+  Height = 206
+  Top = 144
+  Width = 464
+  Caption = 'Modify a description'
+  ClientHeight = 206
+  ClientWidth = 464
+  KeyPreview = True
+  OnKeyUp = FormKeyUp
+  Position = poMainFormCenter
+  LCLVersion = '3.8.0.0'
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 10
+    Height = 15
+    Top = 10
+    Width = 381
+    BorderSpacing.Left = 10
+    BorderSpacing.Top = 10
+    Caption = 'Enter a description (multiple line allowed, characters ~|#{}[] not allowed)'
+  end
+  object Memo1: TMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Label1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = BOk
+    Left = 10
+    Height = 141
+    Top = 25
+    Width = 444
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 10
+    BorderSpacing.Right = 10
+    BorderSpacing.Bottom = 10
+    TabOrder = 0
+    OnChange = Memo1Change
+  end
+  object BCancel: TSpeedButton
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Cursor = crHandPoint
+    Left = 335
+    Height = 23
+    Top = 176
+    Width = 89
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 40
+    BorderSpacing.Bottom = 7
+    Caption = 'Cancel'
+    Images = DataModule1.ILIconUI
+    ImageIndex = 13
+    OnClick = BCancelClick
+  end
+  object BOk: TSpeedButton
+    AnchorSideTop.Control = BCancel
+    AnchorSideRight.Control = BCancel
+    Cursor = crHandPoint
+    Left = 206
+    Height = 23
+    Top = 176
+    Width = 89
+    Anchors = [akTop, akRight]
+    BorderSpacing.Right = 40
+    Caption = 'Ok'
+    Images = DataModule1.ILIconUI
+    ImageIndex = 14
+    OnClick = BOkClick
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = Memo1
+    AnchorSideTop.Control = Memo1
+    AnchorSideTop.Side = asrBottom
+    Left = 10
+    Height = 15
+    Top = 176
+    Width = 176
+    Caption = 'Character not allowed detected'
+    Color = clRed
+    Font.Color = clWhite
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+    Transparent = False
+    Visible = False
+  end
+end

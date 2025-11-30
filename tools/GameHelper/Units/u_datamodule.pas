@@ -13,7 +13,7 @@ type
 
   TDataModule1 = class(TDataModule)
     ILIconCursor: TImageList;
-    ImageList1: TImageList;
+    ILIconUI: TImageList;
     ILIconAlign: TImageList;
     ILIconLayerList: TImageList;
     ILLevelTreeView: TImageList;
@@ -21,6 +21,7 @@ type
   private
     FPath: string;
     procedure AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
+    procedure RedrawImageForIconImageList1;
     procedure RedrawImageForCursor;
     procedure RedrawImageForIconAlign;
     procedure RedrawImageForIconLayerList;
@@ -45,6 +46,7 @@ begin
   RedrawImageForIconAlign;
   RedrawImageForIconLayerList;
   RedrawImageForIconLevelTreeView;
+  RedrawImageForIconImageList1;
 end;
 
 procedure TDataModule1.AddImageToImageList(const aSVGFilename: string; aIL: TImageList);
@@ -53,6 +55,34 @@ begin
   ima := LoadBitmapFromSVG(FPath+aSVGFilename, aIL.Width, -1);
   aIL.Add(ima.Bitmap, NIL);
   ima.Free;
+end;
+
+procedure TDataModule1.RedrawImageForIconImageList1;
+begin
+  ILIconUI.BeginUpdate;
+  ILIconUI.Clear;
+  ILIconUI.Width := FormMain.ScaleDesignToForm(20);
+  ILIconUI.Height := ILIconUI.Width;
+
+  FPath := GetIconFolder;
+  AddImageToImageList('ProjectNew.svg', ILIconUI);
+  AddImageToImageList('ProjectOpen.svg', ILIconUI);
+  AddImageToImageList('ProjectSave.svg', ILIconUI);
+  AddImageToImageList('ProjectOptions.svg', ILIconUI);
+  AddImageToImageList('Add.svg', ILIconUI);
+  AddImageToImageList('TrashCan.svg', ILIconUI);       // 5
+  AddImageToImageList('TextureUpdate.svg', ILIconUI);
+  AddImageToImageList('TextureAdd.svg', ILIconUI);
+  AddImageToImageList('HelpButton.svg', ILIconUI);
+  AddImageToImageList('Undo.svg', ILIconUI);
+  AddImageToImageList('Redo.svg', ILIconUI);          // 10
+  AddImageToImageList('Duplicate.svg', ILIconUI);
+  AddImageToImageList('Rename.svg', ILIconUI);
+  AddImageToImageList('Cancel.svg', ILIconUI);
+  AddImageToImageList('Checked.svg', ILIconUI);
+  AddImageToImageList('ImageOpen.svg', ILIconUI);    // 15
+
+  ILIconUI.EndUpdate;
 end;
 
 procedure TDataModule1.RedrawImageForCursor;
@@ -149,7 +179,9 @@ begin
   AddImageToImageList('Add.svg', ILLevelTreeView);
   AddImageToImageList('TrashCan.svg', ILLevelTreeView);
   AddImageToImageList('Rename.svg', ILLevelTreeView);
-  AddImageToImageList('Duplicate.svg', ILLevelTreeView);
+  AddImageToImageList('Duplicate.svg', ILLevelTreeView);  // 5
+  AddImageToImageList('Description.svg', ILLevelTreeView);
+  AddImageToImageList('SpriteBuilder.svg', ILLevelTreeView);
 
   ILLevelTreeView.EndUpdate;
 end;

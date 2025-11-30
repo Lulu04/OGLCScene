@@ -18,6 +18,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
     procedure FormUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
   private
     procedure LoadCommonData;
@@ -82,6 +83,14 @@ end;
 procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   FScene.ProcessOnKeyUp(Key, Shift);
+end;
+
+procedure TFormMain.FormShow(Sender: TObject);
+begin
+  if not FScene.OpenGLLibLoaded then
+    ShowMessage('ERROR: OpenGL library could not be loaded...'+LineEnding+
+        'Check if your system is compatible with OpenGL 3.3 core'+LineEnding+
+        'and if the library is well installed on your computer');
 end;
 
 procedure TFormMain.FormUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
