@@ -228,6 +228,7 @@ type
 TOGLCContext = class(TLayerList)
  protected
   FOGLC: TOpenGLControl;
+  FOpenGLLibLoaded: boolean;
   FAspectRatio: single;
   function GetMouseCoorOnViewPort: TPoint;
  private
@@ -307,6 +308,8 @@ TOGLCContext = class(TLayerList)
   // Set here the design PPI for your app. This value will affects the value returned by
   // methods ScaleDesignToScene() and ScaleDesignToSceneF().
   property DesignPPI: integer read FDesignPPI write SetDesignPPI;
+  // True if the OpenGL library was successfully loaded
+  property OpenGLLibLoaded: boolean read FOpenGLLibLoaded;
 end;
 
 
@@ -785,6 +788,8 @@ begin
 
   // enable stencil 8bits for UI clipping
   FOGLC.StencilBits := 8;
+  FOGLC.OpenGLMajorVersion := 3;
+  FOGLC.OpenGLMinorVersion := 3;
 
   FOGLC.OnResize := @ProcessOnResize;
   FOGLC.OnMouseDown := @ProcessOnMouseDown;
@@ -795,7 +800,11 @@ begin
   ClearKeysState;
   DesignPPI := DEFAULT_DESIGN_PPI;
 
+  // load OpenGL
   FOGLC.Visible := False;
+  if FOGLC.MakeCurrent
+    then FOpenGLLibLoaded := Load_GL_version_3_3_CORE
+    else FOpenGLLibLoaded := False;
 end;
 
 destructor TOGLCContext.Destroy;
@@ -1000,7 +1009,7 @@ begin
     FCurrentScreen := NIL;
   end;
 
-  if FOnFreeCommonData <> NIL then FOnFreeCommonData;
+  if (FOnFreeCommonData <> NIL) and FOpenGLLibLoaded then FOnFreeCommonData;
   FCommonDataLoaded := FALSE;
 
   FPostProcessingEngine.Free;
@@ -1042,11 +1051,15 @@ procedure TOGLCScene.CreateLogFile(const aFilename: string; aDeletePrevious: boo
 begin
   FLog := TLog.Create(aFilename, aCallback, aCallbackData);
   if aDeletePrevious then FLog.DeleteLogFile;
-  FLog.Mess('Renderer: ' + Gpu.RendererName + '    version '+ Gpu.Version);
-  FLog.Mess('Total video ram: ' + Gpu.TotalVideoRamKb.ToString + ' Kb' +
-            '    Free video ram: ' + Gpu.FreeVideoRamKb.ToString + ' Kb');
-  FLog.Mess('Start application "'+ApplicationName+'" on platform '+App.OSName, 0, True);
-  FLog.AddEmptyLine;
+  if FOpenGLLibLoaded then begin
+    FLog.Mess('Renderer: ' + Gpu.RendererName + '    version '+ Gpu.Version);
+    FLog.Mess('Total video ram: ' + Gpu.TotalVideoRamKb.ToString + ' Kb' +
+              '    Free video ram: ' + Gpu.FreeVideoRamKb.ToString + ' Kb');
+    FLog.Mess('Start application "'+ApplicationName+'" on platform '+App.OSName, 0, True);
+    FLog.AddEmptyLine;
+  end else begin
+    FLog.Error('OpenGL library is not loaded !');
+  end;
 end;
 
 procedure TOGLCScene.LogEmptyLine(aSeparator: string);
@@ -1093,13 +1106,15 @@ procedure TOGLCScene.DoLoop;
 var tick, delta: QWord;
     ElapsedTime: single;
 begin
+  if not FOpenGLLibLoaded then exit;
   if not MakeCurrent then exit;
 
   if not FGLInitialized then begin
     FOGLC.Visible := True;
-    if not Load_GL_version_3_3_CORE
+ {   FOpenGLLibLoaded := Load_GL_version_3_3_CORE;
+    if not FOpenGLLibLoaded
       then raise Exception.Create('Cannot load OpenGL 3.3 core...')
-      {$ifdef USE_glcorearb};{$else}else Load_GL_EXT_blend_func_separate;{$endif}
+      {$ifdef USE_glcorearb};{$else}else Load_GL_EXT_blend_func_separate;{$endif}   }
     SetBlendMode(FX_BLEND_NORMAL);
     //glEnable(GL_POLYGON_SMOOTH);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
