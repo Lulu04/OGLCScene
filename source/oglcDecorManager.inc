@@ -53,7 +53,6 @@ end;
 
 TOGLCDecorManager = class
 private type TDecors = class(specialize TVector<TOGLCDecorContainer>);
-private class var FAtlas: TAtlas;
 private
   FParentScene: TOGLCScene;
   FDecors: TDecors;
@@ -67,22 +66,22 @@ protected
   function ScaleWF(AValue: single): single; virtual; abstract;
   function ScaleHF(AValue: single): single; virtual; abstract;
 public
-  class procedure LoadTexture(aAtlas: TAtlas); virtual;
   constructor Create(aParentScene: TOGLCScene);
   destructor Destroy; override;
 
-  procedure DoBuildLevel(const s: string);
+  procedure DoBuildLevel(const aData: string; aAtlas: TAtlas);
 
   // return the indexes of the layers used by the decors
   function GetUsedLayerIndexes: TArrayOfInteger;
 
-  // The coordinates and size of the world for the current level
+  // The world bounds as defined in the level
   property WorldArea: TRectF read FWorldArea;
   // The gradient instance to render the sky.
   // If the level don't define a gradient for the sky, this property is NIL
   property SkyGradient: TGradientRectangle read FSkyGradient;
 
   property DecorCount: integer read GetDecorCount;
+  // access to the decor instances
   property Decors[index:integer]: TOGLCDecorContainer read GetDecor;
 end;
 
@@ -319,11 +318,6 @@ begin
   Result := FDecors.Size;
 end;
 
-class procedure TOGLCDecorManager.LoadTexture(aAtlas: TAtlas);
-begin
-  FAtlas := aAtlas;
-end;
-
 constructor TOGLCDecorManager.Create(aParentScene: TOGLCScene);
 begin
   FParentScene := aParentScene;
@@ -348,7 +342,7 @@ begin
   FDecors.Clear;
 end;
 
-procedure TOGLCDecorManager.DoBuildLevel(const s: string);
+procedure TOGLCDecorManager.DoBuildLevel(const aData: string; aAtlas: TAtlas);
 var prop: TProperties;
   v: single;
   vb: boolean;
@@ -361,7 +355,7 @@ var prop: TProperties;
   A: TStringArray;
 begin
   Clear;
-  prop.Split(s, '|');
+  prop.Split(aData, '|');
   v := 0;
   vb := False;
   data := '';
@@ -409,7 +403,7 @@ begin
   for i:=0 to c-1 do begin
     if prop.StringValueOf('S'+i.ToString, data, '') then begin
       o := Default(TOGLCDecorItem);
-      layerIndex := o.LoadFromString(FAtlas, data);
+      layerIndex := o.LoadFromString(aAtlas, data);
       // scale
       o.x := ScaleWF(o.x);
       o.y := ScaleHF(o.y);
