@@ -81,7 +81,7 @@ TEventOnGetTextureList = function (): TTextureList of object;
   end;
 
 implementation
-uses Types, u_utils, form_showhelp, OGLCScene;
+uses Types, u_utils, form_showhelp, u_project, OGLCScene;
 
 {$R *.lfm}
 
@@ -94,6 +94,7 @@ begin
     Textures.FillListBox(LBTextureNames);
 
   if Sender = BChooseImageFile then begin
+    OD1.InitialDir := Project.Config.TargetLazarusProject.GetFolderDataTextures;
     if not OD1.Execute then exit;
     Label2.Caption := OD1.FileName;
     Label2.Hint := OD1.FileName;

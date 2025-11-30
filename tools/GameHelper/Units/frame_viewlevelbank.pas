@@ -13,10 +13,14 @@ type
   { TFrameViewLevelBank }
 
   TFrameViewLevelBank = class(TFrame)
+    BGroupDescription: TSpeedButton;
+    BLevelDescription: TSpeedButton;
     BRenameLevel: TSpeedButton;
     BDeleteGroup: TSpeedButton;
     BDeleteLevel: TSpeedButton;
     BDuplicateLevel: TSpeedButton;
+    MILevelDescription: TMenuItem;
+    MIGroupDescription: TMenuItem;
     MIRenameGroup: TMenuItem;
     MIDeleteGroup: TMenuItem;
     MIDuplicateLevel: TMenuItem;
@@ -33,6 +37,8 @@ type
     BAddGroup: TSpeedButton;
     BAddLevel: TSpeedButton;
     BRenameGroup: TSpeedButton;
+    Separator1: TMenuItem;
+    Separator2: TMenuItem;
     TV: TTreeView;
     procedure BAddGroupClick(Sender: TObject);
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
@@ -40,6 +46,7 @@ type
       var PaintImages, DefaultDraw: Boolean);
     procedure TVMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure TVMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure TVMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TVMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -55,10 +62,13 @@ type
     procedure DoAddgroup;
     procedure DoAddLevel;
     procedure DoRenameGroup;
+    procedure DoChangeGroupDescription;
     procedure DoDeleteGroup;
     procedure DoRenameLevel;
     procedure DoDuplicateLevel;
+    procedure DoChangeLevelDescription;
     procedure DoDeleteLevel;
+    procedure DoSaveLevelBank;
   private
     procedure HideToolPanels;
     procedure ShowToolPanel;
@@ -84,7 +94,8 @@ type
 implementation
 
 uses Graphics, LCLType, LazUTF8, LCLIntf, u_project, u_common,
-  u_target_lazarusproject, form_main;
+  u_target_lazarusproject, form_main, u_connection_to_ide,
+  form_enter_description, u_utils, u_resourcestring;
 
 {$R *.lfm}
 
@@ -102,6 +113,38 @@ begin
 
   if (Button = mbLeft) and (TV.Selected <> NIL) then
     ShowToolPanel;
+end;
+
+procedure TFrameViewLevelBank.TVMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
+var node: TTreeNode;
+  group: TLevelGroup;
+  level: PLevelBankItem;
+begin
+  // update hint with group or level description
+  TV.ShowHint := False;
+  Application.ProcessMessages;
+  node := TV.GetNodeAt(X, Y);
+  if NodeIsGroup(node) then begin
+    group := LevelBank.GetGroupByName(node.Text);
+    if group <> NIL then begin
+      if group.GroupDescription <> '' then TV.Hint := sDescription+LineEnding+group.GroupDescription
+        else TV.Hint := sYouHaveNotYetDefinedGroupDesc;
+      TV.ShowHint := True;
+    end;
+  end
+  else
+  if NodeIsLevel(node) then begin
+    group := LevelBank.GetGroupByName(node.Parent.Text);
+    if group <> NIL then begin
+      level := group.GetItemByName(node.Text);
+      if level <> NIL then begin
+        if level^.description <> '' then TV.Hint := sDescription+LineEnding+level^.description
+          else TV.Hint := sYouHaveNotYetDefinedLevelDesc;
+        TV.ShowHint := True;
+      end;
+    end;
+  end;
 end;
 
 procedure TFrameViewLevelBank.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
@@ -155,9 +198,11 @@ begin
   if (Sender = BAddGroup) or (Sender = MINewGroup) then DoAddgroup;
   if (Sender = BAddLevel) or (Sender = MIAddLevel) then DoAddLevel;
   if (Sender = BRenameGroup) or (Sender = MIRenameGroup) then DoRenameGroup;
+  if (Sender = BGroupDescription) or (Sender = MIGroupDescription) then DoChangeGroupDescription;
   if (Sender = BDeleteGroup) or (Sender = MIDeleteGroup) then DoDeleteGroup;
   if (Sender = BRenameLevel) or (Sender = MIRenameLevel) then DoRenameLevel;
   if (Sender = BDuplicateLevel) or (Sender = MIDuplicateLevel) then DoDuplicateLevel;
+  if (Sender = BLevelDescription) or (Sender = MILevelDescription) then DoChangeLevelDescription;
   if (Sender = BDeleteLevel) or (Sender = MIDeleteLevel) then DoDeleteLevel;
 end;
 
@@ -251,8 +296,7 @@ begin
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
 end;
 
 procedure TFrameViewLevelBank.DoAddLevel;
@@ -263,7 +307,6 @@ end;
 procedure TFrameViewLevelBank.DoRenameGroup;
 var group: TLevelGroup;
   oldName, newName: String;
-  node: TTreeNode;
 begin
   group := GetSelectedWorkingLevelGroup;
   if group = NIL then exit;
@@ -276,16 +319,44 @@ begin
     exit;
   end;
 
-  node := TV.Items.FindNodeWithText(oldName);
-  if node = NIL then raise exception.create('bug');
-  node.text := newName; // change node text
+  // change name in tree view
+  TV.Selected.text := newName;
+
+  // change name in level bank
+  group.GroupName := newName;
 
   // generate the level unit file and add it to project
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
+end;
+
+procedure TFrameViewLevelBank.DoChangeGroupDescription;
+var group: TLevelGroup;
+  newDescription: string;
+begin
+  if not SelectedIsGroup then exit;
+  group := GetSelectedWorkingLevelGroup;
+  if group = NIL then exit;
+
+  FormEnterDescription := TFormEnterDescription.Create(NIL);
+  try
+    FormEnterDescription.DescriptionAsText := group.GroupDescription;
+    if FormEnterDescription.ShowModal <> mrOk then exit;
+    newDescription := FormEnterDescription.DescriptionAsText;
+  finally
+    FormEnterDescription.Free;
+  end;
+  if newDescription = group.GroupDescription then exit;
+
+  group.GroupDescription := ReplaceCharacterNotAllowedByUnderscore(newDescription);
+
+  // generate the level unit file and add it to project
+  LevelBank.ExportToFileGameLevel;
+  Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+
+  DoSaveLevelBank;
 end;
 
 procedure TFrameViewLevelBank.DoDeleteGroup;
@@ -307,8 +378,7 @@ begin
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
 end;
 
 procedure TFrameViewLevelBank.DoRenameLevel;
@@ -340,8 +410,7 @@ begin
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
 end;
 
 procedure TFrameViewLevelBank.DoDuplicateLevel;
@@ -382,8 +451,38 @@ begin
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
+end;
+
+procedure TFrameViewLevelBank.DoChangeLevelDescription;
+var group: TLevelGroup;
+  newDescription: String;
+  level: PLevelBankItem;
+begin
+  if not SelectedIsLevel then exit;
+  level := GetSelectedLevel;
+  if level = NIL then exit;
+  group := GetSelectedWorkingLevelGroup;
+  if group = NIL then exit;
+
+  //newDescription := Trim(InputBox('', 'Enter the new description for the level:', level^.description));
+  FormEnterDescription := TFormEnterDescription.Create(NIL);
+  try
+    FormEnterDescription.DescriptionAsText := level^.description;
+    if FormEnterDescription.ShowModal <> mrOk then exit;
+    newDescription := FormEnterDescription.DescriptionAsText;
+  finally
+    FormEnterDescription.Free;
+  end;
+  if newDescription = level^.description then exit;
+
+  level^.description := ReplaceCharacterNotAllowedByUnderscore(newDescription);
+
+  // generate the level unit file and add it to project
+  LevelBank.ExportToFileGameLevel;
+  Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+
+  DoSaveLevelBank;
 end;
 
 procedure TFrameViewLevelBank.DoDeleteLevel;
@@ -406,8 +505,12 @@ begin
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  Project.SetModified;
-  Project.Save;
+  DoSaveLevelBank;
+end;
+
+procedure TFrameViewLevelBank.DoSaveLevelBank;
+begin
+  LevelBank.SaveToPath(Project.Config.TargetLazarusProject.GetFolderGameHelperFiles);
 end;
 
 procedure TFrameViewLevelBank.HideToolPanels;
@@ -451,7 +554,7 @@ var i, j: integer;
 begin
   TV.BeginUpdate;
   TV.Items.Clear;
-  TV.Items.AddFirst(NIL, 'Level Bank');
+  TV.Items.AddFirst(NIL, 'Groups');
   if LevelBank.Size > 0 then begin
     rootnode := TV.Items.GetFirstNode;
     for i:=0 to LevelBank.Size-1 do begin

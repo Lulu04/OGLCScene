@@ -3,7 +3,7 @@ object FormShowHelp: TFormShowHelp
   Height = 318
   Top = 283
   Width = 493
-  Caption = 'FormShowHelp'
+  Caption = 'Help'
   ClientHeight = 318
   ClientWidth = 493
   FormStyle = fsStayOnTop

@@ -60,7 +60,7 @@ end;
 
 function GetDataFolder: string;
 begin
- Result := Application.Location+DirectorySeparator+'Data'+DirectorySeparator;
+  Result := Application.Location+DirectorySeparator+'Data'+DirectorySeparator;
 end;
 
 function GetHandleFolder: string;

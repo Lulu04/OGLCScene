@@ -45,7 +45,7 @@ public
   ID: integer;
   Outline: TShapeOutline;
   ItemDescriptor: TOGLCBodyItem;
-  {Pts}Nodes: ArrayOfUINodeHandle;
+  Nodes: ArrayOfUINodeHandle;
   ParentSurface: TSimpleSurfaceWithEffect;
   PolygonIsClosed: boolean;
   procedure InitDefault;
@@ -258,7 +258,7 @@ begin
       p1 := ParentSurface.SurfaceToScene(ItemDescriptor.center);
       p2 := ParentSurface.SurfaceToScene(ItemDescriptor.pt1);
       r := Distance(p1, p2); // Max(5, (p2.x - p1.x)); //Distance(p1, p2);
-      path := ComputeEllipse(0, 0, r, r, 0.4);
+      path := ComputeEllipse(0, 0, r, r, 0.1);
       OutLine.SetShapeCustom(p1.x, p1.y, path);
       Nodes[0].UpdatePosition(p1);
       Nodes[1].UpdatePosition(p2);
@@ -411,7 +411,7 @@ var i: integer;
 begin
   Result := NIL;
   if Length(Nodes) = 0 then exit;
-FScene.LogDebug('TBodyItem.GetNodesAt: Pts length ='+Length(Nodes).ToString);
+//FScene.LogDebug('TBodyItem.GetNodesAt: Pts length ='+Length(Nodes).ToString);
   for i:=0 to High(Nodes) do
     if Nodes[i].IsOver(aWorldPt) then begin
       SetLength(Result, Length(Result)+1);
@@ -528,6 +528,7 @@ var origin, left, right: integer;
     if Result = -1 then Result := High(Nodes);
   end;
 begin
+  origin := 0;
   if aNode^.Selected <> aSelectState then begin
     aNode^.Selected := aSelectState;
     exit;
@@ -817,13 +818,14 @@ end;
 function TBodyItemList.GetFirstItemWithSelectedNode: PBodyItem;
 var i: SizeUInt;
 begin
+  Result := NIL;
   if Size = 0 then exit;
+
   for i:=0 to Size-1 do
     if Mutable[i]^.SomeNodesAreSelected then begin
       Result := Mutable[i];
       exit;
     end;
-  Result := NIL;
 end;
 
 procedure TBodyItemList.DeleteShapeWithSelectedNode;

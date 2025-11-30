@@ -523,7 +523,7 @@ begin
       j := i;
       if aXPercent = FNodes^[i].XPosition then begin
         FNodes^[i].Color := aColor;        // the point already exists. we change only its value
-        exit;
+        exit(i);
       end else if aXPercent > FNodes^[i].XPosition then inc(i);
     until (i = j) or (i = Length(FNodes^)-1);
 

@@ -13,18 +13,11 @@ uses
 
 type
 
-{ TLevelBankSurfaceList }
-
-TLevelBankSurfaceList = class(TSurfaceList)
-  function Textures: TTextureList; override;
-end;
-
-
 { TScreenLevelBank }
 
 TScreenLevelBank = class(TCustomScreenTemplate)
 private
-  FSurfaces: TLevelBankSurfaceList;
+  FSurfaces: TSurfaceList;
 public
 {  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -43,7 +36,8 @@ public
   procedure ClearView;
   procedure ShowLevel(aLevel: PLevelBankItem);
 
-  property Surfaces: TLevelBankSurfaceList read FSurfaces;
+  function Surfaces: TSurfaceList; override;
+  function Textures: TTextureList; override;
 end;
 
 var ScreenLevelBank: TScreenLevelBank;
@@ -52,19 +46,13 @@ implementation
 
 uses u_layerlist;
 
-{ TLevelBankSurfaceList }
-
-function TLevelBankSurfaceList.Textures: TTextureList;
-begin
-  Result := WorkingLevelGroup.Textures;
-end;
-
 { TScreenLevelBank }
 
 procedure TScreenLevelBank.CreateObjects;
 var A: TArrayOfInteger;
 begin
-  FSurfaces := TLevelBankSurfaceList.Create;
+  FSurfaces := TSurfaceList.Create;
+  FSurfaces.OnGetTexture := @Textures;
   FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELBANK;
 
@@ -104,6 +92,16 @@ procedure TScreenLevelBank.ShowLevel(aLevel: PLevelBankItem);
 begin
   FSurfaces.LoadFromString(aLevel^.surfaces);
   ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
+end;
+
+function TScreenLevelBank.Surfaces: TSurfaceList;
+begin
+  Result := FSurfaces;
+end;
+
+function TScreenLevelBank.Textures: TTextureList;
+begin
+  Result := WorkingLevelGroup.Textures;
 end;
 
 end.

@@ -13,16 +13,11 @@ uses
 
 type
 
-{ TLevelEditorSurfaceList }
-
-TLevelEditorSurfaceList = class(TSurfaceList)
-  function Textures: TTextureList; override;
-end;
-
 { TScreenLevelEditor }
 
 TScreenLevelEditor = class(TScreenWithSurfaceHandling)
 private
+  FSurfaces: TSurfaceList;
   FSpriteAddMultiple: TSprite;
   procedure ProcessOnBeforePaintLayerSkyGradient(Sender: TLayer; const aLayerOpacity: single);
   procedure RemoveAllBeforePaintCallback;
@@ -54,7 +49,6 @@ public
   procedure ZoomOnSceneSize(const aWorldArea: TRectF); override;
   procedure ZoomOnSelection; override;
 public
-  FSurfaces: TLevelEditorSurfaceList;
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); override;
@@ -94,6 +88,7 @@ public
 
   procedure SetFlagModified; override;
   function Surfaces: TSurfaceList; override;
+  function Textures: TTextureList; override;
 
   procedure UpdateWorldBounds(aX, aY, aWidth, aHeight: single; aColor: TColor; aVisible: boolean);
   procedure ComputeWorldBoundsLineWidth;
@@ -105,13 +100,6 @@ implementation
 
 uses Forms, u_levelbank, frame_tool_leveleditor, form_main, u_app_pref,
   u_layerlist, Controls, LCLType, Math;
-
-{ TLevelEditorSurfaceList }
-
-function TLevelEditorSurfaceList.Textures: TTextureList;
-begin
-  Result := WorkingLevelGroup.Textures;
-end;
 
 { TScreenLevelEditor }
 
@@ -670,9 +658,10 @@ end;
 
 procedure TScreenLevelEditor.Initialize;
 begin
-  FSurfaces := TLevelEditorSurfaceList.Create;
+  FSurfaces := TSurfaceList.Create;
   FSurfaces.SetModeForLevelEditor;
   FSurfaces.WorkingLayer := LAYER_LEVELEDITOR;
+  FSurfaces.OnGetTexture:= @Textures;
 
   SkyGradient := TGradientRectangle.Create(FScene);
   SkyGradient.Gradient.LoadGradientDataFromString(DEFAULT_SKY_GRADIENT);
@@ -840,6 +829,11 @@ end;
 function TScreenLevelEditor.Surfaces: TSurfaceList;
 begin
   Result := FSurfaces;
+end;
+
+function TScreenLevelEditor.Textures: TTextureList;
+begin
+  Result := WorkingLevelGroup.Textures;
 end;
 
 procedure TScreenLevelEditor.UpdateWorldBounds(aX, aY, aWidth,

@@ -103,8 +103,8 @@ object FrameToolLevelBank: TFrameToolLevelBank
         Anchors = [akTop, akRight]
         BorderSpacing.Left = 3
         Flat = True
-        Images = DataModule1.ImageList1
-        ImageIndex = 15
+        Images = DataModule1.ILIconUI
+        ImageIndex = 8
         OnClick = BHelpClick
         ShowHint = True
         ParentShowHint = False

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <PathDelim Value="\"/>
+    <Name Value="gamehelperpackage"/>
+    <Type Value="DesignTime"/>
+    <Author Value="Lulu"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\Units"/>
+        <OtherUnitFiles Value="..\..\unit_common"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="a sprite and level editor. This software is a part of OGLCScene library"/>
+    <License Value="same license as OGLCScene"/>
+    <Version Minor="1"/>
+    <Files>
+      <Item>
+        <Filename Value="u_package_register.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="u_package_register"/>
+      </Item>
+      <Item>
+        <Filename Value="u_respons_commontype.pas"/>
+        <UnitName Value="u_respons_commontype"/>
+      </Item>
+      <Item>
+        <Filename Value="form_gamehelper_connection.pas"/>
+        <UnitName Value="form_gamehelper_connection"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="OGLCScenePackage"/>
+      </Item>
+      <Item>
+        <PackageName Value="CodeTools"/>
+      </Item>
+      <Item>
+        <PackageName Value="IDEIntf"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

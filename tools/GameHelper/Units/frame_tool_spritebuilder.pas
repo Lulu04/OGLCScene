@@ -115,8 +115,6 @@ type
     Label53: TLabel;
     Label54: TLabel;
     Label55: TLabel;
-    Label56: TLabel;
-    Label57: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -230,6 +228,7 @@ type
     procedure CBParentDrawItem({%H-}Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure CBChildTypeSelect(Sender: TObject);
+    procedure CheckBox1Change(Sender: TObject);
     procedure Edit2Change(Sender: TObject);
     procedure LBPostureNamesSelectionChange(Sender: TObject; {%H-}User: boolean);
     procedure MIAddNodeClick(Sender: TObject);
@@ -270,7 +269,7 @@ type
     procedure UpdateValuesToWorkingSurface;
     procedure UpdateExtraPropertiesToWorkingTemporary;
     function Textures: TTextureList;
-    function Surfaces: TSpriteBuilderSurfaceList;
+    function Surfaces: TSurfaceList;
     function Bodies: TBodyItemList;
     function Postures: TPostureList;
     procedure DoClearAll;
@@ -289,6 +288,7 @@ type
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 
     procedure EditSpriteInSpriteBank(const aName: string);
+    //procedure EditNewSprite;
 
     function SelectedTabIsChild: boolean;
     function SelectedTabIsCollisionBody: boolean;
@@ -299,7 +299,8 @@ type
 
 implementation
 uses form_main, u_project, u_common, u_screen_template, form_showhelp, u_utils,
-  form_editdeformationgrid, form_editgradient, u_target_lazarusproject, LCLType;
+  form_editdeformationgrid, form_editgradient, u_target_lazarusproject,
+  u_connection_to_ide, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -352,10 +353,10 @@ end;
 procedure TFrameToolsSpriteBuilder.BAddToSpriteBankClick(Sender: TObject);
 var o: PSpriteBankItem;
   nam: string;
-  t: TStringList;
 begin
   nam := Trim(Edit2.Text);
   if nam = '' then exit;
+  if not IsValidPascalVariableName(nam) then exit;
   if Surfaces.Size = 0 then exit;
   if not Surfaces.RootIsDefined then exit;
 
@@ -378,23 +379,17 @@ begin
   o^.surfaces := Surfaces.SaveToString;
   o^.collisionbodies := Bodies.SaveToString;
   o^.postures := Postures.SaveToString;
+  o^.codeoptions := FCodeGenerationOptions.SaveToString;
 
   Project.SetModified;
   Project.Save;
   Modified := False;
 
-  // export sprite definition to its pascal unit
-  t := TStringlist.Create;
-  ExportSpriteToPascalUnit(t, Textures, Surfaces, Postures, nam,
-                           Label55.Caption, Label53.Caption,
-                           CheckBox1.Checked, CheckBox2.Checked, CheckBox3.Checked);
-  try
-    t.SaveToFile(Project.Config.TargetLazarusProject.GetFolderUnitsSprites+Label53.Caption+'.pas');
-  finally
-    t.Free;
-  end;
-  // add the sprite unit name to the project
-  Project.Config.TargetLazarusProject.Unit_AddToProject(Label53.Caption, ulSprites, uePas);
+  // export sprite to pascal unit
+  o^.ExportSpriteToPascalUnit;
+
+  // add the created unit to the target Lazarus project
+  Project.Config.TargetLazarusProject.Unit_AddToProject(o^.GetUnitName, ulSprites, uePas);
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
@@ -750,6 +745,13 @@ begin
   end else begin
     ShowExtraPropertyPanel;
   end;
+end;
+
+procedure TFrameToolsSpriteBuilder.CheckBox1Change(Sender: TObject);
+begin
+  FCodeGenerationOptions.useapplysymetrywhenflip := CheckBox1.Checked;
+  FCodeGenerationOptions.overrideProcessMessage := CheckBox2.Checked;
+  FCodeGenerationOptions.overrideUpdate := CheckBox3.Checked;
 end;
 
 procedure TFrameToolsSpriteBuilder.Edit2Change(Sender: TObject);
@@ -1255,6 +1257,10 @@ begin
     FWorkingChild^.width := SE26.Value;
     FWorkingChild^.height := SE27.Value;
   end
+  else
+  if selectedClass = TSpriteContainer then begin
+    // nothing
+  end
   else raise exception.Create('forgot to implement '+selectedClass.ClassName);
 end;
 
@@ -1263,9 +1269,9 @@ begin
   Result := ScreenSpriteBuilder.Textures;
 end;
 
-function TFrameToolsSpriteBuilder.Surfaces: TSpriteBuilderSurfaceList;
+function TFrameToolsSpriteBuilder.Surfaces: TSurfaceList;
 begin
-  Result := TSpriteBuilderSurfaceList(ScreenSpriteBuilder.Surfaces);
+  Result := ScreenSpriteBuilder.Surfaces;
 end;
 
 function TFrameToolsSpriteBuilder.Bodies: TBodyItemList;
@@ -1328,11 +1334,9 @@ begin
   if s = '' then begin
     Label53.Caption := '';
     Label55.Caption := '';
-    Label57.Caption := '';
   end else begin
-   Label53.Caption := PREFIX_FOR_SPRITE_UNIT_NAME+LowerCase(s);
+   Label53.Caption := UNIT_NAME_PREFIX[ulSprites] + LowerCase(s);
    Label55.Caption := 'T'+s;
-   Label57.Caption := 'F'+s;
   end;
 end;
 
@@ -1518,8 +1522,23 @@ begin
   FModified := False;
 
   Edit2.Text := o^.name;
+  Edit2.ReadOnly := True;
   UpdateExportLabels;
 end;
+
+{procedure TFrameToolsSpriteBuilder.EditNewSprite;
+begin
+  Textures.Clear;
+  Surfaces.Clear;
+  Bodies.Clear;
+  //Bodies.SetParentSurface(Surfaces.GetRootItem^.surface);
+  Postures.Clear;
+  FCodeGenerationOptions.InitDefault;
+
+  Edit2.Text := '';
+  Edit2.ReadOnly := False;
+  UpdateExportLabels;
+end; }
 
 function TFrameToolsSpriteBuilder.SelectedTabIsChild: boolean;
 begin

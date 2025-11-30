@@ -61,8 +61,9 @@ object FrameTextureList: TFrameTextureList
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Right = 30
-      Images = DataModule1.ImageList1
-      ImageIndex = 4
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 7
       OnClick = BChooseImageFileClick
       ShowHint = True
       ParentShowHint = False
@@ -91,8 +92,9 @@ object FrameTextureList: TFrameTextureList
       Width = 26
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 20
-      Images = DataModule1.ImageList1
-      ImageIndex = 7
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 15
       OnClick = BChooseImageFileClick
       ShowHint = True
       ParentShowHint = False
@@ -153,7 +155,8 @@ object FrameTextureList: TFrameTextureList
       Anchors = [akTop, akRight]
       AutoSize = True
       BorderSpacing.Right = 20
-      Images = DataModule1.ImageList1
+      Flat = True
+      Images = DataModule1.ILIconUI
       ImageIndex = 6
       OnClick = BChooseImageFileClick
       ShowHint = True
@@ -253,7 +256,8 @@ object FrameTextureList: TFrameTextureList
         Anchors = [akTop, akRight]
         BorderSpacing.Top = 3
         BorderSpacing.Right = 15
-        Images = DataModule1.ImageList1
+        Flat = True
+        Images = DataModule1.ILIconUI
         ImageIndex = 5
         OnClick = BChooseImageFileClick
         ShowHint = True
@@ -272,7 +276,8 @@ object FrameTextureList: TFrameTextureList
         Anchors = [akTop, akRight]
         BorderSpacing.Top = 3
         BorderSpacing.Right = 5
-        Images = DataModule1.ImageList1
+        Flat = True
+        Images = DataModule1.ILIconUI
         ImageIndex = 9
         OnClick = BChooseImageFileClick
         ShowHint = True
@@ -292,7 +297,8 @@ object FrameTextureList: TFrameTextureList
         Anchors = [akTop]
         BorderSpacing.Top = 3
         BorderSpacing.Right = 3
-        Images = DataModule1.ImageList1
+        Flat = True
+        Images = DataModule1.ILIconUI
         ImageIndex = 10
         OnClick = BChooseImageFileClick
         ShowHint = True
@@ -309,7 +315,8 @@ object FrameTextureList: TFrameTextureList
         Width = 28
         AutoSize = True
         BorderSpacing.Left = 10
-        Images = DataModule1.ImageList1
+        Flat = True
+        Images = DataModule1.ILIconUI
         ImageIndex = 6
         OnClick = BChooseImageFileClick
         ShowHint = True
@@ -330,8 +337,8 @@ object FrameTextureList: TFrameTextureList
         BorderSpacing.Top = 3
         BorderSpacing.Right = 3
         Flat = True
-        Images = DataModule1.ImageList1
-        ImageIndex = 15
+        Images = DataModule1.ILIconUI
+        ImageIndex = 8
         OnClick = BHelpClick
         ShowHint = True
         ParentShowHint = False

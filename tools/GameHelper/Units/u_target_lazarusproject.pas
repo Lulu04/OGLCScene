@@ -8,14 +8,8 @@ interface
 uses
   Classes, SysUtils,
   laz2_DOM, laz2_XMLRead, laz2_XMLWrite,
-  OGLCScene;
+  OGLCScene, u_connection_to_ide;
 
-type
-TUnitLocation = (ulUnits, ulSprites, ulLevels);
-TUnitExtension = (uePas, ueInc, ueLpr);
-const
-UNIT_PREFIX: array[TUnitLocation] of string = ('Units\', 'Units\Sprites\', 'Units\Levels\');
-UNIT_EXT: array[TUnitExtension] of string = ('.pas', '.inc', '.lpr');
 
 type
 
@@ -27,7 +21,6 @@ private // LPI file utils
   function LPI_CheckIfHaveUnit(const aUnitName: string;
                                aUnitLocation: TUnitLocation;
                                aUnitExtension: TUnitExtension): boolean;
-public // LPI file
   function LPI_ExpandUnitName(const aUnitName: string;
                               aUnitLocation: TUnitLocation;
                               aUnitExtension: TUnitExtension): string;
@@ -47,9 +40,14 @@ public // string utils
   procedure RemoveNextConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
   procedure RemovePreviousConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
 public // folder and files
+  function GetProjectFolder: string;
+  function GetFolderGameHelperFiles: string;
   function GetFolderUnits: string;
   function GetFolderUnitsSprites: string;
   function GetFolderUnitsLevels: string;
+  function GetFolderBinary: string;
+  function GetFolderData: string;
+  function GetFolderDataTextures: string;
   function GetFilenameGameLevels: string;
   function GetFilenameProject_Config: string;
   function GetFilenameProject_LPR: string;
@@ -61,7 +59,7 @@ private // TStringList utils
                                  aSearchFromLineIndex: integer;
                                  aSearchToLineIndex: integer=MaxInt): integer;
   procedure StringList_RemoveUnitNameOnLine(t: TStringList; aLineIndex: integer; const aUnitName: string);
-
+  procedure StringList_ReplaceAllOccurrencesOf(t: TStringList; const aOldValue, aNewValue: string);
 private // project options in configuration file
   function ConfigOption_IsActive(const aFilename, aOptionName: string): boolean;
   procedure ConfigOption_SetActive(const aFilename, aOptionName: string; aValue: boolean);
@@ -92,28 +90,32 @@ public // entry in USES clause into an unit
   procedure Unit_USES_AddEntry(const aTargetUnit, aUnitNameToAdd: string; aAddInInterface: boolean);
   procedure Unit_USES_RemoveEntry(const aTargetUnit, aUnitNameToRemove: string;
                                   aRemoveInInterface, aRemoveInImplementation: boolean);
+  procedure Unit_ReplaceAllOccurrencesOf(const aTargetUnitFilename, aOldValue, aNewValue: string);
 
 public // add/remove unit to project
-  function Unit_ExpandUnitName(const aUnitName: string;
+  function Unit_GetFullFilename(const aObjectName: string;
                                aUnitLocation: TUnitLocation;
                                aUnitExtension: TUnitExtension): string;
-  procedure Unit_AddToProject(const aUnitName: string;
+  procedure Unit_AddToProject(const aObjectName: string;
                               aUnitLocation: TUnitLocation;
                               aUnitExtension: TUnitExtension);
-  procedure Unit_RemoveFromProject(const aUnitName: string;
+  procedure Unit_RemoveFromProject(const aObjectName: string;
                                    aUnitLocation: TUnitLocation;
                                    aUnitExtension: TUnitExtension);
-  procedure Unit_DeleteFile(const aUnitName: string;
+  procedure Unit_DeleteFile(const aObjectName: string;
                             aUnitLocation: TUnitLocation;
                             aUnitExtension: TUnitExtension);
-public // formated unit name
-  function GetUnitNameForSprite(const aNameOfTheSprite: string): string;
-public // formated path and filename
-  function GetUnitFileNameForSprite(const aNameOfTheSprite: string): string;
+
+  // i.e. for a sprite named 'Car' return 'u_sprite_car'
+  function SpriteNameToUnitNameWithoutExt(const aSpriteName: string): string;
+  // i.e. for a sprite named 'Car' return 'fullpath + Units\Sprites\u_sprite_car.pas
+  function SpriteNameToUnitFullFilename(const aSpriteName: string): string;
 end;
 
+
 implementation
-uses u_project, u_common, Math, utilitaire_fichier;
+uses u_project, u_common, Math, utilitaire_fichier, Forms;
+
 
 { TTargetLazarusProject }
 
@@ -171,10 +173,19 @@ begin
     system.Delete(Src, i, aFromIndex-i+1);
 end;
 
+function TTargetLazarusProject.GetProjectFolder: string;
+begin
+  Result := IncludeTrailingPathDelimiter(ExtractFilePath(Project.Filename));
+end;
+
+function TTargetLazarusProject.GetFolderGameHelperFiles: string;
+begin
+  Result := GetProjectFolder + 'GameHelperFiles' + DirectorySeparator;
+end;
+
 function TTargetLazarusProject.GetFolderUnits: string;
 begin
-  Result := IncludeTrailingPathDelimiter(ExtractFilePath(Project.Filename)) +
-            'Units' + DirectorySeparator;
+  Result := GetProjectFolder + 'Units' + DirectorySeparator;
 end;
 
 function TTargetLazarusProject.GetFolderUnitsSprites: string;
@@ -185,6 +196,21 @@ end;
 function TTargetLazarusProject.GetFolderUnitsLevels: string;
 begin
   Result := GetFolderUnits + 'Levels' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderBinary: string;
+begin
+  Result := GetProjectFolder + 'Binary' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderData: string;
+begin
+  Result := GetFolderBinary + 'Data' + DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderDataTextures: string;
+begin
+  Result := GetFolderData + 'Textures' +DirectorySeparator;
 end;
 
 function TTargetLazarusProject.GetFilenameGameLevels: string;
@@ -211,7 +237,6 @@ end;
 function TTargetLazarusProject.LPI_ReadUnitsSection: TStringArray;
 var doc: TXMLDocument;
   projectoptionNode, unitsNode, childUnit, childFileName, childValue: TDOMNode;
-  i, j: integer;
 begin
   Result := NIL;
   if not FileExists(GetFilenameProject_LPI) then raise exception.create('Project LPI file not found');
@@ -318,8 +343,8 @@ end;
 function TTargetLazarusProject.LPI_CheckIfHaveUnit(const aUnitName: string;
   aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): boolean;
 var A: TStringArray;
-  i{, k}: integer;
-  fullname, s: string;
+  i: integer;
+  fullname: string;
 begin
   Result := False;
   A := LPI_ReadUnitsSection;
@@ -334,7 +359,7 @@ end;
 function TTargetLazarusProject.LPI_ExpandUnitName(const aUnitName: string;
   aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): string;
 begin
-  Result := UNIT_PREFIX[aUnitLocation] + aUnitName + UNIT_EXT[aUnitExtension];
+  Result := UNIT_SUBFOLDER[aUnitLocation] + aUnitName + UNIT_EXT[aUnitExtension];
 end;
 
 function TTargetLazarusProject.StringList_CreateFromFile(const aFilename: string): TStringList;
@@ -391,6 +416,14 @@ begin
     RemovePreviousConsecutiveChar(s, ' ', icoma-1);
     t.Strings[aLineIndex] := s+';';
   end;
+end;
+
+procedure TTargetLazarusProject.StringList_ReplaceAllOccurrencesOf(
+  t: TStringList; const aOldValue, aNewValue: string);
+var i: integer;
+begin
+  for i:=0 to t.Count-1 do
+    t.Strings[i] := t.Strings[i].Replace(aOldValue, aNewValue, [rfReplaceAll]);
 end;
 
 function TTargetLazarusProject.ConfigOption_IsActive(const aFilename, aOptionName: string): boolean;
@@ -711,29 +744,48 @@ begin
   end;
 end;
 
-function TTargetLazarusProject.Unit_ExpandUnitName(const aUnitName: string;
-  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): string;
+procedure TTargetLazarusProject.Unit_ReplaceAllOccurrencesOf(
+  const aTargetUnitFilename, aOldValue, aNewValue: string);
+var t: TStringList;
 begin
-  case aUnitLocation of
-    ulUnits: Result := GetFolderUnits + aUnitName + UNIT_EXT[aUnitExtension];
-    ulSprites: Result := GetFolderUnitsSprites + aUnitName + UNIT_EXT[aUnitExtension];
-    ulLevels: Result := GetFolderUnitsLevels + aUnitName + UNIT_EXT[aUnitExtension];
-    else raise exception.create('forget to implement');
+  t := StringList_CreateFromFile(aTargetUnitFilename);
+  try
+    StringList_ReplaceAllOccurrencesOf(t, aOldValue, aNewValue);
+    t.SaveToFile(aTargetUnitFilename);
+  finally
+    t.Free;
   end;
 end;
 
-procedure TTargetLazarusProject.Unit_AddToProject(const aUnitName: string;
-  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
-var t: TStringList;
-  usesLine, semicolonLine, i: integer;
-  s: string;
+function TTargetLazarusProject.Unit_GetFullFilename(const aObjectName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension): string;
 begin
+  case aUnitLocation of
+    ulUnits: Result := GetFolderUnits;
+    ulSprites: Result := GetFolderUnitsSprites;
+    ulLevels: Result := GetFolderUnitsLevels;
+    else raise exception.create('forget to implement');
+  end;
+  Result := Result + UNIT_NAME_PREFIX[aUnitLocation] +
+                     LowerCase(aObjectName) +
+                     UNIT_EXT[aUnitExtension];
+end;
+
+procedure TTargetLazarusProject.Unit_AddToProject(const aObjectName: string;
+  aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
+{var t: TStringList;
+  usesLine, semicolonLine, i: integer;
+  s: string;}
+begin
+  if aObjectName = '' then raise exception.create('unit name to add is empty');
+
+  IdeConnect.AskIdeToAddUnitToProject(aObjectName, aUnitLocation, aUnitExtension);
+
   // two things:
   //  - add unit name in USES clause of LPR file
   //  - add XML entry in LPI file
 
-  if aUnitName = '' then raise exception.create('unit name to add is empty');
-
+{
   t := StringList_CreateFromFile(GetFilenameProject_LPR);
   try
     usesLine := StringList_SearchLineThatContain(t, 'uses',  0);
@@ -757,17 +809,19 @@ begin
     t.Free;
   end;
 
-  LPI_AddUnit(aUnitName, aUnitLocation, aUnitExtension);
+  //LPI_AddUnit(aUnitName, aUnitLocation, aUnitExtension);  }
 end;
 
-procedure TTargetLazarusProject.Unit_RemoveFromProject(const aUnitName: string;
+procedure TTargetLazarusProject.Unit_RemoveFromProject(const aObjectName: string;
   aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
-var t: TStringList;
-  lineIndex: integer;
+{var t: TStringList;
+  lineIndex: integer;  }
 begin
-  if aUnitName = '' then raise exception.create('unit name to remove is empty');
+  if aObjectName = '' then raise exception.create('unit name to remove is empty');
 
-  // remove entry in USES clause of LPR file
+  IdeConnect.AskIdeToRemoveUnitFromProject(aObjectName, aUnitLocation, aUnitExtension);
+
+{  // remove entry in USES clause of LPR file
   t := StringList_CreateFromFile(GetFilenameProject_LPR);
   try
     lineIndex := StringList_SearchLineThatContain(t, aUnitName, 0);
@@ -780,27 +834,29 @@ begin
   end;
 
   // remove from LPI file
-  LPI_RemoveUnit(aUnitName, aUnitLocation, aUnitExtension);
+  //LPI_RemoveUnit(aUnitName, aUnitLocation, aUnitExtension);   }
 end;
 
-procedure TTargetLazarusProject.Unit_DeleteFile(const aUnitName: string;
+procedure TTargetLazarusProject.Unit_DeleteFile(const aObjectName: string;
   aUnitLocation: TUnitLocation; aUnitExtension: TUnitExtension);
 var unitFilename: String;
 begin
-  unitFilename := Unit_ExpandUnitName(aUnitName, aUnitLocation, aUnitExtension);
+  //if GameHelperIsStartedFromLazarusIDE then exit; // the deletion is done in the IDE package
+
+  unitFilename := Unit_GetFullFilename(aObjectName, aUnitLocation, aUnitExtension);
 
   if FileExists(unitFilename) then
     SupprimeFichier(unitFilename);
 end;
 
-function TTargetLazarusProject.GetUnitNameForSprite(const aNameOfTheSprite: string): string;
+function TTargetLazarusProject.SpriteNameToUnitNameWithoutExt(const aSpriteName: string): string;
 begin
-  Result := PREFIX_FOR_SPRITE_UNIT_NAME + LowerCase(aNameOfTheSprite);
+  Result := UNIT_NAME_PREFIX[ulSprites] + LowerCase(aSpriteName);
 end;
 
-function TTargetLazarusProject.GetUnitFileNameForSprite(const aNameOfTheSprite: string): string;
+function TTargetLazarusProject.SpriteNameToUnitFullFilename(const aSpriteName: string): string;
 begin
-  Result := GetFolderUnitsSprites + GetUnitNameForSprite(aNameOfTheSprite);
+  Result := GetFolderUnitsSprites + SpriteNameToUnitNameWithoutExt(aSpriteName)+'.pas';
 end;
 
 end.

@@ -164,7 +164,7 @@ begin
     // render icon visible or not
     if FShowIconEye then begin
       xx := ARect.Right-DataModule1.ILIconLayerList.Width;
-      yy := ARect.Top + (ARect.Height-DataModule1.ImageList1.Height) div 2;
+      yy := ARect.Top + (ARect.Height-DataModule1.ILIconLayerList.Height) div 2;
       if Layers.UserLayerIsVisible(Index) then DataModule1.ILIconLayerList.Draw(LB.Canvas, xx, yy, 0)
         else DataModule1.ILIconLayerList.Draw(LB.Canvas, xx, yy, 1);
     end;

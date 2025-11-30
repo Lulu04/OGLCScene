@@ -17,11 +17,13 @@ uses
   u_screen_leveleditor, frame_tool_levelbank, u_layerlist, frame_viewlayerlist,
   form_projectconfig, form_showhelp, form_editdeformationgrid,
   form_editgradient, frame_gradientrow, u_screen_list, form_newproject,
-u_target_lazarusproject, frame_viewlevelbank, frame_tool_screenbank;
+u_target_lazarusproject, frame_viewlevelbank, frame_tool_screenbank,
+u_resourcestring, u_connection_to_ide, form_enter_description;
 
 {$R *.res}
 
 begin
+  Application.Scaled:=True;
   Application.Initialize;
 
   AppPref := TAppPref.CreateFolder('LuluGame');
@@ -29,12 +31,8 @@ begin
     else AppPref.Load;
     Application.CreateForm(TFormMain, FormMain);
     Application.CreateForm(TDataModule1, DataModule1);
-    Application.CreateForm(TFormProjectConfig, FormProjectConfig);
-  Application.CreateForm(TFormEditGradient, FormEditGradient);
-  Application.CreateForm(TFormNewProject, FormNewProject);
   Application.Run;
 
   AppPref.Free;
-
 end.
 

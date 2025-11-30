@@ -1,0 +1,76 @@
+object FormGameHelperConnexion: TFormGameHelperConnexion
+  Left = 356
+  Height = 302
+  Top = 144
+  Width = 725
+  Caption = 'Messages from Game Helper'
+  ClientHeight = 302
+  ClientWidth = 725
+  OnClose = FormClose
+  OnShow = FormShow
+  LCLVersion = '3.8.0.0'
+  object Memo1: TMemo
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Label1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 227
+    Top = 75
+    Width = 725
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Top = 20
+    ReadOnly = True
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideTop.Control = Owner
+    Left = 251
+    Height = 15
+    Top = 40
+    Width = 222
+    BorderSpacing.Top = 40
+    Caption = 'To return to the IDE, close Game Helper'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object BUserWantToQuit: TSpeedButton
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 714
+    Height = 19
+    Hint = 'If something went wrong, click here to return to the IDE'
+    Top = 0
+    Width = 11
+    Anchors = [akTop, akRight]
+    AutoSize = True
+    Caption = 'X'
+    OnClick = BUserWantToQuitClick
+    ShowHint = True
+    ParentShowHint = False
+  end
+  object Label2: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideLeft.Side = asrCenter
+    AnchorSideTop.Control = Owner
+    Left = 284
+    Height = 15
+    Top = 20
+    Width = 156
+    BorderSpacing.Top = 20
+    Caption = 'Connected with Game Helper'
+  end
+  object Timer1: TTimer
+    Interval = 500
+    OnTimer = Timer1Timer
+    Left = 25
+    Top = 62
+  end
+end

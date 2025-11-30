@@ -42,6 +42,8 @@ TProjectConfig = record
   procedure LoadFromString(const data: string);
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
+  procedure SaveToFile(const aFilename: string);
+  function LoadFromFile(const aFilename: string): boolean;
 
 public // utils to modify target lazarus project files
   TargetLazarusProject: TTargetLazarusProject;
@@ -67,7 +69,7 @@ var Project: TProject;
 implementation
 uses Forms, Dialogs, Controls, u_common, form_main, u_texture_list,
   u_surface_list, u_spritebank, u_screen_spritebuilder, u_levelbank,
-  form_newproject, u_app_pref, u_utils, utilitaire_fichier;
+  form_newproject, u_app_pref, u_utils, u_connection_to_ide, utilitaire_fichier;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -166,41 +168,134 @@ begin
   LoadFromString(t.Strings[k+1]);
 end;
 
+procedure TProjectConfig.SaveToFile(const aFilename: string);
+var t: TStringList;
+begin
+  FScene.LogInfo('Try to save project "'+aFilename+'"');
+  t := TStringList.Create;
+  try
+    try
+      SaveTo(t);
+      t.SaveToFile(aFilename);
+      FScene.LogInfo('success', 1);
+    except
+      On E :Exception do begin
+        FScene.LogError('TProjectConfig.Save: exception occur');
+        FScene.logError(E.Message, 1);
+     end;
+    end;
+  finally
+    t.Free;
+  end;
+end;
+
+function TProjectConfig.LoadFromFile(const aFilename: string): boolean;
+var t: TStringList;
+begin
+  FScene.LogInfo('Try to load project "'+aFilename+'"');
+  t := TStringList.Create;
+  try
+    try
+      t.LoadFromFile(aFilename);
+      LoadFrom(t);
+      Result := True;
+      FScene.LogInfo('success', 1);
+    except
+      On E :Exception do begin
+        FScene.LogError('TProjectConfig.Load: exception occur', 1);
+        FScene.logError(E.Message, 2);
+        Result := False;
+      end;
+    end;
+  finally
+    t.Free;
+  end;
+end;
+
 { TProject }
 
 constructor TProject.Create;
 begin
   inherited Create('.oglc');
-  SetFormCaption(FormMain, 'Game Helper');
+  if IdeConnect.Activated then SetFormCaption(FormMain, 'Game Helper (from IDE)')
+    else SetFormCaption(FormMain, 'Game Helper');
   AddFilterToDialogs('Game helper files', '*.oglc');
   AddFilterToDialogs('All file', '*.*');
 end;
 
 function TProject.DoNew: boolean;
-var folderProjectTemplate, lazProjectFolder,
-  lazProjectName: string;
+var folderProjectTemplate, lazProjectFolder, lazProjectName: string;
 begin
-  if FormNewProject.ShowModal <> mrOk then exit(False);
+  FormNewProject := TFormNewProject.Create(NIL);
+  try
+    if FormNewProject.ShowModal <> mrOk then exit(False);
+    // retrieve the project template folder
+    folderProjectTemplate := GetSourceProjectTemplateFolder;
+    lazProjectFolder := FormNewProject.GetLazarusProjectFolder;
+    lazProjectName := FormNewProject.GetLazarusProjectName;
+  finally
+    FormNewProject.Free;
+  end;
 
-  // retrieve the project template folder
-  folderProjectTemplate := GetSourceProjectTemplateFolder;
+  FScene.LogInfo('Try to create a new project "'+lazProjectName+'" in directory "'+lazProjectFolder+'"');
 
-  lazProjectFolder := FormNewProject.GetLazarusProjectFolder;
-  lazProjectName := FormNewProject.GetLazarusProjectName;
-
-  CopyDirectoryContent(folderProjectTemplate, lazProjectFolder);
+  FScene.LogInfo('copy the content of the directory of lazarus project template to the new directory', 1);
+  try
+    CopyDirectoryContent(folderProjectTemplate, lazProjectFolder);
+    FScene.LogInfo('success', 2);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception '+E.Message, 2);
+    end;
+  end;
 
   // rename project files
-  RenommeFichier(lazProjectFolder+'project_oglcscene.ico',
-                 lazProjectFolder+lazProjectName+'.ico');
-  RenommeFichier(lazProjectFolder+'project_oglcscene.lpi',
-                 lazProjectFolder+lazProjectName+'.lpi');
+  FScene.LogInfo('Renaming file project_oglcscene.ico', 1);
+  try
+    RenommeFichier(lazProjectFolder+'project_oglcscene.ico',
+                   lazProjectFolder+lazProjectName+'.ico');
+    FScene.LogInfo('success', 2);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception: '+E.Message, 2);
+    end;
+  end;
+
+  FScene.LogInfo('Renaming file project_oglcscene.lpi', 1);
+  try
+    RenommeFichier(lazProjectFolder+'project_oglcscene.lpi',
+                   lazProjectFolder+lazProjectName+'.lpi');
+    FScene.LogInfo('success', 2);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception: '+E.Message, 2);
+    end;
+  end;
+
+  FScene.LogInfo('Renaming file project_oglcscene.lpr', 1);
+  try
   RenommeFichier(lazProjectFolder+'project_oglcscene.lpr',
                  lazProjectFolder+lazProjectName+'.lpr');
+  FScene.LogInfo('success', 2);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception: '+E.Message, 2);
+    end;
+  end;
 
   // replace project name in lazarus files
-  ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpi', 'project_oglcscene', lazProjectName);
-  ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpr', 'project_oglcscene', lazProjectName);
+  FScene.LogInfo('replacing name in lpi and lpr file', 1);
+  try
+    ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpi', 'project_oglcscene', lazProjectName);
+    ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpr', 'project_oglcscene', lazProjectName);
+    FScene.LogInfo('success', 2);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception: '+E.Message, 2);
+    end;
+  end;
+
+  FScene.LogEmptyLine;
 
   Config.InitDefault;
 
@@ -210,55 +305,50 @@ begin
 end;
 
 procedure TProject.DoSave(const aFilename: string);
-var t: TStringList;
+var pathGameHelperFiles: string;
 begin
-  t := TStringList.Create;
-  try
-    Config.SaveTo(t);
-    SpriteBank.SaveTo(t);
-    LevelBank.SaveTo(t);
+  Config.SaveToFile(aFilename);
 
-    t.SaveToFile(aFilename);
-  finally
-    t.Free;
-  end;
+  pathGameHelperFiles := IncludeTrailingPathDelimiter(ExtractFilePath(aFilename)) +
+                         GAMEHELPERFILES_SUBFOLDER + PathDelim;
+  SpriteBank.SaveToPath(pathGameHelperFiles);
+  LevelBank.SaveToPath(pathGameHelperFiles);
 
   AppPref.LastProjectFilename := aFilename;
 end;
 
 function TProject.DoLoad(const aFilename: string): boolean;
-var t: TStringList;
+var pathGameHelperFiles: string;
 begin
-  t := TStringList.Create;
-  try
-    try
-      t.LoadFromFile(aFilename);
-      if t.Count = 0 then exit(False);
+  Result := Config.LoadFromFile(aFilename);
 
-      Config.LoadFrom(t);
-      SpriteBank.LoadFrom(t);
-      LevelBank.LoadFrom(t);
+  if Result then begin
+    pathGameHelperFiles := IncludeTrailingPathDelimiter(ExtractFilePath(aFilename)) +
+                           GAMEHELPERFILES_SUBFOLDER + PathDelim;
+    SpriteBank.LoadFromPath(pathGameHelperFiles);
+    LevelBank.LoadFromPath(pathGameHelperFiles);
 
-      Result := True;
-    except
-      Result := False;
-    end;
-  finally
-    t.Free;
+    AppPref.LastProjectFilename := aFilename;
   end;
-
-  if Result then AppPref.LastProjectFilename := aFilename;
 end;
 
 procedure TProject.DoClose;
 begin
-  ScreenSpriteBuilder.Textures.Clear;
-  ScreenSpriteBuilder.Surfaces.Clear;
-  ScreenSpriteBuilder.Bodies.Clear;
-  SpriteBank.Clear;
-  LevelBank.Clear;
-  Config.InitDefault;
-  WorkingLevelGroup := NIL;
+  FScene.LogInfo('Closing current project');
+  try
+    ScreenSpriteBuilder.Textures.Clear;
+    ScreenSpriteBuilder.Surfaces.Clear;
+    ScreenSpriteBuilder.Bodies.Clear;
+    SpriteBank.Clear;
+    LevelBank.Clear;
+    Config.InitDefault;
+    WorkingLevelGroup := NIL;
+    FScene.LogInfo('success', 1);
+  except
+    On E :Exception do begin
+      FScene.LogError('Exception: '+E.Message, 1);
+    end;
+  end;
 end;
 
 procedure TProject.OnModifiedChange(aState: boolean);

@@ -222,7 +222,8 @@ type
 implementation
 
 uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
-  form_showhelp, form_editgradient, u_target_lazarusproject, Graphics;
+  form_showhelp, form_editgradient, u_target_lazarusproject,
+  u_connection_to_ide, u_utils, u_resourcestring, Graphics;
 
 {$R *.lfm}
 
@@ -327,6 +328,7 @@ var o: PLevelBankItem;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
+  if not IsValidPascalVariableName(name) then exit;
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
 
@@ -705,10 +707,10 @@ procedure TFrameToolLevelEditor.DoUpdateSurface(aForceRecreateSurface: boolean);
 var recreateSurface: Boolean;
 begin
   if FWorkingChild = NIL then exit;
+  recreateSurface := aForceRecreateSurface;
 
   if FWorkingChild^.IsTextured then
-    recreateSurface := aForceRecreateSurface or
-                       (FWorkingChild^.textureName <> CBToTextureName);
+    recreateSurface := recreateSurface or (FWorkingChild^.textureName <> CBToTextureName);
 
   if recreateSurface then begin
     // create a new surface
