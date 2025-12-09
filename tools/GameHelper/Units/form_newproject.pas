@@ -33,7 +33,7 @@ var
 
 implementation
 
-uses u_utils;
+uses u_utils, LazFileUtils, utilitaire_fichier;
 
 {$R *.lfm}
 
@@ -46,9 +46,24 @@ begin
 end;
 
 function TFormNewProject.CheckParams: boolean;
+var
+  t: TStringList;
 begin
-  Result := IsValidLazarusProjectName(Trim(Edit1.Text)) and
+  Result := IsValidLazarusProjectName(Trim(Edit1.Text), True) and
             (DE.Directory <> '');
+
+  // check if the directory is empty
+  if Result and DirectoryExistsUTF8(DE.Directory)  then begin
+    t := GetDirectoryContent(DE.Directory, [], True, True);
+    try
+      if t.Count > 0 then
+        Result := QuestionDlg('', 'The directory '''+DE.Directory+''' is not empty...'+LineEnding+
+                              'Do you want to continue ?', mtWarning,
+                              [mrOk, 'Continue', mrCancel, 'Cancel'], 0) = mrOk;
+    finally
+      t.Free;
+    end;
+  end;
 end;
 
 function TFormNewProject.GetLazarusProjectFolder: string;

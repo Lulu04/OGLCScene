@@ -35,7 +35,7 @@ object FrameGradientRow: TFrameGradientRow
       Width = 52
       BorderSpacing.Left = 2
       Font.Style = [fsBold]
-      Increment = 0.1
+      Increment = 0.01
       MaxValue = 1
       OnChange = FSE1Change
       OnEnter = FSE1Enter
@@ -63,6 +63,19 @@ object FrameGradientRow: TFrameGradientRow
       OnMouseMove = PBMouseMove
       OnMouseUp = PBMouseUp
       OnPaint = PBPaint
+    end
+    object Label1: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel1
+      Left = 2
+      Height = 15
+      Top = 2
+      Width = 36
+      BorderSpacing.Left = 2
+      BorderSpacing.Top = 2
+      Caption = 'Label1'
+      Font.Style = [fsBold]
+      ParentFont = False
     end
   end
   object CD1: TColorDialog

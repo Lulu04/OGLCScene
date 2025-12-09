@@ -60,7 +60,6 @@ public
   // TDeformationGrid
   DeformationGridData: string;
 
-
   procedure InitDefault;
   procedure KillSurface;
   procedure CreateCollisionBody;
@@ -102,7 +101,25 @@ public
 
   procedure DuplicateTo(aSurface: PSurfaceDescriptor);
 
-  function GetSurfaceLayerIndex: integer;
+  function GetSurfaceType: classOfSimpleSurfaceWithEffect;
+  function GetWidth: integer;
+  function GetHeight: integer;
+  function GetX: single;
+  function GetY: single;
+  function GetLayerIndex: integer;
+  function GetZOrder: integer;
+  function GetPivotX: single;
+  function GetPivotY: single;
+  function GetAngle: single;
+  function GetScaleX: single;
+  function GetScaleY: single;
+  function GetFlipH: boolean;
+  function GetFlipV: boolean;
+  function GetOpacity: single;
+  function GetTint: TBGRAPixel;
+  function GetTintMode: TTintMode;
+  function GetFrame: single;
+
   procedure SetSurfaceLayerIndex(aIndex: integer);
 
   function SaveToString: string;
@@ -235,6 +252,9 @@ begin
   surface.Pivot.x := p.x;
   surface.Pivot.y := p.y;
   HandleManager.UpdatePivotHandle(surface);
+
+  pivotX := p.x;
+  pivotY := p.y
 end;
 
 procedure TSurfaceDescriptor.SetSelected(AValue: boolean);
@@ -851,9 +871,112 @@ begin
   aSurface^.surface.TintMode := surface.TintMode;
 end;
 
-function TSurfaceDescriptor.GetSurfaceLayerIndex: integer;
+function TSurfaceDescriptor.GetSurfaceType: classOfSimpleSurfaceWithEffect;
 begin
-  Result := FScene.LayerIndexOf(surface.ParentLayer);
+  if Assigned(surface) then Result := classOfSimpleSurfaceWithEffect(surface.ClassType)
+    else Result := classtype;
+end;
+
+function TSurfaceDescriptor.GetWidth: integer;
+begin
+  if Assigned(surface) then Result := surface.Width
+    else Result := width;
+end;
+
+function TSurfaceDescriptor.GetHeight: integer;
+begin
+  if Assigned(surface) then Result := surface.Height
+    else Result := height;
+end;
+
+function TSurfaceDescriptor.GetX: single;
+begin
+  if Assigned(surface) then Result := surface.X.Value
+    else Result := x;
+end;
+
+function TSurfaceDescriptor.GetY: single;
+begin
+  if Assigned(surface) then Result := surface.Y.Value
+    else Result := y;
+end;
+
+function TSurfaceDescriptor.GetLayerIndex: integer;
+begin
+  if Assigned(surface) then Result := FScene.LayerIndexOf(surface.ParentLayer)
+    else Result := layerindex;
+end;
+
+function TSurfaceDescriptor.GetZOrder: integer;
+begin
+  if Assigned(surface) then Result := surface.ZOrderAsChild
+    else Result := zorder;
+end;
+
+function TSurfaceDescriptor.GetPivotX: single;
+begin
+  if Assigned(surface) then Result := surface.Pivot.x
+    else Result := pivotx;
+end;
+
+function TSurfaceDescriptor.GetPivotY: single;
+begin
+  if Assigned(surface) then Result := surface.Pivot.y
+    else Result := pivoty;
+end;
+
+function TSurfaceDescriptor.GetAngle: single;
+begin
+  if Assigned(surface) then Result := surface.Angle.Value
+    else Result := angle;
+end;
+
+function TSurfaceDescriptor.GetScaleX: single;
+begin
+  if Assigned(surface) then Result := surface.Scale.X.Value
+    else Result := scalex;
+end;
+
+function TSurfaceDescriptor.GetScaleY: single;
+begin
+  if Assigned(surface) then Result := surface.Scale.Y.Value
+    else Result := scaley;
+end;
+
+function TSurfaceDescriptor.GetFlipH: boolean;
+begin
+  if Assigned(surface) then Result := surface.FlipH
+    else Result := fliph;
+end;
+
+function TSurfaceDescriptor.GetFlipV: boolean;
+begin
+  if Assigned(surface) then Result := surface.FlipV
+    else Result := flipv;
+end;
+
+function TSurfaceDescriptor.GetOpacity: single;
+begin
+  if Assigned(surface) then Result := surface.Opacity.Value
+    else Result := opacity;
+end;
+
+function TSurfaceDescriptor.GetTint: TBGRAPixel;
+begin
+  if Assigned(surface) then Result := surface.Tint.Value
+    else Result := tint;
+end;
+
+function TSurfaceDescriptor.GetTintMode: TTintMode;
+begin
+  if Assigned(surface) then Result := surface.TintMode
+    else Result := tintmode;
+end;
+
+function TSurfaceDescriptor.GetFrame: single;
+begin
+  if Assigned(surface) then Result := surface.Frame
+    else Result := frameindex;
 end;
 
 procedure TSurfaceDescriptor.SetSurfaceLayerIndex(aIndex: integer);
@@ -895,8 +1018,8 @@ begin
   if parentID <> -1 then prop.Add('ParentID', parentID);
 
   if not ParentList.FModeForLevelEditor then begin
-    if surface.ZOrderAsChild <> 0 then prop.Add('ZOrder', surface.ZOrderAsChild);
-  end else prop.Add('LayerIndex', GetSurfaceLayerIndex);
+    if GetZOrder <> 0 then prop.Add('ZOrder', GetZOrder);
+  end else prop.Add('LayerIndex', GetLayerIndex);
 
   if not ParentList.FModeForLevelEditor then
     prop.Add('Name', name);
@@ -908,29 +1031,29 @@ begin
   if IsTextured then
     prop.Add('TextureName', textureName);
 
-  if surface.Pivot.x <> 0.5 then prop.Add('PivotX', surface.Pivot.x);
-  if surface.Pivot.y <> 0.5 then prop.Add('PivotY', surface.Pivot.y);
-  if surface.Angle.Value <> 0 then prop.Add('Angle', surface.Angle.Value);
-  prop.Add('X', surface.X.Value);
-  prop.Add('Y', surface.Y.Value);
+  if GetPivotX <> 0.5 then prop.Add('PivotX', GetPivotX);
+  if GetPivotY <> 0.5 then prop.Add('PivotY', GetPivotY);
+  if GetAngle <> 0 then prop.Add('Angle', GetAngle);
+  if GetX <> 0.0 then prop.Add('X', GetX);
+  if GetY <> 0.0 then prop.Add('Y', GetY);
 
   if not ParentList.FModeForLevelEditor then begin
-    if surface.Scale.X.Value <> 1.0 then prop.Add('ScaleX', surface.Scale.X.Value);
-    if surface.Scale.Y.Value <> 1.0 then prop.Add('ScaleY', surface.Scale.Y.Value);
+    if GetScaleX <> 1.0 then prop.Add('ScaleX', GetScaleX);
+    if GetScaleY <> 1.0 then prop.Add('ScaleY', GetScaleY);
   end;
 
-  prop.Add('Width', surface.Width);
-  prop.Add('Height', surface.Height);
+  prop.Add('Width', GetWidth);
+  prop.Add('Height', GetHeight);
 
-  if surface.FlipH then prop.Add('FlipH', surface.FlipH);
-  if surface.FlipV then prop.Add('FlipV', surface.FlipV);
-  if surface.Opacity.Value <> 255 then prop.Add('Opacity', surface.Opacity.Value);
-  if surface.Tint.Value <> BGRA(0,0,0,0) then prop.Add('Tint', surface.Tint.Value);
-  if surface.TintMode <> tmReplaceColor then prop.Add('TintMode', Ord(surface.TintMode));
-  if surface.Frame <> 1.0 then prop.Add('FrameIndex', surface.Frame);
+  if GetFlipH then prop.Add('FlipH', GetFlipH);
+  if GetFlipV then prop.Add('FlipV', GetFlipV);
+  if GetOpacity <> 255 then prop.Add('Opacity', GetOpacity);
+  if GetTint <> BGRA(0,0,0,0) then prop.Add('Tint', GetTint);
+  if GetTintMode <> tmReplaceColor then prop.Add('TintMode', Ord(GetTintMode));
+  if GetFrame <> 1.0 then prop.Add('FrameIndex', GetFrame);
 
   // TSpriteWithElasticCorner
-  if surface is TSpriteWithElasticCorner then begin
+  if GetSurfaceType = TSpriteWithElasticCorner then begin
     if TopLeftOffsetX <> 0 then prop.Add('TopLeftOffsetX', TopLeftOffsetX);
     if TopLeftOffsetY <> 0 then prop.Add('TopLeftOffsetY', TopLeftOffsetY);
     if TopRightOffsetX <> 0 then prop.Add('TopRightOffsetX', TopRightOffsetX);
@@ -942,7 +1065,7 @@ begin
   end;
 
   // TQuad4Color
-  if surface is TQuad4Color then begin
+  if GetSurfaceType = TQuad4Color then begin
     prop.Add('TopLeftColor', TopLeftColor);
     prop.Add('TopRightColor', TopRightColor);
     prop.Add('BottomRightColor', BottomRightColor);
@@ -950,12 +1073,12 @@ begin
   end;
 
   // TGradientRectangle
-  prop.Add('GradientData', GradientData);
+  if GetSurfaceType = TGradientRectangle then
+    prop.Add('GradientData', GradientData);
 
   // TDeformationGrid
-  if surface is TDeformationGrid then begin
+  if GetSurfaceType = TDeformationGrid then
     prop.Add('DeformationGridData', DeformationGridData);
-  end;
 
   Result := prop.PackedProperty;
 end;

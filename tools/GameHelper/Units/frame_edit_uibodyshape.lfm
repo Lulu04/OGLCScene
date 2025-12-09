@@ -1,0 +1,339 @@
+object FrameEditUIBodyShape: TFrameEditUIBodyShape
+  Left = 0
+  Height = 180
+  Top = 0
+  Width = 282
+  ClientHeight = 180
+  ClientWidth = 282
+  TabOrder = 0
+  DesignLeft = 707
+  DesignTop = 174
+  object Panel1: TPanel
+    Left = 0
+    Height = 180
+    Top = 0
+    Width = 282
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 180
+    ClientWidth = 282
+    Color = 12500670
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object CBBorderVisible: TCheckBox
+      AnchorSideLeft.Control = Label1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Label1
+      AnchorSideBottom.Side = asrBottom
+      Left = 45
+      Height = 19
+      Top = 5
+      Width = 52
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Caption = 'Visible'
+      Checked = True
+      State = cbChecked
+      TabOrder = 0
+      OnChange = CBBorderVisibleChange
+    end
+    object Label3: TLabel
+      AnchorSideLeft.Control = Label5
+      AnchorSideTop.Control = CBBorderVisible
+      AnchorSideTop.Side = asrBottom
+      Left = 13
+      Height = 15
+      Top = 28
+      Width = 29
+      BorderSpacing.Top = 4
+      Caption = 'Color'
+      ParentColor = False
+    end
+    object CBBorder: TColorButton
+      AnchorSideLeft.Control = Label3
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label3
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 47
+      Height = 20
+      Top = 23
+      Width = 64
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = 14474460
+      OnColorChanged = CBBorderVisibleChange
+    end
+    object Label4: TLabel
+      AnchorSideLeft.Control = CBBorder
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label3
+      Left = 126
+      Height = 15
+      Top = 28
+      Width = 31
+      BorderSpacing.Left = 15
+      Caption = 'Alpha'
+      ParentColor = False
+    end
+    object SEBorderAlpha: TSpinEdit
+      AnchorSideLeft.Control = Label4
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label4
+      AnchorSideBottom.Side = asrBottom
+      Left = 162
+      Height = 23
+      Top = 20
+      Width = 46
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Font.Style = [fsBold]
+      Increment = 5
+      MaxValue = 255
+      OnChange = CBBorderVisibleChange
+      ParentFont = False
+      TabOrder = 1
+      Value = 255
+    end
+    object Label5: TLabel
+      AnchorSideTop.Control = Label3
+      AnchorSideTop.Side = asrBottom
+      Left = 13
+      Height = 15
+      Top = 53
+      Width = 32
+      BorderSpacing.Top = 10
+      Caption = 'Width'
+      ParentColor = False
+    end
+    object FSEBorderWidth: TFloatSpinEdit
+      AnchorSideLeft.Control = Label5
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label5
+      AnchorSideBottom.Side = asrBottom
+      Left = 50
+      Height = 23
+      Top = 45
+      Width = 56
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Font.Style = [fsBold]
+      OnChange = CBBorderVisibleChange
+      ParentFont = False
+      TabOrder = 2
+      Value = 1.5
+    end
+    object Label6: TLabel
+      AnchorSideLeft.Control = FSEBorderWidth
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label5
+      Left = 126
+      Height = 15
+      Top = 53
+      Width = 64
+      BorderSpacing.Left = 20
+      Caption = 'Blend mode'
+      ParentColor = False
+    end
+    object CBBorderBlend: TComboBox
+      AnchorSideLeft.Control = Label6
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label6
+      AnchorSideBottom.Side = asrBottom
+      Left = 193
+      Height = 23
+      Top = 45
+      Width = 82
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 3
+      ItemHeight = 15
+      ItemIndex = 0
+      Items.Strings = (
+        'Normal'
+        'Add'
+        'Multiply'
+      )
+      Style = csDropDownList
+      TabOrder = 3
+      Text = 'Normal'
+      OnSelect = CBBorderVisibleChange
+    end
+    object Label1: TLabel
+      AnchorSideLeft.Control = Panel1
+      Left = 5
+      Height = 15
+      Top = 9
+      Width = 35
+      BorderSpacing.Left = 5
+      Caption = 'Border'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      AnchorSideLeft.Control = Panel1
+      Left = 5
+      Height = 15
+      Top = 88
+      Width = 15
+      BorderSpacing.Left = 5
+      Caption = 'Fill'
+      ParentColor = False
+    end
+    object CBFillVisible: TCheckBox
+      AnchorSideLeft.Control = Label2
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label2
+      Left = 30
+      Height = 19
+      Top = 88
+      Width = 52
+      BorderSpacing.Left = 10
+      Caption = 'Visible'
+      Checked = True
+      State = cbChecked
+      TabOrder = 4
+      OnChange = CBFillVisibleChange
+    end
+    object RBFillSingleColor: TRadioButton
+      AnchorSideTop.Control = Label2
+      AnchorSideTop.Side = asrBottom
+      Left = 18
+      Height = 19
+      Top = 108
+      Width = 80
+      BorderSpacing.Top = 5
+      Caption = 'Single color'
+      Checked = True
+      TabOrder = 5
+      TabStop = True
+      OnChange = CBFillVisibleChange
+    end
+    object RBFillGradient: TRadioButton
+      AnchorSideLeft.Control = RBFillSingleColor
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = RBFillSingleColor
+      Left = 108
+      Height = 19
+      Top = 108
+      Width = 63
+      BorderSpacing.Left = 10
+      Caption = 'Gradient'
+      TabOrder = 6
+      OnChange = CBFillVisibleChange
+    end
+    object Label7: TLabel
+      AnchorSideLeft.Control = Label5
+      AnchorSideTop.Control = RBFillSingleColor
+      AnchorSideTop.Side = asrBottom
+      Left = 13
+      Height = 15
+      Top = 134
+      Width = 29
+      BorderSpacing.Top = 7
+      Caption = 'Color'
+      ParentColor = False
+    end
+    object CBFill: TColorButton
+      AnchorSideLeft.Control = Label7
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label7
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 47
+      Height = 20
+      Top = 129
+      Width = 64
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = 14474460
+      OnColorChanged = CBFillVisibleChange
+    end
+    object Label8: TLabel
+      AnchorSideLeft.Control = CBFill
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label7
+      Left = 126
+      Height = 15
+      Top = 134
+      Width = 31
+      BorderSpacing.Left = 15
+      Caption = 'Alpha'
+      ParentColor = False
+    end
+    object SEFillAlpha: TSpinEdit
+      AnchorSideLeft.Control = Label8
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label8
+      AnchorSideBottom.Side = asrBottom
+      Left = 162
+      Height = 23
+      Top = 126
+      Width = 46
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Font.Style = [fsBold]
+      Increment = 5
+      MaxValue = 255
+      OnChange = CBFillVisibleChange
+      ParentFont = False
+      TabOrder = 7
+      Value = 255
+    end
+    object Label9: TLabel
+      AnchorSideLeft.Control = Label8
+      AnchorSideTop.Control = Label7
+      AnchorSideTop.Side = asrBottom
+      Left = 126
+      Height = 15
+      Top = 159
+      Width = 64
+      BorderSpacing.Top = 10
+      Caption = 'Blend mode'
+      ParentColor = False
+    end
+    object CBFillBlend: TComboBox
+      AnchorSideLeft.Control = Label9
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label9
+      AnchorSideBottom.Side = asrBottom
+      Left = 193
+      Height = 23
+      Top = 151
+      Width = 82
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 3
+      ItemHeight = 15
+      ItemIndex = 0
+      Items.Strings = (
+        'Normal'
+        'Add'
+        'Multiply'
+      )
+      Style = csDropDownList
+      TabOrder = 8
+      Text = 'Normal'
+      OnSelect = CBFillVisibleChange
+    end
+    object BEditGradient: TSpeedButton
+      AnchorSideLeft.Control = RBFillGradient
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = RBFillGradient
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 176
+      Height = 17
+      Top = 109
+      Width = 51
+      BorderSpacing.Left = 5
+      Caption = 'Edit'
+      Enabled = False
+      OnClick = BEditGradientClick
+    end
+  end
+end

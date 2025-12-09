@@ -217,13 +217,13 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
     ResizeAnchor = akTop
   end
   object PanelSpriteTool: TPanel
-    Left = 168
+    Left = 136
     Height = 18
     Top = 128
-    Width = 96
+    Width = 128
     BevelOuter = bvNone
     ClientHeight = 18
-    ClientWidth = 96
+    ClientWidth = 128
     Color = 3947580
     ParentBackground = False
     ParentColor = False
@@ -275,7 +275,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideRight.Control = PanelSpriteTool
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 80
+      Left = 112
       Height = 16
       Hint = 'Delete'
       Top = 1
@@ -302,6 +302,44 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 7
+      OnClick = BNewSpriteClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BExportPascalUnit: TSpeedButton
+      AnchorSideLeft.Control = BDuplicateSprite
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelSpriteTool
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 64
+      Height = 16
+      Hint = 'Generate the Pascal unit and add it to Lazarus project'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 8
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 9
+      OnClick = BNewSpriteClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BRemovePascalUnit: TSpeedButton
+      AnchorSideLeft.Control = BExportPascalUnit
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelSpriteTool
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 84
+      Height = 16
+      Hint = 'Remove the Pascal unit from Lazarus project'#13#10'(keep the sprite definition in Game Helper)'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 10
       OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False

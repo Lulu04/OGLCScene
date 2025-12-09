@@ -8,13 +8,19 @@ uses
   Classes, SysUtils,
   OGLCScene;
 
-// Do not remove comments in this file !
-// they are tag used to mark reserved code area to Game Helper
-// You can add your code anywhere but not inside a reserved area
+{
+  Please do not remove the comments in this file !
+  they are tag used to mark code area for Game Helper
+  You can edit manually the code inside a tagged area but keep the tags !
+  NOTE 1: edit the code manually inside the tagged areas when Game Helper is not running
+           because it overwrite their content when the project is saved
+  NOTE 2:  when Game helper start, it read the content of the tagged areas and
+           update the project with them.
+}
 
 const
 
-//LAYERS
+{LAYERS}
 LAYER_COUNT = 9;
   LAYER_TOP    = 0;
   LAYER_UI     = 1;
@@ -25,20 +31,20 @@ LAYER_COUNT = 9;
   LAYER_BG1    = 6;
   LAYER_BG2    = 7;
   LAYER_BG3    = 8;
-//LAYERS
+{/LAYERS}
 
-//DESIGN
+{DESIGN}
   SCREEN_WIDTH_AT_DESIGN_TIME: single = 1024;
   SCREEN_HEIGHT_AT_DESIGN_TIME: single = 768;
   SCREEN_PPI_AT_DESIGN_TIME: integer = 96;
-//DESIGN
+{/DESIGN}
 
 var
 
   AdditionnalScale: single = 1.0;
   FScene: TOGLCScene;
-//VAR
-//VAR
+{VAR}
+{/VAR}
 
 // return the path to Data folder
 function DataFolder: string;

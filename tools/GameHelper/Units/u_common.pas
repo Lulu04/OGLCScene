@@ -15,13 +15,15 @@ const
 APP_LAYER_COUNT = 10;
    LAYER_TOP              = 0;
    LAYER_UI               = 1;
-   LAYER_COLLISION_BODY   = 2;
+   LAYER_COLLISION_BODY   = 2; LAYER_FONT = 2; LAYER_UIPANEL = 2;
    LAYER_SPRITEBUILDER    = 3;
    LAYER_SPRITEBANK       = 4;
 
    LAYER_LEVELBANK        = 5;
    LAYER_LEVELWORLDBOUNDS = 6;
    LAYER_LEVELEDITOR      = 7;
+
+   LAYER_NOTVISIBLE       = 9;
 
    FIRST_LAYER_USER       = 10;  // this is the layer index 0 for the user
 

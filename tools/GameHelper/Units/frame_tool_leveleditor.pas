@@ -22,7 +22,6 @@ type
     BHelpWorld: TSpeedButton;
     BHelpSurfaces: TSpeedButton;
     BHelpLayers: TSpeedButton;
-    BNewSurface: TSpeedButton;
     BSkyWorldSize: TSpeedButton;
     BZoomScene: TSpeedButton;
     BZoomOnSelection: TSpeedButton;
@@ -232,8 +231,8 @@ uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
 procedure TFrameToolLevelEditor.BCancelClick(Sender: TObject);
 begin
   if FModified then
-    if QuestionDlg('','If you leave, changes will be lost.'+LineEnding+'Continue ?', mtWarning,
-                   [mrOk, 'Leave', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+    if QuestionDlg('','If you leave, changes will be lost.', mtWarning,
+                   [mrOk, 'Leave without saving', mrCancel, 'Cancel'], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageLevelBank;
 end;
@@ -328,7 +327,7 @@ var o: PLevelBankItem;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
-  if not IsValidPascalVariableName(name) then exit;
+  if not IsValidPascalVariableName(name, True) then exit;
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
 
@@ -375,11 +374,6 @@ end;
 
 procedure TFrameToolLevelEditor.BNewSurfaceClick(Sender: TObject);
 begin
-  if Sender = BNewSurface then begin
-    if DoAddNewSurface then
-      ShowSelectionData(ScreenLevelEditor.Selected);
-  end;
-
   // disable 'add multiple' if the param aren't correct
   if Sender = BAddMultiple then begin
     with ToggleSpeedButtonManager do
@@ -898,7 +892,8 @@ end;
 procedure TFrameToolLevelEditor.ExitModeAddMultiple;
 begin
   ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
-  ShowSelectionData(NIL);
+  ScreenLevelEditor.SelectNone;
+  //ShowSelectionData(NIL);
 end;
 
 procedure TFrameToolLevelEditor.FillListBoxTextureNames;
@@ -920,7 +915,7 @@ begin
     // 1 selected -> we can edit its parameters
     FWorkingChild := aSelected[0];
     with FWorkingChild^ do begin
-      LayerIndexToCB(GetSurfaceLayerIndex);
+      LayerIndexToCB(GetLayerIndex);
       if IsTextured then begin
         CBTextures.Enabled := True;
         TexturenameToCB(textureName);
@@ -959,7 +954,6 @@ begin
     CBLayers.Enabled := True;
     CBTextures.Enabled := True;
     Panel2.Visible := True;
-    BNewSurface.Enabled := False;
     ToggleSpeedButtonManager.Checked[BAddMultiple] := False; // True;
     BAddMultiple.Enabled := True;
     CheckCreationOfSpriteMultiple;
@@ -975,35 +969,35 @@ begin
     if Length(A) <> 1 then CBLayers.ItemIndex := -1
       else CBLayers.ItemIndex := A[0];
     Panel2.Visible := False;
-    BNewSurface.Enabled := False;
     ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
     BAddMultiple.Enabled := False;
     CheckCreationOfSpriteMultiple;
   end
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
-    CBTextures.ItemIndex := -1;
-    CBTextures.Enabled := True;
-    Panel2.Visible := True;
-    SE1.Value := 0;
-    SE2.Value := 0;
-    SE3.Value := 100;
-    SE4.Value := 100;
-    SE5.Value := 0.5;
-    SE6.Value := 0.5;
-    SE7.Value := 0.0;
-    SE8.Value := 255;
-    CBFlipH.Checked := False;
-    CBFlipV.Checked := False;
-    ColorButton1.ButtonColor := clBlack;
-    SE9.Value := 0;
-    SE10.Value := 1;
-    RadioButton1.Checked := True;
-    BNewSurface.Enabled := True;
-    Label8.Visible := False;
-    ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
-    BAddMultiple.Enabled := True;
-    CheckCreationOfSpriteMultiple;
+    if not ToggleSpeedButtonManager.Checked[BAddMultiple] then begin
+      CBTextures.ItemIndex := -1;
+      CBTextures.Enabled := True;
+      Panel2.Visible := True;
+      SE1.Value := 0;
+      SE2.Value := 0;
+      SE3.Value := 100;
+      SE4.Value := 100;
+      SE5.Value := 0.5;
+      SE6.Value := 0.5;
+      SE7.Value := 0.0;
+      SE8.Value := 255;
+      CBFlipH.Checked := False;
+      CBFlipV.Checked := False;
+      ColorButton1.ButtonColor := clBlack;
+      SE9.Value := 0;
+      SE10.Value := 1;
+      RadioButton1.Checked := True;
+      Label8.Visible := False;
+      ToggleSpeedButtonManager.Checked[BAddMultiple] := False;
+      BAddMultiple.Enabled := True;
+      CheckCreationOfSpriteMultiple;
+    end;
   end;
 
   FInitializingWidget := False;

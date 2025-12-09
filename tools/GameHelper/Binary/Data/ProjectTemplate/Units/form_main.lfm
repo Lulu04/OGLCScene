@@ -8,6 +8,7 @@ object FormMain: TFormMain
   Caption = 'FormMain'
   ClientHeight = 240
   ClientWidth = 320
+  Color = clBlack
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown

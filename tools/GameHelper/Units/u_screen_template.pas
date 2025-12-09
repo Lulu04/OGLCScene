@@ -454,12 +454,12 @@ begin
   FScene.Add(o, LAYER_TOP);
   time := 2.0;
   o.Opacity.ChangeTo(0, time, idcStartSlowEndFast);
-  if aX > FScene.Width/2
-    then rx := -100
-    else rx := 100;
-  if aY > FScene.Height/2
-    then ry := -100
-    else ry := 100;
+  if aX > FScene.Width*0.8 then rx := -100
+    else if aX < FScene.Width*0.2 then rx := 100
+      else if Random > 0.5 then rx := 100 else rx := -100;
+  if aY > FScene.Height*0.8 then ry := -100
+    else if ay < FScene.Height*0.2 then ry := 100
+      else if Random > 0.5 then ry := 100 else ry := -100;
   o.MoveRelative(rx, ry, time, idcSinusoid);
   o.KillDefered(time);
 end;

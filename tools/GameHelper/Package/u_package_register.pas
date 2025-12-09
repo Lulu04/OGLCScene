@@ -38,32 +38,35 @@ type
 
 TConnectionUtils = record
   procedure DoProcessOGLCGameHelperMenuClick(Sender: TObject);
-  procedure SaveAnEmptyOGLCProject(const aFilename: string);
-  procedure BackupOGLCFiles;
+  procedure SaveAnEmptyGameHelperProjectTo(const aFilename: string);
+  // save a copy of the <project>.oglc in the same backup directory than <project>.lpr
+  procedure BackupGameHelperFiles;
 
   // aUrgency can be mluVerbose for simple hint, mluWarning for warning
   procedure ShowMessageInIDE(const aMess: string; aUrgency: TMessageLineUrgency=mluVerbose);
   procedure ShowMessageInForm(const aMess: string);
 
   function GetActiveLazarusProjectFilename: string;
-  function GetActiveProjectPath: string;
-  function GetFolderGameHelperFiles: string;
+  function GetActiveLazarusProjectPath: string;
+  function GetPathGameHelperFiles: string;
   function GetActiveProjectUnitsPath: string;
   function GetActiveProjectUnitsSpritesPath: string;
   function GetActiveProjectUnitsLevelsPath: string;
   function GetActiveProjectBinaryPath: string;
   function GetActiveProjectBinaryDataPath: string;
   function GetActiveProjectBinaryDataTexturesPath: string;
-  // return an array with the short unit names of the units that are part of the current project
-  // ex: MyGame.lpr, Units/u_common.pas, Units/Sprites/u_sprite_car.pas
-  function GetProjectUnitShortFilenames: TStringArray;
+  // return an array with the short path+filename of the units that are part of the current Lazarus project
+  // ex: MyGame.lpr, Units/u_common.pas, Units/Sprites/u_sprite_car.pas, ...
+  function GetListOfProjectUnits: TStringArray;
   function CurrentLazarusProjectIsOGLCSceneProject: boolean;
 
-  function UnitIsPartOfProject(aItem: TResponsItem): boolean; overload;
+  function UnitIsPartOfProject(const aItem: TResponsItem): boolean; overload;
   function UnitIsPartOfProject(const aShortFilename: string): boolean; overload;
-  function IndexOfUnitInFilesProject(aItem: TResponsItem): integer;
-  procedure DoAddUnitToProject(aItem: TResponsItem);
-  procedure DoRemoveUnitFromProject(aItem: TResponsItem);
+  function IndexOfUnitInFilesProject(const aItem: TResponsItem): integer;
+
+  procedure DoCloseSourceEditor(const aItem: TResponsItem);
+  procedure DoAddUnitToProject(const aItem: TResponsItem);
+  procedure DoRemoveUnitFromProject(const aItem: TResponsItem);
   // return True if the message is "Game Helper terminate"
   function DecodeMessageFromGameHelper(const aMess: string): boolean;
 end;
@@ -85,19 +88,19 @@ begin
   Result := LazarusIDE.ActiveProject.MainFile.GetFullFilename;
 end;
 
-function TConnectionUtils.GetActiveProjectPath: string;
+function TConnectionUtils.GetActiveLazarusProjectPath: string;
 begin
   Result := IncludeTrailingPathDelimiter(ExtractFilePath(LazarusIDE.ActiveProject.MainFile.GetFullFilename));
 end;
 
-function TConnectionUtils.GetFolderGameHelperFiles: string;
+function TConnectionUtils.GetPathGameHelperFiles: string;
 begin
-  Result := GetActiveProjectPath + 'GameHelperFiles' + PathDelim;
+  Result := GetActiveLazarusProjectPath + 'GameHelperFiles' + PathDelim;
 end;
 
 function TConnectionUtils.GetActiveProjectUnitsPath: string;
 begin
-  Result := GetActiveProjectPath + 'Units' + PathDelim;
+  Result := GetActiveLazarusProjectPath + 'Units' + PathDelim;
 end;
 
 function TConnectionUtils.GetActiveProjectUnitsSpritesPath: string;
@@ -112,7 +115,7 @@ end;
 
 function TConnectionUtils.GetActiveProjectBinaryPath: string;
 begin
-  Result := GetActiveProjectPath + 'Binary' + PathDelim;
+  Result := GetActiveLazarusProjectPath + 'Binary' + PathDelim;
 end;
 
 function TConnectionUtils.GetActiveProjectBinaryDataPath: string;
@@ -126,7 +129,7 @@ begin
 end;
 
 //
-function TConnectionUtils.GetProjectUnitShortFilenames: TStringArray;
+function TConnectionUtils.GetListOfProjectUnits: TStringArray;
 var
   LazProject: TLazProject;
   i: Integer;
@@ -153,7 +156,7 @@ begin
             (PackageEditingInterface.FindPackageWithName('OGLCScenePackage') <> NIL) and
             // check directory structure
             DirectoryExistsUTF8(GetActiveProjectUnitsPath) and
-            DirectoryExistsUTF8(GetFolderGameHelperFiles) and
+            DirectoryExistsUTF8(GetPathGameHelperFiles) and
             DirectoryExistsUTF8(GetActiveProjectUnitsSpritesPath) and
             DirectoryExistsUTF8(GetActiveProjectUnitsLevelsPath) and
             DirectoryExistsUTF8(GetActiveProjectBinaryPath) and
@@ -165,7 +168,7 @@ begin
             UnitIsPartOfProject('Units'+PathDelim+'u_common.pas');
 end;
 
-function TConnectionUtils.UnitIsPartOfProject(aItem: TResponsItem): boolean;
+function TConnectionUtils.UnitIsPartOfProject(const aItem: TResponsItem): boolean;
 begin
   Result := IndexOfUnitInFilesProject(aItem) <> -1;
 end;
@@ -176,14 +179,14 @@ var A: TStringArray;
 begin
   Result := False;
 
-  A := GetProjectUnitShortFilenames;
+  A := GetListOfProjectUnits;
   if Length(A) = 0 then exit;
   for i:=0 to High(A) do
     if CompareFilenames(A[i], aShortFilename) = 0 then
       exit(True);
 end;
 
-function TConnectionUtils.IndexOfUnitInFilesProject(aItem: TResponsItem): integer;
+function TConnectionUtils.IndexOfUnitInFilesProject(const aItem: TResponsItem): integer;
 var LazProject: TLazProject;
   i: Integer;
   LazFile: TLazProjectFile;
@@ -202,11 +205,21 @@ begin
 
 end;
 
-procedure TConnectionUtils.DoAddUnitToProject(aItem: TResponsItem);
+procedure TConnectionUtils.DoCloseSourceEditor(const aItem: TResponsItem);
+var unitFilename: String;
+  Editor: TSourceEditorInterface;
+begin
+  unitFilename := GetActiveLazarusProjectPath + aItem.ExpandToShortFilename;
+  Editor := SourceEditorManagerIntf.SourceEditorIntfWithFilename(unitFilename);
+  if Editor <> NIL then
+    LazarusIDE.DoCloseEditorFile(Editor, [cfQuiet{, cfSaveFirst}]);
+end;
+
+procedure TConnectionUtils.DoAddUnitToProject(const aItem: TResponsItem);
 var unitFilename: string;
   Editor: TSourceEditorInterface;
 begin
-  unitFilename := GetActiveProjectPath + aItem.ExpandToShortFilename;
+  unitFilename := GetActiveLazarusProjectPath + aItem.ExpandToShortFilename;
 
   // open the unit in IDE editor
   if LazarusIDE.DoOpenEditorFile(unitFilename,-1,-1,[ofOnlyIfExists, ofAddToRecent, ofRevert, ofAddToProject]) <> mrOk then
@@ -222,6 +235,10 @@ begin
     ShowMessageInForm(Format(sUnitOpenedInSourceEditor, [aItem.ExpandToUnitNameWithoutExt]));
   end else
     ShowMessageInForm(Format('Enable to add unit %s to the Lazarus project', [aItem.ExpandToUnitNameWithoutExt]));
+
+  // save all files
+  LazarusIDE.DoSaveAll([]);
+  Application.ProcessMessages; // may be not necessary ?
 
 {  Editor := SourceEditorManagerIntf.SourceEditorIntfWithFilename(unitFilename);
   if Editor <> NIL then begin
@@ -251,37 +268,45 @@ begin
   end    }
 end;
 
-procedure TConnectionUtils.DoRemoveUnitFromProject(aItem: TResponsItem);
+procedure TConnectionUtils.DoRemoveUnitFromProject(const aItem: TResponsItem);
 var unitFilename: String;
-  unitIndexInProjectfiles: integer;
-  Editor: TSourceEditorInterface;
+  unitIndex: integer;
 begin
   if not UnitIsPartOfProject(aItem) then exit;
 
-  // remove unit from project
-  unitIndexInProjectfiles := IndexOfUnitInFilesProject(aItem);
-  if unitIndexInProjectfiles <> -1
-    then LazarusIDE.ActiveProject.RemoveUnit(unitIndexInProjectfiles, True)
-    else ShowMessageInForm(Format(sEnableToRemoveUnitxxxFromProject, [aItem.ExpandToUnitNameWithoutExt]));
-
   // close the source editor for the unit
-  unitFilename := GetActiveProjectPath + aItem.ExpandToShortFilename;
-  Editor:=SourceEditorManagerIntf.SourceEditorIntfWithFilename(unitFilename);
-  if Editor <> NIL then
-    LazarusIDE.DoCloseEditorFile(Editor, [cfSaveFirst]);
+  DoCloseSourceEditor(aItem);
 
-  ShowMessageInForm(Format(sUnitxxxDeletedAndRemovedFromProject, [aItem.ExpandToUnitNameWithoutExt]));
+  // remove unit from project
+  unitIndex := IndexOfUnitInFilesProject(aItem);
+  if unitIndex <> -1 then begin
+    // retrieve the full filename of the unit
+    unitFilename := LazarusIDE.ActiveProject.Files[unitIndex].GetFullFilename;
 
-  // don't delete file on disk from the IDE because an exception appears
-  // delete file on disk
-  //if FileExistsUTF8(unitFilename) then
-  //  DeleteFileUTF8(unitFilename);
+    // remove the unit -> <project>.lpr is modified
+    LazarusIDE.ActiveProject.RemoveUnit(unitIndex, True);
+
+    // save all files
+    LazarusIDE.DoSaveAll([]);
+    Application.ProcessMessages; // may be not necessary ?
+
+    // delete file on disk
+    if FileExistsUTF8(unitFilename) then
+      DeleteFileUTF8(unitFilename);
+
+    // show a message in the package window
+    ShowMessageInForm(Format(sUnitxxxDeletedAndRemovedFromProject, [aItem.ExpandToUnitNameWithoutExt]));
+  end else
+    ShowMessageInForm(Format(sEnableToRemoveUnitxxxFromProject, [aItem.ExpandToUnitNameWithoutExt]));
 end;
+
+
 
 function TConnectionUtils.DecodeMessageFromGameHelper(const aMess: string): boolean;
 var o: TResponsItem;
 begin
   Result := False;
+//  LazarusIDE.SaveSourceEditorChangesToCodeCache(NIL);
   try
     o.LoadFieldsFromString(aMess);
     case o.ResponsType of
@@ -290,8 +315,8 @@ begin
       rtRemoveUnitFromProject: DoRemoveUnitFromProject(o);
       rtTerminated: Result := True;
     end;
-    LazarusIDE.DoSaveAll([]);
-    Application.ProcessMessages;
+//    LazarusIDE.DoSaveAll([]);
+//    Application.ProcessMessages;
   except
   end;
 end;
@@ -299,12 +324,7 @@ end;
 procedure TConnectionUtils.DoProcessOGLCGameHelperMenuClick(Sender: TObject);
 var oglcPackage: TIDEPackage;
   oglcSourcePath, gamehelperBinaryFolder, gamehelperexecutable: string;
-  currentLazarusProjectFilename, currentOGLCProjectFilename: string;
-
-{  k: integer;
-  Buffer, messageLine: string;
-  ByteRead: byte;
-  flagQuit: boolean; }
+  currentLazarusProjectFilename, currentGameHelperProjectFilename: string;
 begin
   IDEMessagesWindow.Clear;
 
@@ -352,15 +372,15 @@ begin
   // retrieve the path of the current project opened in the IDE
   currentLazarusProjectFilename := ConnectionUtils.GetActiveLazarusProjectFilename;
 
-  // if there isn't a OGLC project, create an empty one
-  currentOGLCProjectFilename := ChangeFileExt(currentLazarusProjectFilename, '.oglc');
-  if not FileExistsUTF8(currentOGLCProjectFilename) then begin
-    Showmessage('Project OGLC not found, creating an empty one');
-    SaveAnEmptyOGLCProject(currentOGLCProjectFilename);
+  // if there isn't a Game Helper project, create an empty one
+  currentGameHelperProjectFilename := ChangeFileExt(currentLazarusProjectFilename, '.oglc');
+  if not FileExistsUTF8(currentGameHelperProjectFilename) then begin
+    Showmessage('Game Helper project not found, creating an empty one');
+    SaveAnEmptyGameHelperProjectTo(currentGameHelperProjectFilename);
   end;
 
   // make a copy of the oglc files in the backup directory
-  ConnectionUtils.BackupOGLCFiles;
+  ConnectionUtils.BackupGameHelperFiles;
 
   // open the modal window
   FormGameHelperConnexion := TFormGameHelperConnexion.Create(NIL);
@@ -375,7 +395,7 @@ begin
    end;
 end;
 
-procedure TConnectionUtils.SaveAnEmptyOGLCProject(const aFilename: string);
+procedure TConnectionUtils.SaveAnEmptyGameHelperProjectTo(const aFilename: string);
 var t: TStringList;
 begin
   t := TStringList.Create;
@@ -388,26 +408,35 @@ begin
   end;
 end;
 
-procedure TConnectionUtils.BackupOGLCFiles;
-var oglcProjectFilename, oglcPath, backupPath: string;
+procedure TConnectionUtils.BackupGameHelperFiles;
+var oglcProjectFilename, ghPath, backupPath: string;
   t: TStringList;
   i: integer;
 begin
   // backup the <project>.oglc
   oglcProjectFilename := ChangeFileExt(GetActiveLazarusProjectFilename, '.oglc');
-  backupPath := GetActiveProjectPath + 'backup' + PathDelim;
+  backupPath := GetActiveLazarusProjectPath + 'backup' + PathDelim;
   CopyFile(oglcProjectFilename, backupPath+ExtractFileName(oglcProjectFilename), [cffOverwriteFile]);
 
   // now backup all files found in sub-folder GameHelperFiles\
-  oglcPath := GetFolderGameHelperFiles;
-  backupPath := oglcPath + 'backup' + PathDelim;
+  ghPath := GetPathGameHelperFiles;
+  backupPath := ghPath + 'backup' + PathDelim;
+
   // if needed create the backup directory
   ForceDirectoriesUTF8(backupPath);
+
+  // because Game Helper can be extended, we do not copy files one by one, in hard coded way:
+  // instead we scan the directory to get its content (only files) and make a copy of them.
+
   // get only files
-  t := GetDirectoryContent(oglcPath, [], True, False);
+  t := GetDirectoryContent(ghPath, [], True, False);
   // copy them in backup directory
-  for i:=0 to t.Count-1 do
-    CopyFile(oglcPath+t.Strings[i], backupPath+t.Strings[i], [cffOverwriteFile]);
+  try
+    for i:=0 to t.Count-1 do
+      fileutil.CopyFile(ghPath + t.Strings[i], backupPath + t.Strings[i], [cffOverwriteFile]);
+  finally
+    t.Free;
+  end;
 end;
 
 procedure TConnectionUtils.ShowMessageInIDE(const aMess: string; aUrgency: TMessageLineUrgency);

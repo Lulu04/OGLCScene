@@ -235,6 +235,10 @@ begin
     msRotatingSelection: MouseState := msIdle;
 
     msMovePivotOnSelection: MouseState := msOverPivot;
+
+    msMouseDownOnScaleHandle: MouseState := msOverScaleHandle;
+    msMouseDownOnRotateHandle: MouseState := msOverRotateHandle;
+    msMouseDownOnPivot: MouseState := msOverPivot;
   end;//case
 end;
 

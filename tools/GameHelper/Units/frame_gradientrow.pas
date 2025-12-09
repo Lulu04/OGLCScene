@@ -6,8 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, ExtCtrls, Dialogs, Spin,
-  OGLCScene, BGRABitmap, BGRABitmapTypes,
-  Math;
+  StdCtrls, OGLCScene, BGRABitmap, BGRABitmapTypes, Math;
 
 const GRID_SIZE = 20;
       HALF_WIDTH_POINT = 5 ;
@@ -32,6 +31,7 @@ type
   TFrameGradientRow = class(TFrame)
     CD1: TColorDialog;
     FSE1: TFloatSpinEdit;
+    Label1: TLabel;
     Panel1: TPanel;
     PB: TPaintBox;
     procedure FSE1Change(Sender: TObject);
@@ -74,6 +74,7 @@ type
     function PercentYToPaintBoxY(aValue: single): single;
     function PaintBoxXToPercentX(aValue: single): single;
     function PaintBoxYToPercentY(aValue: single): single;
+    procedure SetIndex(AValue: integer);
     procedure SetPreviousCurrentNextPts(aIndex: integer);
     procedure ClearPreviousCurrentNext;
     procedure SetSelected(AValue: boolean);
@@ -97,7 +98,7 @@ type
    property OnAddNode: TOnAddNode read FOnAddNode write FOnAddNode;
    property OnDeleteNode: TOnDeleteNode read FOnDeleteNode write FOnDeleteNode;
 
-   property Index: integer read FIndex write FIndex;
+   property Index: integer read FIndex write SetIndex;
    property Selected: boolean read FSelected write SetSelected;
    property YPosition: single read GetYPosition;
    property Nodes: PArrayOfGradientItem read FNodes write FNodes;
@@ -105,7 +106,7 @@ type
 
 implementation
 
-uses u_app_pref, form_editgradient, u_common;
+uses u_app_pref, form_editgradient, u_common, Graphics;
 
 { TFrameGradientRow }
 
@@ -289,6 +290,8 @@ procedure TFrameGradientRow.SetSelected(AValue: boolean);
 begin
   if FSelected = AValue then Exit;
   FSelected := AValue;
+  if AValue then Panel1.Color := clHighlight
+    else Panel1.Color := $00595959;
   PB.Invalidate;
 end;
 
@@ -340,8 +343,8 @@ begin
               then FImage.SetSize(PB.Width, PB.Height);
   with FImage do begin
    // background
-   if Selected then Fill(BGRA(0,128,255))
-     else Fill(BGRA(50,20,20));
+   {if Selected then Fill(BGRA(0,128,255))
+     else} Fill(BGRA(50,20,20));
 
    yy := Height*0.5;
    // horizontal axis
@@ -503,6 +506,12 @@ end;
 function TFrameGradientRow.PaintBoxYToPercentY(aValue: single): single;
 begin
   Result := (PB.Height-aValue)/PB.Height;
+end;
+
+procedure TFrameGradientRow.SetIndex(AValue: integer);
+begin
+  FIndex:=AValue;
+  Label1.Caption := FIndex.ToString;
 end;
 
 procedure TFrameGradientRow.Clear;

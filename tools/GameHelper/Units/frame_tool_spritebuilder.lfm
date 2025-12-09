@@ -1095,7 +1095,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 136
           Top = 352
           Width = 290
-          PageIndex = 0
+          PageIndex = 6
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 7
           object PageExtraEmpty: TPage
@@ -1736,6 +1736,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
                 Value = 100
               end
               object BEditGradient: TSpeedButton
+                Cursor = crHandPoint
                 Left = 80
                 Height = 31
                 Top = 53

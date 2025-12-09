@@ -24,6 +24,7 @@ private
   function GetCount: integer;
   function GetName(index: integer): string;
   function GetUserCount: integer;
+  function GetUserLayersToStringArray: TStringArray;
   procedure SetName(index: integer; AValue: string);
   function FormatName(const aName: string): string;
   procedure UpdateSceneLayerCount;
@@ -37,6 +38,7 @@ public
   procedure InitWith(A: TStringArray);
   procedure Add(aName: string);
   procedure Delete(aLayerUserIndex: integer);
+  procedure Exchange(aLayerUser1, aLayerUser2: integer);
 
   function UserIndexCanBeDecremented(aLayerUserIndex: integer): boolean;
   function UserIndexCanBeIncremented(aLayerUserIndex: integer): boolean;
@@ -44,6 +46,7 @@ public
   function UserLayerIsVisible(aLayerUserIndex: integer): boolean;
   procedure SetUserLayerVisible(aLayerUserIndex: integer; aValue: boolean);
 
+  function UserLayerNameExists(const aName: string): boolean;
 
   function SaveToString: string;
   procedure LoadFromString(const s: string);
@@ -57,6 +60,8 @@ public
   property UserCount: integer read GetUserCount;
   // return the number of layer (app + user)
   property Count: integer read GetCount;
+  // retyurn an array of strin with the user layer names
+  property UserLayersToStringArray: TStringArray read GetUserLayersToStringArray;
 end;
 
 var
@@ -95,6 +100,17 @@ end;
 function TLayerList.GetUserCount: integer;
 begin
   Result := Length(FNames) - APP_LAYER_COUNT;
+end;
+
+function TLayerList.GetUserLayersToStringArray: TStringArray;
+var i: integer;
+begin
+  Result := NIL;
+  if GetUserCount = 0 then exit;
+  SetLength(Result, GetUserCount);
+
+  for i:=0 to High(Result) do
+    Result[i] := Names[i];
 end;
 
 procedure TLayerList.SetName(index: integer; AValue: string);
@@ -176,17 +192,31 @@ procedure TLayerList.Delete(aLayerUserIndex: integer);
 var i, j: integer;
 begin
   aLayerUserIndex := aLayerUserIndex + APP_LAYER_COUNT;
-  // we don't erase the reserved layer
-  if aLayerUserIndex < APP_LAYER_COUNT then exit;
 
-  // shift the surfaces on their previous layer
+  // shift the surfaces on their previous layer  <- necessary ?
   FScene.Layer[aLayerUserIndex].Clear;
   for i:=aLayerUserIndex+1 to High(FNames) do
     for j:=0 to FScene.Layer[i].SurfaceCount-1 do
       FScene.Layer[i].Surface[j].MoveToLayer(i-1);
 
-  SetLength(FNames, Length(FNames)-1);
+  // delete the name in the array
+  system.Delete(FNames, aLayerUserIndex, 1);
+
   UpdateSceneLayerCount;
+end;
+
+procedure TLayerList.Exchange(aLayerUser1, aLayerUser2: integer);
+var temp: string;
+begin
+  aLayerUser1 := aLayerUser1 + APP_LAYER_COUNT;
+  aLayerUser2 := aLayerUser2 + APP_LAYER_COUNT;
+  // we don't modify the reserved layers
+  if aLayerUser1 < APP_LAYER_COUNT then exit;
+  if aLayerUser2 < APP_LAYER_COUNT then exit;
+
+  temp := FNames[aLayerUser1];
+  FNames[aLayerUser1] := FNames[aLayerUser2];
+  FNames[aLayerUser2] := temp;
 end;
 
 function TLayerList.UserIndexCanBeDecremented(aLayerUserIndex: integer): boolean;
@@ -207,6 +237,14 @@ end;
 procedure TLayerList.SetUserLayerVisible(aLayerUserIndex: integer; aValue: boolean);
 begin
   FScene.Layer[aLayerUserIndex+APP_LAYER_COUNT].Visible := aValue;
+end;
+
+function TLayerList.UserLayerNameExists(const aName: string): boolean;
+var i: integer;
+begin
+  for i:= APP_LAYER_COUNT to High(FNames) do
+    if FNames[i] = aName then exit(True);
+  Result := False;
 end;
 
 function TLayerList.SaveToString: string;

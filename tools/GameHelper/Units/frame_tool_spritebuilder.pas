@@ -356,13 +356,13 @@ var o: PSpriteBankItem;
 begin
   nam := Trim(Edit2.Text);
   if nam = '' then exit;
-  if not IsValidPascalVariableName(nam) then exit;
+  if not IsValidPascalVariableName(nam, True) then exit;
   if Surfaces.Size = 0 then exit;
   if not Surfaces.RootIsDefined then exit;
 
   o := SpriteBank.GetItemByName(nam);
   if o <> NIL then
-    if QuestionDlg('','a sprite named "'+nam+'" already exists in the bank.'+LineEnding+
+    if QuestionDlg('','a sprite named '''+nam+''' already exists in the bank.'+LineEnding+
                 'Would you like to replace it ?',
                 mtWarning, [mrOk, 'Replace', mrCancel, 'Cancel'],0) = mrCancel then exit;
 
@@ -389,7 +389,7 @@ begin
   o^.ExportSpriteToPascalUnit;
 
   // add the created unit to the target Lazarus project
-  Project.Config.TargetLazarusProject.Unit_AddToProject(o^.GetUnitName, ulSprites, uePas);
+  Project.Config.TargetLazarusProject.Unit_AddToProject(o^.name, ulSprites, uePas);
 
   DoClearAll;
   FormMain.ShowPageSpriteBank;
@@ -1507,6 +1507,8 @@ end;
 procedure TFrameToolsSpriteBuilder.EditSpriteInSpriteBank(const aName: string);
 var o: PSpriteBankItem;
 begin
+  FScene.LogInfo('Start editing sprite '+aName);
+
   o := SpriteBank.GetItemByName(aName);
   if o = NIL then exit;
 

@@ -1,0 +1,884 @@
+object FrameViewFontBank: TFrameViewFontBank
+  Left = 0
+  Height = 668
+  Top = 0
+  Width = 325
+  ClientHeight = 668
+  ClientWidth = 325
+  TabOrder = 0
+  DesignLeft = 941
+  DesignTop = 9
+  object TV: TTreeView
+    AnchorSideTop.Control = Panel8
+    AnchorSideTop.Side = asrBottom
+    AnchorSideBottom.Control = Splitter1
+    Left = 0
+    Height = 184
+    Top = 32
+    Width = 325
+    Anchors = [akTop, akLeft, akBottom]
+    BackgroundColor = 3947580
+    BorderStyle = bsNone
+    Color = 3947580
+    Font.Height = 16
+    Images = DataModule1.ILLevelTreeView
+    ParentFont = False
+    ReadOnly = True
+    RightClickSelect = True
+    ScrollBars = ssAutoVertical
+    TabOrder = 0
+    OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
+    OnMouseDown = TVMouseDown
+    OnMouseWheel = TVMouseWheel
+    OnResize = TVResize
+    OnSelectionChanged = TVSelectionChanged
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Splitter1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 447
+    Top = 221
+    Width = 325
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 447
+    ClientWidth = 325
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object Label4: TLabel
+      AnchorSideLeft.Control = Panel1
+      Left = 8
+      Height = 15
+      Top = 40
+      Width = 66
+      BorderSpacing.Left = 7
+      Caption = 'Font Height:'
+      ParentColor = False
+    end
+    object SE1: TSpinEdit
+      AnchorSideLeft.Control = Label4
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label4
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Label4
+      AnchorSideBottom.Side = asrBottom
+      Left = 79
+      Height = 23
+      Top = 32
+      Width = 55
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Font.Style = [fsBold]
+      MaxValue = 150
+      MinValue = 8
+      OnChange = SE1Change
+      ParentFont = False
+      TabOrder = 0
+      Value = 10
+    end
+    object CheckGroup1: TCheckGroup
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label4
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 74
+      Top = 62
+      Width = 168
+      AutoFill = True
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 7
+      Caption = 'Font style'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.TopBottomSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 2
+      ClientHeight = 54
+      ClientWidth = 164
+      Columns = 2
+      Items.Strings = (
+        'Bold'
+        'Italic'
+        'Underline'
+        'Strike Out'
+      )
+      OnItemClick = CheckGroup1ItemClick
+      ParentBackground = False
+      TabOrder = 1
+      Data = {
+        0400000002020202
+      }
+    end
+    object RBSingleColor: TRadioButton
+      AnchorSideLeft.Control = Label5
+      AnchorSideTop.Control = Label5
+      AnchorSideTop.Side = asrBottom
+      Left = 18
+      Height = 19
+      Top = 158
+      Width = 80
+      BorderSpacing.Left = 10
+      Caption = 'Single color'
+      Checked = True
+      TabOrder = 3
+      TabStop = True
+      OnChange = SE1Change
+    end
+    object RBGradient: TRadioButton
+      AnchorSideLeft.Control = RBSingleColor
+      AnchorSideTop.Control = RBSingleColor
+      AnchorSideTop.Side = asrBottom
+      Left = 18
+      Height = 19
+      Top = 182
+      Width = 63
+      BorderSpacing.Top = 5
+      Caption = 'Gradient'
+      TabOrder = 2
+    end
+    object Label5: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = CheckGroup1
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 15
+      Top = 143
+      Width = 54
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 7
+      Caption = 'Font color'
+      ParentColor = False
+    end
+    object ColorButton1: TColorButton
+      AnchorSideLeft.Control = RBSingleColor
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = RBSingleColor
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 108
+      Height = 20
+      Top = 157
+      Width = 64
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 3
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = clBlack
+      OnColorChanged = SE1Change
+    end
+    object ColorButton2: TColorButton
+      AnchorSideLeft.Control = ColorButton1
+      AnchorSideBottom.Control = RBGradient
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 109
+      Height = 20
+      Top = 181
+      Width = 64
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 1
+      BorderWidth = 2
+      ButtonColorSize = 16
+      ButtonColor = clYellow
+      Enabled = False
+      OnColorChanged = SE1Change
+    end
+    object CBOutline: TCheckBox
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = CBGradientType
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 19
+      Top = 234
+      Width = 57
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 7
+      Caption = 'Outline'
+      Checked = True
+      State = cbChecked
+      TabOrder = 4
+      OnChange = SE1Change
+    end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = CBOutline
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 8
+      Height = 45
+      Top = 253
+      Width = 309
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 7
+      BorderSpacing.Right = 7
+      ClientHeight = 45
+      ClientWidth = 309
+      ParentBackground = False
+      TabOrder = 5
+      object ColorButton3: TColorButton
+        AnchorSideLeft.Control = Label7
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel2
+        AnchorSideTop.Side = asrCenter
+        Cursor = crHandPoint
+        Left = 131
+        Height = 20
+        Top = 12
+        Width = 64
+        BorderSpacing.Left = 2
+        BorderWidth = 2
+        ButtonColorSize = 16
+        ButtonColor = clBlack
+        OnColorChanged = SE1Change
+      end
+      object Label6: TLabel
+        AnchorSideTop.Control = Panel2
+        AnchorSideTop.Side = asrCenter
+        Left = 10
+        Height = 15
+        Top = 15
+        Width = 32
+        Caption = 'Width'
+        ParentColor = False
+      end
+      object Label7: TLabel
+        AnchorSideLeft.Control = FSE1
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel2
+        AnchorSideTop.Side = asrCenter
+        Left = 100
+        Height = 15
+        Top = 15
+        Width = 29
+        BorderSpacing.Left = 10
+        Caption = 'Color'
+        ParentColor = False
+      end
+      object FSE1: TFloatSpinEdit
+        AnchorSideLeft.Control = Label6
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Panel2
+        AnchorSideTop.Side = asrCenter
+        Left = 44
+        Height = 23
+        Top = 11
+        Width = 46
+        BorderSpacing.Left = 2
+        DecimalPlaces = 1
+        Font.Style = [fsBold]
+        Increment = 0.5
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 0
+        Value = 1.5
+      end
+      object Label2: TLabel
+        AnchorSideLeft.Control = ColorButton3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Label7
+        Left = 202
+        Height = 15
+        Top = 15
+        Width = 31
+        BorderSpacing.Left = 7
+        Caption = 'Alpha'
+        ParentColor = False
+      end
+      object SE7: TSpinEdit
+        AnchorSideLeft.Control = Label2
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label2
+        AnchorSideBottom.Side = asrBottom
+        Left = 236
+        Height = 23
+        Top = 7
+        Width = 47
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 3
+        Font.Style = [fsBold]
+        Increment = 5
+        MaxValue = 255
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 1
+        Value = 255
+      end
+    end
+    object CBShadow: TCheckBox
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel2
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 19
+      Top = 305
+      Width = 60
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 7
+      Caption = 'Shadow'
+      Checked = True
+      State = cbChecked
+      TabOrder = 6
+      OnChange = SE1Change
+    end
+    object Panel3: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = CBShadow
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 8
+      Height = 66
+      Top = 324
+      Width = 309
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 7
+      BorderSpacing.Right = 7
+      ClientHeight = 66
+      ClientWidth = 309
+      ParentBackground = False
+      TabOrder = 7
+      object ColorButton4: TColorButton
+        AnchorSideLeft.Control = Label9
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Side = asrCenter
+        AnchorSideBottom.Control = Label9
+        AnchorSideBottom.Side = asrBottom
+        Cursor = crHandPoint
+        Left = 151
+        Height = 20
+        Top = 38
+        Width = 64
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 2
+        BorderWidth = 2
+        ButtonColorSize = 16
+        ButtonColor = clBlack
+        OnColorChanged = SE1Change
+      end
+      object Label8: TLabel
+        AnchorSideTop.Side = asrCenter
+        Left = 16
+        Height = 15
+        Top = 16
+        Width = 45
+        Caption = 'Offset X:'
+        ParentColor = False
+      end
+      object Label9: TLabel
+        Left = 120
+        Height = 15
+        Top = 43
+        Width = 29
+        Anchors = [akLeft]
+        Caption = 'Color'
+        ParentColor = False
+      end
+      object SE2: TSpinEdit
+        AnchorSideLeft.Control = Label8
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label8
+        AnchorSideBottom.Side = asrBottom
+        Left = 64
+        Height = 23
+        Top = 8
+        Width = 40
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 3
+        Font.Style = [fsBold]
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 0
+        Value = 3
+      end
+      object Label10: TLabel
+        AnchorSideTop.Side = asrCenter
+        Left = 112
+        Height = 15
+        Top = 16
+        Width = 45
+        Caption = 'Offset Y:'
+        ParentColor = False
+      end
+      object SE3: TSpinEdit
+        AnchorSideLeft.Control = Label10
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label10
+        AnchorSideBottom.Side = asrBottom
+        Left = 160
+        Height = 23
+        Top = 8
+        Width = 38
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 3
+        Font.Style = [fsBold]
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 1
+        Value = 3
+      end
+      object Label11: TLabel
+        AnchorSideTop.Side = asrCenter
+        Left = 26
+        Height = 15
+        Top = 43
+        Width = 35
+        Caption = 'Radius'
+        ParentColor = False
+      end
+      object SE4: TSpinEdit
+        AnchorSideLeft.Control = Label11
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label11
+        AnchorSideBottom.Side = asrBottom
+        Left = 64
+        Height = 23
+        Top = 35
+        Width = 40
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 3
+        Font.Style = [fsBold]
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 2
+        Value = 3
+      end
+      object Label3: TLabel
+        AnchorSideLeft.Control = ColorButton4
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = Label9
+        Left = 222
+        Height = 15
+        Top = 43
+        Width = 31
+        BorderSpacing.Left = 7
+        Caption = 'Alpha'
+        ParentColor = False
+      end
+      object SE8: TSpinEdit
+        AnchorSideLeft.Control = Label3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label3
+        AnchorSideBottom.Side = asrBottom
+        Left = 256
+        Height = 23
+        Top = 35
+        Width = 47
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 3
+        Font.Style = [fsBold]
+        Increment = 5
+        MaxValue = 255
+        OnChange = SE1Change
+        ParentFont = False
+        TabOrder = 3
+        Value = 255
+      end
+    end
+    object CBGradientType: TComboBox
+      AnchorSideLeft.Control = RBGradient
+      AnchorSideTop.Control = ColorButton2
+      AnchorSideTop.Side = asrBottom
+      Left = 18
+      Height = 23
+      Top = 204
+      Width = 75
+      BorderSpacing.Top = 3
+      Enabled = False
+      ItemHeight = 15
+      ItemIndex = 0
+      Items.Strings = (
+        'Linear'
+        'Reflected'
+        'Diamond'
+        'Radial'
+        'Angular'
+      )
+      Style = csDropDownList
+      TabOrder = 8
+      Text = 'Linear'
+      OnSelect = SE1Change
+    end
+    object CheckBox1: TCheckBox
+      AnchorSideLeft.Control = CBGradientType
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = CBGradientType
+      AnchorSideBottom.Side = asrBottom
+      Left = 103
+      Height = 19
+      Top = 208
+      Width = 117
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 10
+      Caption = 'Gamma correction'
+      Enabled = False
+      TabOrder = 9
+      OnChange = SE1Change
+    end
+    object CheckBox2: TCheckBox
+      AnchorSideLeft.Control = CheckBox1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = CheckBox1
+      Left = 230
+      Height = 19
+      Top = 208
+      Width = 46
+      BorderSpacing.Left = 10
+      Caption = 'Sinus'
+      Enabled = False
+      TabOrder = 10
+      OnChange = SE1Change
+    end
+    object LBFont: TListBox
+      AnchorSideLeft.Control = CheckGroup1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 176
+      Height = 146
+      Top = 1
+      Width = 148
+      Anchors = [akTop, akLeft, akRight]
+      Color = 3947580
+      ItemHeight = 15
+      Style = lbOwnerDrawFixed
+      TabOrder = 11
+      OnDrawItem = LBFontDrawItem
+      OnSelectionChange = LBFontSelectionChange
+    end
+    object Label1: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel3
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 15
+      Top = 415
+      Width = 60
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 25
+      Caption = 'Font name:'
+      ParentColor = False
+    end
+    object Edit1: TEdit
+      AnchorSideLeft.Control = Label1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label1
+      AnchorSideBottom.Side = asrBottom
+      Left = 73
+      Height = 23
+      Top = 407
+      Width = 148
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      TabOrder = 12
+    end
+    object BSave: TSpeedButton
+      AnchorSideLeft.Control = Edit1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Edit1
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 233
+      Height = 30
+      Top = 403
+      Width = 66
+      BorderSpacing.Left = 12
+      Caption = 'Save'
+      Images = DataModule1.ILIconUI
+      ImageIndex = 4
+      OnClick = BSaveClick
+    end
+    object Label12: TLabel
+      AnchorSideLeft.Control = ColorButton1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = RBSingleColor
+      AnchorSideBottom.Side = asrBottom
+      Left = 182
+      Height = 15
+      Top = 162
+      Width = 31
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 10
+      Caption = 'Alpha'
+      ParentColor = False
+    end
+    object SE5: TSpinEdit
+      AnchorSideLeft.Control = Label12
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label12
+      AnchorSideBottom.Side = asrBottom
+      Left = 216
+      Height = 23
+      Top = 154
+      Width = 47
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 3
+      Font.Style = [fsBold]
+      Increment = 5
+      MaxValue = 255
+      OnChange = SE1Change
+      ParentFont = False
+      TabOrder = 13
+      Value = 255
+    end
+    object Label13: TLabel
+      AnchorSideLeft.Control = ColorButton1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = ColorButton2
+      AnchorSideBottom.Side = asrBottom
+      Left = 182
+      Height = 15
+      Top = 186
+      Width = 31
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 10
+      Caption = 'Alpha'
+      ParentColor = False
+    end
+    object SE6: TSpinEdit
+      AnchorSideLeft.Control = Label13
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label13
+      AnchorSideBottom.Side = asrBottom
+      Left = 216
+      Height = 23
+      Top = 178
+      Width = 47
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 3
+      Font.Style = [fsBold]
+      Increment = 5
+      MaxValue = 255
+      OnChange = SE1Change
+      ParentFont = False
+      TabOrder = 14
+      Value = 255
+    end
+    object Label14: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel1
+      Left = 8
+      Height = 15
+      Top = 8
+      Width = 27
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 7
+      Caption = 'Font:'
+      ParentColor = False
+    end
+    object Label15: TLabel
+      AnchorSideLeft.Control = Label14
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Label14
+      Left = 42
+      Height = 15
+      Top = 8
+      Width = 25
+      BorderSpacing.Left = 7
+      Caption = 'Arial'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object BSwapGradientColors: TSpeedButton
+      AnchorSideLeft.Control = SE5
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = SE5
+      Cursor = crHandPoint
+      Left = 273
+      Height = 28
+      Hint = 'Swap gradient colors'
+      Top = 166
+      Width = 28
+      AutoSize = True
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 12
+      Images = DataModule1.ILIconUI
+      ImageIndex = 6
+      OnClick = BSwapGradientColorsClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BSwapOutlineAndShadowColors: TSpeedButton
+      AnchorSideLeft.Control = Panel1
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = SE5
+      AnchorSideBottom.Control = CBShadow
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 148
+      Height = 28
+      Hint = 'Swap outline and shadow colors'
+      Top = 296
+      Width = 28
+      Anchors = [akLeft, akBottom]
+      AutoSize = True
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 12
+      Images = DataModule1.ILIconUI
+      ImageIndex = 6
+      OnClick = BSwapOutlineAndShadowColorsClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object Panel8: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 32
+    Top = 0
+    Width = 325
+    Anchors = [akTop, akLeft, akRight]
+    ClientHeight = 32
+    ClientWidth = 325
+    Color = 1973790
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 2
+    object Label24: TLabel
+      AnchorSideLeft.Control = Panel8
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      Left = 109
+      Height = 15
+      Top = 9
+      Width = 106
+      Caption = 'FONT DESCRIPTOR'
+      Font.Color = 1424112
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object BCancel: TSpeedButton
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = Panel8
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 300
+      Height = 24
+      Hint = 'Return to the main window'
+      Top = 4
+      Width = 24
+      Anchors = [akTop, akRight]
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 13
+      OnClick = BCancelClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object Splitter1: TSplitter
+    AnchorSideLeft.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Cursor = crVSplit
+    Left = 0
+    Height = 5
+    Top = 216
+    Width = 325
+    Align = alNone
+    Anchors = [akTop, akLeft, akRight]
+    ResizeAnchor = akTop
+  end
+  object PanelFont: TPanel
+    Left = 232
+    Height = 18
+    Top = 80
+    Width = 72
+    BevelOuter = bvNone
+    ClientHeight = 18
+    ClientWidth = 72
+    Color = 3947580
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 4
+    Visible = False
+    object BRename: TSpeedButton
+      AnchorSideLeft.Control = PanelFont
+      AnchorSideTop.Control = PanelFont
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Rename the level'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 4
+      OnClick = BRenameClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BDuplicate: TSpeedButton
+      AnchorSideLeft.Control = BRename
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelFont
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 20
+      Height = 16
+      Hint = 'Duplicate this level'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 5
+      OnClick = BRenameClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BDelete: TSpeedButton
+      AnchorSideLeft.Control = BDuplicate
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelFont
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = PanelFont
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 56
+      Height = 16
+      Hint = 'Delete this level'
+      Top = 1
+      Width = 16
+      Anchors = [akTop, akRight]
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 3
+      OnClick = BRenameClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object FD1: TFontDialog
+    MinFontSize = 8
+    MaxFontSize = 150
+    Options = [fdEffects, fdWysiwyg, fdLimitSize]
+    PreviewText = 'The dog is sleeping'
+    Left = 240
+    Top = 128
+  end
+end

@@ -1,0 +1,205 @@
+object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
+  Left = 0
+  Height = 593
+  Top = 0
+  Width = 320
+  ClientHeight = 593
+  ClientWidth = 320
+  TabOrder = 0
+  DesignLeft = 910
+  DesignTop = 67
+  object Panel8: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 32
+    Top = 0
+    Width = 320
+    Anchors = [akTop, akLeft, akRight]
+    ClientHeight = 32
+    ClientWidth = 320
+    Color = 1973790
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object Label24: TLabel
+      AnchorSideLeft.Control = Panel8
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      Left = 119
+      Height = 15
+      Top = 9
+      Width = 82
+      Caption = 'UI Panel Editor'
+      Font.Color = 1424112
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object BCancel: TSpeedButton
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = Panel8
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 295
+      Height = 24
+      Hint = 'Return to the main window'
+      Top = 4
+      Width = 24
+      Anchors = [akTop, akRight]
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 13
+      OnClick = BCancelClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel8
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 561
+    Top = 32
+    Width = 320
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 561
+    ClientWidth = 320
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object Label1: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Side = asrBottom
+      Left = 7
+      Height = 15
+      Top = 415
+      Width = 65
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 25
+      Caption = 'Panel name:'
+      ParentColor = False
+    end
+    object Edit1: TEdit
+      AnchorSideLeft.Control = Label1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideBottom.Control = Label1
+      AnchorSideBottom.Side = asrBottom
+      Left = 77
+      Height = 23
+      Top = 407
+      Width = 148
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      TabOrder = 0
+    end
+    object BSave: TSpeedButton
+      AnchorSideLeft.Control = Edit1
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Edit1
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 237
+      Height = 30
+      Top = 403
+      Width = 66
+      BorderSpacing.Left = 12
+      Caption = 'Save'
+      Images = DataModule1.ILIconUI
+      ImageIndex = 4
+    end
+    object Label50: TLabel
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 283
+      Height = 15
+      Top = 0
+      Width = 34
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 3
+      Caption = 'Shape'
+      Font.Color = clWhite
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object RadioGroup1: TRadioGroup
+      AnchorSideLeft.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 7
+      Height = 45
+      Top = 16
+      Width = 306
+      Anchors = [akTop, akLeft, akRight]
+      AutoFill = True
+      BorderSpacing.Left = 7
+      BorderSpacing.Right = 7
+      Caption = 'Shape'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 3
+      ClientHeight = 25
+      ClientWidth = 302
+      Columns = 3
+      ItemIndex = 0
+      Items.Strings = (
+        'Rectangle'
+        'Round Rect'
+        'Ellipse'
+      )
+      ParentBackground = False
+      TabOrder = 1
+    end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label51
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 5
+      Height = 180
+      Top = 83
+      Width = 310
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 5
+      ParentBackground = False
+      TabOrder = 2
+    end
+    object Label51: TLabel
+      AnchorSideTop.Control = RadioGroup1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 237
+      Height = 15
+      Top = 68
+      Width = 80
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 7
+      BorderSpacing.Right = 3
+      Caption = 'Border and Fill'
+      Font.Color = clWhite
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+  end
+end

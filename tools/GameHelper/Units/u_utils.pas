@@ -44,8 +44,8 @@ procedure ReplaceStringInFile(const aTextFilename, aStringToReplace, aNewString:
 // utils to export pascal unit
   function IsALetter(const c: char; aAcceptUnderscore: boolean): boolean;
   function IsANumber(const c: char): boolean;
-  function IsValidLazarusProjectName(const s: string): boolean;
-  function IsValidPascalVariableName(const s: string): boolean;
+  function IsValidLazarusProjectName(const s: string; aShowMessageBoxIfFail: boolean): boolean;
+  function IsValidPascalVariableName(const s: string; aShowMessageBoxIfFail: boolean): boolean;
   function IsValidFilename(const s: string): boolean;
   // ex: from 'Units\Sprites\u_sprite_car.pas'
   // return 'Units'+PathDelim+'Sprites'+PathDelim+'u_sprite_car.pas'
@@ -60,12 +60,19 @@ type
 { TCodeGenerator }
 
 TCodeGenerator = record
+  function BooleanToPascal(const aValue: boolean): string;
   function PointFToPascal(const aX, aY: single): string; overload;
   function PointFToPascal(const aPt: TPointF): string; overload;
   function BGRAToPascal(aColor: TBGRAPixel): string;
+  function BGRAGradientTypeToPascal(aGradientType: TGradientType): string;
+  function FontStyleToPascal(aFontStyle: TFontStyles): string;
 
-  function CommonPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
-  function ExtraPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+  procedure CommonPropertiesToPascalCode(t: TStringList;
+                                        aSurface: PSurfaceDescriptor;
+                                        const aSpacePrefix: string);
+  procedure ExtraPropertiesToPascalCode(t: TStringList;
+                                       aSurface: PSurfaceDescriptor;
+                                       const aSpacePrefix: string);
 
   function Generate_AngleChangeTo(aAngle: single; const aSurfaceName: string): string;
   function Generate_ScaleChangeTo(aScaleX, aScaleY: single; const aSurfaceName: string): string;
@@ -103,8 +110,7 @@ procedure SaveEmptyOGLCProject(const aFilename: string);
 
 implementation
 
-uses u_common, u_levelbank, Math,
-  BGRASVG;
+uses u_common, u_levelbank, Math, Dialogs, BGRASVG;
 
 function GetImageSize(const aFilename: string): TSize;
 var ima: TBGRABitmap;
@@ -189,12 +195,16 @@ begin
   Result := c in ['0'..'9'];
 end;
 
-function IsValidLazarusProjectName(const s: string): boolean;
+function IsValidLazarusProjectName(const s: string; aShowMessageBoxIfFail: boolean): boolean;
 begin
-  Result := IsValidPascalVariableName(s);
+  Result := IsValidPascalVariableName(s, False);
+
+  if aShowMessageBoxIfFail and not Result then
+    ShowMessage(''''+s+''' is not a valid file name.'+LineEnding+
+                'Please use only characters a..z  A..Z  0..9 and underscore');
 end;
 
-function IsValidPascalVariableName(const s: string): boolean;
+function IsValidPascalVariableName(const s: string; aShowMessageBoxIfFail: boolean): boolean;
 var i: integer;
 begin
   Result := False;
@@ -202,6 +212,10 @@ begin
   Result := IsALetter(s[1], False);
   for i:=2 to Length(s) do
    Result := Result or IsALetter(s[i], True) or IsANumber(s[i]);
+
+  if aShowMessageBoxIfFail and not Result then
+    ShowMessage(''''+s+''' is not a valid Pascal identifier.'+LineEnding+
+                'Please use only characters a..z  A..Z  0..9 and underscore');
 end;
 
 function IsValidFilename(const s: string): boolean;
@@ -241,6 +255,11 @@ begin
     if Result[i] in CHARS_NOT_ALLOWED then Result[i] := '_';
 end;
 
+function TCodeGenerator.BooleanToPascal(const aValue: boolean): string;
+begin
+  if aValue then Result := 'True' else Result := 'False';
+end;
+
 function TCodeGenerator.PointFToPascal(const aX, aY: single): string;
 begin
   Result := 'PointF('+FormatFloatWithDot('0.00', aX)+', '+FormatFloatWithDot('0.00', aY)+')';
@@ -258,64 +277,88 @@ begin
   Result := Result + ')';
 end;
 
-function TCodeGenerator.CommonPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+function TCodeGenerator.BGRAGradientTypeToPascal(aGradientType: TGradientType): string;
 begin
-  Result := '';
-  if (aSurface^.pivotX <> 0.5) or (aSurface^.pivotY <> 0.5) then
-    Result := Result+aSpacePrefix+'Pivot := '+PointFToPascal(aSurface^.pivotX, aSurface^.pivotY)+';';
-  if aSurface^.angle <> 0.0 then
-    Result := Result+aSpacePrefix+'Angle.Value := '+FormatFloatWithDot('0.00', aSurface^.angle)+';';
-  if (aSurface^.scaleX <> 1.0) or (aSurface^.scaleY <> 1.0) then
-    Result := Result+aSpacePrefix+'Scale.Value := '+PointFToPascal(aSurface^.scaleX, aSurface^.scaleY)+';';
-  if aSurface^.flipH then
-    Result := Result+aSpacePrefix+'FlipH := True;';
-  if aSurface^.flipV then
-    Result := Result+aSpacePrefix+'FlipV := True;';
-  if aSurface^.opacity <> 255 then
-    Result := Result+aSpacePrefix+'Opacity.Value := '+ Round(aSurface^.opacity).ToString+';';
-  if aSurface^.tint <> BGRA(0,0,0,0) then
-    Result := Result+aSpacePrefix+'Tint.Value := '+BGRAToPascal(aSurface^.tint)+';';
-  if aSurface^.tintMode <> tmReplaceColor then
-    Result := Result+aSpacePrefix+'TintMode := tmMixColor;';
-  if aSurface^.IsTextured and (aSurface^.frameindex <> 1.0) then
-    Result := Result+aSpacePrefix+'Frame := '+FormatFloatWithDot('0.0', aSurface^.frameindex)+';';
+  WriteStr(Result, aGradientType);
 end;
 
-function TCodeGenerator.ExtraPropertiesToPascalCode(aSurface: PSurfaceDescriptor; const aSpacePrefix: string): string;
+function TCodeGenerator.FontStyleToPascal(aFontStyle: TFontStyles): string;
+var count: integer;
+  procedure Add(const s: string);
+  begin
+    if count = 0 then Result := Result+s
+      else Result := Result + ', '+s;
+    inc(count);
+  end;
+begin
+  count := 0;
+  Result := '[';
+  if fsBold in aFontStyle then Add('fsBold');
+  if fsItalic in aFontStyle then Add('fsItalic');
+  if fsUnderline in aFontStyle then Add('fsUnderline');
+  if fsStrikeOut in aFontStyle then Add('fsStrikeOut');
+  Result := Result + ']';
+end;
+
+procedure TCodeGenerator.CommonPropertiesToPascalCode(t: TStringList;
+  aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
+begin
+  if (aSurface^.pivotX <> 0.5) or (aSurface^.pivotY <> 0.5) then
+    t.Add(aSpacePrefix+'Pivot := '+PointFToPascal(aSurface^.pivotX, aSurface^.pivotY)+';');
+  if aSurface^.angle <> 0.0 then
+    t.Add(aSpacePrefix+'Angle.Value := '+FormatFloatWithDot('0.00', aSurface^.angle)+';');
+  if (aSurface^.scaleX <> 1.0) or (aSurface^.scaleY <> 1.0) then
+    t.Add(aSpacePrefix+'Scale.Value := '+PointFToPascal(aSurface^.scaleX, aSurface^.scaleY)+';');
+  if aSurface^.flipH then
+    t.Add(aSpacePrefix+'FlipH := True;');
+  if aSurface^.flipV then
+    t.Add(aSpacePrefix+'FlipV := True;');
+  if aSurface^.opacity <> 255 then
+    t.Add(aSpacePrefix+'Opacity.Value := '+ Round(aSurface^.opacity).ToString+';');
+  if aSurface^.tint <> BGRA(0,0,0,0) then
+    t.Add(aSpacePrefix+'Tint.Value := '+BGRAToPascal(aSurface^.tint)+';');
+  if aSurface^.tintMode <> tmReplaceColor then
+    t.Add(aSpacePrefix+'TintMode := tmMixColor;');
+  if aSurface^.IsTextured and (aSurface^.frameindex <> 1.0) then
+    t.Add(aSpacePrefix+'Frame := '+FormatFloatWithDot('0.0', aSurface^.frameindex)+';');
+end;
+
+procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
+  aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
 begin
   case aSurface^.classtype.ClassName of
     'TSprite': begin
-      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+
-                aSurface^.height.ToString+'));';
+      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+
+                aSurface^.height.ToString+'));');
     end;
 
     'TQuad4Color': begin
-      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));'#10;
+      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
       if (aSurface^.TopLeftColor = aSurface^.TopRightColor) and
          (aSurface^.TopRightColor = aSurface^.BottomRightColor) and
          (aSurface^.BottomRightColor = aSurface^.BottomLeftColor) then begin
-        Result := Result + aSpacePrefix+'SetAllColorsTo('+BGRAToPascal(aSurface^.TopLeftColor)+');';
+        t.Add(aSpacePrefix+'SetAllColorsTo('+BGRAToPascal(aSurface^.TopLeftColor)+');');
       end else begin
-        Result := Result + aSpacePrefix+'TopLeftColor.Value := '+BGRAToPascal(aSurface^.TopLeftColor)+';'#10+
-                 aSpacePrefix+'TopRightColor.Value := '+BGRAToPascal(aSurface^.TopRightColor)+';'#10+
-                 aSpacePrefix+'BottomRightColor.Value := '+BGRAToPascal(aSurface^.BottomRightColor)+';'#10+
-                 aSpacePrefix+'BottomLeftColor.Value := '+BGRAToPascal(aSurface^.BottomLeftColor)+';';
+        t.Add(aSpacePrefix+'TopLeftColor.Value := '+BGRAToPascal(aSurface^.TopLeftColor)+';');
+        t.Add(aSpacePrefix+'TopRightColor.Value := '+BGRAToPascal(aSurface^.TopRightColor)+';');
+        t.Add(aSpacePrefix+'BottomRightColor.Value := '+BGRAToPascal(aSurface^.BottomRightColor)+';');
+        t.Add(aSpacePrefix+'BottomLeftColor.Value := '+BGRAToPascal(aSurface^.BottomLeftColor)+';');
       end;
     end;
 
     'TGradientRectangle': begin
-      Result := aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aSurface^.GradientData+''');'#10+
-                aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));';
+      t.Add(aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aSurface^.GradientData+''');');
+      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
     end;
 
     'TDeformationGrid': begin
-      Result := aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));'#10+
-                aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');';
+      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
+      t.Add(aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');');
 
     end;
 
     'TSpriteContainer': begin
-      Result := '';
+
     end
 
     else raise exception.Create('forgot to implement '+aSurface^.classtype.ClassName);
@@ -503,7 +546,7 @@ begin
     try
       t := GetEmptyOGLCProjectContent;
       t.SaveToFile(aFilename);
-      FScene.LogInfo('success', 1);
+      FScene.LogInfo('done', 1);
     except
       On E :Exception do begin
         FScene.LogError('Exception '+E.Message, 1);

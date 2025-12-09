@@ -61,7 +61,7 @@ procedure TDataModule1.RedrawImageForIconImageList1;
 begin
   ILIconUI.BeginUpdate;
   ILIconUI.Clear;
-  ILIconUI.Width := FormMain.ScaleDesignToForm(20);
+  ILIconUI.Width := FormMain.ScaleDesignToForm(18);
   ILIconUI.Height := ILIconUI.Width;
 
   FPath := GetIconFolder;
@@ -170,7 +170,7 @@ procedure TDataModule1.RedrawImageForIconLevelTreeView;
 begin
   ILLevelTreeView.BeginUpdate;
   ILLevelTreeView.Clear;
-  ILLevelTreeView.Width := FormMain.ScaleDesignToForm(16);
+  ILLevelTreeView.Width := FormMain.ScaleDesignToForm(18);
   ILLevelTreeView.Height := ILLevelTreeView.Width;
 
   FPath := GetIconFolder;
@@ -182,6 +182,10 @@ begin
   AddImageToImageList('Duplicate.svg', ILLevelTreeView);  // 5
   AddImageToImageList('Description.svg', ILLevelTreeView);
   AddImageToImageList('SpriteBuilder.svg', ILLevelTreeView);
+  AddImageToImageList('LevelEditor.svg', ILLevelTreeView);
+  AddImageToImageList('PascalCodeExport.svg', ILLevelTreeView);
+  AddImageToImageList('PascalCodeDelete.svg', ILLevelTreeView); // 10
+  AddImageToImageList('Font.svg', ILLevelTreeView);
 
   ILLevelTreeView.EndUpdate;
 end;

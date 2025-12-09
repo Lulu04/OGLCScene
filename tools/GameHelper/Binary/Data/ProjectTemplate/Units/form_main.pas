@@ -32,7 +32,7 @@ var
   FormMain: TFormMain;
 
 implementation
-uses OGLCScene, u_common, screen_1;
+uses OGLCScene, u_common, screen_1 {$ifndef WINDOWED_MODE},LCLIntf{$endif};
 
 {$R *.lfm}
 
@@ -51,6 +51,7 @@ begin
   BorderStyle := bsNone;
   WindowState := wsFullScreen;
   ShowWindow(Handle, SW_SHOWFULLSCREEN);
+  BoundsRect := Monitor.BoundsRect;
  {$endif}
 {$else}
   ClientWidth := Trunc(SCREEN_WIDTH_AT_DESIGN_TIME);

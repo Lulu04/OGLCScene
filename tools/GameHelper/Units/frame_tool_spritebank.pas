@@ -15,6 +15,8 @@ type
 
   TFrameToolSpriteBank = class(TFrame)
     BDeleteSprite: TSpeedButton;
+    BExportPascalUnit: TSpeedButton;
+    BRemovePascalUnit: TSpeedButton;
     BNewSprite: TSpeedButton;
     BDuplicateSprite: TSpeedButton;
     BHelp: TSpeedButton;
@@ -55,6 +57,8 @@ type
     procedure DoEditInSpriteBuilder;
     procedure DoNewSprite;
     procedure DoImportSpriteFromAnotherProject;
+    procedure DoAddPascalUnitToLazarusProject;
+    procedure DoRemovePascalUnitFromLazarusProject;
     procedure DoSaveSpriteBank;
   private
     FUndoRedoManager: TSpriteBankUndoRedoManager;
@@ -107,12 +111,11 @@ procedure TFrameToolSpriteBank.BHelpClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp('The Sprite Bank contains the definition of all sprites that you have defined in your project.'#10#10+
   'CREATE A NEW SPRITE:'#10+
-  ' - click the ''New'' button.'#10#10+
+  ' - click the ''+New'' button.'#10#10+
   'IMPORT A SPRITE FROM AN ANOTHER PROJECT:'#10+
   ' - click import and follow the instruction in the window'#10#10+
   'EDIT/RENAME/DUPLICATE/DELETE AN EXISTING SPRITE:'#10+
-  ' - select a sprite in the list: a panel appears.'#10+
-  ' - click the appropriate button.'#10#10+
+  ' - select a sprite in the list and click the appropriate button on the right.'#10#10+
   'SPRITE AND PASCAL UNIT:'#10+
   ' - a Pascal unit is added to the Lazarus project each time a sprite is created.'#10+
   ' - when the sprite is modified under Game Helper, the unit is updated.'#10+
@@ -138,6 +141,14 @@ begin
 
   if Sender = BEditInSpriteBuilder then begin
     DoEditInSpriteBuilder;
+  end;
+
+  if Sender = BExportPascalUnit then begin
+    DoAddPascalUnitToLazarusProject;
+  end;
+
+  if Sender = BRemovePascalUnit then begin
+    DoRemovePascalUnitFromLazarusProject;
   end;
 end;
 
@@ -333,6 +344,47 @@ begin
   // to do
 end;
 
+procedure TFrameToolSpriteBank.DoAddPascalUnitToLazarusProject;
+var i: integer;
+  item: PSpriteBankItem;
+begin
+  HideToolPanels;
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  // retrieve the item
+  item := SpriteBank.GetItemByName(LB.Items.Strings[i]);
+  if item = NIL then begin
+    ShowMessage('item not found in the Sprite Bank... it''s a bug!'+LineEnding+'Operation Canceled');
+    exit;
+  end;
+
+  // generate the unit
+  item^.ExportSpriteToPascalUnit;
+
+  // add it to the lazarus project
+  Project.Config.TargetLazarusProject.Unit_AddToProject(item^.name, ulSprites, uePas);
+end;
+
+procedure TFrameToolSpriteBank.DoRemovePascalUnitFromLazarusProject;
+var i: integer;
+  item: PSpriteBankItem;
+begin
+  HideToolPanels;
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  // retrieve the item
+  item := SpriteBank.GetItemByName(LB.Items.Strings[i]);
+  if item = NIL then begin
+    ShowMessage('item not found in the Sprite Bank... it''s a bug!'+LineEnding+'Operation Canceled');
+    exit;
+  end;
+
+  // remove the unit from lazarus project
+  Project.Config.TargetLazarusProject.Unit_RemoveFromProject(item^.name, ulSprites, uePas);
+end;
+
 procedure TFrameToolSpriteBank.DoSaveSpriteBank;
 begin
   SpriteBank.SaveToPath(Project.Config.TargetLazarusProject.GetFolderGameHelperFiles);
@@ -387,6 +439,7 @@ procedure TFrameToolSpriteBank.OnShow;
 begin
   FillLB;
   UpdateWidgetState;
+  HideToolPanels;
 end;
 
 function TFrameToolSpriteBank.Textures: TTextureList;

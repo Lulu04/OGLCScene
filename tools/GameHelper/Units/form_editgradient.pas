@@ -103,6 +103,8 @@ begin
   if Length(FGradient^.Rows) = 0 then exit;
   FGradient^.FlipH;
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  Clear;
+  DoGradientToFrame;
   FModified := True;
 end;
 
@@ -111,6 +113,8 @@ begin
   if Length(FGradient^.Rows) < 2 then exit;
   FGradient^.FlipV;
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  Clear;
+  DoGradientToFrame;
   FModified := True;
 end;
 
@@ -119,6 +123,8 @@ begin
   if Length(FGradient^.Rows) = 0 then exit;
   FGradient^.Rotate90CCW;
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  Clear;
+  DoGradientToFrame;
   FModified := True;
 end;
 
@@ -127,6 +133,8 @@ begin
   if Length(FGradient^.Rows) = 0 then exit;
   FGradient^.Rotate90CW;
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
+  Clear;
+  DoGradientToFrame;
   FModified := True;
 end;
 
@@ -209,6 +217,7 @@ begin
 
   // delete the frame
   Frames[aIndex].Free;
+  // delete entry in array
   system.Delete(Frames, aIndex, 1);
   // shift other index
   for i:= aIndex to High(Frames) do

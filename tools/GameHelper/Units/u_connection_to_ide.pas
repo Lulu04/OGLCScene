@@ -40,7 +40,7 @@ type
 TTypeOfResponsToIde = (rtUnknown,
                        rtAddUnitToProject,
                        rtRemoveUnitFromProject,
-                       rtTerminated);  // user have close Game Helper
+                       rtTerminated);  // user close Game Helper
 
 { TResponsItem }
 
@@ -152,7 +152,6 @@ begin
   mess.UnitLocation := aUnitLocation;
   mess.UnitExtension := aUnitExtension;
 
-  //mess.BuildResponsTo(FResponsBuffer);
   mess.SendToIDE;
 end;
 
@@ -168,7 +167,6 @@ begin
   mess.UnitLocation := aUnitLocation;
   mess.UnitExtension := aUnitExtension;
 
-  //mess.BuildResponsTo(FResponsBuffer);
   mess.SendToIDE;
 end;
 

@@ -13,7 +13,6 @@ type
   { TFrameToolLevelBank }
 
   TFrameToolLevelBank = class(TFrame)
-    BEdit: TSpeedButton;
     BHelp: TSpeedButton;
     Label24: TLabel;
     Panel1: TPanel;
@@ -21,7 +20,6 @@ type
     Panel6: TPanel;
     Panel8: TPanel;
     Splitter1: TSplitter;
-    procedure BEditClick(Sender: TObject);
     procedure BHelpClick(Sender: TObject);
   private
     FUndoRedoManager: TLevelBankUndoRedoManager;
@@ -47,13 +45,6 @@ uses u_screen_levelbank, form_main,  form_showhelp,
 
 { TFrameToolLevelBank }
 
-procedure TFrameToolLevelBank.BEditClick(Sender: TObject);
-begin
-  if not FrameViewLevelBank.SelectedIsLevel then exit;
-
-  FormMain.EditLevelInLevelBank(FrameViewLevelBank.GetSelectedText);
-end;
-
 procedure TFrameToolLevelBank.BHelpClick(Sender: TObject);
 begin
   form_showhelp.ShowHelp('The Level Bank contains the levels that you have created for your game.'#10+
@@ -61,28 +52,32 @@ begin
   'GROUPS AND LEVELS:'#10+
   'The levels are organized into groups.'#10+
   'For example a game have 10 levels in the group "Summer", 10 levels in the group "Winter", etc... As you see, its easy to group the game levels by categories.'#10+
-  'Keep in mind: textures are belong one single group and are not shared with the other.'#10#10+
+  'NOTE 1: textures are belong one single group and are not shared with the other.'#10+
+  'NOTE 2: you can add a description for groups or levels to display to the player.'#10+
+  '        They are included in the exported Pascal unit.'#10+
   'ADD A NEW GROUP:'#10+
-  ' - in the tree, select the root item named ''Groups'' then click on the +.'+#10#10+
+  ' - in the tree, select the root item named ''Groups'' then click on the +.'+#10+
+  ' - or right click on an empty space of the tree.'#10#10+
   'RENAME OR DELETE A GROUP:'#10+
-  ' - select a group and click on the pen or the trashcan.'#10#10+
+  ' - select a group and click on the appropriate button on the right.'#10#10+
+  'ADD A GROUP DESCRIPTION:'#10+
+  ' - select a group and click the page icon.'#10+
+  '   Descriptions are saved in the game.'#10#10+
   'ADD A LEVEL IN A GROUP:'#10+
   ' - select a group and click on the +.'#10#10+
-  'RENAME, DUPLICATE OR DELETE A LEVEL:'#10+
-  ' - select a level and click on the appropriate button'#10#10+
-  'EDIT AN EXISTING LEVEL:'#10+
-  ' - select the level to edit.'#10+
-  ' - click button ''Edit in Level Editor''.'#10#10+
+  'EDIT, RENAME, DUPLICATE OR DELETE A LEVEL:'#10+
+  ' - select a level and click on the appropriate button on the right.'#10#10+
+  'ADD A LEVEL DESCRIPTION:'#10+
+  ' - select a level and click the page icon.'#10#10+
 
-  'PASCAL UNIT:'#10+
+  'EXPORTED PASCAL UNIT:'#10+
   '  Pascal code is generated automatically in the unit Units\Levels\u_gamelevels.pas'#10+
-  '  This unit contains the data of your levels and define a class that encapsulate functionalities to use in your program.'#10+
+  '  This unit contains the data of your levels and a class that encapsulate functionalities to use in your screen.'#10+
   '  See the comments in this unit.');
 end;
 
 procedure TFrameToolLevelBank.UpdateWidgetState;
 begin
-  BEdit.Enabled := FrameViewLevelBank.SelectedIsLevel;
 end;
 
 procedure TFrameToolLevelBank.ProcessFrameViewLevelBankSelectionChangeEvent(Sender: TObject);
