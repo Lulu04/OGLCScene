@@ -28,6 +28,10 @@ public
   property Color: TBGRAPixel read FColor write SetColor;
   property BlendMode: byte read FBlendMode write FBlendMode;
   property Visible: boolean read GetVisible write FVisible;
+public // utils for Game Helper
+  // save only color and blendmode
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
 end;
 POGLCFill = ^TOGLCFill;
 
@@ -69,6 +73,10 @@ public
   property Path: TOGLCPath read FPath;
   property Indices: TArrayOfVertexIndex read FIndices;
   property Vertices: TArrayOfLineVertexAttributes read FVertices;
+public // utils for Game Helper
+  // save only color, width, lineposition and blendmode
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
 end;
 POGLCBorder = ^TOGLCBorder;
 
@@ -250,6 +258,29 @@ procedure TOGLCFill.CopyIndexTo(p: PVertexIndex);
 begin
   if Length(FIndices) > 0 then
     Move(FIndices[0], p^, SizeOf(TVertexIndex)*Length(FIndices));
+end;
+
+function TOGLCFill.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init(' ');
+  prop.Add('Color', Color);
+  prop.Add('BlendMode', BlendMode);
+  Result := prop.PackedProperty;
+end;
+
+procedure TOGLCFill.LoadFromString(const data: string);
+var prop: TProperties;
+  col: TBGRAPixel;
+  vb: byte;
+begin
+  prop.Split(data, ' ');
+  col := BGRABlack;
+  vb := 0;
+  prop.BGRAPixelValueOf('Color', col, Color);
+  Color := col;
+  prop.ByteValueOf('BlendMode', vb, BlendMode);
+  BlendMode := vb;
 end;
 
 function TOGLCFill.VertexCount: ptrint;
@@ -512,6 +543,39 @@ begin
     Move(FIndices[0], p^, SizeOf(TVertexIndex)*Length(FIndices));
 end;
 
+function TOGLCBorder.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init(' ');
+  prop.Add('Color', Color);
+  prop.Add('Width', Width);
+  prop.Add('BlendMode', BlendMode);
+  prop.Add('LinePos', Ord(LinePosition));
+  Result := prop.PackedProperty;
+end;
+
+procedure TOGLCBorder.LoadFromString(const data: string);
+var prop: TProperties;
+  col: TBGRAPixel;
+  vs: single;
+  vb: byte;
+  vi: integer;
+begin
+  prop.Split(data, ' ');
+  col := clBlack;
+  vs := 0;
+  vb := 0;
+  vi := 0;
+  prop.BGRAPixelValueOf('Color', col, Color);
+  Color := col;
+  prop.SingleValueOf('Width', vs, Width);
+  Width := vs;
+  prop.ByteValueOf('BlendMode', vb, BlendMode);
+  BlendMode := vb;
+  prop.IntegerValueOf('LinePos', vi, Ord(LinePosition));
+  LinePosition := TOGLCLinePosition(vi);
+end;
+
 function TOGLCBorder.VertexCount: ptrint;
 begin
   Result := Length(FVertices);
@@ -570,6 +634,7 @@ procedure TGradientDescriptor.LoadGradientDataFromString(const s: string);
 var i, j, k: integer;
   A: TStringArray;
 begin
+  InitDefault;
   if s = '' then exit;
   A := s.Split([' ']);
   if Length(A) = 0 then exit;
