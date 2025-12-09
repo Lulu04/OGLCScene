@@ -34,6 +34,9 @@ TOGLCPathHelper = type helper for TOGLCPath
   procedure LoadFromFile(const aFilename: string);
   // load a normalized path from file and expand the path to the specified size
   procedure LoadFromNormalizedFileAndExpand(const aFilename: string; aWidth, aHeight: integer);
+
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
 end;
 
 
@@ -353,6 +356,34 @@ begin
      ConvertToSpline(splineStyle);
   finally
     t.Free;
+  end;
+end;
+
+function TOGLCPathHelper.SaveToString: string;
+var
+  i: Integer;
+begin
+  Result := integer(Length(Self)).ToString;
+  if Length(Self) = 0 then exit;
+  for i:=0 to High(Self) do
+    Result := Result + ' ' +
+              FormatFloatWithDot('0.000', Self[i].x) + ' '+ FormatFloatWithDot('0.000', Self[i].y);
+end;
+
+procedure TOGLCPathHelper.LoadFromString(const data: string);
+var i: integer;
+  A: TStringArray;
+  c: integer;
+begin
+  Self := NIL;
+  A := data.Split(' ');
+  if Length(A) = 0 then exit;
+  if not TryStrToInt(A[0], c) then exit;
+  if c < 1 then exit;
+  SetLength(Self, c);
+  for i:=0 to High(Self) do begin
+    Self[i].x := StringToSingle(A[i*2]);
+    Self[i].y := StringToSingle(A[i*2+1]);
   end;
 end;
 
