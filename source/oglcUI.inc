@@ -209,6 +209,9 @@ private
   FRoundRectOptions: TRoundRectangleOptions;
   FRx, FRy: single;
   procedure SetShape(aBorderPath, aFillPath: TOGLCPath; aWidth, aHeight: integer; aBorderWidth: single);
+public // utils for Game Helper
+  function SaveToString: string;
+  procedure LoadFromString(const data: string)
 public
   Border: TOGLCBorder;
   Fill: TOGLCFill;
@@ -2004,6 +2007,91 @@ begin
   Fill.InitFromPath(aFillPath, PointF(aWidth*0.5, aHeight*0.5));
 
   if FMaskEventOnShapeChanged and (FOnShapeChanged <> NIL) then FOnShapeChanged();
+end;
+
+function TBodyShape.SaveToString: string;
+var prop: TProperties;
+  s: string;
+  path: TOGLCPath;
+begin
+  prop.Init(',');
+  prop.Add('ShapeType', Ord(FShapetype));
+  if FShapeType = stRoundRect then begin
+    prop.Add('RoundX', FRx);
+    prop.Add('RoundY', FRy);
+    if FRoundRectOptions <> [] then begin
+      s := '';
+      if rrTopLeftSquare in FRoundRectOptions then s := s + 'A';
+      if rrTopRightSquare in FRoundRectOptions then s := s + 'B';
+      if rrBottomRightSquare in FRoundRectOptions then s := s + 'C';
+      if rrBottomLeftSquare in FRoundRectOptions then s := s + 'D';
+      if rrTopLeftBevel in FRoundRectOptions then s := s + 'E';
+      if rrTopRightBevel in FRoundRectOptions then s := s + 'F';
+      if rrBottomRightBevel in FRoundRectOptions then s := s + 'G';
+      if rrBottomLeftBevel in FRoundRectOptions then s := s + 'H';
+      if rrDefault in FRoundRectOptions then s := s + 'I';
+      prop.Add('RoundRectOption', s);
+    end;
+  end;
+  if FShapeType = stCustom then begin
+    path := Copy(Border.Path);
+    if (Length(path) > 1) and (Path[0] = Path[High(Path)]) then
+      system.Delete(path, High(path), 1); // re-open the path
+    prop.Add('CustomPath', path.SaveToString);
+  end;
+  prop.Add('Width', Width);
+  prop.Add('Height', Height);
+  prop.Add('FillData', Fill.SaveToString);
+  prop.Add('BorderData', Border.SaveToString);
+  Result := prop.PackedProperty;
+end;
+
+procedure TBodyShape.LoadFromString(const data: string);
+var prop: TProperties;
+  vi: integer;
+  s: string;
+  path: TOGLCPath;
+begin
+  InitDefault(FParentScene);
+  prop.Split(data, ',');
+  vi := 0;
+  prop.IntegerValueOf('ShapeType', vi, Ord(FShapeType));
+  FShapeType := TShapeType(vi);
+  if FShapeType = stRoundRect then begin
+    prop.SingleValueOf('RoundX', FRx, 0);
+    prop.SingleValueOf('RoundY', FRy, 0);
+    FRoundRectOptions := [];
+    prop.StringValueOf('RoundRectOption', s, '');
+    if s.Contains('A') then Include(FRoundRectOptions, rrTopLeftSquare);
+    if s.Contains('B') then Include(FRoundRectOptions, rrTopRightSquare);
+    if s.Contains('C') then Include(FRoundRectOptions, rrBottomRightSquare);
+    if s.Contains('D') then Include(FRoundRectOptions, rrBottomLeftSquare);
+    if s.Contains('E') then Include(FRoundRectOptions, rrTopLeftBevel);
+    if s.Contains('F') then Include(FRoundRectOptions, rrTopRightBevel);
+    if s.Contains('G') then Include(FRoundRectOptions, rrBottomRightBevel);
+    if s.Contains('H') then Include(FRoundRectOptions, rrBottomLeftBevel);
+    if s.Contains('I') then Include(FRoundRectOptions, rrDefault);
+  end;
+  if FShapeType = stCustom then begin
+    prop.StringValueOf('CustomPath', s, '');
+    path := NIL;
+    path.LoadFromString(s);
+  end;
+  prop.IntegerValueOf('Width', Width, 100);
+  prop.IntegerValueOf('Height', Height, 100);
+
+  prop.StringValueOf('FillData', s, '');
+  Fill.LoadFromString(s);
+  prop.StringValueOf('BorderData', s, '');
+  Border.LoadFromString(s);
+
+  // create the shape
+  case FShapeType of
+    stRectangle: SetShapeRectangle(Width, Height, Border.Width);
+    stRoundRect: SetShapeRoundRect(Width, Height, FRx, FRy, Border.Width, FRoundRectOptions);
+    stEllipse: SetShapeEllipse(Width, Height, Border.Width);
+    stCustom: SetCustomShape(path, Border.Width);
+  end;
 end;
 
 procedure TBodyShape.InitDefault(aParentScene: TOGLCScene);
