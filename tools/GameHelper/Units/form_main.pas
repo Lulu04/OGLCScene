@@ -11,7 +11,9 @@ uses
   frame_tool_spritebuilder,
   frame_tool_spritebank,
   frame_tool_leveleditor,
-  frame_tool_levelbank;
+  frame_tool_levelbank,
+  frame_viewfontbank, u_ui_objectlist,
+  frame_tool_uipaneleditor;
 
 {
  RIGHT MOUSE button: Move view
@@ -29,12 +31,14 @@ type
 
   TFormMain = class(TForm)
     BLevelBank: TSpeedButton;
-    BScreenBank: TSpeedButton;
+    BFontBank: TSpeedButton;
     BLevelEditor: TSpeedButton;
-    BScreenEditor: TSpeedButton;
+    BToolUIPanel: TSpeedButton;
     Label1: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
+    PageUIPanelEditor: TPage;
+    PageFontBank: TPage;
     PageLevelEditor: TPage;
     PageLevelBank: TPage;
     PageSpriteBuilder: TPage;
@@ -47,9 +51,7 @@ type
     Panel6: TPanel;
     Panel7: TPanel;
     BSpriteBank: TSpeedButton;
-    BSpriteBuilder: TSpeedButton;
     Panel8: TPanel;
-    Panel9: TPanel;
     ToolBarMain: TToolBar;
     BNewProject: TToolButton;
     BLoadProject: TToolButton;
@@ -102,13 +104,16 @@ var
   FrameToolsSpriteBank: TFrameToolSpriteBank;
   FrameToolLevelEditor: TFrameToolLevelEditor;
   FrameToolLevelBank: TFrameToolLevelBank;
+  FrameViewFontBank: TFrameViewFontBank;
+  FrameToolUIPanelEditor: TFrameToolUIPanelEditor;
 
 
 implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_screen_levelbank,
-  u_screen_leveleditor, u_levelbank, form_projectconfig,
-  BGRABitmap, BGRABitmapTypes, u_connection_to_ide;
+  u_screen_leveleditor, u_levelbank, form_projectconfig, BGRABitmap,
+  BGRABitmapTypes, u_connection_to_ide, u_screen_fontbank, u_screen_uipaneleditor,
+  LCLType;
 {$R *.lfm}
 
 { TFormMain }
@@ -147,6 +152,16 @@ begin
   FrameToolLevelBank := TFrameToolLevelBank.Create(Self);
   FrameToolLevelBank.Parent := PageLevelBank;
   FrameToolLevelBank.Align := alClient;
+
+  FrameViewFontBank := TFrameViewFontBank.Create(Self);
+  FrameViewFontBank.Parent := PageFontBank;
+  FrameViewFontBank.Align := alClient;
+  FrameViewFontBank.IsEditable := True;
+
+  FrameToolUIPanelEditor := TFrameToolUIPanelEditor.Create(Self);
+  FrameToolUIPanelEditor.Parent := PageUIPanelEditor;
+  FrameToolUIPanelEditor.Align := alClient;
+
 end;
 
 procedure TFormMain.FormDestroy(Sender: TObject);
@@ -203,14 +218,6 @@ begin
     ToolBarMain.Visible := True;
   end;
 
-  if Sender = BSpriteBuilder then begin
-    FScene.RunScreen(ScreenSpriteBuilder);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
-    FrameToolsSpriteBuilder.OnShow;
-    UpdateWidgets;
-    ToolBarMain.Visible := False;
-  end;
-
   if Sender = BLevelBank then begin
     FScene.RunScreen(ScreenLevelBank);
     Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
@@ -219,10 +226,18 @@ begin
     ToolBarMain.Visible := True;
   end;
 
-  if Sender = BLevelEditor then begin
-    FScene.RunScreen(ScreenLevelEditor);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageLevelEditor);
-    FrameToolLevelEditor.OnShow;
+  if Sender = BFontBank then begin
+    FScene.RunScreen(ScreenFontBank);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageFontBank);
+    FrameViewFontBank.Fill;
+    UpdateWidgets;
+    ToolBarMain.Visible := False;
+  end;
+
+  if Sender = BToolUIPanel then begin
+    FScene.RunScreen(ScreenUIPanelEditor);
+    Notebook1.PageIndex := Notebook1.IndexOf(PageUIPanelEditor);
+    FrameToolUIPanelEditor.OnShow;
     UpdateWidgets;
     ToolBarMain.Visible := False;
   end;
@@ -251,6 +266,13 @@ end;
 procedure TFormMain.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   if (FScene = NIL) or (FScene.CurrentScreen = NIL) then exit;
+  case Key of
+    VK_S: if (ssCtrl in Shift) and Project.IsReady and Project.HasBeenModified then begin
+      Project.Save;
+      UpdateWidgets;
+    end;
+  end;
+
   TCustomScreenTemplate(FScene.CurrentScreen).ProcessOnKeyUp(Key, Shift);
   FScene.ProcessOnKeyUp(Key, Shift);
 end;
@@ -364,11 +386,18 @@ begin
 
   SpriteBank := TSpriteBank.Create;
   LevelBank := TLevelBank.Create;
+  FontBank:= TFontBank.Create;
 
   ScreenLevelEditor := TScreenLevelEditor.Create;
   ScreenLevelEditor.Initialize;
   // level bank
   ScreenLevelBank := TScreenLevelBank.Create;
+
+  ScreenFontBank := TScreenFontBank.Create;
+  ScreenFontBank.Initialize;
+
+  ScreenUIPanelEditor := TScreenUIPanelEditor.Create;
+  ScreenUIPanelEditor.Initialize;
 
   // check if the program was launched by the IDE: if yes, load the appropriate oglc project
   if IdeConnect.Activated then
@@ -395,6 +424,9 @@ begin
   LevelBank.Free;
   LevelBank := NIL;
 
+  FontBank.Free;
+  FontBank := NIL;
+
   ScreenSpriteBuilder.Finalize;
   FreeAndNil(ScreenSpriteBuilder);
 
@@ -406,6 +438,12 @@ begin
 
   ScreenLevelBank.Finalize;
   FreeAndNil(ScreenLevelBank);
+
+  ScreenFontBank.Finalize;
+  FreeAndNil(ScreenFontBank);
+
+  ScreenUIPanelEditor.Finalize;
+  FreeAndNil(ScreenUIPanelEditor);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
@@ -417,17 +455,13 @@ end;
 procedure TFormMain.UpdateWidgets;
 begin
   BSpriteBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageLevelBank);
-//  BSpriteBuilder.Enabled := (Notebook1.PageIndex <> Notebook1.IndexOf(PageSpriteBuilder)) and
-//                            (Notebook1.PageIndex <> Notebook1.IndexOf(PageLevelEditor));
-
   BLevelBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageSpriteBank);
-
-  BSpriteBuilder.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
-  BLevelEditor.Enabled := BSpriteBank.Enabled or BLevelBank.Enabled;
 
   // project button relative to project disabled if Game Helper is started from the IDE
   BNewProject.Enabled := not IdeConnect.Activated;
   BLoadProject.Enabled := not IdeConnect.Activated;
+
+  BSaveProject.Enabled := Project.IsReady and Project.HasBeenModified;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;

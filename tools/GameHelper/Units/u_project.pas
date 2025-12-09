@@ -67,9 +67,9 @@ end;
 var Project: TProject;
 
 implementation
-uses Forms, Dialogs, Controls, u_common, form_main, u_texture_list,
-  u_surface_list, u_spritebank, u_screen_spritebuilder, u_levelbank,
-  form_newproject, u_app_pref, u_utils, u_connection_to_ide, utilitaire_fichier;
+uses Forms, Dialogs, Controls, u_common, form_main, u_spritebank, u_levelbank,
+  form_newproject, u_app_pref, u_utils, u_connection_to_ide, u_ui_objectlist,
+  utilitaire_fichier, LCLIntf;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -177,7 +177,7 @@ begin
     try
       SaveTo(t);
       t.SaveToFile(aFilename);
-      FScene.LogInfo('success', 1);
+      FScene.LogInfo('done', 1);
     except
       On E :Exception do begin
         FScene.LogError('TProjectConfig.Save: exception occur');
@@ -199,7 +199,7 @@ begin
       t.LoadFromFile(aFilename);
       LoadFrom(t);
       Result := True;
-      FScene.LogInfo('success', 1);
+      FScene.LogInfo('done', 1);
     except
       On E :Exception do begin
         FScene.LogError('TProjectConfig.Load: exception occur', 1);
@@ -224,7 +224,8 @@ begin
 end;
 
 function TProject.DoNew: boolean;
-var folderProjectTemplate, lazProjectFolder, lazProjectName: string;
+var folderProjectTemplate, lazProjectFolder, lazProjectName, lpiFilename: string;
+  flagdone: boolean;
 begin
   FormNewProject := TFormNewProject.Create(NIL);
   try
@@ -237,61 +238,75 @@ begin
     FormNewProject.Free;
   end;
 
+  flagdone := True;
   FScene.LogInfo('Try to create a new project "'+lazProjectName+'" in directory "'+lazProjectFolder+'"');
 
-  FScene.LogInfo('copy the content of the directory of lazarus project template to the new directory', 1);
+  FScene.LogInfo('copy the lazarus project template to the new directory', 1);
   try
     CopyDirectoryContent(folderProjectTemplate, lazProjectFolder);
-    FScene.LogInfo('success', 2);
+    FScene.LogInfo('done', 2);
   except
     On E :Exception do begin
       FScene.LogError('Exception '+E.Message, 2);
+      flagdone := False;
     end;
   end;
-
-  // rename project files
-  FScene.LogInfo('Renaming file project_oglcscene.ico', 1);
-  try
-    RenommeFichier(lazProjectFolder+'project_oglcscene.ico',
-                   lazProjectFolder+lazProjectName+'.ico');
-    FScene.LogInfo('success', 2);
-  except
-    On E :Exception do begin
-      FScene.LogError('Exception: '+E.Message, 2);
+  if flagdone then begin
+    // rename project files
+    FScene.LogInfo('Renaming file project_oglcscene.ico', 1);
+    try
+      flagdone := flagDone and RenommeFichier(lazProjectFolder+'project_oglcscene.ico',
+                                              lazProjectFolder+lazProjectName+'.ico');
+      if flagdone then FScene.LogInfo('done', 2)
+        else FScene.LogInfo('FAIL', 2);
+    except
+      On E :Exception do begin
+        FScene.LogError('Exception: '+E.Message, 2);
+        flagdone := False;
+      end;
     end;
-  end;
 
-  FScene.LogInfo('Renaming file project_oglcscene.lpi', 1);
-  try
-    RenommeFichier(lazProjectFolder+'project_oglcscene.lpi',
-                   lazProjectFolder+lazProjectName+'.lpi');
-    FScene.LogInfo('success', 2);
-  except
-    On E :Exception do begin
-      FScene.LogError('Exception: '+E.Message, 2);
-    end;
-  end;
-
-  FScene.LogInfo('Renaming file project_oglcscene.lpr', 1);
-  try
-  RenommeFichier(lazProjectFolder+'project_oglcscene.lpr',
-                 lazProjectFolder+lazProjectName+'.lpr');
-  FScene.LogInfo('success', 2);
-  except
-    On E :Exception do begin
-      FScene.LogError('Exception: '+E.Message, 2);
-    end;
-  end;
-
-  // replace project name in lazarus files
-  FScene.LogInfo('replacing name in lpi and lpr file', 1);
-  try
-    ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpi', 'project_oglcscene', lazProjectName);
-    ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpr', 'project_oglcscene', lazProjectName);
-    FScene.LogInfo('success', 2);
-  except
-    On E :Exception do begin
-      FScene.LogError('Exception: '+E.Message, 2);
+    if flagdone then begin
+      FScene.LogInfo('Renaming file project_oglcscene.lpi', 1);
+      try
+        flagdone := flagDone and RenommeFichier(lazProjectFolder+'project_oglcscene.lpi',
+                                                lazProjectFolder+lazProjectName+'.lpi');
+        if flagdone then FScene.LogInfo('done', 2)
+          else FScene.LogInfo('FAIL', 2);
+      except
+        On E :Exception do begin
+          FScene.LogError('Exception: '+E.Message, 2);
+          flagdone := False;
+        end;
+      end;
+      if flagdone then begin
+        FScene.LogInfo('Renaming file project_oglcscene.lpr', 1);
+        try
+        flagdone := flagDone and RenommeFichier(lazProjectFolder+'project_oglcscene.lpr',
+                                              lazProjectFolder+lazProjectName+'.lpr');
+        if flagdone then FScene.LogInfo('done', 2)
+          else FScene.LogInfo('FAIL', 2);
+        except
+          On E :Exception do begin
+            FScene.LogError('Exception: '+E.Message, 2);
+            flagdone := False;
+          end;
+        end;
+        if flagdone then begin
+          // replace project name in lazarus files
+          FScene.LogInfo('replacing name in lpi and lpr file', 1);
+          try
+            ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpi', 'project_oglcscene', lazProjectName);
+            ReplaceStringInFile(lazProjectFolder+lazProjectName+'.lpr', 'project_oglcscene', lazProjectName);
+            FScene.LogInfo('done', 2);
+          except
+            On E :Exception do begin
+              FScene.LogError('Exception: '+E.Message, 2);
+              flagdone := False;
+            end;
+          end;
+        end;
+      end;
     end;
   end;
 
@@ -301,18 +316,28 @@ begin
 
   SaveAs(lazProjectFolder + lazProjectName + '.oglc');
 
+  if flagdone then begin
+    lpiFilename := lazProjectFolder + ChangeFileExt(lazProjectName, '.lpi');
+    if QuestionDlg('', 'Do you want to open Lazarus with the new project ?'+LineEnding+
+       lpiFilename, mtConfirmation, [mrOK, 'Yes', mrCancel, 'No'], 0) = mrOk then
+      OpenDocument(lpiFilename);
+  end;
+
   Result := true;
 end;
 
 procedure TProject.DoSave(const aFilename: string);
-var pathGameHelperFiles: string;
+//var pathGameHelperFiles: string;
 begin
   Config.SaveToFile(aFilename);
 
-  pathGameHelperFiles := IncludeTrailingPathDelimiter(ExtractFilePath(aFilename)) +
+  // do not save the banks because they are saved immediatly after a change
+
+{  pathGameHelperFiles := IncludeTrailingPathDelimiter(ExtractFilePath(aFilename)) +
                          GAMEHELPERFILES_SUBFOLDER + PathDelim;
   SpriteBank.SaveToPath(pathGameHelperFiles);
   LevelBank.SaveToPath(pathGameHelperFiles);
+  FontBank.Load;}
 
   AppPref.LastProjectFilename := aFilename;
 end;
@@ -327,6 +352,7 @@ begin
                            GAMEHELPERFILES_SUBFOLDER + PathDelim;
     SpriteBank.LoadFromPath(pathGameHelperFiles);
     LevelBank.LoadFromPath(pathGameHelperFiles);
+    FontBank.Load;
 
     AppPref.LastProjectFilename := aFilename;
   end;
@@ -336,14 +362,12 @@ procedure TProject.DoClose;
 begin
   FScene.LogInfo('Closing current project');
   try
-    ScreenSpriteBuilder.Textures.Clear;
-    ScreenSpriteBuilder.Surfaces.Clear;
-    ScreenSpriteBuilder.Bodies.Clear;
     SpriteBank.Clear;
     LevelBank.Clear;
+    FontBank.Clear;
     Config.InitDefault;
     WorkingLevelGroup := NIL;
-    FScene.LogInfo('success', 1);
+    FScene.LogInfo('done', 1);
   except
     On E :Exception do begin
       FScene.LogError('Exception: '+E.Message, 1);
@@ -354,16 +378,23 @@ end;
 procedure TProject.OnModifiedChange(aState: boolean);
 begin
   aState := aState;
+  FormMain.UpdateWidgets;
 end;
 
 procedure TProject.OnProjectReadyChange(aState: boolean);
 begin
   aState := aState;
-
   if IsReady then begin
+    // read the layer list from unit u_common
+    Layers.InitWith(Config.TargetLazarusProject.UCommonGetLayerNames);
+
+    // Sprite Builder: fill the listbox with texture  names
     FrameToolsSpriteBuilder.FillListBoxTextureNames;
+
     if LevelBank.Size > 0 then FormMain.ShowPageLevelBank
       else FormMain.ShowPageSpriteBank;
+
+    // retrieve layers from unit u_common.pas
     Layers.InitWith(Config.TargetLazarusProject.UCommonGetLayerNames);
   end else begin
   end;

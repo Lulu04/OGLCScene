@@ -883,18 +883,6 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           OnKeyUp = CBTexturesKeyDown
           OnSelect = CBTexturesSelect
         end
-        object BNewSurface: TSpeedButton
-          Cursor = crHandPoint
-          Left = 248
-          Height = 28
-          Top = 5
-          Width = 30
-          Images = DataModule1.ILIconUI
-          ImageIndex = 4
-          OnClick = BNewSurfaceClick
-          ShowHint = True
-          ParentShowHint = False
-        end
         object Panel5: TPanel
           AnchorSideLeft.Control = Panel1
           AnchorSideTop.Control = Panel6
@@ -1151,11 +1139,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
         object BAddMultiple: TSpeedButton
           Cursor = crHandPoint
           Left = 240
-          Height = 49
-          Hint = 'Activate/deactivate multiple  add'
-          Top = 40
-          Width = 49
-          Caption = 'Multiple'
+          Height = 41
+          Hint = 'Add the texture on the scene'
+          Top = 24
+          Width = 41
+          Caption = 'Add'
           Color = 11382189
           Flat = True
           Images = DataModule1.ILIconUI

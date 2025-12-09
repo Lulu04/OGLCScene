@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, Buttons,
-  StdCtrls, Spin, lcl_utils, OGLCScene, frame_viewlayerlist;
+  StdCtrls, Spin, ComCtrls, lcl_utils, OGLCScene, frame_viewlayerlist;
 
 type
 
@@ -38,7 +38,6 @@ type
     Panel4: TPanel;
     Panel5: TPanel;
     BScene: TSpeedButton;
-    BCancel: TSpeedButton;
     BOk: TSpeedButton;
     BLayers: TSpeedButton;
     BAddLayer: TSpeedButton;
@@ -51,6 +50,7 @@ type
     RBMaximizeSceneSize: TRadioButton;
     SE1: TSpinEdit;
     SE2: TSpinEdit;
+    UpDown1: TUpDown;
     procedure BAddLayerClick(Sender: TObject);
     procedure BEraseLevelBankClick(Sender: TObject);
     procedure BOkClick(Sender: TObject);
@@ -58,6 +58,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure SE1Change(Sender: TObject);
+    procedure UpDown1Click(Sender: TObject; Button: TUDBtnType);
   private
     NoteBookManager: TNoteBookManager;
     FrameViewLayerList: TFrameViewLayerList;
@@ -69,6 +70,7 @@ type
     procedure DoAddLayer;
     procedure DoDeleteLayer;
     procedure DoRenameLayer;
+    procedure DoOnLayerNamesChanged(aExportFileGameLevel: boolean);
   public
 
   end;
@@ -119,6 +121,12 @@ begin
   FModified := True;
 end;
 
+procedure TFormProjectConfig.UpDown1Click(Sender: TObject; Button: TUDBtnType);
+begin
+  if FrameViewLayerList.MoveSelected(Button = btNext) then
+    DoOnLayerNamesChanged(True);
+end;
+
 function TFormProjectConfig.CheckIntegrity: boolean;
 begin
   Result := (FrameViewLayerList.Count > 0);
@@ -157,18 +165,18 @@ begin
   Project.Config.TargetLazarusProject.ProjectConfig_MaximizeSceneOnMonitor := RBMaximizeSceneSize.Checked;
   Project.Config.TargetLazarusProject.ProjectConfig_WindowedMode := RBWindowed.Checked;
 
-  // layers
+{  // layers
   FrameViewLayerList.SaveLayerConfigToLayerList;
   // set also the layer names in unit u_common.pas
-  Project.Config.TargetLazarusProject.UCommonSetLayerNames(FrameViewLayerList.LB.Items.ToStringArray);
+  Project.Config.TargetLazarusProject.UCommonSetLayerNames(Layers.UserLayersToStringArray);  }
 
   // level editor
   Project.Config.CommonShowFlyingTxt := CheckBox1.Checked;
+  Project.Save;
 end;
 
 procedure TFormProjectConfig.BOkClick(Sender: TObject);
 begin
-  if Sender = BCancel then ModalResult := mrCancel;
 
   if Sender = BOk then begin
     if not CheckIntegrity then exit;
@@ -204,32 +212,34 @@ begin
 end;
 
 procedure TFormProjectConfig.DoAddLayer;
-var layerName: string;
 begin
-  layerName := Trim(InputBox('', 'Enter a name for the new layer:', FrameViewLayerList.GetNewDefaultLayerName));
-  FrameViewLayerList.AddLayer(layerName);
-  FModified := True;
+  if FrameViewLayerList.AddLayer then
+    DoOnLayerNamesChanged(True);
 end;
 
 procedure TFormProjectConfig.DoDeleteLayer;
 begin
-  if FrameViewLayerList.Count <= 1 then exit;
-  if FrameViewLayerList.GetSelectedIndex = -1 then exit;
-  FrameViewLayerList.DeleteLayer(FrameViewLayerList.GetSelectedIndex);
-  FModified := True;
+  if FrameViewLayerList.DeleteSelected then
+    DoOnLayerNamesChanged(True);
 end;
 
 procedure TFormProjectConfig.DoRenameLayer;
-var i: integer;
-  oldName, newName: String;
 begin
-  i := FrameViewLayerList.GetSelectedIndex;
-  if i = -1 then exit;
-  oldName := FrameViewLayerList.Names[i];
-  newName := Trim(InputBox('', 'Enter the new name:', oldName));
-  if (newName = oldName) or (newName = '') then exit;
-  FrameViewLayerList.Names[i] := newName;
-  FModified := True;
+  if FrameViewLayerList.RenameSelected then
+    DoOnLayerNamesChanged(False);
+end;
+
+procedure TFormProjectConfig.DoOnLayerNamesChanged(aExportFileGameLevel: boolean);
+begin
+  if LevelBank.Size > 0 then begin
+    // save the level bank
+    LevelBank.Save;
+    // generate the level's unit
+    if aExportFileGameLevel then
+      LevelBank.ExportToFileGameLevel;
+  end;
+  // set the layer names in u_common
+  Project.Config.TargetLazarusProject.UCommonSetLayerNames(Layers.UserLayersToStringArray);
 end;
 
 end.

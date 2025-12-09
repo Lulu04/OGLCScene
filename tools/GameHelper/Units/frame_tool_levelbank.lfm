@@ -23,35 +23,19 @@ object FrameToolLevelBank: TFrameToolLevelBank
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
-    object BEdit: TSpeedButton
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = Panel1
-      AnchorSideBottom.Side = asrBottom
-      Cursor = crHandPoint
-      Left = 249
-      Height = 19
-      Top = 381
-      Width = 101
-      Anchors = [akRight, akBottom]
-      AutoSize = True
-      BorderSpacing.Bottom = 8
-      Caption = 'Edit in Level Editor'
-      OnClick = BEditClick
-    end
     object Panel6: TPanel
       AnchorSideLeft.Control = Panel1
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = Panel1
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = BEdit
+      AnchorSideBottom.Control = Panel1
+      AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 344
+      Height = 376
       Top = 32
       Width = 353
       Anchors = [akTop, akLeft, akRight, akBottom]
-      BorderSpacing.Bottom = 5
       BevelOuter = bvNone
       Color = 6447714
       ParentBackground = False

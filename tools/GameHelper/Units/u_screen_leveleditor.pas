@@ -381,6 +381,10 @@ begin
       ExitModeAddMultiple;
       FrameToolLevelEditor.ExitModeAddMultiple;
     end;
+
+    msMouseDownOnScaleHandle: MouseState := msOverScaleHandle;
+    msMouseDownOnRotateHandle: MouseState := msOverRotateHandle;
+    msMouseDownOnPivot: MouseState := msOverPivot;
   end;//case
 end;
 
@@ -682,6 +686,7 @@ begin
   CreateSpriteAddMultiple;
   if FSpriteAddMultiple <> NIL then MouseState := msLevelEditorAddingMultiple
     else MouseState := msIdle;
+  ScreenLevelEditor.SelectNone;
 end;
 
 procedure TScreenLevelEditor.ExitModeAddMultiple;

@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 2
+    PageIndex = 1
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage
@@ -202,7 +202,7 @@ object FormProjectConfig: TFormProjectConfig
           Height = 15
           Top = 18
           Width = 137
-          Caption = 'Layers used by your game'
+          Caption = 'Layers used by the project'
         end
         object BAddLayer: TSpeedButton
           AnchorSideLeft.Control = Panel5
@@ -211,12 +211,17 @@ object FormProjectConfig: TFormProjectConfig
           Cursor = crHandPoint
           Left = 321
           Height = 23
+          Hint = 'Add a layer to the list'
           Top = 73
           Width = 84
           BorderSpacing.Left = 15
           BorderSpacing.Top = 40
           Caption = 'Add'
+          Images = DataModule1.ILIconUI
+          ImageIndex = 4
           OnClick = BAddLayerClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BDeleteLayer: TSpeedButton
           AnchorSideLeft.Control = BAddLayer
@@ -225,11 +230,16 @@ object FormProjectConfig: TFormProjectConfig
           Cursor = crHandPoint
           Left = 321
           Height = 23
+          Hint = 'Delete the selected layer'
           Top = 159
           Width = 84
           BorderSpacing.Top = 20
           Caption = 'Delete'
+          Images = DataModule1.ILIconUI
+          ImageIndex = 5
           OnClick = BAddLayerClick
+          ShowHint = True
+          ParentShowHint = False
         end
         object BRenameLayer: TSpeedButton
           AnchorSideLeft.Control = BAddLayer
@@ -238,11 +248,34 @@ object FormProjectConfig: TFormProjectConfig
           Cursor = crHandPoint
           Left = 321
           Height = 23
+          Hint = 'Rename the selected layer'
           Top = 116
           Width = 84
           BorderSpacing.Top = 20
           Caption = 'Rename'
+          Images = DataModule1.ILIconUI
+          ImageIndex = 12
           OnClick = BAddLayerClick
+          ShowHint = True
+          ParentShowHint = False
+        end
+        object UpDown1: TUpDown
+          AnchorSideLeft.Control = BAddLayer
+          AnchorSideTop.Control = BDeleteLayer
+          AnchorSideTop.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 321
+          Height = 51
+          Hint = 'Shift the selected layer'
+          Top = 202
+          Width = 20
+          BorderSpacing.Top = 20
+          Min = 0
+          OnClick = UpDown1Click
+          ParentShowHint = False
+          Position = 0
+          ShowHint = True
+          TabOrder = 1
         end
       end
     end
@@ -357,22 +390,15 @@ object FormProjectConfig: TFormProjectConfig
     ParentBackground = False
     ParentColor = False
     TabOrder = 1
-    object BCancel: TSpeedButton
-      Cursor = crHandPoint
-      Left = 340
-      Height = 24
-      Top = 12
-      Width = 108
-      Caption = 'Cancel'
-      Images = DataModule1.ILIconUI
-      ImageIndex = 13
-      OnClick = BOkClick
-    end
     object BOk: TSpeedButton
+      AnchorSideLeft.Control = Panel1
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = Panel1
+      AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 152
+      Left = 222
       Height = 24
-      Top = 12
+      Top = 10
       Width = 108
       Caption = 'Ok'
       Images = DataModule1.ILIconUI

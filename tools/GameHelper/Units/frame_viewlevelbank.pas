@@ -19,6 +19,8 @@ type
     BDeleteGroup: TSpeedButton;
     BDeleteLevel: TSpeedButton;
     BDuplicateLevel: TSpeedButton;
+    BEditLevel: TSpeedButton;
+    MIEditLevel: TMenuItem;
     MILevelDescription: TMenuItem;
     MIGroupDescription: TMenuItem;
     MIRenameGroup: TMenuItem;
@@ -68,6 +70,7 @@ type
     procedure DoDuplicateLevel;
     procedure DoChangeLevelDescription;
     procedure DoDeleteLevel;
+    procedure DoEditLevel;
     procedure DoSaveLevelBank;
   private
     procedure HideToolPanels;
@@ -95,7 +98,7 @@ implementation
 
 uses Graphics, LCLType, LazUTF8, LCLIntf, u_project, u_common,
   u_target_lazarusproject, form_main, u_connection_to_ide,
-  form_enter_description, u_utils, u_resourcestring;
+  form_enter_description, u_utils, u_resourcestring, LazFileUtils;
 
 {$R *.lfm}
 
@@ -129,7 +132,7 @@ begin
     group := LevelBank.GetGroupByName(node.Text);
     if group <> NIL then begin
       if group.GroupDescription <> '' then TV.Hint := sDescription+LineEnding+group.GroupDescription
-        else TV.Hint := sYouHaveNotYetDefinedGroupDesc;
+        else TV.Hint := sThereIsntGroupDesc;
       TV.ShowHint := True;
     end;
   end
@@ -140,7 +143,7 @@ begin
       level := group.GetItemByName(node.Text);
       if level <> NIL then begin
         if level^.description <> '' then TV.Hint := sDescription+LineEnding+level^.description
-          else TV.Hint := sYouHaveNotYetDefinedLevelDesc;
+          else TV.Hint := sThereIsntLevelDesc;
         TV.ShowHint := True;
       end;
     end;
@@ -204,6 +207,7 @@ begin
   if (Sender = BDuplicateLevel) or (Sender = MIDuplicateLevel) then DoDuplicateLevel;
   if (Sender = BLevelDescription) or (Sender = MILevelDescription) then DoChangeLevelDescription;
   if (Sender = BDeleteLevel) or (Sender = MIDeleteLevel) then DoDeleteLevel;
+  if (Sender = BEditLevel) or (Sender = MIEditLevel) then DoEditLevel;
 end;
 
 procedure TFrameViewLevelBank.TVMouseUp(Sender: TObject; Button: TMouseButton;
@@ -280,10 +284,10 @@ procedure TFrameViewLevelBank.DoAddgroup;
 var groupname: String;
   rootnode: TTreeNode;
 begin
-  groupname := Trim(InputBox('', 'Enter a name for the group:', ''));
+  groupname := Trim(InputBox('', sEnterANameForTheGroup, ''));
   if groupname = '' then exit;
   if LevelBank.GroupNameExists(groupname) then begin
-    ShowMessage('The group "'+groupname+'" already exists. Please retry with another name');
+    ShowMessage(Format(sTheGroupxxAlreadyExists, [groupname]));
     exit;
   end;
 
@@ -291,7 +295,12 @@ begin
   LevelBank.AddGroup(groupname);
   // add the group to the tree
   rootnode := TV.Items.GetFirstNode;
-  TV.Items.AddChild(rootnode, groupname);
+  with TV.Items.AddChild(rootnode, groupname) do begin
+    SelectedIndex := 0;
+    ImageIndex := 0;
+    MakeVisible;
+  end;
+
   // generate the new unit file and add it to project
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
@@ -312,10 +321,10 @@ begin
   if group = NIL then exit;
   oldName := group.GroupName;
 
-  newName := Trim(InputBox('', 'Enter the new name for the group:', oldName));
+  newName := Trim(InputBox('', sEnterTheNewName, oldName));
   if (newName = '') or (newName = oldName) then exit;
   if LevelBank.GroupNameExists(newName) then begin
-    ShowMessage('The group "'+newName+'" already exists. Please retry with another name');
+    ShowMessage(Format(sTheGroupxxAlreadyExists, [newName]));
     exit;
   end;
 
@@ -361,22 +370,31 @@ end;
 
 procedure TFrameViewLevelBank.DoDeleteGroup;
 var group: TLevelGroup;
+  levelFilename: String;
 begin
   if not SelectedIsGroup then exit;
   group := GetSelectedWorkingLevelGroup;
   if group = NIL then exit;
 
-  if QuestionDlg('','Delete the group and its levels ? (this action is irreversible)', mtWarning,
-               [mrOk, 'Delete', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+  if QuestionDlg('', sDeleteTheGroupAndItsLevels, mtWarning,
+               [mrOk, sDelete, mrCancel, sCancel], 0) = mrCancel then exit;
   // delete the group in bank
   LevelBank.DeleteGroupByName(group.GroupName);
 
   // remove entry in tree view
   TV.Items.Delete(TV.Selected);
 
-  // generate the level unit file and add it to project
-  LevelBank.ExportToFileGameLevel;
-  Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+  if LevelBank.Size > 0 then begin
+    // generate the level unit file and add it to project
+    LevelBank.ExportToFileGameLevel;
+    Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+  end else begin
+    // there isn't group in the list -> we remove the level unit from project and disk
+    levelFilename := Project.Config.TargetLazarusProject.GetFilenameGameLevels;
+    Project.Config.TargetLazarusProject.Unit_RemoveFromProject(LEVEL_UNIT_NAME, ulLevels, uePas);
+    if FileExistsUTF8(levelFilename) then
+      DeleteFileUTF8(levelFilename);
+  end;
 
   DoSaveLevelBank;
 end;
@@ -393,10 +411,10 @@ begin
   if group = NIL then exit;
 
   oldName := level^.name;
-  newName := Trim(InputBox('', 'Enter the new name for the level:', oldName));
+  newName := Trim(InputBox('', sEnterTheNewName, oldName));
   if (newName = '') or (newName = oldName) then exit;
   if group.NameExists(newName) then begin
-    ShowMessage('The level "'+newName+'" already exists. Please retry with another name');
+    ShowMessage(Format(sTheLevelxxAlreadyExists, [newName]));
     exit;
   end;
 
@@ -492,8 +510,8 @@ begin
   group := GetSelectedWorkingLevelGroup;
   if group = NIL then exit;
 
-  if QuestionDlg('','Delete this level ? (this action is irreversible)', mtWarning,
-                 [mrOk, 'Delete', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+  if QuestionDlg('', sDeleteThisLevel, mtWarning,
+                 [mrOk, sDelete, mrCancel, sCancel], 0) = mrCancel then exit;
 
   // delete entry in the LevelBank
   group.DeleteByName(TV.Selected.Text);
@@ -506,6 +524,12 @@ begin
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
   DoSaveLevelBank;
+end;
+
+procedure TFrameViewLevelBank.DoEditLevel;
+begin
+  if not SelectedIsLevel then exit;
+  FormMain.EditLevelInLevelBank(GetSelectedText);
 end;
 
 procedure TFrameViewLevelBank.DoSaveLevelBank;
@@ -554,7 +578,7 @@ var i, j: integer;
 begin
   TV.BeginUpdate;
   TV.Items.Clear;
-  TV.Items.AddFirst(NIL, 'Groups');
+  TV.Items.AddFirst(NIL, sGroups);
   if LevelBank.Size > 0 then begin
     rootnode := TV.Items.GetFirstNode;
     for i:=0 to LevelBank.Size-1 do begin

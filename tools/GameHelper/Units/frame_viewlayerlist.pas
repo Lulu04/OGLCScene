@@ -59,8 +59,14 @@ type
     procedure Fill;
     function GetSelectedIndex: integer;
     function GetNewDefaultLayerName: string;
-    procedure AddLayer(const aName: string);
-    procedure DeleteLayer(aIndex: integer);
+    // return True if a new layer is added
+    function AddLayer: boolean;
+    // return True if the deletion is done
+    function DeleteSelected: boolean;
+    // return true if the item has been shifted
+    function MoveSelected(aUp: boolean): boolean;
+    // return True if the item is renamed
+    function RenameSelected: boolean;
 
     procedure SaveLayerConfigToLayerList;
 
@@ -78,7 +84,7 @@ type
 
 implementation
 uses LCLType, LCLHelper, u_project, u_utils, u_datamodule,
-  u_common, Math, OGLCScene;
+  u_common, u_levelbank, Math, OGLCScene, Dialogs;
 
 {$R *.lfm}
 
@@ -422,15 +428,98 @@ begin
   until not NameExists(Result);
 end;
 
-procedure TFrameViewLayerList.AddLayer(const aName: string);
+function TFrameViewLayerList.AddLayer: boolean;
+var layerName: String;
 begin
-  LB.Items.Add(aName);
+  Result := False;
+  layerName := Trim(InputBox('', 'Enter a name for the new layer:', GetNewDefaultLayerName));
+  if Layers.UserLayerNameExists(layerName) then begin
+    ShowMessage('There is a layer named '+layerName+LineEnding+'Please try with another name');
+    exit;
+  end;
+  if not IsValidPascalVariableName(layerName, True) then
+    exit;
+
+  // add in layer list
+  Layers.Add(layerName);
+  // add in listbox
+  LB.Items.Add(layerName);
+  Result := True;
 end;
 
-procedure TFrameViewLayerList.DeleteLayer(aIndex: integer);
+function TFrameViewLayerList.DeleteSelected: boolean;
+var i: integer;
 begin
-  if LB.Count = 0 then exit;
-  LB.Items.Delete(aIndex);
+  Result := False;
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  if LevelBank.UseThisLayer(i) then begin
+    ShowMessage('This layer can''t be deleted because one or several levels use it.'+LineEnding+
+                'Operation canceled');
+    exit;
+  end;
+  // delete in the layer list
+  Layers.Delete(i);
+  // delete in the listbox
+  LB.Items.Delete(i);
+  // adjust the layer indexes in all levels
+  LevelBank.DecreaseLayerIndexGreaterOrEqualThan(i);
+
+  Result := True;
+end;
+
+function TFrameViewLayerList.MoveSelected(aUp: boolean): boolean;
+var
+  i: Integer;
+begin
+  Result := False;
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  if aUp then begin
+    // up
+    if i = 0 then exit;
+    // move in listbox
+    LB.MoveSelectionUp;
+    // move in layer list
+    Layers.Exchange(i, i-1);
+    // modify the layer index in LevelBank
+    LevelBank.ExchangeLayerIndexInAllSurfaces(i, i-1);
+    Result := True;
+  end else begin
+    // down
+    if i = LB.Count-1 then exit;
+    LB.MoveSelectionDown;
+    Layers.Exchange(i, i+1);
+    LevelBank.ExchangeLayerIndexInAllSurfaces(i, i+1);
+    Result := True;
+  end;
+end;
+
+function TFrameViewLayerList.RenameSelected: boolean;
+var i: integer;
+  oldName, newName: String;
+begin
+  Result := False;
+  i := LB.ItemIndex;
+  if i = -1 then exit;
+
+  oldName := Names[i];
+  newName := Trim(InputBox('', 'Enter the new name:', oldName));
+  if (newName = oldName) or (newName = '') then exit;
+  if Layers.UserLayerNameExists(newName) then begin
+    ShowMessage('A layer named '''+newName+''' already exists'+LineEnding+'Please try with another name');
+    exit;
+  end;
+  if not IsValidPascalVariableName(newName, True) then
+    exit;
+
+  // rename in the listbox
+  Names[i] := newName;
+  // rename in layer list
+  Layers.Names[i] := newName;
+  Result := True;
 end;
 
 procedure TFrameViewLayerList.SaveLayerConfigToLayerList;

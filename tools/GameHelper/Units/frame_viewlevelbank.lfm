@@ -41,12 +41,12 @@ object FrameViewLevelBank: TFrameViewLevelBank
   end
   object PanelRoot: TPanel
     Left = 232
-    Height = 18
+    Height = 20
     Top = 8
-    Width = 32
-    BevelOuter = bvNone
-    ClientHeight = 18
-    ClientWidth = 32
+    Width = 20
+    BevelColor = 2302755
+    ClientHeight = 20
+    ClientWidth = 20
     Color = 3947580
     ParentBackground = False
     ParentColor = False
@@ -57,11 +57,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelRoot
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 0
-      Height = 16
+      Left = 1
+      Height = 20
       Hint = 'Add a new group'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 2
@@ -71,13 +71,13 @@ object FrameViewLevelBank: TFrameViewLevelBank
     end
   end
   object PanelGroup: TPanel
-    Left = 216
-    Height = 18
+    Left = 200
+    Height = 20
     Top = 32
-    Width = 88
-    BevelOuter = bvNone
-    ClientHeight = 18
-    ClientWidth = 88
+    Width = 104
+    BevelColor = 2302755
+    ClientHeight = 20
+    ClientWidth = 104
     Color = 3947580
     ParentBackground = False
     ParentColor = False
@@ -88,11 +88,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelGroup
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 0
-      Height = 16
+      Left = 1
+      Height = 20
       Hint = 'Add a new level to this group'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 2
@@ -106,11 +106,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelGroup
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 20
-      Height = 16
+      Left = 25
+      Height = 20
       Hint = 'Rename the group'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
@@ -127,11 +127,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideRight.Control = PanelGroup
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 72
-      Height = 16
+      Left = 83
+      Height = 20
       Hint = 'Delete the group'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       Anchors = [akTop, akRight]
       BorderSpacing.Left = 4
       Flat = True
@@ -147,11 +147,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelGroup
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 40
-      Height = 16
+      Left = 49
+      Height = 20
       Hint = 'If you want to display a description of this group of levels in your game,'#13#10'click to modify it.'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
@@ -162,28 +162,30 @@ object FrameViewLevelBank: TFrameViewLevelBank
     end
   end
   object PanelLevel: TPanel
-    Left = 216
-    Height = 18
+    Left = 184
+    Height = 20
     Top = 60
-    Width = 88
-    BevelOuter = bvNone
-    ClientHeight = 18
-    ClientWidth = 88
+    Width = 128
+    BevelColor = 2302755
+    ClientHeight = 20
+    ClientWidth = 128
     Color = 3947580
     ParentBackground = False
     ParentColor = False
     TabOrder = 3
     Visible = False
     object BRenameLevel: TSpeedButton
-      AnchorSideLeft.Control = PanelLevel
+      AnchorSideLeft.Control = BEditLevel
+      AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = PanelLevel
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 0
-      Height = 16
+      Left = 25
+      Height = 20
       Hint = 'Rename the level'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
+      BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 4
@@ -197,11 +199,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelLevel
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 20
-      Height = 16
+      Left = 49
+      Height = 20
       Hint = 'Duplicate this level'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
@@ -218,11 +220,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideRight.Control = PanelLevel
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 72
-      Height = 16
+      Left = 107
+      Height = 20
       Hint = 'Delete this level'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       Anchors = [akTop, akRight]
       BorderSpacing.Left = 4
       Flat = True
@@ -238,15 +240,32 @@ object FrameViewLevelBank: TFrameViewLevelBank
       AnchorSideTop.Control = PanelLevel
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 40
-      Height = 16
+      Left = 73
+      Height = 20
       Hint = 'If you want to display a description of this level in your game,'#13#10'click to modify it.'
-      Top = 1
-      Width = 16
+      Top = 0
+      Width = 20
       BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 6
+      OnClick = BAddGroupClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BEditLevel: TSpeedButton
+      AnchorSideLeft.Control = PanelLevel
+      AnchorSideTop.Control = PanelLevel
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 1
+      Height = 20
+      Hint = 'Edit the level'
+      Top = 0
+      Width = 20
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 8
       OnClick = BAddGroupClick
       ShowHint = True
       ParentShowHint = False
@@ -284,6 +303,11 @@ object FrameViewLevelBank: TFrameViewLevelBank
     Images = DataModule1.ILLevelTreeView
     Left = 173
     Top = 80
+    object MIEditLevel: TMenuItem
+      Caption = 'Edit in Level Editor'
+      ImageIndex = 8
+      OnClick = BAddGroupClick
+    end
     object MIRenameLevel: TMenuItem
       Caption = 'Rename'
       ImageIndex = 4

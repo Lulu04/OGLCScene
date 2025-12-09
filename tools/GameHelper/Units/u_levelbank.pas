@@ -44,6 +44,10 @@ TLevelBankItem = record
 
   // return an array with the index of user layer used in this level
   function GetUserLayerIndexesUsed: TArrayOfInteger;
+  // called when user shift the index of a layer
+  procedure ExchangeLayerIndexInAllSurfaces(Index1, Index2: integer);
+  // called when user delete a layer
+  procedure DecreaseLayerIndexGreaterOrEqualThan(Index: integer);
   // export pascal code to declare the level as constant
   procedure ExportToPascalConst(t: TStringList; const aGroupName: string; aTextures: TTexturelist);
 end;
@@ -63,6 +67,8 @@ public
   function GetItemByName(const aName: string): PLevelBankItem;
   procedure DeleteByIndex(aIndex: integer);
   procedure DeleteByName(const aName: string);
+  // return true if the layer index is used by a level
+  function UseThisLayer(Index: integer): boolean;
 
   procedure Clear; reintroduce;
 
@@ -76,6 +82,7 @@ TLevelBank = class(specialize TVector<TLevelGroup>)
   destructor Destroy; override;
 
   function GroupNameExists(const aName: string): boolean;
+  function ThereIsAtLeastOneLevelDefined: boolean;
 
   function AddGroup(const aGroupName: string): TLevelGroup;
   function IndexOfGroup(const aGroupName: string): integer;
@@ -85,11 +92,20 @@ TLevelBank = class(specialize TVector<TLevelGroup>)
 
   function GetGroupByName(const aGroupName: string): TLevelGroup;
 
+  // called when user shift the index of a layer
+  procedure ExchangeLayerIndexInAllSurfaces(Index1, Index2: integer);
+  // return true if the layer index is used by a level
+  function UseThisLayer(Index: integer): boolean;
+  // called when used delete a layer
+  procedure DecreaseLayerIndexGreaterOrEqualThan(aIndex: integer);
+
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
   // save into file \GameHelperSave\LevelBank.oglc
   procedure SaveToPath(const aPath: string);
   procedure LoadFromPath(const aPath: string);
+  // save in folder GameHelperFiles\
+  procedure Save;
 
   procedure ExportToFileGameLevel;
 end;
@@ -212,6 +228,48 @@ begin
   end;
 end;
 
+procedure TLevelBankItem.ExchangeLayerIndexInAllSurfaces(Index1, Index2: integer);
+var i: integer;
+  sl: TSurfaceList;
+begin
+  Index1 := Index1 + APP_LAYER_COUNT;
+  Index2 := Index2 + APP_LAYER_COUNT;
+  sl := TSurfaceList.Create;
+  sl.SetModeForLevelEditor;
+  try
+    sl.LoadFromString(surfaces, False);
+    if sl.Size > 0 then begin
+      for i:=0 to sl.Size-1 do
+        with sl.Mutable[i]^ do
+          if layerindex = Index1 then layerindex := Index2
+            else if layerindex = Index2 then layerindex := Index1;
+      surfaces := sl.SaveToString;
+    end;
+  finally
+    sl.Free;
+  end;
+end;
+
+procedure TLevelBankItem.DecreaseLayerIndexGreaterOrEqualThan(Index: integer);
+var i: integer;
+  sl: TSurfaceList;
+begin
+  Index := Index + APP_LAYER_COUNT;
+  sl := TSurfaceList.Create;
+  sl.SetModeForLevelEditor;
+  try
+    sl.LoadFromString(surfaces, False);
+    if sl.Size > 0 then begin
+      for i:=0 to sl.Size-1 do
+        with sl.Mutable[i]^ do
+          if layerindex >= Index then layerindex := layerindex - 1;
+      surfaces := sl.SaveToString;
+    end;
+  finally
+    sl.Free;
+  end;
+end;
+
 procedure TLevelBankItem.ExportToPascalConst(t: TStringList; const aGroupName: string;
   aTextures: TTexturelist);
 var wi: TWorldInfo;
@@ -300,6 +358,19 @@ begin
     end;
 end;
 
+function TLevelGroup.UseThisLayer(Index: integer): boolean;
+var i: SizeUInt;
+  layersUsed: TArrayOfInteger;
+begin
+  Result := False;
+  if Size = 0 then exit;
+
+  for i:=0 to Size-1 do begin
+    layersUsed := Mutable[i]^.GetUserLayerIndexesUsed;
+    if layersUsed.Have(Index) then exit(True);
+  end;
+end;
+
 procedure TLevelGroup.Clear;
 begin
   Textures.Clear;
@@ -379,6 +450,15 @@ begin
   Result := IndexOfGroup(aName) <> -1;
 end;
 
+function TLevelBank.ThereIsAtLeastOneLevelDefined: boolean;
+var i: SizeUInt;
+begin
+  Result := False;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.Size > 0 then exit(True);
+end;
+
 function TLevelBank.AddGroup(const aGroupName: string): TLevelGroup;
 begin
   Result := TLevelGroup.Create;
@@ -433,6 +513,41 @@ begin
     else Result := Mutable[i]^;
 end;
 
+procedure TLevelBank.ExchangeLayerIndexInAllSurfaces(Index1, Index2: integer);
+var i, j: SizeUInt;
+  group: TLevelGroup;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do begin
+    group := Mutable[i]^;
+    if group.Size > 0 then
+      for j:=0 to group.Size-1 do
+        group.Mutable[j]^.ExchangeLayerIndexInAllSurfaces(Index1, Index2);
+  end;
+end;
+
+function TLevelBank.UseThisLayer(Index: integer): boolean;
+var i: SizeUInt;
+begin
+  Result := False;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    if Mutable[i]^.UseThisLayer(Index) then exit(True);
+end;
+
+procedure TLevelBank.DecreaseLayerIndexGreaterOrEqualThan(aIndex: integer);
+var i, j: SizeUInt;
+  group: TLevelGroup;
+begin
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do begin
+    group := Mutable[i]^;
+    if group.Size > 0 then
+      for j:=0 to group.Size-1 do
+        group.Mutable[j]^.DecreaseLayerIndexGreaterOrEqualThan(aIndex);
+  end;
+end;
+
 procedure TLevelBank.SaveTo(t: TStringList);
 var i: SizeUInt;
   prop: TProperties;
@@ -482,7 +597,7 @@ begin
     try
       SaveTo(t);
       t.SaveToFile(filename);
-      FScene.LogInfo('success', 2);
+      FScene.LogInfo('done', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);
@@ -510,7 +625,7 @@ begin
     try
       t.LoadFromFile(filename);
       LoadFrom(t);
-      FScene.LogInfo('success', 2);
+      FScene.LogInfo('done', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);
@@ -519,6 +634,11 @@ begin
   finally
     t.Free;
   end;
+end;
+
+procedure TLevelBank.Save;
+begin
+  SaveToPath(Project.Config.TargetLazarusProject.GetFolderGameHelperFiles);
 end;
 
 procedure TLevelBank.ExportToFileGameLevel;
@@ -631,16 +751,19 @@ begin
   t.Add('');
   // implementation
   CodeGen.AddImplementation(t);
+
   // CONST level data in string format
-  t.Add('const');
-  for i:=0 to Size-1 do begin
-    group := Mutable[i]^;
-    if group.Size > 0 then
-      for j:=0 to group.Size-1 do begin
-        group.Mutable[j]^.ExportToPascalConst(t, group.GroupName, group.Textures);
-        t.Add('');
-      end;
- end;
+  if ThereIsAtLeastOneLevelDefined then begin
+    t.Add('const');
+    for i:=0 to Size-1 do begin
+      group := Mutable[i]^;
+      if group.Size > 0 then
+        for j:=0 to group.Size-1 do begin
+          group.Mutable[j]^.ExportToPascalConst(t, group.GroupName, group.Textures);
+          t.Add('');
+        end;
+    end;
+  end;
 
   t.AddText('{ '+nameClass+' }'+#10);
 

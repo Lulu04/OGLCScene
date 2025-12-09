@@ -212,12 +212,22 @@ begin
     // header
     t.Add('{');
     CodeGen.AddFileGeneratedByGameHelper(t);
-    t.AddText('  Usage:'#10+
-              '    - include this file to your Lazarus project.');
+    t.Add('');
+    t.AddText('  DON''T EDIT THIS UNIT because it may be overwritten by the tool -> your code will be lost !'#10+
+              '  Instead, in another unit add "'+nameUnit+'" in the uses clause'#10+
+              '  and define an inherited class TCustom'+name+' = class('+nameClass+') to contain your code.');
+    t.Add('');
+    t.Add('  Usage:');
     if surfaceList.UseTexture then
-      t.Add('    - call '+nameClass+'.LoadTexture() when you construct your texture atlas.');
-    t.AddText('    - create an instance of the sprite as usual.'#10+
-             '}');
+      t.Add('    - add the sprite textures to your atlas with class method '+nameClass+'.LoadTexture().');
+    t.AddText('    - create an instance of the sprite'#10+
+              '      i.e. F'+name+' := TCustom'+name+'.Create(aLAYER_INDEX);'#10+
+              '    or if the sprite is a child of another:'#10+
+              '           F'+name+' := TCustom'+name+'.Create(-1);'#10+
+              '           F'+name+'.SetChildOf(parentSprite, zordervalue);'#10+
+              '    - initialize the sprite coordinates'#10+
+              '           F'+name+'.Setcoordinates(...);'#10+
+              '}');
     t.Add('');
     CodeGen.AddInterface(t, nameUnit);
 
@@ -279,7 +289,6 @@ begin
     t.Add('');
     // implementation
     CodeGen.AddImplementation(t);
-    t.Add('uses LazFileUtils;');
     t.Add('{ '+nameClass+' }');
     t.Add('');
 
@@ -323,27 +332,26 @@ begin
               'begin'#10);
     case spriteClassType of
       'TSpriteContainer': begin
-        s := '  inherited Create(FScene);';
+        t.Add('  inherited Create(FScene);');
       end;
       'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite', 'TPolarSprite', 'TScrollableSprite': begin
-        s := '  inherited Create('+rootItem^.textureName + ', False);';
+        t.Add('  inherited Create('+rootItem^.textureName + ', False);');
       end;
       'TShapeOutline': begin
-        s := '  inherited Create(FScene);';
+        t.Add('  inherited Create(FScene);');
       end;
       'TGradientRectangle': begin
-        s := '  inherited Create(FScene);';
+        t.Add('  inherited Create(FScene);');
       end;
       'TQuad4Color': begin
-        s := '  inherited Create(FScene);'#10+
-             CodeGen.ExtraPropertiesToPascalCode(rootItem, '  ');
+        t.Add('  inherited Create(FScene);');
+        CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
       end;
       'TDeformationGrid': begin
-        s := '  inherited Create('+rootItem^.textureName + ', False);';
+        t.Add('  inherited Create('+rootItem^.textureName + ', False);');
       end;
       else raise exception.create('forgot to implement '+spriteClassType);
     end;
-    t.Add(s);
     t.AddText('  if aLayerIndex <> -1 then'#10+
               '    FScene.Add(Self, aLayerIndex);'#10);
     if rootItem <> NIL then begin
@@ -351,8 +359,8 @@ begin
         t.Add('  SetCoordinate(ScaleWF('+FormatFloatWithDot('0.00', rootItem^.x)+'), ScaleHF('+
                                  FormatFloatWithDot('0.00', rootItem^.y)+'));');
 
-      t.AddText(CodeGen.CommonPropertiesToPascalCode(rootItem, '  '));
-      t.AddText(CodeGen.ExtraPropertiesToPascalCode(rootItem, '  '));
+      CodeGen.CommonPropertiesToPascalCode(t, rootItem, '  ');
+      CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
     end else t.Add('');
 
     // creating childs
@@ -403,8 +411,8 @@ begin
         t.Add('    SetCoordinate('+sx+', '+sy+');');
       end;
 
-      t.AddText(CodeGen.CommonPropertiesToPascalCode(current, '    '));
-      t.AddText(CodeGen.ExtraPropertiesToPascalCode(current, '    '));
+      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
+      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
       if codeop.useapplysymetrywhenflip then
         t.Add('    ApplySymmetryWhenFlip := True;');
       t.Add('  end;');
@@ -647,7 +655,7 @@ begin
     try
       SaveTo(t);
       t.SaveToFile(filename);
-      FScene.LogInfo('success', 2);
+      FScene.LogInfo('done', 2);
     except
       On E :Exception do begin
         FScene.LogError('TSpriteBank.Save: exception occur');
@@ -676,7 +684,7 @@ begin
     try
       t.LoadFromFile(filename);
       LoadFrom(t);
-      FScene.LogInfo('success', 2);
+      FScene.LogInfo('done', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);

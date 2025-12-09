@@ -1,13 +1,16 @@
 object FormGameHelperConnexion: TFormGameHelperConnexion
   Left = 356
-  Height = 302
+  Height = 293
   Top = 144
-  Width = 725
-  Caption = 'Messages from Game Helper'
-  ClientHeight = 302
-  ClientWidth = 725
+  Width = 489
+  BorderIcons = []
+  BorderStyle = bsSingle
+  Caption = 'Interaction with Game Helper'
+  ClientHeight = 293
+  ClientWidth = 489
   OnClose = FormClose
   OnShow = FormShow
+  Position = poMainFormCenter
   LCLVersion = '3.8.0.0'
   object Memo1: TMemo
     AnchorSideLeft.Control = Owner
@@ -18,9 +21,9 @@ object FormGameHelperConnexion: TFormGameHelperConnexion
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 227
+    Height = 218
     Top = 75
-    Width = 725
+    Width = 489
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Top = 20
     ReadOnly = True
@@ -31,12 +34,12 @@ object FormGameHelperConnexion: TFormGameHelperConnexion
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
-    Left = 251
+    Left = 124
     Height = 15
     Top = 40
-    Width = 222
+    Width = 240
     BorderSpacing.Top = 40
-    Caption = 'To return to the IDE, close Game Helper'
+    Caption = 'Quit Game Helper to continue with the IDE'
     Font.Style = [fsBold]
     ParentFont = False
   end
@@ -44,7 +47,7 @@ object FormGameHelperConnexion: TFormGameHelperConnexion
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 714
+    Left = 478
     Height = 19
     Hint = 'If something went wrong, click here to return to the IDE'
     Top = 0
@@ -60,12 +63,12 @@ object FormGameHelperConnexion: TFormGameHelperConnexion
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
     AnchorSideTop.Control = Owner
-    Left = 284
+    Left = 215
     Height = 15
     Top = 20
-    Width = 156
+    Width = 58
     BorderSpacing.Top = 20
-    Caption = 'Connected with Game Helper'
+    Caption = 'Connected'
   end
   object Timer1: TTimer
     Interval = 500

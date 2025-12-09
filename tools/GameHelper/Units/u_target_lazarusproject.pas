@@ -30,7 +30,7 @@ private // LPI file utils
   procedure LPI_RemoveUnit(const aUnitName: string;
                            aUnitLocation: TUnitLocation;
                            aUnitExtension: TUnitExtension);
-public // string utils
+public // string utils 1 based
   // return True if the char is found -> IndexFound is the index
   function FindIndexOfNextChar(const Src: string; aChar: char;
                                aStartIndex: integer; out IndexFound: integer): boolean;
@@ -39,6 +39,7 @@ public // string utils
                                    aStartIndex: integer; out IndexFound: integer): boolean;
   procedure RemoveNextConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
   procedure RemovePreviousConsecutiveChar(var Src: string; aChar: char; aFromIndex: integer);
+  function GetPartOf(const Src: string; aStartIndex, aEndIndex: integer): string;
 public // folder and files
   function GetProjectFolder: string;
   function GetFolderGameHelperFiles: string;
@@ -70,11 +71,14 @@ private // project options in configuration file
 public // config
   property ProjectConfig_MaximizeSceneOnMonitor: boolean read ConfigOption_GetMaximizeSceneOnMonitor write ConfigOption_SetMaximizeSceneOnMonitor;
   property ProjectConfig_WindowedMode: boolean read ConfigOption_GetWindowedMode write ConfigOption_SetWindowedMode;
-private // unit utils
+private // Tags utils
   function SearchTags(const aUnitFilename, aTagName: string; out FirstTagIndex, LastTagIndex: integer): TStringList;
   function ReadTagContent(const aUnitFilename, aTagName: string): TStringArray;
   procedure ReplaceTagContentBy(const aUnitFilename, aTagName: string; const aLines: TStringArray);
 private // u_common
+  const
+    U_COMMON_TAG_DESIGN = 'DESIGN';
+    U_COMMON_TAG_LAYERS = 'LAYERS';
   function GetFilenameUCommon: string;
 public // u_common
   function UCommonGetLayerNames: TStringArray;
@@ -156,7 +160,8 @@ begin
   i := aFromIndex;
   while (i <= Length(Src)) and (Src[i] = aChar) do
     inc(i);
-  system.Delete(Src, aFromIndex, i-aFromIndex+1);
+  if i <> aFromIndex then
+    system.Delete(Src, aFromIndex, i-aFromIndex+1);
 end;
 
 procedure TTargetLazarusProject.RemovePreviousConsecutiveChar(var Src: string;
@@ -171,6 +176,14 @@ begin
     dec(i);
   if i <> aFromIndex then
     system.Delete(Src, i, aFromIndex-i+1);
+end;
+
+function TTargetLazarusProject.GetPartOf(const Src: string; aStartIndex, aEndIndex: integer): string;
+begin
+  aEndIndex := Min(aEndIndex, Length(Src));
+  if aStartIndex > aEndIndex then raise exception.create('aStartIndex: bad value');
+
+  Result := Copy(Src, aStartIndex, aEndIndex-aStartIndex+1);
 end;
 
 function TTargetLazarusProject.GetProjectFolder: string;
@@ -489,21 +502,25 @@ end;
 function TTargetLazarusProject.SearchTags(const aUnitFilename,
   aTagName: string; out FirstTagIndex, LastTagIndex: integer): TStringList;
 var i: integer;
+  tagBegin, tagEnd: string;
 begin
-  Result := TStringList.Create;
   FirstTagIndex := -1;
   LastTagIndex := -1;
-  if not FileExists(aUnitFilename) then exit;
+  Result := StringList_CreateFromFile(aUnitFilename);
 
-  Result.LoadFromFile(aUnitFilename);
+  tagBegin := '{'+aTagName+'}';
+  tagEnd := '{/'+aTagName+'}';
+
   for i:=0 to Result.Count-2 do
-    if Result.Strings[i] = aTagName then begin
+    if Result.Strings[i].Contains(tagBegin) then begin
       FirstTagIndex := i;
       break;
     end;
+
   if FirstTagIndex = -1 then exit;
+
   for i:=FirstTagIndex+1 to Result.Count-1 do
-    if Result.Strings[i] = aTagName then begin
+    if Result.Strings[i].Contains(tagEnd) then begin
       LastTagIndex := i;
       break;
     end;
@@ -551,15 +568,22 @@ end;
 
 function TTargetLazarusProject.UCommonGetLayerNames: TStringArray;
 var i, k: integer;
+  s: string;
 begin
-  Result := ReadTagContent(GetFilenameUCommon, '//LAYERS');
+  Result := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_LAYERS);
   if Length(Result) = 0 then exit;
   // delete the layer count
   system.Delete(Result, 0, 1);
   // keep only the names
-  for i:=0 to High(Result) do begin
-    k := Pos(' ', Result[i], 3);
-    if k > 0 then Result[i] := Copy(Result[i], 3, k-3);
+  for i:=High(Result) downto 0 do begin
+    s := Trim(Result[i]); // remove spaces at begin
+    k := Pos('=', s, 1);  // return 0 if not found
+    if k > 1 then begin   // 1 because we must have something before the '='
+      repeat
+        dec(k);
+      until (s[k] <> ' ') or (k = 1);
+      Result[i] := GetPartOf(s, 1, k);
+    end else system.Delete(Result, i, 1); // delete the lines that not contain '='
   end;
 end;
 
@@ -583,7 +607,7 @@ begin
 
   for i:=1 to High(A) do
     A[i] := Format(s, [A[i], i-1]);
-  ReplaceTagContentBy(GetFilenameUCommon, '//LAYERS', A);
+  ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_LAYERS, A);
 end;
 
 function TTargetLazarusProject.UCommonGetDesignValues: TArrayOfInteger;
@@ -591,7 +615,7 @@ var i, k: integer;
   A: TStringArray;
 begin
   Result := NIL;
-  A := ReadTagContent(GetFilenameUCommon, '//DESIGN');
+  A := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_DESIGN);
   if Length(A) <> 3 then exit;
   SetLength(Result, Length(A));
   // keep only values
@@ -611,7 +635,7 @@ begin
   A[0] := '  SCREEN_WIDTH_AT_DESIGN_TIME: single = '+aValues[0].ToString+';';
   A[1] := '  SCREEN_HEIGHT_AT_DESIGN_TIME: single = '+aValues[1].ToString+';';
   A[2] := '  SCREEN_PPI_AT_DESIGN_TIME: integer = '+aValues[2].ToString+';';
-  ReplaceTagContentBy(GetFilenameUCommon, '//DESIGN', A);
+  ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_DESIGN, A);
 end;
 
 function TTargetLazarusProject.Unit_USES_CheckIfHaveEntry(t: TStringList;

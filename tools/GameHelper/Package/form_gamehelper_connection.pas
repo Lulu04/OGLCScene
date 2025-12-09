@@ -11,15 +11,20 @@ uses
 
 type
 
+  { TGameHelperProcess }
+
   TGameHelperProcess = class
   private
     FProcess: TProcess;
     FBufferIndex: integer;
     FBuffer: string;
+    FIDEWantGameHelperTermination: boolean;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Start(const aExecutable, aLazarusProjectFilename: string);
+    procedure ReadAndProcessMessage;
+    procedure ForceTerminate;
   end;
 
   { TFormGameHelperConnexion }
@@ -66,15 +71,12 @@ end;
 
 destructor TGameHelperProcess.Destroy;
 begin
-  if FProcess <> NIL then FProcess.Free;
+  if Assigned(FProcess) then FProcess.Free;
   FProcess := NIL;
   inherited Destroy;
 end;
 
 procedure TGameHelperProcess.Start(const aExecutable, aLazarusProjectFilename: string);
-var messageLine: string;
-  ByteRead: byte;
-  flagQuit: boolean;
 begin
   // open Game Helper with command line parameters
   // <executable>  path_for_respons  path_to_current_project
@@ -90,15 +92,16 @@ begin
   FBuffer := '';
   SetLength(FBuffer, 2048);
   FBufferIndex := 1;
-  flagQuit := False;
-  repeat
+  FIDEWantGameHelperTermination := False;
+
+{  repeat
     while FProcess.Output.NumBytesAvailable > 0 do begin
       ByteRead := FProcess.Output.ReadByte;
       if ByteRead <> 13 then  // skip #13
         if ByteRead = 10 then begin  // end of line
           messageLine := Copy(FBuffer, 1, FBufferIndex-1);
-          FormGameHelperConnexion.ShowMessage(messageline);
-          flagQuit := ConnectionUtils.DecodeMessageFromGameHelper(messageLine);
+          //FormGameHelperConnexion.ShowMessage(messageline);
+          FIDEWantGameHelperTermination := ConnectionUtils.DecodeMessageFromGameHelper(messageLine);
           FBufferIndex := 1;
         end else begin
           FBuffer[FBufferIndex] := Chr(ByteRead);
@@ -113,13 +116,48 @@ begin
   if FormGameHelperConnexion.UserWantToQuit then begin
     ConnectionUtils.ShowMessageInIDE('Try to terminate Game Helper');
     FProcess.Terminate(0);
-    FProcess.WaitOnExit(1000);
-    //Sleep(100);
+    //FProcess.WaitOnExit(1000);
+    Sleep(100);
     FormGameHelperConnexion.ModalResult := mrCancel;
   end else FormGameHelperConnexion.ModalResult := mrOk;
 
   FProcess.Free;
-  FProcess := NIL;
+  FProcess := NIL;   }
+end;
+
+procedure TGameHelperProcess.ReadAndProcessMessage;
+var ByteRead: byte;
+  messageLine: string;
+begin
+  if not Assigned(FProcess) or
+     not FProcess.Running or
+     FIDEWantGameHelperTermination or
+     FormGameHelperConnexion.UserWantToQuit then exit;
+
+  if not FProcess.Running then begin
+    FormGameHelperConnexion.modalResult := mrok;
+    exit;
+  end;
+
+  while FProcess.Output.NumBytesAvailable > 0 do begin
+    ByteRead := FProcess.Output.ReadByte;
+    if ByteRead <> 13 then  // skip #13
+      if ByteRead = 10 then begin  // end of line
+        messageLine := Copy(FBuffer, 1, FBufferIndex-1);
+        FIDEWantGameHelperTermination := ConnectionUtils.DecodeMessageFromGameHelper(messageLine);
+        FBufferIndex := 1;
+      end else begin
+        FBuffer[FBufferIndex] := Chr(ByteRead);
+        inc(FBufferIndex);
+      end;
+  end;
+end;
+
+procedure TGameHelperProcess.ForceTerminate;
+begin
+  FProcess.Terminate(0);
+  //FProcess.WaitOnExit(1000);
+  //Sleep(100);
 end;
 
 { TFormGameHelperConnexion }
@@ -128,11 +166,18 @@ procedure TFormGameHelperConnexion.BUserWantToQuitClick(Sender: TObject);
 begin
   BUserWantToQuit.Enabled := False;
   UserWantToQuit := True;
+
+  ConnectionUtils.ShowMessageInIDE('Try to terminate Game Helper');
+  FGameHelperProcess.ForceTerminate;
+  ModalResult := mrCancel;
 end;
 
 procedure TFormGameHelperConnexion.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   Application.RemoveOnIdleHandler(@ProcessOnIdleEvent);
+
+  if Assigned(FGameHelperProcess) then FGameHelperProcess.Free;
+  FGameHelperProcess := NIL;
 end;
 
 procedure TFormGameHelperConnexion.FormShow(Sender: TObject);
@@ -154,8 +199,10 @@ begin
   if not Assigned(FGameHelperProcess) then begin
     FGameHelperProcess := TGameHelperProcess.Create;
     FGameHelperProcess.Start(FExecutable, FLazarusProjectFilename);
-  end;
-  Done := True;
+  end else
+    FGameHelperProcess.ReadAndProcessMessage;
+
+  Done := False;
 end;
 
 procedure TFormGameHelperConnexion.ShowMessage(aMess: string);
