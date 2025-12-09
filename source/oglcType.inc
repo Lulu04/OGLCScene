@@ -157,12 +157,15 @@ TFontGradient = record
   procedure Create(aColor1, aColor2: TBGRAPixel; AGradientType: TGradientType; AOrigin, aD1: TPointF;
                    aGammaColorCorrection: boolean = True; aSinus: Boolean = False);
   function ToBGRAGradientScanner: TBGRAGradientScanner;
+  // utils for Game Helper
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
 end;
 
 const MAXFONTHEIGHT = 150;
 type
 { TFontDescriptor }
-
+PFontDescriptor = ^TFontDescriptor;
 TFontDescriptor = record
   FontName: string;
   FontHeight: integer;
@@ -190,10 +193,18 @@ TFontDescriptor = record
                   aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer); overload;
 
   procedure Create(const aFontName: string; aFontHeight: integer; aStyle: TFontStyles;
-                   aFontGradient: TFontGradient;
+                   const aFontGradient: TFontGradient); overload;
+
+  procedure Create(const aFontName: string; aFontHeight: integer; aStyle: TFontStyles;
+                   const aFontGradient: TFontGradient;
+                   aOutLineColor: TBGRAPixel; aOutLineWidth: single); overload;
+
+  procedure Create(const aFontName: string; aFontHeight: integer; aStyle: TFontStyles;
+                   const aFontGradient: TFontGradient;
                    aOutLineColor: TBGRAPixel; aOutLineWidth: single;
                    aShadowColor: TBGRAPixel; aShadowOffsetX, aShadowOffsetY, aShadowRadius: integer); overload;
 
+  procedure DuplicateTo(aDest: PFontDescriptor);
   // After creating a font descriptor, call this method to compute the font height so that the passed string will
   // fit in the passed rect with a maximum size.
   procedure ComputeMaxHeightFor(const aString: string; const aRect: TRect);
@@ -209,8 +220,10 @@ TFontDescriptor = record
   function UseOutLine: boolean;
   // gives the additionnal size computed from outline width and shadow parameters.
   function DecorationSize: TSize;
+public  // utils for Game Helper
+  function SaveToString: string;
+  procedure LoadFromString(const data: string);
 end;
-PFontDescriptor = ^TFontDescriptor;
 
 
 TOGLCAlignment = (taTopLeft, taTopCenter, taTopRight,
@@ -531,6 +544,47 @@ begin
                                         GammaColorCorrection, Sinus);
 end;
 
+function TFontGradient.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init(' ');
+  prop.Add('Color1', Color1);
+  prop.Add('Color2', Color2);
+  prop.Add('Type', integer(Ord(GradientType)));
+  prop.Add('OriginX', Origin.x);
+  prop.Add('OriginY', Origin.Y);
+  prop.Add('D1X', D1.x);
+  prop.Add('D1Y', D1.Y);
+  prop.Add('GammaCorrect', GammaColorCorrection);
+  prop.Add('Sinus', Sinus);
+  Result := prop.PackedProperty;
+end;
+
+procedure TFontGradient.LoadFromString(const data: string);
+var prop: TProperties;
+  v: integer;
+  vs: single;
+begin
+  if data = '' then exit;
+  v := 0;
+  vs := 0;
+  prop.Split(data, ' ');
+  prop.BGRAPixelValueOf('Color1', Color1, BGRA(255,255,0));
+  prop.BGRAPixelValueOf('Color2', Color2, BGRA(0,255,255));
+  prop.IntegerValueOf('Type', v, 0);
+  GradientType := TGradientType(v);
+  prop.SingleValueOf('OriginX', vs, 0);
+  Origin.x := vs;
+  prop.SingleValueOf('OriginY', vs, 0);
+  Origin.y := vs;
+  prop.SingleValueOf('D1X', vs, 0);
+  D1.x := vs;
+  prop.SingleValueOf('D1Y', vs, 0);
+  D1.y := vs;
+  prop.BooleanValueOf('GammaCorrect', GammaColorCorrection, True);
+  prop.BooleanValueOf('Sinus', Sinus, False);
+end;
+
 { TFontDescriptor }
 
 procedure TFontDescriptor.CreateDefault;
@@ -578,7 +632,25 @@ begin
 end;
 
 procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
-  aStyle: TFontStyles; aFontGradient: TFontGradient; aOutLineColor: TBGRAPixel;
+  aStyle: TFontStyles; const aFontGradient: TFontGradient);
+begin
+  Create(aFontName, aFontHeight, aStyle, aFontGradient,
+         BGRAPixelTransparent, 0.0,
+         BGRAPixelTransparent, 0, 0, 0);
+
+end;
+
+procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
+  aStyle: TFontStyles; const aFontGradient: TFontGradient;
+  aOutLineColor: TBGRAPixel; aOutLineWidth: single);
+begin
+  Create(aFontName, aFontHeight, aStyle, aFontGradient,
+         aOutLineColor, aOutLineWidth,
+         BGRAPixelTransparent, 0, 0, 0);
+end;
+
+procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
+  aStyle: TFontStyles; const aFontGradient: TFontGradient; aOutLineColor: TBGRAPixel;
   aOutLineWidth: single; aShadowColor: TBGRAPixel; aShadowOffsetX,
   aShadowOffsetY, aShadowRadius: integer);
 var ima: TBGRABitmap;
@@ -603,6 +675,23 @@ begin
   SetFontRendererOn(ima);
   FontPixelMetric := ima.FontPixelMetric;
   ima.Free;
+end;
+
+procedure TFontDescriptor.DuplicateTo(aDest: PFontDescriptor);
+begin
+  aDest^.FontName := FontName;
+  aDest^.FontHeight := FontHeight;
+  aDest^.Style := Style;
+  aDest^.OutLineColor := OutLineColor;
+  aDest^.OutLineWidth := OutLineWidth;
+  aDest^.ShadowColor := ShadowColor;
+  aDest^.ShadowOffsetX := ShadowOffsetX;
+  aDest^.ShadowOffsetY := ShadowOffsetY;
+  aDest^.ShadowRadius := ShadowRadius;
+  aDest^.UseGradient := UseGradient;
+  aDest^.FontColor := FontColor;
+  aDest^.Gradient := Gradient;
+  aDest^.FontPixelMetric := FontPixelMetric;
 end;
 
 procedure TFontDescriptor.ComputeMaxHeightFor(const aString: string; const aRect: TRect);
@@ -741,6 +830,59 @@ begin
 
   Result.cx := round(_OutlineWidth)+abs( _ShadowOffsetX )+_ShadowRadius{*2};
   Result.cy := round(_OutlineWidth)+abs( _ShadowOffsetY )+_ShadowRadius{*2};
+end;
+
+function TFontDescriptor.SaveToString: string;
+var prop: TProperties;
+  s: string;
+begin
+  prop.Init('&');
+  prop.Add('FontName', FontName);
+  prop.Add('FontHeight', FontHeight);
+  s := '';
+  if fsBold in Style then s := s+'B';
+  if fsItalic in Style then s := s+'I';
+  if fsUnderline in Style then s := s+'U';
+  if fsStrikeOut in Style then s := s+'S';
+  prop.Add('Style', s);
+  prop.Add('OutLineColor', OutLineColor);
+  prop.Add('OutLineWidth', OutLineWidth);
+  prop.Add('ShadowColor', ShadowColor);
+  prop.Add('ShadowOffsetX', ShadowOffsetX);
+  prop.Add('ShadowOffsetY', ShadowOffsetY);
+  prop.Add('ShadowRadius', ShadowRadius);
+  prop.Add('UseGradient', UseGradient);
+  prop.Add('FontColor', FontColor);
+  if UseGradient then prop.Add('GradientData', Gradient.SaveToString);
+  Result := prop.PackedProperty;
+end;
+
+procedure TFontDescriptor.LoadFromString(const data: string);
+var prop: TProperties;
+  s: string;
+begin
+  CreateDefault;
+  s := '';
+  prop.Split(data, '&');
+  prop.StringValueOf('FontName', FontName, FontName);
+  prop.IntegerValueOf('FontHeight', FontHeight, FontHeight);
+  prop.StringValueOf('Style', s, '');
+  Style := [];
+  if s.Contains('B') then Include(Style, fsBold);
+  if s.Contains('I') then Include(Style, fsItalic);
+  if s.Contains('U') then Include(Style, fsUnderline);
+  if s.Contains('S') then Include(Style, fsStrikeOut);
+  prop.BGRAPixelValueOf('OutLineColor', OutLineColor, OutLineColor);
+  prop.SingleValueOf('OutLineWidth', OutLineWidth, OutLineWidth);
+  prop.BGRAPixelValueOf('ShadowColor', ShadowColor, ShadowColor);
+  prop.IntegerValueOf('ShadowOffsetX', ShadowOffsetX, ShadowOffsetX);
+  prop.IntegerValueOf('ShadowOffsetY', ShadowOffsetY, ShadowOffsetY);
+  prop.IntegerValueOf('ShadowRadius', ShadowRadius, ShadowRadius);
+  prop.BooleanValueOf('UseGradient', UseGradient, UseGradient);
+  if UseGradient then begin
+    prop.StringValueOf('GradientData', s, '');
+    Gradient.LoadFromString(s);
+  end;
 end;
 
 
