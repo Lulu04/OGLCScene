@@ -1,28 +1,64 @@
 {$ifdef oglcINTERFACE}
 type
 
-TUIFillTheme = record
+TUIFillDescriptor = record
   Visible: boolean;
   BlendMode: byte;
   Color,
-  CenterColor,
-  Tint: TBGRAPixel;
+  CenterColor: TBGRAPixel;
 end;
 
-TUIBorderTheme = record
+TUIBorderDescriptor = record
   Visible: boolean;
   BlendMode: byte;
   LinePosition: TOGLCLinePosition;
-  Color, Tint: TBGRAPixel;
+  Color: TBGRAPixel;
   Width: single
 end;
 
-TUIPanelTheme = class
-
+TUIGradientDescriptor = record
+  Data: string;
 end;
 
-TUIThemeTemplate = class
-  Panel: TUIPanelTheme;
+TThemeLabelDescriptor = record
+  Name: string;
+  FontColor: TBGRAPixel;
+end;
+
+TUIPanelTheme = record
+  Fill: TUIFillDescriptor;
+  Border: TUIBorderDescriptor;
+  BackGradient: TUIGradientDescriptor;
+end;
+
+TUIButtonTheme = record
+  ButtonFill: TUIFillDescriptor;
+  ButtonBorder: TUIBorderDescriptor;
+  ButtonBackGradient: TUIGradientDescriptor;
+  LabelColor: TBGRAPixel;
+end;
+
+TUICheckBoxTheme = record
+  CheckShape: string;
+  CheckFill: string;
+end;
+
+TUIThemeTemplate = record
+  Name: string;
+  PanelTheme: string;
+  ButtonTheme: string;
+  CheckBoxTheme: string;
+  RadioButtonTheme: string;
+  ScrollBartheme: string;
+  ProgressBarTheme: string;
+  ScrollBoxTheme: string;
+  ListBoxTheme: string;
+  TextAreaTheme: string;
+end;
+PUIThemeTemplate = ^TUIThemeTemplate;
+
+TUIThemeManager = class(specialize TVector<TUIThemeTemplate>)
+  //function AddDefault: PUIThemeTemplate;
 end;
 
 {$endif oglcINTERFACE}
