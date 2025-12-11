@@ -228,9 +228,10 @@ var cLeft, cMiddle, cRight: TBGRAPixel;
   procedure Scan(aSurface: TSimpleSurfaceWithEffect);
   var j: integer;
   begin
-    if (aSurface is TUIPanel) or (aSurface is TUITextArea) or (aSurface is TUIScrollBar) or (aSurface is TUIScrollBox) then
-      TUIClickableWithBodyShape(aSurface).BackGradient.CopyFrom(gradSoft) // gradHeavy)
-    else
+    if (aSurface is TUIPanel) or (aSurface is TUITextArea) or (aSurface is TUIScrollBar) or (aSurface is TUIScrollBox) then begin
+      TUIClickableWithBodyShape(aSurface).BackGradient.CopyFrom(gradSoft); // gradHeavy)
+      TUIClickableWithBodyShape(aSurface).BackGradient.Visible := True;
+    end else
     if (aSurface is TUIListBox) then begin
       TUIListBox(aSurface).ItemColor.GradientItem.CopyFrom(gradSoft);
       TUIListBox(aSurface).ItemColor.GradientItemSelected.CopyFrom(gradHeavy);
@@ -244,8 +245,10 @@ var cLeft, cMiddle, cRight: TBGRAPixel;
     if (aSurface is TUIRadio) then
       TUIRadio(aSurface).ColorChecked := cMiddle
     else
-    if (aSurface is TUIButton) then
+    if (aSurface is TUIButton) then begin
       TUIButton(aSurface).BackGradient.CopyFrom(gradButton);
+      TUIButton(aSurface).BackGradient.Visible := True;
+    end;
     // we scan also the childs
     for j:=0 to aSurface.ChildCount-1 do
       Scan(aSurface.Childs[j]);
