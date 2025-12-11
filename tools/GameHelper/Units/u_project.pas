@@ -52,7 +52,9 @@ end;
 { TProject }
 
 TProject = class(TCustomProject)
-private
+private // presets
+  FFolderUserPreset: string;
+  procedure IfNeededCopyFactoryPresetsToUserDisk;
 public
   Config: TProjectConfig;
   constructor Create;
@@ -62,6 +64,8 @@ public
   procedure DoClose; override;
   procedure OnModifiedChange(aState: boolean); override;
   procedure OnProjectReadyChange(aState: boolean); override;
+
+  property FolderUserPreset: string read FFolderUserPreset;
 end;
 
 var Project: TProject;
@@ -69,7 +73,7 @@ var Project: TProject;
 implementation
 uses Forms, Dialogs, Controls, u_common, form_main, u_spritebank, u_levelbank,
   form_newproject, u_app_pref, u_utils, u_connection_to_ide, u_ui_objectlist,
-  utilitaire_fichier, LCLIntf;
+  utilitaire_fichier, LCLIntf, LazFileUtils;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -214,6 +218,30 @@ end;
 
 { TProject }
 
+procedure TProject.IfNeededCopyFactoryPresetsToUserDisk;
+var path, factoryPresetsPath: string;
+  saveDir: TOGLCSaveDirectory;
+begin
+  saveDir := TOGLCSaveDirectory.CreateFolder('OGLCScene');
+  path := saveDir.SaveFolder;
+  saveDir.Free;
+
+  if not DirectoryExistsUTF8(path) then FScene.LogError('USER Presets: Enable to create the folder to save user presets...')
+    else begin
+      FFolderUserPreset := path + 'UserPresets' + PathDelim;
+      if not ForceDirectories(FFolderUserPreset) then begin
+        FScene.LogError('USER Presets: Enable to create sub-folder "GameHelper'+PathDelim+'UserPresets'+PathDelim+'" in folder "'+path+'"');
+        FFolderUserPreset := '';
+        exit;
+      end;
+    end;
+
+  if DirectoryExistsUTF8(FFolderUserPreset) then begin
+    factoryPresetsPath := GetDataFolder+'FactoryPresets'+DirectorySeparator;
+    CopyDirectoryContent(factoryPresetsPath, FFolderUserPreset, False);
+  end else ShowMessage('Enable to create the folder to save user presets...');
+end;
+
 constructor TProject.Create;
 begin
   inherited Create('.oglc');
@@ -221,6 +249,8 @@ begin
     else SetFormCaption(FormMain, 'Game Helper');
   AddFilterToDialogs('Game helper files', '*.oglc');
   AddFilterToDialogs('All file', '*.*');
+
+  IfNeededCopyFactoryPresetsToUserDisk;
 end;
 
 function TProject.DoNew: boolean;
@@ -243,7 +273,7 @@ begin
 
   FScene.LogInfo('copy the lazarus project template to the new directory', 1);
   try
-    CopyDirectoryContent(folderProjectTemplate, lazProjectFolder);
+    CopyDirectoryContent(folderProjectTemplate, lazProjectFolder, True);
     FScene.LogInfo('done', 2);
   except
     On E :Exception do begin
@@ -337,7 +367,7 @@ begin
                          GAMEHELPERFILES_SUBFOLDER + PathDelim;
   SpriteBank.SaveToPath(pathGameHelperFiles);
   LevelBank.SaveToPath(pathGameHelperFiles);
-  FontBank.Load;}
+  FontBank.Save;}
 
   AppPref.LastProjectFilename := aFilename;
 end;

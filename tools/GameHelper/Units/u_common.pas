@@ -23,6 +23,8 @@ APP_LAYER_COUNT = 10;
    LAYER_LEVELWORLDBOUNDS = 6;
    LAYER_LEVELEDITOR      = 7;
 
+   LAYER_SCENEBOUNDS      = 8; // to show the scene bounds (ex: 1024/768)
+
    LAYER_NOTVISIBLE       = 9;
 
    FIRST_LAYER_USER       = 10;  // this is the layer index 0 for the user

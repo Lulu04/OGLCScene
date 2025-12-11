@@ -10,7 +10,6 @@ uses
 resourcestring
 sDelete='Delete';
 sOverwrite='Overwrite';
-sLeave='Leave';
 sCancel='Cancel';
 sContinue='Continue';
 sOk='Ok';
@@ -18,6 +17,7 @@ sOk='Ok';
 
 sEnterTheNewName='Enter the new name:';
 sIfYouLeaveChangeWillBeLost='If you leave, changes will be lost.'+LineEnding+'Continue ?';
+sLeaveWithoutSaving='Leave without saving';
 
 sGroups='Groups';
 sDescription='Description';

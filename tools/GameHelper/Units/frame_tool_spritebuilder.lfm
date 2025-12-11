@@ -20,10 +20,10 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 706
     Top = 32
     Width = 300
-    ActivePage = PageSave
+    ActivePage = PagePostures
     Anchors = [akTop, akLeft, akRight, akBottom]
     MultiLine = True
-    TabIndex = 4
+    TabIndex = 3
     TabOrder = 0
     OnChange = PC1Change
     Options = [nboMultiLine]
@@ -1095,7 +1095,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Height = 136
           Top = 352
           Width = 290
-          PageIndex = 6
+          PageIndex = 0
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 7
           object PageExtraEmpty: TPage
@@ -2103,7 +2103,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideLeft.Control = Panel10
           Left = 5
           Height = 15
-          Top = 328
+          Top = 304
           Width = 76
           BorderSpacing.Left = 5
           Caption = 'Posture name:'
@@ -2114,7 +2114,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideTop.Side = asrBottom
           Left = 5
           Height = 23
-          Top = 343
+          Top = 319
           Width = 203
           TabOrder = 1
           OnChange = BAddPostureToListClick
@@ -2127,7 +2127,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Cursor = crHandPoint
           Left = 10
           Height = 28
-          Top = 376
+          Top = 352
           Width = 129
           Anchors = [akLeft]
           AutoSize = True
@@ -2168,7 +2168,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           AnchorSideRight.Side = asrBottom
           Left = 169
           Height = 28
-          Top = 376
+          Top = 352
           Width = 113
           Anchors = [akTop, akRight]
           AutoSize = True

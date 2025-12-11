@@ -79,6 +79,7 @@ TMouseState = ( msIdle,
 
 TCustomScreenTemplate = class(TScreenTemplate)
 private
+  FSceneBounds: TShapeOutline;
   FCamera: TOGLCCamera;
   FViewOffset: TPointF;
   FZoom: single;
@@ -102,9 +103,14 @@ public // camera and view
   procedure CreateCamera(const aLayerIndexList: array of integer);
   procedure FreeCamera;
   procedure ZoomViewToFit(aRect: TRectF; aZoomCorrection: single=1.0);
+  procedure ZoomOnScene;
   property Camera: TOGLCCamera read FCamera;
   property ViewOffset: TPointF read FViewOffset write SetViewOffset;
   property Zoom: single read FZoom write SetZoom;
+public // scene bounds
+  procedure ShowSceneBounds;
+  procedure HideSceneBounds;
+  procedure ComputeSceneBoundsLineWidth;
 public // layers
   // show only the specified layers and hide the other
   procedure ShowLayers(const aLayerIndexList: array of integer);
@@ -253,6 +259,34 @@ begin
   ViewOffset := PointF(aRect.Left + aRect.Width * 0.5, aRect.Top + aRect.Height * 0.5) - FScene.Center;
 end;
 
+procedure TCustomScreenTemplate.ZoomOnScene;
+begin
+  ZoomViewToFit(RectF(0, 0, Project.Config.SceneWidth, Project.Config.SceneHeight), 0.9);
+end;
+
+procedure TCustomScreenTemplate.ShowSceneBounds;
+begin
+  if not Assigned(FSceneBounds) then begin
+    FSceneBounds := TShapeOutline.Create(FScene);
+    FSceneBounds.MoveToLayer(LAYER_SCENEBOUNDS);
+    FSceneBounds.SetShapeRectangle(0, 0, Project.Config.SceneWidth, Project.Config.SceneHeight);
+    FSceneBounds.LineColor := BGRA(80,80,80);
+    ComputeSceneBoundsLineWidth;
+  end;
+  FScene.Layer[LAYER_SCENEBOUNDS].Visible := True;
+end;
+
+procedure TCustomScreenTemplate.HideSceneBounds;
+begin
+  FScene.Layer[LAYER_SCENEBOUNDS].Visible := False;
+end;
+
+procedure TCustomScreenTemplate.ComputeSceneBoundsLineWidth;
+begin
+  if FSceneBounds = NIL then exit;
+  FSceneBounds.LineWidth := Max(1.0, 1.0/Zoom);
+end;
+
 procedure TCustomScreenTemplate.SetMouseState(AValue: TMouseState);
 var tex: PTexture;
 //debug:string;
@@ -370,6 +404,8 @@ begin
     p := p2 - p1;
     ViewOffset := ViewOffset - p;
   end;
+
+  ComputeSceneBoundsLineWidth;
 
   Handled := True;
 end;

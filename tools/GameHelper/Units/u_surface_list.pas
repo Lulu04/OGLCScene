@@ -36,7 +36,7 @@ public
   parentID: integer;     // parentID = -1 means the surface is the root.
   name: string;          // by default same as textureName
   surface: TSimpleSurfaceWithEffect;
-  textureName: string;   // the filename+extension without path
+  textureName: string;   // the subfolder+filename+extension without path
   classtype: classOfSimpleSurfaceWithEffect;
   // temporary variables used when loading. They keep safe the original values
   pivotX, pivotY, angle, x, y, scaleX, scaleY: single;
@@ -59,6 +59,10 @@ public
   GradientData: string;
   // TDeformationGrid
   DeformationGridData: string;
+  // UI objects
+  //BodyShapeData: string;
+  //Caption: string;
+
 
   procedure InitDefault;
   procedure KillSurface;
@@ -384,7 +388,13 @@ begin
   if classType = TSpriteContainer then begin  // TSpriteContainer
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
-  end
+  end {else
+  if classType = TUIPanel then begin      // UIPanel
+    surface := TUIPanel.Create(FScene);
+    TUIPanel(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height);
+  end  }
+
   else raise exception.create('forgot to implement!');
 
   // collision for selection

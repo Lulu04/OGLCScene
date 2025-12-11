@@ -75,6 +75,19 @@ TFontBank = class(specialize TListOfItemWithName<TFontDescriptorItem>)
   function GetSaveFileName: string; override;
 end;
 
+
+
+
+TPanelDescriptorItem = class(TItemWithName)
+  BodyShape,
+  BackGradient: string;
+  x, y, width, height: single; // in percentage of scene width and height
+  IsModal: boolean;
+
+  function SaveToString: string; override;
+  procedure LoadFromString(const data: string); override;
+end;
+
 TUIShapeStyle = (bsRectangle, bsRoundRect, bsEllipse, bsCustom);
 TUIShapeDescriptor = class(TItemWithName)
   BodyShapeData,

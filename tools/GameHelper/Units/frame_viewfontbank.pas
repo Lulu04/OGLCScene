@@ -132,7 +132,7 @@ procedure TFrameViewFontBank.BCancelClick(Sender: TObject);
 begin
   if FModified then
     if QuestionDlg('',sIfYouLeaveChangeWillBeLost, mtWarning,
-                   [mrOk, sLeave, mrCancel, sCancel], 0) = mrCancel then exit;
+                   [mrOk, sLeaveWithoutSaving, mrCancel, sCancel], 0) = mrCancel then exit;
   FormMain.ShowPageLevelBank;
 end;
 

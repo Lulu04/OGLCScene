@@ -17,7 +17,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
     BevelOuter = bvNone
     ClientHeight = 180
     ClientWidth = 282
-    Color = 12500670
+    Color = 10066329
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
@@ -25,14 +25,13 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideLeft.Control = Label1
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = Label1
-      AnchorSideTop.Side = asrBottom
+      AnchorSideTop.Side = asrCenter
       AnchorSideBottom.Control = Label1
       AnchorSideBottom.Side = asrBottom
-      Left = 45
+      Left = 49
       Height = 19
-      Top = 5
+      Top = 7
       Width = 52
-      Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
       Caption = 'Visible'
       Checked = True
@@ -46,7 +45,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideTop.Side = asrBottom
       Left = 13
       Height = 15
-      Top = 28
+      Top = 30
       Width = 29
       BorderSpacing.Top = 4
       Caption = 'Color'
@@ -60,7 +59,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Cursor = crHandPoint
       Left = 47
       Height = 20
-      Top = 23
+      Top = 25
       Width = 64
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -75,7 +74,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideTop.Control = Label3
       Left = 126
       Height = 15
-      Top = 28
+      Top = 30
       Width = 31
       BorderSpacing.Left = 15
       Caption = 'Alpha'
@@ -88,7 +87,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideBottom.Side = asrBottom
       Left = 162
       Height = 23
-      Top = 20
+      Top = 22
       Width = 46
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -105,7 +104,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideTop.Side = asrBottom
       Left = 13
       Height = 15
-      Top = 53
+      Top = 55
       Width = 32
       BorderSpacing.Top = 10
       Caption = 'Width'
@@ -118,11 +117,13 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideBottom.Side = asrBottom
       Left = 50
       Height = 23
-      Top = 45
+      Top = 47
       Width = 56
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
       Font.Style = [fsBold]
+      Increment = 0.5
+      MaxValue = 100
       OnChange = CBBorderVisibleChange
       ParentFont = False
       TabOrder = 2
@@ -134,7 +135,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideTop.Control = Label5
       Left = 126
       Height = 15
-      Top = 53
+      Top = 55
       Width = 64
       BorderSpacing.Left = 20
       Caption = 'Blend mode'
@@ -147,7 +148,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       AnchorSideBottom.Side = asrBottom
       Left = 193
       Height = 23
-      Top = 45
+      Top = 47
       Width = 82
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 3
@@ -168,10 +169,12 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Left = 5
       Height = 15
       Top = 9
-      Width = 35
+      Width = 39
       BorderSpacing.Left = 5
       Caption = 'Border'
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
     end
     object Label2: TLabel
       AnchorSideLeft.Control = Panel1
@@ -181,15 +184,18 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Width = 15
       BorderSpacing.Left = 5
       Caption = 'Fill'
+      Font.Style = [fsBold]
       ParentColor = False
+      ParentFont = False
     end
     object CBFillVisible: TCheckBox
       AnchorSideLeft.Control = Label2
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = Label2
+      AnchorSideTop.Side = asrCenter
       Left = 30
       Height = 19
-      Top = 88
+      Top = 86
       Width = 52
       BorderSpacing.Left = 10
       Caption = 'Visible'

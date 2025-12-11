@@ -8,8 +8,6 @@ object PresetManager: TPresetManager
   ClientWidth = 320
   Color = 13106941
   KeyPreview = True
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
   OnShow = FormShow
   Position = poMainFormCenter
@@ -31,7 +29,9 @@ object PresetManager: TPresetManager
     BorderSpacing.Bottom = 5
     Color = 9240058
     ItemHeight = 0
+    Style = lbOwnerDrawFixed
     TabOrder = 0
+    OnDrawItem = LBDrawItem
     OnSelectionChange = LBSelectionChange
   end
   object BUpdate: TSpeedButton

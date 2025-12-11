@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses u_screen_levelbank, form_main,  form_showhelp,
+uses u_screen_levelbank, form_showhelp,
   u_layerlist, OGLCScene;
 
 {$R *.lfm}

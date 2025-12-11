@@ -82,7 +82,7 @@ type
     procedure DoSetGridSize;
   private
     FPresets: TPresetManager;
-    procedure PresetToWidget(const A: TStringArray);
+    procedure PresetToWidget(const data: string);
     function WidgetToPreset: string;
   public
     procedure Edit(aSurface: PSurfaceDescriptor);
@@ -90,7 +90,7 @@ type
   end;
 
 implementation
-uses BGRABitmap, BGRABitmapTypes, form_main, u_app_pref, Math;
+uses BGRABitmap, BGRABitmapTypes, form_main, u_project, Math;
 
 {$R *.lfm}
 
@@ -104,7 +104,7 @@ begin
   FInitializing := False;
 
   FPresets := TPresetManager.Create(Self);
-  FPresets.Init1('Deformation grid presets', BPreset, GetPresetFolder+'DeformationGrid.preset');
+  FPresets.Init1('Deformation grid presets', BPreset, Project.FolderUserPreset+'DeformationGrid.preset');
   FPresets.Init2(@PresetToWidget, @WidgetToPreset);
   FPresets.Load;
 end;
@@ -470,10 +470,10 @@ begin
     end;
 end;
 
-procedure TFormEditDeformationGrid.PresetToWidget(const A: TStringArray);
+procedure TFormEditDeformationGrid.PresetToWidget(const data: string);
 begin
   FDeformationGrid.ResetNodePositions;
-  FDeformationGrid.LoadDeformationDataFromString(A[0]);
+  FDeformationGrid.LoadDeformationDataFromString(data);
   DoCreateNode;
   FModified := True;
 end;
