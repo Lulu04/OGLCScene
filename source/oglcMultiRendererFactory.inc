@@ -592,7 +592,7 @@ end;
 
 procedure TRendererBase.Batch_Flush;
 begin
-  if FBatch^.CurrentRenderer <> NIL then begin
+  if Assigned(FBatch^.CurrentRenderer) then begin
     FParentScene.BlendMode := FBatch^.CurrentRendererBlendMode;
     FBatch^.CurrentRenderer.Draw(True);
     FBatch^.CurrentRenderer := NIL;
@@ -890,7 +890,7 @@ begin
   pVertex := QueryVertex(border.VertexCount);
   border.CopyVertexTo(pVertex);
 
-  if aForceDraw then Draw(True);
+  if aForceDraw then Batch_Flush;
 end;
 
 procedure TOGLCSmoothLineRenderer.PushPath2(const aPath: TOGLCPath; aLinePosition: TOGLCLinePosition; const aColor: TBGRAPixel; const w,
@@ -912,7 +912,7 @@ begin
   pVertex := QueryVertex(border.VertexCount);
   border.CopyVertexTo(pVertex);
 
-  if aForceDraw then Draw(True);
+  if aForceDraw then Batch_Flush; // Draw(True);
 end;
 
 procedure TOGLCSmoothLineRenderer.PushPaths(const aPaths: TArrayOfOGLCPath; aLinePosition: TOGLCLinePosition;
@@ -935,7 +935,7 @@ begin
       pVertex := QueryVertex(border.VertexCount);
       border.CopyVertexTo(pVertex);
     end;
-  if aForceDraw then Draw(True);
+  if aForceDraw then Batch_Flush; // Draw(True);
 end;
 
 { TOGLCFastLineRenderer }
@@ -1177,7 +1177,7 @@ begin
   PushIndices(aFill^.FIndices);
   p := QueryVertex(aFill^.VertexCount);
   aFill^.CopyVertexTo(p);
-  if aForceDraw then Draw(True);
+  if aForceDraw then Batch_Flush; // Draw(True);
 end;
 
 { TOGLCThreeColorMVTriangleRenderer }
