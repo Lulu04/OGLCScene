@@ -2348,7 +2348,7 @@ begin
   end;
 
   // if needed draw the BackGradient
-  if Length(BackGradient.Vertices) > 0 then begin
+  if BackGradient.Visible and (Length(BackGradient.Vertices) > 0) then begin
     FParentScene.ThreeColorTriangleRenderer.Prepare(ptTriangleStrip, FParentScene.MVPMatrix, FComputedOpacity, FComputedTint, FBlendMode);
     FParentScene.ThreeColorTriangleRenderer.PushGradient(@BackGradient);
   end;
