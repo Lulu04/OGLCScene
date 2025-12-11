@@ -39,7 +39,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure BDeleteFrameClick(Sender: TObject);
   private
-    FModified: boolean;
     FGradient: PGradientDescriptor;
     FGWidth, FGHeight: integer;
     FInitializing: boolean;
@@ -62,15 +61,18 @@ type
     procedure ProcessFrameDeleteNodeEvent(Sender: TObject; aNodeIndex: integer);
     procedure ProcessFrameAddNodeEvent(Sender: TObject; aNodeIndex: integer; const aColor: TBGRAPixel);
   private
+    FOnChange: TNotifyEvent;
     FPresets: TPresetManager;
-    procedure PresetToWidget(const A: TStringArray);
+    procedure PresetToWidget(const data: string);
     function WidgetToPreset: string;
     procedure DoGradientToFrame;
+    procedure DoOnChangeEvent;
   public
     procedure SelectNone;
 
     procedure Edit(aGradient: PGradientDescriptor; aWidth, aHeight: integer);
-    property Modified: boolean read FModified;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+
     property NewGradientData: string read FNewGradientData;
   end;
 
@@ -79,7 +81,7 @@ var
 
 implementation
 
-uses form_main, u_app_pref, form_showhelp;
+uses form_main, form_showhelp, u_project;
 
 {$R *.lfm}
 
@@ -105,7 +107,7 @@ begin
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   Clear;
   DoGradientToFrame;
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.DoFlipV;
@@ -115,7 +117,7 @@ begin
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   Clear;
   DoGradientToFrame;
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.DoRotate90CCW;
@@ -125,7 +127,7 @@ begin
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   Clear;
   DoGradientToFrame;
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.DoRotate90CW;
@@ -135,7 +137,7 @@ begin
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   Clear;
   DoGradientToFrame;
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.Clear;
@@ -199,7 +201,7 @@ begin
 
   fr.Edit(clone.YPosition, @(FGradient^.Rows[k].Items));
 
-  FrameToolsSpriteBuilder.Modified := True;
+  DoOnChangeEvent;
 end;
 
 function TFormEditGradient.GetSelectedFrameIndex: integer;
@@ -228,7 +230,7 @@ begin
   system.Delete(FGradient^.Rows, aIndex, 1);
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
 
-  FrameToolsSpriteBuilder.Modified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.UpdateFramesPosition;
@@ -248,7 +250,7 @@ begin
   FGradient^.Rows[fr.Index].YPosition := fr.YPosition;
 
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.ProcessFrameNodeModifiedEvent(Sender: TObject; aNodeIndex: integer);
@@ -273,7 +275,7 @@ begin
     end;
 
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.ProcessFrameDeleteNodeEvent(Sender: TObject; aNodeIndex: integer);
@@ -289,7 +291,7 @@ begin
     end;
 
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 procedure TFormEditGradient.ProcessFrameAddNodeEvent(Sender: TObject;
@@ -313,15 +315,15 @@ begin
     end;
 
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
-procedure TFormEditGradient.PresetToWidget(const A: TStringArray);
+procedure TFormEditGradient.PresetToWidget(const data: string);
 begin
-  FGradient^.LoadGradientDataFromString(A[0]);
+  FGradient^.LoadGradientDataFromString(data);
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
   DoGradientToFrame;
-  FModified := True;
+  DoOnChangeEvent;
 end;
 
 function TFormEditGradient.WidgetToPreset: string;
@@ -358,6 +360,11 @@ begin
   FInitializing := False;
 end;
 
+procedure TFormEditGradient.DoOnChangeEvent;
+begin
+  if Assigned(FOnChange) then FOnChange(Self);
+end;
+
 procedure TFormEditGradient.SelectNone;
 var i: integer;
 begin
@@ -375,7 +382,7 @@ end;
 procedure TFormEditGradient.FormCreate(Sender: TObject);
 begin
   FPresets := TPresetManager.Create(Self);
-  FPresets.Init1('Gradient presets', BPreset, GetPresetFolder+'Gradient.preset');
+  FPresets.Init1('Gradient presets', BPreset, Project.FolderUserPreset+'Gradient.preset');
   FPresets.Init2(@PresetToWidget, @WidgetToPreset);
   FPresets.Load;
 end;
@@ -394,7 +401,6 @@ begin
   Frames[k].SetSameColorOnAllNodes(ColorButton1.ButtonColor);
 
   FGradient^.ComputeVerticesAndIndices(FGWidth, FGHeight);
-  FModified := True;
 end;
 
 procedure TFormEditGradient.BHelpClick(Sender: TObject);

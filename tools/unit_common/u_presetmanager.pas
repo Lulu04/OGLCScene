@@ -6,13 +6,22 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, Buttons,
-  StdCtrls, ComCtrls;
+  StdCtrls, ComCtrls, Types;
+
+resourcestring
+sAPresetWithTheNamexxxAlreadyExists='A preset with the name %s already exists. Please retry with another name.';
+sNewPreset='New preset';
+sReplacePresetData='Replace preset data ?';
+sDeleteThisPreset='Delete this preset ?';
+sNewName='New name:';
+sBadName='Bad name...';
+sNameForTheNewpreset='Name for the new preset:';
 
 const PRESET_SEPARATOR: char = '|';
 
 type
 
-  TPresetToWidget = procedure(const A: TStringArray) of Object;
+  TPresetToWidget = procedure(const data: string) of Object;
   TWidgetToPreset = function: string of Object;
 
   { TPresetManager }
@@ -27,10 +36,10 @@ type
     BDelete: TSpeedButton;
     BRename: TSpeedButton;
     UpDown1: TUpDown;
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; {%H-}Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure LBDrawItem(Control: TWinControl; Index: Integer; ARect: TRect;
+      State: TOwnerDrawState);
     procedure LBSelectionChange(Sender: TObject; {%H-}User: boolean);
     procedure MIAddClick(Sender: TObject);
     procedure MIManagerClick(Sender: TObject);
@@ -39,14 +48,17 @@ type
     procedure BRenameClick(Sender: TObject);
     procedure UpDown1Click(Sender: TObject; Button: TUDBtnType);
   private
-    FList: TStringList;
     FPresetToWidget: TPresetToWidget;
     FWidgetToPreset: TWidgetToPreset;
     FFilename: string;
     procedure ProcessUserButtonClick(Sender: TObject);
-    procedure ProcessPresetClic(Sender: TObject);
+    procedure ProcessMenuClick(Sender: TObject);
     procedure Clear;
-    function ArrayToString(const A: TStringArray): string;
+    function GetPresetName(aIndex: integer): string;
+    function GetPresetData(aIndex: integer): string;
+    procedure SetPresetName(aIndex: integer; const aName: string);
+    procedure SetPresetData(aIndex: integer; const aData: string);
+    function PresetNameAlreadyExists(const aName: string): boolean;
     procedure UpdateWidgets;
   public
     procedure Init1(const aTitle: string; aUserButton: TSpeedButton;
@@ -60,13 +72,13 @@ type
 
 implementation
 
-uses LCLType, LCLHelper, u_common;
+uses LCLType, LCLHelper, u_common, LazFileUtils;
 
 {$R *.lfm}
 
 { TPresetManager }
 
-procedure TPresetManager.ProcessPresetClic(Sender: TObject);
+procedure TPresetManager.ProcessMenuClick(Sender: TObject);
 var m: TMenuItem;
   A: TStringArray;
   i: integer;
@@ -74,9 +86,9 @@ begin
   m := Sender as TMenuItem;
   i := PopupMenu1.items.IndexOf(m);
   try
-    A := FList.Strings[i-3].Split([PRESET_SEPARATOR]);
-    Delete(A, 0, 1); // delete the name of the preset
-    FPresetToWidget(A);
+    A := LB.Items.Strings[i-3].Split([PRESET_SEPARATOR]);
+    if Length(A) = 2 then
+      FPresetToWidget(A[1]);
   except
     On E :Exception do begin
       FScene.LogError('Preset "'+m.Caption+'" from "'+ExtractFilename(FFilename)+'" raise exception "'+E.Message+'"');
@@ -89,17 +101,46 @@ begin
   LB.Clear;
   while PopupMenu1.Items.Count > 3 do
     PopupMenu1.Items.Delete(3);
-  FList.Clear;
 end;
 
-function TPresetManager.ArrayToString(const A: TStringArray): string;
+function TPresetManager.GetPresetName(aIndex: integer): string;
+var A: TStringArray;
+begin
+ A := LB.Items.Strings[aIndex].Split([PRESET_SEPARATOR]);
+ if Length(A) = 2 then Result := A[0]
+   else Result := '?????';
+end;
+
+function TPresetManager.GetPresetData(aIndex: integer): string;
+var A: TStringArray;
+begin
+ A := LB.Items.Strings[aIndex].Split([PRESET_SEPARATOR]);
+ if Length(A) = 2 then Result := A[1]
+   else Result := '';
+end;
+
+procedure TPresetManager.SetPresetName(aIndex: integer; const aName: string);
+var A: TStringArray;
+begin
+  A := LB.Items.Strings[aIndex].Split([PRESET_SEPARATOR]);
+  if Length(A) = 2 then
+    LB.Items.Strings[aIndex] := aName + PRESET_SEPARATOR + A[1];
+end;
+
+procedure TPresetManager.SetPresetData(aIndex: integer; const aData: string);
+var A: TStringArray;
+begin
+  A := LB.Items.Strings[aIndex].Split([PRESET_SEPARATOR]);
+  if Length(A) = 2 then
+    LB.Items.Strings[aIndex] := A[0] + PRESET_SEPARATOR + aData;
+end;
+
+function TPresetManager.PresetNameAlreadyExists(const aName: string): boolean;
 var i: integer;
 begin
-  Result := '';
-  for i:=0 to High(A) do begin
-    if i <> 0 then Result := Result + PRESET_SEPARATOR;
-    Result := Result + A[i];
-  end;
+  Result := False;
+  for i:=0 to LB.Count-1 do
+    if GetPresetName(i) = aName then exit(True);
 end;
 
 procedure TPresetManager.UpdateWidgets;
@@ -117,13 +158,11 @@ end;
 
 procedure TPresetManager.BUpdateClick(Sender: TObject);
 var i: integer;
-  A: TStringArray;
 begin
   i := LB.ItemIndex;
   if i = -1 then exit;
-  if QuestionDlg('', 'Replace preset data ?', mtWarning, [mrOk, mrCancel], 0) = mrOk then begin
-    A := FList.Strings[i].Split([PRESET_SEPARATOR]);
-    FList.Strings[i] := A[0] + PRESET_SEPARATOR + FWidgetToPreset();
+  if QuestionDlg('', sReplacePresetData, mtWarning, [mrOk, mrCancel], 0) = mrOk then begin
+    SetPresetData(i, FWidgetToPreset());
     Save;
   end;
 end;
@@ -133,8 +172,8 @@ var i: integer;
 begin
   i := LB.ItemIndex;
   if i = -1 then exit;
-  if QuestionDlg('','Delete this preset ?', mtWarning, [mrOk, mrCancel], 0) = mrOk then begin
-    FList.Delete(i);
+
+  if QuestionDlg('', sDeleteThisPreset, mtWarning, [mrOk, mrCancel], 0) = mrOk then begin
     PopupMenu1.Items.Delete(i+3);
     LB.Items.Delete(i);
     Save;
@@ -143,42 +182,57 @@ end;
 
 procedure TPresetManager.BRenameClick(Sender: TObject);
 var i: Integer;
-  n: string;
+  nam: string;
   men: TMenuItem;
-  A: TStringArray;
 begin
   i := LB.ItemIndex;
   if i = -1 then exit;
-  n := LB.Items.Strings[i];
-  if not InputQuery('', 'New name:', n) then exit;
-  if Trim(n) = '' then begin
-    ShowMessage('Bad name...');
+  nam := LB.Items.Strings[i];
+
+  if not InputQuery('', sNewName, nam) then exit;
+
+  if Trim(nam) = '' then begin
+    ShowMessage(sBadName);
     exit;
   end;
+
+  // check if the name already exists
+  nam := nam.Replace(' ', '_', [rfReplaceAll]);
+  if PresetNameAlreadyExists(nam) then begin
+    ShowMessage(Format(sAPresetWithTheNamexxxAlreadyExists, [nam]));
+    exit;
+  end;
+
+  // replace name in menu
   men := PopupMenu1.Items[i+3];
-  men.Caption := n;
-  LB.Items.Strings[i] := n;
-  A := FList.Strings[i].Split([PRESET_SEPARATOR]);
-  A[0] := n;
-  FList.Strings[i] := ArrayToString(A);
+  men.Caption := nam;
+  // replace name in listbox
+  SetPresetName(i, nam);
   Save;
 end;
 
 procedure TPresetManager.UpDown1Click(Sender: TObject; Button: TUDBtnType);
 var i: integer;
+  temp: string;
 begin
   i := LB.ItemIndex;
   if i = -1 then exit;
 
   case Button of
     btNext: if i > 0 then begin
-      FList.Exchange(i-1, i);
+      temp := PopupMenu1.Items.Items[i+3].Caption;
+      PopupMenu1.Items.Items[i+3].Caption := PopupMenu1.Items.Items[i+3-1].Caption;
+      PopupMenu1.Items.Items[i+3-1].Caption := temp;
+
       LB.MoveSelectionUp;
       Save;
     end;
 
     btPrev: if i < LB.Count-1 then begin
-      FList.Exchange(i+1, i);
+      temp := PopupMenu1.Items.Items[i+3].Caption;
+      PopupMenu1.Items.Items[i+3].Caption := PopupMenu1.Items.Items[i+3+1].Caption;
+      PopupMenu1.Items.Items[i+3+1].Caption := temp;
+
       LB.MoveSelectionDown;
       Save;
     end;
@@ -186,32 +240,29 @@ begin
 end;
 
 procedure TPresetManager.MIAddClick(Sender: TObject);
-var n: string;
+var nam: string;
   men: TMenuItem;
 begin
-  n := '';
-  if not InputQuery('New preset', 'Name for the new preset:', n) then exit;
-  if Trim(n) = '' then begin
-    ShowMessage('The preset is not registered: Bad name "'+n+'"');
+  nam := '';
+  if not InputQuery(sNewPreset, sNameForTheNewpreset, nam) then exit;
+
+  if Trim(nam) = '' then begin
+    ShowMessage(sBadName);
     exit;
   end;
-  FList.Add(n + PRESET_SEPARATOR + FWidgetToPreset());
-  LB.Items.Add(n);
+
+  nam := nam.Replace(' ', '_', [rfReplaceAll]);
+  if PresetNameAlreadyExists(nam) then begin
+    ShowMessage(Format(sAPresetWithTheNamexxxAlreadyExists, [nam]));
+    exit;
+  end;
+
+  LB.Items.Add(nam + PRESET_SEPARATOR + FWidgetToPreset());
   men := TMenuItem.Create(Self);
-  men.Caption := n;
-  men.OnClick := @ProcessPresetClic;
+  men.Caption := nam;
+  men.OnClick := @ProcessMenuClick;
   PopupMenu1.Items.Add(men);
   Save;
-end;
-
-procedure TPresetManager.FormCreate(Sender: TObject);
-begin
-  FList := TStringList.Create;
-end;
-
-procedure TPresetManager.FormDestroy(Sender: TObject);
-begin
-  FList.Free;
 end;
 
 procedure TPresetManager.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -222,6 +273,26 @@ end;
 procedure TPresetManager.FormShow(Sender: TObject);
 begin
   UpdateWidgets;
+end;
+
+procedure TPresetManager.LBDrawItem(Control: TWinControl; Index: Integer;
+  ARect: TRect; State: TOwnerDrawState);
+begin
+  Control := Control;
+  with LB.Canvas do begin
+    Brush.Style := bsSolid;
+    if State >= [odSelected] then begin
+      Brush.Color := RGBToColor(94,128,130);
+      Font.Color := clWhite;
+    end else begin
+      Brush.Color := LB.Color;
+      Font.Color := clBlack;
+    end;
+    FillRect(ARect);
+    Brush.Style := bsClear;
+
+    TextOut(ARect.Left, ARect.Top, GetPresetName(Index));
+  end;
 end;
 
 procedure TPresetManager.LBSelectionChange(Sender: TObject; User: boolean);
@@ -251,31 +322,40 @@ end;
 
 procedure TPresetManager.Save;
 begin
-  if FList.Count = 0 then exit;
+  if not DirectoryExistsUTF8(ExtractFilePath(FFilename)) then exit;
+
   try
-    FList.SaveToFile(FFilename);
-  finally
+    LB.Items.SaveToFile(FFilename);
+  except
+    On E :Exception do begin
+      FScene.LogError('Presets '+Caption+': exception while saving to file "'+FFilename);
+      FScene.LogError(E.Message, 1);
+    end;
   end;
 end;
 
 procedure TPresetManager.Load;
 var i: integer;
   m: TMenuItem;
-  A: TStringArray;
 begin
- Clear;
- if not FileExists(FFilename) then exit;
+  Clear;
+  if not FileExists(FFilename) then exit;
 
- FList.LoadFromFile(FFilename);
- // sets the presets on the listbox and in the menu
- for i:=0 to FList.Count-1 do begin
-   A := FList.Strings[i].Split([PRESET_SEPARATOR]);
-   LB.Items.Add(A[0]);
-   m := TMenuItem.Create(Self);
-   m.Caption := A[0];
-   m.OnClick := @ProcessPresetClic;
-   PopupMenu1.Items.Add(m);
- end;
+  try
+    LB.Items.LoadFromFile(FFilename);
+    // add the presets in the menu
+    for i:=0 to LB.Count-1 do begin
+      m := TMenuItem.Create(Self);
+      m.Caption := GetPresetName(i);
+      m.OnClick := @ProcessMenuClick;
+      PopupMenu1.Items.Add(m);
+    end;
+  except
+    On E :Exception do begin
+      FScene.LogError('Presets '+Caption+': exception while loading from file "'+FFilename);
+      FScene.LogError(E.Message, 1);
+    end;
+  end;
 end;
 
 end.

@@ -191,6 +191,7 @@ type
   private
     FDecorLoopModes: TArrayOfDecorLoopMode;
     procedure ProcessDecorLoopModeChange(Sender: TObject);
+    procedure ProcessGradientModified(Sender: TObject);
   public
     FrameTextureList: TFrameTextureList;
     FrameViewLayerList: TFrameViewLayerList;
@@ -231,8 +232,8 @@ uses u_levelbank, u_screen_leveleditor, form_main, u_project, u_common,
 procedure TFrameToolLevelEditor.BCancelClick(Sender: TObject);
 begin
   if FModified then
-    if QuestionDlg('','If you leave, changes will be lost.', mtWarning,
-                   [mrOk, 'Leave without saving', mrCancel, 'Cancel'], 0) = mrCancel then exit;
+    if QuestionDlg('', sIfYouLeaveChangeWillBeLost, mtWarning,
+                   [mrOk, sLeaveWithoutSaving, mrCancel, sCancel], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPageLevelBank;
 end;
@@ -528,9 +529,9 @@ begin
   if Sender = BSkyEditGradient then begin
     FormEditGradient := TFormEditGradient.Create(NIL);
     try
+      FormEditGradient.OnChange := @ProcessGradientModified;
       FormEditGradient.Edit(@ScreenLevelEditor.SkyGradient.Gradient, SE11.Value, SE12.Value);
       FormEditGradient.ShowModal;
-      if FormEditGradient.Modified then FModified := True;
     finally
       FormEditGradient.Free;
       FormEditGradient := NIL;
@@ -760,6 +761,11 @@ begin
 end;
 
 procedure TFrameToolLevelEditor.ProcessDecorLoopModeChange(Sender: TObject);
+begin
+  FModified := True;
+end;
+
+procedure TFrameToolLevelEditor.ProcessGradientModified(Sender: TObject);
 begin
   FModified := True;
 end;

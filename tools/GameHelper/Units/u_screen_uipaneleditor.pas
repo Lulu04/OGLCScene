@@ -16,6 +16,7 @@ type
 TScreenUIPanelEditor = class(TScreenWithSurfaceHandling)
 private
   FUIPanel: TUIPanel;
+  FTextureList: TTexturelist;
 public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer); override;
@@ -31,6 +32,7 @@ public
 
   function Surfaces: TSurfaceList; override;
   function Textures: TTextureList; override;
+  procedure SetFlagModified; override;
 
 public
   property UIPanel: TUIPanel read FUIPanel;
@@ -41,7 +43,7 @@ var ScreenUIPanelEditor: TScreenUIPanelEditor;
 
 implementation
 
-uses u_common, u_utils;
+uses u_common, u_utils, form_main;
 
 { TScreenUIPanelEditor }
 
@@ -77,29 +79,42 @@ end;
 procedure TScreenUIPanelEditor.CreateObjects;
 begin
   ShowLayers([LAYER_TOP, LAYER_UI, LAYER_UIPANEL]);
-  CreateCamera([LAYER_UIPANEL]);
+  ShowSceneBounds;
+  CreateCamera([LAYER_UIPANEL, LAYER_SCENEBOUNDS]);
 
+  // create the main panel
   FUIPanel := TUIPanel.Create(FScene);
   FScene.Add(FUIPanel, LAYER_UIPANEL);
   FUIPanel.CenterOnScene;
   FUIPanel.BodyShape.SetShapeRectangle(200, 200, 1.5);
+
+
+  // link our panel to the editor
+  FrameToolUIPanelEditor.TargetUIPanel := FUIPanel;
 end;
 
 procedure TScreenUIPanelEditor.FreeObjects;
 begin
+  // unlink our panel from the frame
+  FrameToolUIPanelEditor.TargetUIPanel := NIL;
+
+  FTextureList.Clear;
+
   FreeCamera;
   FScene.Layer[LAYER_UIPANEL].Clear;
-
+  HideSceneBounds;
 end;
 
 procedure TScreenUIPanelEditor.Initialize;
 begin
+  FTextureList := TTexturelist.Create;
 
 end;
 
 procedure TScreenUIPanelEditor.Finalize;
 begin
-
+  FTextureList.Free;
+  FTextureList := NIL;
 end;
 
 function TScreenUIPanelEditor.Surfaces: TSurfaceList;
@@ -109,7 +124,12 @@ end;
 
 function TScreenUIPanelEditor.Textures: TTextureList;
 begin
-  Result := NIL;
+  Result := FTextureList;
+end;
+
+procedure TScreenUIPanelEditor.SetFlagModified;
+begin
+  FrameToolUIPanelEditor.Modified := True;
 end;
 
 end.

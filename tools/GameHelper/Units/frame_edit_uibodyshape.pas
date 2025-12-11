@@ -42,6 +42,7 @@ type
   private
     FOnChange: TNotifyEvent;
     FTargetUIPanel: TUIPanel;
+    procedure ProcessGradientChange(Sender: TObject);
     function GetBorderBlendMode: byte;
     function GetBorderColor: TBGRAPixel;
     function GetBorderWidth: single;
@@ -57,13 +58,13 @@ type
     property BorderWidth: single read GetBorderWidth write SetBorderWidth;
     property BorderBlendMode: byte read GetBorderBlendMode write SetBorderBlendMode;
 
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property TargetUIPanel: TUIPanel read FTargetUIPanel write FTargetUIPanel;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
 
 implementation
 
-uses form_editgradient;
+uses form_editgradient, u_common;
 
 {$R *.lfm}
 
@@ -106,8 +107,10 @@ begin
     FTargetUIPanel.BodyShape.Fill.Color := ColorToBGRA(CBFill.ButtonColor, SEFillAlpha.Value);
     FTargetUIPanel.BodyShape.Fill.BlendMode := byte(CBFillBlend.ItemIndex);
 
-    if CBFillVisible.Checked and not RBFillGradient.Checked then
-      FTargetUIPanel.BackGradient.Clear;
+    FTargetUIPanel.BackGradient.Visible := CBFillVisible.Checked and RBFillGradient.Checked;
+    if FTargetUIPanel.BackGradient.Visible and not FTargetUIPanel.BackGradient.IsInitialized then
+      FTargetUIPanel.BackGradient.CreateHorizontal([BGRA(100,50,255,100), BGRA(255,0,255,200), BGRA(50,0,255,100)], [0.0, 0.5, 1.0]);
+
   end;
   if Assigned(FOnChange) then FOnchange(Self);
 end;
@@ -116,13 +119,18 @@ procedure TFrameEditUIBodyShape.BEditGradientClick(Sender: TObject);
 begin
   FormEditGradient := TFormEditGradient.Create(NIL);
   try
+    FormEditGradient.OnChange := @ProcessGradientChange;
     FormEditGradient.Edit(@FTargetUIPanel.BackGradient, FTargetUIPanel.Width, FTargetUIPanel.Height);
     FormEditGradient.ShowModal;
-    if FormEditGradient.Modified then
-      if Assigned(FOnChange) then FOnchange(Self);
+    //FTargetUIPanel.BackGradient.LoadGradientDataFromString(FormEditGradient.NewGradientData);
   finally
     FormEditGradient.Free;
   end;
+end;
+
+procedure TFrameEditUIBodyShape.ProcessGradientChange(Sender: TObject);
+begin
+  if Assigned(FOnChange) then FOnChange(Self);
 end;
 
 function TFrameEditUIBodyShape.GetBorderBlendMode: byte;

@@ -75,6 +75,7 @@ end;
 procedure TScreenFontBank.CreateObjects;
 begin
   ShowLayers([LAYER_FONT, LAYER_UI, LAYER_TOP]);
+  ShowSceneBounds;
  // CreateCamera([LAYER_FONT]);
 end;
 
@@ -87,6 +88,7 @@ begin
   if Assigned(FFontAtlas) then FFontAtlas.Free;
   FFontAtlas := NIL;
 
+  HideSceneBounds;
   //FreeCamera;
 end;
 

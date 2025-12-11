@@ -15,7 +15,6 @@ function GetDataFolder: string;
 function GetHandleFolder: string;
 function GetCursorFolder: string;
 function GetIconFolder: string;
-function GetPresetFolder: string;
 function GetSourceProjectTemplateFolder: string;
 
 
@@ -76,11 +75,6 @@ end;
 function GetIconFolder: string;
 begin
   Result := GetDataFolder+'Icon'+DirectorySeparator;
-end;
-
-function GetPresetFolder: string;
-begin
-  Result := GetDataFolder+'UserPresets'+DirectorySeparator;
 end;
 
 function GetSourceProjectTemplateFolder: string;

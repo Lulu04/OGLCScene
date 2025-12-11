@@ -75,7 +75,8 @@ function GetDirectoryContent(const aDirectoryPath: string;
 procedure CopieRepertoire (const aSrc , aDest : string ; aCopierLesSousRepertoires , aEcraserLesFichiersExistants : boolean ) ;
 
 // copy the content of aSrcDirectory in aDstDirectory. Both directory must exists.
-procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string);
+// sets aOverWrite to True to overwrite existent files
+procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string; aOverWrite: boolean);
 
 // remplit un TREE VIEW avec le contenu d'un répertoire
 // aFiltre est un tableau contenant tous les filtres des fichiers qu'on veut garder. ex : ['.exe','.txt']. [] pour tous les fichiers
@@ -155,7 +156,7 @@ end;
 function CopieFichier(const aSrc, aDest: string; aEcraserExistant: boolean ): boolean;
 var flag: TCopyFileFlags;
 begin
-  flag := [cffPreserveTime];
+  flag := []; //[cffPreserveTime];
   if aEcraserExistant then
     flag += [cffOverwriteFile];
   Result := FileUtil.CopyFile( aSrc, aDest, Flag, FALSE );
@@ -316,7 +317,8 @@ begin
  t.Free ;
 end;
 
-procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string);
+procedure CopyDirectoryContent(const aSrcDirectory, aDstDirectory: string;
+  aOverWrite: boolean);
 var t: TStringList;
   i: integer;
   src, dst: string;
@@ -333,7 +335,7 @@ begin
       if IsFolder(src+t.Strings[i]) then CreerRepertoire(aDstDirectory+t.Strings[i])
       else
       if IsFile(src+t.Strings[i]) then
-        CopieFichier(src+t.Strings[i], dst+t.Strings[i], True);
+        CopieFichier(src+t.Strings[i], dst+t.Strings[i], aOverWrite);
   finally
     t.Free;
   end;
@@ -610,7 +612,8 @@ function CreerRepertoire(const aRepertoire: string): boolean;
 var rep: string;
 begin
  rep := LazFileUtils.CleanAndExpandDirectory( aRepertoire );
- Result := LazFileUtils.CreateDirUTF8 ( rep ) ;
+ if not LazFileUtils.DirectoryExistsUTF8(rep) then
+   Result := LazFileUtils.CreateDirUTF8(rep) ;
 end;
 
 function SupprimeRepertoire(const aRepertoire: string): boolean;

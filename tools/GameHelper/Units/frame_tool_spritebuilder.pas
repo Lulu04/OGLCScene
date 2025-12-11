@@ -273,6 +273,8 @@ type
     function Bodies: TBodyItemList;
     function Postures: TPostureList;
     procedure DoClearAll;
+  private // edit gradient
+    procedure ProcessGradientChange(Sender: TObject);
   private
     FModified: boolean;
   private
@@ -425,11 +427,11 @@ begin
   if not (FWorkingChild^.surface is TGradientRectangle) then exit;
   FormEditGradient := TFormEditGradient.Create(NIL);
   try
+    FormEditGradient.OnChange := @ProcessGradientChange;
     FormEditGradient.Edit(@TGradientRectangle(FWorkingChild^.surface).Gradient,
                           FWorkingChild^.surface.Width, FWorkingChild^.surface.Height);
     FormEditGradient.ShowModal;
     FWorkingChild^.GradientData := FormEditGradient.NewGradientData;
-    if FormEditGradient.Modified then Modified:= True;
   finally
     FormEditGradient.Free;
     FormEditGradient := NIL;
@@ -1305,6 +1307,11 @@ begin
 
   PC1.PageIndex := PC1.IndexOf(PageTextures);
   FInitializingWidget := False;
+end;
+
+procedure TFrameToolsSpriteBuilder.ProcessGradientChange(Sender: TObject);
+begin
+  FModified := True;
 end;
 
 procedure TFrameToolsSpriteBuilder.ShowExtraPropertyPanel;
