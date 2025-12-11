@@ -101,6 +101,7 @@ TGradientDescriptor = record
 private
   FUpdating: boolean;
   FOnChange: TOGLCEvent;
+  FVisible: boolean;
   procedure AddRowItem(const aItem: TGradientRow);
   function CreateArrayOfGradientItem(const aColors: ArrayOfTBGRAPixel; const aPos: ArrayOfSingle): ArrayOfGradientItem;
   function GradientRow(aYPos: single; const Items: ArrayOfGradientItem): TGradientRow;
@@ -114,6 +115,9 @@ public
   procedure InitDefault;
   // clear the gradient.
   procedure Clear;
+
+  // return True if the gradient is initialized
+  function IsInitialized: boolean;
 
   procedure CopyFrom(const aGradient: TGradientDescriptor);
 
@@ -152,6 +156,8 @@ public
   procedure ComputeVerticesAndIndices(aWidth, aHeight: integer);
   // This event is fired when the gradient colors are modified with one of the Createxxxx(...) method or AddRow(...).
   property OnChange: TOGLCEvent read FOnChange write FOnChange;
+  // Set this property to True if you want the gradient to be rendered. default is False.
+  property Visible: boolean read FVisible write FVisible;
 end;
 PGradientDescriptor = ^TGradientDescriptor;
 ArrayOfGradientDescriptor = array of TGradientDescriptor;
@@ -634,7 +640,7 @@ procedure TGradientDescriptor.LoadGradientDataFromString(const s: string);
 var i, j, k: integer;
   A: TStringArray;
 begin
-  InitDefault;
+  Clear;
   if s = '' then exit;
   A := s.Split([' ']);
   if Length(A) = 0 then exit;
@@ -669,6 +675,11 @@ begin
   Vertices := NIL;
   Indices := NIL;
   FUpdating := False;
+end;
+
+function TGradientDescriptor.IsInitialized: boolean;
+begin
+  Result := Length(Rows) > 0;
 end;
 
 procedure TGradientDescriptor.CopyFrom(const aGradient: TGradientDescriptor);
