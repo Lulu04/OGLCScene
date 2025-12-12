@@ -211,6 +211,7 @@ TOGLCCamera = class;
 {$I oglcUITheme.inc}
 {$I oglcUI.inc}
 {$I oglcUIScrollable.inc}
+{$I oglcUIPanelWithEffects.inc}
 {$I oglcUIModalPanel.inc}
 {$I oglcReusableSurfaceContainer.inc}
 {$I oglcUtils.inc}
@@ -940,6 +941,7 @@ end;
 {$I oglcUITheme.inc}
 {$I oglcUI.inc}
 {$I oglcUIScrollable.inc}
+{$I oglcUIPanelWithEffects.inc}
 {$I oglcUIModalPanel.inc}
 {$I oglcTexturedFont.inc}
 {$I oglcAlignText.inc}
@@ -1452,7 +1454,9 @@ end;
 function TOGLCScene.Add_UILabel(const aCaption: string; aFont: TTexturedFont;
   aLayer: integer): TUILabel;
 begin
-  Result := TUILabel.Create(Self, aCaption, aFont);
+  Result := TUILabel.Create(Self);
+  Result.Caption := aCaption;
+  Result.TexturedFont := aFont;
   Add(Result, aLayer);
 end;
 
