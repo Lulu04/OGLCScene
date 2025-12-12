@@ -95,8 +95,9 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos Y="14"/>
+        <CursorPos X="67" Y="8"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -104,10 +105,9 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="83"/>
-        <CursorPos X="100" Y="96"/>
+        <CursorPos X="35" Y="89"/>
         <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -125,7 +125,7 @@
         <Loaded Value="True"/>
       </Unit4>
     </Units>
-    <JumpHistory Count="2" HistoryIndex="1">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="11" Column="8" TopLine="4"/>
@@ -134,6 +134,10 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="14"/>
       </Position2>
+      <Position3>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="89" Column="35" TopLine="83"/>
+      </Position3>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

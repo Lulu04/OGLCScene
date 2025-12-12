@@ -85,7 +85,8 @@ begin
   if maxWidth < BResumeGame.Width then maxWidth := BResumeGame.Width;
   BResumeGame.AnchorPosToParent(haCenter, haCenter, 0, vaCenter, vaCenter, 0);
 
-  title := TUILabel.Create(FScene, 'game paused', aFont);
+  title := TUILabel.Create(FScene);
+  title.InitParams('game paused', aFont);
   AddChild(title);
   title.Tint.Value := BGRA(200,200,255);
   title.Blink(-1, 0.5, 0.5);

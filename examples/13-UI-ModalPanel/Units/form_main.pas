@@ -5,7 +5,7 @@ unit form_main;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls, StdCtrls,
+  Classes, SysUtils, Forms, Controls, Dialogs, Buttons, ExtCtrls,
   BGRABitmap, BGRABitmapTypes,
   OpenGLContext, OGLCScene,
   u_common;
