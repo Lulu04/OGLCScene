@@ -309,16 +309,21 @@ end;
 TUILabel = class(TUIClickableObject)
 private
   function GetCaption: string;
+  function GetTexturedFont: TTexturedFont;
   procedure SetCaption(AValue: string);
+  procedure SetTexturedFont(AValue: TTexturedFont);
 protected
   function GetWidth: integer; override;
   function GetHeight: integer; override;
 public
   CaptionDescriptor: TUICaptionDescriptor;
   procedure DoDraw; override;
-  constructor Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont);
+  constructor Create(aParentScene: TOGLCScene);
+  procedure InitParams(const aCaption: string; aTexturedFont: TTexturedFont);
   // Convenient property to allow direct access to property CaptionDescriptor.Caption
   property Caption: string read GetCaption write SetCaption;
+  // Convenient property to allow direct access to property CaptionDescriptor.TexturedFont
+  property TexturedFont: TTexturedFont read GetTexturedFont write SetTexturedFont;
 end;
 
 { TUIImage }
@@ -1267,9 +1272,19 @@ begin
   Result := CaptionDescriptor.Caption;
 end;
 
+function TUILabel.GetTexturedFont: TTexturedFont;
+begin
+  Result := CaptionDescriptor.TexturedFont;
+end;
+
 procedure TUILabel.SetCaption(AValue: string);
 begin
   CaptionDescriptor.Caption := AValue;
+end;
+
+procedure TUILabel.SetTexturedFont(AValue: TTexturedFont);
+begin
+  CaptionDescriptor.TexturedFont := AValue;
 end;
 
 function TUILabel.GetWidth: integer;
@@ -1291,10 +1306,17 @@ begin
                              NIL, FComputedOpacity, FComputedTint, FBlendMode);
 end;
 
-constructor TUILabel.Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont);
+constructor TUILabel.Create(aParentScene: TOGLCScene);
 begin
   inherited Create(aParentScene);
-  CaptionDescriptor.Init(aCaption, aFont, taCenterLeft);
+  CaptionDescriptor.Init('', NIL, taCenterLeft);
+end;
+
+procedure TUILabel.InitParams(const aCaption: string;
+  aTexturedFont: TTexturedFont);
+begin
+  CaptionDescriptor.Caption := aCaption;
+  CaptionDescriptor.TexturedFont := aTexturedFont;
 end;
 
 { TUIImage }
@@ -1497,7 +1519,9 @@ begin
   FImage.OnTextureChanged := @ProcessCallbackSomethingChangeTheSize;
   FImage.OnSizeChanged := @ProcessCallbackSomethingChangeTheSize;
 
-  FLabel := TUILabel.Create(aParentScene, aCaption, aFont);
+  FLabel := TUILabel.Create(aParentScene);
+  FLabel.Caption := aCaption;
+  FLabel.TexturedFont := aFont;
   FLabel.CaptionDescriptor.Alignment := taCenterLeft;
   AddChild(FLabel);
   FLabel.MouseInteractionEnabled := False; // disable mouse interaction after AddChild() !!
