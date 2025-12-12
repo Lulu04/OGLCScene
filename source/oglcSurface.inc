@@ -70,6 +70,7 @@ private
   ParentSurface: TSimpleSurfaceWithEffect;
   FIsRunning: boolean;
   FRunError: boolean;
+  FKilled: boolean;
   FTemp: TStringArray;
   FScenarioDecodeProc: TScenarioDecode;
   procedure Execute(const aElapsedTime: single);
@@ -82,6 +83,8 @@ public
   // one action per line and each line separated by #10
   procedure InitWith(const aLines: string);
   procedure AddLine(const aLine: string);  // to construct the scenario manually
+  procedure Stop;
+  procedure Kill;
   // this callback is only called when an action has not been recognized
   property OnDecode: TScenarioDecode read FScenarioDecodeProc write FScenarioDecodeProc;
   // True if an error occurs while running the scenario.
@@ -147,6 +150,7 @@ protected
 private
   FListScenario: array of TScenario;
   FScenarioAdditionnalDecode: TScenarioDecode;
+  function GetFirstScenarioFreeID: integer;
   function GetScenario(aID: TIDScenario): TScenario;
   function DoAddScenarioToList(aScenario: TScenario): TIDScenario;
 private
@@ -247,6 +251,7 @@ public  // Scenario
   procedure ReplaceScenarioFromFile(aID: TIDScenario; const aFilename: string);
   procedure StopScenario(aID: TIDScenario);
   procedure StopAllScenario;
+  procedure DeleteScenario(aID: TIDScenario);
   function ScenarioIsPlaying(aID: TIDScenario): boolean;
   // set a callbak proc to decode custom additionnal actions.
   procedure SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
@@ -507,6 +512,19 @@ begin
   if FFlipV then inc(Result, 2);
 end;
 
+function TSimpleSurfaceWithEffect.GetFirstScenarioFreeID: integer;
+var i: integer;
+begin
+  // looks for an empty slot
+  for i:=0 to High(FListScenario) do
+    if FListScenario[i] = NIL then exit(i);
+
+  // not found -> create a new item
+  Result := Length(FListScenario);
+  SetLength(FListScenario, Result+1);
+  FListScenario[Result] := NIL;
+end;
+
 function TSimpleSurfaceWithEffect.GetScenario(aID: TIDScenario ): TScenario;
 begin
   if (aID > -1) and (aID < Length(FListScenario))
@@ -516,8 +534,7 @@ end;
 
 function TSimpleSurfaceWithEffect.DoAddScenarioToList(aScenario: TScenario): TIDScenario;
 begin
-  Result := Length(FListScenario);
-  SetLength(FListScenario, Result + 1);
+  Result := GetFirstScenarioFreeID;
   FListScenario[Result] := aScenario;
   aScenario.ParentSurface := Self;
   aScenario.OnDecode := FScenarioAdditionnalDecode;
@@ -742,6 +759,7 @@ end;
 procedure TSimpleSurfaceWithEffect.Update(const aElapsedTime: single);
 var Xr,Yr,s,c: single ;
     i, loopLength: integer;
+    scenar: TScenario;
 begin
   if FParentSurface <> NIL then begin
     FSurfaceOrigin.x := FParentSurface.FSurfaceOrigin.x + X.Value;
@@ -825,9 +843,14 @@ begin
     Y.Value := FBindToSprite.TargetSurface.Y.Value + FBindToSprite.OffsetY;
   end;
   // Scenario
-  for i:=0 to High(FListScenario) do
-   if FListScenario[i].FIsRunning
-     then FListScenario[i].Execute(aElapsedTime);
+  for i:=0 to High(FListScenario) do begin
+    scenar := FListScenario[i];
+    if scenar.FKilled then begin
+      scenar.Free;
+      FListScenario[i] := NIL;
+    end
+    else if scenar.FIsRunning then scenar.Execute(aElapsedTime);
+  end;
 
   // childs update
   for i:=0 to FChilds.Count-1 do
@@ -1493,6 +1516,13 @@ begin
     FListScenario[i].FIsRunning := FALSE;
 end;
 
+procedure TSimpleSurfaceWithEffect.DeleteScenario(aID: TIDScenario);
+begin
+  if (aID >= 0) and (aID < Length(FListScenario)) then begin
+    //FListScenario[aID].
+  end;
+end;
+
 function TSimpleSurfaceWithEffect.ScenarioIsPlaying(aID: TIDScenario): boolean;
 var s: TScenario;
 begin
@@ -1681,6 +1711,16 @@ end;
 procedure TScenario.AddLine(const aLine: string);
 begin
  Actions.Add(aLine);
+end;
+
+procedure TScenario.Stop;
+begin
+  FIsRunning := False;
+end;
+
+procedure TScenario.Kill;
+begin
+  FKilled := True;
 end;
 
 
