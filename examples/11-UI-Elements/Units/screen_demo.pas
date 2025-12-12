@@ -343,7 +343,8 @@ begin
   FPanel1.AnchorVPosToSurface(FButton1, vaTop, vaBottom, FScene.ScaleDesignToScene(10));
   InitCallbackOn(FPanel1);
     // label2, child of FPanel1
-    FLabel2 := TUILabel.Create(FScene, 'A TUILabel child of TUIPanel -> I''m clipped by my parent!', FtexFont);
+    FLabel2 := TUILabel.Create(FScene);
+    FLabel2.InitParams('A TUILabel child of TUIPanel -> I''m clipped by my parent!', FtexFont);
     FPanel1.AddChild(FLabel2);
     FLabel2.CenterOnParent;
     FLabel2.Tint.Value := BGRA(255,128,220);
@@ -532,10 +533,12 @@ begin
   FLabel9 := FScene.Add_UILabel('TUIScrollBox', FtexFont);
   FLabel9.AnchorPosToSurface(FScrollBox1, haLeft, haLeft, 0, vaBottom, vaTop, 0);
   FLabel9.Tint.Value := BGRA(255,255,0);
-    FLabel7 := TUILabel.Create(FScene, 'Use mouse wheel on the ScrollBars!', FtexFont);
+    FLabel7 := TUILabel.Create(FScene);
+    FLabel7.InitParams('Use mouse wheel on the ScrollBars!', FtexFont);
     FLabel7.Tint.Value := BGRA(220,220,220);
     FScrollBox1.AddChild(FLabel7);
-    FLabel10 := TUILabel.Create(FScene, 'Click on ScrollBox to see the coordinates', FtexFont);
+    FLabel10 := TUILabel.Create(FScene);
+    FLabel10.InitParams('Click on ScrollBox to see the coordinates', FtexFont);
     FLabel10.Tint.Value := BGRA(220,220,220);
     FScrollBox1.AddChild(FLabel10);
     FLabel10.SetCoordinate(0, FLabel7.BottomY);
