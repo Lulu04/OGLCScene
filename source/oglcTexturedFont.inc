@@ -7,7 +7,6 @@ TTexturedFont = class{(TFPHashList)}
  private
   FParentScene: TOGLCScene;
   FAtlas: TOGLCTextureAtlas;
-  FAtlasOwner: boolean;
   FTexCharArray: array of TTexturedChar;
   FFont: TFontDescriptor;
   function GetChar(aUTF8Char: string): PTexturedChar;
@@ -26,7 +25,6 @@ TTexturedFont = class{(TFPHashList)}
   //   value equal to 1 -> normal font spacing
   //   value > 1 -> the characters are farther apart from each other
   CharSpacingCoeff: TBoundedFParam;
-  Constructor Create(aParentScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
   constructor CreateFromImagePacker(aParentScene: TOGLCScene; aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean;
      aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
   Destructor Destroy; override;
@@ -67,17 +65,6 @@ end;
 
 { TTexturedFont }
 
-constructor TTexturedFont.Create(aParentScene: TOGLCScene; aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap);
-begin
-  FPArentScene := aParentScene;
-  Init(aFont);
-  FAtlasOwner := True;
-  FAtlas := TOGLCTextureAtlas.Create(aParentScene);
-  InternalBuild(FAtlas, False, aCharSet, aFillTexture);
-  FAtlas.TryToPack;
-  FAtlas.Build;
-end;
-
 constructor TTexturedFont.CreateFromImagePacker(aParentScene: TOGLCScene;
   aPacker: TOGLCImagePacker; aPackerLoadedFromFile: boolean;
   aFont: TFontDescriptor; const aCharSet: string;
@@ -86,15 +73,10 @@ begin
   FParentScene := aParentScene;
   Init(aFont);
   InternalBuild(aPacker, aPackerLoadedFromFile, aCharSet, aFillTexture);
-  FAtlasOwner := False;
 end;
 
 destructor TTexturedFont.Destroy;
 begin
-  if FAtlasOwner then begin
-    FAtlas.Free;
-    FAtlas := NIL;
-  end;
   FTexCharArray := NIL;
   CharSpacingCoeff.Free;
   CharSpacingCoeff := NIL;
@@ -143,11 +125,13 @@ procedure TTexturedFont.InternalBuild(aPacker: TOGLCImagePacker; aPackerLoadedFr
 var i: integer;
     temp: TBGRABitmap;
     s: string;
+    decorationSize: TSize;
 begin
   NextCharPrefix;
 
   temp := TBGRABitmap.Create(1, 1);
   FFont.SetFontRendererOn(temp);
+  decorationSize := FFont.DecorationSize;
 
   // build the font
   SetLength(FTexCharArray, UTF8LengthFast(aCharSet));
@@ -162,8 +146,8 @@ begin
       FTexCharArray[i].Texture := aPacker.Add(temp.Duplicate, CharPrefix+s);
 
     FTexCharArray[i].Character := s;
-    FTexCharArray[i].DecoratedCharSize := Size(temp.Width, temp.Height);
     FTexCharArray[i].OriginalCharSize := temp.TextSize(s);
+    FTexCharArray[i].DecoratedCharSize := FTexCharArray[i].OriginalCharSize + decorationSize;
    end;
   temp.Free;
 end;
