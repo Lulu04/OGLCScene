@@ -21,6 +21,15 @@ const
   LATIN1_SUPPLEMENT_2=' ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿';
 
   procedure check;
+  // This function scan the text and return only one occurence of the characters used
+  // Usefull to construct small charset with only needed chars.
+  // The function remove all kind of LineEnding.
+  function TextToCharset(const aText: string): string;
+  // Complete the given charset with the characters inside aText, avoiding redundant char. Return the modified charset.
+  // The function remove all kind of LineEnding.
+  function AddToCharset(const aCharSet, aText: string): string; overload;
+  function AddToCharset(const aCharset: string; aText: TStringArray): string; overload;
+
   function LATIN_EXTENDED_A: string;
   function LATIN_EXTENDED_B: string;
   function GREEK_AND_COPTIC: string;
@@ -94,6 +103,21 @@ begin
   AddRange(s, $C980, $C98F);
   SetLength(s, FCount-1);
   if s <> LATIN_EXTENDED_B then raise exception.create('pas bon');
+end;
+
+function TOGLCCharsets.TextToCharset(const aText: string): string;
+begin
+  Result := TextToCharset(aText);
+end;
+
+function TOGLCCharsets.AddToCharset(const aCharSet, aText: string): string;
+begin
+  Result := AddToCharset(aCharSet, aText);
+end;
+
+function TOGLCCharsets.AddToCharset(const aCharset: string; aText: TStringArray): string;
+begin
+  Result := AddToCharset(aCharset, aText);
 end;
 
 function TOGLCCharsets.LATIN_EXTENDED_A: string;
