@@ -35,19 +35,26 @@ end;
 
 { TProperties }
 
-{ TProperties is used to save and load data in a string. A data is associated with a name, like 'Width|500'
-  It use a char separator between a data name and its value.
+{ TProperties is used to save and load data in a string container. A data have a field name and a value, like 'Width|500'
+  A char separator is used to separates each fields and values.
+  When saving a string, to allow all possible characters, strings are encoded in hexadecimal(optionnal)
 
   SAVING DATA IN A STRING:
      function DataToString: string;
      var prop: TProperties;
      begin
        prop.Init('|');
-       prop.Add('Width', FWidth);     // we suppose FWidth is integer and = 120
-       prop.Add('Height', FHeight);   // we suppose FHeight is integer and = 100
-       prop.Add('IsValid', FIsValid); // we suppose FIsValid is boolean and = True
-       Result := prop.PackedProperty;   // return the string 'Width|120|Height|100|IsValid|true'
+       prop.Add('Name', FObjectName); // FObjectName is of type string and equal to 'Object1'
+       prop.Add('Width', FWidth);     // FWidth is integer and = 120
+       prop.Add('Height', FHeight);   // FHeight is integer and = 100
+       prop.Add('IsValid', FIsValid); // FIsValid is boolean and = True
+       Result := prop.PackedProperty; // return the string 'Name|Object1|Width|120|Height|100|IsValid|true'
      end;
+
+  NOTE: in the above example, if the variable FObjectName is likely to contain the separator character,
+        instead of prop.Add('Name', FObjectName);
+        use        prop.Add('Name', FObjectName, True);
+            -> the content of FObjectName is first converted in hexadecimal then pushed in the field 'Name'
 
   LOADING DATA FROM STRING
     procedure LoadFromString(const s: string);
@@ -59,15 +66,21 @@ end;
       prop.BooleanValueOf('IsValid', FIsValid, False);
     end;
 
-// Note: in ASCII table, there are four separator: $1C, $1D, $1E, $1F that can be used
+// Note: in ASCII table, there are four separator: $1C, $1D, $1E, $1F that can be used.
+// $1C is used internally to encode string in hexa.
 }
 TProperties = record
+private const HEADER_ENCODED_STRING: byte = $1C;
 private
  FProperties: TStringArray;
  FSeparator: Char;
  function ValueIndexOf(const aName: string; out index: integer): boolean;
  procedure AddProp(const n, v: string);
  function GetPackedProperty: string;
+ function ByteToHex(const AValue: Byte): string;
+ function HexToByte(const AHexValue: string): integer;
+ function EncodeInHexa(const s: string): string;
+ function DecodeFromHexa(const s: string): string;
 public // unpack section
  procedure SetEmpty;
  // search the section with the specified name in the specified TStringList and split the property.
@@ -89,15 +102,19 @@ public // unpack section
  function ByteValueOf(const aPropertyName: string; var Value: byte; aDefault: byte): boolean;
  function WordValueOf(const aPropertyName: string; var Value: word; aDefault: word): boolean;
  function BGRAPixelValueOf(const aPropertyName: string; var Value: TBGRAPixel; aDefault: TBGRAPixel): boolean;
+ function PointValueOf(const aPropertyName: string; var Value: TPoint; aDefault: TPoint): boolean;
+ function PointFValueOf(const aPropertyName: string; var Value: TPointF; aDefault: TPointF): boolean;
 
 public // pack section
  procedure Init(aSeparator: char);
- procedure Add(const aPropertyName, aValue: string);
+ procedure Add(const aPropertyName, aValue: string; aEncodeInHexa: boolean=False);
  procedure Add(const aPropertyName: string; aValue: boolean);
  procedure Add(const aPropertyName: string; aValue: integer);
  procedure Add(const aPropertyName: string; aValue: int64);
  procedure Add(const aPropertyName: string; aValue: single);
  procedure Add(const aPropertyName: string; aValue: TBGRAPixel);
+ procedure Add(const aPropertyName: string; aValue: TPoint);
+ procedure Add(const aPropertyName: string; aValue: TPointF; aFormat: string='0.000');
  property PackedProperty: string read GetPackedProperty;
 
 public
@@ -271,6 +288,46 @@ begin
   end;
 end;
 
+function TProperties.ByteToHex(const AValue: Byte): string;
+const CHex: array[0..15] of AnsiChar = '0123456789ABCDEF';
+begin
+  Result := CHex[AValue shr 4] + CHex[AValue and $0F];
+end;
+
+function TProperties.HexToByte(const AHexValue: string): integer;
+begin
+  TryStrToInt('$' + AHexValue, Result);
+end;
+
+function TProperties.EncodeInHexa(const s: string): string;
+var i: integer;
+  b: byte;
+begin
+  if s = '' then begin
+    Result := '';
+    exit;
+  end;
+
+  Result := chr(HEADER_ENCODED_STRING); // this header means the string is encoded in hexa
+  for i:=1 to Length(s) do begin
+    b := byte(s[i]);
+    Result := Result + b.ToHexString(2);
+  end;
+end;
+
+function TProperties.DecodeFromHexa(const s: string): string;
+var k: integer;
+begin
+  Result := '';
+  if Length(s) = 0 then exit;
+
+  k := 2;
+  while k < Length(s) do begin
+    Result := Result + chr(HexToByte(s[k]+s[k+1]));
+    inc(k, 2);
+  end;
+end;
+
 procedure TProperties.SetEmpty;
 begin
   FProperties := NIL;
@@ -318,8 +375,11 @@ function TProperties.StringValueOf(const aPropertyName: string; var Value: strin
 var i: integer;
 begin
   Result := ValueIndexOf(aPropertyName, i);
-  if Result then Value := FProperties[i]
-    else Value := aDefault;
+  if Result then begin
+    Value := FProperties[i];
+    if (Length(Value) > 0) and (Value[1] = chr(HEADER_ENCODED_STRING)) then
+      Value := DecodeFromHexa(Value);
+  end else Value := aDefault;
 end;
 
 function TProperties.BooleanValueOf(const aPropertyName: string; var Value: boolean; aDefault: boolean): boolean;
@@ -384,15 +444,50 @@ begin
   end else Value := aDefault;
 end;
 
+function TProperties.PointValueOf(const aPropertyName: string;
+  var Value: TPoint; aDefault: TPoint): boolean;
+var A: TStringArray;
+  i: integer;
+begin
+  Result := ValueIndexOf(aPropertyName, i);
+  if Result then begin
+    try
+      A := DecodeFromHexa(FProperties[i]).Split([' ']);
+      Value.x := A[0].ToInteger;
+      Value.y := A[1].ToInteger;
+    except
+      Value := aDefault;
+    end;
+  end else Value := aDefault;
+end;
+
+function TProperties.PointFValueOf(const aPropertyName: string;
+  var Value: TPointF; aDefault: TPointF): boolean;
+var A: TStringArray;
+  i: integer;
+begin
+  Result := ValueIndexOf(aPropertyName, i);
+  if Result then begin
+    try
+      A := DecodeFromHexa(FProperties[i]).Split([' ']);
+      Value.x := StringToSingle(A[0]);
+      Value.y := StringToSingle(A[1]);
+    except
+      Value := aDefault;
+    end;
+  end else Value := aDefault;
+end;
+
 procedure TProperties.Init(aSeparator: char);
 begin
   FProperties := NIL;
   FSeparator := aSeparator;
 end;
 
-procedure TProperties.Add(const aPropertyName, aValue: string);
+procedure TProperties.Add(const aPropertyName, aValue: string; aEncodeInHexa: boolean);
 begin
-  AddProp(aPropertyName, aValue);
+  if aEncodeInHexa then AddProp(aPropertyName, EncodeInHexa(aValue))
+    else AddProp(aPropertyName, aValue);
 end;
 
 procedure TProperties.Add(const aPropertyName: string; aValue: boolean);
@@ -418,6 +513,20 @@ end;
 procedure TProperties.Add(const aPropertyName: string; aValue: TBGRAPixel);
 begin
   AddProp(aPropertyName, BGRAPixelToHex(aValue));
+end;
+
+procedure TProperties.Add(const aPropertyName: string; aValue: TPoint);
+var s: String;
+begin
+  s := EncodeInHexa(aValue.X.ToString + ' ' + aValue.Y.ToString);
+  AddProp(aPropertyName, s);
+end;
+
+procedure TProperties.Add(const aPropertyName: string; aValue: TPointF; aFormat: string);
+var s: String;
+begin
+  s := EncodeInHexa(FormatFloatWithDot(aFormat, aValue.x) + ' ' + FormatFloatWithDot(aFormat, aValue.y));
+  AddProp(aPropertyName, s);
 end;
 
 function TProperties.ReplaceValue(const aPropertyName, aValue: string): boolean;
