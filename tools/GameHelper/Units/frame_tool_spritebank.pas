@@ -104,6 +104,10 @@ procedure TFrameToolSpriteBank.LBMouseWheel(Sender: TObject;
   Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint;
   var Handled: Boolean);
 begin
+  Shift := Shift;
+  WheelDelta := WheelDelta;
+  MousePos := MousePos;
+  Handled := True;
   HideToolPanels;
 end;
 

@@ -64,7 +64,7 @@ type
 
 implementation
 
-uses form_editgradient, u_common;
+uses form_editgradient;
 
 {$R *.lfm}
 

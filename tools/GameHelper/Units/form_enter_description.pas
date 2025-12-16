@@ -48,6 +48,7 @@ end;
 procedure TFormEnterDescription.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  Shift := Shift;
   if Key = VK_ESCAPE then ModalResult := mrCancel;
 end;
 

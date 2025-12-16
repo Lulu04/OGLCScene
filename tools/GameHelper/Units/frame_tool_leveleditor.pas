@@ -328,7 +328,7 @@ var o: PLevelBankItem;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
-  if not IsValidPascalVariableName(name, True) then exit;
+  if not IsValidPascalVariableName(nam, True) then exit;
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
 

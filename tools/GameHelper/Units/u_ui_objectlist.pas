@@ -13,13 +13,18 @@ type
 
 TItemWithName = class
   _Name: string;
+  procedure InitDefault; virtual; abstract;
+  procedure DuplicateTo(aItem: Pointer); virtual; abstract;
   function SaveToString: string; virtual; abstract;
   procedure LoadFromString(const data: string); virtual; abstract;
 end;
 
+
+//TSimpleNameObjectHash<T> = class(TSimpleHash<TNameObjectHashBucket<T>>)
+
 { TListOfItemWithName }
 
-generic TListOfItemWithName<T> = class(specialize TVector<TItemWithName>)
+generic TListOfItemWithName<T: TItemWithName> = class(specialize TVector<T>)
   destructor Destroy; override;
   function AddEmpty: T; virtual; abstract;
   function IndexOf(const aName: string): integer;
@@ -29,7 +34,24 @@ generic TListOfItemWithName<T> = class(specialize TVector<TItemWithName>)
   function GetByIndex(aIndex: integer): T;
   procedure DeleteByIndex(aIndex: integer);
   procedure DeleteByName(const aName: string);
+public
+  // return True if the item is renamed
+  function DoRenameByName(const aOldName: string;
+                          out aNewName: string;
+                          aSaveBankIfDone: boolean): boolean;
+  // return True if the deletion is done
+  function DoDeleteByName(const aName: string; aSaveBankIfDone: boolean): boolean;
+  // return True if the duplication is done
+  function DoDuplicateByName(const aSrcName: string;
+                             out aDuplicateName: string;
+                             aSaveBankIfDone: boolean): boolean;
+  // check if the passed name exists in the list.
+  // If yes, ask to the user if s/he want to replace its content, return True if yes
+  // If there isn't an item with this name the function return True
+  function AskUserToReplaceExistingItem(const aName: string): boolean;
 
+  // ex: font
+  function GetItemReadableName: string; virtual; abstract;
   // ex: [FONTBANK]
   function GetHeaderFile: string; virtual; abstract;
   // ex: FontBank.oglc
@@ -47,13 +69,12 @@ end;
 
 TFontDescriptorItem = class(TItemWithName)
   FD: TFontDescriptor;
+  procedure InitDefault; override;
   function SaveToString: string; override;
   procedure LoadFromString(const data: string); override;
 
   // copy only FD, not the name
-  procedure DuplicateTo(aItem: TFontDescriptorItem);
-
-  function ToTextureFont(aAtlas: TAtlas; aCharSet: string; aFillTexture: TBGRABitmap=NIL): TTexturedFont;
+  procedure DuplicateTo(aItem: Pointer); override;
 
   // return FTexturedFont_<_Name>
   function VariableNameForTexturedFont: string;
@@ -71,80 +92,97 @@ end;
 
 TFontBank = class(specialize TListOfItemWithName<TFontDescriptorItem>)
   function AddEmpty: TFontDescriptorItem; override;
+  function GetItemReadableName: string; override;
+  function GetHeaderFile: string; override;
+  function GetSaveFileName: string; override;
+
+  procedure GetAtlasWithTexturedFont(const aFontDescriptorName, aCaption: string;
+                                     out aAtlas: TAtlas;
+                                     out aTexturedFont: TTexturedFont;
+                                     aFillTexture: TBGRABitmap=NIL);
+end;
+
+
+
+
+{ TPanelDescriptorItem }
+
+TPanelDescriptorItem = class(TItemWithName)
+  BodyShape,
+  BackGradient: string;
+  Usegradient: boolean;
+  x, y, width, height: integer;
+  IsModal,
+  DarkenBG: boolean;
+  DarknessColor: TBGRAPixel;
+  ScenarioOnShow,
+  ScenarioOnHide: string; // the content of the scenario
+  textures: string;
+  surfaces: string;
+  procedure InitDefault; override;
+  function SaveToString: string; override;
+  procedure LoadFromString(const data: string); override;
+  procedure DuplicateTo(aItem: Pointer); override;
+end;
+
+{ TPanelBank }
+
+TPanelBank = class(specialize TListOfItemWithName<TPanelDescriptorItem>)
+  function AddEmpty: TPanelDescriptorItem; override;
+  function GetItemReadableName: string; override;
   function GetHeaderFile: string; override;
   function GetSaveFileName: string; override;
 end;
 
 
-
-
-TPanelDescriptorItem = class(TItemWithName)
-  BodyShape,
-  BackGradient: string;
-  x, y, width, height: single; // in percentage of scene width and height
-  IsModal: boolean;
-
-  function SaveToString: string; override;
-  procedure LoadFromString(const data: string); override;
-end;
-
-TUIShapeStyle = (bsRectangle, bsRoundRect, bsEllipse, bsCustom);
-TUIShapeDescriptor = class(TItemWithName)
-  BodyShapeData,
-  BackGradientData: string;   // '' for no back gradient
-  procedure InitDefault;
-
-  function ToUIPanel(aScene: TOGLCScene): TUIPanel;
-
-  // use ; , and space
-  function SaveToString: string; override;
-  procedure LoadFromString(const data: string); override;
-
-end;
-
-TUIShapeList = class(specialize TVector<TUIShapeDescriptor>);
-
 TUIButtonDescriptor = record
-  shape: TUIShapeDescriptor;
   //image: TTextureItem;
-  font: TFontDescriptor;
+  //font: TFontDescriptor;
 end;
 
 
 var
   FontBank: TFontBank;
-  UIShapeList: TUIShapeList;
+  PanelBank: TPanelBank;
 
 
 //TButtonItem
 
 implementation
 
-uses u_utils, u_common, u_project, LazFileUtils;
+uses u_utils, u_common, u_project, u_resourcestring, LazFileUtils, Dialogs,
+  Controls;
 
 { TFontDescriptorItem }
 
-function TFontDescriptorItem.SaveToString: string;
+procedure TFontDescriptorItem.InitDefault;
 begin
-  Result := 'Name'+'&'+_Name+'&'+FD.SaveToString;
+  FD.CreateDefault;
+end;
+
+function TFontDescriptorItem.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('&');
+  prop.Add('Name', _Name);
+  prop.Add('Data', FD.SaveToString);
+  Result := prop.PackedProperty;
 end;
 
 procedure TFontDescriptorItem.LoadFromString(const data: string);
 var prop: TProperties;
+  s: string;
 begin
+  s := '';
   prop.Split(data, '&');
-  prop.StringValueOf('Name', _Name, '');
-  FD.LoadFromString(data);
+  prop.StringValueOf('Name', _Name, '???');
+  prop.StringValueOf('Data', s, '');
+  FD.LoadFromString(s);
 end;
 
-procedure TFontDescriptorItem.DuplicateTo(aItem: TFontDescriptorItem);
+procedure TFontDescriptorItem.DuplicateTo(aItem: Pointer);
 begin
-  aItem.FD := FD;
-end;
-
-function TFontDescriptorItem.ToTextureFont(aAtlas: TAtlas; aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
-begin
-  Result := aAtlas.AddTexturedFont(FD, aCharSet, aFillTexture);
+  TFontDescriptorItem(aItem).FD := FD;
 end;
 
 function TFontDescriptorItem.VariableNameForTexturedFont: string;
@@ -215,8 +253,13 @@ end;
 function TFontBank.AddEmpty: TFontDescriptorItem;
 begin
   Result := TFontDescriptorItem.Create;
-  Result.FD.CreateDefault;
+  Result.InitDefault;
   PushBack(Result);
+end;
+
+function TFontBank.GetItemReadableName: string;
+begin
+  Result := sFont;
 end;
 
 function TFontBank.GetHeaderFile: string;
@@ -227,6 +270,135 @@ end;
 function TFontBank.GetSaveFileName: string;
 begin
   Result := 'FontBank.oglc';
+end;
+
+procedure TFontBank.GetAtlasWithTexturedFont(const aFontDescriptorName, aCaption: string;
+  out aAtlas: TAtlas; out aTexturedFont: TTexturedFont;
+  aFillTexture: TBGRABitmap);
+var item: TFontDescriptorItem;
+begin
+  item := GetByName(aFontDescriptorName);
+  if item <> NIL then begin
+    FScene.MakeCurrent;
+    aAtlas := FScene.CreateAtlas;
+    aAtlas.Spacing := 2;
+    aTexturedFont := aAtlas.AddTexturedFont(item.FD, TextToCharset(aCaption), aFillTexture);
+  end else begin
+    aAtlas := NIL;
+    aTexturedFont := NIL;
+    FScene.LogError('TFontBank.GetAtlasWithTexturedFont: aFontDescriptorName "'+aFontDescriptorName+'" not found in FontBank');
+  end;
+end;
+
+{ TPanelDescriptorItem }
+
+procedure TPanelDescriptorItem.InitDefault;
+var panel: TUIPanelWithEffects;
+begin
+  panel := TUIPanelWithEffects.Create(FScene);
+  panel.BodyShape.SetShapeRectangle(FScene.Width div 3, FScene.Height div 3, 3);
+  BodyShape := panel.BodyShape.SaveToString;
+  BackGradient := '';
+  Usegradient := False;
+  x := FScene.Width div 3;
+  y := FScene.Height div 3;
+  width := panel.Width;
+  height := panel.Height;
+  IsModal := False;
+  DarkenBG := False;
+  DarknessColor := BGRA(0,0,0,100);
+  ScenarioOnShow := '';
+  ScenarioOnHide := '';
+  panel.Free;
+
+  textures := '';
+  surfaces := '';
+end;
+
+function TPanelDescriptorItem.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('&');
+  prop.Add('Name', _Name);
+  prop.Add('BodyShape', BodyShape);
+  prop.Add('BackGradient', BackGradient);
+  prop.Add('Usegradient', Usegradient);
+  prop.Add('X', x);
+  prop.Add('Y', y);
+  prop.Add('Width', width);
+  prop.Add('Height', height);
+  prop.Add('IsModal', IsModal);
+  prop.Add('DarkenBG', DarkenBG);
+  if DarkenBG then prop.Add('DarknessColor', DarknessColor);
+  if ScenarioOnShow <> '' then prop.Add('ScenarioOnShow', ScenarioOnShow);
+  if ScenarioOnHide <> '' then prop.Add('ScenarioOnHide', ScenarioOnHide);
+  if textures <> '' then prop.Add('Textures', textures);
+  if surfaces <> '' then prop.Add('Surfaces', surfaces);
+  Result := prop.PackedProperty;
+end;
+
+procedure TPanelDescriptorItem.LoadFromString(const data: string);
+var prop: TProperties;
+begin
+  prop.Split(data, '&');
+  prop.StringValueOf('Name', _Name, '???');
+  prop.StringValueOf('BodyShape', BodyShape, '');
+  prop.StringValueOf('BackGradient', BackGradient, '');
+  prop.BooleanValueOf('Usegradient', Usegradient, False);
+  prop.IntegerValueOf('X', x, 0);
+  prop.IntegerValueOf('Y', y, 0);
+  prop.IntegerValueOf('Width', width, 200);
+  prop.IntegerValueOf('Height', height, 200);
+  prop.BooleanValueOf('IsModal', IsModal, False);
+  prop.BooleanValueOf('DarkenBG', DarkenBG, False);
+  prop.BGRAPixelValueOf('DarknessColor', DarknessColor, BGRA(0,0,0,100));
+  prop.StringValueOf('ScenarioOnShow', ScenarioOnShow, '');
+  prop.StringValueOf('ScenarioOnHide', ScenarioOnHide, '');
+  prop.StringValueOf('Textures', textures, '');
+  prop.StringValueOf('Surfaces', surfaces, '');
+end;
+
+procedure TPanelDescriptorItem.DuplicateTo(aItem: Pointer);
+var dst: TPanelDescriptorItem;
+begin
+  dst := TPanelDescriptorItem(aItem);
+  dst.BodyShape := BodyShape;
+  dst.BackGradient := BackGradient;
+  dst.x := x;
+  dst.y := y;
+  dst.width := width;
+  dst.height := height;
+  dst.IsModal := IsModal;
+  dst.DarkenBG := DarkenBG;
+  dst.DarknessColor := DarknessColor;
+  dst.ScenarioOnShow := ScenarioOnShow;
+  dst.ScenarioOnHide := ScenarioOnHide;
+  dst.textures := textures;
+  dst.surfaces := surfaces;
+end;
+
+{ TPanelBank }
+
+function TPanelBank.AddEmpty: TPanelDescriptorItem;
+begin
+  Result := TPanelDescriptorItem.Create;
+  Result.InitDefault;
+  PushBack(Result);
+end;
+
+function TPanelBank.GetItemReadableName: string;
+begin
+  Result := sPanel;
+end;
+
+function TPanelBank.GetHeaderFile: string;
+begin
+  Result := '[PANELBANK]';
+end;
+
+function TPanelBank.GetSaveFileName: string;
+begin
+  Result := 'PanelBank.oglc';
 end;
 
 { TListOfItemWithName }
@@ -288,6 +460,84 @@ var i: integer;
 begin
   i := IndexOf(aName);
   if i <> -1 then DeleteByIndex(i);
+end;
+
+function TListOfItemWithName.DoRenameByName(const aOldName: string;
+  out aNewName: string; aSaveBankIfDone: boolean): boolean;
+var item: TItemWithName;
+  newName: string;
+begin
+  Result := False;
+
+  item := GetByName(aOldName);
+  if item = NIL then exit;
+  newName := Trim(InputBox('', sEnterTheNewName, aOldName));
+  if newName = aOldName then exit;
+  if NameExists(newName) then begin
+    ShowMessage(Format(sAxxxNamedAlreadyExists, [GetItemReadableName, newName]));
+    exit;
+  end;
+
+  // rename the item in the bank
+  item._Name := newName;
+  if aSaveBankIfDone then Save;
+
+  aNewName := newName;
+  Result := True;
+end;
+
+function TListOfItemWithName.DoDeleteByName(const aName: string;
+  aSaveBankIfDone: boolean): boolean;
+var item: TItemWithName;
+begin
+  Result := False;
+
+  item := GetByName(aName);
+  if item = NIL then exit;
+
+  if QuestionDlg('',Format(sDeleteThisxxx, [GetItemReadableName]), mtWarning,
+                 [mrOk, sDelete, mrCancel, sCancel], 0) = mrCancel then exit;
+
+  // delete in bank
+  DeleteByName(aName);
+  if aSaveBankIfDone then Save;
+  Result := True;
+end;
+
+function TListOfItemWithName.DoDuplicateByName(const aSrcName: string; out
+  aDuplicateName: string; aSaveBankIfDone: boolean): boolean;
+var srcItem, dstItem: TItemWithName;
+  k: integer;
+begin
+  Result := False;
+
+  // retrieve the source item
+  srcItem := GetByName(aSrcName);
+  if srcItem = NIL then exit;
+
+  // create an unique name for the new item
+  k := 0;
+  repeat
+    inc(k);
+    if k < 100 then aDuplicateName := aSrcName+'_'+Format('%.2d', [k])
+      else aDuplicateName := aSrcName+'_'+k.ToString;
+  until not NameExists(aDuplicateName);
+
+  // add the new item in the bank and save
+  dstItem := AddEmpty;
+  srcItem.DuplicateTo(dstItem);
+  dstItem._Name := aDuplicateName;
+  if aSaveBankIfDone then Save;
+
+  Result := True;
+end;
+
+function TListOfItemWithName.AskUserToReplaceExistingItem(const aName: string): boolean;
+begin
+  if NameExists(aName) then
+    if QuestionDlg('', Format(sAxxxAlreadyExistsWouldYouLikeToReplaceIt, [GetItemReadableName, aName]),
+                   mtWarning, [mrOk, sReplace, mrCancel, sCancel], 0) <> mrOk then exit(False);
+  Result := True;
 end;
 
 function TListOfItemWithName.SaveToString: string;
@@ -381,47 +631,6 @@ begin
   finally
     sl.Free;
   end;
-end;
-
-{ TUIShapeDescriptor }
-
-procedure TUIShapeDescriptor.InitDefault;
-var o: TBodyShape;
-begin
-  Self := Default(TUIShapeDescriptor);
-  o.InitDefault(NIL);
-  BodyShapeData := o.SaveToString;
-  BackGradientData := '';   // '' for no gradient
-end;
-
-function TUIShapeDescriptor.ToUIPanel(aScene: TOGLCScene): TUIPanel;
-begin
-  Result := TUIPanel.Create(aScene);
-  Result.BodyShape.LoadFromString(BodyShapeData);
-
-  if BackGradientData <> '' then
-    Result.BackGradient.LoadGradientDataFromString(BackGradientData);
-end;
-
-function TUIShapeDescriptor.SaveToString: string;
-var prop: TProperties;
-begin
-  prop.Init(';');
-  prop.Add('Name', _Name);
-  prop.Add('BodyShapeData', BodyShapeData);
-  if BackGradientData <> '' then
-    prop.Add('GradientData', BackGradientData);
-  Result := prop.PackedProperty;
-end;
-
-procedure TUIShapeDescriptor.LoadFromString(const data: string);
-var prop: TProperties;
-begin
-  InitDefault;
-  prop.Split(data, ';');
-  prop.StringValueOf('Name', _Name, 'noname');
-  prop.StringValueOf('BodyShapeData', BodyShapeData, BodyShapeData);
-  prop.StringValueOf('GradientData', BackGradientData, '');
 end;
 
 end.

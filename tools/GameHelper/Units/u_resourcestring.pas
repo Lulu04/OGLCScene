@@ -10,9 +10,13 @@ uses
 resourcestring
 sDelete='Delete';
 sOverwrite='Overwrite';
+sReplace='Replace';
 sCancel='Cancel';
 sContinue='Continue';
 sOk='Ok';
+
+sSystem='System';
+sProject='Project';
 
 
 sEnterTheNewName='Enter the new name:';
@@ -30,14 +34,18 @@ sTheLevelxxAlreadyExists='The level %s already exists. Please retry with another
 sDeleteThisLevel='Delete this level ? (this action is irreversible)';
 
 
-
+sAxxxNamedAlreadyExists='A %s named %s already exists. Please, try with another name';
+sAxxxAlreadyExistsWouldYouLikeToReplaceIt='a %s named %s already exists in the bank.'+LineEnding+
+                'Would you like to replace it ?';
+sDeleteThisxxx='Delete this %s ?';
+sFont='font';
+sPanel='panel';
 
 sFontDescriptor='Font descriptor';
 sOverwriteTheSelectedFont='Overwrite the selected font ?';
-sDeleteThisFont='Delete this font ?';
-sAFontNamedAlreadyExists='A font named %s already exists. Please, try with another name';
+sAvailableFonts='Available fonts';
 
-
+sPanels='Panels';
 
 implementation
 

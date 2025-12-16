@@ -49,6 +49,7 @@ public // folder and files
   function GetFolderBinary: string;
   function GetFolderData: string;
   function GetFolderDataTextures: string;
+  function GetFolderDataFonts: string;
   function GetFilenameGameLevels: string;
   function GetFilenameProject_Config: string;
   function GetFilenameProject_LPR: string;
@@ -224,6 +225,11 @@ end;
 function TTargetLazarusProject.GetFolderDataTextures: string;
 begin
   Result := GetFolderData + 'Textures' +DirectorySeparator;
+end;
+
+function TTargetLazarusProject.GetFolderDataFonts: string;
+begin
+  Result := GetFolderData + 'Fonts' +DirectorySeparator;
 end;
 
 function TTargetLazarusProject.GetFilenameGameLevels: string;

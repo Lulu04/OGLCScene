@@ -15,8 +15,9 @@ type
 
 TScreenUIPanelEditor = class(TScreenWithSurfaceHandling)
 private
-  FUIPanel: TUIPanel;
+  FUIPanel: TUIPanelWithEffects;
   FTextureList: TTexturelist;
+  FSurfacesList: TSurfaceList;
 public
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   procedure ProcessMouseDown(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer); override;
@@ -35,7 +36,7 @@ public
   procedure SetFlagModified; override;
 
 public
-  property UIPanel: TUIPanel read FUIPanel;
+  property UIPanel: TUIPanelWithEffects read FUIPanel;
 
 end;
 
@@ -43,7 +44,7 @@ var ScreenUIPanelEditor: TScreenUIPanelEditor;
 
 implementation
 
-uses u_common, u_utils, form_main;
+uses u_common, form_main;
 
 { TScreenUIPanelEditor }
 
@@ -59,8 +60,7 @@ begin
   inherited ProcessMouseDown(Button, Shift, X, Y);
 end;
 
-procedure TScreenUIPanelEditor.ProcessMouseMove(Shift: TShiftState; X, Y: Integer
-  );
+procedure TScreenUIPanelEditor.ProcessMouseMove(Shift: TShiftState; X, Y: Integer);
 begin
   inherited ProcessMouseMove(Shift, X, Y);
 end;
@@ -83,7 +83,7 @@ begin
   CreateCamera([LAYER_UIPANEL, LAYER_SCENEBOUNDS]);
 
   // create the main panel
-  FUIPanel := TUIPanel.Create(FScene);
+  FUIPanel := TUIPanelWithEffects.Create(FScene);
   FScene.Add(FUIPanel, LAYER_UIPANEL);
   FUIPanel.CenterOnScene;
   FUIPanel.BodyShape.SetShapeRectangle(200, 200, 1.5);
@@ -99,6 +99,7 @@ begin
   FrameToolUIPanelEditor.TargetUIPanel := NIL;
 
   FTextureList.Clear;
+  FSurfacesList.Clear;
 
   FreeCamera;
   FScene.Layer[LAYER_UIPANEL].Clear;
@@ -108,18 +109,21 @@ end;
 procedure TScreenUIPanelEditor.Initialize;
 begin
   FTextureList := TTexturelist.Create;
-
+  FSurfacesList := TSurfaceList.Create;
+  FSurfacesList.Textures := FTextureList;
 end;
 
 procedure TScreenUIPanelEditor.Finalize;
 begin
+  FSurfacesList.Free;
+  FSurfacesList := NIL;
   FTextureList.Free;
   FTextureList := NIL;
 end;
 
 function TScreenUIPanelEditor.Surfaces: TSurfaceList;
 begin
-  Result := NIL;
+  Result := FSurfacesList;
 end;
 
 function TScreenUIPanelEditor.Textures: TTextureList;

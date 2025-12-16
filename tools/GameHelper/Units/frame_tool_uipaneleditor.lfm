@@ -2,12 +2,12 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
   Left = 0
   Height = 727
   Top = 0
-  Width = 320
+  Width = 300
   ClientHeight = 727
-  ClientWidth = 320
+  ClientWidth = 300
   TabOrder = 0
-  DesignLeft = 910
-  DesignTop = 67
+  DesignLeft = 871
+  DesignTop = 91
   object Panel8: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -16,10 +16,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     Left = 0
     Height = 32
     Top = 0
-    Width = 320
+    Width = 300
     Anchors = [akTop, akLeft, akRight]
     ClientHeight = 32
-    ClientWidth = 320
+    ClientWidth = 300
     Color = 1973790
     ParentBackground = False
     ParentColor = False
@@ -29,7 +29,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
       AnchorSideLeft.Side = asrCenter
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
-      Left = 119
+      Left = 109
       Height = 15
       Top = 9
       Width = 82
@@ -45,7 +45,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
       AnchorSideRight.Control = Panel8
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 295
+      Left = 275
       Height = 24
       Hint = 'Return to the main window'
       Top = 4
@@ -68,15 +68,15 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     Left = 0
     Height = 688
     Top = 39
-    Width = 320
-    ActivePage = PageMainPanel
+    Width = 300
+    ActivePage = PageChilds
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 0
+    TabIndex = 2
     TabOrder = 1
     object PageMainPanel: TTabSheet
       Caption = 'Main panel'
       ClientHeight = 660
-      ClientWidth = 312
+      ClientWidth = 292
       object Panel1: TPanel
         AnchorSideLeft.Control = PageMainPanel
         AnchorSideTop.Control = PageMainPanel
@@ -87,11 +87,11 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
         Left = 0
         Height = 1190
         Top = 0
-        Width = 312
+        Width = 292
         Anchors = [akTop, akLeft, akRight, akBottom]
         BevelOuter = bvNone
         ClientHeight = 1190
-        ClientWidth = 312
+        ClientWidth = 292
         Color = 8289918
         ParentBackground = False
         ParentColor = False
@@ -102,7 +102,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           Left = 7
           Height = 15
-          Top = 563
+          Top = 616
           Width = 65
           Anchors = [akLeft]
           BorderSpacing.Left = 7
@@ -117,7 +117,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 77
           Height = 23
-          Top = 555
+          Top = 608
           Width = 148
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
@@ -131,17 +131,18 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Cursor = crHandPoint
           Left = 237
           Height = 30
-          Top = 551
+          Top = 604
           Width = 66
           BorderSpacing.Left = 12
           Caption = 'Save'
           Images = DataModule1.ILIconUI
           ImageIndex = 4
+          OnClick = BSaveClick
         end
         object Label50: TLabel
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
-          Left = 275
+          Left = 255
           Height = 15
           Top = 0
           Width = 34
@@ -163,7 +164,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Left = 5
           Height = 180
           Top = 132
-          Width = 302
+          Width = 282
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Left = 5
           BorderSpacing.Right = 5
@@ -175,7 +176,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
-          Left = 229
+          Left = 209
           Height = 15
           Top = 117
           Width = 80
@@ -197,12 +198,12 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Left = 5
           Height = 97
           Top = 15
-          Width = 302
+          Width = 282
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Left = 5
           BorderSpacing.Right = 5
           ClientHeight = 97
-          ClientWidth = 302
+          ClientWidth = 282
           ParentBackground = False
           TabOrder = 2
           object RBRectangle: TRadioButton
@@ -222,7 +223,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             AnchorSideLeft.Control = Panel3
             AnchorSideLeft.Side = asrCenter
             AnchorSideTop.Control = RBRectangle
-            Left = 113
+            Left = 103
             Height = 19
             Top = 8
             Width = 76
@@ -234,7 +235,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             AnchorSideTop.Control = RBRectangle
             AnchorSideRight.Control = Panel3
             AnchorSideRight.Side = asrBottom
-            Left = 225
+            Left = 205
             Height = 19
             Top = 8
             Width = 51
@@ -277,7 +278,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             AnchorSideLeft.Side = asrBottom
             AnchorSideBottom.Control = Label3
             AnchorSideBottom.Side = asrBottom
-            Left = 133
+            Left = 125
             Height = 23
             Top = 32
             Width = 59
@@ -294,7 +295,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           end
           object Label3: TLabel
             AnchorSideTop.Control = Label2
-            Left = 112
+            Left = 104
             Height = 15
             Top = 40
             Width = 16
@@ -302,7 +303,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Enabled = False
           end
           object CBTopLeft: TComboBox
-            Left = 208
+            Left = 192
             Height = 23
             Top = 32
             Width = 35
@@ -322,7 +323,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             AnchorSideLeft.Control = CBTopLeft
             AnchorSideLeft.Side = asrBottom
             AnchorSideTop.Control = CBTopLeft
-            Left = 253
+            Left = 237
             Height = 23
             Top = 32
             Width = 35
@@ -343,7 +344,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             AnchorSideLeft.Control = CBTopLeft
             AnchorSideTop.Control = CBTopLeft
             AnchorSideTop.Side = asrBottom
-            Left = 208
+            Left = 192
             Height = 23
             Top = 65
             Width = 35
@@ -363,7 +364,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           object CBBottomRight: TComboBox
             AnchorSideLeft.Control = CBTopRight
             AnchorSideTop.Control = CBBottomLeft
-            Left = 253
+            Left = 237
             Height = 23
             Top = 65
             Width = 35
@@ -387,14 +388,14 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
           Left = 5
-          Height = 92
+          Height = 116
           Top = 332
-          Width = 302
+          Width = 282
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Left = 5
           BorderSpacing.Right = 5
-          ClientHeight = 92
-          ClientWidth = 302
+          ClientHeight = 116
+          ClientWidth = 282
           ParentBackground = False
           TabOrder = 3
           object RBOptionNormal: TRadioButton
@@ -419,10 +420,66 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Left = 16
             Height = 19
             Top = 64
-            Width = 208
-            Caption = 'Darken the scene in the background'
+            Width = 200
+            Caption = 'Darken the scene behind the panel'
             ParentShowHint = False
             TabOrder = 2
+          end
+          object ColorButton1: TColorButton
+            AnchorSideLeft.Control = Label4
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label4
+            AnchorSideBottom.Side = asrBottom
+            Left = 104
+            Height = 20
+            Top = 86
+            Width = 64
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 3
+            BorderWidth = 2
+            ButtonColorSize = 16
+            ButtonColor = clBlack
+          end
+          object Label4: TLabel
+            AnchorSideLeft.Control = CBDarkenBG
+            AnchorSideTop.Control = CBDarkenBG
+            AnchorSideTop.Side = asrBottom
+            Left = 21
+            Height = 15
+            Top = 91
+            Width = 80
+            BorderSpacing.Left = 5
+            BorderSpacing.Top = 8
+            Caption = 'Darkness color:'
+          end
+          object Label5: TLabel
+            AnchorSideLeft.Control = ColorButton1
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideTop.Control = Label4
+            Left = 173
+            Height = 15
+            Top = 91
+            Width = 44
+            BorderSpacing.Left = 5
+            Caption = 'Opacity:'
+          end
+          object SE1: TSpinEdit
+            AnchorSideLeft.Control = Label5
+            AnchorSideLeft.Side = asrBottom
+            AnchorSideBottom.Control = Label5
+            AnchorSideBottom.Side = asrBottom
+            Left = 220
+            Height = 23
+            Top = 83
+            Width = 52
+            Anchors = [akLeft, akBottom]
+            BorderSpacing.Left = 3
+            Font.Style = [fsBold]
+            Increment = 5
+            MaxValue = 255
+            ParentFont = False
+            TabOrder = 3
+            Value = 100
           end
         end
         object Label52: TLabel
@@ -430,7 +487,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
-          Left = 226
+          Left = 206
           Height = 15
           Top = 317
           Width = 83
@@ -448,37 +505,93 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           AnchorSideRight.Control = Panel1
           AnchorSideRight.Side = asrBottom
-          Left = 232
+          Left = 195
           Height = 15
-          Top = 429
-          Width = 77
+          Top = 453
+          Width = 94
           Anchors = [akTop, akRight]
           BorderSpacing.Top = 5
           BorderSpacing.Right = 3
-          Caption = 'Display effect'
+          Caption = 'Show/Hide Anim'
           Font.Color = clWhite
           Font.Style = [fsBold]
           ParentColor = False
           ParentFont = False
         end
-        object ComboBox1: TComboBox
+        object Label6: TLabel
           AnchorSideLeft.Control = Panel1
-          AnchorSideLeft.Side = asrCenter
           AnchorSideTop.Control = Label53
           AnchorSideTop.Side = asrBottom
-          Left = 29
-          Height = 23
-          Top = 444
-          Width = 254
+          Left = 5
+          Height = 15
+          Top = 468
+          Width = 50
           BorderSpacing.Left = 5
-          ItemHeight = 15
-          Items.Strings = (
-            'None'
-            'Fade in'
-            'Fade in + zoom in'
-          )
-          Style = csDropDownList
-          TabOrder = 4
+          Caption = 'On show:'
+        end
+        object Label7: TLabel
+          AnchorSideLeft.Control = Label6
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label6
+          Left = 60
+          Height = 15
+          Top = 468
+          Width = 36
+          BorderSpacing.Left = 5
+          Caption = 'Label7'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object SpeedButton1: TSpeedButton
+          AnchorSideLeft.Control = Label7
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label7
+          AnchorSideTop.Side = asrCenter
+          Cursor = crHandPoint
+          Left = 106
+          Height = 18
+          Top = 466
+          Width = 55
+          BorderSpacing.Left = 10
+          Caption = 'Edit'
+        end
+        object Label8: TLabel
+          AnchorSideLeft.Control = Panel1
+          AnchorSideTop.Control = Label6
+          AnchorSideTop.Side = asrBottom
+          Left = 5
+          Height = 15
+          Top = 488
+          Width = 45
+          BorderSpacing.Left = 5
+          BorderSpacing.Top = 5
+          Caption = 'On hide:'
+        end
+        object Label9: TLabel
+          AnchorSideLeft.Control = Label8
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label8
+          Left = 55
+          Height = 15
+          Top = 488
+          Width = 36
+          BorderSpacing.Left = 5
+          Caption = 'Label9'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object SpeedButton2: TSpeedButton
+          AnchorSideLeft.Control = Label9
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideTop.Control = Label9
+          AnchorSideTop.Side = asrCenter
+          Cursor = crHandPoint
+          Left = 101
+          Height = 18
+          Top = 486
+          Width = 55
+          BorderSpacing.Left = 10
+          Caption = 'Edit'
         end
       end
     end
@@ -487,6 +600,165 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     end
     object PageChilds: TTabSheet
       Caption = 'Childs'
+      ClientHeight = 660
+      ClientWidth = 292
+      object Panel5: TPanel
+        Left = 0
+        Height = 660
+        Top = 0
+        Width = 292
+        Align = alClient
+        BevelOuter = bvNone
+        ClientHeight = 660
+        ClientWidth = 292
+        Color = 9671571
+        ParentBackground = False
+        ParentColor = False
+        TabOrder = 0
+        object Label17: TLabel
+          AnchorSideRight.Control = Label10
+          AnchorSideRight.Side = asrBottom
+          Left = 34
+          Height = 15
+          Top = 24
+          Width = 29
+          Anchors = [akTop, akRight]
+          Caption = 'Type:'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object CBChildType: TComboBox
+          AnchorSideLeft.Control = Label17
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideBottom.Control = Label17
+          AnchorSideBottom.Side = asrBottom
+          Left = 68
+          Height = 23
+          Top = 16
+          Width = 167
+          Anchors = [akLeft, akBottom]
+          BorderSpacing.Left = 5
+          ItemHeight = 15
+          Items.Strings = (
+            'TUILabel'
+            'TUIButton'
+            'TUICheck'
+            'TUIRadio'
+            'TUIImage'
+            'TUIScrollBar'
+            'TUIProgressBar'
+            'TUIPanel'
+            'TUIScrollBox'
+            'TUIListBox'
+            'TUITextArea'
+          )
+          Style = csDropDownList
+          TabOrder = 0
+        end
+        object Label10: TLabel
+          Left = 16
+          Height = 15
+          Top = 56
+          Width = 47
+          Caption = 'Texture:'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object CBTextures: TComboBox
+          AnchorSideLeft.Control = Label10
+          AnchorSideLeft.Side = asrBottom
+          AnchorSideBottom.Control = Label10
+          AnchorSideBottom.Side = asrBottom
+          Left = 68
+          Height = 23
+          Top = 48
+          Width = 167
+          Anchors = [akLeft, akBottom]
+          BorderSpacing.Left = 5
+          DropDownCount = 15
+          ItemHeight = 15
+          Style = csDropDownList
+          TabOrder = 1
+        end
+        object Label11: TLabel
+          AnchorSideRight.Control = Label10
+          AnchorSideRight.Side = asrBottom
+          Left = 27
+          Height = 15
+          Top = 88
+          Width = 36
+          Anchors = [akTop, akRight]
+          Caption = 'Name:'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Edit5: TEdit
+          AnchorSideLeft.Control = CBTextures
+          AnchorSideBottom.Control = Label11
+          AnchorSideBottom.Side = asrBottom
+          Left = 68
+          Height = 23
+          Top = 80
+          Width = 167
+          Anchors = [akLeft, akBottom]
+          TabOrder = 2
+        end
+        object Label12: TLabel
+          AnchorSideRight.Control = Label10
+          AnchorSideRight.Side = asrBottom
+          Left = 23
+          Height = 15
+          Top = 120
+          Width = 40
+          Anchors = [akTop, akRight]
+          Caption = 'Parent:'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object CBParent: TComboBox
+          AnchorSideLeft.Control = CBTextures
+          AnchorSideBottom.Control = Label12
+          AnchorSideBottom.Side = asrBottom
+          Left = 68
+          Height = 21
+          Top = 114
+          Width = 166
+          Anchors = [akLeft, akBottom]
+          ItemHeight = 15
+          Style = csOwnerDrawFixed
+          TabOrder = 3
+        end
+        object BNewChild: TSpeedButton
+          Cursor = crHandPoint
+          Left = 248
+          Height = 25
+          Top = 88
+          Width = 30
+          Images = DataModule1.ILIconUI
+          ImageIndex = 4
+        end
+        object BHelpRootChilds: TSpeedButton
+          AnchorSideLeft.Control = Panel8
+          AnchorSideTop.Control = Panel5
+          AnchorSideRight.Control = Panel5
+          AnchorSideRight.Side = asrBottom
+          Cursor = crHandPoint
+          Left = 265
+          Height = 24
+          Hint = 'Help'
+          Top = 3
+          Width = 24
+          Anchors = [akTop, akRight]
+          BorderSpacing.Left = 3
+          BorderSpacing.Top = 3
+          BorderSpacing.Right = 3
+          Flat = True
+          Images = DataModule1.ILIconUI
+          ImageIndex = 8
+          ShowHint = True
+          ParentShowHint = False
+        end
+      end
     end
   end
 end

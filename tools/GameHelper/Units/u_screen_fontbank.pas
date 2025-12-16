@@ -7,7 +7,8 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, u_screen_template, u_common, u_surface_list, u_texture_list;
+  OGLCScene, u_screen_template, u_common, u_surface_list, u_texture_list,
+  u_ui_objectlist;
 
 type
 
@@ -125,6 +126,8 @@ begin
   FTextArea.Text.TexturedFont := FTexturedFont;
   FTextArea.Text.Caption := aCharset;
   FTextArea.Text.Tint.Value := BGRA(0,0,0,0);
+  FTextArea.MouseInteractionEnabled := False;
+  //FTextArea.ChildClippingEnabled := False;
 end;
 
 procedure TScreenFontBank.ClearView;
