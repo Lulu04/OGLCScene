@@ -138,11 +138,50 @@ type
 
 
 
+/////////////////////
+//  FREE TYPE FONT
+type
 
+{ TOGLCFontManager }
+
+TOGLCFontManager = class
+private
+  FFontCollection: TFreeTypeFontCollection;
+private // system fonts
+  FSystemFontFilenames,
+  FSystemFontNames: TStringArray;
+  function GetSystemFontName(index: integer): string;
+  procedure ScanSystemFonts;
+private // project fonts
+  FProjectFontFilenames,
+  FProjectFontNames: TStringArray;
+  function GetProjectFontName(index: integer): string;
+private
+  function SystemFontIndexOf(aFontName: string): integer;
+  function ProjectFontIndexOf(aFontName: string): integer;
+private
+  procedure ListFontFamily(AFamilyName: string);
+public
+  constructor Create;
+  destructor Destroy; override;
+
+  function SystemFontCount: integer;
+  property SystemFontName[index:integer]: string read GetSystemFontName;
+
+  procedure ScanProjectFont(const aProjectFontDirectory: string);
+  function ProjectFontCount: integer;
+  property ProjectFontName[index:integer]: string read GetProjectFontName;
+
+  function GetFreeTypeFont(aFontName: string): TFreeTypeFont;
+
+  procedure FontHaveBoldOrItalic(const aFontName: string; out CanBold, CanItalic: boolean);
+
+  property FontCollection: TFreeTypeFontCollection read FFontCollection;
+end;
 
 
 /////////////////////
-//  FONTS DESCRIPTOR
+//  FONT DESCRIPTOR
 type
 
 { TFontGradient }
@@ -154,7 +193,8 @@ TFontGradient = record
   Origin, D1: TPointF;
   GammaColorCorrection,
   Sinus: boolean;
-  procedure Create(aColor1, aColor2: TBGRAPixel; AGradientType: TGradientType; AOrigin, aD1: TPointF;
+  procedure Create(aColor1, aColor2: TBGRAPixel; AGradientType: TGradientType;
+                   AOrigin, aD1: TPointF;
                    aGammaColorCorrection: boolean = True; aSinus: Boolean = False);
   function ToBGRAGradientScanner: TBGRAGradientScanner;
   // utils for Game Helper
@@ -208,6 +248,8 @@ TFontDescriptor = record
   // After creating a font descriptor, call this method to compute the font height so that the passed string will
   // fit in the passed rect with a maximum size.
   procedure ComputeMaxHeightFor(const aString: string; const aRect: TRect);
+
+  function GetFreeTypeFont: TFreeTypeFont;
 
   procedure Check;
   function StringToBitmap(const aStr: string; aFillTexture: TBGRABitmap): TBGRABitmap;
@@ -611,9 +653,7 @@ procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
   aShadowOffsetY, aShadowRadius: integer);
 var ima: TBGRABitmap;
 begin
-  if aFontName=''
-    then FontName :='default'
-    else FontName := aFontName;
+  FontName := aFontName;
   FontHeight := aFontHeight;
   Style := aStyle;
   FontColor := aFontColor;
@@ -655,9 +695,6 @@ procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
   aShadowOffsetY, aShadowRadius: integer);
 var ima: TBGRABitmap;
 begin
-  if aFontName=''
-    then FontName :='default'
-    else FontName := aFontName;
   FontName := aFontName;
   FontHeight := aFontHeight;
   Style := aStyle;
@@ -697,17 +734,48 @@ end;
 procedure TFontDescriptor.ComputeMaxHeightFor(const aString: string; const aRect: TRect);
 var ima: TBGRABitmap;
   siz: TSize;
+  familyItem: TCustomFamilyCollectionItem;
+  font: TFreeTypeFont;
+  dsx, dsy: integer;
 begin
   ima := TBGRABitmap.Create(1, 1);
   SetFontRendererOn(ima);
   ima.FontFullHeight := 1;
-  repeat
-    ima.FontFullHeight := ima.FontFullHeight + 1;
-    siz := ima.TextSize(aString);
-  until (siz.cx > aRect.Width) or (siz.cy > aRect.Height);
-  FontHeight := ima.FontFullHeight - 1;
+
+  dsx := DecorationSize.cx;
+  dsy := DecorationSize.cy;
+
+  familyItem := FontCollection.Family[FontName];
+  if familyItem <> NIL then begin
+    font := familyItem.Font[0].Createfont;
+    try
+      font.SizeInPixels := 1;
+      repeat
+        font.SizeInPixels := font.SizeInPixels + 1;
+        siz.cx := Round(font.TextWidth(aString)) + dsx;
+        siz.cy := Round(font.TextHeight(aString)) + dsy;
+      until (siz.cx > aRect.Width) or (siz.cy > aRect.Height);
+      FontHeight := Round(font.SizeInPixels);
+    finally
+      font.Free;
+    end;
+  end else begin
+    repeat
+      ima.FontFullHeight := ima.FontFullHeight + 1;
+      siz := ima.TextSize(aString);
+    until (siz.cx > aRect.Width) or (siz.cy > aRect.Height);
+    FontHeight := ima.FontFullHeight - 1;
+  end;
   Check;
   ima.Free;
+end;
+
+function TFontDescriptor.GetFreeTypeFont: TFreeTypeFont;
+var familyItem: TCustomFamilyCollectionItem;
+begin
+  familyItem := FontCollection.Family[FontName];
+  if familyItem <> NIL then Result := familyItem.Font[0].Createfont
+    else Result := NIL;
 end;
 
 procedure TFontDescriptor.Check;
@@ -726,12 +794,26 @@ end;
 procedure TFontDescriptor.ResizeAndDrawStringOn(aBitmap: TBGRABitmap; const aStr: string; aFillTexture: TBGRABitmap);
 var xx,yy:single;
     ts: TSize;
-    _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
-    _OutLineWidth: single;
+ {   _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
+    _OutLineWidth: single; }
    grad: TBGRAGradientScanner;
+   familyItem: TCustomFamilyCollectionItem;
+   font: TFreeTypeFont;
 begin
+  familyItem := FontCollection.Family[FontName];
+  if familyItem <> NIL then begin
+    font := familyItem.Font[0].Createfont;
+    try
+      font.SizeInPoints := FontHeight;
+      ts.cx := Round(font.TextWidth(aStr));
+      ts.cy := Round(font.TextHeight(aStr));
+    finally
+      font.Free;
+    end;
+  end else ts := aBitmap.TextSize(aStr);
+
   // size of the rendered font. try to take into account shadow and outline.
-  ts := aBitmap.TextSize(aStr)+DecorationSize;
+  ts := ts + DecorationSize;
 
   // to avoid a division by 0
   if ts.cx = 0 then ts.cx := 1;
@@ -739,7 +821,7 @@ begin
 
   aBitmap.SetSize(ts.cx, ts.cy);
 
-  // force shadow param. to 0 if there is no shadow
+{  // force shadow param. to 0 if there is no shadow
   if UseShadow then begin
     _ShadowOffsetX := ShadowOffsetX;
     _ShadowOffsetY := ShadowOffsetY;
@@ -757,7 +839,7 @@ begin
   xx := _OutlineWidth*0.5+_ShadowRadius;
   yy := xx;
   if _ShadowOffsetX < 0 then xx += Abs(_ShadowOffsetX);
-  if _ShadowOffsetY < 0 then yy += Abs(_ShadowOffsetY);
+  if _ShadowOffsetY < 0 then yy += Abs(_ShadowOffsetY);  }
 
   xx := 0;
   yy := 0;
@@ -773,29 +855,47 @@ begin
 end;
 
 procedure TFontDescriptor.SetFontRendererOn(aBitmap: TBGRABitmap);
-var renderer: TBGRATextEffectFontRenderer;
+var renderer: TBGRAFreeTypeFontRenderer;
 begin
   if aBitmap = NIL then exit;
-  if UseShadow or UseOutLine then begin
-    renderer := TBGRATextEffectFontRenderer.Create;
-    with renderer do begin
-      ShadowVisible := UseShadow;
-      ShadowColor := Self.ShadowColor;
-      ShadowOffset.x := ShadowOffsetX;
-      ShadowOffset.y := ShadowOffsetY;
-      ShadowRadius := Self.ShadowRadius;
-      OutlineVisible := UseOutLine;
-      OutlineColor := Self.OutLineColor;
-      OuterOutlineOnly := True;
-      OutlineWidth := Self.OutLineWidth;
-    end;
-    aBitmap.FontRenderer := renderer;
-  end;
 
-  aBitmap.FontQuality := fqFineAntialiasing; //fqFineAntialiasing    fqSystemClearType
+  renderer := TBGRAFreeTypeFontRenderer.Create;
+  aBitmap.FontRenderer := renderer;
   aBitmap.FontName := FontName;
-  aBitmap.FontFullHeight := FontHeight;
+  aBitmap.FontFullHeight:= FontHeight;
+  aBitmap.FontQuality := fqFineClearTypeRGB;
   aBitmap.FontStyle := Style;
+  if UseShadow then begin
+    renderer.ShadowVisible := True;
+    renderer.ShadowColor := Self.ShadowColor;
+    renderer.ShadowOffset := Point(ShadowOffsetX, ShadowOffsetY);
+    renderer.ShadowRadius := Self.ShadowRadius;
+    renderer.ShadowQuality := rbFast;
+  end;
+  if UseOutLine then begin
+    renderer.OutlineVisible := True;
+    renderer.OutlineColor := Self.OutLineColor;
+    renderer.OuterOutlineOnly := True;
+  end;
+{  end else begin
+    if UseShadow or UseOutLine then begin
+      renderer := TBGRATextEffectFontRenderer.Create;
+      with renderer do begin
+        ShadowVisible := UseShadow;
+        ShadowColor := Self.ShadowColor;
+        ShadowOffset.x := ShadowOffsetX;
+        ShadowOffset.y := ShadowOffsetY;
+        ShadowRadius := Self.ShadowRadius;
+        OutlineVisible := UseOutLine;
+        OutlineColor := Self.OutLineColor;
+        OuterOutlineOnly := True;
+        OutlineWidth := Self.OutLineWidth;
+      end;
+      aBitmap.FontRenderer := renderer;
+    end;
+  end;  }
+
+//  aBitmap.FontQuality := fqFineAntialiasing; //fqFineAntialiasing    fqSystemClearType
 end;
 
 function TFontDescriptor.UseShadow: boolean;
@@ -836,8 +936,8 @@ function TFontDescriptor.SaveToString: string;
 var prop: TProperties;
   s: string;
 begin
-  prop.Init('&');
-  prop.Add('FontName', FontName);
+  prop.Init('#');
+  prop.Add('FontName', FontName, True);
   prop.Add('FontHeight', FontHeight);
   s := '';
   if fsBold in Style then s := s+'B';
@@ -863,7 +963,7 @@ var prop: TProperties;
 begin
   CreateDefault;
   s := '';
-  prop.Split(data, '&');
+  prop.Split(data, '#');
   prop.StringValueOf('FontName', FontName, FontName);
   prop.IntegerValueOf('FontHeight', FontHeight, FontHeight);
   prop.StringValueOf('Style', s, '');
@@ -1128,6 +1228,214 @@ end;
 function TColorF.EqualTo(const c: TColorF): boolean;
 begin
   Result := (r = c.r) and (g = c.g) and (b = c.g) and (a = c.a);
+end;
+
+{ TOGLCFontManager }
+
+function TOGLCFontManager.GetSystemFontName(index: integer): string;
+begin
+  Result := FSystemFontNames[index];
+end;
+
+// from https://forum.lazarus.freepascal.org/index.php?topic=32835.0
+procedure TOGLCFontManager.ScanSystemFonts;
+var i: integer;
+  item: TCustomFontCollectionItem;
+  filesFound: TStringList;
+  procedure ScanFolder(const aPath: string);
+  var t: TStringList;
+    j: integer;
+  begin
+    if not DirectoryExistsUTF8(aPath) then exit;
+    t := FindAllFiles(aPath, '*.ttf', False);
+    for j:=0 to t.Count-1 do
+      filesFound.Add(t.Strings[j]);
+    t.Free;
+  end;
+
+begin
+  FFontCollection.Clear;
+  // scan the system font directories
+  filesFound := TStringList.Create;
+  {$ifdef windows}
+   ScanFolder(SHGetFolderPathUTF8(20));  // CSIDL_FONTS = 20
+  {$endif}
+  {$ifdef linux}
+   ScanFolder('/usr/share/cups/fonts/');
+   ScanFolder('/usr/share/fonts/truetype/');
+   ScanFolder('/usr/local/lib/X11/fonts/');
+   ScanFolder(GetUserDir + '.fonts/');
+  {$endif}
+  {$ifdef darwin}
+   ScanFolder('/System/Library/Fonts/');
+  {$endif}
+
+  // retrieve the filename and the font name
+  FSystemFontNames := NIL;
+  FSystemFontFilenames := NIL;
+  if filesFound.Count = 0 then exit;
+
+  SetLength(FSystemFontFilenames, filesFound.Count);
+  SetLength(FSystemFontNames, filesFound.Count);
+  FFontCollection.BeginUpdate;
+  try
+    for i:=0 to filesFound.Count-1 do begin
+      item := FFontCollection.AddFile(filesFound.Strings[i]);
+      if item <> NIL then begin
+        FSystemFontNames[i] := item.Family.FamilyName;
+        FSystemFontFilenames[i] := filesFound.Strings[i];
+      end;
+    end;
+  finally
+    FFontCollection.EndUpdate;
+  end;
+  filesFound.Free;
+end;
+
+function TOGLCFontManager.GetProjectFontName(index: integer): string;
+begin
+  Result := FProjectFontNames[index];
+end;
+
+function TOGLCFontManager.SystemFontIndexOf(aFontName: string): integer;
+var i: integer;
+begin
+  Result := -1;
+  for i:=0 to High(FSystemFontNames) do
+    if CompareText(aFontName, FSystemFontNames[i]) = 0 then exit(i);
+end;
+
+function TOGLCFontManager.ProjectFontIndexOf(aFontName: string): integer;
+var i: integer;
+begin
+  Result := -1;
+  for i:=0 to High(FProjectFontNames) do
+    if CompareText(aFontName, FProjectFontNames[i]) = 0 then exit(i);
+end;
+
+procedure TOGLCFontManager.ListFontFamily(AFamilyName: string);
+var
+  familyItem: TCustomFamilyCollectionItem;
+  i: Integer;
+  font: TFreeTypeFont;
+begin
+  WriteLn('Font family "', AFamilyName, '":');
+  familyItem := FontCollection.Family[AFamilyName];
+  if familyItem = nil then
+    WriteLn('  not found.')
+  else begin
+  WriteLn('  Font count: ', familyItem.FontCount);
+  for i:=0 to familyItem.FontCount-1 do begin
+    WriteLn('  Font #', i+1, ':');
+    WriteLn('                Filename: ', familyItem.Font[i].Filename);
+    WriteLn('                  styles: ', familyItem.Font[i].Styles);
+    WriteLn('                    bold: ', BoolToStr(familyItem.Font[i].Bold, 'true', 'false'));
+    WriteLn('                  italic: ', BoolToStr(familyItem.Font[i].Italic, 'true', 'false'));
+    font := familyItem.Font[i].Createfont;
+    try
+      font.SizeInPoints := 12;
+      WriteLn('     TextWidth(''M'')@12pt: ', FloatToStr(font.TextWidth('M')));
+      font.SizeInPoints := 48;
+      WriteLn('     TextWidth(''M'')@48pt: ', FloatToStr(font.TextWidth('M')));
+    finally
+      font.Free;
+    end;
+    WriteLn;
+  end;
+  end;
+  WriteLn('----------------------------------------------------------------------');
+end;
+
+constructor TOGLCFontManager.Create;
+begin
+  FFontCollection := TFreeTypeFontCollection.Create;
+  ScanSystemFonts;
+  SetDefaultFreeTypeFontCollection(FFontCollection);
+end;
+
+destructor TOGLCFontManager.Destroy;
+begin
+  SetDefaultFreeTypeFontCollection(NIL);
+  FreeAndNil(FFontCollection);
+  inherited Destroy;
+end;
+
+procedure TOGLCFontManager.ScanProjectFont(const aProjectFontDirectory: string);
+var i: integer;
+  item: TCustomFontCollectionItem;
+  filesFound: TStringList;
+begin
+  FFontCollection.Clear;
+  ScanSystemFonts;
+
+  filesFound := FindAllFiles(aProjectFontDirectory, '*.ttf', False);
+  FProjectFontNames := NIL;
+  FProjectFontFilenames := NIL;
+  if filesFound.Count > 0 then begin
+    FFontCollection.BeginUpdate;
+    try
+      SetLength(FProjectFontNames, filesFound.Count);
+      SetLength(FProjectFontFilenames, filesFound.Count);
+      for i:=0 to filesFound.Count-1 do begin
+        FProjectFontFilenames[i] := filesFound.Strings[i];
+        item := FFontCollection.AddFile(filesFound.Strings[i]);
+        FProjectFontNames[i] := item.Family.FamilyName;
+      end;
+    finally
+      FFontCollection.EndUpdate;
+    end;
+  end;
+
+  filesFound.Free;
+end;
+
+function TOGLCFontManager.SystemFontCount: integer;
+begin
+  Result := length(FSystemFontNames);
+end;
+
+function TOGLCFontManager.ProjectFontCount: integer;
+begin
+  Result := Length(FProjectFontNames);
+end;
+
+function TOGLCFontManager.GetFreeTypeFont(aFontName: string): TFreeTypeFont;
+var familyItem: TCustomFamilyCollectionItem;
+begin
+  familyItem := FontCollection.Family[aFontName];
+  if familyItem = NIL then exit(NIL);
+  Result := familyItem.Font[0].Createfont;
+end;
+
+procedure TOGLCFontManager.FontHaveBoldOrItalic(const aFontName: string; out
+  CanBold, CanItalic: boolean);
+var i: Integer;
+  item: TCustomFontCollectionItem;
+begin
+  CanBold := False;
+  CanItalic := False;
+  item := NIL;
+
+  // try with system fonts
+  i := SystemFontIndexOf(aFontName);
+  if i <> -1 then begin
+    item := FFontCollection.FontFile[FSystemFontFilenames[i]];
+    if item <> NIL then begin
+      CanBold := item.Bold;
+      CanItalic := item.Italic;
+    end;
+    exit;
+  end;
+
+  // try with project fonts
+  i := ProjectFontIndexOf(aFontName);
+  if i <> -1 then begin
+    item := FFontCollection.FontFile[FProjectFontFilenames[i]];
+    if item <> NIL then begin
+      CanBold := item.Bold;
+      CanItalic := item.Italic;
+    end;
+  end;
 end;
 
 {$endif oglcIMPLEMENTATION}
