@@ -7,11 +7,14 @@ function FormatFloatWithDot(const aFmt: string; aValue: single): string;
 function StringToSingle(const aStr: string): single;
 
 
-// Add chars to a charset, avoiding redundant char. Return the modified charset.
-// Usefull to create a charset for Textured Font.
-// The function replace all kind of LineEnding by #10.
-function AddToCharset(const aCharSet, aCharsToAdd: string): string; overload;
-function AddToCharset(const aCharset: string; aCharsToAdd: TStringArray): string; overload;
+// This function scan the text and return only one occurence of the characters used
+// Usefull to construct small charset with only needed chars.
+// The function remove all kind of LineEnding.
+function TextToCharset(const aText: string): string;
+// Complete the given charset with the characters inside aText, avoiding redundant char. Return the modified charset.
+// The function remove all kind of LineEnding.
+function AddToCharset(const aCharSet, aText: string): string; overload;
+function AddToCharset(const aCharset: string; aText: TStringArray): string; overload;
 
 // Replace all kind of LineEnding by a simple #10.
 function AdjustLineEnding(const aText: string): string;
@@ -156,34 +159,39 @@ begin
   end;
 end;
 
-function AddToCharset(const aCharSet, aCharsToAdd: string): string;
+function TextToCharset(const aText: string): string;
+begin
+  Result := AddToCharset('', aText);
+end;
+
+function AddToCharset(const aCharSet, aText: string): string;
 var pCur, pEnd: PChar;
   len: integer;
   codePoint: string;
   i: PtrInt;
 begin
   Result := Copy(aCharset, 1, Length(aCharSet));
-  if aCharsToAdd = '' then exit;
+  if aText = '' then exit;
   codePoint := '';
-  pCur := PChar(aCharsToAdd);
-  pEnd := pCur + Length(aCharsToAdd);
+  pCur := PChar(aText);
+  pEnd := pCur + Length(aText);
   while pCur < pEnd do begin
     len := UTF8CodepointSize(pCur);
     SetLength(codePoint, len);
     Move(pCur^, codePoint[1], len);
     if (codePoint = #10) or (codePoint = #13) then i := 1 // remove all lineEnding
-      else i := UTF8Pos(codePoint, Result); //aCharSet);
+      else i := UTF8Pos(codePoint, Result);
     if i = 0 then Result := Result + codepoint;
     inc(pCur, len);
   end;
 end;
 
-function AddToCharset(const aCharset: string; aCharsToAdd: TStringArray): string;
+function AddToCharset(const aCharset: string; aText: TStringArray): string;
 var i: Integer;
 begin
   Result := aCharset;
-  for i:=0 to High(aCharsToAdd) do
-    Result := AddToCharset(Result, aCharsToAdd[i]);
+  for i:=0 to High(aText) do
+    Result := AddToCharset(Result, aText[i]);
 end;
 
 function AdjustLineEnding(const aText: string): string;
