@@ -506,7 +506,6 @@ TOGLCScene = class(TOGLCContext)
   FontManager: TOGLCFontManager;
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
-  function CreateTexturedFont(aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
   // Create a camera for this scene. You can assign the camera to one or several layer.
   // Don't forget to free it with KillCamera(...).
   function CreateCamera: TOGLCCamera;
@@ -1403,12 +1402,6 @@ end;
 function TOGLCScene.CreateAtlas: TOGLCTextureAtlas;
 begin
   Result := TOGLCTextureAtlas.Create(Self);
-end;
-
-function TOGLCScene.CreateTexturedFont(aFont: TFontDescriptor; const aCharSet: string;
-  aFillTexture: TBGRABitmap): TTexturedFont;
-begin
-  Result := TTexturedFont.Create(Self, aFont, aCharSet, aFillTexture);
 end;
 
 function TOGLCScene.CreateCamera: TOGLCCamera;
