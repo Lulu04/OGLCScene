@@ -804,7 +804,7 @@ begin
   if familyItem <> NIL then begin
     font := familyItem.Font[0].Createfont;
     try
-      font.SizeInPoints := FontHeight;
+      font.SizeInPixels := FontHeight;
       ts.cx := Round(font.TextWidth(aStr));
       ts.cy := Round(font.TextHeight(aStr));
     finally
