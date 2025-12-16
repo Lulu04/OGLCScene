@@ -23,7 +23,7 @@ private
 
   FTitle: TFreeText;
   FText: TFreeText;
-  FAlignedText: TAlignedText;
+  FAlignedText: TFreeTextAligned;
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
@@ -98,7 +98,7 @@ begin
     CenterX := FScene.Center.x;
   end;
 
-  FAlignedText := TAlignedText.Create(FScene, FtexFont, Round(FScene.Width*0.5), Round(FScene.Height/3));
+  FAlignedText := TFreeTextAligned.Create(FScene, FtexFont, Round(FScene.Width*0.5), Round(FScene.Height/3));
   FScene.Add(FAlignedText);
   with FAlignedText do begin
     Caption := 'TMultilineText is a surface that draw a text in a rectangular area with horizontal and vertical align. '+
