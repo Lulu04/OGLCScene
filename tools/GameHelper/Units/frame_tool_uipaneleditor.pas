@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, ExtCtrls, ComCtrls, StdCtrls, Dialogs,
   Buttons, Spin,
   OGLCScene, BGRABitmap, BGRABitmapTypes,
-  frame_edit_uibodyshape, frame_texturelist, u_texture_list;
+  frame_edit_uibodyshape, frame_texturelist, u_texture_list, u_surface_list;
 
 type
 
@@ -16,29 +16,46 @@ type
 
   TFrameToolUIPanelEditor = class(TFrame)
     BCancel: TSpeedButton;
+    BHelpRootChilds: TSpeedButton;
+    BNewChild: TSpeedButton;
     BSave: TSpeedButton;
+    CBChildType: TComboBox;
+    CBParent: TComboBox;
+    CBTextures: TComboBox;
     CBTopLeft: TComboBox;
     CBTopRight: TComboBox;
     CBBottomLeft: TComboBox;
     CBBottomRight: TComboBox;
     CBDarkenBG: TCheckBox;
-    ComboBox1: TComboBox;
+    ColorButton1: TColorButton;
     Edit1: TEdit;
+    Edit5: TEdit;
     FSE1: TFloatSpinEdit;
     FSE2: TFloatSpinEdit;
     Label1: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label17: TLabel;
     Label2: TLabel;
     Label24: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
     Label50: TLabel;
     Label51: TLabel;
     Label52: TLabel;
     Label53: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
     PageControl1: TPageControl;
     Panel1: TPanel;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel4: TPanel;
+    Panel5: TPanel;
     Panel8: TPanel;
     RBOptionNormal: TRadioButton;
     RBOptionModal: TRadioButton;
@@ -48,7 +65,11 @@ type
     PageMainPanel: TTabSheet;
     PageTextures: TTabSheet;
     PageChilds: TTabSheet;
+    SE1: TSpinEdit;
+    SpeedButton1: TSpeedButton;
+    SpeedButton2: TSpeedButton;
     procedure BCancelClick(Sender: TObject);
+    procedure BSaveClick(Sender: TObject);
     procedure FSE1Change(Sender: TObject);
   private
     FrameEditUIBodyShape: TFrameEditUIBodyShape;
@@ -64,6 +85,7 @@ type
     procedure ProcessAskToDeleteTextureEvent(aTextureItem: PTextureItem; var aCanDelete: boolean);
     procedure ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
     function Textures: TTextureList;
+    function Surfaces: TSurfaceList;
   private
     procedure DoClearAll;
   public
@@ -78,7 +100,8 @@ type
 
 implementation
 
-uses form_main, u_screen_uipaneleditor, u_resourcestring;
+uses form_main, u_screen_uipaneleditor, u_resourcestring, u_ui_objectlist,
+  u_utils;
 
 {$R *.lfm}
 
@@ -90,7 +113,44 @@ begin
     if QuestionDlg('', sIfYouLeaveChangeWillBeLost, mtWarning,
                    [mrOk, sLeaveWithoutSaving, mrCancel, sCancel], 0) = mrCancel then exit;
   DoClearAll;
-  FormMain.ShowPageLevelBank;
+  FormMain.ShowPagePanelBank;
+end;
+
+procedure TFrameToolUIPanelEditor.BSaveClick(Sender: TObject);
+var nam: string;
+  item: TPanelDescriptorItem;
+  panel: TUIPanelWithEffects;
+begin
+  nam := Trim(Edit1.Text);
+  if nam = '' then exit;
+  if not IsValidPascalVariableName(nam, True) then exit;
+  if not PanelBank.AskUserToReplaceExistingItem(nam) then exit;
+
+  // retrieve the existing item or create one
+  item := PanelBank.GetByName(nam);
+  if item = NIL then item := PanelBank.AddEmpty;
+
+  panel := ScreenUIPanelEditor.UIPanel;
+  item.BodyShape := panel.BodyShape.SaveToString;
+  item.BackGradient := panel.BackGradient.SaveGradientDataToString;
+  item.Usegradient := panel.BackGradient.Visible;
+  item.x := Trunc(Panel.X.Value);
+  item.y := Trunc(Panel.Y.Value);
+  item.width := Panel.Width;
+  item.height := Panel.Height;
+  item.IsModal := RBOptionModal.Checked;
+  item.DarkenBG := CBDarkenBG.Checked;
+  item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE1.Value);
+  item.ScenarioOnShow := '';
+  item.ScenarioOnHide := '';
+  item.textures := Textures.SaveToString;
+  //item.surfaces := Surfaces.;
+
+  PanelBank.Save;
+  Modified := False;
+
+  DoClearAll;
+  FormMain.ShowPagePanelBank;
 end;
 
 procedure TFrameToolUIPanelEditor.FSE1Change(Sender: TObject);
@@ -179,30 +239,37 @@ end;
 procedure TFrameToolUIPanelEditor.ProcessTextureListOnModified(Sender: TObject);
 begin
   FModified := True;
-  //Textures.FillComboBox(CBTextures);
+  Textures.FillComboBox(CBTextures);
 end;
 
 procedure TFrameToolUIPanelEditor.ProcessAskToDeleteTextureEvent(
   aTextureItem: PTextureItem; var aCanDelete: boolean);
 begin
-{  if Length(Surfaces.GetItemsThatUseThisTexture(aTextureItem)) > 0 then begin
+  if Length(Surfaces.GetItemsThatUseThisTexture(aTextureItem)) > 0 then begin
     aCanDelete := False;
     ShowMessage('This texture is used by a surface, you can not delete it');
-  end;  }
+  end;
 end;
 
 procedure TFrameToolUIPanelEditor.ProcessOnTextureChangedEvent(aTextureItem: PTextureItem);
+var surf: ArrayOfPSurfaceDescriptor;
+  i: Integer;
 begin
-{  // recreate the surfaces that use this texture (if any)
+  // recreate the surfaces that use this texture (if any)
   surf := Surfaces.GetItemsThatUseThisTexture(aTextureItem);
   if Length(surf) <> 0 then
     for i:=0 to High(surf) do
-      surf[i]^.RecreateSurfaceBecauseTextureChanged; }
+      surf[i]^.RecreateSurfaceBecauseTextureChanged;
 end;
 
 function TFrameToolUIPanelEditor.Textures: TTextureList;
 begin
   Result := ScreenUIPanelEditor.Textures;
+end;
+
+function TFrameToolUIPanelEditor.Surfaces: TSurfaceList;
+begin
+  Result := ScreenUIPanelEditor.Surfaces;
 end;
 
 procedure TFrameToolUIPanelEditor.DoClearAll;

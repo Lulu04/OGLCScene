@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils,
   project_util,
-  OGLCScene, u_layerlist, u_target_lazarusproject;
+  OGLCScene, u_layerlist, u_target_lazarusproject, LazFreeTypeFontCollection;
 
 var
   LayerNames: TStringArray;
@@ -49,6 +49,7 @@ public // utils to modify target lazarus project files
   TargetLazarusProject: TTargetLazarusProject;
 end;
 
+
 { TProject }
 
 TProject = class(TCustomProject)
@@ -73,7 +74,7 @@ var Project: TProject;
 implementation
 uses Forms, Dialogs, Controls, u_common, form_main, u_spritebank, u_levelbank,
   form_newproject, u_app_pref, u_utils, u_connection_to_ide, u_ui_objectlist,
-  utilitaire_fichier, LCLIntf, LazFileUtils;
+  utilitaire_fichier, LCLIntf, LazFileUtils, FileUtil;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -415,6 +416,9 @@ procedure TProject.OnProjectReadyChange(aState: boolean);
 begin
   aState := aState;
   if IsReady then begin
+    // update the list of font files inside the folder /Fonts
+    FScene.FontManager.ScanProjectFont(Project.Config.TargetLazarusProject.GetFolderDataFonts);
+
     // read the layer list from unit u_common
     Layers.InitWith(Config.TargetLazarusProject.UCommonGetLayerNames);
 

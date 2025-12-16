@@ -13,6 +13,7 @@ uses
   frame_tool_leveleditor,
   frame_tool_levelbank,
   frame_viewfontbank, u_ui_objectlist,
+  frame_tool_panelbank,
   frame_tool_uipaneleditor;
 
 {
@@ -33,10 +34,13 @@ type
     BLevelBank: TSpeedButton;
     BFontBank: TSpeedButton;
     BLevelEditor: TSpeedButton;
+    BScreenBank: TSpeedButton;
     BToolUIPanel: TSpeedButton;
+    CBBank: TComboBox;
     Label1: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
+    PagePanelBank: TPage;
     PageUIPanelEditor: TPage;
     PageFontBank: TPage;
     PageLevelEditor: TPage;
@@ -63,6 +67,7 @@ type
     procedure BProjectConfigClick(Sender: TObject);
     procedure BSaveProjectClick(Sender: TObject);
     procedure BSpriteBankClick(Sender: TObject);
+    procedure CBBankSelect(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
     procedure FormCreate(Sender: TObject);
@@ -91,6 +96,9 @@ type
     procedure ShowPageSpriteBuilder;
     procedure ShowPageLevelEditor;
     procedure ShowPageLevelBank;
+    procedure ShowPageFontBank;
+    procedure ShowPagePanelBank;
+    procedure ShowPagePanelEditor;
 
     procedure EditSpriteInSpriteBank(const aName: string);
     procedure EditNewSprite;
@@ -105,6 +113,7 @@ var
   FrameToolLevelEditor: TFrameToolLevelEditor;
   FrameToolLevelBank: TFrameToolLevelBank;
   FrameViewFontBank: TFrameViewFontBank;
+  FrameToolPanelBank: TFrameToolPanelBank;
   FrameToolUIPanelEditor: TFrameToolUIPanelEditor;
 
 
@@ -157,6 +166,11 @@ begin
   FrameViewFontBank.Parent := PageFontBank;
   FrameViewFontBank.Align := alClient;
   FrameViewFontBank.IsEditable := True;
+
+  FrameToolPanelBank := TFrameToolPanelBank.Create(Self);
+  FrameToolPanelBank.Parent := PagePanelBank;
+  FrameToolPanelBank.Align := alClient;
+  FrameToolPanelBank.IsEditable := True;
 
   FrameToolUIPanelEditor := TFrameToolUIPanelEditor.Create(Self);
   FrameToolUIPanelEditor.Parent := PageUIPanelEditor;
@@ -240,6 +254,16 @@ begin
     FrameToolUIPanelEditor.OnShow;
     UpdateWidgets;
     ToolBarMain.Visible := False;
+  end;
+end;
+
+procedure TFormMain.CBBankSelect(Sender: TObject);
+begin
+  case CBBank.ItemIndex of
+    0: ShowPageSpriteBank;
+    1: ShowPageLevelBank;
+    2: ShowPageFontBank;
+    3: ShowPagePanelBank;
   end;
 end;
 
@@ -387,6 +411,7 @@ begin
   SpriteBank := TSpriteBank.Create;
   LevelBank := TLevelBank.Create;
   FontBank:= TFontBank.Create;
+  PanelBank := TPanelBank.Create;
 
   ScreenLevelEditor := TScreenLevelEditor.Create;
   ScreenLevelEditor.Initialize;
@@ -426,6 +451,9 @@ begin
 
   FontBank.Free;
   FontBank := NIL;
+
+  PanelBank.Free;
+  PanelBank := NIL;
 
   ScreenSpriteBuilder.Finalize;
   FreeAndNil(ScreenSpriteBuilder);
@@ -471,6 +499,7 @@ begin
   FScene.RunScreen(ScreenSpriteBank);
   UpdateWidgets;
   ToolBarMain.Visible := True;
+  CBBank.Enabled := True;
 end;
 
 procedure TFormMain.ShowPageSpriteBuilder;
@@ -480,6 +509,7 @@ begin
   FScene.RunScreen(ScreenSpriteBuilder);
   UpdateWidgets;
   ToolBarMain.Visible := False;
+  CBBank.Enabled := False;
 end;
 
 procedure TFormMain.ShowPageLevelEditor;
@@ -489,6 +519,7 @@ begin
   FScene.RunScreen(ScreenLevelEditor);
   UpdateWidgets;
   ToolBarMain.Visible := False;
+  CBBank.Enabled := False;
 end;
 
 procedure TFormMain.ShowPageLevelBank;
@@ -498,6 +529,37 @@ begin
   FScene.RunScreen(ScreenLevelBank);
   UpdateWidgets;
   ToolBarMain.Visible := True;
+  CBBank.Enabled := True;
+end;
+
+procedure TFormMain.ShowPageFontBank;
+begin
+  FScene.RunScreen(ScreenFontBank);
+  Notebook1.PageIndex := Notebook1.IndexOf(PageFontBank);
+  FrameViewFontBank.Fill;
+  UpdateWidgets;
+  ToolBarMain.Visible := True;
+  CBBank.Enabled := True;
+end;
+
+procedure TFormMain.ShowPagePanelBank;
+begin
+  FScene.RunScreen(ScreenUIPanelEditor);
+  Notebook1.PageIndex := Notebook1.IndexOf(PagePanelBank);
+  FrameToolPanelBank.OnShow;
+  UpdateWidgets;
+  ToolBarMain.Visible := True;
+  CBBank.Enabled := True;
+end;
+
+procedure TFormMain.ShowPagePanelEditor;
+begin
+  FScene.RunScreen(ScreenUIPanelEditor);
+  Notebook1.PageIndex := Notebook1.IndexOf(PageUIPanelEditor);
+  FrameToolUIPanelEditor.OnShow;
+  UpdateWidgets;
+  ToolBarMain.Visible := False;
+  CBBank.Enabled := False;
 end;
 
 procedure TFormMain.EditSpriteInSpriteBank(const aName: string);

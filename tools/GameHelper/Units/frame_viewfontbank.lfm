@@ -1,19 +1,19 @@
 object FrameViewFontBank: TFrameViewFontBank
   Left = 0
-  Height = 668
+  Height = 813
   Top = 0
   Width = 325
-  ClientHeight = 668
+  ClientHeight = 813
   ClientWidth = 325
   TabOrder = 0
-  DesignLeft = 941
-  DesignTop = 9
+  DesignLeft = 863
+  DesignTop = 13
   object TV: TTreeView
     AnchorSideTop.Control = Panel8
     AnchorSideTop.Side = asrBottom
     AnchorSideBottom.Control = Splitter1
     Left = 0
-    Height = 184
+    Height = 123
     Top = 32
     Width = 325
     Anchors = [akTop, akLeft, akBottom]
@@ -36,18 +36,18 @@ object FrameViewFontBank: TFrameViewFontBank
   end
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = Splitter1
+    AnchorSideTop.Control = Splitter2
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 447
-    Top = 221
+    Height = 435
+    Top = 378
     Width = 325
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 447
+    ClientHeight = 435
     ClientWidth = 325
     Color = 8289918
     ParentBackground = False
@@ -55,11 +55,14 @@ object FrameViewFontBank: TFrameViewFontBank
     TabOrder = 1
     object Label4: TLabel
       AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label14
+      AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 40
+      Top = 27
       Width = 66
       BorderSpacing.Left = 7
+      BorderSpacing.Top = 8
       Caption = 'Font Height:'
       ParentColor = False
     end
@@ -72,7 +75,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 79
       Height = 23
-      Top = 32
+      Top = 19
       Width = 55
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -82,43 +85,7 @@ object FrameViewFontBank: TFrameViewFontBank
       OnChange = SE1Change
       ParentFont = False
       TabOrder = 0
-      Value = 10
-    end
-    object CheckGroup1: TCheckGroup
-      AnchorSideLeft.Control = Panel1
-      AnchorSideTop.Control = Label4
-      AnchorSideTop.Side = asrBottom
-      Left = 8
-      Height = 74
-      Top = 62
-      Width = 168
-      AutoFill = True
-      BorderSpacing.Left = 7
-      BorderSpacing.Top = 7
-      Caption = 'Font style'
-      ChildSizing.LeftRightSpacing = 6
-      ChildSizing.TopBottomSpacing = 6
-      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
-      ChildSizing.EnlargeVertical = crsHomogenousChildResize
-      ChildSizing.ShrinkHorizontal = crsScaleChilds
-      ChildSizing.ShrinkVertical = crsScaleChilds
-      ChildSizing.Layout = cclLeftToRightThenTopToBottom
-      ChildSizing.ControlsPerLine = 2
-      ClientHeight = 54
-      ClientWidth = 164
-      Columns = 2
-      Items.Strings = (
-        'Bold'
-        'Italic'
-        'Underline'
-        'Strike Out'
-      )
-      OnItemClick = CheckGroup1ItemClick
-      ParentBackground = False
-      TabOrder = 1
-      Data = {
-        0400000002020202
-      }
+      Value = 20
     end
     object RBSingleColor: TRadioButton
       AnchorSideLeft.Control = Label5
@@ -126,12 +93,12 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 19
-      Top = 158
+      Top = 137
       Width = 80
       BorderSpacing.Left = 10
       Caption = 'Single color'
       Checked = True
-      TabOrder = 3
+      TabOrder = 2
       TabStop = True
       OnChange = SE1Change
     end
@@ -141,19 +108,19 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 19
-      Top = 182
+      Top = 161
       Width = 63
       BorderSpacing.Top = 5
       Caption = 'Gradient'
-      TabOrder = 2
+      TabOrder = 1
     end
     object Label5: TLabel
       AnchorSideLeft.Control = Panel1
-      AnchorSideTop.Control = CheckGroup1
+      AnchorSideTop.Control = GroupBox1
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 143
+      Top = 122
       Width = 54
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
@@ -169,14 +136,14 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 108
       Height = 20
-      Top = 157
+      Top = 136
       Width = 64
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
       BorderSpacing.Top = 3
       BorderWidth = 2
       ButtonColorSize = 16
-      ButtonColor = clBlack
+      ButtonColor = clWhite
       OnColorChanged = SE1Change
     end
     object ColorButton2: TColorButton
@@ -186,7 +153,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 109
       Height = 20
-      Top = 181
+      Top = 160
       Width = 64
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 1
@@ -198,18 +165,16 @@ object FrameViewFontBank: TFrameViewFontBank
     end
     object CBOutline: TCheckBox
       AnchorSideLeft.Control = Panel1
-      AnchorSideTop.Control = CBGradientType
+      AnchorSideTop.Control = CheckBox2
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 19
-      Top = 234
+      Top = 232
       Width = 57
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
       Caption = 'Outline'
-      Checked = True
-      State = cbChecked
-      TabOrder = 4
+      TabOrder = 3
       OnChange = SE1Change
     end
     object Panel2: TPanel
@@ -220,7 +185,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideRight.Side = asrBottom
       Left = 8
       Height = 45
-      Top = 253
+      Top = 251
       Width = 309
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 7
@@ -228,7 +193,7 @@ object FrameViewFontBank: TFrameViewFontBank
       ClientHeight = 45
       ClientWidth = 309
       ParentBackground = False
-      TabOrder = 5
+      TabOrder = 4
       object ColorButton3: TColorButton
         AnchorSideLeft.Control = Label7
         AnchorSideLeft.Side = asrBottom
@@ -324,14 +289,12 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 19
-      Top = 305
+      Top = 303
       Width = 60
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
       Caption = 'Shadow'
-      Checked = True
-      State = cbChecked
-      TabOrder = 6
+      TabOrder = 5
       OnChange = SE1Change
     end
     object Panel3: TPanel
@@ -342,7 +305,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideRight.Side = asrBottom
       Left = 8
       Height = 66
-      Top = 324
+      Top = 322
       Width = 309
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 7
@@ -350,7 +313,7 @@ object FrameViewFontBank: TFrameViewFontBank
       ClientHeight = 66
       ClientWidth = 309
       ParentBackground = False
-      TabOrder = 7
+      TabOrder = 6
       object ColorButton4: TColorButton
         AnchorSideLeft.Control = Label9
         AnchorSideLeft.Side = asrBottom
@@ -494,7 +457,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 23
-      Top = 204
+      Top = 183
       Width = 75
       BorderSpacing.Top = 3
       Enabled = False
@@ -508,7 +471,7 @@ object FrameViewFontBank: TFrameViewFontBank
         'Angular'
       )
       Style = csDropDownList
-      TabOrder = 8
+      TabOrder = 7
       Text = 'Linear'
       OnSelect = SE1Change
     end
@@ -520,46 +483,27 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 103
       Height = 19
-      Top = 208
+      Top = 187
       Width = 117
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
       Caption = 'Gamma correction'
       Enabled = False
-      TabOrder = 9
+      TabOrder = 8
       OnChange = SE1Change
     end
     object CheckBox2: TCheckBox
       AnchorSideLeft.Control = CheckBox1
-      AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = CheckBox1
-      Left = 230
+      AnchorSideTop.Side = asrBottom
+      Left = 103
       Height = 19
-      Top = 208
+      Top = 206
       Width = 46
-      BorderSpacing.Left = 10
       Caption = 'Sinus'
       Enabled = False
-      TabOrder = 10
+      TabOrder = 9
       OnChange = SE1Change
-    end
-    object LBFont: TListBox
-      AnchorSideLeft.Control = CheckGroup1
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = Panel1
-      AnchorSideRight.Control = Panel1
-      AnchorSideRight.Side = asrBottom
-      Left = 176
-      Height = 146
-      Top = 1
-      Width = 148
-      Anchors = [akTop, akLeft, akRight]
-      Color = 3947580
-      ItemHeight = 15
-      Style = lbOwnerDrawFixed
-      TabOrder = 11
-      OnDrawItem = LBFontDrawItem
-      OnSelectionChange = LBFontSelectionChange
     end
     object Label1: TLabel
       AnchorSideLeft.Control = Panel1
@@ -567,7 +511,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 415
+      Top = 413
       Width = 60
       BorderSpacing.Left = 7
       BorderSpacing.Top = 25
@@ -581,11 +525,11 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 73
       Height = 23
-      Top = 407
+      Top = 405
       Width = 148
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
-      TabOrder = 12
+      TabOrder = 10
     end
     object BSave: TSpeedButton
       AnchorSideLeft.Control = Edit1
@@ -595,7 +539,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 233
       Height = 30
-      Top = 403
+      Top = 401
       Width = 66
       BorderSpacing.Left = 12
       Caption = 'Save'
@@ -610,7 +554,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 182
       Height = 15
-      Top = 162
+      Top = 141
       Width = 31
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -624,7 +568,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 216
       Height = 23
-      Top = 154
+      Top = 133
       Width = 47
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 3
@@ -633,7 +577,7 @@ object FrameViewFontBank: TFrameViewFontBank
       MaxValue = 255
       OnChange = SE1Change
       ParentFont = False
-      TabOrder = 13
+      TabOrder = 11
       Value = 255
     end
     object Label13: TLabel
@@ -643,7 +587,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 182
       Height = 15
-      Top = 186
+      Top = 165
       Width = 31
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -657,7 +601,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 216
       Height = 23
-      Top = 178
+      Top = 157
       Width = 47
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 3
@@ -666,7 +610,7 @@ object FrameViewFontBank: TFrameViewFontBank
       MaxValue = 255
       OnChange = SE1Change
       ParentFont = False
-      TabOrder = 14
+      TabOrder = 12
       Value = 255
     end
     object Label14: TLabel
@@ -674,8 +618,9 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Control = Panel1
       Left = 8
       Height = 15
-      Top = 8
+      Top = 4
       Width = 27
+      Anchors = [akLeft]
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
       Caption = 'Font:'
@@ -687,7 +632,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Control = Label14
       Left = 42
       Height = 15
-      Top = 8
+      Top = 4
       Width = 25
       BorderSpacing.Left = 7
       Caption = 'Arial'
@@ -703,7 +648,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Left = 273
       Height = 28
       Hint = 'Swap gradient colors'
-      Top = 166
+      Top = 145
       Width = 28
       AutoSize = True
       BorderSpacing.Left = 10
@@ -724,7 +669,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Left = 148
       Height = 28
       Hint = 'Swap outline and shadow colors'
-      Top = 296
+      Top = 294
       Width = 28
       Anchors = [akLeft, akBottom]
       AutoSize = True
@@ -735,6 +680,68 @@ object FrameViewFontBank: TFrameViewFontBank
       OnClick = BSwapOutlineAndShadowColorsClick
       ShowHint = True
       ParentShowHint = False
+    end
+    object GroupBox1: TGroupBox
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label4
+      AnchorSideTop.Side = asrBottom
+      Left = 8
+      Height = 68
+      Top = 47
+      Width = 164
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 5
+      Caption = 'Font style'
+      ClientHeight = 48
+      ClientWidth = 160
+      ParentBackground = False
+      TabOrder = 13
+      object CBBold: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 0
+        Width = 42
+        Caption = 'Bold'
+        TabOrder = 0
+        OnChange = SE1Change
+      end
+      object CBItalic: TCheckBox
+        Left = 88
+        Height = 19
+        Top = 0
+        Width = 43
+        Caption = 'Italic'
+        TabOrder = 1
+        OnChange = SE1Change
+      end
+      object CheckBox5: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 24
+        Width = 69
+        Caption = 'Underline'
+        TabOrder = 2
+        OnChange = SE1Change
+      end
+      object CheckBox6: TCheckBox
+        Left = 88
+        Height = 19
+        Top = 24
+        Width = 68
+        Caption = 'Strike out'
+        TabOrder = 3
+        OnChange = SE1Change
+      end
+    end
+    object PB: TPaintBox
+      Left = 248
+      Height = 50
+      Top = 199
+      Width = 50
+      OnMouseDown = PBMouseDown
+      OnMouseMove = PBMouseMove
+      OnMouseUp = PBMouseUp
+      OnPaint = PBPaint
     end
   end
   object Panel8: TPanel
@@ -795,7 +802,7 @@ object FrameViewFontBank: TFrameViewFontBank
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 216
+    Top = 155
     Width = 325
     Align = alNone
     Anchors = [akTop, akLeft, akRight]
@@ -821,7 +828,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 0
       Height = 16
-      Hint = 'Rename the level'
+      Hint = 'Rename'
       Top = 1
       Width = 16
       Flat = True
@@ -839,7 +846,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 20
       Height = 16
-      Hint = 'Duplicate this level'
+      Hint = 'Duplicate'
       Top = 1
       Width = 16
       BorderSpacing.Left = 4
@@ -860,7 +867,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 56
       Height = 16
-      Hint = 'Delete this level'
+      Hint = 'Delete'
       Top = 1
       Width = 16
       Anchors = [akTop, akRight]
@@ -873,6 +880,66 @@ object FrameViewFontBank: TFrameViewFontBank
       ParentShowHint = False
     end
   end
+  object Panel4: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Splitter1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 213
+    Top = 160
+    Width = 325
+    Anchors = [akTop, akLeft, akRight]
+    BevelOuter = bvNone
+    ClientHeight = 213
+    ClientWidth = 325
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 5
+    object TVAvailableFonts: TTreeView
+      AnchorSideLeft.Control = Panel4
+      AnchorSideTop.Control = Panel4
+      AnchorSideRight.Control = Panel4
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Panel4
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 213
+      Top = 0
+      Width = 325
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BackgroundColor = 3947580
+      Color = 3947580
+      Font.Height = 16
+      HotTrack = True
+      Images = DataModule1.ILLevelTreeView
+      ParentFont = False
+      ReadOnly = True
+      RightClickSelect = True
+      ScrollBars = ssVertical
+      TabOrder = 0
+      OnAdvancedCustomDrawItem = TVAvailableFontsAdvancedCustomDrawItem
+      OnSelectionChanged = TVAvailableFontsSelectionChanged
+      Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+    end
+  end
+  object Splitter2: TSplitter
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel4
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Cursor = crVSplit
+    Left = 0
+    Height = 5
+    Top = 373
+    Width = 325
+    Align = alNone
+    Anchors = [akTop, akLeft, akRight]
+    ResizeAnchor = akTop
+  end
   object FD1: TFontDialog
     MinFontSize = 8
     MaxFontSize = 150
@@ -880,5 +947,11 @@ object FrameViewFontBank: TFrameViewFontBank
     PreviewText = 'The dog is sleeping'
     Left = 240
     Top = 128
+  end
+  object Timer1: TTimer
+    Interval = 200
+    OnTimer = Timer1Timer
+    Left = 99
+    Top = 143
   end
 end

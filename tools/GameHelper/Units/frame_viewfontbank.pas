@@ -23,7 +23,10 @@ type
     CBShadow: TCheckBox;
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
-    CheckGroup1: TCheckGroup;
+    CBBold: TCheckBox;
+    CBItalic: TCheckBox;
+    CheckBox5: TCheckBox;
+    CheckBox6: TCheckBox;
     ColorButton1: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
@@ -32,6 +35,7 @@ type
     Edit1: TEdit;
     FD1: TFontDialog;
     FSE1: TFloatSpinEdit;
+    GroupBox1: TGroupBox;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -48,7 +52,8 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
-    LBFont: TListBox;
+    Panel4: TPanel;
+    PB: TPaintBox;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel1: TPanel;
@@ -67,20 +72,30 @@ type
     SE6: TSpinEdit;
     BSwapGradientColors: TSpeedButton;
     Splitter1: TSplitter;
+    Splitter2: TSplitter;
+    Timer1: TTimer;
+    TVAvailableFonts: TTreeView;
     TV: TTreeView;
     procedure BCancelClick(Sender: TObject);
     procedure BRenameClick(Sender: TObject);
     procedure BSaveClick(Sender: TObject);
     procedure BSwapGradientColorsClick(Sender: TObject);
     procedure BSwapOutlineAndShadowColorsClick(Sender: TObject);
-    procedure CheckGroup1ItemClick(Sender: TObject; Index: integer);
-    procedure LBFontDrawItem(Control: TWinControl; Index: Integer;
-      ARect: TRect; State: TOwnerDrawState);
-    procedure LBFontSelectionChange(Sender: TObject; User: boolean);
+    procedure PBMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure PBMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure PBMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure PBPaint(Sender: TObject);
     procedure SE1Change(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
       var PaintImages, DefaultDraw: Boolean);
+    procedure TVAvailableFontsAdvancedCustomDrawItem(Sender: TCustomTreeView;
+      Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
+      var PaintImages, DefaultDraw: Boolean);
+    procedure TVAvailableFontsSelectionChanged(Sender: TObject);
     procedure TVMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TVMouseWheel(Sender: TObject; Shift: TShiftState;
@@ -92,6 +107,7 @@ type
     FModified: boolean;
     FInitializing: boolean;
     FOnSelectionChange: TNotifyEvent;
+    FPreviewNeedUpdate: boolean;
     function WidgetToFontDescriptor: TFontDescriptor;
     procedure FontDescriptorToWidget(const fd: TFontDescriptor);
     procedure UpdatePreview;
@@ -103,6 +119,8 @@ type
     procedure FontStyleToWidget(aFt: TFontStyles);
     function GetGradientOrigin: TPointF;
     function GetGradientD1: TPointF;
+    procedure SetGradientOrigin(aPt: TPointF);
+    procedure SetGradientD1(aPt: TPointF);
     procedure HideToolPanels;
     procedure ShowToolPanels;
     function NodeIsRoot(aNode: TTreeNode): boolean;
@@ -112,7 +130,17 @@ type
     procedure DoRenameSelected;
     procedure DoDuplicateSelected;
     procedure DoDeleteSelected;
+  private
+    FGradOriginPercentCoor,
+    FGradD1PercentCoor: TPointF;
+    FGradCursorImage: TBGRABitmap;
+    procedure UpdateGradientControlPoints(aX, aY: integer);
+  private
+    function AvailableSelectedIsFont: boolean;
+    procedure FillTVAvailableFonts;
   public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
     procedure Fill;
 
     property IsEditable: boolean read FIsEditable write FIsEditable;
@@ -121,8 +149,8 @@ type
 
 implementation
 
-uses u_resourcestring, u_utils, form_main, u_screen_fontbank, u_common,
-  LCLType;
+uses u_resourcestring, form_main, u_screen_fontbank, u_common,
+  u_project, u_utils, LCLType, Math;
 
 {$R *.lfm}
 
@@ -151,9 +179,12 @@ end;
 procedure TFrameViewFontBank.BSaveClick(Sender: TObject);
 var nam: string;
   item: TFontDescriptorItem;
+  newnode: TTreeNode;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
+  if not IsValidPascalVariableName(nam, True) then exit;
+
   if SelectedIsFont and (TV.Selected.Text = nam) then begin
     if QuestionDlg('', sOverwriteTheSelectedFont, mtWarning,
                    [mrOk, sOverwrite, mrCancel, sCancel], 0) <> mrOk then exit;
@@ -171,11 +202,13 @@ begin
   FontBank.Save;
 
   // add the font to the treeview
-  with TV.Items.AddChild(TV.Items.GetFirstNode, nam) do begin
+  newnode :=  TV.Items.AddChild(TV.Items.GetFirstNode, nam);
+  with newNode do begin
     ImageIndex := 11;
     SelectedIndex := 11;
     MakeVisible;
   end;
+  TV.Selected := newNode;
 end;
 
 procedure TFrameViewFontBank.BSwapGradientColorsClick(Sender: TObject);
@@ -212,52 +245,51 @@ begin
   UpdatePreview;
 end;
 
-procedure TFrameViewFontBank.CheckGroup1ItemClick(Sender: TObject;
-  Index: integer);
+procedure TFrameViewFontBank.PBMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 begin
-  Index := Index;
-  if not FInitializing then
-    UpdatePreview;
+  Sender := Sender;
+  Button := Button;
+  Shift := Shift;
+  UpdateGradientControlPoints(X, Y);
+  UpdatePreview;
+  PB.Invalidate;
+  PB.Tag := 1;
 end;
 
-procedure TFrameViewFontBank.LBFontDrawItem(Control: TWinControl;
-  Index: Integer; ARect: TRect; State: TOwnerDrawState);
+procedure TFrameViewFontBank.PBMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
 begin
-  Control := Control;
-  with LBFont.Canvas do begin
+  Shift := Shift;
+  if PB.Tag = 0 then exit;
+  UpdateGradientControlPoints(X, Y);
+  UpdatePreview;
+  PB.Invalidate;
+end;
+
+procedure TFrameViewFontBank.PBMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  Sender := Sender;
+  Button := Button;
+  Shift := Shift;
+  X := X;
+  Y := Y;
+  PB.Tag := 0;
+end;
+
+procedure TFrameViewFontBank.PBPaint(Sender: TObject);
+var xx, yy: integer;
+begin
+  With PB.Canvas do begin
     Brush.Style := bsSolid;
-    if State >= [odSelected] then begin
-      Brush.Color := RGBToColor(94,128,130);
-      Font.Color := clWhite;
-    end else begin
-      if Index and 1 = 0 then Brush.Color := LBFont.Color
-        else Brush.Color := u_utils.PercentColor(LBFont.Color, 0.15);
-      Font.Color := clWhite;
-    end;
-    // render dot rectangle if mouse is over item
-   { if Index = FItemIndexUnderMouse then begin
-      Pen.Style := psDot;
-      Pen.Color := clHighLight; // PercentColor(LB.Color, 0.5);
-      Rectangle(ARect.Left-1, ARect.Top, ARect.Right+1, ARect.Bottom);
-    end else} FillRect(ARect);
-
-    Brush.style := bsClear;
-//    LBFont.Font.Name := LBFont.Items.Strings[Index];
-    TextOut(ARect.Left+3, ARect.Top, LBFont.Items.Strings[Index]);
-//    LBFont.Font.Name := 'default';
+    Brush.Color := clBlack;
+    FillRect(0, 0, Width, Height);
   end;
-end;
 
-procedure TFrameViewFontBank.LBFontSelectionChange(Sender: TObject; User: boolean);
-var i: integer;
-begin
-  User := User;
-  if FInitializing then exit;
-
-  i := LBFont.ItemIndex;
-  if i <> -1 then Label15.Caption := LBFont.Items.Strings[i]
-    else if Label15.Caption = '' then Label15.Caption := 'Arial';
-  SE1Change(Self);
+  xx := Round(FGradOriginPercentCoor.x*PB.ClientWidth)-FGradCursorImage.Width div 2;
+  yy := Round(FGradOriginPercentCoor.y*PB.ClientHeight)-FGradCursorImage.Height div 2;
+  FGradCursorImage.Draw(PB.Canvas, xx, yy, False);
 end;
 
 procedure TFrameViewFontBank.SE1Change(Sender: TObject);
@@ -267,6 +299,7 @@ begin
   CheckBox1.Enabled := RBGradient.Checked;
   CheckBox2.Enabled := RBGradient.Checked;
   BSwapGradientColors.Enabled := RBGradient.Checked;
+  PB.Enabled := RBGradient.Checked;
 
   Panel2.Enabled := CBOutline.Checked;
   Panel3.Enabled := CBShadow.Checked;
@@ -276,6 +309,14 @@ begin
 
   if not FInitializing then
     UpdatePreview;
+end;
+
+procedure TFrameViewFontBank.Timer1Timer(Sender: TObject);
+begin
+  if FPreviewNeedUpdate then begin
+    ScreenFontBank.UpdatePreview(WidgetToFontDescriptor, GetCharset, GetFillTexture);
+    FPreviewNeedUpdate := False;
+  end;
 end;
 
 procedure TFrameViewFontBank.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
@@ -322,6 +363,70 @@ begin
     PaintImages := True;
     DefaultDraw := True;
   end;
+end;
+
+procedure TFrameViewFontBank.TVAvailableFontsAdvancedCustomDrawItem(
+  Sender: TCustomTreeView; Node: TTreeNode; State: TCustomDrawState;
+  Stage: TCustomDrawStage; var PaintImages, DefaultDraw: Boolean);
+var r: TRect;
+  p: TPoint;
+  ft: TFontStyles;
+begin
+  Sender := Sender;
+  if (Stage = cdPostPaint) then begin // all is painted
+    ft := TVAvailableFonts.Font.Style;
+    r := Node.DisplayRect(True);
+    With TVAvailableFonts.Canvas do begin
+      // background
+      if cdsSelected in State then begin
+        Brush.Color := TVAvailableFonts.SelectionColor;
+        TVAvailableFonts.Font.Color := clWhite
+      end else begin
+        Brush.Color := TVAvailableFonts.BackgroundColor;
+        TVAvailableFonts.Font.Color := clWhite;
+      end;
+
+      Brush.Style := bsSolid;
+      Pen.Style := psClear;
+      FillRect(r);
+      //Pen.Style := psSolid;
+
+      // hot track (mouse is over)
+      p := TVAvailableFonts.ScreenToClient(Mouse.CursorPos);
+      if (TVAvailableFonts.GetNodeAt(p.x, p.y) = Node) and (Node.Level = 2) then
+        TVAvailableFonts.Font.Style := TVAvailableFonts.Font.Style+[fsUnderline];
+
+      // group
+      Brush.Style := bsClear;
+      if Node.Level = 1 then begin
+        TVAvailableFonts.Font.Style := TVAvailableFonts.Font.Style+[fsBold];
+        TVAvailableFonts.Font.Color := RGBToColor(255,255,150);
+      end;
+      TextOut(r.Left+2, r.Top+(r.Height-TVAvailableFonts.Font.Height) div 2, Node.Text);
+      TVAvailableFonts.Font.Style := ft;
+    end;
+    PaintImages := True;
+    DefaultDraw := false;
+  end else begin
+    PaintImages := True;
+    DefaultDraw := True;
+  end;
+end;
+
+procedure TFrameViewFontBank.TVAvailableFontsSelectionChanged(Sender: TObject);
+var canBold, canItalic: boolean;
+begin
+  if FInitializing then exit;
+
+  if AvailableSelectedIsFont then begin
+    Label15.Caption := self.TVAvailableFonts.Selected.Text;
+    FScene.FontManager.FontHaveBoldOrItalic(Label15.Caption, canBold, canItalic);
+    CBBold.Enabled := canBold;
+    if not CBBold.Enabled then CBBold.Checked := False;
+    CBItalic.Enabled := canItalic;
+    if not CBItalic.Enabled then CBItalic.Checked := False;
+  end;
+  SE1Change(Self);
 end;
 
 procedure TFrameViewFontBank.TVMouseDown(Sender: TObject;
@@ -424,7 +529,7 @@ end;
 procedure TFrameViewFontBank.FontDescriptorToWidget(const fd: TFontDescriptor);
 begin
   FInitializing := True;
-  LBFont.ItemIndex := LBFont.Items.IndexOf(fd.FontName);
+  TVAvailableFonts.Selected := TVAvailableFonts.Items.FindNodeWithText(fd.FontName);
   Label15.Caption := fd.FontName;
   SE1.Value := fd.FontHeight;
   FontStyleToWidget(fd.Style);
@@ -436,8 +541,11 @@ begin
     ColorButton2.ButtonColor := fd.Gradient.Color2.ToColor;
     SE6.Value := fd.Gradient.Color2.alpha;
     GradientTypeToCB(fd.Gradient.GradientType);
+    SetGradientOrigin(fd.Gradient.Origin);
+    SetGradientD1(fd.Gradient.D1);
     CheckBox1.Checked := fd.Gradient.GammaColorCorrection;
     CheckBox2.Checked := fd.Gradient.Sinus;
+    PB.Invalidate;
   end else begin
     RBSingleColor.Checked := True;
     ColorButton1.ButtonColor := fd.FontColor.ToColor;
@@ -465,7 +573,8 @@ end;
 
 procedure TFrameViewFontBank.UpdatePreview;
 begin
-  ScreenFontBank.UpdatePreview(WidgetToFontDescriptor, GetCharset, GetFillTexture);
+  //ScreenFontBank.UpdatePreview(WidgetToFontDescriptor, GetCharset, GetFillTexture);
+  FPreviewNeedUpdate := True;
 end;
 
 function TFrameViewFontBank.GetCharset: string;
@@ -486,10 +595,10 @@ end;
 function TFrameViewFontBank.WidgetToFontStyle: TFontStyles;
 begin
   Result := [];
-  if CheckGroup1.Checked[0] then Include(Result, fsBold);
-  if CheckGroup1.Checked[1] then Include(Result, fsItalic);
-  if CheckGroup1.Checked[2] then Include(Result, fsUnderline);
-  if CheckGroup1.Checked[3] then Include(Result, fsStrikeOut);
+  if CBBold.Checked then Include(Result, fsBold);
+  if CBItalic.Checked then Include(Result, fsItalic);
+  if CheckBox5.Checked then Include(Result, fsUnderline);
+  if CheckBox6.Checked then Include(Result, fsStrikeOut);
 end;
 
 function TFrameViewFontBank.CBToGradientType: TGradientType;
@@ -504,21 +613,35 @@ end;
 
 procedure TFrameViewFontBank.FontStyleToWidget(aFt: TFontStyles);
 begin
-  CheckGroup1.Checked[0] := fsBold in aFt;
-  CheckGroup1.Checked[1] := fsItalic in aFt;
-  CheckGroup1.Checked[2] := fsUnderline in aFt;
-  CheckGroup1.Checked[3] := fsStrikeOut in aFt;
+  CBBold.Checked := fsBold in aFt;
+  CBItalic.Checked := fsItalic in aFt;
+  CheckBox5.Checked := fsUnderline in aFt;
+  CheckBox6.Checked:= fsStrikeOut in aFt;
 
 end;
 
 function TFrameViewFontBank.GetGradientOrigin: TPointF;
 begin
-  Result := PointF(0, 0);
+  Result.x := FGradOriginPercentCoor.x * SE1.Value;
+  Result.y := FGradOriginPercentCoor.y * SE1.Value;
 end;
 
 function TFrameViewFontBank.GetGradientD1: TPointF;
 begin
-  Result := PointF(SE1.Value, SE1.Value);
+  Result.x := FGradD1PercentCoor.x * SE1.Value;
+  Result.y := FGradD1PercentCoor.y * SE1.Value;
+end;
+
+procedure TFrameViewFontBank.SetGradientOrigin(aPt: TPointF);
+begin
+  FGradOriginPercentCoor.x := aPt.x / SE1.Value;
+  FGradOriginPercentCoor.y := aPt.y / SE1.Value;
+end;
+
+procedure TFrameViewFontBank.SetGradientD1(aPt: TPointF);
+begin
+  FGradD1PercentCoor.x := aPt.x / SE1.Value;
+  FGradD1PercentCoor.y := aPt.y / SE1.Value;
 end;
 
 procedure TFrameViewFontBank.HideToolPanels;
@@ -580,86 +703,101 @@ begin
   if not SelectedIsFont then exit;
 
   oldName := TV.Selected.Text;
-  newName := Trim(InputBox('', sEnterTheNewName, oldName));
-  if newName = oldName then exit;
-  if FontBank.NameExists(newName) then begin
-    ShowMessage(Format(sAFontNamedAlreadyExists, [newName]));
-    exit;
-  end;
-
-  // change name in bank and save
-  FontBank.GetByName(oldName)._Name := newName;
-  FontBank.Save;
+  if not FontBank.DoRenameByName(oldName, newName, True) then exit;
 
   // change name in treeview
   TV.Selected.Text := newName;
 end;
 
 procedure TFrameViewFontBank.DoDuplicateSelected;
-var srcName, dstName: string;
-  k: integer;
-  srcItem, dstItem: TFontDescriptorItem;
+var dstName: string;
+  newNode: TTreeNode;
 begin
   HideToolPanels;
   if not SelectedIsFont then exit;
 
-  // retrieve the source item
-  srcName := TV.Selected.Text;
-  srcItem := FontBank.GetByName(srcName);
-  if srcItem = NIL then begin
-    ShowMessage('Source item not found in the Font Bank... it''s a bug!'+LineEnding+'Operation Canceled');
-    exit;
-  end;
-
-  // create a unique name for the new font
-  k := 0;
-  repeat
-    inc(k);
-    if k < 100 then dstName := srcName+'_'+Format('%.2d', [k])
-      else dstName := srcName+'_'+k.ToString;
-  until not FontBank.NameExists(dstName);
-
-  // add the new item in the bank and save
-  dstItem := FontBank.AddEmpty;
-  srcItem.DuplicateTo(dstItem);
-  dstItem._Name := dstName;
-  FontBank.Save;
-
+  if not FontBank.DoDuplicateByName(TV.Selected.Text, dstName, True) then exit;
   // add the new name in the treeview
-  with TV.Items.AddChild(TV.Items.GetFirstNode, dstName) do begin
+  newNode :=  TV.Items.AddChild(TV.Items.GetFirstNode, dstName);
+  with newNode do begin
     ImageIndex := 11;
     SelectedIndex := 11;
     MakeVisible;
   end;
+  TV.Selected := newNode;
 end;
 
 procedure TFrameViewFontBank.DoDeleteSelected;
-var item: TFontDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsFont then exit;
-  if QuestionDlg('',sDeleteThisFont, mtWarning,
-                 [mrOk, sDelete, mrCancel, sCancel], 0) = mrCancel then exit;
 
-  item := FontBank.GetByName(TV.Selected.Text);
-  if item = NIL then begin
-    ShowMessage('Item not found in the Font Bank... it''s a bug!'+LineEnding+'Operation Canceled');
-    exit;
-  end;
-
-  // delete in bank
-  FontBank.DeleteByName(TV.Selected.Text);
-  FontBank.Save;
-
+  if not FontBank.DoDeleteByName(TV.Selected.Text, True) then exit;
   // delete in treeview
   TV.Items.Delete(TV.Selected);
 
   ScreenFontBank.ClearView;
 end;
 
+function TFrameViewFontBank.AvailableSelectedIsFont: boolean;
+begin
+  if TVAvailableFonts.Selected = NIL then exit(False)
+    else Result := TVAvailableFonts.Selected.Level = 2;
+end;
+
+procedure TFrameViewFontBank.FillTVAvailableFonts;
+var root, nodeSystem, nodeProject: TTreeNode;
+  i: integer;
+begin
+  TVAvailableFonts.BeginUpdate;
+  TVAvailableFonts.Items.Clear;
+  TVAvailableFonts.Items.AddFirst(NIL, sAvailableFonts);
+  root := TVAvailableFonts.Items.GetFirstNode;
+  nodeProject := TVAvailableFonts.Items.AddChild(root, sProject);
+  nodeProject.MakeVisible;
+  nodeSystem := TVAvailableFonts.Items.AddChild(root, sSystem);
+  nodeSystem.MakeVisible;
+
+  FScene.FontManager.ScanProjectFont(Project.Config.TargetLazarusProject.GetFolderDataFonts);
+
+  for i:=0 to FScene.FontManager.ProjectFontCount-1 do
+    with TVAvailableFonts.Items.AddChild(nodeProject, FScene.FontManager.ProjectFontName[i]) do
+      MakeVisible;
+
+  for i:=0 to FScene.FontManager.SystemFontCount-1 do
+    with TVAvailableFonts.Items.AddChild(nodeSystem, FScene.FontManager.SystemFontName[i]) do
+      MakeVisible;
+
+  root.MakeVisible;
+  TVAvailableFonts.EndUpdate;
+end;
+
+procedure TFrameViewFontBank.UpdateGradientControlPoints(aX, aY: integer);
+begin
+  FGradOriginPercentCoor.x := EnsureRange(aX/PB.ClientWidth, 0, 1);
+  FGradOriginPercentCoor.y := EnsureRange(aY/PB.ClientHeight, 0, 1);
+  FGradD1PercentCoor := PointF(1-FGradOriginPercentCoor.x, 1-FGradOriginPercentCoor.y);
+end;
+
+constructor TFrameViewFontBank.Create(aOwner: TComponent);
+begin
+  inherited Create(aOwner);
+  FGradCursorImage := TBGRABitmap.Create(15, 15, BGRAPixelTransparent);
+  FGradCursorImage.FillEllipseAntialias(FGradCursorImage.Width div 2,
+                           FGradCursorImage.Height div 2,
+                           FGradCursorImage.Width div 2,
+                           FGradCursorImage.Height div 2,
+                           BGRA(220,220,220));
+end;
+
+destructor TFrameViewFontBank.Destroy;
+begin
+  FGradCursorImage.Free;
+  inherited Destroy;
+end;
+
 procedure TFrameViewFontBank.Fill;
-var
-  root, fdnode: TTreeNode;
+var  root, fdnode: TTreeNode;
   fd: TFontDescriptorItem;
   i: Integer;
 begin
@@ -677,9 +815,12 @@ begin
     end;
   TV.EndUpdate;
 
-  LBFont.Clear;
-  for i:=0 to Screen.Fonts.Count-1 do
-    LBFont.Items.Add(Screen.Fonts.Strings[i]);
+  FScene.FontManager.ScanProjectFont(Project.Config.TargetLazarusProject.GetFolderDataFonts);
+
+  FillTVAvailableFonts;
+
+  FGradOriginPercentCoor := PointF(0.5, 0.0);
+  FGradD1PercentCoor := PointF(0.5, 1.0);
 end;
 
 end.

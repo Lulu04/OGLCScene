@@ -265,16 +265,17 @@ object FormMain: TFormMain
       AnchorSideLeft.Control = Panel2
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = Panel6
+      AnchorSideRight.Control = Panel6
+      AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = Panel6
       AnchorSideBottom.Side = asrBottom
       Left = 432
       Height = 29
       Top = 1
-      Width = 302
+      Width = 377
       Anchors = [akTop, akLeft, akRight, akBottom]
-      BorderSpacing.Right = 20
       ClientHeight = 29
-      ClientWidth = 302
+      ClientWidth = 377
       Color = 3226172
       ParentBackground = False
       ParentColor = False
@@ -284,11 +285,11 @@ object FormMain: TFormMain
         AnchorSideTop.Side = asrCenter
         AnchorSideRight.Control = BToolUIPanel
         Cursor = crHandPoint
-        Left = 114
+        Left = 19
         Height = 19
         Top = 5
         Width = 71
-        Anchors = [akTop, akRight]
+        Anchors = [akTop]
         AutoSize = True
         BorderSpacing.Right = 10
         Caption = 'FONT BANK'
@@ -303,11 +304,11 @@ object FormMain: TFormMain
         AnchorSideRight.Control = Panel10
         AnchorSideRight.Side = asrBottom
         Cursor = crHandPoint
-        Left = 195
+        Left = 104
         Height = 19
         Top = 5
         Width = 101
-        Anchors = [akTop, akRight]
+        Anchors = [akTop]
         AutoSize = True
         BorderSpacing.Right = 5
         Caption = 'UI PANEL EDITOR'
@@ -315,6 +316,30 @@ object FormMain: TFormMain
         Font.Style = [fsBold]
         OnClick = BSpriteBankClick
         ParentFont = False
+      end
+      object CBBank: TComboBox
+        AnchorSideTop.Control = Panel10
+        AnchorSideTop.Side = asrCenter
+        AnchorSideRight.Control = Panel10
+        AnchorSideRight.Side = asrBottom
+        Left = 241
+        Height = 23
+        Top = 3
+        Width = 130
+        Anchors = [akTop, akRight]
+        BorderSpacing.Right = 5
+        ItemHeight = 15
+        ItemIndex = 1
+        Items.Strings = (
+          'SPRITE BANK'
+          'LEVEL BANK'
+          'FONT BANK'
+          'PANEL BANK'
+        )
+        Style = csDropDownList
+        TabOrder = 0
+        Text = 'LEVEL BANK'
+        OnSelect = CBBankSelect
       end
     end
   end
@@ -344,7 +369,7 @@ object FormMain: TFormMain
       Height = 264
       Top = 1
       Width = 304
-      PageIndex = 0
+      PageIndex = 6
       Anchors = [akTop, akLeft, akRight, akBottom]
       TabOrder = 0
       object PageSpriteBank: TPage
@@ -368,6 +393,8 @@ object FormMain: TFormMain
       object PageFontBank: TPage
       end
       object PageUIPanelEditor: TPage
+      end
+      object PagePanelBank: TPage
       end
     end
   end

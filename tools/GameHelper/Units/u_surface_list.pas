@@ -60,9 +60,14 @@ public
   // TDeformationGrid
   DeformationGridData: string;
   // UI objects
-  //BodyShapeData: string;
-  //Caption: string;
-
+  BodyShapeData: string;
+  BackGradientData: string;
+  UseBackGradient: boolean;
+  // UI objects with text (textured font)
+  FontDescriptorName, Caption: string;
+  TextAlignment: TOGLCAlignment;
+  Atlas: TAtlas;   // to contain localy the textured font
+  TexturedFont: TTexturedFont;
 
   procedure InitDefault;
   procedure KillSurface;
@@ -229,7 +234,7 @@ end;
 
 implementation
 
-uses u_common, u_screen_spritebuilder, u_utils, Math;
+uses u_common, u_screen_spritebuilder, u_utils, u_ui_objectlist, Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -301,12 +306,26 @@ begin
   // TDeformationGrid
   DeformationGridData := '';
 
+  // UIObject
+  BodyShapeData := '';
+  BackGradientData := '';
+  UseBackGradient := False;
+  Caption := '';
+  FontDescriptorName := '';
+  Atlas := NIL;
+  TexturedFont := NIL;
+
+
+
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
 end;
 
 procedure TSurfaceDescriptor.KillSurface;
 begin
+  if Atlas <> nIL then FreeAndNil(Atlas);
+  TexturedFont := NIL;
+
   if surface <> NIL then surface.Kill;
   surface := NIL;
   HandleManager.KillSurfaces;
@@ -388,12 +407,21 @@ begin
   if classType = TSpriteContainer then begin  // TSpriteContainer
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
-  end {else
+  end else
   if classType = TUIPanel then begin      // UIPanel
     surface := TUIPanel.Create(FScene);
     TUIPanel(surface).BodyShape.LoadFromString(BodyShapeData);
-    TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height);
-  end  }
+    TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIPanel(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUIPanel(surface).BackGradient.Visible := UseBackGradient;
+  end else
+  if classType = TUILabel then begin // UILabel
+    surface := TUILabel.Create(FScene);
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    TUILabel(surface).CaptionDescriptor.Alignment := TextAlignment;
+    TUILabel(surface).TexturedFont := TexturedFont;
+    TUILabel(surface).Caption := Caption;
+  end
 
   else raise exception.create('forgot to implement!');
 
@@ -867,6 +895,35 @@ begin
   end else begin
     aSurface^.zOrder := surface.ZOrderAsChild;
   end;
+  aSurface^.frameindex := frameindex;
+  // EXTRA properties
+  // TSpriteWithElasticCorner
+  aSurface^.TopLeftOffsetX := TopLeftOffsetX;
+  aSurface^.TopLeftOffsetY := TopLeftOffsetY;
+  aSurface^.TopRightOffsetX := TopRightOffsetX;
+  aSurface^.TopRightOffsetY := TopRightOffsetY;
+  aSurface^.BottomRightOffsetX := BottomRightOffsetX;
+  aSurface^.BottomRightOffsetY := BottomRightOffsetY;
+  aSurface^.BottomLeftOffsetX := BottomLeftOffsetX;
+  aSurface^.BottomLeftOffsetY := BottomLeftOffsetY;
+  // TQuad4Color
+  aSurface^.TopLeftColor := TopLeftColor;
+  aSurface^.TopRightColor := TopRightColor;
+  aSurface^.BottomRightColor := BottomRightColor;
+  aSurface^.BottomLeftColor := BottomLeftColor;
+  // TGradientRectangle
+  aSurface^.GradientData := GradientData;
+  // TDeformationGrid
+  aSurface^.DeformationGridData := DeformationGridData;
+  // UI objects
+  aSurface^.BodyShapeData := BodyShapeData;
+  aSurface^.BackGradientData := BackGradientData;
+  aSurface^.UseBackGradient := UseBackGradient;
+  // surfaces with text (textured font)
+  aSurface^.FontDescriptorName := FontDescriptorName;
+  aSurface^.Caption := Caption;
+  aSurface^.TextAlignment := TextAlignment;
+
   aSurface^.CreateSurface(True);
   aSurface^.SetChildDependency;
   aSurface^.surface.SetCoordinate(surface.GetXY);
@@ -879,6 +936,10 @@ begin
   aSurface^.surface.Opacity.Value := surface.Opacity.Value;
   aSurface^.surface.Tint.Value := surface.Tint.Value;
   aSurface^.surface.TintMode := surface.TintMode;
+  aSurface^.surface.Frame := surface.Frame;
+  if Atlas <> NIL then
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption,
+                                      aSurface^.Atlas, aSurface^.TexturedFont, NIL);
 end;
 
 function TSurfaceDescriptor.GetSurfaceType: classOfSimpleSurfaceWithEffect;
@@ -1090,6 +1151,19 @@ begin
   if GetSurfaceType = TDeformationGrid then
     prop.Add('DeformationGridData', DeformationGridData);
 
+  // UI objects
+  if BodyShapeData <> '' then begin
+    prop.Add('BodyShapeData', BodyShapeData);
+    if BackGradientData <> '' then prop.Add('BackGradientData', BackGradientData);
+    if UseBackGradient then prop.Add('UseBackGradient', UseBackGradient);
+  end;
+  // UI objects with text (textured font)
+  if FontDescriptorName <> '' then begin
+    prop.Add('FontDescriptorName', FontDescriptorName);
+    if Caption <> '' then prop.Add('Caption', Caption, True);
+    prop.Add('TextAlignment', Ord(TextAlignment));
+  end;
+
   Result := prop.PackedProperty;
 end;
 
@@ -1173,6 +1247,18 @@ begin
 
   // TDeformationGrid
   prop.StringValueOf('DeformationGridData', DeformationGridData, '');
+
+  // UI objects
+  prop.StringValueOf('BodyShapeData', BodyShapeData, '');
+  prop.StringValueOf('BackGradientData', BackGradientData, '');
+  prop.BooleanValueOf('UseBackGradient', UseBackGradient, False);
+
+  // UI objects with text (textured font)
+  prop.StringValueOf('FontDescriptorName', FontDescriptorName, '');
+  prop.StringValueOf('Caption', Caption, '');
+  prop.IntegerValueOf('TextAlignment', v, 0);
+  TextAlignment := TOGLCAlignment(v);
+
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode

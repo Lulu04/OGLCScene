@@ -1,1 +1,2 @@
-Please, put your textures files in the subfolder 'Textures'
+put your textures files (png, svg, ...) in the subfolder 'Textures'
+put your font files in the subfolder 'Fonts'
