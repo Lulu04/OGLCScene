@@ -2079,6 +2079,7 @@ begin
   InitDefault(FParentScene);
   prop.Split(data, ',');
   vi := 0;
+  s := '';
   prop.IntegerValueOf('ShapeType', vi, Ord(FShapeType));
   FShapeType := TShapeType(vi);
   if FShapeType = stRoundRect then begin
