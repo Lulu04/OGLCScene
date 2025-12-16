@@ -52,6 +52,7 @@ uses
   DynLibs,
   lazutf8,
   BGRABitmapTypes, BGRABitmap, BGRATextFX, BGRAPath, BGRAGradientScanner, BGRAFreeType, BGRASVG,//EasyLazFreeType,
+  LazFreeTypeFontCollection, EasyLazFreeType,
   math,
   strutils, gvector;
 
@@ -499,6 +500,10 @@ TOGLCScene = class(TOGLCContext)
   property ScrollableTextureRenderer: TOGLCScrollableTextureRenderer read GetScrollableTextureRenderer;
   // Flush the batch renderer system
   procedure FlushRenderer;
+ public
+  // With Font Manager you can retrieve the list of the fonts installed on the system
+  // and the fonts presents in the project Data/Fonts/ folder
+  FontManager: TOGLCFontManager;
  public // convenience functions
   function CreateAtlas: TOGLCTextureAtlas;
   function CreateTexturedFont(aFont: TFontDescriptor; const aCharSet: string; aFillTexture: TBGRABitmap): TTexturedFont;
@@ -1000,6 +1005,8 @@ begin
   FCurrentBlendMode := $FF;
 
   PostProcessing.FParentScene := Self;
+
+  FontManager := TOGLCFontManager.Create;
 end;
 
 destructor TOGLCScene.Destroy;
@@ -1044,6 +1051,9 @@ begin
     FLog.Free;
     FLog := NIL;
   end;
+
+  FontManager.Free;
+  FontManager := NIL;
 
   inherited Destroy;
 end;
