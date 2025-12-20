@@ -26,9 +26,9 @@ public
 end;
 
 
-{ TFreeTextOnPathToFollow }
+{ TFreeTextOnPath }
 // a text that moves along a TOGLCPathToFollow instance
-TFreeTextOnPathToFollow = class(TFreeText)
+TFreeTextOnPath = class(TFreeText)
 private
   FAutoRotate: boolean;
   FAngleAdjust,
@@ -57,10 +57,12 @@ public
   property CoeffPositionOnPath: single read FCoeffPositionOnPath write SetCoeffPositionOnLine;
 end;
 
+TFreeTextOnPathToFollow = TFreeTextOnPath deprecated 'use TFreeTextOnPath instead';
 
-{ TFreeTextClockLabel }
+
+{ TFreeTextClock }
 // A surface that can count/count down time and show the current time
-TFreeTextClockLabel = class(TFreeText)
+TFreeTextClock = class(TFreeText)
 private
   FOnCountdownDone: TNotifyEvent;
   FTime: single;
@@ -88,6 +90,7 @@ public
   // event callback for countdown mode. Fired when timer reach 0.
   property OnCountdownDone: TNotifyEvent read FOnCountdownDone write FOnCountdownDone;
 end;
+  TFreeTextClockLabel = TFreeTextClock deprecated 'use TFreeTextClock instead';
 
 
 { TFreeTextAligned }
@@ -139,6 +142,9 @@ TAlignedText = TFreeTextAligned deprecated 'use TFreeTextAligned instead';
 
 procedure TFreeTextAligned.SetAlign(AValue: TOGLCAlignment);
 begin
+  if (AValue = taCenterLeft) or (AValue = taBottomLeft) then AValue := taTopLeft;
+  if (AValue = taCenterCenter) or (AValue = taBottomCenter) then AValue := taTopCenter;
+  if (AValue = taCenterRight) or (AValue = taBottomRight) then AValue := taTopRight;
   FAlignedTextDescriptor.Align := AValue;
 end;
 
@@ -301,21 +307,21 @@ begin
   FParentScene := aParentScene;
 end;
 
- { TFreeTextOnPathToFollow }
+ { TFreeTextOnPath }
 
-procedure TFreeTextOnPathToFollow.SetCoeffPositionOnLine(AValue: single);
+procedure TFreeTextOnPath.SetCoeffPositionOnLine(AValue: single);
 begin
   FCoeffPositionOnPath := EnsureRange(AValue, 0.0, 1.0);
 end;
 
-procedure TFreeTextOnPathToFollow.Update(const aElapsedTime: single);
+procedure TFreeTextOnPath.Update(const aElapsedTime: single);
 begin
    inherited Update(aElapsedTime);
    if not FFreeze then
      DistanceTraveled.OnElapse(aElapsedTime);
 end;
 
-procedure TFreeTextOnPathToFollow.Draw(const aLayerPercentOpacity: single);
+procedure TFreeTextOnPath.Draw(const aLayerPercentOpacity: single);
 var i, j, yOffset, flipIndex: integer;
   m: TOGLCMatrix;
   pos: TPointF;
@@ -371,11 +377,11 @@ begin
   end;
 end;
 
-procedure TFreeTextOnPathToFollow.DoDraw;
+procedure TFreeTextOnPath.DoDraw;
 begin
 end;
 
-constructor TFreeTextOnPathToFollow.CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow; aZOrder: integer);
+constructor TFreeTextOnPath.CreateAsChildOf(aParentPathToFollow: TOGLCPathToFollow; aZOrder: integer);
 begin
   inherited Create(aParentPathToFollow.ParentScene);
   DistanceTraveled := TFParam.Create;
@@ -384,30 +390,30 @@ begin
   aParentPathToFollow.AddChild(Self, aZOrder);
 end;
 
-destructor TFreeTextOnPathToFollow.Destroy;
+destructor TFreeTextOnPath.Destroy;
 begin
   DistanceTraveled.Free;
   DistanceTraveled := NIL;
   inherited Destroy;
 end;
 
- { TFreeTextClockLabel }
+ { TFreeTextClock }
 
-procedure TFreeTextClockLabel.SetTime(AValue: single);
+procedure TFreeTextClock.SetTime(AValue: single);
 begin
   if FTime = AValue then Exit;
   FTime := AValue;
   UpdateCaption;
 end;
 
-procedure TFreeTextClockLabel.SetShowFractionalPart(AValue: boolean);
+procedure TFreeTextClock.SetShowFractionalPart(AValue: boolean);
 begin
   if FShowFractionalPart = AValue then Exit;
   FShowFractionalPart := AValue;
   UpdateCaption;
 end;
 
-procedure TFreeTextClockLabel.UpdateCaption;
+procedure TFreeTextClock.UpdateCaption;
 begin
   if FShowFractionalPart then
     Caption := SecondsToString(FTime, FShowFractionalPart)
@@ -415,14 +421,14 @@ begin
     Caption := IntToStr(Ceil(FTime));
 end;
 
-constructor TFreeTextClockLabel.Create(aParentScene: TOGLCScene; aPaused: boolean);
+constructor TFreeTextClock.Create(aParentScene: TOGLCScene; aPaused: boolean);
 begin
   inherited Create(aParentScene);
   FPaused := aPaused;
   FShowFractionalPart := TRUE;
 end;
 
-procedure TFreeTextClockLabel.Update(const aElapsedTime: single);
+procedure TFreeTextClock.Update(const aElapsedTime: single);
 begin
   inherited Update(aElapsedTime);
   if FFreeze or FPaused then exit;
@@ -440,12 +446,12 @@ begin
   UpdateCaption;
 end;
 
-procedure TFreeTextClockLabel.Pause;
+procedure TFreeTextClock.Pause;
 begin
   FPaused := TRUE;
 end;
 
-procedure TFreeTextClockLabel.Run;
+procedure TFreeTextClock.Run;
 begin
   FPaused := FALSE;
 end;
