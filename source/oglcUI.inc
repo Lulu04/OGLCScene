@@ -197,10 +197,13 @@ public // anchor utils - only the position, do not change the size - H for Horiz
                                aVSelfSide, aVTargetSide: TVAnchorType; aVMargin: integer);
 end;
 
+type
+
+TShapeType=(stRectangle, stRoundRect, stEllipse, stCustom);
+
 { TBodyShape }
 
 TBodyShape = record
-private type TShapeType=(stRectangle, stRoundRect, stEllipse, stCustom);
 private
   FOnShapeChanged: TOGLCEvent;
   FMaskEventOnShapeChanged: boolean;
@@ -211,7 +214,11 @@ private
   procedure SetShape(aBorderPath, aFillPath: TOGLCPath; aWidth, aHeight: integer; aBorderWidth: single);
 public // utils for Game Helper
   function SaveToString: string;
-  procedure LoadFromString(const data: string)
+  procedure LoadFromString(const data: string);
+  property Shapetype: TShapeType read FShapetype;
+  property RoundRectOptions: TRoundRectangleOptions read FRoundRectOptions;
+  property Rx: single read FRx;
+  property Ry: single read FRy;
 public
   Border: TOGLCBorder;
   Fill: TOGLCFill;
@@ -1162,7 +1169,7 @@ begin
 
   FFillForStencil.InitDefault;
 
-  Gradient.InitDefault;
+  Gradient.Clear;
   Gradient.CreateSingleColor(BGRA(55,200,50));
   Gradient.OnChange := @ProcessCallbackSomethingChangeTheSize;
 
@@ -2427,7 +2434,7 @@ begin
   BodyShape.OnShapeChanged := @ProcessCallbackSomethingChangeTheSize;
   FAutoSize := True;
 
-  BackGradient.InitDefault;
+  BackGradient.Clear;
   BackGradient.OnChange := @ProcessBackGradientColorChange;
 
   FChildClippingEnabled := True;
