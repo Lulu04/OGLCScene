@@ -33,11 +33,20 @@ private
   procedure ProcessButtonClick(Sender: TSimpleSurfaceWithEffect);
 public
   constructor Create(aFont: TTexturedFont);
-  procedure ShowModal; override;
-  procedure Hide(aFree: boolean); override;
+  procedure ShowModal(const aAnimScenario: string); override;
+  procedure Hide(const aAnimScenario: string; aFree: boolean); override;
 end;
 
 function PPIScale(aValue: integer): integer;
+
+const
+  MODALPANEL_ONSHOW_SCENARIO = 'Visible True'#10+
+                               'Scale 0.1'#10+
+                               'ScaleChange 1.0 0.3 idcLinear'#10+
+                               'Wait 0.3';
+
+  MODALPANEL_ONHIDE_SCENARIO = 'ScaleChange 0.1 0.3 idcLinear'#10+
+                               'Wait 0.3';
 
 implementation
 uses u_common, LCLType, BGRABitmapTypes, form_main;
@@ -62,10 +71,11 @@ end;
 procedure TInGamePausePanel.ProcessButtonClick(Sender: TSimpleSurfaceWithEffect);
 begin
   if Sender = BResumeGame then begin
-    Hide(False);
-  end else
+    Hide(MODALPANEL_ONHIDE_SCENARIO, False);
+  end
+  else
   if Sender = BExitGame then begin
-    Hide(False);
+    Hide(MODALPANEL_ONHIDE_SCENARIO, False);
     FormMain.Close;
   end;
 end;
@@ -102,18 +112,18 @@ begin
   CenterOnScene;
 end;
 
-procedure TInGamePausePanel.ShowModal;
+procedure TInGamePausePanel.ShowModal(const aAnimScenario: string);
 begin
   // the mouse pointer is visible
   FScene.Mouse.SystemMouseCursorVisible := True;
-  inherited ShowModal;
+  inherited ShowModal(aAnimScenario);
 end;
 
-procedure TInGamePausePanel.Hide(aFree: boolean);
+procedure TInGamePausePanel.Hide(const aAnimScenario: string; aFree: boolean);
 begin
   // the mouse pointer is hidden
   FScene.Mouse.SystemMouseCursorVisible := False;
-  inherited Hide(aFree);
+  inherited Hide(aAnimScenario, aFree);
 end;
 
 { TShip }

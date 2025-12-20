@@ -117,7 +117,7 @@ begin
 
   // check ESC key
   if FScene.KeyState[VK_ESCAPE] then
-    FInGamePausePanel.ShowModal;
+    FInGamePausePanel.ShowModal(MODALPANEL_ONSHOW_SCENARIO);
 
 end;
 

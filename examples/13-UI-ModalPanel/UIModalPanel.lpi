@@ -81,7 +81,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="13">
       <Unit0>
         <Filename Value="UIModalPanel.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -95,7 +95,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="21" Y="15"/>
         <UsageCount Value="200"/>
@@ -106,43 +105,208 @@
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="56"/>
-        <CursorPos X="35" Y="73"/>
-        <UsageCount Value="53"/>
+        <TopLine Value="99"/>
+        <CursorPos X="59" Y="120"/>
+        <UsageCount Value="86"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="75"/>
-        <CursorPos X="46" Y="89"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="36"/>
+        <CursorPos X="51" Y="47"/>
+        <UsageCount Value="53"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Units\u_common.pas"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="27"/>
         <Loaded Value="True"/>
       </Unit4>
+      <Unit5>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="105"/>
+        <CursorPos Y="121"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="61"/>
+        <CursorPos Y="73"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="110"/>
+        <CursorPos X="38" Y="126"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\source\oglcUI.inc"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="1877"/>
+        <CursorPos Y="1886"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="524"/>
+        <CursorPos Y="533"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\source\oglcMessage.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="37"/>
+        <UsageCount Value="26"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\source\oglcDecorManager.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="181"/>
+        <CursorPos X="27" Y="182"/>
+        <UsageCount Value="7"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="639"/>
+        <CursorPos Y="662"/>
+        <UsageCount Value="18"/>
+      </Unit12>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="11" Column="6"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="68" Column="33" TopLine="55"/>
       </Position1>
       <Position2>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="17" Column="37"/>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="91" Column="44" TopLine="71"/>
       </Position2>
       <Position3>
-        <Filename Value="Units\screen_demo.pas"/>
-        <Caret Line="73" Column="35" TopLine="56"/>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="76" Column="12" TopLine="72"/>
       </Position3>
       <Position4>
-        <Filename Value="Units\u_sprite_def.pas"/>
-        <Caret Line="89" Column="46" TopLine="75"/>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1526" Column="62" TopLine="1522"/>
       </Position4>
+      <Position5>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="76" Column="18" TopLine="62"/>
+      </Position5>
+      <Position6>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1526" Column="48" TopLine="1524"/>
+      </Position6>
+      <Position7>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="75" Column="16" TopLine="62"/>
+      </Position7>
+      <Position8>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1514" Column="4" TopLine="1508"/>
+      </Position8>
+      <Position9>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="75" Column="16" TopLine="61"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1658" Column="6" TopLine="1658"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="532" Column="14" TopLine="516"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1634" Column="8" TopLine="1632"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1623" Column="12" TopLine="1611"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1436" Column="36" TopLine="1421"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="68" Column="32" TopLine="55"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="91" Column="40" TopLine="78"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="76" Column="12" TopLine="62"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1525" Column="64" TopLine="1511"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1546" Column="17" TopLine="1525"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="75" Column="13" TopLine="64"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1516" Column="28" TopLine="1507"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="171" Column="15" TopLine="158"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="843" Column="24" TopLine="824"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="75" Column="13" TopLine="61"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="1516" Column="26" TopLine="1507"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="159" Column="20" TopLine="146"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="534" Column="23" TopLine="525"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="172" Column="16" TopLine="161"/>
+      </Position28>
+      <Position29>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="843" Column="17" TopLine="826"/>
+      </Position29>
+      <Position30>
+        <Filename Value="..\..\source\oglcSurface.inc"/>
+        <Caret Line="158" Column="20" TopLine="141"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
