@@ -104,7 +104,6 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="97"/>
         <CursorPos X="100" Y="110"/>
@@ -114,7 +113,9 @@
       <Unit3>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
+        <TopLine Value="139"/>
         <CursorPos X="15" Y="13"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
