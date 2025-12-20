@@ -107,11 +107,12 @@ private
   function GradientRow(aYPos: single; const Items: ArrayOfGradientItem): TGradientRow;
 public // for tool GameHelper
   function SaveGradientDataToString: string;
-  procedure LoadGradientDataFromString(const s: string);
+  procedure LoadGradientDataFromString(const data: string);
 public
   Rows: TArrayOfGradientRow;
   Vertices: TArrayOfxycolor;
   Indices: TArrayOfVertexIndex;
+  // all fields to 0
   procedure InitDefault;
   // clear the gradient.
   procedure Clear;
@@ -121,6 +122,8 @@ public
 
   procedure CopyFrom(const aGradient: TGradientDescriptor);
 
+  // create a default gradient
+  procedure CreateDefault;
   // Initialize the gradient with a single color.
   procedure CreateSingleColor(const aColor: TBGRAPixel);
   // Initialize the gradient with a serie of colors placed horizontaly from the left to the right.
@@ -376,6 +379,7 @@ begin
   FThreshold2 := FThreshold1;
   FVisible := True;
   FMaskVisible := True;
+  FBorderPosition := lpMiddle;
 end;
 
 procedure TOGLCBorder.InitFromPath(const aPath: ArrayOfTPointF; w: single);
@@ -624,43 +628,51 @@ end;
 
 function TGradientDescriptor.SaveGradientDataToString: string;
 var i, j: integer;
+  prop: TProperties;
 begin
-  Result := Length(Rows).ToString;    // row count
+  prop.Init(' ');
+  prop.Add('Visible', Visible);
+  prop.Add('RowCount', integer(Length(Rows)));
   for i:=0 to High(Rows) do begin
-    Result := Result + ' ' + FormatFloatWithDot('0.000', Rows[i].YPosition) +             // y value
-                       ' ' + integer(Length(Rows[i].Items)).ToString;                     // item count
-    for j:=0 to High(Rows[i].Items) do
-      Result := Result + ' ' + FormatFloatWithDot('0.000', Rows[i].Items[j].XPosition) +  // x value
-                         ' ' + BGRAPixelToHex(Rows[i].Items[j].Color);                    // color
-
+    prop.Add('YPos'+i.ToString, Rows[i].YPosition);                   // y value
+    prop.Add('NodeCount'+i.ToString, integer(Length(Rows[i].Items))); // item count
+    for j:=0 to High(Rows[i].Items) do begin
+      prop.Add('R'+i.ToString+'_'+j.ToString+'XPos', Rows[i].Items[j].XPosition);
+      prop.Add('R'+i.ToString+'_'+j.ToString+'Color', Rows[i].Items[j].Color);
+    end;
   end;
+  Result := prop.PackedProperty;
 end;
 
-procedure TGradientDescriptor.LoadGradientDataFromString(const s: string);
-var i, j, k: integer;
-  A: TStringArray;
+procedure TGradientDescriptor.LoadGradientDataFromString(const data: string);
+var i, j, c: integer;
+  prop: TProperties;
 begin
   Clear;
-  if s = '' then exit;
-  A := s.Split([' ']);
-  if Length(A) = 0 then exit;
+  if data = '' then exit;
 
+  c := 0;
+  prop.Split(data, ' ');
+  prop.BooleanValueOf('Visible', FVisible, False);
+  prop.IntegerValueOf('RowCount', c, 0);
+  if c = 0 then begin
+    CreateDefault;
+    exit;
+  end;
+  Rows := NIL;
+  SetLength(Rows, c);
   try
-    SetLength(Rows, A[0].ToInteger);
-    k := 1;
     for i:=0 to High(Rows) do begin
-      Rows[i].YPosition := StringToSingle(A[k]);
-      SetLength(Rows[i].Items, A[k+1].ToInteger);
-      inc(k, 2);
+      prop.SingleValueOf('YPos'+i.ToString, Rows[i].YPosition, 0.0);
+      prop.IntegerValueOf('NodeCount'+i.ToString, c, 0);
+      SetLength(Rows[i].Items, c);
       for j:=0 to High(Rows[i].Items) do begin
-        Rows[i].Items[j].XPosition := StringToSingle(A[k]);
-        inc(k);
-        Rows[i].Items[j].Color := HexToBGRAPixel(A[k]);
-        inc(k);
+        prop.SingleValueOf('R'+i.ToString+'_'+j.ToString+'XPos', Rows[i].Items[j].XPosition, 0.0);
+        prop.BGRAPixelValueOf('R'+i.ToString+'_'+j.ToString+'Color', Rows[i].Items[j].Color, BGRAWhite);
       end;
     end;
   except
-    Clear;
+    CreateDefault;
   end;
 end;
 
@@ -674,6 +686,7 @@ begin
   Rows := NIL;
   Vertices := NIL;
   Indices := NIL;
+  FVisible := False;
   FUpdating := False;
 end;
 
@@ -687,6 +700,11 @@ begin
   Clear;
   Rows := Copy(aGradient.Rows);
   if FOnChange <> NIL then FOnChange;
+end;
+
+procedure TGradientDescriptor.CreateDefault;
+begin
+  LoadGradientDataFromString('Visible false RowCount 2 YPos0 0.000 NodeCount 2 R0_0XPos 0.000 R0_0Color 0080FFFF R0_1XPos 1.000 R0_1Color 0080FFFF YPos1 1.000 NodeCount 2 R1_0XPos  0.000 R1_0Color 000080FF R1_1XPos 1.000 R1_1Color 000080FF');
 end;
 
 procedure TGradientDescriptor.CreateSingleColor(const aColor: TBGRAPixel);
