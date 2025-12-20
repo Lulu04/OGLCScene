@@ -14,7 +14,7 @@ private
   FDarkenTheScene: boolean;
   FSceneDarkness: TQuad4Color;
   FFreePanelWhenEndAnimIsDone: boolean;
-  FCurrentScenarioID: TIDScenario;
+  FCurrentScenario: TScenario;
 public
   procedure Draw(const aLayerPercentOpacity: single);  override;
   procedure ProcessMessage(UserValue: TUserMessageValue); override;
@@ -26,7 +26,7 @@ public
   procedure ActivateSceneDarken(aColor: TBGRAPixel);
 
   // Show the panel and execute the scenario passed in parameters.
-  // Player can interact with the mouse on the panel only when the scenario terminate.
+  // Player can interact with the mouse on the panel only when the scenario is terminated.
   // To show the panel immediatly without animation, sets aAnimScenario to ''
   procedure Show(const aAnimScenario: string); virtual;
 
@@ -36,6 +36,10 @@ public
   // The panel is freed if aFree is True.
   procedure Hide(const aAnimScenario: string; aFree: boolean); virtual;
 
+  // This method is called when the show animation is done
+  procedure OnShowIsDone; virtual;
+  // This method is called when the hide animation is done
+  procedure OnHideIsDone; virtual;
 end;
 
 {$endif oglcINTERFACE}
@@ -56,21 +60,13 @@ procedure TUIPanelWithEffects.ProcessMessage(UserValue: TUserMessageValue);
 begin
   case UserValue of
     100000: begin
-      if ScenarioIsPlaying(FCurrentScenarioID) then PostMessage(100000)
-        else begin
-          DeleteScenario(FCurrentScenarioID);
-          MouseInteractionEnabled := True;
-        end;
+      if FCurrentScenario.IsPlaying then PostMessage(100000)
+        else OnShowIsDone;
     end;
 
     100001: begin
-      if ScenarioIsPlaying(FCurrentScenarioID) then PostMessage(100001)
-        else begin
-          DeleteScenario(FCurrentScenarioID);
-          MouseInteractionEnabled := False;
-          Visible := False;
-          if FFreePanelWhenEndAnimIsDone then Kill;
-        end;
+      if FCurrentScenario.IsPlaying then PostMessage(100001)
+        else OnHideIsDone;
     end;
   end;
 end;
@@ -83,14 +79,11 @@ begin
 
   FSceneDarkness := TQuad4Color.Create(aParentScene);
   FSceneDarkness.SetSize(aParentScene.Width, aParentScene.Height);
-  FSceneDarkness.Opacity.Value := 0;
 end;
 
 destructor TUIPanelWithEffects.Destroy;
 begin
-  if Assigned(FSceneDarkness) then
-    FSceneDarkness.Free;
-  FSceneDarkness := NIL;
+  FreeAndNil(FSceneDarkness);
   inherited Destroy;
 end;
 
@@ -108,22 +101,37 @@ begin
     exit;
   end;
 
-  FCurrentScenarioID := AddAndPlayScenario(aAnimScenario);
+  FCurrentScenario := AddAndPlayScenario(aAnimScenario);
   PostMessage(100000);
 end;
 
 procedure TUIPanelWithEffects.Hide(const aAnimScenario: string; aFree: boolean);
 begin
   MouseInteractionEnabled := False;
+
   if aAnimScenario = '' then begin
     Visible := False;
     if aFree then Kill;
-    exit;
+  end else begin
+    FFreePanelWhenEndAnimIsDone := aFree;
+    FCurrentScenario := AddAndPlayScenario(aAnimScenario);
+    PostMessage(100001);
   end;
+end;
 
-  FFreePanelWhenEndAnimIsDone := aFree;
-  FCurrentScenarioID := AddAndPlayScenario(aAnimScenario);
-  PostMessage(100001);
+procedure TUIPanelWithEffects.OnShowIsDone;
+begin
+  FCurrentScenario.Kill;
+  FCurrentScenario := NIL;
+  MouseInteractionEnabled := True;
+end;
+
+procedure TUIPanelWithEffects.OnHideIsDone;
+begin
+  FCurrentScenario.Kill;
+  FCurrentScenario := NIL;
+  Visible := False;
+  if FFreePanelWhenEndAnimIsDone then Kill;
 end;
 
 {$endif oglcIMPLEMENTATION}

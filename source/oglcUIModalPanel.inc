@@ -4,28 +4,26 @@ PModalPanelItem = ^TModalPanelItem;
 
 { TUIModalPanel }
 // When a modal panel is shown, the scene is freezed and little darkened.
-// An application of the modal panel can be i.e. when user press ESC key during the game,
-// a modal panel show a menu with button to resume game, a button to return to the main game menu...
 // When the modal panel is hidden, the scene continue where it left off.
-TUIModalPanel = class(TUIPanel)
+// Modal panel can be used for example for the game pause panel.
+TUIModalPanel = class(TUIPanelWithEffects)
 private type ModalPanelState = (mpsShown, mpsHidden);
 private
   FState: ModalPanelState;
-  FItemInstance: PModalPanelItem;
-  FSceneDarkness: TQuad4Color;
 public
   procedure Draw(const aLayerPercentOpacity: single);  override;
 public
   // aBlackOpacity is the opacity value for the black color applyed to the whole scene to darken it
   // when the modal panel is shown. 0= no darkening  255=full black
   constructor Create(aParentScene: TOGLCScene; aBlackOpacity: byte=100);
-  destructor Destroy; override;
 
   // Show the modal panel: the scene is freezed and darkened.
-  procedure ShowModal; virtual;
+  procedure ShowModal(const aAnimScenario: string); virtual;
   // Hide the modal panel: the scene continue normally.
   // if aFree is True, the panel will be freed on the next frame
-  procedure Hide(aFree: boolean); virtual;
+  procedure Hide(const aAnimScenario: string; aFree: boolean); override;
+
+  procedure OnHideIsDone; override;
 end;
 
 
@@ -62,48 +60,67 @@ end;
 procedure TUIModalPanel.Draw(const aLayerPercentOpacity: single);
 begin
   FParentScene.ModelViewMatrix.LoadIdentity;
-  if FSceneDarkness <> NIL then FSceneDarkness.Draw(aLayerPercentOpacity);
 
-  inherited Draw(aLayerPercentOpacity);
+  // render the scene darkness
+  if FDarkenTheScene then
+    FSceneDarkness.Draw(aLayerPercentOpacity);
+
+  if not Visible then exit;
+
+  // render panel
+  FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
+  if (FComputedOpacity = 0) and FChildsUseParentOpacity then exit;
+  FComputedTint.InitFromTint(TintMode, Tint.Value);
+  PushAndPrepareSceneMV;
+
+  if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
+    else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
+
+  DoDraw();
+
+  if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
+    else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
+
+  {$IFDEF DEBUG_MODE_ON}
+    FParentScene.BlendMode := FX_BLEND_NORMAL;
+    DrawBox(FParentScene, 0, 0, Width, Height, BGRA(255,0,0));
+  {$ENDIF}
+
+  // restore the parent scene modelview matrix
+  PopSceneMV;
 end;
 
 constructor TUIModalPanel.Create(aParentScene: TOGLCScene; aBlackOpacity: byte=100);
 begin
   inherited Create(aParentScene);
-  FItemInstance := FParentScene.FModalPanelList.Add(Self);
+  FParentScene.FModalPanelList.Add(Self);
 
-  if aBlackOpacity > 0 then begin
-    FSceneDarkness := TQuad4Color.Create(aParentScene);
-    FSceneDarkness.SetSize(aParentScene.Width, aParentScene.Height);
-    FSceneDarkness.SetAllColorsTo(BGRA(0,0,0));
-    FSceneDarkness.Opacity.Value := aBlackOpacity;
-  end else FSceneDarkness := NIL;
+  if aBlackOpacity > 0 then
+    ActivateSceneDarken(BGRA(0,0,0,aBlackOpacity));
 
   FState := mpsHidden;
 end;
 
-destructor TUIModalPanel.Destroy;
-begin
-  if FSceneDarkness <> NIL then begin
-    FSceneDarkness.Free;
-    FSceneDarkness := NIL;
-  end;
-  inherited Destroy;
-end;
-
-procedure TUIModalPanel.ShowModal;
+procedure TUIModalPanel.ShowModal(const aAnimScenario: string);
 begin
   if FState = mpsShown then exit;
   FState := mpsShown;
   FParentScene.FModalPanelList.IncVisibleCount;
+  Show(aAnimScenario);
 end;
 
-procedure TUIModalPanel.Hide(aFree: boolean);
+procedure TUIModalPanel.Hide(const aAnimScenario: string; aFree: boolean);
 begin
+  MouseInteractionEnabled := False;
   if FState = mpsHidden then exit;
+  inherited Hide(aAnimScenario, aFree);
+end;
+
+procedure TUIModalPanel.OnHideIsDone;
+begin
+  inherited OnHideIsDone;
   FState := mpsHidden;
   FParentScene.FModalPanelList.DecVisibleCount;
-  if aFree then Kill;
 end;
 
 { TModalPanelList }
