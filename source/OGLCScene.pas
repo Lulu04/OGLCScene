@@ -70,7 +70,6 @@ TOGLCEvent = procedure of object;
 }
 
 // SCENARIO
-TIDScenario = integer;
 const
      // Boolean value
      acTRUE                 = 'TRUE';
@@ -1122,10 +1121,6 @@ begin
 
   if not FGLInitialized then begin
     FOGLC.Visible := True;
- {   FOpenGLLibLoaded := Load_GL_version_3_3_CORE;
-    if not FOpenGLLibLoaded
-      then raise Exception.Create('Cannot load OpenGL 3.3 core...')
-      {$ifdef USE_glcorearb};{$else}else Load_GL_EXT_blend_func_separate;{$endif}   }
     SetBlendMode(FX_BLEND_NORMAL);
     //glEnable(GL_POLYGON_SMOOTH);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
