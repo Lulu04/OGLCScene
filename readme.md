@@ -1,6 +1,7 @@
 # OGLCScene
 2D game engine for FreePascal/Lazarus. Tested under Windows and Linux. Should work on MacOS compatible with OpenGL 3.3.  
 ## Dependencies
+In Lazarus IDE, open the package 'oglcscenepackage.lpk' located in source directory then click 'Compile'.
 You need packages LazOpenGlContext and BGRABitmap installed in the IDE.  
 ## Support
 - Only 2D !
@@ -28,6 +29,8 @@ The tools are located in the "tools" folder.
 - Game Helper is a tool that include:
   - SPRITE BUILDER: to construct complex sprites, to design their collision bodies, and to define several postures to animate them. A sprite definition can be exported as a Pascal unit ready to include in your Lazarus project.
   - LEVEL EDITOR: to construct your game levels: import the textures, define the world size, put surfaces on screen easily with graphic interface, export the levels in a Pascal unit ready to include in your Lazarus project.
+  - FONT EDITOR: to define the fonts used by the game.
+  - UI PANEL EDITOR: to easily design your game panels with image, labels, buttons, check, listbox...
 
   
 ## Screenshot
