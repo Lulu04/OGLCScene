@@ -379,7 +379,7 @@ begin
   FThreshold2 := FThreshold1;
   FVisible := True;
   FMaskVisible := True;
-  FBorderPosition := lpMiddle;
+  FBorderPosition := lpInside;
 end;
 
 procedure TOGLCBorder.InitFromPath(const aPath: ArrayOfTPointF; w: single);
@@ -704,7 +704,7 @@ end;
 
 procedure TGradientDescriptor.CreateDefault;
 begin
-  LoadGradientDataFromString('Visible false RowCount 2 YPos0 0.000 NodeCount 2 R0_0XPos 0.000 R0_0Color 0080FFFF R0_1XPos 1.000 R0_1Color 0080FFFF YPos1 1.000 NodeCount 2 R1_0XPos  0.000 R1_0Color 000080FF R1_1XPos 1.000 R1_1Color 000080FF');
+  CreateHorizontal([BGRA(255,255,0), BGRA(0,255,255)], [0, 1]);
 end;
 
 procedure TGradientDescriptor.CreateSingleColor(const aColor: TBGRAPixel);
