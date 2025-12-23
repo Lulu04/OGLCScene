@@ -1,0 +1,7 @@
+Default|ShapeType,1,RoundX,10.0000,RoundY,10.0000,Width,324,Height,300,FillData,Color 1E1E1EFF BlendMode 0,BorderData,Color DCDCDCFF Width 3.0000 BlendMode 0 LinePos 1#0
+DarkRed|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 1E0F07FF BlendMode 0,BorderData,Color 895F71FF Width 3.0000 BlendMode 0 LinePos 1#0
+DarkBlue|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 06091EFF BlendMode 0,BorderData,Color 5C668BFF Width 3.0000 BlendMode 0 LinePos 1#0
+DarkGreen|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 091E06FF BlendMode 0,BorderData,Color 5A8D5BFF Width 3.0000 BlendMode 0 LinePos 1#0
+DarkYellow|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 1E1D06FF BlendMode 0,BorderData,Color 918957FF Width 3.0000 BlendMode 0 LinePos 1#0
+DarkPurple|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 1F051FFF BlendMode 0,BorderData,Color 955395FF Width 3.0000 BlendMode 0 LinePos 1#0
+Multicolor|ShapeType,1,RoundX,30.0000,RoundY,30.0000,Width,324,Height,300,FillData,Color 1E1E1EFF BlendMode 0,BorderData,Color C0C0C0FF Width 1.5000 BlendMode 0 LinePos 1#Visible true RowCount 3 YPos0 0.0000 NodeCount0 2 R0_0XPos 0.0000 R0_0Color 0000FFFF R0_1XPos 1.0000 R0_1Color 000000FF YPos1 0.5000 NodeCount1 2 R1_0XPos 0.0000 R1_0Color FF0000FF R1_1XPos 1.0000 R1_1Color 00FF00FF YPos2 1.0000 NodeCount2 2 R2_0XPos 0.0000 R2_0Color 000000FF R2_1XPos 1.0000 R2_1Color 0000FFFF
