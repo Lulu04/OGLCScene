@@ -107,17 +107,17 @@ end;
 
 function TOGLCCharsets.TextToCharset(const aText: string): string;
 begin
-  Result := TextToCharset(aText);
+  Result := OGLCScene.AddToCharset('', aText);
 end;
 
 function TOGLCCharsets.AddToCharset(const aCharSet, aText: string): string;
 begin
-  Result := AddToCharset(aCharSet, aText);
+  Result := OGLCScene.AddToCharset(aCharSet, aText);
 end;
 
 function TOGLCCharsets.AddToCharset(const aCharset: string; aText: TStringArray): string;
 begin
-  Result := AddToCharset(aCharset, aText);
+  Result := OGLCScene.AddToCharset(aCharset, aText);
 end;
 
 function TOGLCCharsets.LATIN_EXTENDED_A: string;
