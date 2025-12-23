@@ -11,8 +11,6 @@ private type ModalPanelState = (mpsShown, mpsHidden);
 private
   FState: ModalPanelState;
 public
-  procedure Draw(const aLayerPercentOpacity: single);  override;
-public
   // aBlackOpacity is the opacity value for the black color applyed to the whole scene to darken it
   // when the modal panel is shown. 0= no darkening  255=full black
   constructor Create(aParentScene: TOGLCScene; aBlackOpacity: byte=100);
@@ -56,39 +54,6 @@ end;
 {$ifdef oglcIMPLEMENTATION}
 
 { TUIModalPanel }
-
-procedure TUIModalPanel.Draw(const aLayerPercentOpacity: single);
-begin
-  FParentScene.ModelViewMatrix.LoadIdentity;
-
-  // render the scene darkness
-  if FDarkenTheScene then
-    FSceneDarkness.Draw(aLayerPercentOpacity);
-
-  if not Visible then exit;
-
-  // render panel
-  FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
-  if (FComputedOpacity = 0) and FChildsUseParentOpacity then exit;
-  FComputedTint.InitFromTint(TintMode, Tint.Value);
-  PushAndPrepareSceneMV;
-
-  if FChildsUseParentOpacity then DrawChildSurfacesWithNegativeZOrder(FComputedOpacity)
-    else DrawChildSurfacesWithNegativeZOrder(aLayerPercentOpacity);
-
-  DoDraw();
-
-  if FChildsUseParentOpacity then DrawChildSurfacesWithPositiveZOrder(FComputedOpacity)
-    else DrawChildSurfacesWithPositiveZOrder(aLayerPercentOpacity);
-
-  {$IFDEF DEBUG_MODE_ON}
-    FParentScene.BlendMode := FX_BLEND_NORMAL;
-    DrawBox(FParentScene, 0, 0, Width, Height, BGRA(255,0,0));
-  {$ENDIF}
-
-  // restore the parent scene modelview matrix
-  PopSceneMV;
-end;
 
 constructor TUIModalPanel.Create(aParentScene: TOGLCScene; aBlackOpacity: byte=100);
 begin
