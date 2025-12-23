@@ -99,6 +99,8 @@ TLevelBank = class(specialize TVector<TLevelGroup>)
   // called when used delete a layer
   procedure DecreaseLayerIndexGreaterOrEqualThan(aIndex: integer);
 
+  function LevelCountInAllGroups: integer;
+
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
   // save into file \GameHelperSave\LevelBank.oglc
@@ -148,7 +150,7 @@ procedure TWorldInfo.InitDefault;
 begin
   Self := Default(TWorldInfo);
   useskygradient := True;
-  skygradientdata := DEFAULT_SKY_GRADIENT;
+  skygradientdata := DEFAULT_GRADIENT;
 end;
 
 function TWorldInfo.SaveToString(aSaveAllProperties: boolean): string;
@@ -193,7 +195,7 @@ begin
   prop.SingleValueOf('SkyY', skyy, 0.0);
   prop.IntegerValueOf('SkyWidth', skywidth, 1);
   prop.IntegerValueOf('SkyHeight', skyheight, 1);
-  prop.StringValueOf('SkyGradientData', skygradientdata, DEFAULT_SKY_GRADIENT);
+  prop.StringValueOf('SkyGradientData', skygradientdata, DEFAULT_GRADIENT);
 end;
 
 { TLevelBankItem }
@@ -548,6 +550,15 @@ begin
   end;
 end;
 
+function TLevelBank.LevelCountInAllGroups: integer;
+var i: SizeUInt;
+begin
+  if Size = 0 then exit(0);
+  Result := 0;
+  for i:=0 to Size-1 do
+    Result := Result + Mutable[i]^.Size;
+end;
+
 procedure TLevelBank.SaveTo(t: TStringList);
 var i: SizeUInt;
   prop: TProperties;
@@ -625,7 +636,7 @@ begin
     try
       t.LoadFromFile(filename);
       LoadFrom(t);
-      FScene.LogInfo('done', 2);
+      FScene.LogInfo('success, '+Size.ToString+' group(s), '+LevelCountInAllGroups.ToString+' level(s)', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);

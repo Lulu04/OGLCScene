@@ -5,7 +5,9 @@ unit frame_tool_panelbank;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, ComCtrls, Buttons, Types;
+  Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, ComCtrls, Buttons,
+  Types,
+  OGLCScene;
 
 type
 
@@ -17,6 +19,7 @@ type
     BDelete: TSpeedButton;
     BDuplicate: TSpeedButton;
     BRename: TSpeedButton;
+    BEdit: TSpeedButton;
     Label24: TLabel;
     Panel1: TPanel;
     Panel8: TPanel;
@@ -45,6 +48,7 @@ type
     function NodeIsPanel(aNode: TTreeNode): boolean;
     function SelectedIsRoot: boolean;
     function SelectedIsPanel: boolean;
+    procedure DoEditSelected;
     procedure DoRenameSelected;
     procedure DoDuplicateSelected;
     procedure DoDeleteSelected;
@@ -57,8 +61,8 @@ type
 
 implementation
 
-uses u_ui_objectlist, u_resourcestring, u_screen_uipaneleditor, form_main,
-  Graphics;
+uses u_ui_objectlist, u_resourcestring, form_main,
+  u_common, u_screen_uipanelbank, u_screen_uipaneleditor, Graphics;
 
 {$R *.lfm}
 
@@ -112,9 +116,12 @@ end;
 
 procedure TFrameToolPanelBank.BAddPanelClick(Sender: TObject);
 begin
-  if Sender = BAddPanel then
+  if Sender = BAddPanel then begin
     FormMain.ShowPagePanelEditor;
+    FrameToolUIPanelEditor.EditNewPanel;
+  end;
 
+  if Sender = BEdit then DoEditSelected;
   if Sender = BRename then DoRenameSelected;
   if Sender = BDuplicate then DoDuplicateSelected;
   if Sender = BDelete then DoDeleteSelected;
@@ -172,8 +179,8 @@ begin
   if PanelBank.Size > 0 then
     for i:=0 to PanelBank.Size-1 do begin
       node := TV.Items.AddChild(root, PanelBank.GetByIndex(i)._Name);
-      node.SelectedIndex := 12;
-      node.ImageIndex := 12;
+      node.SelectedIndex := 11;
+      node.ImageIndex := 11;
       node.MakeVisible;
     end;
   TV.EndUpdate;
@@ -181,7 +188,8 @@ end;
 
 procedure TFrameToolPanelBank.HideToolPanels;
 begin
-
+  PanelPanel.Visible := False;
+  PanelRoot.Visible := False;
 end;
 
 procedure TFrameToolPanelBank.ShowToolPanels;
@@ -212,23 +220,9 @@ begin
 end;
 
 procedure TFrameToolPanelBank.UpdatePreview;
-var item: TPanelDescriptorItem;
 begin
-  if (TV.Selected = NIL) or SelectedIsRoot then begin
-    ScreenUIPanelEditor.UIPanel.Visible := False;
-    exit;
-  end;
-
-  item := PanelBank.GetByName(TV.Selected.Text);
-  ScreenUIPanelEditor.UIPanel.Visible := True;
-  ScreenUIPanelEditor.UIPanel.BodyShape.LoadFromString(item.BodyShape);
-  ScreenUIPanelEditor.UIPanel.BackGradient.LoadGradientDataFromString(item.BackGradient);
-  ScreenUIPanelEditor.UIPanel.BackGradient.Visible := item.Usegradient;
-  ScreenUIPanelEditor.UIPanel.BodyShape.Fill.Visible := not item.Usegradient;
-  ScreenUIPanelEditor.UIPanel.BodyShape.ResizeCurrentShape(item.width, item.height, True);
-  ScreenUIPanelEditor.UIPanel.SetCoordinate(item.x, item.y);
-  if item.DarkenBG then ScreenUIPanelEditor.UIPanel.ActivateSceneDarken(item.DarknessColor);
-  ScreenUIPanelEditor.UIPanel.Show(item.ScenarioOnShow);
+  ScreenUIPanelBank.ClearView;
+  if SelectedIsPanel then ScreenUIPanelBank.ShowPanelFromBank(TV.Selected.Text);
 
 end;
 
@@ -254,6 +248,20 @@ begin
   Result := NodeIsPanel(TV.Selected);
 end;
 
+procedure TFrameToolPanelBank.DoEditSelected;
+var
+  item: TPanelDescriptorItem;
+begin
+  HideToolPanels;
+  if not SelectedIsPanel then exit;
+
+  item := PanelBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
+
+  ScreenUIPanelEditor.EditPanelFromBank(TV.Selected.Text);
+  FScene.RunScreen(ScreenUIPanelEditor);
+end;
+
 procedure TFrameToolPanelBank.DoRenameSelected;
 var oldName, newName: string;
 begin
@@ -276,8 +284,8 @@ begin
   if not PanelBank.DoDuplicateByName(TV.Selected.Text, dstName, True) then exit;
   // add the new name in the treeview
   with TV.Items.AddChild(TV.Items.GetFirstNode, dstName) do begin
-    ImageIndex := 12;
-    SelectedIndex := 12;
+    ImageIndex := 11;
+    SelectedIndex := 11;
     MakeVisible;
   end;
 end;

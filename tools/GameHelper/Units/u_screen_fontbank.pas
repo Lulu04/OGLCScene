@@ -7,8 +7,7 @@ interface
 uses
   Classes, SysUtils,
   BGRABitmap, BGRABitmapTypes,
-  OGLCScene, u_screen_template, u_common, u_surface_list, u_texture_list,
-  u_ui_objectlist;
+  OGLCScene, u_screen_template, u_common, u_surface_list, u_texture_list;
 
 type
 

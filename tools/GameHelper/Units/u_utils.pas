@@ -208,10 +208,12 @@ function IsValidPascalVariableName(const s: string; aShowMessageBoxIfFail: boole
 var i: integer;
 begin
   Result := False;
-  if Length(s) = 0 then exit;
-  Result := IsALetter(s[1], False);
-  for i:=2 to Length(s) do
-   Result := Result or IsALetter(s[i], True) or IsANumber(s[i]);
+
+  if Length(s) > 0 then begin
+    Result := IsALetter(s[1], False);
+    for i:=2 to Length(s) do
+     Result := Result or IsALetter(s[i], True) or IsANumber(s[i]);
+  end;
 
   if aShowMessageBoxIfFail and not Result then
     ShowMessage(''''+s+''' is not a valid Pascal identifier.'+LineEnding+
@@ -302,6 +304,8 @@ end;
 
 procedure TCodeGenerator.CommonPropertiesToPascalCode(t: TStringList;
   aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
+const BLEND_NAMES: array[0..3] of string=('FX_BLEND_NORMAL', 'FX_BLEND_ADD', 'FX_BLEND_MULT',
+                                          'FX_NOBLEND');
 begin
   if (aSurface^.pivotX <> 0.5) or (aSurface^.pivotY <> 0.5) then
     t.Add(aSpacePrefix+'Pivot := '+PointFToPascal(aSurface^.pivotX, aSurface^.pivotY)+';');
@@ -321,6 +325,8 @@ begin
     t.Add(aSpacePrefix+'TintMode := tmMixColor;');
   if aSurface^.IsTextured and (aSurface^.frameindex <> 1.0) then
     t.Add(aSpacePrefix+'Frame := '+FormatFloatWithDot('0.0', aSurface^.frameindex)+';');
+  if aSurface^.blendmode <> FX_BLEND_NORMAL then
+    t.Add(aSpacePrefix+'BlendMode := '+BLEND_NAMES[aSurface^.blendmode]+';');
 end;
 
 procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;

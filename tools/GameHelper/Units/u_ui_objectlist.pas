@@ -6,7 +6,7 @@ unit u_ui_objectlist;
 interface
 
 uses
-  Classes, SysUtils, Graphics,
+  Classes, SysUtils, Graphics, StdCtrls,
   OGLCScene, BGRABitmap, BGRABitmapTypes, gvector;
 
 type
@@ -49,6 +49,8 @@ public
   // If yes, ask to the user if s/he want to replace its content, return True if yes
   // If there isn't an item with this name the function return True
   function AskUserToReplaceExistingItem(const aName: string): boolean;
+
+  procedure FillComboBoxWithNames(aCB: TComboBox);
 
   // ex: font
   function GetItemReadableName: string; virtual; abstract;
@@ -108,10 +110,6 @@ end;
 { TPanelDescriptorItem }
 
 TPanelDescriptorItem = class(TItemWithName)
-  BodyShape,
-  BackGradient: string;
-  Usegradient: boolean;
-  x, y, width, height: integer;
   IsModal,
   DarkenBG: boolean;
   DarknessColor: TBGRAPixel;
@@ -283,6 +281,8 @@ begin
     aAtlas := FScene.CreateAtlas;
     aAtlas.Spacing := 2;
     aTexturedFont := aAtlas.AddTexturedFont(item.FD, TextToCharset(aCaption), aFillTexture);
+    aAtlas.TryToPack;
+    aAtlas.Build;
   end else begin
     aAtlas := NIL;
     aTexturedFont := NIL;
@@ -293,23 +293,12 @@ end;
 { TPanelDescriptorItem }
 
 procedure TPanelDescriptorItem.InitDefault;
-var panel: TUIPanelWithEffects;
 begin
-  panel := TUIPanelWithEffects.Create(FScene);
-  panel.BodyShape.SetShapeRectangle(FScene.Width div 3, FScene.Height div 3, 3);
-  BodyShape := panel.BodyShape.SaveToString;
-  BackGradient := '';
-  Usegradient := False;
-  x := FScene.Width div 3;
-  y := FScene.Height div 3;
-  width := panel.Width;
-  height := panel.Height;
   IsModal := False;
   DarkenBG := False;
   DarknessColor := BGRA(0,0,0,100);
   ScenarioOnShow := '';
   ScenarioOnHide := '';
-  panel.Free;
 
   textures := '';
   surfaces := '';
@@ -318,15 +307,8 @@ end;
 function TPanelDescriptorItem.SaveToString: string;
 var prop: TProperties;
 begin
-  prop.Init('&');
+  prop.Init('!');
   prop.Add('Name', _Name);
-  prop.Add('BodyShape', BodyShape);
-  prop.Add('BackGradient', BackGradient);
-  prop.Add('Usegradient', Usegradient);
-  prop.Add('X', x);
-  prop.Add('Y', y);
-  prop.Add('Width', width);
-  prop.Add('Height', height);
   prop.Add('IsModal', IsModal);
   prop.Add('DarkenBG', DarkenBG);
   if DarkenBG then prop.Add('DarknessColor', DarknessColor);
@@ -340,15 +322,9 @@ end;
 procedure TPanelDescriptorItem.LoadFromString(const data: string);
 var prop: TProperties;
 begin
-  prop.Split(data, '&');
+  prop.Split(data, '!');
   prop.StringValueOf('Name', _Name, '???');
-  prop.StringValueOf('BodyShape', BodyShape, '');
-  prop.StringValueOf('BackGradient', BackGradient, '');
-  prop.BooleanValueOf('Usegradient', Usegradient, False);
-  prop.IntegerValueOf('X', x, 0);
-  prop.IntegerValueOf('Y', y, 0);
-  prop.IntegerValueOf('Width', width, 200);
-  prop.IntegerValueOf('Height', height, 200);
+  //prop.StringValueOf('BodyShape', BodyShape, '');
   prop.BooleanValueOf('IsModal', IsModal, False);
   prop.BooleanValueOf('DarkenBG', DarkenBG, False);
   prop.BGRAPixelValueOf('DarknessColor', DarknessColor, BGRA(0,0,0,100));
@@ -362,12 +338,6 @@ procedure TPanelDescriptorItem.DuplicateTo(aItem: Pointer);
 var dst: TPanelDescriptorItem;
 begin
   dst := TPanelDescriptorItem(aItem);
-  dst.BodyShape := BodyShape;
-  dst.BackGradient := BackGradient;
-  dst.x := x;
-  dst.y := y;
-  dst.width := width;
-  dst.height := height;
   dst.IsModal := IsModal;
   dst.DarkenBG := DarkenBG;
   dst.DarknessColor := DarknessColor;
@@ -540,11 +510,20 @@ begin
   Result := True;
 end;
 
+procedure TListOfItemWithName.FillComboBoxWithNames(aCB: TComboBox);
+var i: SizeUInt;
+begin
+  aCB.Clear;
+  if Size > 0 then
+    for i:=0 to Size-1 do
+      aCB.Items.Add(Mutable[i]^._Name);
+end;
+
 function TListOfItemWithName.SaveToString: string;
 var prop: TProperties;
   i: integer;
 begin
-  prop.Init('|');
+  prop.Init('{');
   prop.Add('Count', integer(Size).ToString);
   if Size > 0 then
     for i:=0 to Size-1 do
@@ -559,7 +538,7 @@ var prop: TProperties;
   o: T;
 begin
   Clear;
-  prop.Split(data, '|');
+  prop.Split(data, '{');
   c := 0;
   s := '';
   prop.IntegerValueOf('Count', c, 0);
@@ -622,7 +601,7 @@ begin
         exit;
       end;
       LoadFromString(sl.Strings[k+1]);
-      FScene.LogInfo('success', 2);
+      FScene.LogInfo('success, '+Size.ToString+' item(s)', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);

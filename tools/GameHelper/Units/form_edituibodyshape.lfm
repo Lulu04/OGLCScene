@@ -1,0 +1,287 @@
+object FormEditBodyShape: TFormEditBodyShape
+  Left = 711
+  Height = 335
+  Top = 278
+  Width = 320
+  Caption = 'BodyShape editor'
+  ClientHeight = 335
+  ClientWidth = 320
+  OnCreate = FormCreate
+  OnShow = FormShow
+  Position = poOwnerFormCenter
+  LCLVersion = '3.8.0.0'
+  object Panel1: TPanel
+    Left = 0
+    Height = 335
+    Top = 0
+    Width = 320
+    Align = alClient
+    ClientHeight = 335
+    ClientWidth = 320
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object BPreset: TSpeedButton
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 272
+      Height = 19
+      Top = 3
+      Width = 45
+      Anchors = [akTop, akRight]
+      AutoSize = True
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 2
+      Caption = 'PRESET'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object Label50: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 4
+      Height = 15
+      Top = 16
+      Width = 34
+      BorderSpacing.Left = 3
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 3
+      Caption = 'Shape'
+      Font.Color = clWhite
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object Panel3: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label50
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 6
+      Height = 97
+      Top = 31
+      Width = 308
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 5
+      ClientHeight = 97
+      ClientWidth = 308
+      ParentBackground = False
+      TabOrder = 0
+      object RBRectangle: TRadioButton
+        AnchorSideLeft.Control = Panel3
+        Left = 16
+        Height = 19
+        Top = 8
+        Width = 70
+        BorderSpacing.Left = 15
+        Caption = 'Rectangle'
+        Checked = True
+        TabOrder = 4
+        TabStop = True
+        OnChange = FSE1Change
+      end
+      object RBRoundRect: TRadioButton
+        AnchorSideLeft.Control = Panel3
+        AnchorSideLeft.Side = asrCenter
+        AnchorSideTop.Control = RBRectangle
+        Left = 116
+        Height = 19
+        Top = 8
+        Width = 76
+        Caption = 'Round rect'
+        TabOrder = 0
+        OnChange = FSE1Change
+      end
+      object RBEllipse: TRadioButton
+        AnchorSideTop.Control = RBRectangle
+        AnchorSideRight.Control = Panel3
+        AnchorSideRight.Side = asrBottom
+        Left = 231
+        Height = 19
+        Top = 8
+        Width = 51
+        Anchors = [akTop, akRight]
+        BorderSpacing.Right = 25
+        Caption = 'Ellipse'
+        TabOrder = 1
+        OnChange = FSE1Change
+      end
+      object Label2: TLabel
+        Left = 16
+        Height = 15
+        Top = 40
+        Width = 16
+        Caption = 'Rx:'
+        Enabled = False
+      end
+      object FSE1: TFloatSpinEdit
+        AnchorSideLeft.Control = Label2
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label2
+        AnchorSideBottom.Side = asrBottom
+        Left = 37
+        Height = 23
+        Top = 32
+        Width = 59
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 5
+        DecimalPlaces = 1
+        Enabled = False
+        Font.Style = [fsBold]
+        MaxValue = 1000
+        OnChange = FSE1Change
+        ParentFont = False
+        TabOrder = 2
+        Value = 8
+      end
+      object FSE2: TFloatSpinEdit
+        AnchorSideLeft.Control = Label3
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideBottom.Control = Label3
+        AnchorSideBottom.Side = asrBottom
+        Left = 125
+        Height = 23
+        Top = 32
+        Width = 59
+        Anchors = [akLeft, akBottom]
+        BorderSpacing.Left = 5
+        DecimalPlaces = 1
+        Enabled = False
+        Font.Style = [fsBold]
+        MaxValue = 1000
+        OnChange = FSE1Change
+        ParentFont = False
+        TabOrder = 3
+        Value = 8
+      end
+      object Label3: TLabel
+        AnchorSideTop.Control = Label2
+        Left = 104
+        Height = 15
+        Top = 40
+        Width = 16
+        Caption = 'Ry:'
+        Enabled = False
+      end
+      object CBTopLeft: TComboBox
+        Left = 192
+        Height = 23
+        Top = 32
+        Width = 35
+        ItemHeight = 15
+        ItemIndex = 1
+        Items.Strings = (
+          '◻'
+          '○'
+          '/'
+        )
+        Style = csDropDownList
+        TabOrder = 5
+        Text = '○'
+        OnSelect = FSE1Change
+      end
+      object CBTopRight: TComboBox
+        AnchorSideLeft.Control = CBTopLeft
+        AnchorSideLeft.Side = asrBottom
+        AnchorSideTop.Control = CBTopLeft
+        Left = 237
+        Height = 23
+        Top = 32
+        Width = 35
+        BorderSpacing.Left = 10
+        ItemHeight = 15
+        ItemIndex = 1
+        Items.Strings = (
+          '◻'
+          '○'
+          '\'
+        )
+        Style = csDropDownList
+        TabOrder = 6
+        Text = '○'
+        OnSelect = FSE1Change
+      end
+      object CBBottomLeft: TComboBox
+        AnchorSideLeft.Control = CBTopLeft
+        AnchorSideTop.Control = CBTopLeft
+        AnchorSideTop.Side = asrBottom
+        Left = 192
+        Height = 23
+        Top = 65
+        Width = 35
+        BorderSpacing.Top = 10
+        ItemHeight = 15
+        ItemIndex = 1
+        Items.Strings = (
+          '◻'
+          '○'
+          '\'
+        )
+        Style = csDropDownList
+        TabOrder = 7
+        Text = '○'
+        OnSelect = FSE1Change
+      end
+      object CBBottomRight: TComboBox
+        AnchorSideLeft.Control = CBTopRight
+        AnchorSideTop.Control = CBBottomLeft
+        Left = 237
+        Height = 23
+        Top = 65
+        Width = 35
+        ItemHeight = 15
+        ItemIndex = 1
+        Items.Strings = (
+          '◻'
+          '○'
+          '/'
+        )
+        Style = csDropDownList
+        TabOrder = 8
+        Text = '○'
+        OnSelect = FSE1Change
+      end
+    end
+    object Label51: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Panel3
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 4
+      Height = 15
+      Top = 133
+      Width = 80
+      BorderSpacing.Left = 3
+      BorderSpacing.Top = 5
+      BorderSpacing.Right = 3
+      Caption = 'Border and Fill'
+      Font.Color = clWhite
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object Panel2: TPanel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = Label51
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Left = 6
+      Height = 180
+      Top = 148
+      Width = 308
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 5
+      ParentBackground = False
+      TabOrder = 1
+    end
+  end
+end

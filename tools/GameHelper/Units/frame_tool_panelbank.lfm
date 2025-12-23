@@ -116,28 +116,30 @@ object FrameToolPanelBank: TFrameToolPanelBank
     end
   end
   object PanelPanel: TPanel
-    Left = 232
+    Left = 208
     Height = 18
     Top = 80
-    Width = 72
+    Width = 96
     BevelOuter = bvNone
     ClientHeight = 18
-    ClientWidth = 72
+    ClientWidth = 96
     Color = 3947580
     ParentBackground = False
     ParentColor = False
     TabOrder = 4
     Visible = False
     object BRename: TSpeedButton
-      AnchorSideLeft.Control = PanelPanel
+      AnchorSideLeft.Control = BEdit
+      AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = PanelPanel
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 0
+      Left = 20
       Height = 16
       Hint = 'Rename'
       Top = 1
       Width = 16
+      BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 4
@@ -151,7 +153,7 @@ object FrameToolPanelBank: TFrameToolPanelBank
       AnchorSideTop.Control = PanelPanel
       AnchorSideTop.Side = asrCenter
       Cursor = crHandPoint
-      Left = 20
+      Left = 40
       Height = 16
       Hint = 'Duplicate'
       Top = 1
@@ -172,7 +174,7 @@ object FrameToolPanelBank: TFrameToolPanelBank
       AnchorSideRight.Control = PanelPanel
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 56
+      Left = 80
       Height = 16
       Hint = 'Delete'
       Top = 1
@@ -182,6 +184,23 @@ object FrameToolPanelBank: TFrameToolPanelBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 3
+      OnClick = BAddPanelClick
+      ShowHint = True
+      ParentShowHint = False
+    end
+    object BEdit: TSpeedButton
+      AnchorSideLeft.Control = PanelPanel
+      AnchorSideTop.Control = PanelPanel
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Edit in Panel Editor'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 7
       OnClick = BAddPanelClick
       ShowHint = True
       ParentShowHint = False

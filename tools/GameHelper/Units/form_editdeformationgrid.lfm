@@ -3,7 +3,7 @@ object FormEditDeformationGrid: TFormEditDeformationGrid
   Height = 500
   Top = 174
   Width = 500
-  Caption = 'Edition deformation grid'
+  Caption = 'Deformation grid editor'
   ClientHeight = 500
   ClientWidth = 500
   OnClose = FormClose

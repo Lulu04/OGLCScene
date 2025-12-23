@@ -320,7 +320,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       BorderSpacing.Left = 8
       Flat = True
       Images = DataModule1.ILLevelTreeView
-      ImageIndex = 9
+      ImageIndex = 8
       OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
@@ -339,7 +339,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       BorderSpacing.Left = 4
       Flat = True
       Images = DataModule1.ILLevelTreeView
-      ImageIndex = 10
+      ImageIndex = 9
       OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False

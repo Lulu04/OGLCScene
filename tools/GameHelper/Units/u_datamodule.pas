@@ -81,6 +81,7 @@ begin
   AddImageToImageList('Cancel.svg', ILIconUI);
   AddImageToImageList('Checked.svg', ILIconUI);
   AddImageToImageList('ImageOpen.svg', ILIconUI);    // 15
+  AddImageToImageList('ClearBrush.svg', ILIconUI);
 
   ILIconUI.EndUpdate;
 end;
@@ -181,11 +182,11 @@ begin
   AddImageToImageList('Rename.svg', ILLevelTreeView);
   AddImageToImageList('Duplicate.svg', ILLevelTreeView);  // 5
   AddImageToImageList('Description.svg', ILLevelTreeView);
-  AddImageToImageList('SpriteBuilder.svg', ILLevelTreeView);
-  AddImageToImageList('LevelEditor.svg', ILLevelTreeView);
+  AddImageToImageList('EditItem.svg', ILLevelTreeView);
   AddImageToImageList('PascalCodeExport.svg', ILLevelTreeView);
-  AddImageToImageList('PascalCodeDelete.svg', ILLevelTreeView); // 10
-  AddImageToImageList('Font.svg', ILLevelTreeView);
+  AddImageToImageList('PascalCodeDelete.svg', ILLevelTreeView);
+  AddImageToImageList('Font.svg', ILLevelTreeView);  // 10
+  AddImageToImageList('Panel.svg', ILLevelTreeView);
 
   ILLevelTreeView.EndUpdate;
 end;

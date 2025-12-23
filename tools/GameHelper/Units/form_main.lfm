@@ -369,7 +369,7 @@ object FormMain: TFormMain
       Height = 264
       Top = 1
       Width = 304
-      PageIndex = 6
+      PageIndex = 0
       Anchors = [akTop, akLeft, akRight, akBottom]
       TabOrder = 0
       object PageSpriteBank: TPage

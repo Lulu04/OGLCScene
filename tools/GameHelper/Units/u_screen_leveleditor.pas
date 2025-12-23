@@ -668,7 +668,7 @@ begin
   FSurfaces.OnGetTexture:= @Textures;
 
   SkyGradient := TGradientRectangle.Create(FScene);
-  SkyGradient.Gradient.LoadGradientDataFromString(DEFAULT_SKY_GRADIENT);
+  SkyGradient.Gradient.LoadGradientDataFromString(DEFAULT_GRADIENT);
 end;
 
 procedure TScreenLevelEditor.Finalize;

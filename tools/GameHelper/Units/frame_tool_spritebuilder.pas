@@ -59,6 +59,7 @@ type
     ColorButton3: TColorButton;
     ColorButton4: TColorButton;
     ColorButton5: TColorButton;
+    CBBlend: TComboBox;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit5: TEdit;
@@ -115,6 +116,7 @@ type
     Label53: TLabel;
     Label54: TLabel;
     Label55: TLabel;
+    Label56: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
@@ -383,8 +385,7 @@ begin
   o^.postures := Postures.SaveToString;
   o^.codeoptions := FCodeGenerationOptions.SaveToString;
 
-  Project.SetModified;
-  Project.Save;
+  SpriteBank.SaveToPath(Project.Config.TargetLazarusProject.GetFolderGameHelperFiles);
   Modified := False;
 
   // export sprite to pascal unit
@@ -714,7 +715,8 @@ begin
                    (FWorkingChild^.IsTextured and (Trunc(Frame) <> SE9.Value)) or
                    (Round(Opacity.Value) <> SE10.Value) or
                    (TintMode <> GetWidgetTintMode) or
-                   (Tint.Value <> GetWidgetTint);
+                   (Tint.Value <> GetWidgetTint) or
+                   (CBBlend.ItemIndex <> integer(BlendMode));
 
     if FWorkingChild^.surface is TSprite then
       with TSprite(FWorkingChild^.surface) do
@@ -946,7 +948,7 @@ begin
 
   if CBChildTypeIsTextured and (CBTextures.ItemIndex = -1) then exit(False);
 
-  if Trim(Edit5.Text) = '' then exit(False);
+  if not IsValidPascalVariableName(Trim(Edit5.Text), True) then exit(False);
 
   definingRoot := Surfaces.Size = 0;
   if not definingRoot  and (CBParent.ItemIndex = -1) then exit(False);
@@ -957,13 +959,18 @@ begin
 end;
 
 function TFrameToolsSpriteBuilder.DoAddNewChild: boolean;
+var n: string;
 begin
   Result := False;
   if not CheckChildWidgets then exit;
-  if Surfaces.NameExists(Trim(Edit5.Text)) then begin
-    ShowMessage('Name already exists "'+Trim(Edit5.Text)+'"');
+
+  n := Trim(Edit5.Text);
+  if Surfaces.NameExists(n) then begin
+    ShowMessage('Name already exists "'+n+'"');
     exit;
   end;
+
+  if not IsValidPascalVariableName(n, True) then exit;
 
   FWorkingChild := Surfaces.AddEmpty;
   DoUpdateChild(True);
@@ -1195,6 +1202,7 @@ begin
     Opacity.Value := SE10.Value;
     TintMode := GetWidgetTintMode;
     Tint.Value := GetWidgetTint;
+    BlendMode := Byte(CBBlend.ItemIndex);
 
     if FWorkingChild^.IsTextured then begin
       FWorkingChild^.frameindex := SE9.Value;
@@ -1421,6 +1429,7 @@ begin
       RadioButton1.Checked := surface.TintMode = tmReplaceColor;
       CBFlipH.Checked := surface.FlipH;
       CBFlipV.Checked := surface.FlipV;
+      CBBlend.ItemIndex := surface.BlendMode;
 
       ShowFrameIndexWidget(False);
       SE9.Value := 1;
