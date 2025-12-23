@@ -384,6 +384,7 @@ begin
     SpriteBank.LoadFromPath(pathGameHelperFiles);
     LevelBank.LoadFromPath(pathGameHelperFiles);
     FontBank.Load;
+    PanelBank.Load;
 
     AppPref.LastProjectFilename := aFilename;
   end;

@@ -361,8 +361,8 @@ begin
 
       CodeGen.CommonPropertiesToPascalCode(t, rootItem, '  ');
       CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
-    end else t.Add('');
-
+    end;
+    t.Add('');
     // creating childs
     for i:=0 to surfaceList.Size-1 do begin
       current := surfaceList.Mutable[i];
@@ -684,7 +684,7 @@ begin
     try
       t.LoadFromFile(filename);
       LoadFrom(t);
-      FScene.LogInfo('done', 2);
+      FScene.LogInfo('success, '+Size.ToString+' item(s)', 2);
     except
       On E :Exception do begin
         FScene.logError(E.Message, 2);

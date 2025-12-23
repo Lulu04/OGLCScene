@@ -117,7 +117,7 @@ end;
 
 procedure TFormEditDeformationGrid.FormShow(Sender: TObject);
 begin
-  Left := FormMain.Width-Width;
+  Left := FormMain.Width - Width - PPIScale(3);
 end;
 
 procedure TFormEditDeformationGrid.FormClose(Sender: TObject; var CloseAction: TCloseAction);

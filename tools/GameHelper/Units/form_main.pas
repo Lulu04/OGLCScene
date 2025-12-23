@@ -92,6 +92,8 @@ type
   public
     procedure UpdateWidgets;
 
+    procedure HideAllPages;
+
     procedure ShowPageSpriteBank;
     procedure ShowPageSpriteBuilder;
     procedure ShowPageLevelEditor;
@@ -121,8 +123,8 @@ implementation
 uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_screen_levelbank,
   u_screen_leveleditor, u_levelbank, form_projectconfig, BGRABitmap,
-  BGRABitmapTypes, u_connection_to_ide, u_screen_fontbank, u_screen_uipaneleditor,
-  LCLType;
+  BGRABitmapTypes, u_connection_to_ide, u_screen_fontbank,
+  u_screen_uipaneleditor, u_screen_uipanelbank, LCLType;
 {$R *.lfm}
 
 { TFormMain }
@@ -423,6 +425,8 @@ begin
 
   ScreenUIPanelEditor := TScreenUIPanelEditor.Create;
   ScreenUIPanelEditor.Initialize;
+  ScreenUIPanelBank := TScreenUIPanelBank.Create;
+  ScreenUIPanelBank.Initialize;
 
   // check if the program was launched by the IDE: if yes, load the appropriate oglc project
   if IdeConnect.Activated then
@@ -454,6 +458,9 @@ begin
 
   PanelBank.Free;
   PanelBank := NIL;
+
+  ScreenUIPanelBank.Finalize;
+  FreeAndNil(ScreenUIPanelBank);
 
   ScreenSpriteBuilder.Finalize;
   FreeAndNil(ScreenSpriteBuilder);
@@ -490,6 +497,11 @@ begin
   BLoadProject.Enabled := not IdeConnect.Activated;
 
   BSaveProject.Enabled := Project.IsReady and Project.HasBeenModified;
+end;
+
+procedure TFormMain.HideAllPages;
+begin
+  Notebook1.PageIndex := -1;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
@@ -544,7 +556,7 @@ end;
 
 procedure TFormMain.ShowPagePanelBank;
 begin
-  FScene.RunScreen(ScreenUIPanelEditor);
+  FScene.RunScreen(ScreenUIPanelBank);
   Notebook1.PageIndex := Notebook1.IndexOf(PagePanelBank);
   FrameToolPanelBank.OnShow;
   UpdateWidgets;
@@ -554,7 +566,6 @@ end;
 
 procedure TFormMain.ShowPagePanelEditor;
 begin
-  FScene.RunScreen(ScreenUIPanelEditor);
   Notebook1.PageIndex := Notebook1.IndexOf(PageUIPanelEditor);
   FrameToolUIPanelEditor.OnShow;
   UpdateWidgets;

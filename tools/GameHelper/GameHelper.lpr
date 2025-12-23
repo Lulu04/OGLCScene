@@ -20,7 +20,8 @@ uses
   frame_tool_screenbank, u_resourcestring, u_connection_to_ide,
   form_enter_description, frame_edit_uibodyshape, frame_tool_uipaneleditor,
   frame_viewfontbank, u_screen_fontbank, u_screen_uipaneleditor,
-  u_ui_objectlist, frame_tool_panelbank;
+  u_ui_objectlist, frame_tool_panelbank, form_edituibodyshape,
+u_screen_uipanelbank;
 
 {$R *.res}
 

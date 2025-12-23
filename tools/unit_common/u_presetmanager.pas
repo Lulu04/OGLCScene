@@ -48,6 +48,7 @@ type
     procedure BRenameClick(Sender: TObject);
     procedure UpDown1Click(Sender: TObject; Button: TUDBtnType);
   private
+    FOnPresetChange: TNotifyEvent;
     FPresetToWidget: TPresetToWidget;
     FWidgetToPreset: TWidgetToPreset;
     FFilename: string;
@@ -67,6 +68,10 @@ type
                     aWidgetToPreset: TWidgetToPreset);
     procedure Save;
     procedure Load;
+
+    procedure FillComboBoxWithPresetNames(aCB: TComboBox);
+    property PresetData[aIndex:integer]: string read GetPresetData;
+    property OnPresetChange: TNotifyEvent read FOnPresetChange write FOnPresetChange;
   end;
 
 
@@ -164,6 +169,7 @@ begin
   if QuestionDlg('', sReplacePresetData, mtWarning, [mrOk, mrCancel], 0) = mrOk then begin
     SetPresetData(i, FWidgetToPreset());
     Save;
+    if Assigned(FOnPresetChange) then FOnPresetChange(Self);
   end;
 end;
 
@@ -177,6 +183,7 @@ begin
     PopupMenu1.Items.Delete(i+3);
     LB.Items.Delete(i);
     Save;
+    if Assigned(FOnPresetChange) then FOnPresetChange(Self);
   end;
 end;
 
@@ -209,6 +216,7 @@ begin
   // replace name in listbox
   SetPresetName(i, nam);
   Save;
+  if Assigned(FOnPresetChange) then FOnPresetChange(Self);
 end;
 
 procedure TPresetManager.UpDown1Click(Sender: TObject; Button: TUDBtnType);
@@ -226,6 +234,7 @@ begin
 
       LB.MoveSelectionUp;
       Save;
+      if Assigned(FOnPresetChange) then FOnPresetChange(Self);
     end;
 
     btPrev: if i < LB.Count-1 then begin
@@ -235,6 +244,7 @@ begin
 
       LB.MoveSelectionDown;
       Save;
+      if Assigned(FOnPresetChange) then FOnPresetChange(Self);
     end;
   end;
 end;
@@ -263,6 +273,7 @@ begin
   men.OnClick := @ProcessMenuClick;
   PopupMenu1.Items.Add(men);
   Save;
+  if Assigned(FOnPresetChange) then FOnPresetChange(Self);
 end;
 
 procedure TPresetManager.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -350,12 +361,22 @@ begin
       m.OnClick := @ProcessMenuClick;
       PopupMenu1.Items.Add(m);
     end;
+    FScene.LogInfo(Caption+' loaded successfully, '+LB.Count.ToString+' preset(s)');
   except
     On E :Exception do begin
       FScene.LogError('Presets '+Caption+': exception while loading from file "'+FFilename);
       FScene.LogError(E.Message, 1);
     end;
   end;
+end;
+
+procedure TPresetManager.FillComboBoxWithPresetNames(aCB: TComboBox);
+var
+  i: Integer;
+begin
+  aCB.Clear;
+  for i:=0 to LB.Count-1 do
+    aCB.Items.Add(GetPresetName(i));
 end;
 
 end.

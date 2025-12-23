@@ -47,6 +47,7 @@ public
   tintMode: TTintMode;
   width, height, layerindex: integer;
   frameindex: single;
+  blendmode: byte;
   // EXTRA properties
   // TSpriteWithElasticCorner
   TopLeftOffsetX, TopLeftOffsetY,
@@ -59,15 +60,36 @@ public
   GradientData: string;
   // TDeformationGrid
   DeformationGridData: string;
-  // UI objects
+  // UI objects with bodyshape
   BodyShapeData: string;
   BackGradientData: string;
-  UseBackGradient: boolean;
+  // UI panels with effects
+  BGDarkenColor: TBGRAPixel;
+  OnShowScenario,
+  OnHideScenario: string;
   // UI objects with text (textured font)
   FontDescriptorName, Caption: string;
-  TextAlignment: TOGLCAlignment;
   Atlas: TAtlas;   // to contain localy the textured font
-  TexturedFont: TTexturedFont;
+  TexturedFont: TTexturedFont;  // the textured font created from Atlas with FontDescriptorName and Caption
+  TextAlignment: TOGLCAlignment;
+  AutoSize: boolean;
+  // UI objects with check
+  Checked: boolean;
+  CheckShape: TUICheckShape;
+  CheckFill: TUICheckFill;
+  CheckColorChecked: TBGRAPixel;
+  textureName2: string;
+  CheckAdjustImageToFontHeight: boolean;
+  // ScrollBar
+  uiOrientation: TUIOrientation;
+  scrollbarMin, scrollbarMax, scrollbarPageSize, scrollbarPosition: ptrInt;
+  scrollbarCursorBodyShapeData: string;
+  // ProgressBar
+  ProgressBarGradientData: string;
+  ProgressBarReversed: boolean;
+  ProgressBarPercent: single;
+  // TextArea
+  TextAreaText: string;
 
   procedure InitDefault;
   procedure KillSurface;
@@ -102,7 +124,7 @@ public
   procedure SaveCurrentScaleValueBeforeScaling;
   procedure ComputeScale(aType: TScaleHandle; aDelta: TPointF; aKeepAspectRatio: boolean);
   procedure SaveCurrentPosAndSizeBeforeResizing;
-  procedure AddDeltaToSpriteSize(aType: TScaleHandle; aDelta: TPoint; aKeepAspectRatio: boolean);
+  procedure AddDeltaToSurfaceSize(aType: TScaleHandle; aDelta: TPoint; aKeepAspectRatio: boolean);
   function IsContainedBy(const r: TRectF): boolean;
 
   property Selected: boolean read GetSelected write SetSelected;
@@ -128,6 +150,7 @@ public
   function GetTint: TBGRAPixel;
   function GetTintMode: TTintMode;
   function GetFrame: single;
+  function GetBlendmode: byte;
 
   procedure SetSurfaceLayerIndex(aIndex: integer);
 
@@ -229,6 +252,9 @@ public
   property UndoRedoManager: TSurfaceUndoRedoManager read FUndoRedoManager;
 
   property ModeForLevelEditor: boolean read FModeForLevelEditor;
+
+public // Panel Editor
+  function AddMainPanel(const aName: string; aWidth, aHeight: integer): TUIPanelWithEffects;
 end;
 
 
@@ -290,6 +316,7 @@ begin
   flipV := False;
   zOrder := 0;
   frameindex := 1.0;
+  blendmode := FX_BLEND_NORMAL;
 
   // TSpriteWithElasticCorner
   TopLeftOffsetX := 0; TopLeftOffsetY := 0;
@@ -302,20 +329,37 @@ begin
   BottomRightColor := BGRA(0,0,255);
   BottomLeftColor := BGRA(255,255,0);
   // TGradientRectangle
-  GradientData := '2 0.000 2 0.000 FF0000FF 1.000 FF0000FF 1.000 2 0.000 00FF00FF 1.000 00FF00FF';
+  GradientData := DEFAULT_GRADIENT;
   // TDeformationGrid
   DeformationGridData := '';
 
   // UIObject
   BodyShapeData := '';
   BackGradientData := '';
-  UseBackGradient := False;
+  BGDarkenColor := BGRAPixelTransparent;
+  OnShowScenario := '';
+  OnHideScenario := '';
   Caption := '';
+  AutoSize := True;
   FontDescriptorName := '';
   Atlas := NIL;
   TexturedFont := NIL;
-
-
+  Checked := False;
+  CheckShape := ctRectangle;
+  CheckFill := cfColor;
+  CheckColorChecked := BGRAWhite;
+  textureName2 := '';
+  CheckAdjustImageToFontHeight := True;
+  uiOrientation := uioHorizontal;
+  scrollbarMin := 0;
+  scrollbarMax := 100;
+  scrollbarPageSize := 10;
+  scrollbarPosition := 0;
+  scrollbarCursorBodyShapeData := '';
+  ProgressBarGradientData := '';
+  ProgressBarReversed := False;
+  ProgressBarPercent := 0.0;
+  TextAreaText := '';
 
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
@@ -323,7 +367,7 @@ end;
 
 procedure TSurfaceDescriptor.KillSurface;
 begin
-  if Atlas <> nIL then FreeAndNil(Atlas);
+  if Atlas <> NIL then FreeAndNil(Atlas);
   TexturedFont := NIL;
 
   if surface <> NIL then surface.Kill;
@@ -413,7 +457,22 @@ begin
     TUIPanel(surface).BodyShape.LoadFromString(BodyShapeData);
     TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height, True);
     TUIPanel(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
-    TUIPanel(surface).BackGradient.Visible := UseBackGradient;
+    TUIPanel(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+  end else
+  if classtype = TUIPanelWithEffects then begin // TUIPanelWithEffects
+    surface := TUIPanelWithEffects.Create(FScene);
+    TUIPanelWithEffects(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIPanelWithEffects(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUIPanel(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    if BGDarkenColor.alpha <> 0 then TUIPanelWithEffects(surface).ActivateSceneDarken(BGDarkenColor);
+    TUIPanelWithEffects(surface).Show('');
+  end else
+  if classType = TFreeText then begin  // TFreeText
+    surface := TFreeText.Create(FScene);
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    TFreeText(surface).Caption := Caption;
+    TFreeText(surface).TexturedFont := TexturedFont;
   end else
   if classType = TUILabel then begin // UILabel
     surface := TUILabel.Create(FScene);
@@ -421,9 +480,29 @@ begin
     TUILabel(surface).CaptionDescriptor.Alignment := TextAlignment;
     TUILabel(surface).TexturedFont := TexturedFont;
     TUILabel(surface).Caption := Caption;
+  end else
+  if classType = TUIImage then begin  // TUIImage
+    surface := TUIImage.Create(FScene, GetTextureFromTextureName, width, height);
+  end else
+  if classType = TUIButton then begin // TUIButton
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    surface := TUIButton.Create(FScene, Caption, TexturedFont, GetTextureFromTextureName);
+    TUIButton(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUICheck then begin // TUICheck
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    surface := TUICheck.Create(FScene, Caption, TexturedFont);
+    TUICheck(surface).Checked := Checked;
+    TUICheck(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUIRadio then begin // TUIRadio
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    surface := TUIRadio.Create(FScene, Caption, TexturedFont);
+    TUIRadio(surface).Checked := Checked;
+    TUIRadio(surface).MouseInteractionEnabled := False;
   end
 
-  else raise exception.create('forgot to implement!');
+  else raise exception.create('forgot to implement '''+classType.ClassName+'''');
 
   // collision for selection
   CreateCollisionBody;
@@ -497,6 +576,7 @@ begin
   surface.Tint.Value := tint;
   surface.TintMode := tintmode;
   surface.Frame := frameindex;
+  surface.BlendMode := blendmode;
   if ParentList.FModeForLevelEditor then
     TSprite(surface).SetSize(width, height);
 end;
@@ -754,7 +834,7 @@ begin
   FPosOrigin := surface.GetXY;
 end;
 
-procedure TSurfaceDescriptor.AddDeltaToSpriteSize(aType: TScaleHandle;
+procedure TSurfaceDescriptor.AddDeltaToSurfaceSize(aType: TScaleHandle;
   aDelta: TPoint; aKeepAspectRatio: boolean);
 const MIN_VALUE = 1;
 var dw, dh, newW, newH: integer;
@@ -870,7 +950,22 @@ begin
 
   newW := FSizeOrigin.cx + dw;
   newH := FSizeOrigin.cy + dh;
-  TSprite(surface).SetSize(newW, newH);
+
+  // apply new size of the surface
+  case surface.ClassName of
+    'TSprite': TSprite(surface).SetSize(newW, newH);
+    'TUIPanel', 'TUIPanelWithEffects': TUIClickableWithBodyShape(surface).BodyShape.ResizeCurrentShape(newW, newH, True);
+    'TUIImage': TUIImage(surface).SetSize(newW, newH);
+    'TUILabel':;
+    'TUIButton': if not TUIButton(surface).AutoSize then TUIButton(surface).BodyShape.ResizeCurrentShape(newW, newH, True);
+    'TUICheck':;
+    'TUIRadio':;
+    'TUIScrollBar', 'TUIProgressBar',
+    'TUIScrollBox', 'TUIListBox',
+    'TUITextArea': TUIClickableWithBodyShape(surface).BodyShape.ResizeCurrentShape(newW, newH, True);
+    else raise exception.create('forgot to implement!');
+  end;
+
   CreateCollisionBody;
 end;
 
@@ -896,6 +991,7 @@ begin
     aSurface^.zOrder := surface.ZOrderAsChild;
   end;
   aSurface^.frameindex := frameindex;
+  aSurface^.blendmode := blendmode;
   // EXTRA properties
   // TSpriteWithElasticCorner
   aSurface^.TopLeftOffsetX := TopLeftOffsetX;
@@ -918,11 +1014,30 @@ begin
   // UI objects
   aSurface^.BodyShapeData := BodyShapeData;
   aSurface^.BackGradientData := BackGradientData;
-  aSurface^.UseBackGradient := UseBackGradient;
+  aSurface^.BGDarkenColor := BGDarkenColor;
+  aSurface^.OnShowScenario := OnShowScenario;
+  aSurface^.OnHideScenario := OnHideScenario;
   // surfaces with text (textured font)
   aSurface^.FontDescriptorName := FontDescriptorName;
   aSurface^.Caption := Caption;
   aSurface^.TextAlignment := TextAlignment;
+  aSurface^.Checked := Checked;
+  aSurface^.CheckShape := CheckShape;
+  aSurface^.CheckFill := CheckFill;
+  aSurface^.CheckColorChecked :=  CheckColorChecked;
+  aSurface^.textureName2 := textureName2;
+  aSurface^.CheckAdjustImageToFontHeight := CheckAdjustImageToFontHeight;
+  aSurface^.AutoSize := AutoSize;
+  aSurface^.uiOrientation := uiOrientation;
+  aSurface^.scrollbarMin := scrollbarMin;
+  aSurface^.scrollbarMax := scrollbarMax;
+  aSurface^.scrollbarPageSize := scrollbarPageSize;
+  aSurface^.scrollbarPosition := scrollbarPosition;
+  aSurface^.scrollbarCursorBodyShapeData := scrollbarCursorBodyShapeData;
+  aSurface^.ProgressBarGradientData := ProgressBarGradientData;
+  aSurface^.ProgressBarReversed := ProgressBarReversed;
+  aSurface^.ProgressBarPercent := ProgressBarPercent;
+  aSurface^.TextAreaText := TextAreaText;
 
   aSurface^.CreateSurface(True);
   aSurface^.SetChildDependency;
@@ -937,9 +1052,7 @@ begin
   aSurface^.surface.Tint.Value := surface.Tint.Value;
   aSurface^.surface.TintMode := surface.TintMode;
   aSurface^.surface.Frame := surface.Frame;
-  if Atlas <> NIL then
-    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption,
-                                      aSurface^.Atlas, aSurface^.TexturedFont, NIL);
+  aSurface^.surface.BlendMode := surface.BlendMode;
 end;
 
 function TSurfaceDescriptor.GetSurfaceType: classOfSimpleSurfaceWithEffect;
@@ -1050,6 +1163,12 @@ begin
     else Result := frameindex;
 end;
 
+function TSurfaceDescriptor.GetBlendmode: byte;
+begin
+  if Assigned(surface) then Result := surface.BlendMode
+    else Result := blendmode;
+end;
+
 procedure TSurfaceDescriptor.SetSurfaceLayerIndex(aIndex: integer);
 begin
   surface.MoveToLayer(aIndex);
@@ -1083,6 +1202,8 @@ end;
 
 function TSurfaceDescriptor.SaveToString: string;
 var prop: TProperties;
+  _className: String;
+  isUISurface: Boolean;
 begin
   prop.Init('~');
   prop.Add('ID', id);
@@ -1099,8 +1220,10 @@ begin
     if classtype <> TSprite then
       prop.Add('Classtype', classtype.ClassName);
 
-  if IsTextured then
+  if textureName <> '' then
     prop.Add('TextureName', textureName);
+  if textureName2 <> '' then
+    prop.Add('TextureName2', textureName2);
 
   if GetPivotX <> 0.5 then prop.Add('PivotX', GetPivotX);
   if GetPivotY <> 0.5 then prop.Add('PivotY', GetPivotY);
@@ -1122,6 +1245,7 @@ begin
   if GetTint <> BGRA(0,0,0,0) then prop.Add('Tint', GetTint);
   if GetTintMode <> tmReplaceColor then prop.Add('TintMode', Ord(GetTintMode));
   if GetFrame <> 1.0 then prop.Add('FrameIndex', GetFrame);
+  if GetBlendMode <> FX_BLEND_NORMAL then prop.Add('BlendMode', GetBlendMode);
 
   // TSpriteWithElasticCorner
   if GetSurfaceType = TSpriteWithElasticCorner then begin
@@ -1151,17 +1275,58 @@ begin
   if GetSurfaceType = TDeformationGrid then
     prop.Add('DeformationGridData', DeformationGridData);
 
-  // UI objects
-  if BodyShapeData <> '' then begin
-    prop.Add('BodyShapeData', BodyShapeData);
-    if BackGradientData <> '' then prop.Add('BackGradientData', BackGradientData);
-    if UseBackGradient then prop.Add('UseBackGradient', UseBackGradient);
-  end;
-  // UI objects with text (textured font)
-  if FontDescriptorName <> '' then begin
-    prop.Add('FontDescriptorName', FontDescriptorName);
-    if Caption <> '' then prop.Add('Caption', Caption, True);
-    prop.Add('TextAlignment', Ord(TextAlignment));
+  _className := GetSurfaceType.ClassName;
+  isUISurface := (_className = 'TUIPanel') or (_className = 'TUIPanelWithEffects') or
+                 (_className = 'TUIImage') or (_className = 'TUILabel') or
+                 (_className = 'TUIButton') or (_className = 'TUICheck') or
+                 (_className = 'TUIRadio') or (_className = 'TUIScrollBar') or
+                 (_className = 'TUIProgressBar') or (_className = 'TUIScrollBox') or
+                 (_className = 'TUIListBox') or (_className = 'TUITextArea');
+  if isUISurface then begin
+    // UI objects
+    if BodyShapeData <> '' then begin
+      prop.Add('BodyShapeData', BodyShapeData);
+      if BackGradientData <> '' then prop.Add('BackGradientData', BackGradientData);
+    end;
+    if BGDarkenColor.alpha <> 0 then prop.Add('BGDarkenColor', BGDarkenColor);
+    if OnShowScenario <> '' then  prop.Add('OnShowScenario', OnShowScenario);
+    if OnHideScenario <> '' then  prop.Add('OnHideScenario', OnHideScenario);
+    // UI objects with text (textured font)
+    if FontDescriptorName <> '' then begin
+      prop.Add('FontDescriptorName', FontDescriptorName);
+      if Caption <> '' then prop.Add('Caption', Caption, True);
+      prop.Add('TextAlignment', Ord(TextAlignment));
+    end;
+    // UI objects with check
+    if (_className = 'TUICheck') or (_className = 'TUIRadio') then begin
+      if Checked then prop.Add('Checked', Checked);
+      prop.Add('CheckShape', Ord(CheckShape));
+      prop.Add('CheckFill', Ord(CheckFill));
+      prop.Add('CheckColorChecked', CheckColorChecked);
+      if not CheckAdjustImageToFontHeight then
+        prop.Add('AdjustImageToFontHeight', CheckAdjustImageToFontHeight);
+    end;
+    // autosize
+    if not AutoSize then prop.Add('AutoSize', AutoSize);
+
+    if _className = 'TUIScrollBar' then begin
+      prop.Add('Orientation', Ord(uiOrientation));
+      prop.Add('scrollbarMin', scrollbarMin);
+      prop.Add('scrollbarMax', scrollbarMax);
+      prop.Add('scrollbarPageSize', scrollbarPageSize);
+      prop.Add('scrollbarPosition', scrollbarPosition);
+      prop.Add('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData);
+    end;
+
+    if _className = 'TUIProgressBar' then begin
+      prop.Add('Orientation', Ord(uiOrientation));
+      prop.Add('ProgressBarReversed', ProgressBarReversed);
+      prop.Add('ProgressBarPercent', ProgressBarPercent);
+    end;
+
+    if _className = 'TUITextArea' then begin
+      prop.Add('TextAreaText', TextAreaText, True);
+    end;
   end;
 
   Result := prop.PackedProperty;
@@ -1196,6 +1361,16 @@ begin
     'TSpriteContainer': classtype := TSpriteContainer;
     'TQuad4Color': classtype := TQuad4Color;
     'TGradientRectangle': classtype := TGradientRectangle;
+    'TFreeText': classtype := TFreeText;
+    'TUIPanel': classtype := TUIPanel;
+    'TUIPanelWithEffects': classtype := TUIPanelWithEffects;
+    'TUILabel': classtype := TUILabel;
+    'TUIImage': classtype := TUIImage;
+    'TUIButton': classtype := TUIButton;
+    'TUICheck': classtype := TUICheck;
+    'TUIRadio': classtype := TUIRadio;
+    'TUIScrollBar': classtype := TUIScrollBar;
+    'TUIProgressBar': classtype := TUIProgressBar;
     else exception.create('forgot to implement!');
   end;
   prop.StringValueOf('TextureName', textureName, textureName);
@@ -1225,6 +1400,7 @@ begin
   prop.IntegerValueOf('TintMode', v, Ord(tmReplaceColor));
   tintmode := TTintMode(v);
   prop.SingleValueOf('FrameIndex', frameindex, 1.0);
+  prop.ByteValueOf('BlendMode', blendmode, FX_BLEND_NORMAL);
 
   // TSpriteWithElasticCorner
   prop.SingleValueOf('TopLeftOffsetX', TopLeftOffsetX, 0);
@@ -1251,7 +1427,9 @@ begin
   // UI objects
   prop.StringValueOf('BodyShapeData', BodyShapeData, '');
   prop.StringValueOf('BackGradientData', BackGradientData, '');
-  prop.BooleanValueOf('UseBackGradient', UseBackGradient, False);
+  prop.BGRAPixelValueOf('BGDarkenColor', BGDarkenColor, BGRA(0,0,0,100));
+  prop.StringValueOf('OnShowScenario', OnShowScenario, '');
+  prop.StringValueOf('OnHideScenario', OnHideScenario, '');
 
   // UI objects with text (textured font)
   prop.StringValueOf('FontDescriptorName', FontDescriptorName, '');
@@ -1259,6 +1437,30 @@ begin
   prop.IntegerValueOf('TextAlignment', v, 0);
   TextAlignment := TOGLCAlignment(v);
 
+  // UI objects with check
+  prop.BooleanValueOf('Checked', Checked, False);
+  prop.StringValueOf('TextureName2', textureName2, '');
+  prop.IntegerValueOf('CheckShape', v, 1);
+  CheckShape := TUICheckShape(v);
+  prop.IntegerValueOf('CheckFill', v, 0);
+  CheckFill := TUICheckFill(v);
+  prop.BGRAPixelValueOf('CheckColorChecked', CheckColorChecked, BGRAWhite);
+  prop.BooleanValueof('AdjustImageToFontHeight', CheckAdjustImageToFontHeight, True);
+  // autosize
+  prop.BooleanValueOf('AutoSize', AutoSize, True);
+  // ScrollBar
+  prop.IntegerValueOf('Orientation', v, 0);
+  uiOrientation := TUIOrientation(v);
+  prop.Int64ValueOf('scrollbarMin', scrollbarMin, 0);
+  prop.Int64ValueOf('scrollbarMax', scrollbarMax, 100);
+  prop.Int64ValueOf('scrollbarPageSize', scrollbarPageSize, 10);
+  prop.Int64ValueOf('scrollbarPosition', scrollbarPosition, 0);
+  prop.StringValueOf('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData, scrollbarCursorBodyShapeData);
+  // ProgressBar
+  prop.BooleanValueOf('ProgressBarReversed', ProgressBarReversed, False);
+  prop.SingleValueOf('ProgressBarPercent', ProgressBarPercent, 0.0);
+  // TUITextArea
+  prop.StringValueOf('TextAreaText', TextAreaText, '');
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode
@@ -1319,7 +1521,13 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
         parentIsRegistered := True;
         AddToResult(GetItemBySurface(aSurface));
       end;
+
+      // TUIButton have childs -> this produce a bug
+    //  if (o is TUIButton)
+
+
       if o.ChildCount > 0 then CheckRecursive(o);
+
       AddToResult(GetItemBySurface(o))
     end;
     if not parentIsRegistered then
@@ -1794,6 +2002,32 @@ begin
   if Size = 0 then exit;
   for i:=0 to Size-1 do
     aLB.Items.Add(Mutable[i]^.name);
+end;
+
+function TSurfaceList.AddMainPanel(const aName: string; aWidth, aHeight: integer): TUIPanelWithEffects;
+var o: PSurfaceDescriptor;
+  bodyshape: TBodyShape;
+begin
+  o := AddEmpty;
+  o^.name := aName;
+  o^.classtype := TUIPanelWithEffects;
+  o^.width := aWidth;
+  o^.height := aHeight;
+  o^.parentID := -1;
+  o^.layerindex := WorkingLayer;
+
+  bodyshape.InitDefault(FScene);
+  bodyShape.Fill.Color := BGRA(30,15,7);
+  bodyshape.SetShapeRectangle(aWidth, aHeight, 3);
+  o^.BodyShapeData := bodyshape.SaveToString;
+  o^.BackGradientData := '';
+  o^.BGDarkenColor := BGRAPixelTransparent;
+  o^.CreateSurface(True);
+  o^.SetChildDependency;
+  //o^.surface.CenterOnScene;
+  //o^.x := o^.surface.X.Value;
+  //o^.y := o^.surface.Y.Value;
+  Result := TUIPanelWithEffects(o^.surface);
 end;
 
 end.

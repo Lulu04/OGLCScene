@@ -359,14 +359,12 @@ begin
   o^.worldinfo := wi.SaveToString;
 
   o^.layerloopinfo := FDecorLoopModes.SaveToString;
+  LevelBank.SaveToPath(Project.Config.TargetLazarusProject.GetFolderGameHelperFiles);
 
   // generate the new levels unit file and add it to target Lazarus project
   LevelBank.ExportToFileGameLevel;
   Project.Config.TargetLazarusProject.Unit_AddToProject(LEVEL_UNIT_NAME, ulLevels, uePas);
 
-  // save the game helper project
-  Project.SetModified;
-  Project.Save;
   Modified := False;
 
   DoClearAll;

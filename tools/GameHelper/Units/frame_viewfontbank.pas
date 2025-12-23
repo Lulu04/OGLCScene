@@ -204,8 +204,8 @@ begin
   // add the font to the treeview
   newnode :=  TV.Items.AddChild(TV.Items.GetFirstNode, nam);
   with newNode do begin
-    ImageIndex := 11;
-    SelectedIndex := 11;
+    ImageIndex := 10;
+    SelectedIndex := 10;
     MakeVisible;
   end;
   TV.Selected := newNode;
@@ -720,8 +720,8 @@ begin
   // add the new name in the treeview
   newNode :=  TV.Items.AddChild(TV.Items.GetFirstNode, dstName);
   with newNode do begin
-    ImageIndex := 11;
-    SelectedIndex := 11;
+    ImageIndex := 10;
+    SelectedIndex := 10;
     MakeVisible;
   end;
   TV.Selected := newNode;
@@ -809,8 +809,8 @@ begin
     for i:=0 to FontBank.Size-1 do begin
       fd := FontBank.GetByIndex(i);
       fdnode := TV.Items.AddChild(root, fd._Name);
-      fdnode.SelectedIndex := 11;
-      fdnode.ImageIndex := 11;
+      fdnode.SelectedIndex := 10;
+      fdnode.ImageIndex := 10;
       fdnode.MakeVisible;
     end;
   TV.EndUpdate;

@@ -156,7 +156,7 @@ TScreenWithSurfaceHandling = class(TCustomScreenTemplate)
   procedure SaveCurrentScaleValueBeforeScalingSelection;
   procedure ScaleSelection(aDelta: TPointF; aKeepAspectRatio: boolean); virtual;
   procedure SaveCurrentPosAndSizeBeforeResizingSelection;
-  procedure AddDeltaToSizeOnSelection(aDelta: TPoint; aKeepAspectRatio: boolean);
+  procedure AddDeltaToSizeOnSelection(aDelta: TPoint; aKeepAspectRatio: boolean); virtual;
   procedure DeleteSelection; virtual;
   procedure UpdateHandlePositionOnSelected;
   function MouseIsOverPivotHandle(aWorldPt: TPointF): boolean;
@@ -753,7 +753,7 @@ procedure TScreenWithSurfaceHandling.AddDeltaToSizeOnSelection(aDelta: TPoint; a
 var i: integer;
 begin
   for i:=0 to High(FSelected) do
-    FSelected[i]^.AddDeltaToSpriteSize(FScaleHandleType, aDelta, aKeepAspectRatio);
+    FSelected[i]^.AddDeltaToSurfaceSize(FScaleHandleType, aDelta, aKeepAspectRatio);
 
   UpdateHandlePositionOnSelected;
 end;
