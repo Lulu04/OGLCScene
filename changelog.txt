@@ -1,6 +1,7 @@
 Version 1.2 - 2025
 > new tool GameHelper that offer a graphic interface to facilitate the creation of complex sprite, the definition of its collision shapes, and also to define different posture for the sprite: usefull for a character with legs and arms. The created sprite can be exported to a Pascal unit to be easily integrated in your game.
 > GameHelper have also a level editor that support multiple layers. The edited levels can be exported to a Pascal unit to easily be integrated in your game.
+> GameHelper have also a font editor to easily create the fonts used in your game, and a User Interface Panel Editor to easily design the panels for your game, with labels, image, button, listbox, ...
 > new property for surface: CollisionBody. It allow to describe the collision area for a surface by associating one or several primitive shape: point, line, circle, rectangle, polygon. This primitive shapes are then used to check a collision between another surface. 
 > tile engine: now a tile can be flipped horizontally and vertically. Tool TileMap Designer has been improved to support this new feature.
 > when a game changes screen, its now possible to display a sprite with a loading message to warn the player of the wait.
