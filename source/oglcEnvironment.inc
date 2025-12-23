@@ -250,7 +250,7 @@ begin
   glScissor(round(X.Value), round(Y.Value), Width, Height);
   glEnable(GL_SCISSOR_TEST);
 
-  FParentScene.TexturedTriangleRenderer.Prepare(ptTriangles, FTexture, 0, FParentScene.MVPMatrix,
+  FParentScene.TexturedTriangleRenderer.Prepare(ptTriangleStrip, FTexture, 0, FParentScene.MVPMatrix,
                                                 FComputedOpacity, FComputedTint, FBlendMode);
   // small
   InitQuadOffset(0.8);
