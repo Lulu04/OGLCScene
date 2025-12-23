@@ -110,8 +110,8 @@ begin
   MouseInteractionEnabled := False;
 
   if aAnimScenario = '' then begin
-    Visible := False;
-    if aFree then Kill;
+    FFreePanelWhenEndAnimIsDone := aFree;
+    OnHideIsDone;
   end else begin
     FFreePanelWhenEndAnimIsDone := aFree;
     FCurrentScenario := AddAndPlayScenario(aAnimScenario);
@@ -128,7 +128,7 @@ end;
 
 procedure TUIPanelWithEffects.OnHideIsDone;
 begin
-  FCurrentScenario.Kill;
+  if Assigned(FCurrentScenario) then FCurrentScenario.Kill;
   FCurrentScenario := NIL;
   Visible := False;
   if FFreePanelWhenEndAnimIsDone then Kill;
