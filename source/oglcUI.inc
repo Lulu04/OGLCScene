@@ -381,7 +381,11 @@ private
   procedure DoAnim_OnMouseUp(Sender: TSimpleSurfaceWithEffect);
   procedure DoAnim_OnClick(Sender: TSimpleSurfaceWithEffect);
 public
+  procedure Update(const aElapsedtime: single); override;
+  procedure DoDraw; override;
+public
   constructor Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont; aTexture: PTexture);
+  destructor Destroy; override;
   property Image: TUIImage read FImage;
   property _Label: TUILabel read FLabel;
   // Convenient property to allow direct access to property _Label.CaptionDescriptor.Caption
@@ -1522,7 +1526,7 @@ begin
 
   if aTexture <> NIL then FImage := TUIImage.Create(aParentScene, aTexture, aTexture^.FrameWidth, aTexture^.FrameHeight)
     else FImage := TUIImage.Create(aParentScene, aTexture, 0, 0);
-  AddChild(FImage);
+  //AddChild(FImage);
   FImage.OnTextureChanged := @ProcessCallbackSomethingChangeTheSize;
   FImage.OnSizeChanged := @ProcessCallbackSomethingChangeTheSize;
 
@@ -1530,7 +1534,7 @@ begin
   FLabel.Caption := aCaption;
   FLabel.TexturedFont := aFont;
   FLabel.CaptionDescriptor.Alignment := taCenterLeft;
-  AddChild(FLabel);
+  //AddChild(FLabel);
   FLabel.MouseInteractionEnabled := False; // disable mouse interaction after AddChild() !!
   FLabel.CaptionDescriptor.OnSizeChanged := @ProcessCallbackSomethingChangeTheSize;
 
@@ -1544,6 +1548,13 @@ begin
   FOnAnimMouseDown := @DoAnim_OnMouseDown;
   FOnAnimMouseUp := @DoAnim_OnMouseUp;
   FOnAnimClick := @DoAnim_OnClick;
+end;
+
+destructor TUIButton.Destroy;
+begin
+  FreeAndNil(FLabel);
+  FreeAndNil(FImage);
+  inherited Destroy;
 end;
 
 procedure TUIButton.DoAnim_OnMouseEnter(Sender: TSimpleSurfaceWithEffect);
@@ -1573,6 +1584,26 @@ procedure TUIButton.DoAnim_OnClick(Sender: TSimpleSurfaceWithEffect);
 begin
   Tint.Value := BGRA(0, 0, 0, 150);
   Tint.Alpha.ChangeTo(0, 0.2);
+end;
+
+procedure TUIButton.Update(const aElapsedtime: single);
+begin
+  inherited Update(aElapsedtime);
+  if Freeze then exit;
+  _Label.Update(aElapsedtime);
+  Image.Update(aElapsedtime);
+end;
+
+procedure TUIButton.DoDraw;
+begin
+ { if not _Label.CaptionDescriptor.CanBeDrawn then exit;
+
+  with _Label.CaptionDescriptor do
+    FTexturedFont.DrawChars(FCharIndexes, 0, 0, FlipToIndex, NIL,
+                             NIL, FComputedOpacity, FComputedTint, FBlendMode);}
+
+  _Label.Draw(FComputedOpacity);
+  Image.Draw(FComputedOpacity);
 end;
 
 { TUIClickableObject }
