@@ -107,29 +107,30 @@
         <EditorIndex Value="2"/>
         <TopLine Value="99"/>
         <CursorPos X="59" Y="120"/>
-        <UsageCount Value="86"/>
+        <UsageCount Value="87"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="36"/>
-        <CursorPos X="51" Y="47"/>
-        <UsageCount Value="53"/>
+        <TopLine Value="110"/>
+        <CursorPos X="45" Y="126"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="Units\u_common.pas"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="105"/>
-        <CursorPos Y="121"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="102"/>
+        <CursorPos Y="114"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -137,15 +138,15 @@
         <EditorIndex Value="4"/>
         <TopLine Value="61"/>
         <CursorPos Y="73"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="110"/>
-        <CursorPos X="38" Y="126"/>
-        <UsageCount Value="27"/>
+        <TopLine Value="101"/>
+        <CursorPos Y="131"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit7>
       <Unit8>
@@ -153,16 +154,15 @@
         <EditorIndex Value="7"/>
         <TopLine Value="1877"/>
         <CursorPos Y="1886"/>
-        <UsageCount Value="27"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="..\..\source\oglcSurface.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="524"/>
-        <CursorPos Y="533"/>
-        <UsageCount Value="27"/>
+        <CursorPos X="37" Y="537"/>
+        <UsageCount Value="28"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -189,123 +189,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
-        <Caret Line="68" Column="33" TopLine="55"/>
+        <Caret Line="37" Column="13" TopLine="25"/>
       </Position1>
       <Position2>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="91" Column="44" TopLine="71"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="114" TopLine="102"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="76" Column="12" TopLine="72"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="115" TopLine="102"/>
       </Position3>
       <Position4>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1526" Column="62" TopLine="1522"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="116" TopLine="102"/>
       </Position4>
       <Position5>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="76" Column="18" TopLine="62"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="109" TopLine="104"/>
       </Position5>
       <Position6>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1526" Column="48" TopLine="1524"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="110" TopLine="104"/>
       </Position6>
       <Position7>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="75" Column="16" TopLine="62"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="112" TopLine="104"/>
       </Position7>
       <Position8>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1514" Column="4" TopLine="1508"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="113" TopLine="104"/>
       </Position8>
       <Position9>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="75" Column="16" TopLine="61"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="114" TopLine="104"/>
       </Position9>
       <Position10>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1658" Column="6" TopLine="1658"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="118" Column="55" TopLine="104"/>
       </Position10>
       <Position11>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="532" Column="14" TopLine="516"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="114" TopLine="102"/>
       </Position11>
       <Position12>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1634" Column="8" TopLine="1632"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="115" TopLine="102"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1623" Column="12" TopLine="1611"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="116" TopLine="102"/>
       </Position13>
       <Position14>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1436" Column="36" TopLine="1421"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="109" TopLine="104"/>
       </Position14>
       <Position15>
         <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
-        <Caret Line="68" Column="32" TopLine="55"/>
+        <Caret Line="110" TopLine="104"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="91" Column="40" TopLine="78"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="112" TopLine="104"/>
       </Position16>
       <Position17>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="76" Column="12" TopLine="62"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="113" TopLine="104"/>
       </Position17>
       <Position18>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1525" Column="64" TopLine="1511"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="114" Column="17" TopLine="104"/>
       </Position18>
       <Position19>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1546" Column="17" TopLine="1525"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="37" Column="13" TopLine="23"/>
       </Position19>
       <Position20>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="75" Column="13" TopLine="64"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="110" Column="3" TopLine="110"/>
       </Position20>
       <Position21>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1516" Column="28" TopLine="1507"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="114" TopLine="102"/>
       </Position21>
       <Position22>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="171" Column="15" TopLine="158"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="115" TopLine="102"/>
       </Position22>
       <Position23>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="843" Column="24" TopLine="824"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="116" TopLine="102"/>
       </Position23>
       <Position24>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="75" Column="13" TopLine="61"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="109" TopLine="94"/>
       </Position24>
       <Position25>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="1516" Column="26" TopLine="1507"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="110" TopLine="94"/>
       </Position25>
       <Position26>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="159" Column="20" TopLine="146"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="112" TopLine="94"/>
       </Position26>
       <Position27>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="534" Column="23" TopLine="525"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="113" TopLine="94"/>
       </Position27>
       <Position28>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="172" Column="16" TopLine="161"/>
+        <Filename Value="..\..\source\oglcUIPanelWithEffects.inc"/>
+        <Caret Line="114" TopLine="94"/>
       </Position28>
       <Position29>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="843" Column="17" TopLine="826"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="120" TopLine="102"/>
       </Position29>
       <Position30>
-        <Filename Value="..\..\source\oglcSurface.inc"/>
-        <Caret Line="158" Column="20" TopLine="141"/>
+        <Filename Value="..\..\source\oglcUIModalPanel.inc"/>
+        <Caret Line="114" TopLine="102"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
