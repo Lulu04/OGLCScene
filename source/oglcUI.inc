@@ -694,6 +694,7 @@ end;
 procedure TUICheck.DoDraw;
 var p: pointer;
 begin
+  inherited DoDraw;
   if (FCheckShapeType = ctUseTexture) or (FCheckShapeType = ctNone) then exit;
 
   FParentScene.ModelViewMatrix.Translate(FCheckShapeLocation.x, FCheckShapeLocation.y);
