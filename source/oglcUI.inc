@@ -1597,12 +1597,6 @@ end;
 
 procedure TUIButton.DoDraw;
 begin
- { if not _Label.CaptionDescriptor.CanBeDrawn then exit;
-
-  with _Label.CaptionDescriptor do
-    FTexturedFont.DrawChars(FCharIndexes, 0, 0, FlipToIndex, NIL,
-                             NIL, FComputedOpacity, FComputedTint, FBlendMode);}
-
   _Label.Draw(FComputedOpacity);
   Image.Draw(FComputedOpacity);
 end;
