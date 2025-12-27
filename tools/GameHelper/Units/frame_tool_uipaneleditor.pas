@@ -33,6 +33,13 @@ type
     CheckBox1: TCheckBox;
     CheckBox10: TCheckBox;
     CheckBox11: TCheckBox;
+    CheckBox12: TCheckBox;
+    CheckBox13: TCheckBox;
+    CheckBox14: TCheckBox;
+    CheckBox15: TCheckBox;
+    CheckBox16: TCheckBox;
+    CheckBox17: TCheckBox;
+    CheckBox18: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
@@ -44,7 +51,10 @@ type
     ColorButton1: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
+    ColorButton4: TColorButton;
     ColorButton5: TColorButton;
+    ColorButton6: TColorButton;
+    ColorButton7: TColorButton;
     ComboBox1: TComboBox;
     ComboBox10: TComboBox;
     ComboBox2: TComboBox;
@@ -64,6 +74,7 @@ type
     FSE3: TFloatSpinEdit;
     GroupBox1: TGroupBox;
     Label1: TLabel;
+    Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
@@ -84,6 +95,7 @@ type
     Label27: TLabel;
     Label28: TLabel;
     Label29: TLabel;
+    Label3: TLabel;
     Label30: TLabel;
     Label31: TLabel;
     Label32: TLabel;
@@ -127,6 +139,7 @@ type
     Label67: TLabel;
     Label68: TLabel;
     Label69: TLabel;
+    Label7: TLabel;
     Label70: TLabel;
     Label71: TLabel;
     Label72: TLabel;
@@ -136,7 +149,13 @@ type
     Label76: TLabel;
     Label77: TLabel;
     Label78: TLabel;
+    Label79: TLabel;
     Label8: TLabel;
+    Label80: TLabel;
+    Label81: TLabel;
+    Label82: TLabel;
+    Label83: TLabel;
+    Label9: TLabel;
     Memo1: TMemo;
     Memo2: TMemo;
     Memo3: TMemo;
@@ -213,6 +232,7 @@ type
     SE32: TSpinEdit;
     SE33: TSpinEdit;
     SE34: TSpinEdit;
+    SE36: TSpinEdit;
     SE9: TSpinEdit;
     SE17: TSpinEdit;
     SE18: TSpinEdit;
@@ -251,6 +271,12 @@ type
     SpeedButton3: TSpeedButton;
     SpeedButton4: TSpeedButton;
     SpeedButton5: TSpeedButton;
+    SE35: TSpinEdit;
+    SpeedButton6: TSpeedButton;
+    SpeedButton7: TSpeedButton;
+    SE37: TSpinEdit;
+    SE38: TSpinEdit;
+    SpeedButton8: TSpeedButton;
     procedure BCancelClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BSaveClick(Sender: TObject);
@@ -260,6 +286,8 @@ type
     procedure SE1Enter(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
     procedure SpeedButton3Click(Sender: TObject);
+    procedure SpeedButton6Click(Sender: TObject);
+    procedure SpeedButton8Click(Sender: TObject);
   private
     FModified: boolean;
     FInitializing: boolean;
@@ -285,6 +313,7 @@ type
     procedure DoUpdateChild(aForceRecreateSurface: boolean);
     procedure UpdateExtraPropertiesToWorkingTemporary;
     procedure UpdateValuesToWorkingSurface;
+    procedure UpdateEventCheckBox;
   private
     FWorkingChild: PSurfaceDescriptor;
     procedure DoClearAll;
@@ -312,8 +341,8 @@ procedure UpdateDebugLabels;
 
 implementation
 
-uses form_main, u_screen_uipaneleditor, u_resourcestring,
-  u_utils, u_project, form_edituibodyshape, u_common, LCLType, Graphics;
+uses form_main, u_screen_uipaneleditor, u_resourcestring, u_utils, u_project,
+  form_edituibodyshape, u_common, form_editgradient, LCLType, Graphics;
 
 {$R *.lfm}
 
@@ -363,11 +392,247 @@ begin
 end;
 
 procedure TFrameToolUIPanelEditor.CBChildTypeSelect(Sender: TObject);
+//var chang: boolean;
+var fontItem: TFontDescriptorItem;
+  recreateSurface: boolean;
+  flag: boolean;
 begin
   if FInitializing then exit;
 
+  flag := Assigned(FWorkingChild);
+  if flag then flag := Assigned(FWorkingChild^.surface);
+
+  recreateSurface := False;
+
   if Sender = CBChildType then begin
     Edit5.Text := GetUniqueName;
+    ShowExtraPropertyPanel;
+  end;
+
+  // TUIPanel
+  if ((Sender = SE12) or (Sender = SE13)) and flag then begin
+    TUIPanel(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE12.Value, SE13.Value, True);
+    FModified := True;
+  end;
+  // TUIImage
+  if (Sender = CBTexturesUIImage) and flag then begin
+    FWorkingChild^.textureName := CBTexturesUIImage.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = SE17) or (Sender = SE18)) and flag then begin
+    TUIImage(FWorkingChild^.surface).SetSize(SE17.Value, SE18.Value);
+    FModified := True;
+  end;
+  // TUILabel
+  if (Sender = Edit2) and flag then begin
+    TUILabel(FWorkingChild^.surface).Caption := Edit2.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = ComboBox1) and flag then begin
+    FWorkingChild^.FontDescriptorName := ComboBox1.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUIButton
+  if ((Sender = SE23) or (Sender = SE24)) and flag then begin
+    TUIButton(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE23.Value, SE24.Value, True);
+    FModified := True;
+  end;
+  if (Sender = CheckBox1) and flag then begin
+    TUIButton(FWorkingChild^.surface).AutoSize := CheckBox1.Checked;
+    FModified := True;
+  end;
+  if (Sender = CBTexturesUIButton) and flag then begin
+    FWorkingChild^.textureName := CBTexturesUIButton.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = ComboBox2) and flag then begin
+    FWorkingChild^.FontDescriptorName := ComboBox2.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = Edit3) and flag then begin
+    TUIButton(FWorkingChild^.surface).Caption := Edit3.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUICheck
+  if (Sender = Edit4) and flag then begin
+    TUICheck(FWorkingChild^.surface).Caption := Edit4.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ComboBox3) or (Sender = ComboBox4)) and flag then begin
+    FWorkingChild^.FontDescriptorName := ComboBox3.Text;
+    FWorkingChild^.CheckShape := TUICheckShape(ComboBox4.ItemIndex);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = CheckBox12) and flag then begin
+    TUICheck(FWorkingChild^.surface).Checked := CheckBox12.Checked;
+    FModified := True;
+  end;
+  if (Sender = ComboBox5) and flag then begin
+    FWorkingChild^.CheckFill := TUICheckFill(ComboBox5.ItemIndex);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ColorButton2) or (Sender = SE14)) and flag then begin
+    TUICheck(FWorkingChild^.surface).ColorChecked := ColorToBGRA(ColorButton2.ButtonColor, SE14.Value);
+    FModified := True;
+  end;
+  if ((Sender = CBTexturesUICheckChecked) or (Sender = CBTexturesUICheckUnchecked) or
+     (Sender = CheckBox10)) and flag then begin
+      FWorkingChild^.textureName := CBTexturesUICheckChecked.Text;
+      FWorkingChild^.textureName2 := CBTexturesUICheckUnchecked.Text;
+      FWorkingChild^.CheckAdjustImageToFontHeight := CheckBox10.Checked;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUIRadio
+  if (Sender = Edit6) and flag then begin
+    TUIRadio(FWorkingChild^.surface).Caption := Edit6.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ComboBox6) or (Sender = ComboBox7)) and flag then begin
+    FWorkingChild^.FontDescriptorName := ComboBox6.Text;
+    FWorkingChild^.CheckShape := TUICheckShape(ComboBox7.ItemIndex);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = CheckBox13) and flag then begin
+    TUIRadio(FWorkingChild^.surface).Checked := CheckBox13.Checked;
+    FModified := True;
+  end;
+  if (Sender = ComboBox8) and flag then begin
+    FWorkingChild^.CheckFill := TUICheckFill(ComboBox8.ItemIndex);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ColorButton3) or (Sender = SE15)) and flag then begin
+    TUIRadio(FWorkingChild^.surface).ColorChecked := ColorToBGRA(ColorButton3.ButtonColor, SE15.Value);
+    FModified := True;
+  end;
+  if ((Sender = CBTexturesUIRadioChecked) or (Sender = CBTexturesUIRadioUnchecked) or
+     (Sender = CheckBox11)) and flag then begin
+      FWorkingChild^.textureName := CBTexturesUIRadioChecked.Text;
+      FWorkingChild^.textureName2 := CBTexturesUIRadioUnchecked.Text;
+      FWorkingChild^.CheckAdjustImageToFontHeight := CheckBox11.Checked;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUIScrollBar
+  if ((Sender = SE25) or (Sender = SE26)) and flag then begin
+    TUIScrollBar(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE25.Value, SE26.Value, True);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = RadioButton5) or (Sender = RadioButton6)) and flag then begin
+    if RadioButton5.Checked then FWorkingChild^.uiOrientation := uioVertical
+      else FWorkingChild^.uiOrientation := uioHorizontal;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = SE19) or (Sender = SE20) or (Sender = SE21) or (Sender = SE22)) and flag then begin
+    TUIScrollBar(FWorkingChild^.surface).SetParams(SE22.Value, SE19.Value, SE20.Value, SE21.Value);
+    FModified := True;
+  end;
+  // TUIProgressBar
+  if ((Sender = SE27) or (Sender = SE28)) and flag then begin
+    TUIProgressBar(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE27.Value, SE28.Value, True);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = RadioButton3) or (Sender = RadioButton4) or
+      (Sender = CheckBox9)) and flag then begin
+    if RadioButton3.Checked then FWorkingChild^.uiOrientation := uioVertical
+      else FWorkingChild^.uiOrientation := uioHorizontal;
+    TUIProgressBar(FWorkingChild^.surface).Reversed := CheckBox9.Checked;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = FSE3) and flag then begin
+    TUIProgressBar(FWorkingChild^.surface).Percent := FSE3.Value;
+    FModified := True;
+  end;
+  // TUIScrollBox
+  if ((Sender = SE29) or (Sender = SE30)) and flag then begin
+    TUIScrollBox(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE29.Value, SE30.Value, True);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = CheckBox14) or (Sender = CheckBox15)) and flag then begin
+    FWorkingChild^.scrollboxUseVScrollbar := CheckBox14.Checked;
+    FWorkingChild^.scrollboxUseHScrollbar := CheckBox15.Checked;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUIListBox
+  if ((Sender = SE31) or (Sender = SE32)) and flag then begin
+    TUIScrollBox(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE31.Value, SE32.Value, True);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = ComboBox10) and flag then begin   // listbox item height = font height
+    FWorkingChild^.FontDescriptorName := ComboBox10.Text;
+    fontItem := FontBank.GetByName(ComboBox10.Text);
+    if fontItem <> NIL then SE38.Value := fontItem.FD.FontHeight;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = CheckBox16) and flag then begin
+    FWorkingChild^.listboxMultiSelect := CheckBox16.Checked;
+    FModified := True;
+  end;
+  if (Sender = SE38) and flag then begin
+    FWorkingChild^.listboxItemHeight := SE38.Value;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ColorButton4) or (Sender = SE35) or
+      (Sender = ColorButton6) or (Sender = SE36)) and flag then begin
+    FWorkingChild^.listboxUnselectedTextColor := ColorToBGRA(ColorButton4.ButtonColor, SE35.Value);
+    FWorkingChild^.listboxSelectedTextColor := ColorToBGRA(ColorButton6.ButtonColor, SE36.Value);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  // TUITextArea
+  if ((Sender = SE33) or (Sender = SE34)) and flag then begin
+    TUITextArea(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE33.Value, SE34.Value, True);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = ComboBox9) and flag then begin   // listbox item height = font height
+    FWorkingChild^.FontDescriptorName := ComboBox9.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ColorButton7) or (Sender = SE37)) and flag then begin
+    FWorkingChild^.TextAreaTextTint := ColorToBGRA(ColorButton7.ButtonColor, SE37.Value);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = RadioGroup1) and flag then begin
+    FWorkingChild^.TextAlignment := TOGLCAlignment(RadioGroup1.ItemIndex);
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if (Sender = Memo3) and flag then begin
+    FWorkingChild^.TextAreaText := Memo3.Text;
+    recreateSurface := True;
+    FModified := True;
+  end;
+
+
+
+  if FWorkingChild <> NIL then begin
+    DoUpdateChild(recreateSurface);
+    FModified := True;
+  end else begin
     ShowExtraPropertyPanel;
   end;
 end;
@@ -424,6 +689,54 @@ begin
   finally
     FormEditBodyShape.Free;
     FormEditBodyShape := NIL;
+  end;
+end;
+
+procedure TFrameToolUIPanelEditor.SpeedButton6Click(Sender: TObject);
+var item: PSurfaceDescriptor;
+  w, h: integer;
+begin
+  if ScreenUIPanelEditor.SelectedCount <> 1 then exit;
+  item := ScreenUIPanelEditor.Selected[0];
+  if item^.surface.ClassName <> 'TUIListBox' then exit;
+  w := TUIListBox(item^.surface).ClientArea.Width;
+  h := TUIListBox(item^.surface).ItemHeight;
+
+  FormEditGradient := TFormEditGradient.Create(NIL);
+  try
+    if Sender = SpeedButton6
+      then FormEditGradient.Edit(@TUIListBox(item^.surface).ItemColor.GradientItem, w, h)
+      else FormEditGradient.Edit(@TUIListBox(item^.surface).ItemColor.GradientItemSelected, w, h);
+    FormEditGradient.ShowModal;
+    if Sender = SpeedButton6
+      then item^.listboxUnselectedGradientData := TUIListBox(item^.surface).ItemColor.GradientItem.SaveGradientDataToString
+      else item^.listboxSelectedGradientData := TUIListBox(item^.surface).ItemColor.GradientItemSelected.SaveGradientDataToString;
+  finally
+    FormEditGradient.Free;
+  end;
+end;
+
+procedure TFrameToolUIPanelEditor.SpeedButton8Click(Sender: TObject);
+var item: PSurfaceDescriptor;
+  w, h: integer;
+begin
+  if ScreenUIPanelEditor.SelectedCount <> 1 then exit;
+  item := ScreenUIPanelEditor.Selected[0];
+  if item^.surface.ClassName <> 'TUIProgressBar' then exit;
+  w := TUIProgressBar(item^.surface).ClientArea.Width;
+  h := TUIProgressBar(item^.surface).ClientArea.Height;
+
+  FormEditGradient := TFormEditGradient.Create(NIL);
+  try
+    if not TUIProgressBar(item^.surface).Gradient.IsInitialized then begin
+      TUIProgressBar(item^.surface).Gradient.LoadGradientDataFromString(DEFAULT_GRADIENT);
+      TUIProgressBar(item^.surface).Gradient.ComputeVerticesAndIndices(w, h);
+    end;
+    FormEditGradient.Edit(@TUIProgressBar(item^.surface).Gradient, w, h);
+    FormEditGradient.ShowModal;
+    item^.ProgressBarGradientData := TUIProgressBar(item^.surface).Gradient.SaveGradientDataToString;
+  finally
+    FormEditGradient.Free;
   end;
 end;
 
@@ -634,10 +947,12 @@ end;
 procedure TFrameToolUIPanelEditor.DoUpdateChild(aForceRecreateSurface: boolean);
 var recreateSurface: Boolean;
   texname1, texName2: string;
+  surf: TSimpleSurfaceWithEffect;
 begin
   if FWorkingChild = NIL then exit;
 
   UpdateExtraPropertiesToWorkingTemporary;
+  surf := FWorkingChild^.surface;
 
   recreateSurface := aForceRecreateSurface or
                      not (FWorkingChild^.surface is CBToClassType) or
@@ -671,17 +986,21 @@ begin
     FWorkingChild^.zOrder := SE8.Value;
     FWorkingChild^.SetChildDependency;
     FModified := True;
+    // restore handle
+    FWorkingChild^.ShowHandle;
   end;
 
   UpdateValuesToWorkingSurface;
 
   // in case the name was changed, we update the combobox parent
   Surfaces.ReplaceNameInComboBox(CBParent);
+  ShowSelectionData(ScreenUIPanelEditor.Selected);
 end;
 
 procedure TFrameToolUIPanelEditor.UpdateExtraPropertiesToWorkingTemporary;
 var selectedClass: classOfSimpleSurfaceWithEffect;
   texName1, texName2: string;
+  grad: TGradientDescriptor;
 begin
   // init extra properties to temporary variable
   if FWorkingChild = NIL then exit;
@@ -689,7 +1008,7 @@ begin
   if FWorkingChild^.IsRoot then selectedClass := TUIPanelWithEffects;
 
   case selectedClass.ClassName of
-    'TUIPanel': begin
+    'TUIPanel', 'TUIPanelWithEffects': begin
       FWorkingChild^.width := SE12.Value;
       FWorkingChild^.height := SE13.Value;
       if FWorkingChild^.BodyShapeData = '' then
@@ -715,10 +1034,13 @@ begin
       GetSelectedTextureName(texName1, texName2);
       FWorkingChild^.textureName := texName1;
       FWorkingChild^.textureName2 := '';
+      if FWorkingChild^.BodyShapeData = '' then
+        FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
     end;
     'TUICheck': begin
       FWorkingChild^.Caption := Edit4.Text;
       FWorkingChild^.FontDescriptorName := ComboBox3.Text;
+      FWorkingChild^.Checked := CheckBox12.Checked;
       FWorkingChild^.CheckShape := TUICheckShape(ComboBox4.ItemIndex);
       FWorkingChild^.CheckFill := TUICheckFill(ComboBox5.ItemIndex);
       FWorkingChild^.CheckColorChecked := ColorToBGRA(ColorButton2.ButtonColor, SE14.Value);
@@ -730,6 +1052,7 @@ begin
     'TUIRadio': begin
       FWorkingChild^.Caption := Edit6.Text;
       FWorkingChild^.FontDescriptorName := ComboBox6.Text;
+      FWorkingChild^.Checked := CheckBox13.Checked;
       FWorkingChild^.CheckShape := TUICheckShape(ComboBox7.ItemIndex);
       FWorkingChild^.CheckFill := TUICheckFill(ComboBox8.ItemIndex);
       FWorkingChild^.CheckColorChecked := ColorToBGRA(ColorButton3.ButtonColor, SE15.Value);
@@ -747,6 +1070,8 @@ begin
       FWorkingChild^.scrollbarMax := SE20.Value;
       FWorkingChild^.scrollbarPageSize := SE21.Value;
       FWorkingChild^.scrollbarPosition := SE22.Value;
+      if FWorkingChild^.BodyShapeData = '' then
+        FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
     end;
     'TUIProgressBar': begin
       FWorkingChild^.width := SE27.Value;
@@ -755,18 +1080,47 @@ begin
         else FWorkingChild^.uiOrientation := uioHorizontal;
       FWorkingChild^.ProgressBarReversed := CheckBox9.Checked;
       FWorkingChild^.ProgressBarPercent := FSE3.Value;
+      if FWorkingChild^.BodyShapeData = '' then
+        FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
+      if FWorkingChild^.ProgressBarGradientData = '' then
+        FWorkingChild^.ProgressBarGradientData := DEFAULT_GRADIENT;
     end;
     'TUIScrollBox': begin
       FWorkingChild^.width := SE29.Value;
       FWorkingChild^.height := SE30.Value;
+      FWorkingChild^.scrollboxUseVScrollbar := CheckBox14.Checked;
+      FWorkingChild^.scrollboxUseHScrollbar := CheckBox15.Checked;
+      if FWorkingChild^.BodyShapeData = '' then
+        FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
     end;
     'TUIListBox': begin
       FWorkingChild^.width := SE31.Value;
       FWorkingChild^.height := SE32.Value;
+      FWorkingChild^.FontDescriptorName := ComboBox10.Text;
+      FWorkingChild^.listboxUnselectedTextColor := ColorToBGRA(ColorButton4.ButtonColor, SE35.Value);
+      if FWorkingChild^.listboxUnselectedGradientData = '' then begin
+        grad.InitDefault;
+        grad.CreateSingleColor(BGRA(30,30,30));
+        FWorkingChild^.listboxUnselectedGradientData := grad.SaveGradientDataToString;
+      end;
+      FWorkingChild^.listboxSelectedTextColor := ColorToBGRA(ColorButton6.ButtonColor, SE36.Value);
+      if FWorkingChild^.listboxSelectedGradientData = '' then begin
+        grad.InitDefault;
+        grad.CreateSingleColor(BGRA(51,153,255));
+        FWorkingChild^.listboxSelectedGradientData := grad.SaveGradientDataToString;
+      end;
+      FWorkingChild^.listboxMultiSelect := CheckBox16.Checked;
+      if FWorkingChild^.BodyShapeData = '' then
+        FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
     end;
     'TUITextArea': begin
       FWorkingChild^.width := SE33.Value;
       FWorkingChild^.height := SE34.Value;
+      if FWorkingChild^.BodyShapeData = '' then FWorkingChild^.BodyShapeData := DEFAULT_BODYSHAPE;
+      if FWorkingChild^.BackGradientData = '' then FWorkingChild^.BackGradientData := DEFAULT_GRADIENT;
+      FWorkingChild^.FontDescriptorName := ComboBox9.Text;
+      FWorkingChild^.TextAreaTextTint := ColorToBGRA(ColorButton7.ButtonColor, SE37.Value);
+      FWorkingChild^.TextAlignment := TOGLCAlignment(RadioGroup1.ItemIndex);
       FWorkingChild^.TextAreaText := Memo3.Lines.Text;
     end;
     else raise exception.create('forgot to implement '+selectedClass.ClassName);
@@ -799,11 +1153,32 @@ begin
     end;
   end;
 
-  if (FWorkingChild^.surface is TUIPanel) or (FWorkingChild^.surface is TUIPanelWithEffects) then
-    TUIPanel(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE12.Value, SE13.Value, True);
-  // to do the other surface with width and height
-
   FWorkingChild^.UpdateHandlePosition;
+end;
+
+procedure TFrameToolUIPanelEditor.UpdateEventCheckBox;
+var flag: boolean;
+begin
+  FInitializing := True;
+  flag := Assigned(FWorkingChild);
+
+  CheckBox2.Enabled := flag;
+  CheckBox3.Enabled := flag;
+  CheckBox4.Enabled := flag;
+  CheckBox5.Enabled := flag;
+  CheckBox6.Enabled := flag;
+  CheckBox7.Enabled := flag;
+  CheckBox8.Enabled := flag;
+
+  CheckBox17.Enabled := flag and ((FWorkingChild^.classtype = TUICheck) or
+                                 (FWorkingChild^.classtype = TUIRadio) or
+                                 (FWorkingChild^.classtype = TUIScrollBar));
+  //if not CheckBox17.Enabled then CheckBox17.Checked := False;
+
+  CheckBox18.Enabled := flag and (FWorkingChild^.classtype = TUIListBox);
+  //if not CheckBox18.Enabled then CheckBox18.Checked := False;
+
+  FInitializing := False;
 end;
 
 procedure TFrameToolUIPanelEditor.FillCBParent;
@@ -895,7 +1270,7 @@ begin
       end;
       'TUIProgressBar': begin
         NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageUIProgressBar);
-        SpeedButton20.Enabled := Assigned(FWorkingChild^.surface);
+        SpeedButton20.Enabled := flag;
       end;
       'TUIScrollBox': begin
         NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageUIScrollBox);
@@ -944,6 +1319,8 @@ begin
   FillTexturesComboBox;
   FillCBParent;
   FillFontsComboBox;
+
+  UpdateEventCheckBox;
 
   UpdateDebugLabels;
 end;
@@ -1002,6 +1379,7 @@ begin
       if surface is TUIImage then begin
         SE17.Value := surface.Width;
         SE18.Value := surface.Height;
+        CBTexturesUIImage.ItemIndex := Textures.GetItemIndexByName(FWorkingChild^.textureName);
       end;
       if surface is TUILabel then begin
         Edit2.Text := TUILabel(surface).Caption;
@@ -1018,6 +1396,7 @@ begin
       if surface is TUICheck then begin
         Edit4.Text := TUICheck(surface).Caption;
         ComboBox3.ItemIndex := ComboBox3.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+        CheckBox12.Checked := FWorkingChild^.Checked;
         ComboBox4.ItemIndex := Ord(FWorkingChild^.CheckShape);
 
         ComboBox5.Itemindex := Ord(FWorkingChild^.CheckFill);
@@ -1032,6 +1411,7 @@ begin
       if surface is TUIRadio then begin
         Edit6.Text := TUIRadio(surface).Caption;
         ComboBox6.ItemIndex := ComboBox6.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+        CheckBox13.Checked := FWorkingChild^.Checked;
         ComboBox7.ItemIndex := Ord(FWorkingChild^.CheckShape);
 
         ComboBox8.Itemindex := Ord(FWorkingChild^.CheckFill);
@@ -1072,6 +1452,11 @@ begin
       if surface is TUITextArea then begin
         SE33.Value := surface.Width;
         SE34.Value := surface.Height;
+        ComboBox9.ItemIndex := ComboBox9.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+        ColorButton7.ButtonColor := FWorkingChild^.TextAreaTextTint.ToColor;
+        SE37.Value := FWorkingChild^.TextAreaTextTint.alpha;
+        RadioGroup1.ItemIndex := Ord(FWorkingChild^.TextAlignment);
+        Memo3.Text := FWorkingChild^.TextAreaText;
       end;
 
 
@@ -1082,6 +1467,7 @@ begin
     Panel6.Enabled := True;
     BNewChild.Enabled := False;
     ShowExtraPropertyPanel;
+    UpdateEventCheckBox;
   end
   else
   if Length(aSelected) > 1 then begin
@@ -1095,6 +1481,7 @@ begin
     Panel6.Enabled := False;
     BNewChild.Enabled := False;
     ShowExtraPropertyPanel;
+    UpdateEventCheckBox;
   end
   else begin
     // 0 selected -> reset parameters, enable them and activate the button 'ADD'
@@ -1113,6 +1500,7 @@ begin
     BNewChild.Enabled := True;
     ShowFrameIndexWidget(False);
     ShowExtraPropertyPanel;
+    UpdateEventCheckBox;
   end;
 
   FInitializing := False;

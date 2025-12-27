@@ -83,13 +83,25 @@ public
   // ScrollBar
   uiOrientation: TUIOrientation;
   scrollbarMin, scrollbarMax, scrollbarPageSize, scrollbarPosition: ptrInt;
-  scrollbarCursorBodyShapeData: string;
+//  scrollbarCursorBodyShapeData: string;
+//  scrollbarCursorGradientData: string;
   // ProgressBar
   ProgressBarGradientData: string;
   ProgressBarReversed: boolean;
   ProgressBarPercent: single;
+  // scrollbox
+  scrollboxUseVScrollbar, scrollboxUseHScrollbar: boolean;
+  // listbox
+  listboxUnselectedTextColor: TBGRAPixel;
+  listboxUnselectedGradientData: string;
+  listboxSelectedTextColor: TBGRAPixel;
+  listboxSelectedGradientData: string;
+  listboxMultiSelect: boolean;
+  listboxItemHeight: integer;
   // TextArea
   TextAreaText: string;
+  TextAreaTextTint: TBGRAPixel;
+
 
   procedure InitDefault;
   procedure KillSurface;
@@ -98,6 +110,7 @@ public
   procedure RecreateSurfaceBecauseTextureChanged;
   procedure SetChildDependency;
   function GetTextureFromTextureName: PTexture;
+  function GetTexture2FromTexturename2: PTexture;
 
   procedure SaveAndRemoveChilds;
   procedure RestoreChilds;
@@ -116,6 +129,7 @@ public
   procedure AddOffsetToPivot(aOffset: TPointF); // in world coordinates
   procedure UpdateHandlePosition;
   procedure ToogleScaledAndRotatedHandle;
+  procedure ShowHandle;
   procedure HideHandle;
 
   procedure SaveCurrentAngleBeforeRotation;
@@ -355,11 +369,21 @@ begin
   scrollbarMax := 100;
   scrollbarPageSize := 10;
   scrollbarPosition := 0;
-  scrollbarCursorBodyShapeData := '';
+//  scrollbarCursorBodyShapeData := '';
+//  scrollbarCursorGradientData := '';
   ProgressBarGradientData := '';
   ProgressBarReversed := False;
   ProgressBarPercent := 0.0;
+  scrollboxUseVScrollbar := True;
+  scrollboxUseHScrollbar := False;
+  listboxUnselectedTextColor := BGRA(220,220,220);
+  listboxUnselectedGradientData := '';
+  listboxSelectedTextColor := BGRAWhite;
+  listboxSelectedGradientData := '';
+  listboxMultiSelect := False;
+  listboxItemHeight := 24;
   TextAreaText := '';
+  TextAreaTextTint := BGRA(220,220,220);
 
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
@@ -493,13 +517,83 @@ begin
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
     surface := TUICheck.Create(FScene, Caption, TexturedFont);
     TUICheck(surface).Checked := Checked;
+    if CheckShape = ctUseTexture then begin
+      TUICheck(surface).CustomizeCheckBox(GetTexture2FromTextureName2, GetTextureFromTextureName, CheckAdjustImageToFontHeight);
+    end else begin
+      TUICheck(surface).CustomizeCheckBox(CheckShape, CheckFill);
+      TUICheck(surface).ColorChecked := CheckColorChecked;
+    end;
     TUICheck(surface).MouseInteractionEnabled := False;
   end else
   if classType = TUIRadio then begin // TUIRadio
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
     surface := TUIRadio.Create(FScene, Caption, TexturedFont);
     TUIRadio(surface).Checked := Checked;
+    if CheckShape = ctUseTexture then begin
+      TUIRadio(surface).CustomizeCheckBox(GetTexture2FromTextureName2, GetTextureFromTextureName, CheckAdjustImageToFontHeight);
+    end else begin
+      TUIRadio(surface).CustomizeCheckBox(CheckShape, CheckFill);
+      TUIRadio(surface).ColorChecked := CheckColorChecked;
+    end;
     TUIRadio(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUIScrollBar then begin  // TUIScrollBar
+    surface := TUIScrollBar.Create(FScene, uiOrientation);
+    TUIScrollBar(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIScrollBar(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIScrollBar(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUIScrollBar(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    TUIScrollBar(surface).SliderShape.LoadFromString(BodyShapeData);
+    TUIScrollBar(surface).SetParams(scrollbarPosition, scrollbarMin, scrollbarMax, scrollbarPageSize);
+    TUIScrollBar(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUIProgressBar then begin // TUIProgressBar
+    surface := TUIProgressBar.Create(FScene, uiOrientation);
+    TUIProgressBar(surface).Reversed := progressbarReversed;
+    TUIProgressBar(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIProgressBar(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIProgressBar(surface).Gradient.LoadGradientDataFromString(ProgressBarGradientData);
+    TUIProgressBar(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    TUIProgressBar(surface).Percent := ProgressBarPercent;
+    TUIProgressBar(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUIScrollBox then begin // TUIScrollBox
+    surface := TUIScrollBox.Create(FScene, scrollboxUseVScrollbar, scrollboxUseHScrollbar);
+    TUIScrollBox(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIScrollBox(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIScrollBox(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUIScrollBox(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    TUIScrollBox(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUIListBox then begin // TUIListBox
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, 'Item 123', Atlas, TexturedFont, NIL);
+    surface := TUIListBox.Create(FScene, TexturedFont);
+    TUIListBox(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIListBox(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIListBox(surface).ItemColor.ColorText := listboxUnselectedTextColor;
+    TUIListBox(surface).ItemColor.GradientItem.LoadGradientDataFromString(listboxUnselectedGradientData);
+    TUIListBox(surface).ItemColor.ColorSelectedText := listboxSelectedTextColor;
+    TUIListBox(surface).ItemColor.GradientItemSelected.LoadGradientDataFromString(listboxSelectedGradientData);
+    TUIListBox(surface).ItemHeight := listboxItemHeight;
+    TUIListBox(surface).Add('Item 1');
+    TUIListBox(surface).Add('Item 2');
+    TUIListBox(surface).Add('Item 3');
+    TUIListBox(surface).FirstSelectedIndex := 1;
+    TUIListBox(surface).MultiSelect := listboxMultiSelect;
+    TUIListBox(surface).MouseInteractionEnabled := False;
+  end else
+  if classType = TUITextArea then begin  // TUITextArea
+    surface := TUITextArea.Create(FScene);
+    TUITextArea(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUITextArea(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUITextArea(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUITextArea(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    TUITextArea(surface).Text.Caption := TextAreaText;
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, TextAreaText, Atlas, TexturedFont, NIL);
+    TUITextArea(surface).Text.TexturedFont := TexturedFont;
+    TUITextArea(surface).Text.Align := TextAlignment;
+    TUITextArea(surface).Text.Tint.Value := TextAreaTextTint;
+    TUITextArea(surface).MouseInteractionEnabled := False;
   end
 
   else raise exception.create('forgot to implement '''+classType.ClassName+'''');
@@ -530,7 +624,7 @@ begin
       parentItem := ParentList.GetItemByID(parentID);
       if parentItem = NIL
         then raise exception.create('parent with ID='+parentID.ToString+' not found !')
-        else surface.SetChildOf(parentItem^.surface, zOrder);
+        else parentItem^.surface.AddChild(surface, zOrder);  //   surface.SetChildOf(parentItem^.surface, zOrder);
   end;
 end;
 
@@ -538,6 +632,13 @@ function TSurfaceDescriptor.GetTextureFromTextureName: PTexture;
 var texItem: PTextureItem;
 begin
   texItem := ParentList.Textures.GetItemByName(textureName);
+  if texItem <> NIL then Result := texItem^.texture else Result := NIL;
+end;
+
+function TSurfaceDescriptor.GetTexture2FromTexturename2: PTexture;
+var texItem: PTextureItem;
+begin
+  texItem := ParentList.Textures.GetItemByName(textureName2);
   if texItem <> NIL then Result := texItem^.texture else Result := NIL;
 end;
 
@@ -1033,11 +1134,21 @@ begin
   aSurface^.scrollbarMax := scrollbarMax;
   aSurface^.scrollbarPageSize := scrollbarPageSize;
   aSurface^.scrollbarPosition := scrollbarPosition;
-  aSurface^.scrollbarCursorBodyShapeData := scrollbarCursorBodyShapeData;
+//  aSurface^.scrollbarCursorBodyShapeData := scrollbarCursorBodyShapeData;
+//  aSurface^.scrollbarCursorGradientData := scrollbarCursorGradientData;
   aSurface^.ProgressBarGradientData := ProgressBarGradientData;
   aSurface^.ProgressBarReversed := ProgressBarReversed;
   aSurface^.ProgressBarPercent := ProgressBarPercent;
+  aSurface^.scrollboxUseVScrollbar := scrollboxUseVScrollbar;
+  aSurface^.scrollboxUseHScrollbar := scrollboxUseHScrollbar;
+  aSurface^.listboxUnselectedTextColor := listboxUnselectedTextColor;
+  aSurface^.listboxUnselectedGradientData := listboxUnselectedGradientData;
+  aSurface^.listboxSelectedTextColor := listboxSelectedTextColor;
+  aSurface^.listboxSelectedGradientData := listboxSelectedGradientData;
+  aSurface^.listboxMultiSelect := listboxMultiSelect;
+  aSurface^.listboxItemHeight := listboxItemHeight;
   aSurface^.TextAreaText := TextAreaText;
+  aSurface^.TextAreaTextTint := TextAreaTextTint;
 
   aSurface^.CreateSurface(True);
   aSurface^.SetChildDependency;
@@ -1195,6 +1306,11 @@ begin
   HandleManager.ToogleScaledAndRotatedHandle(surface);
 end;
 
+procedure TSurfaceDescriptor.ShowHandle;
+begin
+  HandleManager.ShowScaleHandle(surface);
+end;
+
 procedure TSurfaceDescriptor.HideHandle;
 begin
   HandleManager.HideAll;
@@ -1315,17 +1431,34 @@ begin
       prop.Add('scrollbarMax', scrollbarMax);
       prop.Add('scrollbarPageSize', scrollbarPageSize);
       prop.Add('scrollbarPosition', scrollbarPosition);
-      prop.Add('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData);
+//      prop.Add('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData);
+//      prop.Add('scrollbarCursorGradientData', scrollbarCursorGradientData);
     end;
 
     if _className = 'TUIProgressBar' then begin
       prop.Add('Orientation', Ord(uiOrientation));
       prop.Add('ProgressBarReversed', ProgressBarReversed);
       prop.Add('ProgressBarPercent', ProgressBarPercent);
+      prop.Add('GradientData', ProgressBarGradientData);
+    end;
+
+    if _className = 'TUIScrollBox' then begin
+      prop.Add('UseVScrollbar', scrollboxUseVScrollbar);
+      prop.Add('UseHScrollbar', scrollboxUseHScrollbar);
+    end;
+
+    if _className = 'TUIListBox' then begin
+      prop.Add('UnselectedTextColor', listboxUnselectedTextColor);
+      prop.Add('UnselectedGradientData', listboxUnselectedGradientData);
+      prop.Add('SelectedTextColor', listboxSelectedTextColor);
+      prop.Add('SelectedGradientData', listboxSelectedGradientData);
+      prop.Add('MultiSelect', listboxMultiSelect);
+      prop.Add('ItemHeight', listboxItemHeight);
     end;
 
     if _className = 'TUITextArea' then begin
-      prop.Add('TextAreaText', TextAreaText, True);
+      prop.Add('Text', TextAreaText, True);
+      prop.Add('TextTint', TextAreaTextTint);
     end;
   end;
 
@@ -1371,6 +1504,9 @@ begin
     'TUIRadio': classtype := TUIRadio;
     'TUIScrollBar': classtype := TUIScrollBar;
     'TUIProgressBar': classtype := TUIProgressBar;
+    'TUIScrollBox': classtype := TUIScrollBox;
+    'TUIListBox': classtype := TUIListBox;
+    'TUITextArea': classtype := TUITextArea;
     else exception.create('forgot to implement!');
   end;
   prop.StringValueOf('TextureName', textureName, textureName);
@@ -1455,12 +1591,27 @@ begin
   prop.Int64ValueOf('scrollbarMax', scrollbarMax, 100);
   prop.Int64ValueOf('scrollbarPageSize', scrollbarPageSize, 10);
   prop.Int64ValueOf('scrollbarPosition', scrollbarPosition, 0);
-  prop.StringValueOf('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData, scrollbarCursorBodyShapeData);
+//  prop.StringValueOf('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData, scrollbarCursorBodyShapeData);
+//  prop.StringValueOf('scrollbarCursorGradientData', scrollbarCursorGradientData, scrollbarCursorGradientData);
   // ProgressBar
   prop.BooleanValueOf('ProgressBarReversed', ProgressBarReversed, False);
   prop.SingleValueOf('ProgressBarPercent', ProgressBarPercent, 0.0);
+  prop.StringValueOf('GradientData', ProgressBarGradientData, ProgressBarGradientData);
+
+  // scrollbox
+  prop.BooleanValueOf('UseVScrollbar', scrollboxUseVScrollbar, True);
+  prop.BooleanValueOf('UseHScrollbar', scrollboxUseHScrollbar, False);
+  // listbox
+  prop.BGRAPixelValueOf('UnselectedTextColor', listboxUnselectedTextColor, BGRA(220,220,220));
+  prop.StringValueOf('UnselectedGradientData', listboxUnselectedGradientData, '');
+  prop.BGRAPixelValueOf('SelectedTextColor', listboxSelectedTextColor, BGRAWhite);
+  prop.StringValueOf('SelectedGradientData', listboxSelectedGradientData, '');
+  prop.BooleanValueOf('MultiSelect', listboxMultiSelect, False);
+  prop.IntegerValueOf('ItemHeight', listboxItemHeight, listboxItemHeight);
+
   // TUITextArea
-  prop.StringValueOf('TextAreaText', TextAreaText, '');
+  prop.StringValueOf('Text', TextAreaText, '');
+  prop.BGRAPixelValueOf('TextTint', TextAreaTextTint, BGRA(220,220,220));
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode
@@ -1517,20 +1668,20 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
     parentIsRegistered := False;
     for i:=aSurface.ChildCount-1 downto 0 do begin
       o := aSurface.Childs[i];
-      if not parentIsRegistered and (o.ZOrderAsChild < 0) then begin
-        parentIsRegistered := True;
-        AddToResult(GetItemBySurface(aSurface));
-      end;
+      // TUIClickableAndScrollableWithBodyShape can have TUIScrollBarOwned childs -> this produce a bug
+      // we ignore them
+      if o is TUIScrollBarOwned then continue;
+      //if not(o is TUIScrollBarOwned) then begin
+        if not parentIsRegistered and (o.ZOrderAsChild < 0) then begin
+          parentIsRegistered := True;
+          AddToResult(GetItemBySurface(aSurface));
+        end;
+        if o.ChildCount > 0 then CheckRecursive(o);
 
-      // TUIButton have childs -> this produce a bug
-    //  if (o is TUIButton)
-
-
-      if o.ChildCount > 0 then CheckRecursive(o);
-
-      AddToResult(GetItemBySurface(o))
+        AddToResult(GetItemBySurface(o));
+      //end;
     end;
-    if not parentIsRegistered then
+    if not parentIsRegistered and not (aSurface is TUIScrollBarOwned) then
       AddToResult(GetItemBySurface(aSurface));
   end;
   procedure CopySurfaceList;
