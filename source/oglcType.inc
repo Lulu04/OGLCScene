@@ -1247,7 +1247,7 @@ var i: integer;
     j: integer;
   begin
     if not DirectoryExistsUTF8(aPath) then exit;
-    t := FindAllFiles(aPath, '*.ttf', False);
+    t := FindAllFiles(aPath, '*.ttf', True);
     for j:=0 to t.Count-1 do
       filesFound.Add(t.Strings[j]);
     t.Free;
@@ -1261,8 +1261,8 @@ begin
    ScanFolder(SHGetFolderPathUTF8(20));  // CSIDL_FONTS = 20
   {$endif}
   {$ifdef linux}
-   ScanFolder('/usr/share/cups/fonts/');
    ScanFolder('/usr/share/fonts/truetype/');
+   ScanFolder('/usr/share/cups/fonts/');
    ScanFolder('/usr/local/lib/X11/fonts/');
    ScanFolder(GetUserDir + '.fonts/');
   {$endif}
@@ -1280,7 +1280,11 @@ begin
   FFontCollection.BeginUpdate;
   try
     for i:=0 to filesFound.Count-1 do begin
-      item := FFontCollection.AddFile(filesFound.Strings[i]);
+      try
+        item := FFontCollection.AddFile(filesFound.Strings[i]);
+      except
+        item := NIL;
+      end;
       if item <> NIL then begin
         FSystemFontNames[i] := item.Family.FamilyName;
         FSystemFontFilenames[i] := filesFound.Strings[i];
