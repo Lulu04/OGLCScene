@@ -1,6 +1,8 @@
 {$ifdef oglcINTERFACE}
 type
 
+TUIScrollBarOwned = TUIScrollBar;
+
 TUIScrollBarMode = (sbmNeverShow, sbmAlwaysShow, sbmAuto);
 
 { TUIClickableAndScrollableWithBodyShape }
@@ -8,7 +10,7 @@ TUIScrollBarMode = (sbmNeverShow, sbmAlwaysShow, sbmAuto);
 TUIClickableAndScrollableWithBodyShape = class(TUIClickableWithBodyShape)
 private
   FHScrollBarMode, FVScrollBarMode: TUIScrollBarMode;
-  FHScrollBar, FVScrollBar: TUIScrollBar;
+  FHScrollBar, FVScrollBar: TUIScrollBarOwned;
   function GetHMouseWheelDeltaValue: ptrint;
   function GetVMouseWheelDeltaValue: ptrint;
   procedure ProcessEventScrollBarChange({%H-}aSurface: TSimpleSurfaceWithEffect); virtual;
@@ -317,7 +319,7 @@ begin
   inherited Create(aParentScene);
 
   if aUseVScrollBar then begin
-    FVScrollBar := TUIScrollBar.Create(aParentScene, uioVertical);
+    FVScrollBar := TUIScrollBarOwned.Create(aParentScene, uioVertical);
     FVScrollBar.BodyShape.Border.Color := FVScrollBar.BodyShape.Fill.Color;
     FVScrollBar.Visible := False;
     FVScrollBar.OnChange := @ProcessEventScrollBarChange;
@@ -326,7 +328,7 @@ begin
   end;
 
   if aUseHScrollBar then begin
-    FHScrollBar := TUIScrollBar.Create(aParentScene, uioHorizontal);
+    FHScrollBar := TUIScrollBarOwned.Create(aParentScene, uioHorizontal);
     FHScrollBar.BodyShape.Border.Color := FVScrollBar.BodyShape.Fill.Color;
     FHScrollBar.Visible := False;
     FHScrollBar.OnChange := @ProcessEventScrollBarChange;
