@@ -812,7 +812,7 @@ begin
   end;
   // Angle
   Angle.OnElapse(aElapsedTime);
-  // Do Rotation around an axis
+  // Do Rotation around a point
   with FRotationAroundPt do
    if InProgress then begin
      Xr := GetCenterX - XPt;
