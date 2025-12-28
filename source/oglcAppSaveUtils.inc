@@ -169,7 +169,7 @@ begin
  {$elseif defined(Darwin) and defined(cpux86_64)}
   Result := 'x86_64-macos/';
  {$else}
-    {$error You can not compile this program for this platform !}
+  Result := '';
  {$endif}
 end;
 
