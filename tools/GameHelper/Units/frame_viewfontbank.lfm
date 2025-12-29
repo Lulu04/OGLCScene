@@ -21,6 +21,7 @@ object FrameViewFontBank: TFrameViewFontBank
     BorderStyle = bsNone
     Color = 3947580
     Font.Height = 16
+    HotTrack = True
     Images = DataModule1.ILLevelTreeView
     ParentFont = False
     ReadOnly = True
@@ -32,7 +33,7 @@ object FrameViewFontBank: TFrameViewFontBank
     OnMouseWheel = TVMouseWheel
     OnResize = TVResize
     OnSelectionChanged = TVSelectionChanged
-    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
   end
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
@@ -734,10 +735,16 @@ object FrameViewFontBank: TFrameViewFontBank
       end
     end
     object PB: TPaintBox
-      Left = 248
-      Height = 50
-      Top = 199
-      Width = 50
+      AnchorSideTop.Control = SE6
+      AnchorSideTop.Side = asrBottom
+      Left = 240
+      Height = 65
+      Hint = 'Mouse left button to move the origin point (circle)'#13#10'Mouse right button to move the end point (square)'
+      Top = 183
+      Width = 65
+      BorderSpacing.Top = 3
+      ParentShowHint = False
+      ShowHint = True
       OnMouseDown = PBMouseDown
       OnMouseMove = PBMouseMove
       OnMouseUp = PBMouseUp

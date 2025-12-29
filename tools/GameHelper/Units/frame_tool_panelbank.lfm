@@ -96,7 +96,7 @@ object FrameToolPanelBank: TFrameToolPanelBank
       ParentColor = False
       ParentFont = False
     end
-    object BCancel: TSpeedButton
+    object BHelp: TSpeedButton
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel8
@@ -104,13 +104,14 @@ object FrameToolPanelBank: TFrameToolPanelBank
       Cursor = crHandPoint
       Left = 295
       Height = 24
-      Hint = 'Return to the main window'
+      Hint = 'Help'
       Top = 4
       Width = 24
       Anchors = [akTop, akRight]
       Flat = True
       Images = DataModule1.ILIconUI
-      ImageIndex = 13
+      ImageIndex = 8
+      OnClick = BHelpClick
       ShowHint = True
       ParentShowHint = False
     end

@@ -672,6 +672,24 @@ begin
     CBTextures.Enabled := CBChildTypeIsTextured;
     if not CBTextures.Enabled then CBTextures.ItemIndex := -1;
     Label4.Enabled := CBTextures.Enabled;
+    if FWorkingChild <> NIL then begin
+      FInitializingWidget := True;
+      SE16.Value := FWorkingChild^.width;
+      SE17.Value := FWorkingChild^.height;
+      SE18.Value := FWorkingChild^.width;
+      SE19.Value := FWorkingChild^.height;
+      SE20.Value := FWorkingChild^.width;
+      SE21.Value := FWorkingChild^.height;
+      SE22.Value := FWorkingChild^.width;
+      SE23.Value := FWorkingChild^.height;
+      SE24.Value := FWorkingChild^.width;
+      SE25.Value := FWorkingChild^.height;
+      SE26.Value := FWorkingChild^.width;
+      SE27.Value := FWorkingChild^.height;
+      SE28.Value := FWorkingChild^.width;
+      SE29.Value := FWorkingChild^.height;
+      FInitializingWidget := False;
+    end;
   end;
 
   if Sender = CBTextures then begin
@@ -719,16 +737,18 @@ begin
                    (CBBlend.ItemIndex <> integer(BlendMode));
 
     if FWorkingChild^.surface is TSprite then
-      with TSprite(FWorkingChild^.surface) do
-        chang := chang or (Width <> SE18.Value) or (Height <> SE19.Value);
+      //with TSprite(FWorkingChild^.surface) do
+      with FWorkingChild^ do
+        chang := chang or (width <> SE18.Value) or (height <> SE19.Value);
 
     if FWorkingChild^.surface is TDeformationGrid then
-      with TDeformationGrid(FWorkingChild^.surface) do
-        chang := chang or (Width <> SE26.Value) or (Height <> SE27.Value);
+      //with TDeformationGrid(FWorkingChild^.surface) do
+      with FWorkingChild^ do
+        chang := chang or (width <> SE26.Value) or (height <> SE27.Value);
 
     if FWorkingChild^.surface is TQuad4Color then
       with TQuad4Color(FWorkingChild^.surface) do
-        chang := chang or (Width <> SE16.Value) or (Height <> SE17.Value) or
+        chang := chang or (FWorkingChild^.width <> SE16.Value) or (FWorkingChild^.height <> SE17.Value) or
                  (BGRAToColor(TopLeftColor.Value) <> ColorButton1.ButtonColor) or
                  (Trunc(TopLeftColor.Alpha.Value) <> SE12.Value) or
                  (BGRAToColor(TopRightColor.Value) <> ColorButton2.ButtonColor) or
@@ -739,8 +759,9 @@ begin
                  (Trunc(BottomLeftColor.Alpha.Value) <> SE14.Value);
 
     if FWorkingChild^.surface is TGradientRectangle then
-      with TGradientRectangle(FWorkingChild^.surface) do
-        chang := chang or (Width <> SE28.Value) or (Height <> SE29.Value);
+      //with TGradientRectangle(FWorkingChild^.surface) do
+      with FWorkingChild^ do
+        chang := chang or (width <> SE28.Value) or (height <> SE29.Value);
 
     if chang then begin
       DoUpdateChild(False);
@@ -1017,12 +1038,17 @@ begin
     FWorkingChild^.zOrder := SE8.Value;
     FWorkingChild^.SetChildDependency;
     FModified := True;
+    // restore handle
+    FWorkingChild^.ShowHandle;
   end;
 
   UpdateValuesToWorkingSurface;
 
   // in case the name was changed, we update the combobox parent
   Surfaces.ReplaceNameInComboBox(CBParent);
+
+  // update the extra panel in case the working surface have changed its type
+  if recreateSurface then ShowExtraPropertyPanel;
 end;
 
 function TFrameToolsSpriteBuilder.GetWidgetTintMode: TTintMode;

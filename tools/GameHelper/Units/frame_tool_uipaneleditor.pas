@@ -330,6 +330,8 @@ procedure UpdateDebugLabels;
     procedure EditNewPanel;
     procedure EditPanelFromBank(aItem: TPanelDescriptorItem);
 
+    procedure ProcessEndResize;
+
     procedure FillTexturesComboBox;
     procedure FillCBParent;
     procedure FillFontsComboBox;
@@ -573,7 +575,7 @@ begin
   end;
   // TUIListBox
   if ((Sender = SE31) or (Sender = SE32)) and flag then begin
-    TUIScrollBox(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE31.Value, SE32.Value, True);
+    TUIListBox(FWorkingChild^.surface).BodyShape.ResizeCurrentShape(SE31.Value, SE32.Value, True);
     recreateSurface := True;
     FModified := True;
   end;
@@ -995,6 +997,9 @@ begin
   // in case the name was changed, we update the combobox parent
   Surfaces.ReplaceNameInComboBox(CBParent);
   ShowSelectionData(ScreenUIPanelEditor.Selected);
+
+  // update the extra panel in case the working surface have changed its type
+  if recreateSurface then ShowExtraPropertyPanel;
 end;
 
 procedure TFrameToolUIPanelEditor.UpdateExtraPropertiesToWorkingTemporary;
@@ -1448,6 +1453,13 @@ begin
       if surface is TUIListBox then begin
         SE31.Value := surface.Width;
         SE32.Value := surface.Height;
+        ComboBox10.ItemIndex := ComboBox10.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+        CheckBox16.Checked := FWorkingChild^.listboxMultiSelect;
+        SE38.Value := FWorkingChild^.listboxItemHeight;
+        ColorButton4.ButtonColor := BGRAToColor(FWorkingChild^.listboxUnselectedTextColor);
+        SE35.Value := FWorkingChild^.listboxUnselectedTextColor.alpha;
+        ColorButton6.ButtonColor := BGRAToColor(FWorkingChild^.listboxSelectedTextColor);
+        SE36.Value := FWorkingChild^.listboxSelectedTextColor.alpha;
       end;
       if surface is TUITextArea then begin
         SE33.Value := surface.Width;
@@ -1535,6 +1547,11 @@ begin
 
   OnShow;
 //  ScreenUIPanelEditor.ZoomOnScene;
+end;
+
+procedure TFrameToolUIPanelEditor.ProcessEndResize;
+begin
+  DoUpdateChild(True);
 end;
 
 procedure TFrameToolUIPanelEditor.FillTexturesComboBox;

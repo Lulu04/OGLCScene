@@ -161,6 +161,8 @@ begin
     end;
     Application.ProcessMessages;
   until MouseState <> msScalingSelection;
+
+  FrameToolUIPanelEditor.ProcessEndResize;
 end;
 
 procedure TScreenUIPanelEditor.ProcessMouseUp(Button: TMouseButton;

@@ -6,8 +6,8 @@ object FrameToolScreenBank: TFrameToolScreenBank
   ClientHeight = 552
   ClientWidth = 320
   TabOrder = 0
-  DesignLeft = 589
-  DesignTop = 189
+  DesignLeft = 753
+  DesignTop = 97
   object Panel1: TPanel
     Left = 0
     Height = 552
@@ -62,6 +62,7 @@ object FrameToolScreenBank: TFrameToolScreenBank
         Top = 58
         Width = 188
         Caption = 'Keep camera(s) in world bounds'
+        Enabled = False
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
@@ -86,6 +87,7 @@ object FrameToolScreenBank: TFrameToolScreenBank
         ClientHeight = 20
         ClientWidth = 236
         Columns = 2
+        Enabled = False
         ItemIndex = 0
         Items.Strings = (
           'Single'
@@ -95,22 +97,6 @@ object FrameToolScreenBank: TFrameToolScreenBank
         ParentShowHint = False
         ShowHint = True
         TabOrder = 1
-      end
-      object Label38: TLabel
-        AnchorSideTop.Control = Panel2
-        AnchorSideRight.Control = Panel2
-        AnchorSideRight.Side = asrBottom
-        Left = 230
-        Height = 15
-        Top = 3
-        Width = 86
-        Anchors = [akTop, akRight]
-        BorderSpacing.Top = 2
-        BorderSpacing.Right = 3
-        Caption = 'Camera options'
-        Font.Color = clWhite
-        Font.Style = [fsBold]
-        ParentFont = False
       end
     end
     object Panel3: TPanel
@@ -220,6 +206,23 @@ object FrameToolScreenBank: TFrameToolScreenBank
         Caption = 'Use a local atlas and add level textures to it'
         TabOrder = 0
       end
+    end
+    object Label38: TLabel
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = Panel2
+      Left = 275
+      Height = 15
+      Top = 252
+      Width = 42
+      Anchors = [akRight, akBottom]
+      BorderSpacing.Top = 2
+      BorderSpacing.Right = 3
+      Caption = 'Camera'
+      Font.Color = clWhite
+      Font.Style = [fsBold]
+      ParentFont = False
     end
   end
 end

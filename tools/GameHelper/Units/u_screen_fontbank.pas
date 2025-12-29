@@ -76,7 +76,8 @@ procedure TScreenFontBank.CreateObjects;
 begin
   ShowLayers([LAYER_FONT, LAYER_UI, LAYER_TOP]);
   ShowSceneBounds;
- // CreateCamera([LAYER_FONT]);
+  CreateCamera([LAYER_FONT, LAYER_SCENEBOUNDS]);
+  ZoomOnScene;
 end;
 
 procedure TScreenFontBank.FreeObjects;
@@ -89,7 +90,7 @@ begin
   FFontAtlas := NIL;
 
   HideSceneBounds;
-  //FreeCamera;
+  FreeCamera;
 end;
 
 procedure TScreenFontBank.Initialize;

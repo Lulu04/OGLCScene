@@ -13,19 +13,11 @@ type
 
 { TScreenUIPanelBank }
 
-  TScreenUIPanelBank = class(TScreenWithSurfaceHandling)
+  TScreenUIPanelBank = class(TCustomScreenTemplate)
 private
-  FModePanelEditor: boolean;
-  FUIPanel: TUIPanelWithEffects;
   FTextureList: TTexturelist;
   FSurfacesList: TSurfaceList;
 public
-//  procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
-//  procedure ProcessMouseDown(Button: TMouseButton; {%H-}Shift: TShiftState; X, Y: Integer); override;
-//  procedure ProcessMouseMove(Shift: TShiftState; X, Y: Integer); override;
-//  procedure ProcessMouseWheel({%H-}Shift: TShiftState; {%H-}WheelDelta: Integer; {%H-}MousePos: TPoint; var {%H-}Handled: Boolean); override;
-//  procedure ProcessOnKeyUp(var Key: Word; {%H-}Shift: TShiftState); override;
-
   procedure CreateObjects; override;
   procedure FreeObjects; override;
 
@@ -34,21 +26,16 @@ public
 
   function Surfaces: TSurfaceList; override;
   function Textures: TTextureList; override;
-  procedure SetFlagModified; override;
-
 
   procedure ClearView;
   procedure ShowPanelFromBank(const aName: string);
-public
-  property UIPanel: TUIPanelWithEffects read FUIPanel write FUIPanel;
-  property ModePanelEditor: boolean read FModePanelEditor write FModePanelEditor;
 end;
 
 var ScreenUIPanelBank: TScreenUIPanelBank;
 
 implementation
 
-uses u_common, u_ui_objectlist, form_main;
+uses u_common, u_ui_objectlist;
 
 { TScreenUIPanelBank }
 
@@ -97,16 +84,10 @@ begin
   Result := FTextureList;
 end;
 
-procedure TScreenUIPanelBank.SetFlagModified;
-begin
-  FrameToolUIPanelEditor.Modified := True;
-end;
-
 procedure TScreenUIPanelBank.ClearView;
 begin
   Surfaces.Clear;
   Textures.Clear;
-  FUIPanel := NIL;
 end;
 
 procedure TScreenUIPanelBank.ShowPanelFromBank(const aName: string);
@@ -118,8 +99,8 @@ begin
   if item = NIL then exit;
 
   Textures.LoadFromString(item.textures);
+  Surfaces.WorkingLayer := LAYER_UIPANEL;
   Surfaces.LoadFromString(item.surfaces);
-  FUIPanel := TUIPanelWithEffects(surfaces.GetRootItem^.surface);
 end;
 
 end.

@@ -1002,7 +1002,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Height = 200
           Top = 294
           Width = 292
-          PageIndex = 11
+          PageIndex = 10
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 4
           object PageExtraEmpty: TPage
@@ -3146,8 +3146,8 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                       ChildSizing.ShrinkVertical = crsScaleChilds
                       ChildSizing.Layout = cclLeftToRightThenTopToBottom
                       ChildSizing.ControlsPerLine = 3
-                      ClientHeight = 77
-                      ClientWidth = 276
+                      ClientHeight = 97
+                      ClientWidth = 280
                       Columns = 3
                       ItemIndex = 0
                       Items.Strings = (

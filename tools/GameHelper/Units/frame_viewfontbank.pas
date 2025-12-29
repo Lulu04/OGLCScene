@@ -133,8 +133,11 @@ type
   private
     FGradOriginPercentCoor,
     FGradD1PercentCoor: TPointF;
-    FGradCursorImage: TBGRABitmap;
-    procedure UpdateGradientControlPoints(aX, aY: integer);
+    FButtonPressed: TMouseButton;
+    FGradOriginCursorImage,
+    FGradD1CursorImage: TBGRABitmap;
+    procedure UpdateGradientOriginControlPoints(aX, aY: integer);
+    procedure UpdateGradientD1ControlPoints(aX, aY: integer);
   private
     function AvailableSelectedIsFont: boolean;
     procedure FillTVAvailableFonts;
@@ -249,12 +252,17 @@ procedure TFrameViewFontBank.PBMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   Sender := Sender;
-  Button := Button;
   Shift := Shift;
-  UpdateGradientControlPoints(X, Y);
+  FButtonPressed := Button;
+  if Button = mbLeft then begin
+    UpdateGradientOriginControlPoints(X, Y);
+    PB.Tag := 1;
+  end else if Button = mbRight then begin
+    UpdateGradientD1ControlPoints(X, Y);
+    PB.Tag := 1;
+  end;
   UpdatePreview;
   PB.Invalidate;
-  PB.Tag := 1;
 end;
 
 procedure TFrameViewFontBank.PBMouseMove(Sender: TObject; Shift: TShiftState;
@@ -262,7 +270,10 @@ procedure TFrameViewFontBank.PBMouseMove(Sender: TObject; Shift: TShiftState;
 begin
   Shift := Shift;
   if PB.Tag = 0 then exit;
-  UpdateGradientControlPoints(X, Y);
+  case FButtonPressed of
+    mbLeft: UpdateGradientOriginControlPoints(X, Y);
+    mbRight: UpdateGradientD1ControlPoints(X, Y);
+  end;
   UpdatePreview;
   PB.Invalidate;
 end;
@@ -279,7 +290,8 @@ begin
 end;
 
 procedure TFrameViewFontBank.PBPaint(Sender: TObject);
-var xx, yy: integer;
+var xx1, yy1, xx2, yy2: integer;
+  var ima: TBGRABitmap;
 begin
   With PB.Canvas do begin
     Brush.Style := bsSolid;
@@ -287,9 +299,24 @@ begin
     FillRect(0, 0, Width, Height);
   end;
 
-  xx := Round(FGradOriginPercentCoor.x*PB.ClientWidth)-FGradCursorImage.Width div 2;
-  yy := Round(FGradOriginPercentCoor.y*PB.ClientHeight)-FGradCursorImage.Height div 2;
-  FGradCursorImage.Draw(PB.Canvas, xx, yy, False);
+  ima := TBGRABitmap.Create(PB.ClientWidth, PB.ClientHeight, BGRABlack);
+
+  xx1 := Round(FGradOriginPercentCoor.x*PB.ClientWidth)-FGradOriginCursorImage.Width div 2;
+  yy1 := Round(FGradOriginPercentCoor.y*PB.ClientHeight)-FGradOriginCursorImage.Height div 2;
+  ima.PutImage(xx1, yy1, FGradOriginCursorImage, dmDrawWithTransparency);//  FGradOriginCursorImage.Draw(PB.Canvas, xx, yy, False);
+
+  xx2 := Round(FGradD1PercentCoor.x*PB.ClientWidth)-FGradD1CursorImage.Width div 2;
+  yy2 := Round(FGradD1PercentCoor.y*PB.ClientHeight)-FGradD1CursorImage.Height div 2;
+  ima.PutImage(xx2, yy2, FGradD1CursorImage, dmDrawWithTransparency);//  FGradD1CursorImage.Draw(PB.Canvas, xx, yy, False);
+
+  xx1 := xx1 + FGradOriginCursorImage.Width div 2;
+  yy1 := yy1 + FGradOriginCursorImage.Height div 2;
+  xx2 := xx2 + FGradD1CursorImage.Width div 2;
+  yy2 := yy2 + FGradD1CursorImage.Height div 2;
+  ima.DrawLineAntialias(xx1, yy1, xx2, yy2, BGRAWhite, 2.0);
+
+  ima.Draw(PB.Canvas,0, 0);
+  ima.Free;
 end;
 
 procedure TFrameViewFontBank.SE1Change(Sender: TObject);
@@ -299,7 +326,7 @@ begin
   CheckBox1.Enabled := RBGradient.Checked;
   CheckBox2.Enabled := RBGradient.Checked;
   BSwapGradientColors.Enabled := RBGradient.Checked;
-  PB.Enabled := RBGradient.Checked;
+  PB.Visible := RBGradient.Checked;
 
   Panel2.Enabled := CBOutline.Checked;
   Panel3.Enabled := CBShadow.Checked;
@@ -772,27 +799,37 @@ begin
   TVAvailableFonts.EndUpdate;
 end;
 
-procedure TFrameViewFontBank.UpdateGradientControlPoints(aX, aY: integer);
+procedure TFrameViewFontBank.UpdateGradientOriginControlPoints(aX, aY: integer);
 begin
   FGradOriginPercentCoor.x := EnsureRange(aX/PB.ClientWidth, 0, 1);
   FGradOriginPercentCoor.y := EnsureRange(aY/PB.ClientHeight, 0, 1);
-  FGradD1PercentCoor := PointF(1-FGradOriginPercentCoor.x, 1-FGradOriginPercentCoor.y);
+  //FGradD1PercentCoor := PointF(1-FGradOriginPercentCoor.x, 1-FGradOriginPercentCoor.y);
+end;
+
+procedure TFrameViewFontBank.UpdateGradientD1ControlPoints(aX, aY: integer);
+begin
+  FGradD1PercentCoor.x := EnsureRange(aX/PB.ClientWidth, 0, 1);
+  FGradD1PercentCoor.y := EnsureRange(aY/PB.ClientHeight, 0, 1);
 end;
 
 constructor TFrameViewFontBank.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  FGradCursorImage := TBGRABitmap.Create(15, 15, BGRAPixelTransparent);
-  FGradCursorImage.FillEllipseAntialias(FGradCursorImage.Width div 2,
-                           FGradCursorImage.Height div 2,
-                           FGradCursorImage.Width div 2,
-                           FGradCursorImage.Height div 2,
-                           BGRA(220,220,220));
+  FGradOriginCursorImage := TBGRABitmap.Create(10, 10, BGRAPixelTransparent);
+  FGradOriginCursorImage.FillEllipseAntialias(FGradOriginCursorImage.Width div 2,
+                           FGradOriginCursorImage.Height div 2,
+                           FGradOriginCursorImage.Width div 2,
+                           FGradOriginCursorImage.Height div 2,
+                           BGRA(255,255,0));
+
+  FGradD1CursorImage := TBGRABitmap.Create(10, 10, BGRAPixelTransparent);
+  FGradD1CursorImage.RectangleAntialias(0, 0, FGradD1CursorImage.Width-1, FGradD1CursorImage.Height-1, BGRA(255,255,0), 2.0);
 end;
 
 destructor TFrameViewFontBank.Destroy;
 begin
-  FGradCursorImage.Free;
+  FGradOriginCursorImage.Free;
+  FGradD1CursorImage.Free;
   inherited Destroy;
 end;
 

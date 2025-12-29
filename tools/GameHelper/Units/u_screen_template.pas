@@ -262,6 +262,7 @@ end;
 procedure TCustomScreenTemplate.ZoomOnScene;
 begin
   ZoomViewToFit(RectF(0, 0, Project.Config.SceneWidth, Project.Config.SceneHeight), 0.9);
+  ComputeSceneBoundsLineWidth;
 end;
 
 procedure TCustomScreenTemplate.ShowSceneBounds;
