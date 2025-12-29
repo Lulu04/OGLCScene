@@ -84,6 +84,8 @@ TFontDescriptorItem = class(TItemWithName)
   function VariableNameForFD: string;
   // return gradient<_Name>
   function VariableNameForFontGradient: string;
+
+  // declare the fd variable and if needed the gradient variable (without 'var')
   function PascalCodeToDeclareVariables: string;
   function PascalCodeToInitializeVariables: string;
   function PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean;

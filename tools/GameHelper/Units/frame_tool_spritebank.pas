@@ -113,7 +113,7 @@ end;
 
 procedure TFrameToolSpriteBank.BHelpClick(Sender: TObject);
 begin
-  form_showhelp.ShowHelp('The Sprite Bank contains the definition of all sprites that you have defined in your project.'#10#10+
+  form_showhelp.ShowHelp('The Sprite Bank contains the sprites that you have defined in your project.'#10#10+
   'CREATE A NEW SPRITE:'#10+
   ' - click the ''+New'' button.'#10#10+
   'IMPORT A SPRITE FROM AN ANOTHER PROJECT:'#10+

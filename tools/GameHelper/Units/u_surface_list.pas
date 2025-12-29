@@ -476,7 +476,7 @@ begin
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
   end else
-  if classType = TUIPanel then begin      // UIPanel
+  if (classType = TUIPanel) {or (classtype = TUIPanelWithEffects)} then begin      // UIPanel
     surface := TUIPanel.Create(FScene);
     TUIPanel(surface).BodyShape.LoadFromString(BodyShapeData);
     TUIPanel(surface).BodyShape.ResizeCurrentShape(width, height, True);
@@ -619,12 +619,15 @@ var parentItem: PSurfaceDescriptor;
 begin
   if parentID = -1 then begin
     if ParentList.ModeForLevelEditor then FScene.Add(surface, layerindex)
-      else FScene.Add(surface, ParentList.WorkingLayer);
+      else begin
+        FScene.Add(surface, ParentList.WorkingLayer);
+        //if classtype = TUIPanelWithEffects then TUIPanelWithEffects(surface).Show('');
+      end;
   end else begin
       parentItem := ParentList.GetItemByID(parentID);
       if parentItem = NIL
         then raise exception.create('parent with ID='+parentID.ToString+' not found !')
-        else parentItem^.surface.AddChild(surface, zOrder);  //   surface.SetChildOf(parentItem^.surface, zOrder);
+        else parentItem^.surface.AddChild(surface, zOrder);
   end;
 end;
 
@@ -1657,6 +1660,7 @@ end;
 function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDescriptor;
   procedure AddToResult(item: PSurfaceDescriptor);
   begin
+    if item = NIL then exit;
     SetLength(Result, Length(Result)+1);
     Result[High(Result)] := item;
   end;
@@ -1664,6 +1668,7 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
   var i: integer;
     o: TSimpleSurfaceWithEffect;
     parentIsRegistered: boolean=False;
+    item: PSurfaceDescriptor;
   begin
     parentIsRegistered := False;
     for i:=aSurface.ChildCount-1 downto 0 do begin
@@ -1674,15 +1679,18 @@ function TSurfaceList.GetSortedSurfaceFromNearestTofurthest: ArrayOfPSurfaceDesc
       //if not(o is TUIScrollBarOwned) then begin
         if not parentIsRegistered and (o.ZOrderAsChild < 0) then begin
           parentIsRegistered := True;
-          AddToResult(GetItemBySurface(aSurface));
+          item := GetItemBySurface(aSurface);
+          if item <> NIL then AddToResult(item);
         end;
         if o.ChildCount > 0 then CheckRecursive(o);
 
         AddToResult(GetItemBySurface(o));
       //end;
     end;
-    if not parentIsRegistered and not (aSurface is TUIScrollBarOwned) then
-      AddToResult(GetItemBySurface(aSurface));
+    if not parentIsRegistered and not (aSurface is TUIScrollBarOwned) then begin
+      item := GetItemBySurface(aSurface);
+      if item <> NIL then AddToResult(item);
+    end;
   end;
   procedure CopySurfaceList;
   var i, j: SizeUInt;

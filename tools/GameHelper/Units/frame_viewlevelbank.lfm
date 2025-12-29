@@ -265,7 +265,7 @@ object FrameViewLevelBank: TFrameViewLevelBank
       Width = 20
       Flat = True
       Images = DataModule1.ILLevelTreeView
-      ImageIndex = 8
+      ImageIndex = 7
       OnClick = BAddGroupClick
       ShowHint = True
       ParentShowHint = False

@@ -59,7 +59,8 @@ end;
 
 function GetDataFolder: string;
 begin
-  Result := Application.Location+DirectorySeparator+'Data'+DirectorySeparator;
+  //Result := Application.Location+DirectorySeparator+'Data'+DirectorySeparator;
+  Result := FScene.App.DataFolder;
 end;
 
 function GetHandleFolder: string;

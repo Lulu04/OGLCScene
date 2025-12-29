@@ -15,7 +15,7 @@ type
 
   TFrameToolPanelBank = class(TFrame)
     BAddPanel: TSpeedButton;
-    BCancel: TSpeedButton;
+    BHelp: TSpeedButton;
     BDelete: TSpeedButton;
     BDuplicate: TSpeedButton;
     BRename: TSpeedButton;
@@ -28,6 +28,7 @@ type
     Splitter1: TSplitter;
     TV: TTreeView;
     procedure BAddPanelClick(Sender: TObject);
+    procedure BHelpClick(Sender: TObject);
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
       var PaintImages, DefaultDraw: Boolean);
@@ -61,8 +62,8 @@ type
 
 implementation
 
-uses u_ui_objectlist, u_resourcestring, form_main,
-  u_common, u_screen_uipanelbank, u_screen_uipaneleditor, Graphics;
+uses u_ui_objectlist, u_resourcestring, form_main, u_common,
+  u_screen_uipanelbank, u_screen_uipaneleditor, form_showhelp, Graphics;
 
 {$R *.lfm}
 
@@ -125,6 +126,15 @@ begin
   if Sender = BRename then DoRenameSelected;
   if Sender = BDuplicate then DoDuplicateSelected;
   if Sender = BDelete then DoDeleteSelected;
+end;
+
+procedure TFrameToolPanelBank.BHelpClick(Sender: TObject);
+begin
+  form_showhelp.ShowHelp('The Panel Bank contains the panels that you have defined in your project.'#10#10+
+  'CREATE A NEW PANEL:'#10+
+  ' - click on Panels label then click the ''+'' button.'#10#10+
+  'EDIT/RENAME/DUPLICATE/DELETE AN EXISTING PANEL:'#10+
+  ' - select a panel in the list and click the appropriate button on the right.');
 end;
 
 procedure TFrameToolPanelBank.TVMouseDown(Sender: TObject;
