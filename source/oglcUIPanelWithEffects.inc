@@ -46,11 +46,14 @@ end;
 {$ifdef oglcIMPLEMENTATION}
 
 procedure TUIPanelWithEffects.Draw(const aLayerPercentOpacity: single);
+var m: TOGLCMatrix;
 begin
   // if needed draw the colored rectangle
   if FDarkenTheScene then begin
+    m.CopyFrom(FParentScene.ModelViewMatrix);
     FParentScene.ModelViewMatrix.LoadIdentity;
     FSceneDarkness.Draw(aLayerPercentOpacity);
+    FParentScene.ModelViewMatrix.CopyFrom(m);
   end;
 
   inherited Draw(aLayerPercentOpacity);
