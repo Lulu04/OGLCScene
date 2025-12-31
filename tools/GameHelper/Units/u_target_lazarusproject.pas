@@ -73,19 +73,26 @@ public // config
   property ProjectConfig_MaximizeSceneOnMonitor: boolean read ConfigOption_GetMaximizeSceneOnMonitor write ConfigOption_SetMaximizeSceneOnMonitor;
   property ProjectConfig_WindowedMode: boolean read ConfigOption_GetWindowedMode write ConfigOption_SetWindowedMode;
 private // Tags utils
-  function SearchTags(const aUnitFilename, aTagName: string; out FirstTagIndex, LastTagIndex: integer): TStringList;
+  function SearchTags(const aUnitFilename, aTagName: string; out BeginTagIndex, EndTagIndex: integer): TStringList;
   function ReadTagContent(const aUnitFilename, aTagName: string): TStringArray;
   procedure ReplaceTagContentBy(const aUnitFilename, aTagName: string; const aLines: TStringArray);
 private // u_common
   const
     U_COMMON_TAG_DESIGN = 'DESIGN';
     U_COMMON_TAG_LAYERS = 'LAYERS';
+    U_COMMON_TAG_VAR = 'VAR';
+    U_COMMON_TAG_VARS_INIT = 'VARS_INIT';
   function GetFilenameUCommon: string;
 public // u_common
   function UCommonGetLayerNames: TStringArray;
   procedure UCommonSetLayerNames(const aNames: TStringArray);
   function UCommonGetDesignValues: TArrayOfInteger;
   procedure UCommonSetDesignValues(const aValues: TArrayOfInteger);
+  function UCommonGetVarNames: TStringArray;
+  procedure UCommonAddVar(const aVarName, aVarType: string);
+  procedure UCommonRemoveVar(const aVarName: string);
+  procedure UCommonAddVarInitialization(const aCode: string);
+  procedure UCommonRemoveVarInitialization(const aVarName: string);
 
 private // entry in USES clause into an unit
   function Unit_USES_CheckIfHaveEntry(t: TStringList; const aUnitNameToCheck: string;
@@ -506,12 +513,12 @@ begin
 end;
 
 function TTargetLazarusProject.SearchTags(const aUnitFilename,
-  aTagName: string; out FirstTagIndex, LastTagIndex: integer): TStringList;
+  aTagName: string; out BeginTagIndex, EndTagIndex: integer): TStringList;
 var i: integer;
   tagBegin, tagEnd: string;
 begin
-  FirstTagIndex := -1;
-  LastTagIndex := -1;
+  BeginTagIndex := -1;
+  EndTagIndex := -1;
   Result := StringList_CreateFromFile(aUnitFilename);
 
   tagBegin := '{'+aTagName+'}';
@@ -519,15 +526,15 @@ begin
 
   for i:=0 to Result.Count-2 do
     if Result.Strings[i].Contains(tagBegin) then begin
-      FirstTagIndex := i;
+      BeginTagIndex := i;
       break;
     end;
 
-  if FirstTagIndex = -1 then exit;
+  if BeginTagIndex = -1 then exit;
 
-  for i:=FirstTagIndex+1 to Result.Count-1 do
+  for i:=BeginTagIndex+1 to Result.Count-1 do
     if Result.Strings[i].Contains(tagEnd) then begin
-      LastTagIndex := i;
+      EndTagIndex := i;
       break;
     end;
 end;
@@ -642,6 +649,63 @@ begin
   A[1] := '  SCREEN_HEIGHT_AT_DESIGN_TIME: single = '+aValues[1].ToString+';';
   A[2] := '  SCREEN_PPI_AT_DESIGN_TIME: integer = '+aValues[2].ToString+';';
   ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_DESIGN, A);
+end;
+
+function TTargetLazarusProject.UCommonGetVarNames: TStringArray;
+begin
+  Result := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_VAR);
+end;
+
+procedure TTargetLazarusProject.UCommonAddVar(const aVarName, aVarType: string);
+var i: integer;
+  A: TStringArray;
+begin
+  A := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_VAR);
+  // check if the var is already declared
+  for i:=0 to High(A) do
+    if Pos(aVarName, A[i]) <> 0 then exit;
+  SetLength(A, Length(A)+1);
+  A[High(A)] := '  '+aVarName+': '+aVarType+';';
+
+  ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_VAR, A);
+end;
+
+procedure TTargetLazarusProject.UCommonRemoveVar(const aVarName: string);
+var i: integer;
+  A: TStringArray;
+begin
+  A := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_VAR);
+  // search the var
+  for i:=0 to High(A) do
+    if Pos(aVarName, A[i]) <> 0 then begin
+      system.Delete(A, i, 1);
+      ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_VAR, A);
+      exit;
+    end;
+end;
+
+procedure TTargetLazarusProject.UCommonAddVarInitialization(const aCode: string);
+var i: integer;
+  A: TStringArray;
+begin
+  A := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_VARS_INIT);
+  // check if the line already exists
+  for i:=0 to High(A) do
+    if aCode = A[i] then exit;
+  SetLength(A, Length(A)+1);
+  A[High(A)] := aCode;
+  ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_VARS_INIT, A);
+end;
+
+procedure TTargetLazarusProject.UCommonRemoveVarInitialization(const aVarName: string);
+var i: integer;
+  A: TStringArray;
+begin
+  A := ReadTagContent(GetFilenameUCommon, U_COMMON_TAG_VARS_INIT);
+  for i:=High(A) downto 0 do
+    if Pos(aVarName, A[i]) <> 0 then
+      system.Delete(A, i, 1);
+  ReplaceTagContentBy(GetFilenameUCommon, U_COMMON_TAG_VARS_INIT, A);
 end;
 
 function TTargetLazarusProject.Unit_USES_CheckIfHaveEntry(t: TStringList;

@@ -5,6 +5,7 @@ object FrameViewFontBank: TFrameViewFontBank
   Width = 325
   ClientHeight = 813
   ClientWidth = 325
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 863
   DesignTop = 13
@@ -18,7 +19,6 @@ object FrameViewFontBank: TFrameViewFontBank
     Width = 325
     Anchors = [akTop, akLeft, akBottom]
     BackgroundColor = 3947580
-    BorderStyle = bsNone
     Color = 3947580
     Font.Height = 16
     HotTrack = True
@@ -26,14 +26,14 @@ object FrameViewFontBank: TFrameViewFontBank
     ParentFont = False
     ReadOnly = True
     RightClickSelect = True
-    ScrollBars = ssAutoVertical
+    ScrollBars = ssVertical
     TabOrder = 0
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
     OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
     OnMouseDown = TVMouseDown
     OnMouseWheel = TVMouseWheel
     OnResize = TVResize
     OnSelectionChanged = TVSelectionChanged
-    Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
   end
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
@@ -44,11 +44,11 @@ object FrameViewFontBank: TFrameViewFontBank
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 435
-    Top = 378
+    Height = 456
+    Top = 357
     Width = 325
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 435
+    ClientHeight = 456
     ClientWidth = 325
     Color = 8289918
     ParentBackground = False
@@ -60,7 +60,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 27
+      Top = 28
       Width = 66
       BorderSpacing.Left = 7
       BorderSpacing.Top = 8
@@ -76,17 +76,17 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 79
       Height = 23
-      Top = 19
+      Top = 20
       Width = 55
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
       Font.Style = [fsBold]
       MaxValue = 150
       MinValue = 8
-      OnChange = SE1Change
       ParentFont = False
       TabOrder = 0
       Value = 20
+      OnChange = SE1Change
     end
     object RBSingleColor: TRadioButton
       AnchorSideLeft.Control = Label5
@@ -94,7 +94,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 19
-      Top = 137
+      Top = 138
       Width = 80
       BorderSpacing.Left = 10
       Caption = 'Single color'
@@ -109,7 +109,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 19
-      Top = 161
+      Top = 162
       Width = 63
       BorderSpacing.Top = 5
       Caption = 'Gradient'
@@ -121,7 +121,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 122
+      Top = 123
       Width = 54
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
@@ -137,7 +137,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 108
       Height = 20
-      Top = 136
+      Top = 137
       Width = 64
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -154,7 +154,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 109
       Height = 20
-      Top = 160
+      Top = 161
       Width = 64
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 1
@@ -170,7 +170,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 19
-      Top = 232
+      Top = 233
       Width = 57
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
@@ -186,7 +186,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideRight.Side = asrBottom
       Left = 8
       Height = 45
-      Top = 251
+      Top = 252
       Width = 309
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 7
@@ -247,10 +247,10 @@ object FrameViewFontBank: TFrameViewFontBank
         DecimalPlaces = 1
         Font.Style = [fsBold]
         Increment = 0.5
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 0
         Value = 1.5
+        OnChange = SE1Change
       end
       object Label2: TLabel
         AnchorSideLeft.Control = ColorButton3
@@ -278,10 +278,10 @@ object FrameViewFontBank: TFrameViewFontBank
         Font.Style = [fsBold]
         Increment = 5
         MaxValue = 255
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 1
         Value = 255
+        OnChange = SE1Change
       end
     end
     object CBShadow: TCheckBox
@@ -290,7 +290,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 19
-      Top = 303
+      Top = 304
       Width = 60
       BorderSpacing.Left = 7
       BorderSpacing.Top = 7
@@ -306,7 +306,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideRight.Side = asrBottom
       Left = 8
       Height = 66
-      Top = 322
+      Top = 323
       Width = 309
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 7
@@ -363,10 +363,10 @@ object FrameViewFontBank: TFrameViewFontBank
         Anchors = [akLeft, akBottom]
         BorderSpacing.Left = 3
         Font.Style = [fsBold]
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 0
         Value = 3
+        OnChange = SE1Change
       end
       object Label10: TLabel
         AnchorSideTop.Side = asrCenter
@@ -389,10 +389,10 @@ object FrameViewFontBank: TFrameViewFontBank
         Anchors = [akLeft, akBottom]
         BorderSpacing.Left = 3
         Font.Style = [fsBold]
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 1
         Value = 3
+        OnChange = SE1Change
       end
       object Label11: TLabel
         AnchorSideTop.Side = asrCenter
@@ -415,10 +415,10 @@ object FrameViewFontBank: TFrameViewFontBank
         Anchors = [akLeft, akBottom]
         BorderSpacing.Left = 3
         Font.Style = [fsBold]
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 2
         Value = 3
+        OnChange = SE1Change
       end
       object Label3: TLabel
         AnchorSideLeft.Control = ColorButton4
@@ -446,10 +446,10 @@ object FrameViewFontBank: TFrameViewFontBank
         Font.Style = [fsBold]
         Increment = 5
         MaxValue = 255
-        OnChange = SE1Change
         ParentFont = False
         TabOrder = 3
         Value = 255
+        OnChange = SE1Change
       end
     end
     object CBGradientType: TComboBox
@@ -458,7 +458,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 18
       Height = 23
-      Top = 183
+      Top = 184
       Width = 75
       BorderSpacing.Top = 3
       Enabled = False
@@ -484,7 +484,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 103
       Height = 19
-      Top = 187
+      Top = 188
       Width = 117
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -499,7 +499,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 103
       Height = 19
-      Top = 206
+      Top = 207
       Width = 46
       Caption = 'Sinus'
       Enabled = False
@@ -512,7 +512,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 15
-      Top = 413
+      Top = 414
       Width = 60
       BorderSpacing.Left = 7
       BorderSpacing.Top = 25
@@ -526,7 +526,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 73
       Height = 23
-      Top = 405
+      Top = 406
       Width = 148
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -540,7 +540,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Cursor = crHandPoint
       Left = 233
       Height = 30
-      Top = 401
+      Top = 402
       Width = 66
       BorderSpacing.Left = 12
       Caption = 'Save'
@@ -555,7 +555,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 182
       Height = 15
-      Top = 141
+      Top = 142
       Width = 31
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -569,17 +569,17 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 216
       Height = 23
-      Top = 133
+      Top = 134
       Width = 47
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 3
       Font.Style = [fsBold]
       Increment = 5
       MaxValue = 255
-      OnChange = SE1Change
       ParentFont = False
       TabOrder = 11
       Value = 255
+      OnChange = SE1Change
     end
     object Label13: TLabel
       AnchorSideLeft.Control = ColorButton1
@@ -588,7 +588,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 182
       Height = 15
-      Top = 165
+      Top = 166
       Width = 31
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -602,24 +602,24 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Side = asrBottom
       Left = 216
       Height = 23
-      Top = 157
+      Top = 158
       Width = 47
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 3
       Font.Style = [fsBold]
       Increment = 5
       MaxValue = 255
-      OnChange = SE1Change
       ParentFont = False
       TabOrder = 12
       Value = 255
+      OnChange = SE1Change
     end
     object Label14: TLabel
       AnchorSideLeft.Control = Panel1
       AnchorSideTop.Control = Panel1
       Left = 8
       Height = 15
-      Top = 4
+      Top = 5
       Width = 27
       Anchors = [akLeft]
       BorderSpacing.Left = 7
@@ -633,7 +633,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Control = Label14
       Left = 42
       Height = 15
-      Top = 4
+      Top = 5
       Width = 25
       BorderSpacing.Left = 7
       Caption = 'Arial'
@@ -647,18 +647,18 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Control = SE5
       Cursor = crHandPoint
       Left = 273
-      Height = 28
+      Height = 34
       Hint = 'Swap gradient colors'
-      Top = 145
-      Width = 28
+      Top = 146
+      Width = 34
       AutoSize = True
       BorderSpacing.Left = 10
       BorderSpacing.Top = 12
       Images = DataModule1.ILIconUI
       ImageIndex = 6
-      OnClick = BSwapGradientColorsClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BSwapGradientColorsClick
     end
     object BSwapOutlineAndShadowColors: TSpeedButton
       AnchorSideLeft.Control = Panel1
@@ -667,20 +667,20 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Control = CBShadow
       AnchorSideBottom.Side = asrBottom
       Cursor = crHandPoint
-      Left = 148
-      Height = 28
+      Left = 145
+      Height = 34
       Hint = 'Swap outline and shadow colors'
-      Top = 294
-      Width = 28
+      Top = 289
+      Width = 34
       Anchors = [akLeft, akBottom]
       AutoSize = True
       BorderSpacing.Left = 10
       BorderSpacing.Top = 12
       Images = DataModule1.ILIconUI
       ImageIndex = 6
-      OnClick = BSwapOutlineAndShadowColorsClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BSwapOutlineAndShadowColorsClick
     end
     object GroupBox1: TGroupBox
       AnchorSideLeft.Control = Panel1
@@ -688,7 +688,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideTop.Side = asrBottom
       Left = 8
       Height = 68
-      Top = 47
+      Top = 48
       Width = 164
       BorderSpacing.Left = 7
       BorderSpacing.Top = 5
@@ -740,7 +740,7 @@ object FrameViewFontBank: TFrameViewFontBank
       Left = 240
       Height = 65
       Hint = 'Mouse left button to move the origin point (circle)'#13#10'Mouse right button to move the end point (square)'
-      Top = 183
+      Top = 184
       Width = 65
       BorderSpacing.Top = 3
       ParentShowHint = False
@@ -797,9 +797,9 @@ object FrameViewFontBank: TFrameViewFontBank
       Flat = True
       Images = DataModule1.ILIconUI
       ImageIndex = 13
-      OnClick = BCancelClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BCancelClick
     end
   end
   object Splitter1: TSplitter
@@ -841,9 +841,9 @@ object FrameViewFontBank: TFrameViewFontBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 4
-      OnClick = BRenameClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BRenameClick
     end
     object BDuplicate: TSpeedButton
       AnchorSideLeft.Control = BRename
@@ -860,9 +860,9 @@ object FrameViewFontBank: TFrameViewFontBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 5
-      OnClick = BRenameClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BRenameClick
     end
     object BDelete: TSpeedButton
       AnchorSideLeft.Control = BDuplicate
@@ -882,9 +882,9 @@ object FrameViewFontBank: TFrameViewFontBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 3
-      OnClick = BRenameClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BRenameClick
     end
   end
   object Panel4: TPanel
@@ -893,13 +893,14 @@ object FrameViewFontBank: TFrameViewFontBank
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Splitter2
     Left = 0
-    Height = 213
+    Height = 192
     Top = 160
     Width = 325
-    Anchors = [akTop, akLeft, akRight]
+    Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 213
+    ClientHeight = 192
     ClientWidth = 325
     Color = 8289918
     ParentBackground = False
@@ -913,7 +914,7 @@ object FrameViewFontBank: TFrameViewFontBank
       AnchorSideBottom.Control = Panel4
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 213
+      Height = 192
       Top = 0
       Width = 325
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -927,21 +928,20 @@ object FrameViewFontBank: TFrameViewFontBank
       RightClickSelect = True
       ScrollBars = ssVertical
       TabOrder = 0
+      Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
       OnAdvancedCustomDrawItem = TVAvailableFontsAdvancedCustomDrawItem
       OnSelectionChanged = TVAvailableFontsSelectionChanged
-      Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
     end
   end
   object Splitter2: TSplitter
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = Panel4
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Cursor = crVSplit
     Left = 0
     Height = 5
-    Top = 373
+    Top = 352
     Width = 325
     Align = alNone
     Anchors = [akTop, akLeft, akRight]

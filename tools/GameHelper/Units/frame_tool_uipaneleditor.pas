@@ -84,7 +84,6 @@ type
     Label17: TLabel;
     Label18: TLabel;
     Label19: TLabel;
-    Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
@@ -318,7 +317,6 @@ type
     FWorkingChild: PSurfaceDescriptor;
     procedure DoClearAll;
     procedure ShowExtraPropertyPanel;
-procedure UpdateDebugLabels;
   public
     FrameTexturesList: TFrameTextureList;
     constructor Create(aOwner: TComponent); override;
@@ -943,7 +941,6 @@ begin
   FModified := True;
 
   ShowSelectionData(NIL);
-UpdateDebugLabels;
 end;
 
 procedure TFrameToolUIPanelEditor.DoUpdateChild(aForceRecreateSurface: boolean);
@@ -1293,11 +1290,6 @@ begin
     end;
 end;
 
-procedure TFrameToolUIPanelEditor.UpdateDebugLabels;
-begin
-  Label2.Caption := 'Surfaces count: '+Surfaces.Size.ToString;
-end;
-
 constructor TFrameToolUIPanelEditor.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
@@ -1326,8 +1318,6 @@ begin
   FillFontsComboBox;
 
   UpdateEventCheckBox;
-
-  UpdateDebugLabels;
 end;
 
 procedure TFrameToolUIPanelEditor.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);

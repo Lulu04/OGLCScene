@@ -215,7 +215,7 @@ begin
     t.Add('');
     t.AddText('  DON''T EDIT THIS UNIT because it may be overwritten by the tool -> your code will be lost !'#10+
               '  Instead, in another unit add "'+nameUnit+'" in the uses clause'#10+
-              '  and define an inherited class TCustom'+name+' = class('+nameClass+') to contain your code.');
+              '  and add your code in a class inherited from '+nameClass+'.');
     t.Add('');
     t.Add('  Usage:');
     if surfaceList.UseTexture then
@@ -243,7 +243,8 @@ begin
         if i < textureList.Size-1 then s := s +', ';
         if (i mod 4 = 0) and (i > 0) and (i < textureList.Size-1) then s := s + #10'  ';
       end;
-      s := s + ': PTexture;';
+      s := s + ': PTexture;'#10+
+           '  class var FAdditionnalScale: single;';
       t.AddText(s);
     end;
 
@@ -278,7 +279,7 @@ begin
     if postureList.Size > 0 then begin
       s := 'public'#10;
       for i:=0 to postureList.Size-1 do begin
-        s := s+'  procedure Posture_'+postureList.Mutable[i]^.name+'(aDuration: single=0.5);';
+        s := s+'  procedure Posture_'+postureList.Mutable[i]^.name+'(aDuration: single=0.5; aVelocityCurve: word=idcSinusoid);';
         if i < postureList.Size-1 then s := s+#10;
       end;
       t.AddText(s);
@@ -297,6 +298,7 @@ begin
       t.AddText('class procedure '+nameClass+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
                 'var texFolder: string;'#10+
                 'begin'#10+
+                '  FAdditionnalScale := AdditionnalScale;'#10+
                 '  texFolder := u_common.TexturesFolder;');
       for i:=0 to textureList.Size-1 do
         t.Add('  '+textureList.Mutable[i]^.PascalCodeToAddTextureToAtlas(True));
@@ -397,15 +399,15 @@ begin
       // the width and height of the parent or current
       if (current^.x <> 0) or (current^.y <> 0) then begin
         if _parent^.classtype = TSpriteContainer then begin
-          sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width{.surface.Width}, current^.name);
-          sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height{.surface.Height}, current^.name);
+          sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
+          sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
         end else begin
           if _parent^.IsRoot then begin
-            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width{.surface.Width}, 'Self');
-            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height{surface.Height}, 'Self');
+            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, 'Self');
+            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height, 'Self');
           end else begin
-            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width{surface.Width}, _parent^.name);
-            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height{surface.Height}, _parent^.name);
+            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, _parent^.name);
+            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height, _parent^.name);
           end;
         end;
         t.Add('    SetCoordinate('+sx+', '+sy+');');
@@ -512,7 +514,7 @@ begin
     // methods for postures
     if postureList.Size > 0 then begin
       for i:=0 to postureList.Size-1 do begin
-        t.AddText('procedure '+nameClass+'.Posture_'+postureList.Mutable[i]^.name+'(aDuration: single);'#10+
+        t.AddText('procedure '+nameClass+'.Posture_'+postureList.Mutable[i]^.name+'(aDuration: single; aVelocityCurve: word);'#10+
                   'begin');
         for j:=0 to surfaceList.Size-1 do begin
           current := surfaceList.Mutable[j];
@@ -525,18 +527,18 @@ begin
           // the width and height of the parent or current
           pt := postureList.Mutable[i]^.Values[j];
           if _parent^.classtype = TSpriteContainer then begin
-            sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/current^.width{surface.Width}, current^.name);
-            sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/current^.height{surface.Height}, current^.name);
+            sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/current^.width, current^.name);
+            sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/current^.height, current^.name);
           end else begin
             if _parent^.IsRoot then begin
-              sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/_parent^.width{surface.Width},'Self');
-              sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/_parent^.height{surface.Height}, 'Self');
+              sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/_parent^.width,'Self');
+              sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/_parent^.height, 'Self');
             end else begin
-              sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/_parent^.width{surface.Width}, _parent^.name);
-              sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/_parent^.height{surface.Height}, _parent^.name);
+              sx := CodeGen.FormatXCoorRelativeToParentWidth(pt.x/_parent^.width, _parent^.name);
+              sy := CodeGen.FormatYCoorRelativeToParentHeight(pt.y/_parent^.height, _parent^.name);
             end;
           end;
-          t.Add('  '+current^.name+'.MoveTo('+sx+', '+sy+', aDuration, idcSinusoid);');
+          t.Add('  '+current^.name+'.MoveTo('+sx+', '+sy+', aDuration, aVelocityCurve);');
 
           t.Add(CodeGen.Generate_AngleChangeTo(postureList.Mutable[i]^.Values[j].angle, current^.name));
           t.Add(CodeGen.Generate_ScaleChangeTo(postureList.Mutable[i]^.Values[j].scalex, postureList.Mutable[i]^.Values[j].scaley, current^.name));

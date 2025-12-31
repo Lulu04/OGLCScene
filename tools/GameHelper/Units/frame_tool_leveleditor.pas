@@ -328,9 +328,13 @@ var o: PLevelBankItem;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
-  if not IsValidPascalVariableName(nam, True) then exit;
   if Textures.Size = 0 then exit;
   if Surfaces.Size = 0 then exit;
+  if not IsValidPascalVariableName(nam, True) then exit;
+  if CBUseGradientForSky.Checked and (ComboBox1.ItemIndex = -1) then begin
+    ShowMessage('Please choose a layer for the sky gradient in tab World');
+    exit;
+  end;
 
   o := WorkingLevelGroup.GetItemByName(nam);
   if o <> NIL then

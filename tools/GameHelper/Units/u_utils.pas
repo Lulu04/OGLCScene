@@ -334,12 +334,12 @@ procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
 begin
   case aSurface^.classtype.ClassName of
     'TSprite': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+
-                aSurface^.height.ToString+'));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aSurface^.height.ToString+'*FAdditionnalScale)));');
     end;
 
     'TQuad4Color': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
       if (aSurface^.TopLeftColor = aSurface^.TopRightColor) and
          (aSurface^.TopRightColor = aSurface^.BottomRightColor) and
          (aSurface^.BottomRightColor = aSurface^.BottomLeftColor) then begin
@@ -354,13 +354,12 @@ begin
 
     'TGradientRectangle': begin
       t.Add(aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aSurface^.GradientData+''');');
-      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
     end;
 
     'TDeformationGrid': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW('+aSurface^.width.ToString+'), ScaleH('+aSurface^.height.ToString+'));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
       t.Add(aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');');
-
     end;
 
     'TSpriteContainer': begin
@@ -376,7 +375,7 @@ begin
   Result :='  '+aSurfaceName+'.Angle.ChangeTo(';
   if aAngle = 0 then Result := Result+'0'
     else Result := Result+FormatFloatWithDot('0.000', aAngle);
-  Result := Result+', aDuration, idcSinusoid);';
+  Result := Result+', aDuration, aVelocityCurve);';
 end;
 
 function TCodeGenerator.Generate_ScaleChangeTo(aScaleX, aScaleY: single;
@@ -388,7 +387,7 @@ begin
   Result := Result + ', ';
   if aScaleY = 1.0 then Result := Result+'1.0'
     else Result := Result+FormatFloatWithDot('0.000', aScaleY);
-  Result := Result + '), aDuration, idcSinusoid);';
+  Result := Result + '), aDuration, aVelocityCurve);';
 end;
 
 function TCodeGenerator.FormatXCoorRelativeToParentWidth(aX: single;

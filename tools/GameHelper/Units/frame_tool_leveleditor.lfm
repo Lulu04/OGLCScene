@@ -5,6 +5,7 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
   Width = 296
   ClientHeight = 754
   ClientWidth = 296
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 892
   DesignTop = 67
@@ -19,9 +20,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
     Height = 612
     Top = 32
     Width = 296
-    ActivePage = PageSurfaces
+    ActivePage = PageWorld
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 3
     TabOrder = 0
     object PageTextures: TTabSheet
       Caption = 'Textures'
@@ -140,11 +141,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Left = 10
             DecimalPlaces = 3
             Increment = 0.1
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 0
             Value = 0.5
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object SE6: TFloatSpinEdit
             AnchorSideLeft.Control = SE2
@@ -156,11 +157,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 58
             DecimalPlaces = 3
             Increment = 0.05
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 1
             Value = 0.5
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object Label16: TLabel
             AnchorSideTop.Control = Label15
@@ -192,10 +193,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Increment = 0.5
             MaxValue = 360
             MinValue = -360
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 2
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object Label18: TLabel
             AnchorSideTop.Control = Label16
@@ -224,11 +225,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
             MaxValue = 255
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 3
             Value = 255
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object SE1: TFloatSpinEdit
             AnchorSideLeft.Control = Label13
@@ -244,10 +245,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             DecimalPlaces = 1
             MaxValue = 1000000
             MinValue = -1000000
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 4
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object SE2: TFloatSpinEdit
             AnchorSideLeft.Control = SE1
@@ -262,10 +263,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             DecimalPlaces = 1
             MaxValue = 1000000
             MinValue = -1000000
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 5
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object CBFlipH: TCheckBox
             AnchorSideLeft.Side = asrBottom
@@ -396,10 +397,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
             MaxValue = 255
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 9
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object Label3: TLabel
             AnchorSideLeft.Control = ColorButton1
@@ -425,11 +426,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             MaxValue = 100000
             MinValue = 1
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 11
             Value = 1
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object SE4: TSpinEdit
             AnchorSideLeft.Control = SE2
@@ -442,11 +443,11 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Anchors = [akLeft, akBottom]
             MaxValue = 100000
             MinValue = 1
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 12
             Value = 1
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
           object BResetSize: TSpeedButton
             AnchorSideLeft.Control = SE4
@@ -454,16 +455,16 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             AnchorSideTop.Control = SE4
             AnchorSideTop.Side = asrCenter
             Left = 216
-            Height = 19
+            Height = 25
             Hint = 'Set the texture size'
-            Top = 43
-            Width = 35
+            Top = 40
+            Width = 41
             AutoSize = True
             BorderSpacing.Left = 11
             Caption = 'origin'
-            OnClick = CBTexturesSelect
             ShowHint = True
             ParentShowHint = False
+            OnClick = CBTexturesSelect
           end
           object Label8: TLabel
             AnchorSideLeft.Control = Panel2
@@ -494,9 +495,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Flat = True
             Images = DataModule1.ILIconUI
             ImageIndex = 8
-            OnClick = BHelpSurfacesClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BHelpSurfacesClick
           end
           object Label28: TLabel
             AnchorSideTop.Control = Label18
@@ -526,10 +527,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = 1
-            OnChange = CBTexturesSelect
-            OnEnter = SE1Enter
             TabOrder = 13
             Value = 1
+            OnChange = CBTexturesSelect
+            OnEnter = SE1Enter
           end
         end
         object Panel3: TPanel
@@ -606,9 +607,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 0
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton2: TSpeedButton
             Cursor = crHandPoint
@@ -622,9 +623,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 1
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton3: TSpeedButton
             Cursor = crHandPoint
@@ -638,9 +639,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 2
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton4: TSpeedButton
             Cursor = crHandPoint
@@ -654,9 +655,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 3
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton5: TSpeedButton
             Cursor = crHandPoint
@@ -670,9 +671,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 4
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton6: TSpeedButton
             Cursor = crHandPoint
@@ -686,9 +687,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 5
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton7: TSpeedButton
             Cursor = crHandPoint
@@ -702,9 +703,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 6
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton8: TSpeedButton
             Cursor = crHandPoint
@@ -718,9 +719,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 7
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton9: TSpeedButton
             Cursor = crHandPoint
@@ -734,9 +735,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 8
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton10: TSpeedButton
             Cursor = crHandPoint
@@ -750,9 +751,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 9
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton11: TSpeedButton
             Cursor = crHandPoint
@@ -766,9 +767,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 10
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton12: TSpeedButton
             Cursor = crHandPoint
@@ -782,9 +783,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 11
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton13: TSpeedButton
             Cursor = crHandPoint
@@ -798,9 +799,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 12
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object SpeedButton14: TSpeedButton
             Cursor = crHandPoint
@@ -814,9 +815,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 13
             Transparent = False
-            OnClick = SpeedButton1Click
             ShowHint = True
             ParentShowHint = False
+            OnClick = SpeedButton1Click
           end
           object Label23: TLabel
             Left = 32
@@ -841,10 +842,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             DecimalPlaces = 1
             Increment = 0.5
             MaxValue = 5
-            OnChange = FSEOverlapChange
-            OnEnter = SE1Enter
             TabOrder = 1
             Value = 0.5
+            OnChange = FSEOverlapChange
+            OnEnter = SE1Enter
           end
         end
         object Label4: TLabel
@@ -910,9 +911,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 14
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BRotate90CW: TSpeedButton
             Cursor = crHandPoint
@@ -926,9 +927,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 15
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMirrorH: TSpeedButton
             Cursor = crHandPoint
@@ -942,9 +943,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 16
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMirrorV: TSpeedButton
             Cursor = crHandPoint
@@ -958,9 +959,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 17
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMoveToTop: TSpeedButton
             Cursor = crHandPoint
@@ -974,9 +975,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 18
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMoveToTopOneStep: TSpeedButton
             Cursor = crHandPoint
@@ -990,9 +991,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 19
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMoveToBottomOneStep: TSpeedButton
             Cursor = crHandPoint
@@ -1006,9 +1007,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 20
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
           object BMoveToBottom: TSpeedButton
             Cursor = crHandPoint
@@ -1022,9 +1023,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 21
             Transparent = False
-            OnClick = BRotate90CCWClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BRotate90CCWClick
           end
         end
         object Panel6: TPanel
@@ -1054,9 +1055,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 22
             Transparent = False
-            OnClick = BZoomWorldClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BZoomWorldClick
           end
           object BZoomOnSelection: TSpeedButton
             Cursor = crHandPoint
@@ -1070,9 +1071,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 24
             Transparent = False
-            OnClick = BZoomWorldClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BZoomWorldClick
           end
           object BZoomScene: TSpeedButton
             Cursor = crHandPoint
@@ -1086,9 +1087,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 23
             Transparent = False
-            OnClick = BZoomWorldClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BZoomWorldClick
           end
           object Label35: TLabel
             AnchorSideLeft.Side = asrCenter
@@ -1150,9 +1151,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           ImageIndex = 4
           Layout = blGlyphTop
           Transparent = False
-          OnClick = BNewSurfaceClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BNewSurfaceClick
         end
         object Panel11: TPanel
           AnchorSideLeft.Control = Panel1
@@ -1198,9 +1199,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 25
             Transparent = False
-            OnClick = BDistributeHClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BDistributeHClick
           end
           object BDistributeV: TSpeedButton
             Cursor = crHandPoint
@@ -1214,9 +1215,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Images = DataModule1.ILIconAlign
             ImageIndex = 26
             Transparent = False
-            OnClick = BDistributeHClick
             ShowHint = True
             ParentShowHint = False
+            OnClick = BDistributeHClick
           end
         end
       end
@@ -1271,9 +1272,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Flat = True
           Images = DataModule1.ILIconUI
           ImageIndex = 8
-          OnClick = BHelpLayersClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BHelpLayersClick
         end
         object Label36: TLabel
           AnchorSideLeft.Control = Panel12
@@ -1342,9 +1343,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 80
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
+            TabOrder = 0
             OnChange = SpinEdit3Change
             OnEnter = SE1Enter
-            TabOrder = 0
           end
           object SpinEdit3: TFloatSpinEdit
             AnchorSideLeft.Control = Label20
@@ -1357,9 +1358,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 63
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
+            TabOrder = 1
             OnChange = SpinEdit3Change
             OnEnter = SE1Enter
-            TabOrder = 1
           end
           object SpinEdit4: TFloatSpinEdit
             AnchorSideLeft.Control = Label22
@@ -1372,9 +1373,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 63
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
+            TabOrder = 2
             OnChange = SpinEdit3Change
             OnEnter = SE1Enter
-            TabOrder = 2
           end
           object SpinEdit1: TFloatSpinEdit
             AnchorSideLeft.Control = Label9
@@ -1387,9 +1388,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
             Width = 80
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
+            TabOrder = 3
             OnChange = SpinEdit3Change
             OnEnter = SE1Enter
-            TabOrder = 3
           end
           object Label17: TLabel
             AnchorSideLeft.Control = CheckBox1
@@ -1530,9 +1531,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
           Flat = True
           Images = DataModule1.ILIconUI
           ImageIndex = 8
-          OnClick = BHelpWorldClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BHelpWorldClick
         end
         object Panel13: TPanel
           AnchorSideLeft.Control = Panel7
@@ -1619,10 +1620,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
               Anchors = [akLeft, akBottom]
               BorderSpacing.Left = 10
               MaxValue = 100000
-              OnChange = CBUseGradientForSkyChange
-              OnEnter = SE1Enter
               TabOrder = 0
               Value = 512
+              OnChange = CBUseGradientForSkyChange
+              OnEnter = SE1Enter
             end
             object Label31: TLabel
               AnchorSideTop.Control = Label30
@@ -1652,10 +1653,10 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
               Anchors = [akLeft, akBottom]
               BorderSpacing.Left = 10
               MaxValue = 100000
-              OnChange = CBUseGradientForSkyChange
-              OnEnter = SE1Enter
               TabOrder = 1
               Value = 512
+              OnChange = CBUseGradientForSkyChange
+              OnEnter = SE1Enter
             end
             object ComboBox1: TComboBox
               AnchorSideLeft.Control = Label32
@@ -1707,9 +1708,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
               Width = 63
               Anchors = [akLeft, akBottom]
               BorderSpacing.Left = 10
+              TabOrder = 3
               OnChange = CBUseGradientForSkyChange
               OnEnter = SE1Enter
-              TabOrder = 3
             end
             object Label34: TLabel
               AnchorSideTop.Control = Label33
@@ -1735,9 +1736,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
               Width = 63
               Anchors = [akLeft, akBottom]
               BorderSpacing.Left = 10
+              TabOrder = 4
               OnChange = CBUseGradientForSkyChange
               OnEnter = SE1Enter
-              TabOrder = 4
             end
             object BSkySceneSize: TSpeedButton
               Cursor = crHandPoint
@@ -1807,9 +1808,9 @@ object FrameToolLevelEditor: TFrameToolLevelEditor
       Flat = True
       Images = DataModule1.ILIconUI
       ImageIndex = 13
-      OnClick = BCancelClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BCancelClick
     end
   end
   object Panel4: TPanel

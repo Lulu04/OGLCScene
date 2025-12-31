@@ -5,6 +5,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
   Width = 300
   ClientHeight = 727
   ClientWidth = 300
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 966
   DesignTop = 77
@@ -54,9 +55,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
       Flat = True
       Images = DataModule1.ILIconUI
       ImageIndex = 13
-      OnClick = BCancelClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BCancelClick
     end
   end
   object PageControl1: TPageControl
@@ -241,10 +242,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Font.Style = [fsBold]
             Increment = 5
             MaxValue = 255
-            OnEnter = SE1Enter
             ParentFont = False
             TabOrder = 3
             Value = 100
+            OnEnter = SE1Enter
           end
         end
         object Label52: TLabel
@@ -602,10 +603,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             BorderSpacing.Left = 10
             DecimalPlaces = 3
             Increment = 0.01
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabOrder = 0
             Value = 0.5
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object SE4: TFloatSpinEdit
             AnchorSideLeft.Control = SE2
@@ -617,10 +618,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Width = 58
             DecimalPlaces = 3
             Increment = 0.01
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabOrder = 1
             Value = 0.5
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object Label18: TLabel
             AnchorSideTop.Control = Label16
@@ -652,10 +653,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Increment = 0.1
             MaxValue = 100000
             MinValue = 0.001
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabOrder = 2
             Value = 1
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object SE6: TFloatSpinEdit
             AnchorSideLeft.Control = SE2
@@ -669,10 +670,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Increment = 0.05
             MaxValue = 100000
             MinValue = 0.001
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabOrder = 3
             Value = 1
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object Label19: TLabel
             AnchorSideLeft.Control = Label13
@@ -702,9 +703,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Increment = 0.5
             MaxValue = 360
             MinValue = -360
+            TabOrder = 4
             OnChange = CBChildTypeSelect
             OnEnter = SE1Enter
-            TabOrder = 4
           end
           object Label20: TLabel
             AnchorSideTop.Control = Label19
@@ -734,9 +735,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             BorderSpacing.Left = 10
             MaxValue = 10000
             MinValue = -10000
+            TabOrder = 5
             OnChange = CBChildTypeSelect
             OnEnter = SE1Enter
-            TabOrder = 5
           end
           object SE1: TFloatSpinEdit
             AnchorSideLeft.Control = Label13
@@ -751,9 +752,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = -1000000
+            TabOrder = 6
             OnChange = CBChildTypeSelect
             OnEnter = SE1Enter
-            TabOrder = 6
           end
           object SE2: TFloatSpinEdit
             AnchorSideLeft.Control = SE1
@@ -767,9 +768,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = -1000000
+            TabOrder = 7
             OnChange = CBChildTypeSelect
             OnEnter = SE1Enter
-            TabOrder = 7
           end
           object Label21: TLabel
             AnchorSideTop.Control = Panel6
@@ -808,11 +809,11 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
             MaxValue = 255
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 8
             Value = 255
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object Label28: TLabel
             AnchorSideLeft.Control = ColorButton5
@@ -898,10 +899,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Anchors = [akLeft, akBottom]
             BorderSpacing.Left = 10
             MaxValue = 255
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabStop = False
             TabOrder = 9
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
           object RadioButton1: TRadioButton
             AnchorSideLeft.Control = SE11
@@ -986,10 +987,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             BorderSpacing.Left = 10
             MaxValue = 100000
             MinValue = 1
-            OnChange = CBChildTypeSelect
-            OnEnter = SE1Enter
             TabOrder = 13
             Value = 1
+            OnChange = CBChildTypeSelect
+            OnEnter = SE1Enter
           end
         end
         object NotebookExtra: TNotebook
@@ -1002,7 +1003,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Height = 200
           Top = 294
           Width = 292
-          PageIndex = 10
+          PageIndex = 0
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 4
           object PageExtraEmpty: TPage
@@ -1053,10 +1054,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 BorderSpacing.Left = 10
                 MaxValue = 100000
                 MinValue = 1
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 0
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label44: TLabel
                 AnchorSideTop.Control = Label43
@@ -1081,10 +1082,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 BorderSpacing.Left = 10
                 MaxValue = 100000
                 MinValue = 1
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object SpeedButton14: TSpeedButton
                 AnchorSideLeft.Control = Panel15
@@ -1133,10 +1134,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 0
                 Value = 32
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label48: TLabel
                 AnchorSideTop.Control = Label47
@@ -1160,10 +1161,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 32
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label26: TLabel
                 Left = 14
@@ -1394,10 +1395,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 4
                 Value = 50
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label51: TLabel
                 AnchorSideTop.Control = Label50
@@ -1421,10 +1422,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 5
                 Value = 24
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object SpeedButton1: TSpeedButton
                 AnchorSideLeft.Control = CBTexturesUIButton
@@ -1637,11 +1638,11 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                     Anchors = [akLeft, akBottom]
                     BorderSpacing.Left = 5
                     MaxValue = 255
-                    OnChange = CBChildTypeSelect
-                    OnEnter = SE1Enter
                     TabStop = False
                     TabOrder = 1
                     Value = 255
+                    OnChange = CBChildTypeSelect
+                    OnEnter = SE1Enter
                   end
                 end
                 object PageCheckTextures: TPage
@@ -1962,11 +1963,11 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                     Anchors = [akLeft, akBottom]
                     BorderSpacing.Left = 5
                     MaxValue = 255
-                    OnChange = CBChildTypeSelect
-                    OnEnter = SE1Enter
                     TabStop = False
                     TabOrder = 1
                     Value = 255
+                    OnChange = CBChildTypeSelect
+                    OnEnter = SE1Enter
                   end
                 end
                 object PageRadioTextures: TPage
@@ -2130,9 +2131,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 5
                 MaxValue = 1000000
+                TabOrder = 0
                 OnChange = CBChildTypeSelect
                 OnEnter = SE1Enter
-                TabOrder = 0
               end
               object Label66: TLabel
                 AnchorSideLeft.Control = SE19
@@ -2161,10 +2162,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 5
                 MaxValue = 1000000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label67: TLabel
                 AnchorSideTop.Control = Label66
@@ -2192,10 +2193,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Width = 70
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 5
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 2
                 Value = 10
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label68: TLabel
                 AnchorSideLeft.Control = SE21
@@ -2223,9 +2224,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Width = 70
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 5
+                TabOrder = 3
                 OnChange = CBChildTypeSelect
                 OnEnter = SE1Enter
-                TabOrder = 3
               end
               object Label71: TLabel
                 Left = 11
@@ -2307,10 +2308,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 6
                 Value = 50
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label61: TLabel
                 AnchorSideTop.Control = Label60
@@ -2334,10 +2335,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 7
                 Value = 30
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
             end
           end
@@ -2426,10 +2427,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 DecimalPlaces = 3
                 Increment = 0.05
                 MaxValue = 1
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 3
                 Value = 1
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object SpeedButton20: TSpeedButton
                 AnchorSideLeft.Control = Panel10
@@ -2463,10 +2464,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 4
                 Value = 50
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label63: TLabel
                 AnchorSideTop.Control = Label62
@@ -2490,10 +2491,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 5
                 Value = 25
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object SpeedButton8: TSpeedButton
                 Cursor = crHandPoint
@@ -2552,10 +2553,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 0
                 Value = 50
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label69: TLabel
                 AnchorSideTop.Control = Label64
@@ -2579,10 +2580,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 50
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object CheckBox14: TCheckBox
                 Left = 32
@@ -2656,10 +2657,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 0
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label74: TLabel
                 AnchorSideTop.Control = Label73
@@ -2683,10 +2684,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label78: TLabel
                 AnchorSideLeft.Control = SpeedButton22
@@ -2771,10 +2772,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 3
                 MaxValue = 255
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 3
                 Value = 255
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label9: TLabel
                 AnchorSideLeft.Control = Label80
@@ -2828,10 +2829,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 3
                 MaxValue = 255
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 4
                 Value = 255
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label79: TLabel
                 Left = 12
@@ -2909,10 +2910,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 5
                 MaxValue = 10000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 6
                 Value = 24
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
             end
           end
@@ -2962,10 +2963,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 0
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object Label76: TLabel
                 AnchorSideTop.Control = Label75
@@ -2989,10 +2990,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
                 MaxValue = 100000
-                OnChange = CBChildTypeSelect
-                OnEnter = SE1Enter
                 TabOrder = 1
                 Value = 100
+                OnChange = CBChildTypeSelect
+                OnEnter = SE1Enter
               end
               object PageControl2: TPageControl
                 AnchorSideLeft.Control = Panel13
@@ -3099,10 +3100,10 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                       Anchors = [akLeft, akBottom]
                       BorderSpacing.Left = 5
                       MaxValue = 255
-                      OnChange = CBChildTypeSelect
-                      OnEnter = SE1Enter
                       TabOrder = 1
                       Value = 255
+                      OnChange = CBChildTypeSelect
+                      OnEnter = SE1Enter
                     end
                   end
                 end
@@ -3161,9 +3162,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                         'BottomCenter'
                         'BottomRight'
                       )
-                      OnSelectionChanged = CBChildTypeSelect
                       ParentBackground = False
                       TabOrder = 0
+                      OnSelectionChanged = CBChildTypeSelect
                     end
                   end
                 end
@@ -3299,13 +3300,6 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Caption = 'OnSelectionChange'
             TabOrder = 8
           end
-        end
-        object Label2: TLabel
-          Left = 8
-          Height = 15
-          Top = 640
-          Width = 81
-          Caption = 'Surfaces count:'
         end
       end
     end
