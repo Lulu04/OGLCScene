@@ -6,16 +6,13 @@ interface
 
 uses
   Classes, SysUtils,
-  OGLCScene;
+  OGLCScene, BGRABitmaptypes;
 
 {
-  Please do not remove the comments in this file !
-  they are tag used to mark code area for Game Helper
-  You can edit manually the code inside a tagged area but keep the tags !
-  NOTE 1: edit the code manually inside the tagged areas when Game Helper is not running
-           because it overwrite their content when the project is saved
-  NOTE 2:  when Game helper start, it read the content of the tagged areas and
-           update the project with them.
+  Please do not remove the comments in this file, they are tag used to mark code area for Game Helper.
+  You can edit manually ONLY the LAYERS and the DESIGN values (but keep the tags !).
+  Edit them only when Game Helper is not running because it overwrite their content when the project is saved.
+  When Game helper start, it read the content of the LAYERS and DESIGN areas and update the project with them.
 }
 
 const
@@ -43,12 +40,15 @@ var
 
   AdditionnalScale: single = 1.0;
   FScene: TOGLCScene;
+
 {VAR}
 {/VAR}
+procedure InitializeGlobalVariables;
 
-// return the path to Data folder
+// Path utils
 function DataFolder: string;
 function TexturesFolder: string;
+function FontsFolder: string;
 
 // Scaling utils
 function PPIScale(AValue: integer): integer;
@@ -59,6 +59,11 @@ function ScaleHF(AValue: single): single;
 
 implementation
 {$I project_config.cfg}
+procedure InitializeGlobalVariables;
+begin
+{VARS_INIT}
+{/VARS_INIT}
+end;
 
 function DataFolder: string;
 begin
@@ -68,6 +73,11 @@ end;
 function TexturesFolder: string;
 begin
   Result := DataFolder+'Textures'+DirectorySeparator;
+end;
+
+function FontsFolder: string;
+begin
+ Result := DataFolder+'Fonts'+DirectorySeparator;
 end;
 
 function PPIScale(AValue: integer): integer;

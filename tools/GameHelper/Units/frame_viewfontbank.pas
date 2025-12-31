@@ -183,35 +183,50 @@ procedure TFrameViewFontBank.BSaveClick(Sender: TObject);
 var nam: string;
   item: TFontDescriptorItem;
   newnode: TTreeNode;
+  res: TModalResult;
 begin
   nam := Trim(Edit1.Text);
   if nam = '' then exit;
   if not IsValidPascalVariableName(nam, True) then exit;
 
+  res := mrNone;
   if SelectedIsFont and (TV.Selected.Text = nam) then begin
-    if QuestionDlg('', sOverwriteTheSelectedFont, mtWarning,
-                   [mrOk, sOverwrite, mrCancel, sCancel], 0) <> mrOk then exit;
+    res := QuestionDlg('', sOverwriteTheSelectedFont, mtWarning,
+                   [mrOk, sOverwrite, mrCancel, sCancel], 0);
+    if res <> mrOk then exit;
+  end;
+  if res = mrOk then begin
     // modify the selected item
     item := FontBank.GetByName(nam);
     item.FD := WidgetToFontDescriptor;
     FontBank.Save;
-    exit;
+  end else begin
+    // add a new item in the bank
+    item := FontBank.AddEmpty;
+    item._Name := nam;
+    item.FD := WidgetToFontDescriptor;
+    FontBank.Save;
+    // add the font to the treeview
+    newnode :=  TV.Items.AddChild(TV.Items.GetFirstNode, nam);
+    with newNode do begin
+      ImageIndex := 10;
+      SelectedIndex := 10;
+      MakeVisible;
+    end;
+    TV.Selected := newNode;
   end;
 
-  // add a new item in the bank
-  item := FontBank.AddEmpty;
-  item._Name := nam;
-  item.FD := WidgetToFontDescriptor;
-  FontBank.Save;
+  // remove old variable initialization
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableNameForFontGradient);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableNameForFD);
 
-  // add the font to the treeview
-  newnode :=  TV.Items.AddChild(TV.Items.GetFirstNode, nam);
-  with newNode do begin
-    ImageIndex := 10;
-    SelectedIndex := 10;
-    MakeVisible;
+  // create the variables in unit u_common and generate the code to initialize them
+  if item.FD.UseGradient then begin
+    Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFontGradient, 'TFontGradient');
+    Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeGradientVariable);
   end;
-  TV.Selected := newNode;
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFD, 'TFontDescriptor');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeFDVariable);
 end;
 
 procedure TFrameViewFontBank.BSwapGradientColorsClick(Sender: TObject);
@@ -724,13 +739,36 @@ begin
 end;
 
 procedure TFrameViewFontBank.DoRenameSelected;
-var oldName, newName: string;
+var oldName, newName, fdVarName, gradVarName: string;
+  item: TFontDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsFont then exit;
 
+  item := FontBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
+  fdVarName := item.VariableNameForFD;
+  gradVarName := item.VariableNameForFontGradient;
+
   oldName := TV.Selected.Text;
   if not FontBank.DoRenameByName(oldName, newName, True) then exit;
+
+  // delete the old variables declaration and initialization
+  if item.FD.UseGradient then begin
+    Project.Config.TargetLazarusProject.UCommonRemoveVar(gradVarName);
+    Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(gradVarName);
+  end;
+  Project.Config.TargetLazarusProject.UCommonRemoveVar(fdVarName);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(fdVarName);
+
+  item := FontBank.GetByName(newName);
+  // add variable declaration and initialization in u_common
+  if item.FD.UseGradient then begin
+    Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFontGradient, 'TFontGradient');
+    Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeGradientVariable);
+  end;
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFD, 'TFontDescriptor');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeFDVariable);
 
   // change name in treeview
   TV.Selected.Text := newName;
@@ -739,6 +777,7 @@ end;
 procedure TFrameViewFontBank.DoDuplicateSelected;
 var dstName: string;
   newNode: TTreeNode;
+  item: TFontDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsFont then exit;
@@ -752,14 +791,39 @@ begin
     MakeVisible;
   end;
   TV.Selected := newNode;
+
+  item := FontBank.GetByName(dstName);
+  // add variable declaration and initialization in u_common
+  if item.FD.UseGradient then begin
+    Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFontGradient, 'TFontGradient');
+    Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeGradientVariable);
+  end;
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFD, 'TFontDescriptor');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeFDVariable);
 end;
 
 procedure TFrameViewFontBank.DoDeleteSelected;
+var item: TFontDescriptorItem;
+  fdVarName, gradVarName: string;
 begin
   HideToolPanels;
   if not SelectedIsFont then exit;
 
+  item := FontBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
+  fdVarName := item.VariableNameForFD;
+  gradVarName := item.VariableNameForFontGradient;
+
   if not FontBank.DoDeleteByName(TV.Selected.Text, True) then exit;
+
+  // delete the variables declaration and initialization
+  if item.FD.UseGradient then begin
+    Project.Config.TargetLazarusProject.UCommonRemoveVar(gradVarName);
+    Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(gradVarName);
+  end;
+  Project.Config.TargetLazarusProject.UCommonRemoveVar(fdVarName);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(fdVarName);
+
   // delete in treeview
   TV.Items.Delete(TV.Selected);
 

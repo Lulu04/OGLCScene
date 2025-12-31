@@ -80,14 +80,15 @@ TFontDescriptorItem = class(TItemWithName)
 
   // return FTexturedFont_<_Name>
   function VariableNameForTexturedFont: string;
-  // return fd<_Name>
+  // return fontdescriptor<_Name>
   function VariableNameForFD: string;
   // return gradient<_Name>
   function VariableNameForFontGradient: string;
 
   // declare the fd variable and if needed the gradient variable (without 'var')
-  function PascalCodeToDeclareVariables: string;
-  function PascalCodeToInitializeVariables: string;
+//  function PascalCodeToDeclareVariables: string;
+  function PascalCodeToInitializeGradientVariable: string;
+  function PascalCodeToInitializeFDVariable: string;
   function PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean;
                                               const aCharSetName: string): string;
 end;
@@ -192,7 +193,7 @@ end;
 
 function TFontDescriptorItem.VariableNameForFD: string;
 begin
-  Result := 'fd'+_Name;
+  Result := 'fontdescriptor'+_Name;
 end;
 
 function TFontDescriptorItem.VariableNameForFontGradient: string;
@@ -200,43 +201,45 @@ begin
   Result := 'gradient'+_Name;
 end;
 
-function TFontDescriptorItem.PascalCodeToDeclareVariables: string;
+{function TFontDescriptorItem.PascalCodeToDeclareVariables: string;
 begin
   Result := '  fd'+_Name+': TFontDescriptor;';
   if FD.UseGradient then
     Result := Result + #10'  '+VariableNameForFontGradient+': TFontGradient';
-end;
+end;  }
 
-function TFontDescriptorItem.PascalCodeToInitializeVariables: string;
+function TFontDescriptorItem.PascalCodeToInitializeGradientVariable: string;
 var s: string;
 begin
   Result := '';
-  if FD.UseGradient then begin
+  if FD.UseGradient then
     Result := '  '+VariableNameForFontGradient+'.Create('+CodeGen.BGRAToPascal(FD.Gradient.Color1)+', '+
               CodeGen.BGRAToPascal(FD.Gradient.Color2)+', '+
               Codegen.BGRAGradientTypeToPascal(FD.Gradient.GradientType)+', '+
               CodeGen.PointFToPascal(FD.Gradient.Origin)+', '+
               CodeGen.PointFToPascal(FD.Gradient.D1)+', '+
               CodeGen.BooleanToPascal(FD.Gradient.GammaColorCorrection)+', '+
-              CodeGen.BooleanToPascal(FD.Gradient.Sinus)+');'#10;
-  end;
+              CodeGen.BooleanToPascal(FD.Gradient.Sinus)+');';
+end;
 
+function TFontDescriptorItem.PascalCodeToInitializeFDVariable: string;
+begin
   if FD.UseGradient then
-    s := '  fd'+_Name+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
-          CodeGen.FontStyleToPascal(FD.Style)+', '+VariableNameForFontGradient
+    Result := '  '+VariableNameForFD+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
+         CodeGen.FontStyleToPascal(FD.Style)+', '+VariableNameForFontGradient
   else
-    s := '  fd'+_Name+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
+    Result := '  '+VariableNameForFD+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
           CodeGen.FontStyleToPascal(FD.Style)+', '+CodeGen.BGRAToPascal(FD.FontColor);
 
   if FD.UseOutLine then
-    s := s + ', '#10+CodeGen.BGRAToPascal(FD.OutLineColor)+', '+FormatFloatWithDot('0.0', FD.OutLineWidth);
+    Result := Result + ', '+CodeGen.BGRAToPascal(FD.OutLineColor)+', '+FormatFloatWithDot('0.0', FD.OutLineWidth);
 
   if FD.UseShadow then
-    s := s + ', '#10+CodeGen.BGRAToPascal(FD.ShadowColor)+', '+
+    Result := Result + ', '+CodeGen.BGRAToPascal(FD.ShadowColor)+', '+
          FD.ShadowOffsetX.ToString+', '+ FD.ShadowOffsetY.ToString+', '+
          FD.ShadowRadius.ToString;
 
-  Result := Result + s + ');';
+  Result := Result + ');';
 end;
 
 function TFontDescriptorItem.PascalCodeToAddTexturedFontToAtlas(

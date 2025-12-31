@@ -661,8 +661,8 @@ var t: TStringlist;
   group: TLevelGroup;
 begin
   {
-     on exporte tous les groupes de level dans un même fichier u_game_levels.pas
-     gérés par une seule classe:
+     All groups of level are exported in a single file named u_game_levels.pas
+     and managed by one single class:
 
      TGamelevels = class(TOGLCDecorManager)
      public
@@ -741,9 +741,12 @@ begin
             '  // return the name of the level as defined in Game Helper'#10+
             '  class function GetLevelName(aGroupIndex, aLevelIndex: integer): string;'#10+
             '  // return the level description as defined in Game Helper'#10+
-            '  class function GetLevelDescription(aGroupIndex, aLevelIndex: integer): string;'#10#10+
-            '  // call this method to build the needed level'#10+
-            '  procedure BuildLevel(aGroupIndex, aLevelIndex: integer; aAtlas: TAtlas);');
+            '  class function GetLevelDescription(aGroupIndex, aLevelIndex: integer): string;');
+  if not haveSingleGroup then begin
+    t.Add('');
+    t.AddText('  // call this method to build the needed level'#10+
+              '  procedure BuildLevel(aGroupIndex, aLevelIndex: integer; aAtlas: TAtlas);');
+  end;
 
   t.AddText('public // defined in ancestor'#10+
             '{'+#10+
@@ -801,7 +804,7 @@ begin
     if haveSingleGroup then prefixSpace := '  '
       else prefixSpace := '      ';
     if group.Size > 0 then begin
-      for j:=0 to group.Size-1 do
+      for j:=0 to group.Textures.Size-1 do
         t.Add(prefixSpace+group.Textures.Mutable[j]^.PascalCodeToAddTextureToAtlas(False))
     end else t.Add(prefixSpace+'// this group is empty');
 

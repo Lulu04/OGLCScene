@@ -66,6 +66,7 @@ begin
   FScene.ScreenFadeTime := 0.5;
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
+  FScene.FontManager.ScanProjectFont(FontsFolder);
 
   Application.OnIdle := @ProcessApplicationIdle;
 end;
@@ -102,6 +103,7 @@ end;
 procedure TFormMain.LoadCommonData;
 begin
   FScene.CreateLogFile(Application.Location+'scene.log', True, NIL, NIL);
+  InitializeGlobalVariables;
 
   // create your game screens here
   Screen1 := TScreen1.Create;

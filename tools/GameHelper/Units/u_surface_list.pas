@@ -1087,13 +1087,12 @@ begin
   aSurface^.name := name;
   aSurface^.textureName := textureName;
   aSurface^.classtype := classtype;
-  if ParentList.ModeForLevelEditor then begin
-    aSurface^.layerindex := FScene.LayerIndexOf(surface.ParentLayer);
-    aSurface^.width := surface.Width;
-    aSurface^.height := surface.Height;
-  end else begin
-    aSurface^.zOrder := surface.ZOrderAsChild;
-  end;
+  if ParentList.ModeForLevelEditor
+    then aSurface^.layerindex := FScene.LayerIndexOf(surface.ParentLayer)
+    else aSurface^.zOrder := surface.ZOrderAsChild;
+
+  aSurface^.width := surface.Width;
+  aSurface^.height := surface.Height;
   aSurface^.frameindex := frameindex;
   aSurface^.blendmode := blendmode;
   // EXTRA properties

@@ -984,7 +984,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 1.0, 0.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
-  ShowHintTextOnSelected(sDuplicated);
+  //ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheRight;
@@ -995,7 +995,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 1.0, 0.0, 0.0, FrameToolLevelEditor.OverlapValue));
-  ShowHintTextOnSelected(sDuplicated);
+  //ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheTop;
@@ -1006,7 +1006,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 1.0, 0.0, FrameToolLevelEditor.OverlapValue));
-  ShowHintTextOnSelected(sDuplicated);
+  //ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.DuplicateSelectionToTheBottom;
@@ -1017,7 +1017,7 @@ begin
   A := Copy(FSelected, 0, Length(FSelected));
   SelectNone;
   AddToSelected(Surfaces.DuplicateAndShiftItemsByID(A, 0.0, 0.0, 0.0, 1.0, FrameToolLevelEditor.OverlapValue));
-  ShowHintTextOnSelected(sDuplicated);
+  //ShowHintTextOnSelected(sDuplicated);
 end;
 
 procedure TScreenWithSurfaceHandling.ShowHintTextOnSelected(const aTxt: string);
