@@ -155,6 +155,7 @@ begin
         FGridPts[iy][ix].TimeMultiplicator := StringToSingle(A[k+3]);
         inc(k, 4);
       end;
+    ResetNodePositions;
     FGridInitialized := True;
   except
     FGridInitialized := False;
