@@ -90,7 +90,7 @@ procedure TFormMain.TrackBar1Change(Sender: TObject);
 begin
   if ScreenDemo = NIL then exit;
 
-  if Sender = TrackBar1 then ScreenDemo.LittleRed.SetWindSpeed(TrackBar1.Position*0.01);
+  if Sender = TrackBar1 then ScreenDemo.LittleRed.SetWindSpeed(TrackBar1.Position*0.02);
 
   if Sender = CheckBox1 then ScreenDemo.LittleRed.ToogleFlipH;
 

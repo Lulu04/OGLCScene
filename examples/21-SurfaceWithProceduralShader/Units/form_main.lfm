@@ -8,13 +8,13 @@ object FormMain: TFormMain
   ClientWidth = 189
   Color = clBlack
   DefaultMonitor = dmPrimary
+  Position = poScreenCenter
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  Position = poScreenCenter
-  LCLVersion = '3.8.0.0'
-  WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 24
     Height = 96

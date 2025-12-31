@@ -8,13 +8,13 @@ object FormMain: TFormMain
   ClientWidth = 374
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
@@ -28,6 +28,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 83
     ClientWidth = 185
+    ParentBackground = False
     TabOrder = 0
     object OpenGLControl1: TOpenGLControl
       Left = 32
@@ -51,6 +52,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 83
     ClientWidth = 184
+    ParentBackground = False
     TabOrder = 1
     object OpenGLControl2: TOpenGLControl
       Left = 16
@@ -72,6 +74,7 @@ object FormMain: TFormMain
     Anchors = [akTop, akLeft, akBottom]
     BevelOuter = bvNone
     Color = clSilver
+    ParentBackground = False
     ParentColor = False
     TabOrder = 2
   end
@@ -88,6 +91,7 @@ object FormMain: TFormMain
     Anchors = [akTop, akLeft, akRight]
     BevelOuter = bvNone
     Color = clSilver
+    ParentBackground = False
     ParentColor = False
     TabOrder = 3
   end
@@ -106,6 +110,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 82
     ClientWidth = 185
+    ParentBackground = False
     TabOrder = 4
     object OpenGLControl3: TOpenGLControl
       Left = 8
@@ -131,6 +136,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 82
     ClientWidth = 184
+    ParentBackground = False
     TabOrder = 5
     object OpenGLControl4: TOpenGLControl
       Left = 16

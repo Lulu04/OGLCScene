@@ -292,7 +292,7 @@ end;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   itemWidth: integer;
 begin
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
@@ -303,8 +303,8 @@ begin
   FAtlas.Spacing := 1;
 
   // we define a font for the text
-  fd.Create('Arial', FScene.ScaleDesignToScene(18), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
+  fontDescriptor.Create('Roboto', FScene.ScaleDesignToScene(18), [], BGRA(255,255,255));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
 
   FtexWarning := FAtlas.AddFromSVG(path+'DlgWarning.svg', FScene.ScaleDesignToScene(32), -1);
   FtexUnchecked := FAtlas.AddFromSVG(path+'CheckBoxUnchecked.svg', FScene.ScaleDesignToScene(32), -1);

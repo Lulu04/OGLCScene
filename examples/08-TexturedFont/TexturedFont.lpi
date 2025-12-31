@@ -81,7 +81,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="7">
       <Unit0>
         <Filename Value="TexturedFont.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -96,8 +96,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="23"/>
-        <CursorPos X="49" Y="44"/>
+        <TopLine Value="35"/>
+        <CursorPos X="21" Y="42"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -107,18 +107,38 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="11"/>
-        <CursorPos X="3" Y="26"/>
-        <UsageCount Value="79"/>
+        <TopLine Value="43"/>
+        <CursorPos X="64" Y="109"/>
+        <UsageCount Value="83"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="Units\u_common.pas"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="12"/>
         <Loaded Value="True"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="..\..\source\OGLCScene.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="166"/>
+        <CursorPos X="14" Y="173"/>
+        <UsageCount Value="10"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\source\oglcVersion.inc"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="C:\lazarus\components\lazutils\lazfileutils.pas"/>
+        <UnitName Value="LazFileUtils"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="40"/>
+        <CursorPos X="17" Y="62"/>
+        <UsageCount Value="11"/>
+      </Unit6>
     </Units>
-    <JumpHistory Count="4" HistoryIndex="3">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="11" Column="8"/>
@@ -135,6 +155,34 @@
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="101" Column="11" TopLine="87"/>
       </Position4>
+      <Position5>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="84" Column="26" TopLine="68"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="20" TopLine="6"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="84" Column="39" TopLine="61"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="20" Column="7" TopLine="6"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="46" TopLine="44"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="10" Column="8" TopLine="7"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="39" Column="26" TopLine="29"/>
+      </Position11>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

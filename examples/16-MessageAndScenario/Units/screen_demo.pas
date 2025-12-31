@@ -89,7 +89,7 @@ procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
   coef: single;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
   FAtlas := FScene.CreateAtlas;
@@ -106,8 +106,8 @@ begin
   FtexShipPliers := FAtlas.AddFromSVG(path+'SpaceShipPliers.svg', Round(55*coef), -1);
   FtexMeteor := FAtlas.AddFromSVG(path+'SpaceMeteor.svg', Round(327*coef), -1);
 
-  fd.Create('Arial', FScene.ScaleDesignToScene(18), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
+  fontDescriptor.Create('Roboto', FScene.ScaleDesignToScene(18), [], BGRA(255,255,255));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
@@ -155,7 +155,7 @@ begin
   FScene.Add(FLabel, LAYER_GUI);
   FLabel.TexturedFont := FtexFont;
   FLabel.Caption := 'Press SPACE to deploy/retract the arm to harvest the meteor';
-  FLabel.Tint.Value := BGRA(255,0,255);
+  //FLabel.Tint.Value := BGRA(255,0,255);
   FLabel.Opacity.Value := 200;
   FLabel.CenterX := FScene.Center.x;
   FLabel.BottomY := FScene.Height - FLabel.Height;

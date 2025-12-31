@@ -34,12 +34,14 @@ var
   FormMain: TFormMain;
 
 implementation
-uses screen_demo;
+uses screen_demo, LazFileutils;
 {$R *.lfm}
 
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
+var
+  fontDirectory: String;
 begin
   FScene := TOGLCScene.Create(OpenGLControl1, 4/3);
   FScene.DesignPPI := 96;  // this project was made with a 96ppi monitor
@@ -48,6 +50,10 @@ begin
 
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
+
+  // scan the font provided with the demo
+  fontDirectory := CleanAndExpandDirectory(Application.Location+'..'+PathDelim+'Data'+PathDelim+'Fonts'+PathDelim);
+  FScene.FontManager.ScanProjectFont(fontDirectory);
 
   Application.OnIdle := @ProcessApplicationIdle;
 end;

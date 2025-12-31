@@ -8,13 +8,13 @@ object FormMain: TFormMain
   ClientWidth = 303
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 24
     Height = 96
@@ -33,16 +33,17 @@ object FormMain: TFormMain
     ClientHeight = 97
     ClientWidth = 151
     Color = 13290186
+    ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object CheckBox1: TCheckBox
       Left = 40
       Height = 19
       Top = 32
-      Width = 71
+      Width = 69
       Caption = 'ShowGrid'
-      OnChange = CheckBox1Change
       TabOrder = 0
+      OnChange = CheckBox1Change
     end
   end
   object Timer1: TTimer

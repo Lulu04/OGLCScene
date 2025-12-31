@@ -47,7 +47,7 @@ uses Forms, Graphics;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   yGround: single;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
@@ -61,8 +61,8 @@ begin
   FtexJungle := FAtlas.Add(path+'jungle.jpg');
 
   // we define the font for the text
-  fd.Create('Arial', FScene.ScaleDesignToScene(30), [fsBold], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
+  fontDescriptor.Create('Roboto', FScene.ScaleDesignToScene(30), [], BGRA(255,255,255));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
