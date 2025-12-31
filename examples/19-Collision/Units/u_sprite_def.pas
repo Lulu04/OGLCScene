@@ -231,7 +231,7 @@ begin
   // Because:
   //         1) the file .par have a reference to an image file for the texture used by the particle emitter
   //         2) this texture is already loaded in our atlas
-  // -> we specify the atlas instance where the load method will search the relevant file.
+  // -> we specify the atlas instance where the load method will search the relevant texture.
   pe.LoadFromFile(PathToDataFolder+'SpaceShipEngine.par', aAtlas);
   pe.ParticlesPosRelativeToEmitterPos := False;
   pe.SetCoordinate(Width*0.5, Height);

@@ -85,7 +85,6 @@
       <Unit0>
         <Filename Value="HelloWorld.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <CursorPos Y="4"/>
         <UsageCount Value="200"/>
@@ -98,7 +97,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="16" Y="15"/>
+        <TopLine Value="26"/>
+        <CursorPos X="21" Y="40"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -116,8 +116,10 @@
       <Unit3>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="16" Y="15"/>
+        <TopLine Value="20"/>
+        <CursorPos Y="41"/>
         <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit3>
@@ -198,7 +200,7 @@
         <Loaded Value="True"/>
       </Unit14>
     </Units>
-    <JumpHistory Count="11" HistoryIndex="10">
+    <JumpHistory Count="13" HistoryIndex="12">
       <Position1>
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="50" Column="38" TopLine="35"/>
@@ -243,6 +245,14 @@
         <Filename Value="..\19-Collision\Units\u_sprite_def.pas"/>
         <Caret Line="173" Column="14" TopLine="159"/>
       </Position11>
+      <Position12>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="21" Column="20" TopLine="10"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="33" Column="20" TopLine="14"/>
+      </Position13>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -67,7 +67,7 @@ begin
   end;
 
   FVelocityCurve := aVelocityCurveID;
-  FDuration := 3.0;
+  FDuration := 2.0;
 
   // second child is a sprite
   FSprite := TSprite.Create(aTex, False);
@@ -93,10 +93,10 @@ end;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   yy, ydelta: single;
   i, h: integer;
-  coloredSquare: TMultiColorRectangle;
+  coloredSquare: TQuad4Color;
 begin
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
 
@@ -110,8 +110,8 @@ begin
   FtexWarning := FAtlas.AddFromSVG(path+'DlgWarning.svg', -1, h);
 
   // we define the font for the text
-  fd.Create('Arial', h, [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
+  fontDescriptor.Create('Roboto', h, [], BGRA(255,255,255));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the
@@ -125,8 +125,9 @@ begin
   FAtlas.FreeItemImages;
 
   // creation of the colored square
-  coloredSquare := TMultiColorRectangle.Create(Round(FScene.Width*0.5), FScene.Height);
+  coloredSquare := TQuad4Color.Create(FScene);
   FScene.Add(coloredSquare);
+  coloredSquare.SetSize(FScene.Width div 2, FScene.Height);
   coloredSquare.SetAllColorsTo(BGRA(0,100,150));
   coloredSquare.SetCoordinate(FScene.Width*0.25, 0);
 
@@ -135,7 +136,7 @@ begin
   // Creation of the sprites
   for i:=0 to High(FSprites) do begin
     FSprites[i] := TSpriteForDemo.Create(FtexFont, FtexWarning, yy, Word(i));
-    yy := yy + ydelta; //fd.FontHeight * 1.5;
+    yy := yy + ydelta; //fontDescriptor.FontHeight * 1.5;
   end;
 
 end;

@@ -42,7 +42,7 @@ uses Forms, LCLType;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
   FAtlas := FScene.CreateAtlas;
@@ -53,8 +53,8 @@ begin
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));
   FtexShip := FAtlas.AddFromSVG(path+'SpaceShip.svg', Round(FScene.Width/8), -1);
 
-  fd.Create('Arial', 20, [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
+  fontDescriptor.Create('Roboto', 20, [], BGRA(0,0,0));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the

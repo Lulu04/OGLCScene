@@ -38,7 +38,7 @@ uses Forms;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   text: TFreeText;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
@@ -49,8 +49,8 @@ begin
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
   FtexWarning := FAtlas.AddFromSVG(path+'DlgWarning.svg', FScene.ScaleDesignToScene(200), -1);
 
-  fd.Create('Arial', 20, [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
+  fontDescriptor.Create('Roboto', 20, [], BGRA(255,255,255));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the

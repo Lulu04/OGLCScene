@@ -27,19 +27,20 @@ implementation
 
 procedure TScreenDemo.CreateObjects;
 var spriteText: TSprite;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
 begin
-  // font is drawn in black: this way we can choose the color of the text at sprite level (see below)
-  fd.Create('Arial', 32, [], BGRA(0,0,0));
+  // we define the font
+  fontDescriptor.Create('Roboto', 32, [], BGRA(255,255,255));
 
   // It's the easiest way to create a texture with text written on it.
-  // But this means you'll have one texture for one text, which isn't optimized for OpenGL.
-  // It's better to use a TTexturedFont object: see example TexturedFont
-  spriteText := TSprite.Create(FScene, fd, 'Hello world');
+  // But this means you'll have one texture for one text, which isn't optimized.
+  // It's better to use TAtlas and TTexturedFont objects: see example TexturedFont
+  spriteText := TSprite.Create(FScene, fontDescriptor, 'Hello world');
   FScene.Add(spriteText);
   spriteText.CenterOnScene;
-  // we apply a Tint on the sprite because the font is draw in black
-  spriteText.Tint.Value := BGRA(255,255,220);
+
+  // set the background color
+  FScene.BackgroundColor := BGRA(30,0,30);
 end;
 
 procedure TScreenDemo.FreeObjects;

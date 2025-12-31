@@ -101,7 +101,7 @@ end;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   i: Integer;
   ground, castle, wood: TSprite;
   sky: TMultiColorRectangle;
@@ -114,8 +114,8 @@ begin
   FAtlas.Spacing := 1;
 
   // we define the font for the text
-  fd.Create('Arial', 20, [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
+  fontDescriptor.Create('Roboto', 20, [], BGRA(0,0,0));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL); // use 2 predefined charsets
 
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));

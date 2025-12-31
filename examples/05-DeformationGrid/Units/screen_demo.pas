@@ -43,7 +43,7 @@ uses Forms;
 procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   yy, margin: single;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
@@ -53,8 +53,8 @@ begin
 
   path := Application.Location+'..'+DirectorySeparator+'Data'+DirectorySeparator;
 
-  fd.Create('Arial Black', Round(FScene.Height/10), [], BGRA(255,60,97,200), BGRA(255,255,150), 8, BGRA(0,255,0,255), 20, 20, 15);
-  FtexTitle := FAtlas.AddString('dtTumultuousWater', fd, NIL);
+  fontDescriptor.Create('Roboto', Round(FScene.Height/10), [], BGRA(255,60,97,200), BGRA(255,255,150), 8, BGRA(0,255,0,255), 20, 20, 15);
+  FtexTitle := FAtlas.AddString('dtTumultuousWater', fontDescriptor, NIL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individual textures are initialized as part of the
@@ -82,7 +82,7 @@ begin
 
   yy := yy + FTitle1.BottomY;
   // the second title creates its own private texture (just to demonstrate its possible to not use an atlas (not recommended))
-  FTitle2 := TDeformationGrid.Create(FScene, fd, 'dtWindingLeft');
+  FTitle2 := TDeformationGrid.Create(FScene, fontDescriptor, 'dtWindingLeft');
   FScene.Add(FTitle2);
   with FTitle2 do begin
     SetCoordinate((FScene.Width-FTitle1.Width)*0.5, yy);
@@ -92,7 +92,7 @@ begin
   end;
 
   yy := yy + FTitle1.BottomY;
-  FTitle3 := TDeformationGrid.Create(FScene, fd, 'dtWindingRight');
+  FTitle3 := TDeformationGrid.Create(FScene, fontDescriptor, 'dtWindingRight');
   FScene.Add(FTitle3);
   with FTitle3 do begin
     SetCoordinate((FScene.Width-FTitle1.Width)*0.5, yy);
@@ -102,7 +102,7 @@ begin
   end;
 
   yy := yy + FTitle1.BottomY;
-  FTitle4 := TDeformationGrid.Create(FScene, fd, 'dtFlagRight');
+  FTitle4 := TDeformationGrid.Create(FScene, fontDescriptor, 'dtFlagRight');
   FScene.Add(FTitle4);
   with FTitle4 do begin
     SetCoordinate((FScene.Width-FTitle1.Width)*0.5, yy);

@@ -100,7 +100,7 @@ procedure TScreenDemo.CreateObjects;
 var path: string;
   ima: TBGRABitmap;
   coef: single;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
   FAtlas := FScene.CreateAtlas;
@@ -121,8 +121,8 @@ begin
   // used by the particle emitter for the ship engine.
   FAtlas.Add(path+'Dust_particle.png');
 
-  fd.Create('Arial', FScene.ScaleDesignToScene(18), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
+  fontDescriptor.Create('Roboto', FScene.ScaleDesignToScene(18), [], BGRA(0,0,0));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   FAtlas.TryToPack;
   FAtlas.Build;    // here the atlas is built and all individuals textures are initialized as part of the

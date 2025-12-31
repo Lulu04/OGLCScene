@@ -8,13 +8,13 @@ object FormMain: TFormMain
   ClientWidth = 303
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
   object Panel1: TPanel
     Left = 160
     Height = 277
@@ -25,6 +25,7 @@ object FormMain: TFormMain
     ClientHeight = 277
     ClientWidth = 143
     Color = 13092807
+    ParentBackground = False
     ParentColor = False
     TabOrder = 0
     object Label1: TLabel
@@ -42,9 +43,9 @@ object FormMain: TFormMain
       Width = 129
       Frequency = 10
       Max = 100
-      OnChange = TrackBar1Change
       Position = 0
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 0
     end
     object Label2: TLabel
@@ -62,32 +63,32 @@ object FormMain: TFormMain
       Width = 129
       Frequency = 10
       Max = 100
-      OnChange = TrackBar1Change
       Position = 0
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 1
     end
     object CheckBox1: TCheckBox
       Left = 10
       Height = 19
       Top = 93
-      Width = 113
+      Width = 111
       Caption = 'Sprite AutoRotate'
       Checked = True
-      OnChange = TrackBar1Change
       State = cbChecked
       TabOrder = 2
+      OnChange = TrackBar1Change
     end
     object CheckBox2: TCheckBox
       Left = 8
       Height = 19
       Top = 200
-      Width = 105
+      Width = 103
       Caption = 'Text AutoRotate'
       Checked = True
-      OnChange = TrackBar1Change
       State = cbChecked
       TabOrder = 3
+      OnChange = TrackBar1Change
     end
   end
   object Panel2: TPanel
@@ -99,6 +100,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 277
     ClientWidth = 160
+    ParentBackground = False
     TabOrder = 1
     object OpenGLControl1: TOpenGLControl
       Left = 8

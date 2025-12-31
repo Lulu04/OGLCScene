@@ -6,15 +6,15 @@ object FormMain: TFormMain
   Caption = 'Program name'
   ClientHeight = 204
   ClientWidth = 303
-  Color = 8558233
+  Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
   object OpenGLControl1: TOpenGLControl
     Left = 24
     Height = 140

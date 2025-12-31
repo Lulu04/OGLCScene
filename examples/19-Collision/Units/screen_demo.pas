@@ -50,7 +50,7 @@ procedure TScreenDemo.CreateObjects;
 var path, s: string;
   ima: TBGRABitmap;
   zoom: single;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
   i: integer;
 begin
   // we create an atlas at run time to ensure all images are in the same OpenGL texture -> optimization
@@ -58,8 +58,8 @@ begin
   // to avoid texture artifacts, we want all image in the packed texture separated by 1 pixel
   FAtlas.Spacing := 1;
 
-  fd.Create('Arial', FScene.ScaleDesignToScene(20), [], BGRA(0,0,0));
-  FtexFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
+  fontDescriptor.Create('Roboto', FScene.ScaleDesignToScene(20), [], BGRA(0,0,0));
+  FtexFont := FAtlas.AddTexturedFont(fontDescriptor, FScene.Charsets.SIMPLELATIN + FScene.Charsets.ASCII_SYMBOL);
 
   path := PathToDataFolder;
   FtexStar := FAtlas.AddFromSVG(path+'SpaceStar.svg', -1, Round(FScene.Height/100));

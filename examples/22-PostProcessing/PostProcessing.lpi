@@ -96,6 +96,7 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="27" Y="15"/>
         <UsageCount Value="200"/>
@@ -106,15 +107,15 @@
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
+        <TopLine Value="88"/>
         <CursorPos X="16" Y="15"/>
         <UsageCount Value="153"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="..\..\source\OGLCScene.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="370"/>
+        <TopLine Value="371"/>
         <CursorPos Y="385"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>

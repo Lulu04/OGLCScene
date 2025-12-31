@@ -47,19 +47,24 @@ var
   FormMain: TFormMain;
 
 implementation
-uses screen_scene1, screen_scene2;
+uses screen_scene1, screen_scene2, LazFileUtils;
 {$R *.lfm}
 
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
+var
+  fontDirectory: String;
 begin
+  fontDirectory := CleanAndExpandDirectory(Application.Location+'..'+PathDelim+'Data'+PathDelim+'Fonts'+PathDelim);
+
   FScene1 := TOGLCScene.Create(OpenGLControl1, -1);  //1  4/3
   FScene1.DesignPPI := 96;
   FScene1.LayerCount := LAYER_COUNT_SCENE1;
   FScene1.CreateLogFile(Application.Location+'scene1.log', True);
   FScene1.OnLoadCommonData := @LoadCommonDataScene1;
   FScene1.OnFreeCommonData := @FreeCommonDataScene1;
+  FScene1.FontManager.ScanProjectFont(fontDirectory);
 
   FScene2 := TOGLCScene.Create(OpenGLControl2, -1);
   FScene2.DesignPPI := 96;
@@ -67,6 +72,7 @@ begin
   FScene2.CreateLogFile(Application.Location+'scene2.log', True);
   FScene2.OnLoadCommonData := @LoadCommonDataScene2;
   FScene2.OnFreeCommonData := @FreeCommonDataScene2;
+  FScene2.FontManager.ScanProjectFont(fontDirectory);
 
   FScene3 := TOGLCScene.Create(OpenGLControl3, -1);
   FScene3.DesignPPI := 96;
@@ -74,6 +80,7 @@ begin
   FScene3.CreateLogFile(Application.Location+'scene3.log', True);
   FScene3.OnLoadCommonData := @LoadCommonDataScene3;
   FScene3.OnFreeCommonData := @FreeCommonDataScene3;
+  FScene3.FontManager.ScanProjectFont(fontDirectory);
 
   FScene4 := TOGLCScene.Create(OpenGLControl4, -1);
   FScene4.DesignPPI := 96;
@@ -81,6 +88,7 @@ begin
   FScene4.CreateLogFile(Application.Location+'scene4.log', True);
   FScene4.OnLoadCommonData := @LoadCommonDataScene4;
   FScene4.OnFreeCommonData := @FreeCommonDataScene4;
+  FScene4.FontManager.ScanProjectFont(fontDirectory);
 
   Application.OnIdle := @ProcessApplicationIdle;
 end;
@@ -151,12 +159,12 @@ begin
 end;
 
 procedure TFormMain.LoadCommonDataScene3;
-var fd: TFontDescriptor;
+var fontDescriptor: TFontDescriptor;
   o: TDeformationGrid;
 begin
   // for the scene3, we create the object directly here
-  fd.Create('Arial', Round(FScene3.Height/8), [], BGRA(255,60,97,200), BGRA(255,255,150), 8, BGRA(0,255,0,255), 20, 20, 15);
-  o := TDeformationGrid.Create(FScene3, fd, 'Deformation grid');
+  fontDescriptor.Create('Roboto', Round(FScene3.Height/8), [], BGRA(255,60,97,200), BGRA(255,255,150), 8, BGRA(0,255,0,255), 20, 20, 15);
+  o := TDeformationGrid.Create(FScene3, fontDescriptor, 'Deformation grid');
   FScene3.Add(o);
   with o do begin
     CenterOnScene;
@@ -175,11 +183,11 @@ end;
 
 procedure TFormMain.LoadCommonDataScene4;
 var o: TSprite;
-  fd: TFontDescriptor;
+  fontDescriptor: TFontDescriptor;
 begin
   // for the scene4, we create the object directly here
-  fd.Create('Arial', Round(FScene4.Height/8), [], BGRA(255,0,255));
-  o :=  TSprite.Create(FScene4, fd, 'HELLO WORLD !');
+  fontDescriptor.Create('Roboto', Round(FScene4.Height/8), [], BGRA(255,0,255));
+  o :=  TSprite.Create(FScene4, fontDescriptor, 'HELLO WORLD !');
   FScene4.Add(o);
   o.CenterOnScene;
   o.Angle.AddConstant(50);
