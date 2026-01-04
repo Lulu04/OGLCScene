@@ -1,34 +1,32 @@
-unit frame_tool_panelbank;
+unit frame_pathbank;
 
 {$mode ObjFPC}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, StdCtrls, ExtCtrls, ComCtrls, Buttons,
-  Types,
-  OGLCScene;
+  Classes, SysUtils, Forms, Controls, ExtCtrls, ComCtrls, Buttons, StdCtrls,
+  u_resourcestring, u_ui_objectlist, u_screen_pathbank, Types;
 
 type
 
-  { TFrameToolPanelBank }
+  { TFramePathBank }
 
-  TFrameToolPanelBank = class(TFrame)
-    BAddPanel: TSpeedButton;
-    BHelp: TSpeedButton;
+  TFramePathBank = class(TFrame)
+    BAdd: TSpeedButton;
     BDelete: TSpeedButton;
     BDuplicate: TSpeedButton;
-    BRename: TSpeedButton;
     BEdit: TSpeedButton;
+    BHelp: TSpeedButton;
+    BRename: TSpeedButton;
     Label24: TLabel;
     Panel1: TPanel;
     Panel8: TPanel;
-    PanelPanel: TPanel;
+    PanelPath: TPanel;
     PanelRoot: TPanel;
     Splitter1: TSplitter;
     TV: TTreeView;
-    procedure BAddPanelClick(Sender: TObject);
-    procedure BHelpClick(Sender: TObject);
+    procedure BAddClick(Sender: TObject);
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
       Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
       var PaintImages, DefaultDraw: Boolean);
@@ -40,21 +38,19 @@ type
     procedure TVSelectionChanged(Sender: TObject);
   private
     FIsEditable: boolean;
+    procedure UpdatePreview;
     procedure FillTV;
     procedure HideToolPanels;
     procedure ShowToolPanels;
-
-    procedure UpdatePreview;
     function NodeIsRoot(aNode: TTreeNode): boolean;
-    function NodeIsPanel(aNode: TTreeNode): boolean;
+    function NodeIsPath(aNode: TTreeNode): boolean;
     function SelectedIsRoot: boolean;
-    function SelectedIsPanel: boolean;
+    function SelectedIsPath: boolean;
     procedure DoEditSelected;
     procedure DoRenameSelected;
     procedure DoDuplicateSelected;
     procedure DoDeleteSelected;
   public
-
     procedure OnShow;
 
     property IsEditable: boolean read FIsEditable write FIsEditable;
@@ -62,14 +58,13 @@ type
 
 implementation
 
-uses u_ui_objectlist, u_resourcestring, form_main, u_common,
-  u_screen_uipanelbank, u_screen_uipaneleditor, form_showhelp, Graphics;
+uses u_screen_patheditor, u_common, form_main, Graphics;
 
 {$R *.lfm}
 
-{ TFrameToolPanelBank }
+{ TFramePathBank }
 
-procedure TFrameToolPanelBank.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
+procedure TFramePathBank.TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
   Node: TTreeNode; State: TCustomDrawState; Stage: TCustomDrawStage;
   var PaintImages, DefaultDraw: Boolean);
 var r: TRect;
@@ -115,13 +110,13 @@ begin
   end;
 end;
 
-procedure TFrameToolPanelBank.BAddPanelClick(Sender: TObject);
+procedure TFramePathBank.BAddClick(Sender: TObject);
 begin
-  if Sender = BAddPanel then begin
-    ScreenUIPanelEditor.EditNewPanel;
-    FScene.RunScreen(ScreenUIPanelEditor);
-    FormMain.ShowPagePanelEditor;
-    FrameToolUIPanelEditor.EditNewPanel;
+  if Sender = BAdd then begin
+    ScreenPathEditor.EditNewPath;
+    FScene.RunScreen(ScreenPathEditor);
+    FormMain.ShowPagePathEditor;
+    FramePathEditor.EditNewPath;
   end;
 
   if Sender = BEdit then DoEditSelected;
@@ -130,17 +125,8 @@ begin
   if Sender = BDelete then DoDeleteSelected;
 end;
 
-procedure TFrameToolPanelBank.BHelpClick(Sender: TObject);
-begin
-  form_showhelp.ShowHelp('The Panel Bank contains the panels that you have defined in your project.'#10#10+
-  'CREATE A NEW PANEL:'#10+
-  ' - click on Panels label then click the ''+'' button.'#10#10+
-  'EDIT/RENAME/DUPLICATE/DELETE AN EXISTING PANEL:'#10+
-  ' - select a panel in the list and click the appropriate button on the right.');
-end;
-
-procedure TFrameToolPanelBank.TVMouseDown(Sender: TObject;
-  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+procedure TFramePathBank.TVMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
 var n: TTreeNode;
 begin
   Sender := Sender;
@@ -153,7 +139,7 @@ begin
     ShowToolPanels;
 end;
 
-procedure TFrameToolPanelBank.TVMouseWheel(Sender: TObject; Shift: TShiftState;
+procedure TFramePathBank.TVMouseWheel(Sender: TObject; Shift: TShiftState;
   WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
 begin
   Sender := Sender;
@@ -164,47 +150,51 @@ begin
   HideToolPanels;
 end;
 
-procedure TFrameToolPanelBank.TVResize(Sender: TObject);
+procedure TFramePathBank.TVResize(Sender: TObject);
 begin
   Sender := Sender;
   HideToolPanels;
 end;
 
-procedure TFrameToolPanelBank.TVSelectionChanged(Sender: TObject);
+procedure TFramePathBank.TVSelectionChanged(Sender: TObject);
 begin
   Sender := Sender;
   HideToolPanels;
   UpdatePreview;
-  //if Assigned(FOnSelectionChange) then FOnSelectionChange(Self);
-
   ShowToolPanels;
 end;
 
-procedure TFrameToolPanelBank.FillTV;
+procedure TFramePathBank.UpdatePreview;
+begin
+  ScreenPathBank.ClearView;
+  if SelectedIsPath then ScreenPathBank.ShowPathFromBank(TV.Selected.Text);
+end;
+
+procedure TFramePathBank.FillTV;
 var  root, node: TTreeNode;
   i: Integer;
 begin
   TV.BeginUpdate;
   TV.Items.Clear;
-  TV.Items.AddFirst(NIL, sPanels);
+  TV.Items.AddFirst(NIL, sPaths);
   root := TV.Items.GetFirstNode;
-  if PanelBank.Size > 0 then
-    for i:=0 to PanelBank.Size-1 do begin
-      node := TV.Items.AddChild(root, PanelBank.GetByIndex(i)._Name);
-      node.SelectedIndex := 11;
-      node.ImageIndex := 11;
+  if PathBank.Size > 0 then
+    for i:=0 to PathBank.Size-1 do begin
+      node := TV.Items.AddChild(root, PathBank.GetByIndex(i)._Name);
+      node.SelectedIndex := 12;
+      node.ImageIndex := 12;
       node.MakeVisible;
     end;
   TV.EndUpdate;
 end;
 
-procedure TFrameToolPanelBank.HideToolPanels;
+procedure TFramePathBank.HideToolPanels;
 begin
-  PanelPanel.Visible := False;
+  PanelPath.Visible := False;
   PanelRoot.Visible := False;
 end;
 
-procedure TFrameToolPanelBank.ShowToolPanels;
+procedure TFramePathBank.ShowToolPanels;
 var r, r1: TRect;
   procedure MakePanelVisible(aPanel: TPanel);
   var x: integer;
@@ -227,94 +217,87 @@ begin
 
     if SelectedIsRoot then MakePanelVisible(PanelRoot)
     else
-    if SelectedIsPanel then MakePanelVisible(PanelPanel);
+    if SelectedIsPath then MakePanelVisible(PanelPath);
   end;
 end;
 
-procedure TFrameToolPanelBank.UpdatePreview;
-begin
-  ScreenUIPanelBank.ClearView;
-  if SelectedIsPanel then ScreenUIPanelBank.ShowPanelFromBank(TV.Selected.Text);
-
-end;
-
-function TFrameToolPanelBank.NodeIsRoot(aNode: TTreeNode): boolean;
+function TFramePathBank.NodeIsRoot(aNode: TTreeNode): boolean;
 begin
   if aNode = NIL then exit(False);
   Result := aNode.Level = 0;
 end;
 
-function TFrameToolPanelBank.NodeIsPanel(aNode: TTreeNode): boolean;
+function TFramePathBank.NodeIsPath(aNode: TTreeNode): boolean;
 begin
   if aNode = NIL then exit(False);
   Result := aNode.Level = 1;
 end;
 
-function TFrameToolPanelBank.SelectedIsRoot: boolean;
+function TFramePathBank.SelectedIsRoot: boolean;
 begin
   Result := NodeIsRoot(TV.Selected);
 end;
 
-function TFrameToolPanelBank.SelectedIsPanel: boolean;
+function TFramePathBank.SelectedIsPath: boolean;
 begin
-  Result := NodeIsPanel(TV.Selected);
+  Result := NodeIsPath(TV.Selected);
 end;
 
-procedure TFrameToolPanelBank.DoEditSelected;
+procedure TFramePathBank.DoEditSelected;
 var
-  item: TPanelDescriptorItem;
+  item: TPathDescriptorItem;
 begin
   HideToolPanels;
-  if not SelectedIsPanel then exit;
+  if not SelectedIsPath then exit;
 
-  item := PanelBank.GetByName(TV.Selected.Text);
+  item := PathBank.GetByName(TV.Selected.Text);
   if item = NIL then exit;
 
-  ScreenUIPanelEditor.EditPanelFromBank(TV.Selected.Text);
-  FScene.RunScreen(ScreenUIPanelEditor);
+  ScreenPathEditor.EditPathFromBank(TV.Selected.Text);
+  FScene.RunScreen(ScreenPathEditor);
 end;
 
-procedure TFrameToolPanelBank.DoRenameSelected;
+procedure TFramePathBank.DoRenameSelected;
 var oldName, newName: string;
 begin
   HideToolPanels;
-  if not SelectedIsPanel then exit;
+  if not SelectedIsPath then exit;
 
   oldName := TV.Selected.Text;
-  if not PanelBank.DoRenameByName(oldName, newName, True) then exit;
+  if not PathBank.DoRenameByName(oldName, newName, True) then exit;
 
   // change name in treeview
   TV.Selected.Text := newName;
 end;
 
-procedure TFrameToolPanelBank.DoDuplicateSelected;
+procedure TFramePathBank.DoDuplicateSelected;
 var dstName: string;
 begin
   HideToolPanels;
-  if not SelectedIsPanel then exit;
+  if not SelectedIsPath then exit;
 
-  if not PanelBank.DoDuplicateByName(TV.Selected.Text, dstName, True) then exit;
+  if not PathBank.DoDuplicateByName(TV.Selected.Text, dstName, True) then exit;
   // add the new name in the treeview
   with TV.Items.AddChild(TV.Items.GetFirstNode, dstName) do begin
-    ImageIndex := 11;
-    SelectedIndex := 11;
+    ImageIndex := 12;
+    SelectedIndex := 12;
     MakeVisible;
   end;
 end;
 
-procedure TFrameToolPanelBank.DoDeleteSelected;
+procedure TFramePathBank.DoDeleteSelected;
 begin
   HideToolPanels;
-  if not SelectedIsPanel then exit;
+  if not SelectedIsPath then exit;
 
-  if not PanelBank.DoDeleteByName(TV.Selected.Text, True) then exit;
+  if not PathBank.DoDeleteByName(TV.Selected.Text, True) then exit;
   // delete in treeview
   TV.Items.Delete(TV.Selected);
 
   UpdatePreview;
 end;
 
-procedure TFrameToolPanelBank.OnShow;
+procedure TFramePathBank.OnShow;
 begin
   FillTV;
 end;

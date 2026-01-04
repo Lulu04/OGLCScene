@@ -376,6 +376,7 @@ begin
       case current^.classtype.ClassName of
         'TSpriteContainer': s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
         'TSprite': s := '  '+current^.name+' := TSprite.Create('+current^.textureName+', False);';
+        'TPolarSprite': s := '  '+current^.name+' := TPolarSprite.Create('+current^.textureName+', False);';
         'TQuad4Color': s := '  '+current^.name+' := TQuad4Color.Create(FScene);';
         'TGradientRectangle': s := '  '+current^.name+' := TGradientRectangle.Create(FScene);';
         'TDeformationGrid': s := '  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);';

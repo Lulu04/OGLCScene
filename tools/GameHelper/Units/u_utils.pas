@@ -338,6 +338,29 @@ begin
                 aSurface^.height.ToString+'*FAdditionnalScale)));');
     end;
 
+    'TSpriteWithElasticCorner': begin
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aSurface^.height.ToString+'*FAdditionnalScale)));');
+      if (aSurface^.TopLeftOffsetX <> 0.0) or (aSurface^.TopLeftOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.TopLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.TopLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.TopLeftOffsetY)+'));');
+      if (aSurface^.TopRightOffsetX <> 0.0) or (aSurface^.TopRightOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.TopRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.TopRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.TopRightOffsetY)+'));');
+      if (aSurface^.BottomRightOffsetX <> 0.0) or (aSurface^.BottomRightOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.BottomRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.BottomRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.BottomRightOffsetY)+'));');
+      if (aSurface^.BottomLeftOffsetX <> 0.0) or (aSurface^.BottomLeftOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.BottomLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.BottomLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.BottomLeftOffsetY)+'));');
+    end;
+
+    'TPolarSprite': begin
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aSurface^.height.ToString+'*FAdditionnalScale)));');
+      t.Add(aSpacePrefix+'Polar.Center.Value := PointF(X.Value+Width*0.5, Y.Value+Height*0.5);'); //+PointFToPascal(aSurface^.x+aSurface^.width*0.5, aSurface^.y+aSurface^.height*0.5)+';');
+      if aSurface^.PolarAngle <> 0.0 then
+        t.Add(aSpacePrefix+'Polar.Angle.Value := '+FormatFloatWithDot('0.00', aSurface^.PolarAngle)+';');
+      if aSurface^.PolarDistance <> 0.0 then
+        t.Add(aSpacePrefix+'Polar.Distance.Value := '+FormatFloatWithDot('0.00', aSurface^.PolarDistance)+';');
+    end;
+
     'TQuad4Color': begin
       t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
       if (aSurface^.TopLeftColor = aSurface^.TopRightColor) and
@@ -363,7 +386,6 @@ begin
     end;
 
     'TSpriteContainer': begin
-
     end
 
     else raise exception.Create('forgot to implement '+aSurface^.classtype.ClassName);

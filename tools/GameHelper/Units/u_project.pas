@@ -385,6 +385,7 @@ begin
     LevelBank.LoadFromPath(pathGameHelperFiles);
     FontBank.Load;
     PanelBank.Load;
+    PathBank.Load;
 
     AppPref.LastProjectFilename := aFilename;
   end;
@@ -397,6 +398,8 @@ begin
     SpriteBank.Clear;
     LevelBank.Clear;
     FontBank.Clear;
+    PanelBank.Clear;
+    PathBank.Clear;
     Config.InitDefault;
     WorkingLevelGroup := NIL;
     FScene.LogInfo('done', 1);

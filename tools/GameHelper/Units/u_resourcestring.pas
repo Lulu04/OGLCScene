@@ -40,12 +40,14 @@ sAxxxAlreadyExistsWouldYouLikeToReplaceIt='a %s named %s already exists in the b
 sDeleteThisxxx='Delete this %s ?';
 sFont='font';
 sPanel='panel';
+sPath='path';
 
 sFontDescriptor='Font descriptor';
 sOverwriteTheSelectedFont='Overwrite the selected font ?';
 sAvailableFonts='Available fonts';
 
 sPanels='Panels';
+sPaths='Paths';
 
 implementation
 

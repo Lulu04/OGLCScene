@@ -113,6 +113,7 @@ end;
 { TPanelDescriptorItem }
 
 TPanelDescriptorItem = class(TItemWithName)
+  ChildClippingEnabled,
   IsModal,
   DarkenBG: boolean;
   DarknessColor: TBGRAPixel;
@@ -136,16 +137,31 @@ TPanelBank = class(specialize TListOfItemWithName<TPanelDescriptorItem>)
 end;
 
 
-TUIButtonDescriptor = record
-  //image: TTextureItem;
-  //font: TFontDescriptor;
+{ TPathDescriptorItem }
+
+TPathDescriptorItem = class(TItemWithName)
+  PathData: string;
+  UseSpline: boolean;
+  SplineStyle: TSplineStyle;
+  procedure InitDefault; override;
+  function SaveToString: string; override;
+  procedure LoadFromString(const data: string); override;
+  procedure DuplicateTo(aItem: Pointer); override;
 end;
 
+{ TPathBank }
+
+TPathBank = class(specialize TListOfItemWithName<TPathDescriptorItem>)
+  function AddEmpty: TPathDescriptorItem; override;
+  function GetItemReadableName: string; override;
+  function GetHeaderFile: string; override;
+  function GetSaveFileName: string; override;
+end;
 
 var
   FontBank: TFontBank;
   PanelBank: TPanelBank;
-
+  PathBank: TPathBank;
 
 //TButtonItem
 
@@ -209,7 +225,6 @@ begin
 end;  }
 
 function TFontDescriptorItem.PascalCodeToInitializeGradientVariable: string;
-var s: string;
 begin
   Result := '';
   if FD.UseGradient then
@@ -299,6 +314,7 @@ end;
 
 procedure TPanelDescriptorItem.InitDefault;
 begin
+  ChildClippingEnabled := True;
   IsModal := False;
   DarkenBG := False;
   DarknessColor := BGRA(0,0,0,100);
@@ -314,6 +330,7 @@ var prop: TProperties;
 begin
   prop.Init('!');
   prop.Add('Name', _Name);
+  prop.Add('Clipping', ChildClippingEnabled);
   prop.Add('IsModal', IsModal);
   prop.Add('DarkenBG', DarkenBG);
   if DarkenBG then prop.Add('DarknessColor', DarknessColor);
@@ -329,6 +346,7 @@ var prop: TProperties;
 begin
   prop.Split(data, '!');
   prop.StringValueOf('Name', _Name, '???');
+  prop.BooleanValueOf('Clipping', ChildClippingEnabled, True);
   //prop.StringValueOf('BodyShape', BodyShape, '');
   prop.BooleanValueOf('IsModal', IsModal, False);
   prop.BooleanValueOf('DarkenBG', DarkenBG, False);
@@ -343,6 +361,7 @@ procedure TPanelDescriptorItem.DuplicateTo(aItem: Pointer);
 var dst: TPanelDescriptorItem;
 begin
   dst := TPanelDescriptorItem(aItem);
+  dst.ChildClippingEnabled := ChildClippingEnabled;
   dst.IsModal := IsModal;
   dst.DarkenBG := DarkenBG;
   dst.DarknessColor := DarknessColor;
@@ -374,6 +393,70 @@ end;
 function TPanelBank.GetSaveFileName: string;
 begin
   Result := 'PanelBank.oglc';
+end;
+
+{ TPathDescriptorItem }
+
+procedure TPathDescriptorItem.InitDefault;
+begin
+  PathData := '';
+  UseSpline := True;
+  SplineStyle := ssCrossingWithEnds;
+end;
+
+function TPathDescriptorItem.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('!');
+  prop.Add('Name', _Name);
+  prop.Add('UseSpline', UseSpline);
+  if UseSpline then prop.Add('SplineStyle', ord(SplineStyle));
+  prop.Add('Path', PathData);
+  Result := prop.PackedProperty;
+end;
+
+procedure TPathDescriptorItem.LoadFromString(const data: string);
+var prop: TProperties;
+  v: integer;
+begin
+  v := 0;
+  prop.Split(data, '!');
+  prop.StringValueOf('Name', _Name, '???');
+  prop.BooleanValueOf('UseSpline', UseSpline, True);
+  prop.IntegerValueOf('SplineStyle', v, Ord(ssCrossingWithEnds));
+  SplineStyle := TSplineStyle(v);
+  prop.StringValueOf('Path', PathData, '');
+end;
+
+procedure TPathDescriptorItem.DuplicateTo(aItem: Pointer);
+begin
+  TPathDescriptorItem(aItem).UseSpline := UseSpline;
+  TPathDescriptorItem(aItem).SplineStyle := SplineStyle;
+  TPathDescriptorItem(aItem).PathData := PathData;
+end;
+
+{ TPathBank }
+
+function TPathBank.AddEmpty: TPathDescriptorItem;
+begin
+  Result := TPathDescriptorItem.Create;
+  Result.InitDefault;
+  PushBack(Result);
+end;
+
+function TPathBank.GetItemReadableName: string;
+begin
+  Result := sPath;
+end;
+
+function TPathBank.GetHeaderFile: string;
+begin
+  Result := '[PATHBANK]';
+end;
+
+function TPathBank.GetSaveFileName: string;
+begin
+  Result := 'PathBank.oglc';
 end;
 
 { TListOfItemWithName }

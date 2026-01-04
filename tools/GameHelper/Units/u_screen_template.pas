@@ -70,9 +70,15 @@ TMouseState = ( msIdle,
                 msWaitingForNextPolygonNode,
                 msBackPressedOnPolygonCreation,
 
-                msCancelShapeCreation,  // used when user pess ESCAPE while creating a collision shape
+                msCancelShapeCreation,  // used when user press ESCAPE while creating a collision shape
 
-                msLevelEditorAddingMultiple   // used by level editor
+                msLevelEditorAddingMultiple,   // used by level editor
+
+                msWaitingForNextCircleNode,
+                msOverCircleNode,
+                msMouseDownOnCircleNode,
+                msMovingCircleNode,
+                msCanInsertCircleNode
               );
 
 { TCustomScreenTemplate }
@@ -334,7 +340,13 @@ begin
     msToolPolygon,
     msCreatingPolygon: tex := texMouseToolPolygon;
     msWaitingForNextPolygonNode, msBackPressedOnPolygonCreation: tex := texMouseAddNode;
-    else tex := texMouseNormal;
+
+    msWaitingForNextCircleNode: tex := texmouseAddNodeCircle;
+    msOverCircleNode: tex := texMouseMovingNode;
+    msMouseDownOnCircleNode: tex := texMouseMovingNode;
+    msMovingCircleNode: tex := texMouseMovingNode;
+    msCanInsertCircleNode: tex := texMouseInsertNodeCircle;
+  else tex := texMouseNormal;
   end;
 
   FScene.MakeCurrent;
@@ -683,8 +695,14 @@ procedure TScreenWithSurfaceHandling.AddOffsetCoordinateToSelection(aOffset: TPo
 var i: integer;
 begin
   if Length(FSelected) = 0 then exit;
-  for i:=0 to High(FSelected) do
+  for i:=0 to High(FSelected) do begin
     FSelected[i]^.surface.MoveRelative(aOffset, 0);
+
+    if FSelected[i]^.surface is TPolarSprite then begin
+      with TPolarSprite(FSelected[i]^.surface).Polar do
+        Center.Value := Center.Value + aOffset;
+    end;
+  end;
 end;
 
 procedure TScreenWithSurfaceHandling.AddOffsetToPivotOnSelection(aOffset: TPointF);

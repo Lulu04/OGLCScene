@@ -21,7 +21,8 @@ uses
   form_enter_description, frame_edit_uibodyshape, frame_tool_uipaneleditor,
   frame_viewfontbank, u_screen_fontbank, u_screen_uipaneleditor,
   u_ui_objectlist, frame_tool_panelbank, form_edituibodyshape,
-u_screen_uipanelbank;
+  u_screen_uipanelbank, u_screen_pathbank, frame_pathbank, u_screen_patheditor,
+  frame_patheditor;
 
 {$R *.res}
 

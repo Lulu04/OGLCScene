@@ -1,14 +1,14 @@
-object FrameToolPanelBank: TFrameToolPanelBank
+object FramePathBank: TFramePathBank
   Left = 0
-  Height = 693
+  Height = 606
   Top = 0
-  Width = 320
-  ClientHeight = 693
-  ClientWidth = 320
+  Width = 296
+  ClientHeight = 606
+  ClientWidth = 296
   LCLVersion = '4.5.0.0'
   TabOrder = 0
-  DesignLeft = 879
-  DesignTop = 110
+  DesignLeft = 811
+  DesignTop = 178
   object Panel1: TPanel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Splitter1
@@ -18,53 +18,15 @@ object FrameToolPanelBank: TFrameToolPanelBank
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 352
-    Top = 341
-    Width = 320
+    Height = 350
+    Top = 256
+    Width = 296
     Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
     Color = 8289918
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
-  end
-  object Splitter1: TSplitter
-    AnchorSideLeft.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Cursor = crVSplit
-    Left = 0
-    Height = 5
-    Top = 336
-    Width = 320
-    Align = alNone
-    Anchors = [akTop, akLeft, akRight]
-    ResizeAnchor = akTop
-  end
-  object TV: TTreeView
-    AnchorSideTop.Control = Panel8
-    AnchorSideTop.Side = asrBottom
-    AnchorSideBottom.Control = Splitter1
-    Left = 0
-    Height = 304
-    Top = 32
-    Width = 325
-    Anchors = [akTop, akLeft, akBottom]
-    BackgroundColor = 3947580
-    BorderStyle = bsNone
-    Color = 3947580
-    Font.Height = 16
-    Images = DataModule1.ILLevelTreeView
-    ParentFont = False
-    ReadOnly = True
-    RightClickSelect = True
-    ScrollBars = ssAutoVertical
-    TabOrder = 2
-    Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
-    OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
-    OnMouseDown = TVMouseDown
-    OnMouseWheel = TVMouseWheel
-    OnResize = TVResize
-    OnSelectionChanged = TVSelectionChanged
   end
   object Panel8: TPanel
     AnchorSideLeft.Control = Owner
@@ -74,139 +36,87 @@ object FrameToolPanelBank: TFrameToolPanelBank
     Left = 0
     Height = 32
     Top = 0
-    Width = 320
+    Width = 296
     Anchors = [akTop, akLeft, akRight]
     ClientHeight = 32
-    ClientWidth = 320
+    ClientWidth = 296
     Color = 1973790
     ParentBackground = False
     ParentColor = False
-    TabOrder = 3
+    TabOrder = 1
     object Label24: TLabel
       AnchorSideLeft.Control = Panel8
       AnchorSideLeft.Side = asrCenter
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
-      Left = 125
+      Left = 116
       Height = 15
       Top = 9
-      Width = 71
-      Caption = 'PANEL BANK'
+      Width = 65
+      Caption = 'PATH BANK'
       Font.Color = 1424112
       Font.Style = [fsBold]
-      ParentColor = False
       ParentFont = False
     end
     object BHelp: TSpeedButton
+      AnchorSideLeft.Control = Panel8
       AnchorSideTop.Control = Panel8
       AnchorSideTop.Side = asrCenter
       AnchorSideRight.Control = Panel8
       AnchorSideRight.Side = asrBottom
       Cursor = crHandPoint
-      Left = 295
+      Left = 271
       Height = 24
       Hint = 'Help'
       Top = 4
       Width = 24
       Anchors = [akTop, akRight]
+      BorderSpacing.Left = 3
       Flat = True
       Images = DataModule1.ILIconUI
       ImageIndex = 8
       ShowHint = True
       ParentShowHint = False
-      OnClick = BHelpClick
     end
   end
-  object PanelPanel: TPanel
-    Left = 208
-    Height = 18
-    Top = 80
-    Width = 96
-    BevelOuter = bvNone
-    ClientHeight = 18
-    ClientWidth = 96
+  object TV: TTreeView
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel8
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Splitter1
+    Left = 0
+    Height = 219
+    Top = 32
+    Width = 296
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BackgroundColor = 3947580
+    BorderStyle = bsNone
     Color = 3947580
-    ParentBackground = False
-    ParentColor = False
-    TabOrder = 4
-    Visible = False
-    object BRename: TSpeedButton
-      AnchorSideLeft.Control = BEdit
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = PanelPanel
-      AnchorSideTop.Side = asrCenter
-      Cursor = crHandPoint
-      Left = 20
-      Height = 16
-      Hint = 'Rename'
-      Top = 1
-      Width = 16
-      BorderSpacing.Left = 4
-      Flat = True
-      Images = DataModule1.ILLevelTreeView
-      ImageIndex = 4
-      ShowHint = True
-      ParentShowHint = False
-      OnClick = BAddPanelClick
-    end
-    object BDuplicate: TSpeedButton
-      AnchorSideLeft.Control = BRename
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = PanelPanel
-      AnchorSideTop.Side = asrCenter
-      Cursor = crHandPoint
-      Left = 40
-      Height = 16
-      Hint = 'Duplicate'
-      Top = 1
-      Width = 16
-      BorderSpacing.Left = 4
-      Flat = True
-      Images = DataModule1.ILLevelTreeView
-      ImageIndex = 5
-      ShowHint = True
-      ParentShowHint = False
-      OnClick = BAddPanelClick
-    end
-    object BDelete: TSpeedButton
-      AnchorSideLeft.Control = BDuplicate
-      AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = PanelPanel
-      AnchorSideTop.Side = asrCenter
-      AnchorSideRight.Control = PanelPanel
-      AnchorSideRight.Side = asrBottom
-      Cursor = crHandPoint
-      Left = 80
-      Height = 16
-      Hint = 'Delete'
-      Top = 1
-      Width = 16
-      Anchors = [akTop, akRight]
-      BorderSpacing.Left = 4
-      Flat = True
-      Images = DataModule1.ILLevelTreeView
-      ImageIndex = 3
-      ShowHint = True
-      ParentShowHint = False
-      OnClick = BAddPanelClick
-    end
-    object BEdit: TSpeedButton
-      AnchorSideLeft.Control = PanelPanel
-      AnchorSideTop.Control = PanelPanel
-      AnchorSideTop.Side = asrCenter
-      Cursor = crHandPoint
-      Left = 0
-      Height = 16
-      Hint = 'Edit in Panel Editor'
-      Top = 1
-      Width = 16
-      Flat = True
-      Images = DataModule1.ILLevelTreeView
-      ImageIndex = 7
-      ShowHint = True
-      ParentShowHint = False
-      OnClick = BAddPanelClick
-    end
+    Font.Height = 16
+    HotTrack = True
+    Images = DataModule1.ILLevelTreeView
+    ParentFont = False
+    ReadOnly = True
+    RightClickSelect = True
+    ScrollBars = ssVertical
+    TabOrder = 2
+    Options = [tvoAutoItemHeight, tvoHideSelection, tvoHotTrack, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+    OnAdvancedCustomDrawItem = TVAdvancedCustomDrawItem
+    OnMouseDown = TVMouseDown
+    OnMouseWheel = TVMouseWheel
+    OnResize = TVResize
+    OnSelectionChanged = TVSelectionChanged
+  end
+  object Splitter1: TSplitter
+    Cursor = crVSplit
+    Left = 32
+    Height = 5
+    Top = 251
+    Width = 267
+    Align = alNone
+    ResizeAnchor = akTop
   end
   object PanelRoot: TPanel
     Left = 232
@@ -219,9 +129,9 @@ object FrameToolPanelBank: TFrameToolPanelBank
     Color = 3947580
     ParentBackground = False
     ParentColor = False
-    TabOrder = 5
+    TabOrder = 4
     Visible = False
-    object BAddPanel: TSpeedButton
+    object BAdd: TSpeedButton
       AnchorSideLeft.Control = PanelRoot
       AnchorSideTop.Control = PanelRoot
       AnchorSideTop.Side = asrCenter
@@ -236,7 +146,98 @@ object FrameToolPanelBank: TFrameToolPanelBank
       ImageIndex = 2
       ShowHint = True
       ParentShowHint = False
-      OnClick = BAddPanelClick
+      OnClick = BAddClick
+    end
+  end
+  object PanelPath: TPanel
+    Left = 176
+    Height = 18
+    Top = 80
+    Width = 96
+    BevelOuter = bvNone
+    ClientHeight = 18
+    ClientWidth = 96
+    Color = 3947580
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 5
+    Visible = False
+    object BRename: TSpeedButton
+      AnchorSideLeft.Control = BEdit
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelPath
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 20
+      Height = 16
+      Hint = 'Rename'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 4
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BAddClick
+    end
+    object BDuplicate: TSpeedButton
+      AnchorSideLeft.Control = BRename
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelPath
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 40
+      Height = 16
+      Hint = 'Duplicate'
+      Top = 1
+      Width = 16
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 5
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BAddClick
+    end
+    object BDelete: TSpeedButton
+      AnchorSideLeft.Control = BDuplicate
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = PanelPath
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = PanelPath
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 80
+      Height = 16
+      Hint = 'Delete'
+      Top = 1
+      Width = 16
+      Anchors = [akTop, akRight]
+      BorderSpacing.Left = 4
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 3
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BAddClick
+    end
+    object BEdit: TSpeedButton
+      AnchorSideLeft.Control = PanelPath
+      AnchorSideTop.Control = PanelPath
+      AnchorSideTop.Side = asrCenter
+      Cursor = crHandPoint
+      Left = 0
+      Height = 16
+      Hint = 'Edit in Panel Editor'
+      Top = 1
+      Width = 16
+      Flat = True
+      Images = DataModule1.ILLevelTreeView
+      ImageIndex = 7
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BAddClick
     end
   end
 end

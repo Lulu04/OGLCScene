@@ -6,7 +6,7 @@ unit u_levelbank;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, SysUtils, StdCtrls,
   OGLCScene, gvector,
   BGRABitmap, BGRABitmapTypes,
   u_undo_redo, u_texture_list, u_layerlist;
@@ -72,6 +72,8 @@ public
 
   procedure Clear; reintroduce;
 
+  procedure FillComboBoxWithLevels(aCB: TComboBox);
+
   function SaveToString: string;
   procedure LoadFromString(const data: string);
   property GroupName: string read FGroupName write FGroupName;
@@ -100,6 +102,8 @@ TLevelBank = class(specialize TVector<TLevelGroup>)
   procedure DecreaseLayerIndexGreaterOrEqualThan(aIndex: integer);
 
   function LevelCountInAllGroups: integer;
+
+  procedure FillComboBoxWithGroups(aCB: TComboBox);
 
   procedure SaveTo(t: TStringList);
   procedure LoadFrom(t: TStringList);
@@ -379,6 +383,15 @@ begin
   inherited Clear;
 end;
 
+procedure TLevelGroup.FillComboBoxWithLevels(aCB: TComboBox);
+var i: SizeUInt;
+begin
+  aCB.Clear;
+  if Size > 0 then
+    for i:=0 to Size-1 do
+      aCB.Items.Add(Mutable[i]^.name);
+end;
+
 function TLevelGroup.SaveToString: string;
 var i: SizeUInt;
   prop: TProperties;
@@ -557,6 +570,15 @@ begin
   Result := 0;
   for i:=0 to Size-1 do
     Result := Result + Mutable[i]^.Size;
+end;
+
+procedure TLevelBank.FillComboBoxWithGroups(aCB: TComboBox);
+var i: SizeUInt;
+begin
+  aCB.Clear;
+  if Size > 0 then
+    for i:=0 to Size-1 do
+      aCB.Items.Add(Mutable[i]^.FGroupName);
 end;
 
 procedure TLevelBank.SaveTo(t: TStringList);

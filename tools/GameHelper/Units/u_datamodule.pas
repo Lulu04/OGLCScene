@@ -187,6 +187,7 @@ begin
   AddImageToImageList('PascalCodeDelete.svg', ILLevelTreeView);
   AddImageToImageList('Font.svg', ILLevelTreeView);  // 10
   AddImageToImageList('Panel.svg', ILLevelTreeView);
+  AddImageToImageList('Path.svg', ILLevelTreeView);
 
   ILLevelTreeView.EndUpdate;
 end;
