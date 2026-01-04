@@ -30,6 +30,7 @@ TOGLCPathHelper = type helper for TOGLCPath
 
   procedure ExpandNormalizedTo(aWidth, aHeight: integer);
   procedure ConvertToSpline(aSplineStyle: TSplineStyle);
+  function ToSpline(aSplineStyle: TSplineStyle): TOGLCPath;
 
   procedure LoadFromFile(const aFilename: string);
   // load a normalized path from file and expand the path to the specified size
@@ -37,6 +38,9 @@ TOGLCPathHelper = type helper for TOGLCPath
 
   function SaveToString: string;
   procedure LoadFromString(const data: string);
+
+  function SaveNormalizedToString(aWidth, aHeight: single): string;
+  procedure LoadNormalizedFromStringAndExpand(const data: string; aWidth, aHeight: single);
 end;
 
 
@@ -277,6 +281,12 @@ begin
   Self := Copy(spline, 0, Length(spline));
 end;
 
+function TOGLCPathHelper.ToSpline(aSplineStyle: TSplineStyle): TOGLCPath;
+begin
+  Result := NIL;
+  Result.ConcatPoints(ComputeOpenedSpline(Self, aSplineStyle));
+end;
+
 procedure TOGLCPathHelper.LoadFromFile(const aFilename: string);
 var t: TStringList;
     A: TStringArray;
@@ -367,11 +377,25 @@ begin
   if Length(Self) = 0 then exit;
   for i:=0 to High(Self) do
     Result := Result + ' ' +
-              FormatFloatWithDot('0.000', Self[i].x) + ' '+ FormatFloatWithDot('0.000', Self[i].y);
+              FormatFloatWithDot('0.00000', Self[i].x) + ' '+ FormatFloatWithDot('0.00000', Self[i].y);
+end;
+
+function TOGLCPathHelper.SaveNormalizedToString(aWidth, aHeight: single): string;
+var
+  i: Integer;
+begin
+  Result := integer(Length(Self)).ToString;
+  if Length(Self) = 0 then exit;
+  if (aWidth = 0) or (aHeight = 0) then exit;
+
+  for i:=0 to High(Self) do
+    Result := Result + ' ' +
+              FormatFloatWithDot('0.00000', Self[i].x/aWidth) + ' '+
+              FormatFloatWithDot('0.00000', Self[i].y/aHeight);
 end;
 
 procedure TOGLCPathHelper.LoadFromString(const data: string);
-var i: integer;
+var i, k: integer;
   A: TStringArray;
   c: integer;
 begin
@@ -381,9 +405,21 @@ begin
   if not TryStrToInt(A[0], c) then exit;
   if c < 1 then exit;
   SetLength(Self, c);
+  k := 1;
   for i:=0 to High(Self) do begin
-    Self[i].x := StringToSingle(A[i*2]);
-    Self[i].y := StringToSingle(A[i*2+1]);
+    Self[i].x := StringToSingle(A[k]);
+    Self[i].y := StringToSingle(A[k+1]);
+    inc(k, 2);
+  end;
+end;
+
+procedure TOGLCPathHelper.LoadNormalizedFromStringAndExpand(const data: string; aWidth, aHeight: single);
+var i: integer;
+begin
+  LoadFromString(data);
+  for i:=0 to High(Self) do begin
+    Self[i].x := Self[i].x * aWidth;
+    Self[i].y := Self[i].y * aHeight;
   end;
 end;
 
