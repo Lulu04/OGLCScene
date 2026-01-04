@@ -1,0 +1,372 @@
+object FramePathEditor: TFramePathEditor
+  Left = 0
+  Height = 399
+  Top = 0
+  Width = 296
+  ClientHeight = 399
+  ClientWidth = 296
+  LCLVersion = '4.5.0.0'
+  TabOrder = 0
+  DesignLeft = 689
+  DesignTop = 280
+  object Panel8: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 32
+    Top = 0
+    Width = 296
+    Anchors = [akTop, akLeft, akRight]
+    ClientHeight = 32
+    ClientWidth = 296
+    Color = 1973790
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object Label24: TLabel
+      AnchorSideLeft.Control = Panel8
+      AnchorSideLeft.Side = asrCenter
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      Left = 111
+      Height = 15
+      Top = 9
+      Width = 75
+      Caption = 'PATH EDITOR'
+      Font.Color = 1424112
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object BCancel: TSpeedButton
+      AnchorSideTop.Control = Panel8
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = Panel8
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 271
+      Height = 24
+      Hint = 'Return to the main window'
+      Top = 4
+      Width = 24
+      Anchors = [akTop, akRight]
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 13
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BCancelClick
+    end
+  end
+  object Panel1: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Panel8
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 367
+    Top = 32
+    Width = 296
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    ClientHeight = 367
+    ClientWidth = 296
+    Color = 8289918
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 1
+    object CBUseSpline: TCheckBox
+      AnchorSideTop.Control = Label3
+      AnchorSideTop.Side = asrBottom
+      Left = 10
+      Height = 19
+      Top = 116
+      Width = 74
+      BorderSpacing.Top = 15
+      Caption = 'Use spline'
+      Checked = True
+      Font.Style = [fsBold]
+      ParentFont = False
+      State = cbChecked
+      TabOrder = 0
+      OnChange = CBUseSplineChange
+    end
+    object ComboBox1: TComboBox
+      AnchorSideTop.Control = CBUseSpline
+      AnchorSideTop.Side = asrBottom
+      Left = 35
+      Height = 23
+      Top = 135
+      Width = 158
+      ItemHeight = 15
+      ItemIndex = 3
+      Items.Strings = (
+        'ssInside'
+        'ssInsideWithEnds'
+        'ssCrossing'
+        'ssCrossingWithEnds'
+        'ssOutside'
+        'ssRoundOutside'
+        'ssVertexToSide'
+        'ssEasyBezier'
+      )
+      Style = csDropDownList
+      TabOrder = 1
+      Text = 'ssCrossingWithEnds'
+      OnSelect = CBUseSplineChange
+    end
+    object Label7: TLabel
+      AnchorSideTop.Control = ComboBox1
+      AnchorSideTop.Side = asrBottom
+      Left = 16
+      Height = 15
+      Top = 168
+      Width = 67
+      BorderSpacing.Top = 10
+      Caption = 'Global move'
+      ParentColor = False
+    end
+    object Arrow4: TArrow
+      AnchorSideTop.Control = Arrow2
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Arrow2
+      Cursor = crHandPoint
+      Left = 100
+      Height = 20
+      Top = 188
+      Width = 20
+      Anchors = [akTop, akRight]
+      ArrowColor = 3881787
+      Constraints.MinHeight = 8
+      Constraints.MinWidth = 8
+      ShadowType = stFilled
+      ShadowColor = 986895
+      OnClick = CBUseSplineChange
+    end
+    object Arrow2: TArrow
+      AnchorSideTop.Control = Label7
+      Cursor = crHandPoint
+      Left = 120
+      Height = 20
+      Top = 168
+      Width = 20
+      ArrowColor = 3881787
+      ArrowType = atUp
+      Constraints.MinHeight = 8
+      Constraints.MinWidth = 8
+      ShadowType = stFilled
+      ShadowColor = 986895
+      OnClick = CBUseSplineChange
+    end
+    object Arrow3: TArrow
+      AnchorSideLeft.Control = Arrow2
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Arrow2
+      AnchorSideTop.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 140
+      Height = 20
+      Top = 188
+      Width = 20
+      ArrowColor = 3881787
+      ArrowType = atRight
+      Constraints.MinHeight = 8
+      Constraints.MinWidth = 8
+      ShadowType = stFilled
+      ShadowColor = 986895
+      OnClick = CBUseSplineChange
+    end
+    object Arrow1: TArrow
+      AnchorSideLeft.Control = Arrow2
+      AnchorSideTop.Control = Arrow4
+      AnchorSideTop.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 120
+      Height = 20
+      Top = 208
+      Width = 20
+      ArrowColor = 3881787
+      ArrowType = atDown
+      Constraints.MinHeight = 8
+      Constraints.MinWidth = 8
+      ShadowType = stFilled
+      ShadowColor = 986895
+      OnClick = CBUseSplineChange
+    end
+    object BHelp: TSpeedButton
+      AnchorSideTop.Control = Panel1
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 267
+      Height = 24
+      Hint = 'Help'
+      Top = 5
+      Width = 24
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 5
+      BorderSpacing.Right = 5
+      Flat = True
+      Images = DataModule1.ILIconUI
+      ImageIndex = 8
+      ShowHint = True
+      ParentShowHint = False
+      OnClick = BHelpClick
+    end
+    object CheckBox4: TCheckBox
+      AnchorSideTop.Control = Arrow1
+      AnchorSideTop.Side = asrBottom
+      Left = 16
+      Height = 19
+      Top = 248
+      Width = 82
+      BorderSpacing.Top = 20
+      Caption = 'Show nodes'
+      Checked = True
+      State = cbChecked
+      TabOrder = 2
+      OnClick = CBUseSplineChange
+    end
+    object Label1: TLabel
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = CheckBox4
+      AnchorSideTop.Side = asrBottom
+      Left = 7
+      Height = 15
+      Top = 282
+      Width = 67
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 15
+      Caption = 'Panel name:'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+    end
+    object Edit1: TEdit
+      AnchorSideLeft.Control = Label1
+      AnchorSideTop.Control = Label1
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = BSave
+      AnchorSideBottom.Side = asrBottom
+      Left = 7
+      Height = 23
+      Top = 297
+      Width = 203
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Right = 5
+      TabOrder = 3
+    end
+    object BSave: TSpeedButton
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = Edit1
+      AnchorSideTop.Side = asrCenter
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 215
+      Height = 30
+      Top = 293
+      Width = 66
+      Anchors = [akTop, akRight]
+      BorderSpacing.Right = 15
+      Caption = 'Save'
+      Images = DataModule1.ILIconUI
+      ImageIndex = 4
+      OnClick = BSaveClick
+    end
+    object BClearAllNodes: TSpeedButton
+      AnchorSideRight.Control = Panel1
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = CheckBox4
+      AnchorSideBottom.Side = asrBottom
+      Cursor = crHandPoint
+      Left = 143
+      Height = 22
+      Top = 245
+      Width = 113
+      Anchors = [akLeft, akRight, akBottom]
+      BorderSpacing.Right = 40
+      Caption = 'Clear all nodes'
+      Images = DataModule1.ILIconUI
+      ImageIndex = 16
+      OnClick = BClearAllNodesClick
+    end
+    object CBShowLevel: TCheckBox
+      Left = 10
+      Height = 19
+      Top = 32
+      Width = 79
+      Caption = 'Show level'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 4
+      OnChange = CBUseSplineChange
+    end
+    object ComboBox2: TComboBox
+      AnchorSideLeft.Control = Label2
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = CBShowLevel
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Label2
+      AnchorSideBottom.Side = asrBottom
+      Left = 65
+      Height = 23
+      Top = 53
+      Width = 215
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Enabled = False
+      ItemHeight = 15
+      Style = csDropDownList
+      TabOrder = 5
+      OnSelect = CBUseSplineChange
+    end
+    object Label2: TLabel
+      AnchorSideTop.Control = CBShowLevel
+      AnchorSideTop.Side = asrBottom
+      Left = 24
+      Height = 15
+      Top = 61
+      Width = 36
+      BorderSpacing.Top = 10
+      Caption = 'Group:'
+      Enabled = False
+    end
+    object Label3: TLabel
+      AnchorSideTop.Control = Label2
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = Label2
+      AnchorSideRight.Side = asrBottom
+      Left = 30
+      Height = 15
+      Top = 86
+      Width = 30
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 10
+      Caption = 'Level:'
+      Enabled = False
+    end
+    object ComboBox3: TComboBox
+      AnchorSideLeft.Control = Label3
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Label3
+      AnchorSideBottom.Side = asrBottom
+      Left = 65
+      Height = 23
+      Top = 78
+      Width = 215
+      Anchors = [akLeft, akBottom]
+      BorderSpacing.Left = 5
+      Enabled = False
+      ItemHeight = 15
+      Style = csDropDownList
+      TabOrder = 6
+      OnSelect = CBUseSplineChange
+    end
+  end
+end

@@ -67,8 +67,8 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 688
-    Top = 39
+    Height = 687
+    Top = 40
     Width = 300
     ActivePage = PageChilds
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -76,7 +76,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     TabOrder = 1
     object PageMainPanel: TTabSheet
       Caption = 'Main panel'
-      ClientHeight = 660
+      ClientHeight = 659
       ClientWidth = 292
       object Panel1: TPanel
         AnchorSideLeft.Control = PageMainPanel
@@ -86,12 +86,12 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
         AnchorSideBottom.Control = Owner
         AnchorSideBottom.Side = asrBottom
         Left = 0
-        Height = 1190
+        Height = 1189
         Top = 0
         Width = 292
         Anchors = [akTop, akLeft, akRight, akBottom]
         BevelOuter = bvNone
-        ClientHeight = 1190
+        ClientHeight = 1189
         ClientWidth = 292
         Color = 8289918
         ParentBackground = False
@@ -103,7 +103,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           Left = 7
           Height = 15
-          Top = 376
+          Top = 424
           Width = 67
           BorderSpacing.Left = 7
           BorderSpacing.Top = 15
@@ -121,7 +121,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideBottom.Side = asrBottom
           Left = 7
           Height = 23
-          Top = 391
+          Top = 439
           Width = 199
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Right = 5
@@ -137,7 +137,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Cursor = crHandPoint
           Left = 211
           Height = 30
-          Top = 387
+          Top = 435
           Width = 66
           Anchors = [akTop, akRight]
           BorderSpacing.Right = 15
@@ -154,7 +154,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideRight.Side = asrBottom
           Left = 5
           Height = 116
-          Top = 31
+          Top = 79
           Width = 282
           Anchors = [akTop, akLeft, akRight]
           BorderSpacing.Left = 5
@@ -255,7 +255,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideRight.Side = asrBottom
           Left = 3
           Height = 15
-          Top = 16
+          Top = 64
           Width = 83
           BorderSpacing.Left = 3
           BorderSpacing.Top = 5
@@ -274,7 +274,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideRight.Side = asrBottom
           Left = 3
           Height = 15
-          Top = 152
+          Top = 200
           Width = 94
           BorderSpacing.Left = 3
           BorderSpacing.Top = 5
@@ -290,7 +290,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           AnchorSideTop.Side = asrBottom
           Left = 4
           Height = 194
-          Top = 167
+          Top = 215
           Width = 283
           ClientHeight = 194
           ClientWidth = 283
@@ -335,6 +335,8 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Width = 136
             Anchors = [akTop, akLeft, akBottom]
             BorderSpacing.Bottom = 3
+            ReadOnly = True
+            ScrollBars = ssAutoVertical
             TabOrder = 0
           end
           object Label8: TLabel
@@ -374,8 +376,26 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
             Width = 136
             Anchors = [akTop, akLeft, akBottom]
             BorderSpacing.Bottom = 3
+            ReadOnly = True
+            ScrollBars = ssAutoVertical
             TabOrder = 1
           end
+        end
+        object CBChildClipping: TCheckBox
+          Left = 8
+          Height = 19
+          Hint = 'Check = clipping is applied, childs outside the panel client area are not visible.'#13#10'Uncheck = no clipping, usefull if you want to place a child outside the panel client area.'
+          Top = 24
+          Width = 138
+          Caption = 'Child clipping enabled'
+          Checked = True
+          Font.Style = [fsBold]
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
+          State = cbChecked
+          TabOrder = 3
+          OnChange = CBChildClippingChange
         end
       end
     end
@@ -384,16 +404,16 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     end
     object PageChilds: TTabSheet
       Caption = 'Childs'
-      ClientHeight = 660
+      ClientHeight = 659
       ClientWidth = 292
       object Panel5: TPanel
         Left = 0
-        Height = 660
+        Height = 659
         Top = 0
         Width = 292
         Align = alClient
         BevelOuter = bvNone
-        ClientHeight = 660
+        ClientHeight = 659
         ClientWidth = 292
         Color = 9671571
         ParentBackground = False
@@ -1003,7 +1023,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Height = 200
           Top = 294
           Width = 292
-          PageIndex = 0
+          PageIndex = 1
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 4
           object PageExtraEmpty: TPage
@@ -1035,7 +1055,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
               object Label43: TLabel
                 Left = 16
                 Height = 15
-                Top = 64
+                Top = 16
                 Width = 37
                 Caption = 'Width:'
                 Font.Style = [fsBold]
@@ -1048,7 +1068,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 AnchorSideBottom.Side = asrBottom
                 Left = 63
                 Height = 23
-                Top = 56
+                Top = 8
                 Width = 58
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
@@ -1063,7 +1083,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 AnchorSideTop.Control = Label43
                 Left = 144
                 Height = 15
-                Top = 64
+                Top = 16
                 Width = 41
                 Caption = 'Height:'
                 Font.Style = [fsBold]
@@ -1076,7 +1096,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 AnchorSideBottom.Side = asrBottom
                 Left = 195
                 Height = 23
-                Top = 56
+                Top = 8
                 Width = 58
                 Anchors = [akLeft, akBottom]
                 BorderSpacing.Left = 10
@@ -1093,7 +1113,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Cursor = crHandPoint
                 Left = 82
                 Height = 25
-                Top = 16
+                Top = 40
                 Width = 129
                 Caption = 'Edit shape...'
                 OnClick = SpeedButton3Click
@@ -3231,73 +3251,100 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           object CheckBox2: TCheckBox
             Left = 10
             Height = 19
+            Hint = 'Fired when user click on the surface'
             Top = 0
             Width = 123
             Caption = 'OnClick'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 0
           end
           object CheckBox3: TCheckBox
             Left = 133
             Height = 19
+            Hint = 'Fired when user move the mouse over the surface'
             Top = 0
             Width = 101
             Caption = 'OnMouseEnter'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 1
           end
           object CheckBox4: TCheckBox
             Left = 10
             Height = 19
+            Hint = 'Fired when user move the mouse outside the surface'
             Top = 19
             Width = 123
             Caption = 'OnMouseLeave'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 2
           end
           object CheckBox5: TCheckBox
             Left = 133
             Height = 19
+            Hint = 'Fired when user press a mouse button on the surface'
             Top = 19
             Width = 101
             Caption = 'OnMouseDown'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 3
           end
           object CheckBox6: TCheckBox
             Left = 10
             Height = 19
+            Hint = 'Fired when user release a mouse button on the surface'
             Top = 38
             Width = 123
             Caption = 'OnMouseUp'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 4
           end
           object CheckBox7: TCheckBox
             Left = 133
             Height = 19
+            Hint = 'Fired when the mouse move over the surface'
             Top = 38
             Width = 101
             Caption = 'OnMouseMove'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 5
           end
           object CheckBox8: TCheckBox
             Left = 10
             Height = 19
+            Hint = 'Fired when used use the mouse wheel over the surface'
             Top = 57
             Width = 123
             Caption = 'OnMouseWheel'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 6
           end
           object CheckBox17: TCheckBox
             Left = 133
             Height = 19
+            Hint = 'Fired when use check or uncheck a TUICheck or TUIRadio'
             Top = 57
             Width = 101
             Caption = 'OnChange'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 7
           end
           object CheckBox18: TCheckBox
             Left = 10
             Height = 19
+            Hint = 'Fired when user select an item in a TUIListBox'
             Top = 76
             Width = 123
             Caption = 'OnSelectionChange'
+            ParentShowHint = False
+            ShowHint = True
             TabOrder = 8
           end
         end

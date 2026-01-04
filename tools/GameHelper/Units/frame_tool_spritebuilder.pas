@@ -117,7 +117,10 @@ type
     Label54: TLabel;
     Label55: TLabel;
     Label56: TLabel;
+    Label59: TLabel;
     Label6: TLabel;
+    Label60: TLabel;
+    Label61: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
@@ -181,6 +184,16 @@ type
     SE28: TSpinEdit;
     SE29: TSpinEdit;
     SE3: TFloatSpinEdit;
+    SE30: TFloatSpinEdit;
+    SE31: TFloatSpinEdit;
+    SE32: TFloatSpinEdit;
+    SE33: TFloatSpinEdit;
+    SE34: TFloatSpinEdit;
+    SE35: TFloatSpinEdit;
+    SE36: TFloatSpinEdit;
+    SE37: TFloatSpinEdit;
+    SE38: TFloatSpinEdit;
+    SE39: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
     SE5: TFloatSpinEdit;
     SE6: TFloatSpinEdit;
@@ -737,12 +750,26 @@ begin
                    (CBBlend.ItemIndex <> integer(BlendMode));
 
     if FWorkingChild^.surface is TSprite then
-      //with TSprite(FWorkingChild^.surface) do
       with FWorkingChild^ do
         chang := chang or (width <> SE18.Value) or (height <> SE19.Value);
 
+    if FWorkingChild^.surface is TSpriteWithElasticCorner then
+      with FWorkingChild^ do
+        chang := chang or (width <> SE20.Value) or
+                          (height <> SE21.Value) or
+                          (TopLeftOffsetX <> SE30.Value) or (TopLeftOffsetY <> SE31.Value) or
+                          (TopRightOffsetX <> SE34.Value) or (TopRightOffsetY <> SE35.Value) or
+                          (BottomRightOffsetX <> SE38.Value) or (BottomRightOffsetY <> SE39.Value) or
+                          (BottomLeftOffsetX <> SE36.Value) or (BottomLeftOffsetY <> SE37.Value);
+
+    if FWorkingChild^.surface is TPolarSprite then
+      with FWorkingChild^ do
+        chang := chang or (width <> SE22.Value) or
+                          (height <> SE23.Value) or
+                          (PolarAngle <> SE32.Value) or
+                          (PolarDistance <> SE33.Value);
+
     if FWorkingChild^.surface is TDeformationGrid then
-      //with TDeformationGrid(FWorkingChild^.surface) do
       with FWorkingChild^ do
         chang := chang or (width <> SE26.Value) or (height <> SE27.Value);
 
@@ -759,7 +786,6 @@ begin
                  (Trunc(BottomLeftColor.Alpha.Value) <> SE14.Value);
 
     if FWorkingChild^.surface is TGradientRectangle then
-      //with TGradientRectangle(FWorkingChild^.surface) do
       with FWorkingChild^ do
         chang := chang or (width <> SE28.Value) or (height <> SE29.Value);
 
@@ -928,7 +954,11 @@ begin
     'TGradientRectangle': Result := TGradientRectangle;
     'TQuad4Color': Result := TQuad4Color;
     'TSpriteContainer': Result := TSpriteContainer;
-      else raise exception.create('forgot to implement!');
+    'TFreeText': Result := TFreeText;
+    'TFreeTextOnPath': Result := TFreeTextOnPath;
+    'TFreeTextClock': Result := TFreeTextClock;
+    'TFreeTextAligned': Result := TFreeTextAligned;
+    else raise exception.create('forgot to implement!');
   end;
 end;
 
@@ -1242,6 +1272,27 @@ begin
   if FWorkingChild^.surface is TSprite then
     TSprite(FWorkingChild^.surface).SetSize(SE18.Value, SE19.Value);
 
+  if FWorkingChild^.surface is TPolarSprite then
+    with TPolarSprite(FWorkingChild^.surface) do begin
+      SetSize(SE22.Value, SE23.Value);
+      Polar.Center.Value := PointF(SE1.Value+SE22.Value*0.5, SE2.Value+SE23.Value*0.5);
+      Polar.Angle.Value := SE32.Value;
+      Polar.Distance.Value := SE33.Value;
+    end;
+
+  if FWorkingChild^.surface is TSpriteWithElasticCorner then
+      with TSpriteWithElasticCorner(FWorkingChild^.surface) do begin
+        SetSize(SE20.Value, SE21.Value);
+        CornerOffset.TopLeft.x.Value := SE30.Value;
+        CornerOffset.TopLeft.y.Value := SE31.Value;
+        CornerOffset.TopRight.x.Value := SE34.Value;
+        CornerOffset.TopRight.y.Value := SE35.Value;
+        CornerOffset.BottomRight.x.Value := SE38.Value;
+        CornerOffset.BottomRight.y.Value := SE39.Value;
+        CornerOffset.BottomLeft.x.Value := SE36.Value;
+        CornerOffset.BottomLeft.y.Value := SE37.Value;
+      end;
+
   if FWorkingChild^.surface is TDeformationGrid then
     TDeformationGrid(FWorkingChild^.surface).SetSize(SE26.Value, SE27.Value);
 
@@ -1296,6 +1347,26 @@ begin
   else
   if selectedClass = TSpriteContainer then begin
     // nothing
+  end
+  else
+  if selectedClass = TPolarSprite then begin
+    FWorkingChild^.width := SE22.Value;
+    FWorkingChild^.height := SE23.Value;
+    FWorkingChild^.PolarAngle := SE32.Value;
+    FWorkingChild^.PolarDistance := SE33.Value;
+  end
+  else
+  if selectedClass = TSpriteWithElasticCorner then begin
+    FWorkingChild^.width := SE20.Value;
+    FWorkingChild^.height := SE21.Value;
+    FWorkingChild^.TopLeftOffsetX := SE30.Value;
+    FWorkingChild^.TopLeftOffsetY := SE31.Value;
+    FWorkingChild^.TopRightOffsetX := SE34.Value;
+    FWorkingChild^.TopRightOffsetY := SE35.Value;
+    FWorkingChild^.BottomRightOffsetX := SE38.Value;
+    FWorkingChild^.BottomRightOffsetY := SE39.Value;
+    FWorkingChild^.BottomLeftOffsetX := SE36.Value;
+    FWorkingChild^.BottomLeftOffsetY := SE37.Value;
   end
   else raise exception.Create('forgot to implement '+selectedClass.ClassName);
 end;
@@ -1472,6 +1543,26 @@ begin
       if surface is TSprite then begin
         SE18.Value := surface.Width;
         SE19.Value := surface.Height;
+      end;
+
+      if surface is TSpriteWithElasticCorner then begin
+        SE20.Value := surface.Width;
+        SE21.Value := surface.Height;
+        SE30.Value := TSpriteWithElasticCorner(surface).CornerOffset.TopLeft.x.Value;
+        SE31.Value := TSpriteWithElasticCorner(surface).CornerOffset.TopLeft.y.Value;
+        SE34.Value := TSpriteWithElasticCorner(surface).CornerOffset.TopRight.x.Value;
+        SE35.Value := TSpriteWithElasticCorner(surface).CornerOffset.TopRight.y.Value;
+        SE38.Value := TSpriteWithElasticCorner(surface).CornerOffset.BottomRight.x.Value;
+        SE39.Value := TSpriteWithElasticCorner(surface).CornerOffset.BottomRight.y.Value;
+        SE36.Value := TSpriteWithElasticCorner(surface).CornerOffset.BottomLeft.x.Value;
+        SE37.Value := TSpriteWithElasticCorner(surface).CornerOffset.BottomLeft.y.Value;
+      end;
+
+      if surface is TPolarSprite then begin
+        SE22.Value := surface.Width;
+        SE23.Value := surface.Height;
+        SE32.Value := TPolarSprite(surface).Polar.Angle.Value;
+        SE33.Value := TPolarSprite(surface).Polar.Distance.Value;
       end;
 
       if surface is TDeformationGrid then begin

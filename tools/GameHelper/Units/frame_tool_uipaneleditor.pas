@@ -40,6 +40,7 @@ type
     CheckBox16: TCheckBox;
     CheckBox17: TCheckBox;
     CheckBox18: TCheckBox;
+    CBChildClipping: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
@@ -279,6 +280,7 @@ type
     procedure BCancelClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BSaveClick(Sender: TObject);
+    procedure CBChildClippingChange(Sender: TObject);
     procedure CBChildTypeSelect(Sender: TObject);
     procedure CBParentDrawItem(Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
@@ -376,11 +378,12 @@ begin
   if item = NIL then item := PanelBank.AddEmpty;
 
   item._Name := nam;
+  item.ChildClippingEnabled := CBChildClipping.Checked;
   item.IsModal := RBOptionModal.Checked;
   item.DarkenBG := CBDarkenBG.Checked;
   item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE100.Value);
-  item.ScenarioOnShow := '';
-  item.ScenarioOnHide := '';
+  item.ScenarioOnShow := Memo1.Text;
+  item.ScenarioOnHide := Memo2.Text;
   item.textures := Textures.SaveToString;
   item.surfaces := Surfaces.SaveToString;
 
@@ -389,6 +392,14 @@ begin
 
   DoClearAll;
   FormMain.ShowPagePanelBank;
+end;
+
+procedure TFrameToolUIPanelEditor.CBChildClippingChange(Sender: TObject);
+var item: PSurfaceDescriptor;
+begin
+  item := Surfaces.GetRootItem;
+  if (item <> NIL) and (item^.surface <> NIL) then
+    TUIPanel(item^.surface).ChildClippingEnabled := CBChildClipping.Checked;
 end;
 
 procedure TFrameToolUIPanelEditor.CBChildTypeSelect(Sender: TObject);
@@ -872,7 +883,7 @@ function TFrameToolUIPanelEditor.CheckChildWidgets: boolean;
 begin
   if CBChildType.ItemIndex = -1 then exit(False);
   if not IsValidPascalVariableName(Trim(Edit5.Text), True) then exit(False);
-  if CBParent.ItemIndex = -1 then exit(False);
+//  if CBParent.ItemIndex = -1 then exit(False);
 
   case CBChildType.Text of
     'TUIPanel', 'TUIPanelWithEffects': Result := True;
@@ -946,12 +957,10 @@ end;
 procedure TFrameToolUIPanelEditor.DoUpdateChild(aForceRecreateSurface: boolean);
 var recreateSurface: Boolean;
   texname1, texName2: string;
-  surf: TSimpleSurfaceWithEffect;
 begin
   if FWorkingChild = NIL then exit;
 
   UpdateExtraPropertiesToWorkingTemporary;
-  surf := FWorkingChild^.surface;
 
   recreateSurface := aForceRecreateSurface or
                      not (FWorkingChild^.surface is CBToClassType) or
@@ -1510,20 +1519,12 @@ end;
 
 procedure TFrameToolUIPanelEditor.EditNewPanel;
 begin
-  // create the root panel
-  //TargetUIPanel := TUIPanelWithEffects(Surfaces.GetRootItem^.surface); //.AddMainPanel('Panel1', FScene.Width div 3, FScene.Height div 4);
   OnShow;
 end;
 
 procedure TFrameToolUIPanelEditor.EditPanelFromBank(aItem: TPanelDescriptorItem);
 begin
   FScene.LogInfo('Start editing panel '+aItem._Name);
-
-{  Textures.LoadFromString(aItem.textures);
-  Surfaces.LoadFromString(aItem.surfaces); }
-
-//  TargetUIPanel := TUIPanelWithEffects(Surfaces.GetRootItem^.surface);  //ScreenUIPanelEditor.UIPanel;
-//  ScreenUIPanelEditor.UIPanel := TargetUIPanel;
 
   FInitializing := True;
   if aItem.IsModal then RBOptionModal.Checked := True
@@ -1536,7 +1537,6 @@ begin
   FInitializing := False;
 
   OnShow;
-//  ScreenUIPanelEditor.ZoomOnScene;
 end;
 
 procedure TFrameToolUIPanelEditor.ProcessEndResize;

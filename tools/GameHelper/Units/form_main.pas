@@ -14,7 +14,7 @@ uses
   frame_tool_levelbank,
   frame_viewfontbank, u_ui_objectlist,
   frame_tool_panelbank,
-  frame_tool_uipaneleditor;
+  frame_tool_uipaneleditor, frame_pathbank, frame_patheditor;
 
 {
  RIGHT MOUSE button: Move view
@@ -40,6 +40,8 @@ type
     Label1: TLabel;
     Notebook1: TNotebook;
     OGL: TOpenGLControl;
+    PagePathEditor: TPage;
+    PagePathBank: TPage;
     PagePanelBank: TPage;
     PageUIPanelEditor: TPage;
     PageFontBank: TPage;
@@ -101,6 +103,8 @@ type
     procedure ShowPageFontBank;
     procedure ShowPagePanelBank;
     procedure ShowPagePanelEditor;
+    procedure ShowPagePathBank;
+    procedure ShowPagePathEditor;
 
     procedure EditSpriteInSpriteBank(const aName: string);
     procedure EditNewSprite;
@@ -117,6 +121,8 @@ var
   FrameViewFontBank: TFrameViewFontBank;
   FrameToolPanelBank: TFrameToolPanelBank;
   FrameToolUIPanelEditor: TFrameToolUIPanelEditor;
+  FramePathBank: TFramePathBank;
+  FramePathEditor: TFramePathEditor;
 
 
 implementation
@@ -124,7 +130,8 @@ uses u_screen_spritebuilder, u_project, u_app_pref, u_screen_template,
   u_spritebank, u_ui_handle, u_screen_spritebank, u_screen_levelbank,
   u_screen_leveleditor, u_levelbank, form_projectconfig, BGRABitmap,
   BGRABitmapTypes, u_connection_to_ide, u_screen_fontbank,
-  u_screen_uipaneleditor, u_screen_uipanelbank, LCLType;
+  u_screen_uipaneleditor, u_screen_uipanelbank, u_screen_pathbank,
+  u_screen_patheditor, LCLType;
 {$R *.lfm}
 
 { TFormMain }
@@ -140,6 +147,8 @@ begin
 
   FScene.OnLoadCommonData := @LoadCommonData;
   FScene.OnFreeCommonData := @FreeCommonData;
+
+  FScene.FontManager.ScanProjectFont(GetFontFolder);
 
   // check if the app was started from the IDE
   IdeConnect.CheckCommandLine;
@@ -177,6 +186,15 @@ begin
   FrameToolUIPanelEditor := TFrameToolUIPanelEditor.Create(Self);
   FrameToolUIPanelEditor.Parent := PageUIPanelEditor;
   FrameToolUIPanelEditor.Align := alClient;
+
+  FramePathBank := TFramePathBank.Create(Self);
+  FramePathBank.Parent := PagePathBank;
+  FramePathBank.Align := alClient;
+  FramePathBank.IsEditable := True;
+
+  FramePathEditor := TFramePathEditor.Create(Self);
+  FramePathEditor.Parent := PagePathEditor;
+  FramePathEditor.Align := alClient;
 
 end;
 
@@ -261,11 +279,12 @@ end;
 
 procedure TFormMain.CBBankSelect(Sender: TObject);
 begin
-  case CBBank.ItemIndex of
-    0: ShowPageSpriteBank;
-    1: ShowPageLevelBank;
-    2: ShowPageFontBank;
-    3: ShowPagePanelBank;
+  case CBBank.Text of
+    'SPRITE BANK': ShowPageSpriteBank;
+    'LEVEL BANK': ShowPageLevelBank;
+    'FONT BANK': ShowPageFontBank;
+    'PANEL BANK': ShowPagePanelBank;
+    'PATH BANK': ShowPagePathBank;
   end;
 end;
 
@@ -351,10 +370,10 @@ begin
   FAtlas := FScene.CreateAtlas;
   FAtlas.Spacing := 1;
 
-  fd.Create('Arial', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
+  fd.Create('Roboto', 14, [], BGRA(255,255,100), BGRA(0,0,0,200), 3, BGRA(0,0,0,180), 3, 3, 5);
   FHintFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
-  fd.Create('Arial', 16, [], BGRA(255,155,155), BGRA(0,0,0,200), 3);
+  fd.Create('Roboto', 16, [], BGRA(255,155,155), BGRA(0,0,0,200), 3);
   FErrorFont := FAtlas.AddTexturedFont(fd, FScene.Charsets.ASCII_SYMBOL+FScene.Charsets.SIMPLELATIN);
 
   path := GetHandleFolder;
@@ -365,6 +384,7 @@ begin
   texHandlePathNode := FAtlas.AddMultiFrameImageFromSVG([path+'PathNode.svg',
                                                       path+'PathNodeSelected.svg'],
                                                       PPIScale(12), -1, 2, 1, 2);
+  texHandlePathNodeCircle := FAtlas.AddFromSVG(path+'PathNodeCircle.svg', FScene.ScaleDesignToScene(6)*2, -1);
 
   // mouse cursor
   path := GetCursorFolder;
@@ -378,6 +398,8 @@ begin
   texMouseOverNode := FAtlas.AddFromSVG(path+'OverNode.svg', PPIScale(32), -1);
   texMouseMovingNode := FAtlas.AddFromSVG(path+'MovingNode.svg', PPIScale(32), -1);
   texMouseAddNode := FAtlas.AddFromSVG(path+'AddNode.svg', PPIScale(32), -1);
+  texmouseAddNodeCircle := FAtlas.AddFromSVG(path+'AddNodeCircle.svg', PPIScale(32), -1);
+  texMouseInsertNodeCircle := FAtlas.AddFromSVG(path+'InsertNodeCircle.svg', PPIScale(32), -1);
   texMouseToolPoint := FAtlas.AddFromSVG(path+'Point.svg', PPIScale(32), -1);
   texMouseToolLine := FAtlas.AddFromSVG(path+'Line.svg', PPIScale(32), -1);
   texMouseToolCircle := FAtlas.AddFromSVG(path+'Circle.svg', PPIScale(32), -1);
@@ -414,6 +436,7 @@ begin
   LevelBank := TLevelBank.Create;
   FontBank:= TFontBank.Create;
   PanelBank := TPanelBank.Create;
+  PathBank := TPathBank.Create;
 
   ScreenLevelEditor := TScreenLevelEditor.Create;
   ScreenLevelEditor.Initialize;
@@ -427,6 +450,12 @@ begin
   ScreenUIPanelEditor.Initialize;
   ScreenUIPanelBank := TScreenUIPanelBank.Create;
   ScreenUIPanelBank.Initialize;
+
+  ScreenPathBank := TScreenPathBank.Create;
+  ScreenPathBank.Initialize;
+  ScreenPathEditor := TScreenPathEditor.Create;
+  ScreenPathEditor.Initialize;
+
 
   // check if the program was launched by the IDE: if yes, load the appropriate oglc project
   if IdeConnect.Activated then
@@ -459,6 +488,9 @@ begin
   PanelBank.Free;
   PanelBank := NIL;
 
+  PathBank.Free;
+  PathBank := NIL;
+
   ScreenUIPanelBank.Finalize;
   FreeAndNil(ScreenUIPanelBank);
 
@@ -479,6 +511,11 @@ begin
 
   ScreenUIPanelEditor.Finalize;
   FreeAndNil(ScreenUIPanelEditor);
+
+  ScreenPathBank.Finalize;
+  FreeAndNil(ScreenPathBank);
+  ScreenPathEditor.Finalize;
+  FreeAndNil(ScreenPathEditor);
 end;
 
 procedure TFormMain.ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
@@ -568,6 +605,25 @@ procedure TFormMain.ShowPagePanelEditor;
 begin
   Notebook1.PageIndex := Notebook1.IndexOf(PageUIPanelEditor);
   FrameToolUIPanelEditor.OnShow;
+  UpdateWidgets;
+  ToolBarMain.Visible := False;
+  CBBank.Enabled := False;
+end;
+
+procedure TFormMain.ShowPagePathBank;
+begin
+  FScene.RunScreen(ScreenPathBank);
+  Notebook1.PageIndex := Notebook1.IndexOf(PagePathBank);
+  FramePathBank.OnShow;
+  UpdateWidgets;
+  ToolBarMain.Visible := True;
+  CBBank.Enabled := True;
+end;
+
+procedure TFormMain.ShowPagePathEditor;
+begin
+  Notebook1.PageIndex := Notebook1.IndexOf(PagePathEditor);
+  FramePathEditor.OnShow;
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;

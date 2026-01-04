@@ -16,6 +16,7 @@ function GetHandleFolder: string;
 function GetCursorFolder: string;
 function GetIconFolder: string;
 function GetSourceProjectTemplateFolder: string;
+function GetFontFolder: string;
 
 
 type
@@ -39,7 +40,7 @@ var
 
 implementation
 
-uses u_common, Forms;
+uses u_common, Forms, LazFileUtils;
 
 function PPIScale(AValue: integer): integer;
 begin
@@ -59,7 +60,6 @@ end;
 
 function GetDataFolder: string;
 begin
-  //Result := Application.Location+DirectorySeparator+'Data'+DirectorySeparator;
   Result := FScene.App.DataFolder;
 end;
 
@@ -81,6 +81,12 @@ end;
 function GetSourceProjectTemplateFolder: string;
 begin
   Result := GetDataFolder+'ProjectTemplate'+DirectorySeparator;
+end;
+
+function GetFontFolder: string;
+begin
+  Result := CleanAndExpandDirectory(Application.Location+PathDelim+'..'+PathDelim+'..'+
+            PathDelim+'..'+PathDelim+'examples'+PathDelim+'Data'+PathDelim+'Fonts'+PathDelim);
 end;
 
 { TAppPref }

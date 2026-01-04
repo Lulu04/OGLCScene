@@ -16,7 +16,7 @@ APP_LAYER_COUNT = 10;
    LAYER_TOP              = 0;
    LAYER_UI               = 1;
    LAYER_COLLISION_BODY   = 2;
-   LAYER_SPRITEBUILDER    = 3; LAYER_FONT = 3; LAYER_UIPANEL = 3;
+   LAYER_SPRITEBUILDER    = 3; LAYER_FONT = 3; LAYER_UIPANEL = 3; LAYER_PATH = 3;
    LAYER_SPRITEBANK       = 4;
 
    LAYER_LEVELBANK        = 5;
@@ -48,12 +48,13 @@ var
 
   // handle textures
   texHandlePivot, texHandleRotate, texArrowH,
-  texHandlePathNode: PTexture;
+  texHandlePathNode, texHandlePathNodeCircle: PTexture;
   // mouse cursor textures
   texMouseNormal,
   texSelectSurfaceByRect,
   texMouseOverSurface, texMouseOverPivot, texMouseRotateSurface, texMouseScaleSurface,
   texMouseOverNode, texMouseMovingNode, texMouseAddNode,
+  texmouseAddNodeCircle, texMouseInsertNodeCircle,
   texMouseToolPoint, texMouseToolLine, texMouseToolCircle, texMouseToolRectangle, texMouseToolPolygon: PTexture;
 
 implementation

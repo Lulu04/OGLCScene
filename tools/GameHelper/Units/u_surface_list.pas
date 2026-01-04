@@ -49,6 +49,8 @@ public
   frameindex: single;
   blendmode: byte;
   // EXTRA properties
+  // TPolarSprite
+  PolarAngle, PolarDistance: single;
   // TSpriteWithElasticCorner
   TopLeftOffsetX, TopLeftOffsetY,
   TopRightOffsetX, TopRightOffsetY,
@@ -101,6 +103,10 @@ public
   // TextArea
   TextAreaText: string;
   TextAreaTextTint: TBGRAPixel;
+  // UIEvent
+  OnClick, OnMouseEnter, OnMouseLeave,
+  OnMouseDown, OnMouseUp, OnMouseMove,
+  OnMouseWheel, OnChange, OnSelectionChange: boolean;
 
 
   procedure InitDefault;
@@ -332,6 +338,9 @@ begin
   frameindex := 1.0;
   blendmode := FX_BLEND_NORMAL;
 
+  // TPolarSprite
+//  PolarCenterX := 0; PolarCenterY := 0;
+  PolarAngle := 0; PolarDistance := 0;
   // TSpriteWithElasticCorner
   TopLeftOffsetX := 0; TopLeftOffsetY := 0;
   TopRightOffsetX := 0; TopRightOffsetY := 0;
@@ -384,6 +393,15 @@ begin
   listboxItemHeight := 24;
   TextAreaText := '';
   TextAreaTextTint := BGRA(220,220,220);
+  OnClick := False;
+  OnMouseEnter := False;
+  OnMouseLeave := False;
+  OnMouseDown := False;
+  OnMouseUp := False;
+  OnMouseMove := False;
+  OnMouseWheel := False;
+  OnChange := False;
+  OnSelectionChange := False;
 
   classtype := TSimpleSurfaceWithEffect;
   HandleManager.InitDefault;
@@ -411,7 +429,7 @@ var tex: PTexture;
 begin
   tex := GetTextureFromTextureName;
 
-  if (classType = TSprite) then begin                  // TSprite
+  if (classType = TSprite) then begin    // TSprite
     surface := TSprite.Create(tex, False);
     surface.Frame := frameindex;
     TSprite(surface).SetSize(width, height);
@@ -432,15 +450,20 @@ begin
       CornerOffset.BottomLeft.y.Value := BottomLeftOffsetY;
     end;
   end else
-  if classType = TTiledSprite then begin
+  if classType = TTiledSprite then begin  // TTiledSprite
     surface := TTiledSprite.Create(tex, False);
     surface.Frame := frameindex;
     TTiledSprite(surface).SetSize(width, height)
   end else
-  if classType = TPolarSprite then begin
+  if classType = TPolarSprite then begin    // TPolarSprite
     surface := TPolarSprite.Create(tex, False);
     surface.Frame := frameindex;
-    TPolarSprite(surface).SetSize(width, height);
+    with TPolarSprite(surface) do begin
+      SetSize(width, height);
+      Polar.Center.Value := PointF(Self.x+Self.width*0.5, Self.y+Self.height*0.5);
+      Polar.Angle.Value := PolarAngle;
+      Polar.Distance.Value := PolarDistance;
+    end;
   end else
   if classType = TScrollableSprite then begin
     surface := TScrollableSprite.Create(tex, False);
@@ -1096,6 +1119,9 @@ begin
   aSurface^.frameindex := frameindex;
   aSurface^.blendmode := blendmode;
   // EXTRA properties
+  // TPolarSprite
+  aSurface^.PolarAngle := PolarAngle;
+  aSurface^.PolarDistance := PolarDistance;
   // TSpriteWithElasticCorner
   aSurface^.TopLeftOffsetX := TopLeftOffsetX;
   aSurface^.TopLeftOffsetY := TopLeftOffsetY;
@@ -1151,6 +1177,16 @@ begin
   aSurface^.listboxItemHeight := listboxItemHeight;
   aSurface^.TextAreaText := TextAreaText;
   aSurface^.TextAreaTextTint := TextAreaTextTint;
+  aSurface^.OnClick := OnClick;
+  aSurface^.OnMouseEnter := OnMouseEnter;
+  aSurface^.OnMouseLeave := OnMouseLeave;
+  aSurface^.OnMouseDown := OnMouseDown;
+  aSurface^.OnMouseUp := OnMouseUp;
+  aSurface^.OnMouseMove := OnMouseMove;
+  aSurface^.OnMouseWheel := OnMouseWheel;
+  aSurface^.OnChange := OnChange;
+  aSurface^.OnSelectionChange := OnSelectionChange;
+
 
   aSurface^.CreateSurface(True);
   aSurface^.SetChildDependency;
@@ -1365,6 +1401,11 @@ begin
   if GetFrame <> 1.0 then prop.Add('FrameIndex', GetFrame);
   if GetBlendMode <> FX_BLEND_NORMAL then prop.Add('BlendMode', GetBlendMode);
 
+  // TPolarSprite
+  if GetSurfaceType = TPolarSprite then begin
+    if PolarAngle <> 0 then prop.Add('PolarAngle', PolarAngle);
+    if PolarDistance <> 0 then prop.Add('PolarDistance', PolarDistance);
+  end;
   // TSpriteWithElasticCorner
   if GetSurfaceType = TSpriteWithElasticCorner then begin
     if TopLeftOffsetX <> 0 then prop.Add('TopLeftOffsetX', TopLeftOffsetX);
@@ -1462,6 +1503,16 @@ begin
       prop.Add('Text', TextAreaText, True);
       prop.Add('TextTint', TextAreaTextTint);
     end;
+
+    if OnClick then prop.Add('OnClick', OnClick);
+    if OnMouseEnter then prop.Add('OnMouseEnter', OnMouseEnter);
+    if OnMouseLeave then prop.Add('OnMouseLeave', OnMouseLeave);
+    if OnMouseDown then prop.Add('OnMouseDown', OnMouseDown);
+    if OnMouseUp then prop.Add('OnMouseUp', OnMouseUp);
+    if OnMouseMove then prop.Add('OnMouseMove', OnMouseMove);
+    if OnMouseWheel then prop.Add('OnMouseWheel', OnMouseWheel);
+    if OnChange then prop.Add('OnChange', OnChange);
+    if OnSelectionChange then prop.Add('OnSelectionChange', OnSelectionChange);
   end;
 
   Result := prop.PackedProperty;
@@ -1540,6 +1591,9 @@ begin
   prop.SingleValueOf('FrameIndex', frameindex, 1.0);
   prop.ByteValueOf('BlendMode', blendmode, FX_BLEND_NORMAL);
 
+  // TPolarSprite
+  prop.SingleValueOf('PolarAngle', PolarAngle, 0);
+  prop.SingleValueOf('PolarDistance', PolarDistance, 0);
   // TSpriteWithElasticCorner
   prop.SingleValueOf('TopLeftOffsetX', TopLeftOffsetX, 0);
   prop.SingleValueOf('TopLeftOffsetY', TopLeftOffsetY, 0);
@@ -1614,6 +1668,18 @@ begin
   // TUITextArea
   prop.StringValueOf('Text', TextAreaText, '');
   prop.BGRAPixelValueOf('TextTint', TextAreaTextTint, BGRA(220,220,220));
+
+  // UI events
+  prop.BooleanValueOf('OnClick', OnClick, False);
+  prop.BooleanValueOf('OnMouseEnter', OnMouseEnter, False);
+  prop.BooleanValueOf('OnMouseLeave', OnMouseLeave, False);
+  prop.BooleanValueOf('OnMouseDown', OnMouseDown, False);
+  prop.BooleanValueOf('OnMouseUp', OnMouseUp, False);
+  prop.BooleanValueOf('OnMouseMove', OnMouseMove, False);
+  prop.BooleanValueOf('OnMouseWheel', OnMouseWheel, False);
+  prop.BooleanValueOf('OnChange', OnChange, False);
+  prop.BooleanValueOf('OnSelectionChange', OnSelectionChange, False);
+
 end;
 
 // L=layerindex X,Y=coor W,H=size PX,PY=pivot A=angle O=opacity F=flip T=tint M=tintmode

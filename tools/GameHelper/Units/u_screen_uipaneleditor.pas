@@ -409,6 +409,7 @@ begin
   Textures.Clear;
   FUIPanel := NIL;
   if FPanelNameToEdit <> '' then begin
+    // editing an existing panel
     item := PanelBank.GetByName(FPanelNameToEdit);
     if item = NIL then exit;
 
@@ -419,6 +420,7 @@ begin
     FrameToolUIPanelEditor.EditPanelFromBank(item);
     FormMain.ShowPagePanelEditor;
   end else begin
+    // editing a new panel
     FUIPanel := Surfaces.AddMainPanel('Panel1', FScene.Width div 3, FScene.Height div 5);
     FrameToolUIPanelEditor.TargetUIPanel := FUIPanel;
     FrameToolUIPanelEditor.EditNewPanel;
