@@ -76,8 +76,9 @@ public
 public
   // the idea is to set the center coordinate of the surface from polar coordinate.
   // Polar coordinates are defined with a distance and an angle, and are relative to a center point.
-  // changing the distance and/or angle automatically moves the sprite accordingly
-  // First initialize Polar.Center, then play with Polar.Distance and Polar.Angle
+  // changing the distance and/or angle automatically moves the sprite accordingly.
+  // First initialize Polar.Center, then play with Polar.Distance and Polar.Angle.
+  // Coordinates of the center are in local space.
   Polar: TPolarSystemParam;
 end;
 TArrayOfTPolarSprite = array of TPolarSprite;
