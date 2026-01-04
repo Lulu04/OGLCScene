@@ -10,9 +10,8 @@ private
   FIndices: TArrayOfVertexIndex;
   FColor, FCenterColor: TBGRAPixel;
   FCenterColorUseColor: boolean;
-  FVisible, FMaskVisible: boolean;
+  FVisible: boolean;
   FCenter: TPointF;
-  function GetVisible: boolean;
   procedure SetCenterColor(AValue: TBGRAPixel);
   procedure SetColor(AValue: TBGRAPixel);
   procedure ClearArrays;
@@ -27,9 +26,9 @@ public
   property CenterColor: TBGRAPixel read FCenterColor write SetCenterColor;
   property Color: TBGRAPixel read FColor write SetColor;
   property BlendMode: byte read FBlendMode write FBlendMode;
-  property Visible: boolean read GetVisible write FVisible;
+  property Visible: boolean read FVisible write FVisible;
 public // utils for Game Helper
-  // save only color and blendmode
+  // save only Visible, color and blendmode
   function SaveToString: string;
   procedure LoadFromString(const data: string);
 end;
@@ -47,10 +46,9 @@ private
   FVertices: TArrayOfLineVertexAttributes;
   FIndices: TArrayOfVertexIndex;
   FColor: TBGRAPixel;
-  FVisible, FMaskVisible: boolean;
+  FVisible: boolean;
   FLineWidth: single;
   FThreshold1, FThreshold2: single;
-  function GetVisible: boolean;
   procedure SetBorderPosition(AValue: TOGLCLinePosition);
   procedure SetColor(AValue: TBGRAPixel);
   procedure SetLineWidth(AValue: single);
@@ -69,12 +67,12 @@ public
   property Color: TBGRAPixel read FColor write SetColor;
   property BlendMode: byte read FBlendMode write FBlendMode;
   property LinePosition: TOGLCLinePosition read FBorderPosition write SetBorderPosition;
-  property Visible: boolean read GetVisible write FVisible;
+  property Visible: boolean read FVisible write FVisible;
   property Path: TOGLCPath read FPath;
   property Indices: TArrayOfVertexIndex read FIndices;
   property Vertices: TArrayOfLineVertexAttributes read FVertices;
 public // utils for Game Helper
-  // save only color, width, lineposition and blendmode
+  // save only Visible, color, width, lineposition and blendmode
   function SaveToString: string;
   procedure LoadFromString(const data: string);
 end;
@@ -187,11 +185,6 @@ begin
   end;
 end;
 
-function TOGLCFill.GetVisible: boolean;
-begin
-  Result := FVisible and FMaskVisible;
-end;
-
 procedure TOGLCFill.SetCenterColor(AValue: TBGRAPixel);
 begin
   if FCenterColor = AValue then Exit;
@@ -214,7 +207,6 @@ begin
   FCenterColor := FColor;
   FCenterColorUseColor := True;
   FVisible := True;
-  FMaskVisible := True;
   FBlendMode := FX_BLEND_NORMAL;
 end;
 
@@ -273,6 +265,7 @@ function TOGLCFill.SaveToString: string;
 var prop: TProperties;
 begin
   prop.Init(' ');
+  prop.Add('Visible', Visible);
   prop.Add('Color', Color);
   prop.Add('BlendMode', BlendMode);
   Result := prop.PackedProperty;
@@ -286,6 +279,7 @@ begin
   prop.Split(data, ' ');
   col := BGRABlack;
   vb := 0;
+  prop.BooleanValueOf('Visible', FVisible, True);
   prop.BGRAPixelValueOf('Color', col, Color);
   Color := col;
   prop.ByteValueOf('BlendMode', vb, BlendMode);
@@ -341,11 +335,6 @@ begin
   InitArrays;
 end;
 
-function TOGLCBorder.GetVisible: boolean;
-begin
-  Result := FVisible and FMaskVisible;
-end;
-
 function TOGLCBorder.BorderWidthToThreshold(aWidth: single): single;
 var eq: TStraightLineEquation;
 begin
@@ -372,13 +361,11 @@ end;
 procedure TOGLCBorder.InitDefault;
 begin
   ClearArrays;
-//  FLoop := False;
   FColor := BGRA(220,220,220);
   FLineWidth := 1.5;
   FThreshold1 := BorderWidthToThreshold(FLineWidth*0.5);
   FThreshold2 := FThreshold1;
   FVisible := True;
-  FMaskVisible := True;
   FBorderPosition := lpInside;
 end;
 
@@ -557,6 +544,7 @@ function TOGLCBorder.SaveToString: string;
 var prop: TProperties;
 begin
   prop.Init(' ');
+  prop.Add('Visible', Visible);
   prop.Add('Color', Color);
   prop.Add('Width', Width);
   prop.Add('BlendMode', BlendMode);
@@ -576,6 +564,7 @@ begin
   vs := 0;
   vb := 0;
   vi := 0;
+  prop.BooleanValueOf('Visible', FVisible, True);
   prop.BGRAPixelValueOf('Color', col, Color);
   Color := col;
   prop.SingleValueOf('Width', vs, Width);
