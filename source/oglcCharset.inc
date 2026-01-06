@@ -16,7 +16,8 @@ const
   NUMBER='0123456789';
   ASCII_SYMBOL='!"#$%&''()*+,-./:;<=>?@[\]^_`{|}~';
   ASCII_LETTER='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  SIMPLELATIN=NUMBER+' '+ASCII_LETTER;
+  ASCII_SPACE=' ';
+  SIMPLELATIN=NUMBER + ASCII_SPACE + ASCII_LETTER;
   LATIN1_SUPPLEMENT_1='ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ';
   LATIN1_SUPPLEMENT_2=' ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿';
 
@@ -29,6 +30,11 @@ const
   // The function remove all kind of LineEnding.
   function AddToCharset(const aCharSet, aText: string): string; overload;
   function AddToCharset(const aCharset: string; aText: TStringArray): string; overload;
+
+  // return the list of the name of the available charsets
+  function GetListOfCharsetNames: TStringArray;
+  // return a charset from its name
+  function GetByName(const aCharsetName: string): string;
 
   function LATIN_EXTENDED_A: string;
   function LATIN_EXTENDED_B: string;
@@ -118,6 +124,93 @@ end;
 function TOGLCCharsets.AddToCharset(const aCharset: string; aText: TStringArray): string;
 begin
   Result := OGLCScene.AddToCharset(aCharset, aText);
+end;
+
+function TOGLCCharsets.GetListOfCharsetNames: TStringArray;
+begin
+  Result := ['NUMBER',
+             'ASCII_SYMBOL',
+             'ASCII_SPACE',
+             'ASCII_LETTER',
+             'LATIN1_SUPPLEMENT_1',
+             'LATIN1_SUPPLEMENT_2',
+             'LATIN_EXTENDED_A',
+             'LATIN_EXTENDED_B',
+             'GREEK_AND_COPTIC',
+             'CYRILLIC',
+             'CYRILLIC_SUPPLEMENT',
+             'ARMENIAN',
+             'HEBREW',
+             'ARABIC',
+             'SYRIAC',
+             'ARABIC_SUPPLEMENT',
+             'THAANA',
+             'NKo',
+             'DEVANAGARI',
+             'BENGALI',
+             'GURMUKHI',
+             'GUJARATI',
+             'ORIYA',
+             'TAMIL',
+             'TELUGU',
+             'KANNADA',
+             'MALAYALAM',
+             'SINHALA',
+             'THAI',
+             'LAO',
+             'TIBETAN',
+             'MYANMAR',
+             'GEORGIAN',
+             'HANGUL_JAMO',
+             'ETHIOPIC',
+             'ETHIOPIC_SUPPLEMENT',
+             'CHEROKEE',
+             'UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS'];
+end;
+
+function TOGLCCharsets.GetByName(const aCharsetName: string): string;
+begin
+  case aCharsetName of
+    'NUMBER': Result := NUMBER;
+    'ASCII_SYMBOL': Result := ASCII_SYMBOL;
+    'ASCII_SPACE': Result := ASCII_SPACE;
+    'ASCII_LETTER': Result := ASCII_LETTER;
+    'LATIN1_SUPPLEMENT_1': Result := LATIN1_SUPPLEMENT_1;
+    'LATIN1_SUPPLEMENT_2': Result := LATIN1_SUPPLEMENT_2;
+    'LATIN_EXTENDED_A': Result := LATIN_EXTENDED_A;
+    'LATIN_EXTENDED_B': Result := LATIN_EXTENDED_B;
+    'GREEK_AND_COPTIC': Result := GREEK_AND_COPTIC;
+    'CYRILLIC': Result := CYRILLIC;
+    'CYRILLIC_SUPPLEMENT': Result := CYRILLIC_SUPPLEMENT;
+    'ARMENIAN': Result := ARMENIAN;
+    'HEBREW': Result := HEBREW;
+    'ARABIC': Result := ARABIC;
+    'SYRIAC': Result := SYRIAC;
+    'ARABIC_SUPPLEMENT': Result := ARABIC_SUPPLEMENT;
+    'THAANA': Result := THAANA;
+    'NKo': Result := NKo;
+    'DEVANAGARI': Result := DEVANAGARI;
+    'BENGALI': Result := BENGALI;
+    'GURMUKHI': Result := GURMUKHI;
+    'GUJARATI': Result := GUJARATI;
+    'ORIYA': Result := ORIYA;
+    'TAMIL': Result := TAMIL;
+    'TELUGU': Result := TELUGU;
+    'KANNADA': Result := KANNADA;
+    'MALAYALAM': Result := MALAYALAM;
+    'SINHALA': Result := SINHALA;
+    'THAI': Result := THAI;
+    'LAO': Result := LAO;
+    'TIBETAN': Result := TIBETAN;
+    'MYANMAR': Result := MYANMAR;
+    'GEORGIAN': Result := GEORGIAN;
+    'HANGUL_JAMO': Result := HANGUL_JAMO;
+    'ETHIOPIC': Result := ETHIOPIC;
+    'ETHIOPIC_SUPPLEMENT': Result := ETHIOPIC_SUPPLEMENT;
+    'CHEROKEE': Result := CHEROKEE;
+    'UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS': Result := UNIFIED_CANADIAN_ABORIGINAL_SYLLABICS;
+    else raise exception.create(' Charset '+aCharsetName+' is not available...');
+  end;
 end;
 
 function TOGLCCharsets.LATIN_EXTENDED_A: string;
