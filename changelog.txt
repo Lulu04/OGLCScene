@@ -2,7 +2,8 @@ Version 2.4 -
 > All examples: added an error message to the user when OpenGL fail to load.
 > Fix: Now a layer update a surface only if it is not in killed state.
 > Fix: TFreeTextAligned Width and Height return the right values.
-> Game Helper: bug fix and improve functionalities
+> Charsets: added method to retrieve the name list of available charset.
+> Game Helper: added Path Editor, bug fix an improve functionalities.
 
 Version 2.3 - Jan 01 2026
 > Now examples use the Roboto font provided with the library to avoid the problem font name not found.
