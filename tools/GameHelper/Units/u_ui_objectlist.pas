@@ -71,6 +71,9 @@ end;
 
 TFontDescriptorItem = class(TItemWithName)
   FD: TFontDescriptor;
+  UseCharsetPreset: boolean;
+  CharsetPresets: TStringArray; // the list of used charsets
+  TextToCharSet: string; // the text from which construct the charset
   procedure InitDefault; override;
   function SaveToString: string; override;
   procedure LoadFromString(const data: string); override;
@@ -89,8 +92,7 @@ TFontDescriptorItem = class(TItemWithName)
 //  function PascalCodeToDeclareVariables: string;
   function PascalCodeToInitializeGradientVariable: string;
   function PascalCodeToInitializeFDVariable: string;
-  function PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean;
-                                              const aCharSetName: string): string;
+  function PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean): string;
 end;
 
 { TFontBank }
@@ -175,14 +177,26 @@ uses u_utils, u_common, u_project, u_resourcestring, LazFileUtils, Dialogs,
 procedure TFontDescriptorItem.InitDefault;
 begin
   FD.CreateDefault;
+  UseCharsetPreset := True;
+  CharsetPresets := ['NUMBER', 'ASCII_SPACE', 'ASCII_LETTER'];
+  TextToCharSet := '';
 end;
 
 function TFontDescriptorItem.SaveToString: string;
 var prop: TProperties;
+  i: integer;
+  s: string;
 begin
   prop.Init('&');
   prop.Add('Name', _Name);
   prop.Add('Data', FD.SaveToString);
+  prop.Add('UseCharset', UseCharsetPreset);
+  if Length(CharsetPresets) > 0 then begin
+    s.Join(' ', CharsetPresets);
+    prop.Add('Charsets', s);
+  end;
+  if TextToCharSet <> '' then prop.Add('TextToCharSet', TextToCharSet, True);
+
   Result := prop.PackedProperty;
 end;
 
@@ -195,16 +209,23 @@ begin
   prop.StringValueOf('Name', _Name, '???');
   prop.StringValueOf('Data', s, '');
   FD.LoadFromString(s);
+  prop.BooleanValueOf('UseCharset', UseCharsetPreset, True);
+  prop.StringValueOf('Charsets', s, '');
+  CharsetPresets := s.Split([' ']);
+  prop.StringValueOf('TextToCharSet', TextToCharSet, '');
 end;
 
 procedure TFontDescriptorItem.DuplicateTo(aItem: Pointer);
 begin
   TFontDescriptorItem(aItem).FD := FD;
+  TFontDescriptorItem(aItem).UseCharsetPreset := UseCharsetPreset;
+  TFontDescriptorItem(aItem).CharsetPresets := Copy(CharsetPresets, 0, Length(CharsetPresets));
+  TFontDescriptorItem(aItem).TextToCharSet := Copy(TextToCharSet, 1, Length(TextToCharSet));
 end;
 
 function TFontDescriptorItem.VariableNameForTexturedFont: string;
 begin
-  Result := 'FTexturedFont_'+_Name;
+  Result := 'texturedfont'+_Name;
 end;
 
 function TFontDescriptorItem.VariableNameForFD: string;
@@ -257,13 +278,25 @@ begin
   Result := Result + ');';
 end;
 
-function TFontDescriptorItem.PascalCodeToAddTexturedFontToAtlas(
-  aGenerateVariableName: boolean; const aCharSetName: string): string;
+function TFontDescriptorItem.PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean): string;
+var charset: string;
+  i: integer;
 begin
   // FVar := aAtlas .AddTexturedFont(FScene, aFD: TFontDescriptor, aCharSet: string, aFillTexture);
-  if aGenerateVariableName then Result := VariableNameForTexturedFont+' := '
-    else Result := '';
-  Result := Result + 'aAtlas.AddTexturedFont(FScene, '+VariableNameForFD+', '+aCharSetName+', NIL);';
+  if aGenerateVariableName then Result := '  '+VariableNameForTexturedFont+' := '
+    else Result := '  ';
+
+  if UseCharsetPreset and (Length(CharsetPresets) > 0) then begin
+    charset := '';
+    for i:=0 to High(CharsetPresets) do begin
+      charset := charset + 'FScene.Charsets.'+CharsetPresets[i];
+      if i < High(CharsetPresets) then charset := charset + '+';
+    end;
+  end
+  else if TextToCharSet <> '' then charset := 'FScene.Charsets.TextToCharset('''+TextToCharSet+''')'
+  else charset := 'FScene.Charsets.NUMBER+FScene.Charsets.ASCII_SPACE+FScene.Charsets.ASCII_LETTER';
+
+  Result := Result + 'aAtlas.AddTexturedFont(FScene, '+VariableNameForFD+', '+charset+', NIL);';
 end;
 
 { TFontBank }

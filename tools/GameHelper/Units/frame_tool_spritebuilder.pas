@@ -54,15 +54,36 @@ type
     CheckBox1: TCheckBox;
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
+    CheckBox4: TCheckBox;
+    CheckBox5: TCheckBox;
+    CheckBox6: TCheckBox;
     ColorButton1: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
     ColorButton4: TColorButton;
     ColorButton5: TColorButton;
     CBBlend: TComboBox;
+    ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
+    ComboBox3: TComboBox;
+    ComboBox4: TComboBox;
+    ComboBox5: TComboBox;
     Edit2: TEdit;
     Edit3: TEdit;
+    Edit4: TEdit;
     Edit5: TEdit;
+    Edit6: TEdit;
+    Label70: TLabel;
+    Label71: TLabel;
+    Label73: TLabel;
+    Memo1: TMemo;
+    PageControl1: TPageControl;
+    PageTFreeTextAligned: TPage;
+    Panel21: TPanel;
+    RadioButton3: TRadioButton;
+    RadioButton4: TRadioButton;
+    RadioGroup2: TRadioGroup;
+    SE42: TFloatSpinEdit;
     FSE2: TFloatSpinEdit;
     FSE1: TFloatSpinEdit;
     Label1: TLabel;
@@ -117,10 +138,19 @@ type
     Label54: TLabel;
     Label55: TLabel;
     Label56: TLabel;
+    Label57: TLabel;
+    Label58: TLabel;
     Label59: TLabel;
     Label6: TLabel;
     Label60: TLabel;
     Label61: TLabel;
+    Label62: TLabel;
+    Label63: TLabel;
+    Label64: TLabel;
+    Label66: TLabel;
+    Label67: TLabel;
+    Label68: TLabel;
+    Label69: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
@@ -129,6 +159,9 @@ type
     MIAddNode: TMenuItem;
     NotebookExtra: TNotebook;
     OD1: TOpenDialog;
+    PageTFreeTextClock: TPage;
+    PageTFreeTextOnPath: TPage;
+    PageTFreeText: TPage;
     PageTSprite: TPage;
     PageTShapeOutline: TPage;
     PageTGradientRectangle: TPage;
@@ -195,6 +228,10 @@ type
     SE38: TFloatSpinEdit;
     SE39: TFloatSpinEdit;
     SE4: TFloatSpinEdit;
+    SE40: TFloatSpinEdit;
+    SE41: TFloatSpinEdit;
+    SE43: TSpinEdit;
+    SE44: TSpinEdit;
     SE5: TFloatSpinEdit;
     SE6: TFloatSpinEdit;
     SE7: TFloatSpinEdit;
@@ -228,6 +265,8 @@ type
     SE16: TSpinEdit;
     SE17: TSpinEdit;
     PageSave: TTabSheet;
+    TabSheet1: TTabSheet;
+    TabSheet3: TTabSheet;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
     procedure BAddToSpriteBankClick(Sender: TObject);
@@ -317,7 +356,7 @@ type
 implementation
 uses form_main, u_project, u_common, u_screen_template, form_showhelp, u_utils,
   form_editdeformationgrid, form_editgradient, u_target_lazarusproject,
-  u_connection_to_ide, LCLType;
+  u_connection_to_ide, u_ui_objectlist, LCLType;
 {$R *.lfm}
 
 { TFrameToolsSpriteBuilder }
@@ -677,14 +716,23 @@ end;
 
 procedure TFrameToolsSpriteBuilder.CBChildTypeSelect(Sender: TObject);
 var texItem: PTextureItem;
-  chang: boolean;
+  chang, recreateSurface: boolean;
 begin
   if FInitializingWidget then exit;
+  recreateSurface := False;
 
   if Sender = CBChildType then begin
     CBTextures.Enabled := CBChildTypeIsTextured;
     if not CBTextures.Enabled then CBTextures.ItemIndex := -1;
     Label4.Enabled := CBTextures.Enabled;
+    if Edit5.Text = '' then begin
+      case CBChildType.Text of
+        'TFreeText': Edit5.Text := Surfaces.GetUniqueName('FreeText');
+        'TFreeTextOnPath': Edit5.Text := Surfaces.GetUniqueName('FreeTextOnPath');
+        'TFreeTextClock': Edit5.Text := Surfaces.GetUniqueName('FreeTextClock');
+        'TFreeTextAligned': Edit5.Text := Surfaces.GetUniqueName('FreeTextAligned');
+      end;
+    end;
     if FWorkingChild <> NIL then begin
       FInitializingWidget := True;
       SE16.Value := FWorkingChild^.width;
@@ -789,8 +837,33 @@ begin
       with FWorkingChild^ do
         chang := chang or (width <> SE28.Value) or (height <> SE29.Value);
 
+    if FWorkingChild^.surface is TFreeText then begin
+      with FWorkingChild^ do
+        chang := chang or (Edit4.Text <> Caption) or (ComboBox1.Text <> FontDescriptorName);
+      recreateSurface := chang;
+    end;
+
+    if FWorkingChild^.surface is TFreeTextClock then begin
+      with FWorkingChild^ do
+        chang := chang or (ComboBox4.Text <> FontDescriptorName) or
+                          (SE40.Value <> TimeValue) or
+                          (RadioButton4.Checked <> CountDown) or
+                          (CheckBox5.Checked <> ClockShowDecimal) or
+                          (CheckBox6.Checked <> ClockStartPaused);
+      recreateSurface := chang;
+    end;
+
+    if FWorkingChild^.surface is TFreeTextAligned then begin
+      with FWorkingChild^ do
+        chang := chang or (width <> SE43.Value) or (height <> SE44.Value) or
+                          (ComboBox5.Text <> FontDescriptorName) or
+                          (Radiogroup2.ItemIndex <> Ord(TextAlignment)) or
+                          (Memo1.Text <> Caption);
+      recreateSurface := chang;
+    end;
+
     if chang then begin
-      DoUpdateChild(False);
+      DoUpdateChild(recreateSurface);
       FModified := True;
     end;
   end else begin
@@ -1005,6 +1078,9 @@ begin
   if not definingRoot  and (CBParent.ItemIndex = -1) then exit(False);
 
   // check extra properties
+  if CBChildType.Text = 'TFreeText' then begin
+    if ComboBox1.ItemIndex = -1 then exit(False);
+  end;
 
   Result := True;
 end;
@@ -1049,7 +1125,6 @@ begin
     recreateSurface := recreateSurface or
                        (FWorkingChild^.surface.Width <> FWorkingChild^.width) or
                        (FWorkingChild^.surface.Height <> FWorkingChild^.height);
-
 
   FWorkingChild^.name := Trim(Edit5.Text);
 
@@ -1311,6 +1386,8 @@ begin
       SetSize(SE28.Value, SE29.Value);
     end;
 
+  //if FWorkingChild^.surface is TFreeText then
+
   FWorkingChild^.UpdateHandlePosition;
 end;
 
@@ -1367,6 +1444,23 @@ begin
     FWorkingChild^.BottomRightOffsetY := SE39.Value;
     FWorkingChild^.BottomLeftOffsetX := SE36.Value;
     FWorkingChild^.BottomLeftOffsetY := SE37.Value;
+  end
+  else if selectedClass = TFreeText then begin
+    FWorkingChild^.Caption := Edit4.Text;
+    FWorkingChild^.FontDescriptorName := ComboBox1.Text;
+  end
+  else if selectedClass = TFreeTextClock then begin
+    FWorkingChild^.FontDescriptorName := ComboBox4.Text;
+    FWorkingChild^.TimeValue := SE40.Value;
+    FWorkingChild^.CountDown := RadioButton4.Checked;
+    FWorkingChild^.ClockShowDecimal := CheckBox5.Checked;
+  end
+  else if selectedClass = TFreeTextAligned then begin
+    FWorkingChild^.width := SE43.Value;
+    FWorkingChild^.height := SE44.Value;
+    FWorkingChild^.Caption := Memo1.Text;
+    FWorkingChild^.FontDescriptorName := ComboBox5.Text;
+    FWorkingChild^.TextAlignment := TOGLCAlignment(RadioGroup2.ItemIndex);
   end
   else raise exception.Create('forgot to implement '+selectedClass.ClassName);
 end;
@@ -1435,6 +1529,10 @@ begin
       'TQuad4Color': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraTQuad4Color);
       'TSpriteContainer': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraEmpty);
       'TDeformationGrid': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTDeformationGrid);
+      'TFreeText': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeText);
+      'TFreeTextOnPath': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeTextOnPath);
+      'TFreeTextClock': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeTextClock);
+      'TFreeTextAligned': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeTextAligned);
       else raise exception.create('forgot to implement '+CBChildType.Items.Strings[i]);
     end;
 end;
@@ -1472,6 +1570,13 @@ end;
 
 procedure TFrameToolsSpriteBuilder.OnShow;
 begin
+  FontBank.FillComboBoxWithNames(ComboBox1);
+  FontBank.FillComboBoxWithNames(ComboBox2);
+  FontBank.FillComboBoxWithNames(ComboBox4);
+  FontBank.FillComboBoxWithNames(ComboBox5);
+
+  PathBank.FillComboBoxWithNames(ComboBox3);
+
   FillListBoxTextureNames;
   Surfaces.FillComboBox(CBParent);
   Textures.FillComboBox(CBTextures);
@@ -1587,6 +1692,28 @@ begin
      if surface is TGradientRectangle then begin
        SE28.Value := surface.Width;
        SE29.Value := surface.Height;
+     end;
+
+     if surface is TFreeText then begin
+       Edit4.Text := FWorkingChild^.Caption;
+       ComboBox1.ItemIndex := ComboBox1.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+     end;
+
+     if surface is TFreeTextClock then begin
+      Edit4.Text := FWorkingChild^.Caption;
+      ComboBox4.ItemIndex := ComboBox4.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+      SE40.Value := FWorkingChild^.TimeValue;
+      RadioButton3.Checked := not FWorkingChild^.CountDown;
+      RadioButton4.Checked := FWorkingChild^.CountDown;
+      CheckBox5.Checked := FWorkingChild^.ClockShowDecimal;
+     end;
+
+     if surface is TFreeTextAligned then begin
+       SE43.Value := surface.Width;
+       SE44.Value := surface.Height;
+       Memo1.Text := FWorkingChild^.Caption;
+       ComboBox5.ItemIndex := ComboBox5.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+       RadioGroup2.ItemIndex := Ord(FWorkingChild^.TextAlignment);
      end;
     end;
     CBChildType.Enabled := True;

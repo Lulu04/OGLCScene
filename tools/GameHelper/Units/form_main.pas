@@ -177,6 +177,9 @@ begin
   FrameViewFontBank.Parent := PageFontBank;
   FrameViewFontBank.Align := alClient;
   FrameViewFontBank.IsEditable := True;
+  FrameViewFontBank.CheckListBox1.Clear;
+  FrameViewFontBank.CheckListBox1.Items.AddStrings(FScene.Charsets.GetListOfCharsetNames);
+
 
   FrameToolPanelBank := TFrameToolPanelBank.Create(Self);
   FrameToolPanelBank.Parent := PagePanelBank;
@@ -325,9 +328,9 @@ end;
 procedure TFormMain.FormShow(Sender: TObject);
 begin
   if not FScene.OpenGLLibLoaded then
-  ShowMessage('ERROR: OpenGL library could not be loaded...'+LineEnding+
-      'Check if your system is compatible with OpenGL 3.3 core'+LineEnding+
-      'and if the library is well installed on your computer');
+    ShowMessage('ERROR: OpenGL library could not be loaded...'+LineEnding+
+                'Check if your system is compatible with OpenGL 3.3 core'+LineEnding+
+                'and if the library is well installed on your computer');
 end;
 
 procedure TFormMain.OGLMouseDown(Sender: TObject; Button: TMouseButton;
