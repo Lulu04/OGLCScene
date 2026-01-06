@@ -62,6 +62,9 @@ public
   GradientData: string;
   // TDeformationGrid
   DeformationGridData: string;
+  // TFreeTextClock
+  TimeValue: single;
+  CountDown, ClockShowDecimal, ClockStartPaused: boolean;
   // UI objects with bodyshape
   BodyShapeData: string;
   BackGradientData: string;
@@ -225,6 +228,9 @@ public
   // Items are sorted from nearest to furthest away.
   function GetItemsAt(aX, aY: integer): ArrayOfPSurfaceDescriptor;
 
+  // example: from 'FreeText' gives 'FreeText1', or 'FreeText2'...
+  function GetUniqueName(const aBaseName: string): string;
+
   function NameExists(const aName: string): boolean;
   function TextureNameisUsedByASurface(const aTextureName: string): boolean;
   function UseTexture: boolean;
@@ -355,6 +361,12 @@ begin
   GradientData := DEFAULT_GRADIENT;
   // TDeformationGrid
   DeformationGridData := '';
+  // TFreeTextClock
+  TimeValue := 0.0;
+  CountDown := False;
+  ClockShowDecimal := True;
+  ClockStartPaused := False;
+
 
   // UIObject
   BodyShapeData := '';
@@ -465,12 +477,12 @@ begin
       Polar.Distance.Value := PolarDistance;
     end;
   end else
-  if classType = TScrollableSprite then begin
+  if classType = TScrollableSprite then begin    // TScrollableSprite
     surface := TScrollableSprite.Create(tex, False);
     surface.Frame := frameindex;
     TScrollableSprite(surface).SetSize(width, height);
   end else
-  if classType = TShapeOutline then begin
+  if classType = TShapeOutline then begin      // TShapeOutline
     surface := TShapeOutline.Create(FScene)
   end else
   if classType = TGradientRectangle then begin         // TGradientRectangle
@@ -520,6 +532,21 @@ begin
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
     TFreeText(surface).Caption := Caption;
     TFreeText(surface).TexturedFont := TexturedFont;
+  end else
+  if classType = TFreeTextClock then begin  // TFreeTextClock
+    surface := TFreeTextClock.Create(FScene, ClockStartPaused);
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, '0123456789:.', Atlas, TexturedFont, NIL);
+    TFreeTextClock(surface).TexturedFont := TexturedFont;
+    TFreeTextClock(surface).Time := TimeValue;
+    TFreeTextClock(surface).CountDown := CountDown;
+    TFreeTextClock(surface).ShowFractionalPart := ClockShowDecimal;
+    //TFreeTextClock(surface).Run;
+  end else
+  if classType = TFreeTextAligned then begin // TFreeTextAligned
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    surface := TFreeTextAligned.Create(FScene, TexturedFont, width, height);
+    TFreeTextAligned(surface).Caption := Caption;
+    TFreeTextAligned(surface).Align := TextAlignment;
   end else
   if classType = TUILabel then begin // UILabel
     surface := TUILabel.Create(FScene);
@@ -1140,6 +1167,12 @@ begin
   aSurface^.GradientData := GradientData;
   // TDeformationGrid
   aSurface^.DeformationGridData := DeformationGridData;
+  // TFreeTextClock
+  aSurface^.TimeValue := TimeValue;
+  aSurface^.CountDown := CountDown;
+  aSurface^.ClockShowDecimal := ClockShowDecimal;
+  aSurface^.ClockStartPaused := ClockStartPaused;
+
   // UI objects
   aSurface^.BodyShapeData := BodyShapeData;
   aSurface^.BackGradientData := BackGradientData;
@@ -1434,6 +1467,28 @@ begin
   if GetSurfaceType = TDeformationGrid then
     prop.Add('DeformationGridData', DeformationGridData);
 
+  // TFreeText
+  if GetSurfaceType = TFreeText then begin
+    prop.Add('FontDescriptorName', FontDescriptorName);
+    prop.Add('Caption', Caption, True);
+  end;
+
+  // TFreeTextClock
+  if GetSurfaceType = TFreeTextClock then begin
+    prop.Add('FontDescriptorName', FontDescriptorName);
+    prop.Add('StartPaused', ClockStartPaused);
+    if TimeValue <> 0.0 then prop.Add('TimeValue', TimeValue);
+    if CountDown then prop.Add('CountDown', CountDown);
+    if not ClockShowDecimal then prop.Add('ClockShowDecimal', ClockShowDecimal);
+  end;
+
+  // TFreeTextAligned
+  if GetSurfaceType = TFreeTextAligned then begin
+    prop.Add('FontDescriptorName', FontDescriptorName);
+    prop.Add('TextAlignment', Ord(TextAlignment));
+    prop.Add('Caption', Caption, True);
+  end;
+
   _className := GetSurfaceType.ClassName;
   isUISurface := (_className = 'TUIPanel') or (_className = 'TUIPanelWithEffects') or
                  (_className = 'TUIImage') or (_className = 'TUILabel') or
@@ -1548,6 +1603,9 @@ begin
     'TQuad4Color': classtype := TQuad4Color;
     'TGradientRectangle': classtype := TGradientRectangle;
     'TFreeText': classtype := TFreeText;
+    'TFreeTextOnPath': classtype := TFreeTextOnPath;
+    'TFreeTextClock': classtype := TFreeTextClock;
+    'TFreeTextAligned': classtype := TFreeTextAligned;
     'TUIPanel': classtype := TUIPanel;
     'TUIPanelWithEffects': classtype := TUIPanelWithEffects;
     'TUILabel': classtype := TUILabel;
@@ -1616,6 +1674,12 @@ begin
   // TDeformationGrid
   prop.StringValueOf('DeformationGridData', DeformationGridData, '');
 
+  // TFreeTextClock
+  prop.BooleanValueOf('StartPaused', ClockStartPaused, True);
+  prop.SingleValueOf('TimeValue', TimeValue, 0.0);
+  prop.BooleanValueOf('CountDown', CountDown, False);
+  prop.BooleanValueOf('ClockShowDecimal', ClockShowDecimal, True);
+
   // UI objects
   prop.StringValueOf('BodyShapeData', BodyShapeData, '');
   prop.StringValueOf('BackGradientData', BackGradientData, '');
@@ -1623,7 +1687,7 @@ begin
   prop.StringValueOf('OnShowScenario', OnShowScenario, '');
   prop.StringValueOf('OnHideScenario', OnHideScenario, '');
 
-  // UI objects with text (textured font)
+  // UI objects with text (textured font) or TFreeTextxxx
   prop.StringValueOf('FontDescriptorName', FontDescriptorName, '');
   prop.StringValueOf('Caption', Caption, '');
   prop.IntegerValueOf('TextAlignment', v, 0);
@@ -1946,6 +2010,16 @@ begin
       Result[High(Result)] := sorted[i];
     end;
   end;
+end;
+
+function TSurfaceList.GetUniqueName(const aBaseName: string): string;
+var i: integer;
+begin
+  i := 0;
+  repeat
+    inc(i);
+  until not NameExists(aBaseName+i.ToString);
+  Result := aBaseName + i.ToString;
 end;
 
 function TSurfaceList.NameExists(const aName: string): boolean;

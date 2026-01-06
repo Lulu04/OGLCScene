@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, ComCtrls, ExtCtrls, StdCtrls, Dialogs,
-  Buttons, Spin, Graphics,
+  Buttons, Spin, Graphics, CheckLst,
   OGLCScene, u_ui_objectlist, Types, BGRABitmap, BGRABitmapTypes;
 
 type
@@ -27,6 +27,7 @@ type
     CBItalic: TCheckBox;
     CheckBox5: TCheckBox;
     CheckBox6: TCheckBox;
+    CheckListBox1: TCheckListBox;
     ColorButton1: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
@@ -43,6 +44,7 @@ type
     Label13: TLabel;
     Label14: TLabel;
     Label15: TLabel;
+    Label16: TLabel;
     Label2: TLabel;
     Label24: TLabel;
     Label3: TLabel;
@@ -52,13 +54,20 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    Memo1: TMemo;
+    Memo2: TMemo;
+    PageControl1: TPageControl;
     Panel4: TPanel;
+    Panel5: TPanel;
+    Panel6: TPanel;
     PB: TPaintBox;
     Panel2: TPanel;
     Panel3: TPanel;
     Panel1: TPanel;
     Panel8: TPanel;
     PanelFont: TPanel;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
     RBSingleColor: TRadioButton;
     RBGradient: TRadioButton;
     SE1: TSpinEdit;
@@ -73,6 +82,8 @@ type
     BSwapGradientColors: TSpeedButton;
     Splitter1: TSplitter;
     Splitter2: TSplitter;
+    PageDesign: TTabSheet;
+    PageCharset: TTabSheet;
     Timer1: TTimer;
     TVAvailableFonts: TTreeView;
     TV: TTreeView;
@@ -81,12 +92,14 @@ type
     procedure BSaveClick(Sender: TObject);
     procedure BSwapGradientColorsClick(Sender: TObject);
     procedure BSwapOutlineAndShadowColorsClick(Sender: TObject);
+    procedure CheckListBox1SelectionChange(Sender: TObject; User: boolean);
     procedure PBMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PBMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure PBMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure PBPaint(Sender: TObject);
+    procedure RadioButton1Change(Sender: TObject);
     procedure SE1Change(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure TVAdvancedCustomDrawItem(Sender: TCustomTreeView;
@@ -114,6 +127,8 @@ type
     function GetCharset: string;
     function GetFillTexture: TBGRABitmap;
     function WidgetToFontStyle: TFontStyles;
+    function WidgetToCharsetPresets: TStringArray;
+    procedure CharsetPresetsToWidget(const aCharsets: TStringArray);
     function CBToGradientType: TGradientType;
     procedure GradientTypeToCB(aGradientType: TGradientType);
     procedure FontStyleToWidget(aFt: TFontStyles);
@@ -199,12 +214,18 @@ begin
     // modify the selected item
     item := FontBank.GetByName(nam);
     item.FD := WidgetToFontDescriptor;
+    item.UseCharsetPreset := RadioButton1.Checked;
+    item.CharsetPresets := WidgetToCharsetPresets;
+    item.TextToCharSet := Memo1.Text;
     FontBank.Save;
   end else begin
     // add a new item in the bank
     item := FontBank.AddEmpty;
     item._Name := nam;
     item.FD := WidgetToFontDescriptor;
+    item.UseCharsetPreset := RadioButton1.Checked;
+    item.CharsetPresets := WidgetToCharsetPresets;
+    item.TextToCharSet := Memo1.Text;
     FontBank.Save;
     // add the font to the treeview
     newnode :=  TV.Items.AddChild(TV.Items.GetFirstNode, nam);
@@ -227,6 +248,8 @@ begin
   end;
   Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFD, 'TFontDescriptor');
   Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeFDVariable);
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForTexturedFont, 'TTexturedFont');
+
 end;
 
 procedure TFrameViewFontBank.BSwapGradientColorsClick(Sender: TObject);
@@ -261,6 +284,14 @@ begin
   SE8.Value := alpha;
   FInitializing := False;
   UpdatePreview;
+end;
+
+procedure TFrameViewFontBank.CheckListBox1SelectionChange(Sender: TObject; User: boolean);
+var i: integer;
+begin
+  Memo2.Clear;
+  for i:=0 to CheckListBox1.Count-1 do
+    if CheckListBox1.Checked[i] then Memo2.Lines.Add(FScene.Charsets.GetByName(CheckListBox1.Items.Strings[i]));
 end;
 
 procedure TFrameViewFontBank.PBMouseDown(Sender: TObject; Button: TMouseButton;
@@ -332,6 +363,17 @@ begin
 
   ima.Draw(PB.Canvas,0, 0);
   ima.Free;
+end;
+
+procedure TFrameViewFontBank.RadioButton1Change(Sender: TObject);
+begin
+  CheckListBox1.Enabled := RadioButton1.Checked;
+  Label16.Enabled := RadioButton1.Checked;
+  Memo2.Enabled := RadioButton1.Checked;
+
+  Memo1.Enabled := RadioButton2.Checked;
+  if not FInitializing then UpdatePreview;
+
 end;
 
 procedure TFrameViewFontBank.SE1Change(Sender: TObject);
@@ -512,8 +554,13 @@ begin
   if SelectedIsFont then begin
     item := FontBank.GetByName(TV.Selected.Text);
     if item = NIL then exit;
-
+    FInitializing := True;
     FontDescriptorToWidget(item.FD);
+    RadioButton1.Checked := item.UseCharsetPreset;
+    RadioButton2.Checked := not item.UseCharsetPreset;
+    CharsetPresetsToWidget(item.CharsetPresets);
+    Memo1.Text := item.TextToCharSet;
+    FInitializing := False;
     UpdatePreview;
     Edit1.Text := item._Name;
   end else begin
@@ -641,6 +688,38 @@ begin
   if CBItalic.Checked then Include(Result, fsItalic);
   if CheckBox5.Checked then Include(Result, fsUnderline);
   if CheckBox6.Checked then Include(Result, fsStrikeOut);
+end;
+
+function TFrameViewFontBank.WidgetToCharsetPresets: TStringArray;
+var i, c, k: integer;
+begin
+  Result := NIL;
+  c := 0;
+  for i:=0 to CheckListBox1.Count-1 do
+    if CheckListBox1.Checked[i] then inc(c);
+  if c = 0 then exit;
+
+  SetLength(Result, c);
+
+  k := 0;
+  for i:=0 to CheckListBox1.Count-1 do
+    if CheckListBox1.Checked[i] then begin
+      Result[k] := CheckListBox1.Items.Strings[i];
+      inc(k);
+    end;
+end;
+
+procedure TFrameViewFontBank.CharsetPresetsToWidget(const aCharsets: TStringArray);
+var i, k: integer;
+begin
+  // unckeck all
+  for i:=0 to CheckListBox1.Count-1 do
+    CheckListBox1.Checked[i] := False;
+
+  for i:=0 to High(aCharsets) do begin
+    k := CheckListBox1.Items.IndexOf(aCharsets[i]);
+    if k <> -1 then CheckListBox1.Checked[k] := True;
+  end;
 end;
 
 function TFrameViewFontBank.CBToGradientType: TGradientType;

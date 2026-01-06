@@ -94,7 +94,7 @@ implementation
 
 uses form_main, u_texture_list, u_surface_list, u_collisionbody_list,
   u_posture_list, u_project, u_common, u_utils, u_connection_to_ide,
-  BGRABitmapTypes, LazFileUtils;
+  u_ui_objectlist, BGRABitmapTypes, LazFileUtils;
 
 { TSpriteCodeGenerationOptions }
 
@@ -186,6 +186,7 @@ var t: TStringList;
   pt: TPostureValues;
   pf: TPointF;
   nameUnit, nameClass, spriteClassType: string;
+  fontItem: TFontDescriptorItem;
 begin
   if (textures = '') or (surfaces = '') then exit;
   // create each needed instance
@@ -352,6 +353,17 @@ begin
       'TDeformationGrid': begin
         t.Add('  inherited Create('+rootItem^.textureName + ', False);');
       end;
+      'TFreeText': begin
+        t.Add('  inherited Create(FScene);');
+      end;
+      'TFreeTextClock': begin
+        t.Add('  inherited Create(FScene, '+CodeGen.BooleanToPascal(rootItem^.ClockStartPaused)+');');
+      end;
+      'TFreeTextAligned': begin
+        fontItem := FontBank.GetByName(rootItem^.FontDescriptorName);
+        t.Add('  inherited Create(FScene, '+fontItem.VariableNameForTexturedFont+
+              ', ScaleW('+rootItem^.width.ToString+'), ScaleH('+rootItem^.height.ToString+'));');
+      end
       else raise exception.create('forgot to implement '+spriteClassType);
     end;
     t.AddText('  if aLayerIndex <> -1 then'#10+
@@ -374,12 +386,19 @@ begin
       if (rootItem <> NIL) and (current = rootItem) then continue;
 
       case current^.classtype.ClassName of
-        'TSpriteContainer': s := '  '+current^.name+' := TSpriteContainer.Create(FScene)'#10;
-        'TSprite': s := '  '+current^.name+' := TSprite.Create('+current^.textureName+', False);';
-        'TPolarSprite': s := '  '+current^.name+' := TPolarSprite.Create('+current^.textureName+', False);';
-        'TQuad4Color': s := '  '+current^.name+' := TQuad4Color.Create(FScene);';
-        'TGradientRectangle': s := '  '+current^.name+' := TGradientRectangle.Create(FScene);';
-        'TDeformationGrid': s := '  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);';
+        'TSpriteContainer': t.Add('  '+current^.name+' := TSpriteContainer.Create(FScene)');
+        'TSprite': t.Add('  '+current^.name+' := TSprite.Create('+current^.textureName+', False);');
+        'TPolarSprite': t.Add('  '+current^.name+' := TPolarSprite.Create('+current^.textureName+', False);');
+        'TQuad4Color': t.Add('  '+current^.name+' := TQuad4Color.Create(FScene);');
+        'TGradientRectangle': t.Add('  '+current^.name+' := TGradientRectangle.Create(FScene);');
+        'TDeformationGrid': t.Add('  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);');
+        'TFreeText': t.Add('  '+current^.name+' := TFreeText.Create(FScene);');
+        'TFreeTextClock': t.Add('  '+current^.name+' := TFreeTextClock.Create(FScene, '+CodeGen.BooleanToPascal(current^.ClockStartPaused)+');');
+        'TFreeTextAligned': begin
+          fontItem := FontBank.GetByName(current^.FontDescriptorName);
+          t.Add('  '+current^.name+' := TFreeTextAligned.Create(FScene, '+fontItem.VariableNameForTexturedFont+
+              ', ScaleW('+rootItem^.width.ToString+'), ScaleH('+rootItem^.height.ToString+'));');
+        end
         else raise exception.create('forgot to implement '+current^.classtype.ClassName);
       end;
 

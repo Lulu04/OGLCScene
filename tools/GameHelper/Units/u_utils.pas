@@ -66,12 +66,13 @@ TCodeGenerator = record
   function BGRAToPascal(aColor: TBGRAPixel): string;
   function BGRAGradientTypeToPascal(aGradientType: TGradientType): string;
   function FontStyleToPascal(aFontStyle: TFontStyles): string;
+  function TextAlignmentToPascal(aAlign: TOGLCAlignment): string;
 
   procedure CommonPropertiesToPascalCode(t: TStringList;
                                         aSurface: PSurfaceDescriptor;
                                         const aSpacePrefix: string);
   procedure ExtraPropertiesToPascalCode(t: TStringList;
-                                       aSurface: PSurfaceDescriptor;
+                                       aItem: PSurfaceDescriptor;
                                        const aSpacePrefix: string);
 
   function Generate_AngleChangeTo(aAngle: single; const aSurfaceName: string): string;
@@ -110,7 +111,7 @@ procedure SaveEmptyOGLCProject(const aFilename: string);
 
 implementation
 
-uses u_common, u_levelbank, Math, Dialogs, BGRASVG;
+uses u_common, u_levelbank, u_ui_objectlist, Math, Dialogs, BGRASVG;
 
 function GetImageSize(const aFilename: string): TSize;
 var ima: TBGRABitmap;
@@ -163,7 +164,8 @@ begin
     'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite', 'TPolarSprite',
     'TScrollableSprite', 'TDeformationGrid': Result := True;
 
-     'TShapeOutline', 'TGradientRectangle', 'TQuad4Color', 'TSpriteContainer': Result := False;
+     'TShapeOutline', 'TGradientRectangle', 'TQuad4Color', 'TSpriteContainer',
+     'TFreeText', 'TFreeTextOnPath', 'TFreeTextClock', 'TFreeTextAligned': Result := False;
 
      else raise exception.create('"'+aClassName+'" not implemented');
   end;
@@ -302,6 +304,13 @@ begin
   Result := Result + ']';
 end;
 
+function TCodeGenerator.TextAlignmentToPascal(aAlign: TOGLCAlignment): string;
+var s: string;
+begin
+  WriteStr(s, aAlign);
+  Result := s;
+end;
+
 procedure TCodeGenerator.CommonPropertiesToPascalCode(t: TStringList;
   aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
 const BLEND_NAMES: array[0..3] of string=('FX_BLEND_NORMAL', 'FX_BLEND_ADD', 'FX_BLEND_MULT',
@@ -330,65 +339,88 @@ begin
 end;
 
 procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
-  aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
+  aItem: PSurfaceDescriptor; const aSpacePrefix: string);
+var
+  fontItem: TFontDescriptorItem;
 begin
-  case aSurface^.classtype.ClassName of
+  case aItem^.classtype.ClassName of
     'TSprite': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
-                aSurface^.height.ToString+'*FAdditionnalScale)));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aItem^.height.ToString+'*FAdditionnalScale)));');
     end;
 
     'TSpriteWithElasticCorner': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
-                aSurface^.height.ToString+'*FAdditionnalScale)));');
-      if (aSurface^.TopLeftOffsetX <> 0.0) or (aSurface^.TopLeftOffsetY <> 0.0) then
-        t.Add(aSpacePrefix+'CornerOffset.TopLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.TopLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.TopLeftOffsetY)+'));');
-      if (aSurface^.TopRightOffsetX <> 0.0) or (aSurface^.TopRightOffsetY <> 0.0) then
-        t.Add(aSpacePrefix+'CornerOffset.TopRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.TopRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.TopRightOffsetY)+'));');
-      if (aSurface^.BottomRightOffsetX <> 0.0) or (aSurface^.BottomRightOffsetY <> 0.0) then
-        t.Add(aSpacePrefix+'CornerOffset.BottomRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.BottomRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.BottomRightOffsetY)+'));');
-      if (aSurface^.BottomLeftOffsetX <> 0.0) or (aSurface^.BottomLeftOffsetY <> 0.0) then
-        t.Add(aSpacePrefix+'CornerOffset.BottomLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aSurface^.BottomLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aSurface^.BottomLeftOffsetY)+'));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aItem^.height.ToString+'*FAdditionnalScale)));');
+      if (aItem^.TopLeftOffsetX <> 0.0) or (aItem^.TopLeftOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.TopLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aItem^.TopLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aItem^.TopLeftOffsetY)+'));');
+      if (aItem^.TopRightOffsetX <> 0.0) or (aItem^.TopRightOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.TopRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aItem^.TopRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aItem^.TopRightOffsetY)+'));');
+      if (aItem^.BottomRightOffsetX <> 0.0) or (aItem^.BottomRightOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.BottomRight.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aItem^.BottomRightOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aItem^.BottomRightOffsetY)+'));');
+      if (aItem^.BottomLeftOffsetX <> 0.0) or (aItem^.BottomLeftOffsetY <> 0.0) then
+        t.Add(aSpacePrefix+'CornerOffset.BottomLeft.Value := PointF(ScaleWF('+FormatFloatWithDot('0.000', aItem^.BottomLeftOffsetX)+'), ScaleHF('+FormatFloatWithDot('0.000', aItem^.BottomLeftOffsetY)+'));');
     end;
 
     'TPolarSprite': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
-                aSurface^.height.ToString+'*FAdditionnalScale)));');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+
+                aItem^.height.ToString+'*FAdditionnalScale)));');
       t.Add(aSpacePrefix+'Polar.Center.Value := PointF(X.Value+Width*0.5, Y.Value+Height*0.5);'); //+PointFToPascal(aSurface^.x+aSurface^.width*0.5, aSurface^.y+aSurface^.height*0.5)+';');
-      if aSurface^.PolarAngle <> 0.0 then
-        t.Add(aSpacePrefix+'Polar.Angle.Value := '+FormatFloatWithDot('0.00', aSurface^.PolarAngle)+';');
-      if aSurface^.PolarDistance <> 0.0 then
-        t.Add(aSpacePrefix+'Polar.Distance.Value := '+FormatFloatWithDot('0.00', aSurface^.PolarDistance)+';');
+      if aItem^.PolarAngle <> 0.0 then
+        t.Add(aSpacePrefix+'Polar.Angle.Value := '+FormatFloatWithDot('0.00', aItem^.PolarAngle)+';');
+      if aItem^.PolarDistance <> 0.0 then
+        t.Add(aSpacePrefix+'Polar.Distance.Value := '+FormatFloatWithDot('0.00', aItem^.PolarDistance)+';');
     end;
 
     'TQuad4Color': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
-      if (aSurface^.TopLeftColor = aSurface^.TopRightColor) and
-         (aSurface^.TopRightColor = aSurface^.BottomRightColor) and
-         (aSurface^.BottomRightColor = aSurface^.BottomLeftColor) then begin
-        t.Add(aSpacePrefix+'SetAllColorsTo('+BGRAToPascal(aSurface^.TopLeftColor)+');');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aItem^.height.ToString+'*FAdditionnalScale)));');
+      if (aItem^.TopLeftColor = aItem^.TopRightColor) and
+         (aItem^.TopRightColor = aItem^.BottomRightColor) and
+         (aItem^.BottomRightColor = aItem^.BottomLeftColor) then begin
+        t.Add(aSpacePrefix+'SetAllColorsTo('+BGRAToPascal(aItem^.TopLeftColor)+');');
       end else begin
-        t.Add(aSpacePrefix+'TopLeftColor.Value := '+BGRAToPascal(aSurface^.TopLeftColor)+';');
-        t.Add(aSpacePrefix+'TopRightColor.Value := '+BGRAToPascal(aSurface^.TopRightColor)+';');
-        t.Add(aSpacePrefix+'BottomRightColor.Value := '+BGRAToPascal(aSurface^.BottomRightColor)+';');
-        t.Add(aSpacePrefix+'BottomLeftColor.Value := '+BGRAToPascal(aSurface^.BottomLeftColor)+';');
+        t.Add(aSpacePrefix+'TopLeftColor.Value := '+BGRAToPascal(aItem^.TopLeftColor)+';');
+        t.Add(aSpacePrefix+'TopRightColor.Value := '+BGRAToPascal(aItem^.TopRightColor)+';');
+        t.Add(aSpacePrefix+'BottomRightColor.Value := '+BGRAToPascal(aItem^.BottomRightColor)+';');
+        t.Add(aSpacePrefix+'BottomLeftColor.Value := '+BGRAToPascal(aItem^.BottomLeftColor)+';');
       end;
     end;
 
     'TGradientRectangle': begin
-      t.Add(aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aSurface^.GradientData+''');');
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
+      t.Add(aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aItem^.GradientData+''');');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aItem^.height.ToString+'*FAdditionnalScale)));');
     end;
 
     'TDeformationGrid': begin
-      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aSurface^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aSurface^.height.ToString+'*FAdditionnalScale)));');
-      t.Add(aSpacePrefix+'LoadDeformationDataFromString('''+aSurface^.DeformationGridData+''');');
+      t.Add(aSpacePrefix+'SetSize(ScaleW(Round('+aItem^.width.ToString+'*FAdditionnalScale)), ScaleH(Round('+aItem^.height.ToString+'*FAdditionnalScale)));');
+      t.Add(aSpacePrefix+'LoadDeformationDataFromString('''+aItem^.DeformationGridData+''');');
     end;
 
     'TSpriteContainer': begin
+    end;
+
+    'TFreeText': begin
+      t.Add(aSpacePrefix+'Caption := '''+aItem^.Caption+''';');
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
+    end;
+
+    'TFreeTextClock': begin
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
+      t.Add(aSpacePrefix+'Time := '+FormatFloatWithDot('0.00', aItem^.TimeValue)+';');
+      t.Add(aSpacePrefix+'CountDown := '+CodeGen.BooleanToPascal(aItem^.CountDown)+';');
+      t.Add(aSpacePrefix+'ShowFractionalPart := '+CodeGen.BooleanToPascal(aItem^.ClockShowDecimal)+';');
+    end;
+
+    'TFreeTextAligned': begin
+      t.Add(aSpacePrefix+'Caption := '''+aItem^.Caption+''';');
+      t.Add(aSpacePrefix+'Align := '+TextAlignmentToPascal(aItem^.TextAlignment)+';');
     end
 
-    else raise exception.Create('forgot to implement '+aSurface^.classtype.ClassName);
+    else raise exception.Create('forgot to implement '+aItem^.classtype.ClassName);
   end;
 end;
 
