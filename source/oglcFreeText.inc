@@ -94,7 +94,7 @@ end;
 
 
 { TFreeTextAligned }
-// Draws a text in a specified rectangular area with horizontal align (left, center or right).
+// Draws a text in a rectangular area with horizontal align (Topleft, TopCenter or TopRight).
 // The text can be multiline: use #10 to separate the lines.
 // Instead of TUITextArea, the text is not clipped and mouse can't interact with it.
 TFreeTextAligned = class(TSimpleSurfaceWithEffect)
@@ -177,12 +177,12 @@ end;
 
 function TFreeTextAligned.GetWidth: integer;
 begin
-  Result := FAlignedTextDescriptor.DrawingSize.cx;
+  Result := FAlignedTextDescriptor.Area.Width; //  .DrawingSize.cx;
 end;
 
 function TFreeTextAligned.GetHeight: integer;
 begin
-  Result := FAlignedTextDescriptor.DrawingSize.cy;
+  Result := FAlignedTextDescriptor.Area.Height; //  .DrawingSize.cy;
 end;
 
 procedure TFreeTextAligned.DoDraw;
@@ -401,7 +401,7 @@ end;
 
 procedure TFreeTextClock.SetTime(AValue: single);
 begin
-  if FTime = AValue then Exit;
+  //if FTime = AValue then Exit;
   FTime := AValue;
   UpdateCaption;
 end;
