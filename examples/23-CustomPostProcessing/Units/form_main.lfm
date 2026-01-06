@@ -15,6 +15,7 @@ object FormMain: TFormMain
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
+  OnShow = FormShow
   object OpenGLControl1: TOpenGLControl
     Left = 24
     Height = 96

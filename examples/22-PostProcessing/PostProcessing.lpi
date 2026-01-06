@@ -98,7 +98,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="27" Y="15"/>
+        <TopLine Value="141"/>
+        <CursorPos Y="147"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -322,7 +323,7 @@
       </Position29>
       <Position30>
         <Filename Value="Units\form_main.pas"/>
-        <Caret Line="15" Column="30"/>
+        <Caret Line="15" Column="27"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

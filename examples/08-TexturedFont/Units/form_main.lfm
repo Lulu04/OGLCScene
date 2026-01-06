@@ -8,13 +8,14 @@ object FormMain: TFormMain
   ClientWidth = 427
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '3.8.0.0'
-  WindowState = wsMaximized
+  OnShow = FormShow
   object Panel1: TPanel
     Left = 288
     Height = 300
@@ -50,9 +51,9 @@ object FormMain: TFormMain
         'taTopCenter'
         'taTopRight'
       )
-      OnSelectionChanged = RadioGroup1SelectionChanged
       ParentBackground = False
       TabOrder = 0
+      OnSelectionChanged = RadioGroup1SelectionChanged
     end
   end
   object Panel2: TPanel

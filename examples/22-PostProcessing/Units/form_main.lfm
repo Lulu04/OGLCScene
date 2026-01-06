@@ -8,13 +8,14 @@ object FormMain: TFormMain
   ClientWidth = 378
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '3.8.0.0'
-  WindowState = wsMaximized
+  OnShow = FormShow
   object Panel1: TPanel
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
@@ -90,9 +91,9 @@ object FormMain: TFormMain
       Width = 175
       Max = 100
       Min = 1
-      OnChange = CheckBox1Change
       Position = 50
       ShowSelRange = False
+      OnChange = CheckBox1Change
       Enabled = False
       TabOrder = 2
     end
@@ -162,9 +163,9 @@ object FormMain: TFormMain
       Width = 175
       Max = 100
       Min = 10
-      OnChange = CheckBox1Change
       Position = 50
       ShowSelRange = False
+      OnChange = CheckBox1Change
       Enabled = False
       TabOrder = 4
     end
@@ -205,9 +206,9 @@ object FormMain: TFormMain
       Width = 175
       Max = 300
       Min = 1
-      OnChange = CheckBox1Change
       Position = 100
       ShowSelRange = False
+      OnChange = CheckBox1Change
       Enabled = False
       TabOrder = 5
     end

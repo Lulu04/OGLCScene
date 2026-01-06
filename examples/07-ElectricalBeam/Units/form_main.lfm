@@ -8,13 +8,14 @@ object FormMain: TFormMain
   ClientWidth = 303
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
+  OnShow = FormShow
   object OpenGLControl1: TOpenGLControl
     Left = 24
     Height = 108
@@ -33,6 +34,7 @@ object FormMain: TFormMain
     ClientHeight = 408
     ClientWidth = 147
     Color = 12961221
+    ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object Label1: TLabel
@@ -50,9 +52,9 @@ object FormMain: TFormMain
       Width = 137
       Max = 45
       Min = 5
-      OnChange = TrackBar1Change
       Position = 5
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 0
     end
     object Label2: TLabel
@@ -70,9 +72,9 @@ object FormMain: TFormMain
       Width = 137
       Max = 20
       Min = 1
-      OnChange = TrackBar1Change
       Position = 3
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 1
     end
     object ColorButton1: TColorButton
@@ -109,9 +111,9 @@ object FormMain: TFormMain
       Frequency = 10
       Max = 50
       Min = 1
-      OnChange = TrackBar1Change
       Position = 20
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 2
     end
     object Label5: TLabel
@@ -147,9 +149,9 @@ object FormMain: TFormMain
       Width = 137
       Frequency = 10
       Max = 255
-      OnChange = TrackBar1Change
       Position = 120
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 3
     end
     object Label7: TLabel
@@ -167,9 +169,9 @@ object FormMain: TFormMain
       Width = 137
       Max = 100
       Min = 1
-      OnChange = TrackBar1Change
       Position = 5
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 4
     end
   end
