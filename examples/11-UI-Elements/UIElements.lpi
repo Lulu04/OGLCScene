@@ -95,9 +95,10 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="28"/>
-        <CursorPos Y="57"/>
+        <TopLine Value="82"/>
+        <CursorPos Y="88"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -105,7 +106,6 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
         <TopLine Value="289"/>
         <CursorPos X="86" Y="306"/>
@@ -169,123 +169,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="269" Column="15" TopLine="253"/>
+        <Caret Line="2452" Column="3" TopLine="2449"/>
       </Position1>
       <Position2>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="2452" Column="3" TopLine="2449"/>
+        <Caret Line="268" Column="13" TopLine="256"/>
       </Position2>
       <Position3>
-        <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="268" Column="13" TopLine="256"/>
+        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
+        <Caret Line="27" Column="16" TopLine="11"/>
       </Position3>
       <Position4>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="27" Column="16" TopLine="11"/>
+        <Caret Line="379" Column="13" TopLine="367"/>
       </Position4>
       <Position5>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="379" Column="13" TopLine="367"/>
+        <Caret Line="26" Column="13" TopLine="13"/>
       </Position5>
       <Position6>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="26" Column="13" TopLine="13"/>
+        <Caret Line="320" Column="17" TopLine="317"/>
       </Position6>
       <Position7>
-        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="320" Column="17" TopLine="317"/>
-      </Position7>
-      <Position8>
         <Filename Value="..\..\source\oglcUI.inc"/>
         <Caret Line="132" Column="13" TopLine="118"/>
-      </Position8>
-      <Position9>
+      </Position7>
+      <Position8>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
         <Caret Line="352" Column="31" TopLine="335"/>
-      </Position9>
-      <Position10>
+      </Position8>
+      <Position9>
         <Filename Value="..\..\source\oglcUI.inc"/>
         <Caret Line="109" Column="13" TopLine="96"/>
+      </Position9>
+      <Position10>
+        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
+        <Caret Line="352" Column="31" TopLine="335"/>
       </Position10>
       <Position11>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="352" Column="31" TopLine="335"/>
+        <Caret Line="29" Column="18" TopLine="14"/>
       </Position11>
       <Position12>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="29" Column="18" TopLine="14"/>
+        <Caret Line="352" Column="29" TopLine="342"/>
       </Position12>
       <Position13>
-        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="352" Column="29" TopLine="342"/>
+        <Filename Value="..\..\source\oglcUI.inc"/>
+        <Caret Line="109" Column="13" TopLine="96"/>
       </Position13>
       <Position14>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="109" Column="13" TopLine="96"/>
+        <Caret Line="1667" Column="28" TopLine="1662"/>
       </Position14>
       <Position15>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="1667" Column="28" TopLine="1662"/>
+        <Caret Line="54" Column="12" TopLine="41"/>
       </Position15>
       <Position16>
-        <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="54" Column="12" TopLine="41"/>
+        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
+        <Caret Line="354" Column="18" TopLine="338"/>
       </Position16>
       <Position17>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="354" Column="18" TopLine="338"/>
+        <Caret Line="356" Column="30" TopLine="344"/>
       </Position17>
       <Position18>
-        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="356" Column="30" TopLine="344"/>
+        <Filename Value="..\..\source\oglcUI.inc"/>
+        <Caret Line="109" Column="13" TopLine="96"/>
       </Position18>
       <Position19>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="109" Column="13" TopLine="96"/>
+        <Caret Line="1667" Column="28" TopLine="1662"/>
       </Position19>
       <Position20>
         <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="1667" Column="28" TopLine="1662"/>
+        <Caret Line="54" Column="12" TopLine="41"/>
       </Position20>
       <Position21>
-        <Filename Value="..\..\source\oglcUI.inc"/>
-        <Caret Line="54" Column="12" TopLine="41"/>
+        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
+        <Caret Line="318" TopLine="295"/>
       </Position21>
       <Position22>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="318" TopLine="295"/>
+        <Caret Line="26" Column="18" TopLine="16"/>
       </Position22>
       <Position23>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="26" Column="18" TopLine="16"/>
+        <Caret Line="333" Column="5" TopLine="314"/>
       </Position23>
       <Position24>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="333" Column="5" TopLine="314"/>
+        <Caret Line="45" Column="19" TopLine="36"/>
       </Position24>
       <Position25>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="45" Column="19" TopLine="36"/>
+        <Caret Line="43" Column="48" TopLine="31"/>
       </Position25>
       <Position26>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="43" Column="48" TopLine="31"/>
+        <Caret Line="446" Column="12" TopLine="434"/>
       </Position26>
       <Position27>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="446" Column="12" TopLine="434"/>
+        <Caret Line="46" Column="15" TopLine="28"/>
       </Position27>
       <Position28>
         <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="46" Column="15" TopLine="28"/>
+        <Caret Line="458" Column="3" TopLine="453"/>
       </Position28>
       <Position29>
-        <Filename Value="..\..\source\oglcUIScrollable.inc"/>
-        <Caret Line="458" Column="3" TopLine="453"/>
-      </Position29>
-      <Position30>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="293" Column="21" TopLine="289"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="58" TopLine="29"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

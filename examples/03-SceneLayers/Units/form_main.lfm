@@ -8,13 +8,14 @@ object FormMain: TFormMain
   ClientWidth = 303
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '3.8.0.0'
-  WindowState = wsMaximized
+  OnShow = FormShow
   object Panel1: TPanel
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
@@ -78,9 +79,9 @@ object FormMain: TFormMain
       Width = 136
       Frequency = 20
       Max = 255
-      OnChange = RadioButton1Change
       Position = 255
       ShowSelRange = False
+      OnChange = RadioButton1Change
       TabOrder = 2
     end
     object CheckBox1: TCheckBox

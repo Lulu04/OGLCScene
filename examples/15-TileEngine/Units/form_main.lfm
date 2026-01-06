@@ -8,13 +8,14 @@ object FormMain: TFormMain
   ClientWidth = 374
   Color = clBlack
   DefaultMonitor = dmPrimary
+  LCLVersion = '4.5.0.0'
+  WindowState = wsMaximized
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
-  LCLVersion = '2.2.6.0'
-  WindowState = wsMaximized
+  OnShow = FormShow
   object Panel1: TPanel
     Left = 160
     Height = 147
@@ -25,6 +26,7 @@ object FormMain: TFormMain
     ClientHeight = 147
     ClientWidth = 214
     Color = 13290186
+    ParentBackground = False
     ParentColor = False
     TabOrder = 0
     object Label1: TLabel
@@ -51,19 +53,19 @@ object FormMain: TFormMain
       Frequency = 20
       Max = 1200
       Min = -1200
-      OnChange = TrackBar1Change
       Position = 300
       ShowSelRange = False
+      OnChange = TrackBar1Change
       TabOrder = 0
     end
     object CheckBox1: TCheckBox
       Left = 9
       Height = 19
       Top = 101
-      Width = 99
+      Width = 97
       Caption = 'Show tile sheet'
-      OnChange = TrackBar1Change
       TabOrder = 1
+      OnChange = TrackBar1Change
     end
   end
   object Panel2: TPanel
@@ -75,6 +77,7 @@ object FormMain: TFormMain
     BevelOuter = bvNone
     ClientHeight = 147
     ClientWidth = 160
+    ParentBackground = False
     TabOrder = 1
     object OpenGLControl1: TOpenGLControl
       Left = 24
