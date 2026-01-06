@@ -22,11 +22,13 @@ private
   FReadyToRender: boolean;
 private
   FCallbackSizeChanged: TOGLCEvent;
+  FRect: TRect;
   procedure InitDefault;
   procedure FreeObjects;
   procedure DistributeTheWordsOnTheSurface;
   function GetCaption: string;
   procedure SetAlign(AValue: TOGLCAlignment);
+  procedure SetArea(AValue: TRect);
   procedure SetCaption(AValue: string);
   procedure SetTexturedFont(AValue: TTexturedFont);
   // return True if some words are found on the specified line index.
@@ -42,11 +44,11 @@ private
   procedure ForceDistributeWordsAndAlign;
 public
   Tint: TBGRAParam;
-  Area: TRect;
   DrawingRect: TRect; // real rect area of the text area. TopLeft is relative to Area.
   DrawingSize: TSize; // The real size of the text area
   Words: ArrayOfWord_; // an array that contains info on each word to render.
 
+  property Area: TRect read FRect write SetArea;
   // Initialize this property with the text you want to see in the text area.
   // Separate the lines with #10 character or any kind of LineEnding.
   property Caption: string read GetCaption write SetCaption;
@@ -184,7 +186,7 @@ begin
       // the word fit
       PutWordOnCurrentLine;
       inc(iw);
-    end else begin
+      end else begin
          // the word don't fit
          if CurrentLineIsEmpty then begin
            DoWordWrapOnCurrentLine;
@@ -194,7 +196,7 @@ begin
            DoWordWrapOnCurrentLine;
            inc(iw);
          end;
-    end;
+      end;
     end;
     if xx > DrawingSize.cx then DrawingSize.cx := xx;
   until iw = Length(W);
@@ -212,6 +214,15 @@ begin
   if FAlign = AValue then Exit;
   FAlign := AValue;
   DoAlign;
+end;
+
+procedure TAlignedTextDescriptor.SetArea(AValue: TRect);
+begin
+  if FRect = AValue then Exit;
+  FRect := AValue;
+  DistributeTheWordsOnTheSurface;
+  DoAlign;
+  if FCallbackSizeChanged <> NIL then FCallbackSizeChanged;
 end;
 
 procedure TAlignedTextDescriptor.SetCaption(AValue: string);
