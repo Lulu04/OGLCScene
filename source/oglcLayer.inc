@@ -348,7 +348,8 @@ begin
 
   //for i:=0 to FList.Count-1 do
   for i:=FList.Count-1 downto 0 do
-    TSimpleSurfaceWithEffect(FList.Items[i]).Update(aElapsedTime);
+    with TSimpleSurfaceWithEffect(FList.Items[i]) do
+      if not FKill then Update(aElapsedTime);
 
   // sort the surface
   if FOnSortCompare <> NIL then FList.Sort(FOnSortCompare);
