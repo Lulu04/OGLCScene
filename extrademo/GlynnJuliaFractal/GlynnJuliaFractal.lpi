@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <CompatibilityMode Value="True"/>
+      </Flags>
+      <Title Value="GlynnJuliaFractal"/>
+      <Scaled Value="True"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <BuildNr Value="35"/>
+      <Language Value="040C"/>
+    </VersionInfo>
+    <BuildModes Count="2" Active="Release">
+      <Item1 Name="Debug" Default="True"/>
+      <Item2 Name="Release">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="GlynnJuliaFractal"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir)"/>
+            <OtherUnitFiles Value="Units;..\..\source"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+              <VariablesInRegisters Value="True"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+            <Options>
+              <Win32>
+                <GraphicApplication Value="True"/>
+              </Win32>
+            </Options>
+          </Linking>
+        </CompilerOptions>
+      </Item2>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <RequiredPackages Count="5">
+      <Item1>
+        <PackageName Value="OGLCScenePackage"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LazOpenGLContext"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="BGRABitmapPack"/>
+        <MinVersion Major="9" Valid="True"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="LazUtils"/>
+      </Item4>
+      <Item5>
+        <PackageName Value="LCL"/>
+      </Item5>
+    </RequiredPackages>
+    <Units Count="37">
+      <Unit0>
+        <Filename Value="GlynnJuliaFractal.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="19"/>
+        <UsageCount Value="200"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="Units\form_main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="55"/>
+        <CursorPos X="27" Y="58"/>
+        <UsageCount Value="200"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="Units\screen_demo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="12"/>
+        <CursorPos Y="47"/>
+        <UsageCount Value="204"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\source\OGLCScene.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="164"/>
+        <CursorPos X="11" Y="175"/>
+        <UsageCount Value="95"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="C:\source\oglcPostProcessing.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="289"/>
+        <CursorPos X="45" Y="301"/>
+        <UsageCount Value="56"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="C:\source\oglcType.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="35"/>
+        <CursorPos Y="48"/>
+        <UsageCount Value="89"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="Units\u_common.pas"/>
+        <IsPartOfProject Value="True"/>
+        <TopLine Value="3"/>
+        <CursorPos X="3" Y="14"/>
+        <UsageCount Value="116"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="C:\source\oglcLayer.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="269"/>
+        <CursorPos Y="297"/>
+        <UsageCount Value="17"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="C:\source\oglcRenderToTexture.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="42" Y="6"/>
+        <UsageCount Value="41"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="C:\source\oglcMultiRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1372"/>
+        <CursorPos X="44" Y="1382"/>
+        <UsageCount Value="18"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="C:\source\oglcShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos Y="50"/>
+        <UsageCount Value="42"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="C:\source\oglcUI.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="13" Y="44"/>
+        <UsageCount Value="10"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="25" Y="7"/>
+        <UsageCount Value="178"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="C:\source\oglcSurfaceWithProceduralShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="47" Y="4"/>
+        <UsageCount Value="67"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="C:\source\oglcAppSaveUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="366"/>
+        <CursorPos X="51" Y="377"/>
+        <UsageCount Value="14"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="Units\u_presets.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="5" Y="14"/>
+        <UsageCount Value="48"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="Units\u_export_to_string.pas"/>
+        <ComponentName Value="FormCopyToClipboard"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="91"/>
+        <CursorPos X="74" Y="112"/>
+        <UsageCount Value="82"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="Units\u_presetmanager.pas"/>
+        <ComponentName Value="PresetManager"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="15" Y="60"/>
+        <UsageCount Value="40"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="279"/>
+        <CursorPos X="35" Y="293"/>
+        <UsageCount Value="10"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="C:\lazarus\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="2041"/>
+        <CursorPos X="25" Y="2049"/>
+        <UsageCount Value="6"/>
+      </Unit19>
+      <Unit20>
+        <Filename Value="C:\lazarus\lcl\buttons.pp"/>
+        <UnitName Value="Buttons"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="37" Y="321"/>
+        <UsageCount Value="5"/>
+      </Unit20>
+      <Unit21>
+        <Filename Value="C:\lazarus\lcl\lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="32"/>
+        <CursorPos X="3" Y="45"/>
+        <UsageCount Value="5"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="C:\lazarus\lcl\clipbrd.pp"/>
+        <UnitName Value="Clipbrd"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="205"/>
+        <CursorPos X="3" Y="262"/>
+        <UsageCount Value="10"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="Units\form_importfromforum.pas"/>
+        <ComponentName Value="FormImportPreset"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="45"/>
+        <CursorPos X="48" Y="58"/>
+        <UsageCount Value="52"/>
+      </Unit23>
+      <Unit24>
+        <Filename Value="C:\lazarus\lcl\interfaces\win32\win32memostrings.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="46"/>
+        <CursorPos Y="62"/>
+        <UsageCount Value="7"/>
+      </Unit24>
+      <Unit25>
+        <Filename Value="C:\source\oglcGlow.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="3" Y="220"/>
+        <UsageCount Value="11"/>
+      </Unit25>
+      <Unit26>
+        <Filename Value="C:\source\oglcSpriteTemplate.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="308"/>
+        <CursorPos X="34" Y="313"/>
+        <UsageCount Value="10"/>
+      </Unit26>
+      <Unit27>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\sysutils\sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="69"/>
+        <CursorPos X="10" Y="82"/>
+        <UsageCount Value="7"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="C:\source\oglcUtils.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="133"/>
+        <CursorPos Y="151"/>
+        <UsageCount Value="9"/>
+      </Unit28>
+      <Unit29>
+        <Filename Value="C:\source\oglcVersion.inc"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="24" Y="3"/>
+        <UsageCount Value="9"/>
+      </Unit29>
+      <Unit30>
+        <Filename Value="..\OGLCScene\source\oglcShader.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos Y="52"/>
+        <UsageCount Value="14"/>
+      </Unit30>
+      <Unit31>
+        <Filename Value="..\OGLCScene\source\oglcMultiRendererFactory.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1324"/>
+        <CursorPos Y="1348"/>
+        <UsageCount Value="10"/>
+      </Unit31>
+      <Unit32>
+        <Filename Value="..\OGLCScene\tools\StarNestDesigner\Units\u_procedural_starnest.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="72"/>
+        <CursorPos X="31" Y="94"/>
+        <UsageCount Value="10"/>
+      </Unit32>
+      <Unit33>
+        <Filename Value="..\OGLCScene\tools\CloudDesigner\Units\u_proceduralcloud.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <UsageCount Value="10"/>
+      </Unit33>
+      <Unit34>
+        <Filename Value="..\OGLCScene\source\oglcPostProcessing.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="332"/>
+        <CursorPos X="49" Y="347"/>
+        <UsageCount Value="10"/>
+      </Unit34>
+      <Unit35>
+        <Filename Value="..\OGLCScene\source\oglcType.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="283"/>
+        <CursorPos X="41" Y="288"/>
+        <UsageCount Value="10"/>
+      </Unit35>
+      <Unit36>
+        <Filename Value="..\..\LazComponents\OGLCScene-2.0\source\oglcTexture.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="70"/>
+        <CursorPos X="57" Y="81"/>
+        <UsageCount Value="14"/>
+      </Unit36>
+    </Units>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="96" Column="104" TopLine="74"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="95" Column="104" TopLine="73"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="104" Column="104" TopLine="82"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="39" Column="15" TopLine="21"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="42" Column="52" TopLine="28"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="75" Column="21" TopLine="53"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="89" Column="3" TopLine="87"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="59" Column="3" TopLine="57"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="60" Column="3" TopLine="58"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="61" Column="3" TopLine="59"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="62" Column="3" TopLine="60"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="74" Column="3" TopLine="61"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="73" Column="44" TopLine="57"/>
+      </Position13>
+      <Position14>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="75" Column="44" TopLine="59"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="77" Column="43" TopLine="69"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="76" Column="5" TopLine="68"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="34" Column="24" TopLine="26"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="35" Column="20" TopLine="26"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="198" Column="24" TopLine="175"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="205" Column="24" TopLine="182"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="212" Column="24" TopLine="189"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="295" Column="35" TopLine="292"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="36" Column="19" TopLine="21"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="128" Column="17" TopLine="104"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="404" Column="40" TopLine="390"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="128" Column="21" TopLine="105"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="405" Column="19" TopLine="390"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="133" Column="18" TopLine="116"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="441" Column="30" TopLine="425"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\u_procedural_glynnjulia.pas"/>
+        <Caret Line="534" Column="20" TopLine="516"/>
+      </Position30>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="GlynnJuliaFractal"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="Units;..\OGLCScene\source"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <IncludeAssertionCode Value="True"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <VariablesInRegisters Value="True"/>
+      </Optimizations>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf2Set"/>
+        <UseHeaptrc Value="True"/>
+        <TrashVariables Value="True"/>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="1">
+      <Item1>
+        <Name Value="RunError(201)"/>
+      </Item1>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

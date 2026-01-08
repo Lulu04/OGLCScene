@@ -1,0 +1,230 @@
+object FormMain: TFormMain
+  Left = 576
+  Height = 669
+  Top = 99
+  Width = 1118
+  Caption = 'Boleeman and Lulu: Glynn Set Curve Maker of Julia Fractal'
+  ClientHeight = 669
+  ClientWidth = 1118
+  Color = clBlack
+  DefaultMonitor = dmPrimary
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
+  Position = poWorkAreaCenter
+  LCLVersion = '3.8.0.0'
+  WindowState = wsMaximized
+  object Panel1: TPanel
+    Left = 0
+    Height = 669
+    Top = 0
+    Width = 140
+    Align = alLeft
+    ClientHeight = 669
+    ClientWidth = 140
+    ParentBackground = False
+    ParentColor = False
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 10
+      Height = 15
+      Top = 142
+      Width = 52
+      Caption = 'Iterations:'
+    end
+    object Label2: TLabel
+      Left = 10
+      Height = 15
+      Top = 199
+      Width = 84
+      Caption = 'Min Hue Offset:'
+    end
+    object Label3: TLabel
+      Left = 13
+      Height = 15
+      Top = 474
+      Width = 34
+      Caption = 'Alpha:'
+    end
+    object Label4: TLabel
+      Left = 13
+      Height = 15
+      Top = 530
+      Width = 111
+      Caption = 'Alpha Glow Softness:'
+    end
+    object seIterations: TSpinEdit
+      Left = 10
+      Height = 23
+      Top = 160
+      Width = 60
+      MaxValue = 2047
+      MinValue = 5
+      OnChange = seIterationsChange
+      TabOrder = 0
+      Value = 197
+    end
+    object seMinhueOffset: TSpinEdit
+      Left = 10
+      Height = 23
+      Top = 215
+      Width = 60
+      MaxValue = 250
+      MinValue = 5
+      OnChange = seIterationsChange
+      TabOrder = 1
+      Value = 132
+    end
+    object rgColorModes: TRadioGroup
+      Left = -3
+      Height = 136
+      Top = 3
+      Width = 136
+      AutoFill = True
+      Caption = 'Color Modes'
+      ChildSizing.LeftRightSpacing = 6
+      ChildSizing.EnlargeHorizontal = crsHomogenousChildResize
+      ChildSizing.EnlargeVertical = crsHomogenousChildResize
+      ChildSizing.ShrinkHorizontal = crsScaleChilds
+      ChildSizing.ShrinkVertical = crsScaleChilds
+      ChildSizing.Layout = cclLeftToRightThenTopToBottom
+      ChildSizing.ControlsPerLine = 1
+      ClientHeight = 116
+      ClientWidth = 132
+      ItemIndex = 3
+      Items.Strings = (
+        'RGB Color'
+        'HSL One'
+        'HSL Two'
+        'HSL Three'
+      )
+      OnClick = seIterationsChange
+      OnSelectionChanged = seIterationsChange
+      ParentBackground = False
+      TabOrder = 2
+    end
+    object seAlpha: TSpinEdit
+      Left = 10
+      Height = 23
+      Top = 490
+      Width = 60
+      MaxValue = 255
+      OnChange = seIterationsChange
+      TabOrder = 3
+      Value = 255
+    end
+    object seAlphaExp: TSpinEdit
+      Left = 10
+      Height = 23
+      Top = 545
+      Width = 60
+      MaxValue = 5
+      MinValue = 1
+      OnChange = seIterationsChange
+      TabOrder = 4
+      Value = 1
+    end
+    object seCoeffB: TFloatSpinEdit
+      Left = 10
+      Height = 23
+      Top = 380
+      Width = 60
+      Increment = 0.01
+      MaxValue = 0.9
+      MinValue = 0.3
+      OnChange = seIterationsChange
+      TabOrder = 5
+      Value = 0.6
+    end
+    object seCoeffG: TFloatSpinEdit
+      Left = 10
+      Height = 23
+      Top = 325
+      Width = 60
+      Increment = 0.01
+      MaxValue = 0.9
+      MinValue = 0.3
+      OnChange = seIterationsChange
+      TabOrder = 6
+      Value = 0.6
+    end
+    object seCoeffR: TFloatSpinEdit
+      Left = 10
+      Height = 23
+      Top = 270
+      Width = 60
+      Increment = 0.01
+      MaxValue = 0.9
+      MinValue = 0.3
+      OnChange = seIterationsChange
+      TabOrder = 7
+      Value = 0.6
+    end
+    object seLightness: TFloatSpinEdit
+      Left = 10
+      Height = 23
+      Top = 435
+      Width = 60
+      Increment = 0.01
+      MaxValue = 0.9
+      MinValue = 0.1
+      OnChange = seIterationsChange
+      TabOrder = 8
+      Value = 0.52
+    end
+    object Label5: TLabel
+      Left = 10
+      Height = 15
+      Top = 252
+      Width = 112
+      Caption = 'Saturation Red Coeff:'
+    end
+    object Label6: TLabel
+      Left = 10
+      Height = 15
+      Top = 307
+      Width = 123
+      Caption = 'Saturation Green Coeff:'
+    end
+    object Label7: TLabel
+      Left = 13
+      Height = 15
+      Top = 364
+      Width = 115
+      Caption = 'Saturation Blue Coeff:'
+    end
+    object Label8: TLabel
+      Left = 12
+      Height = 15
+      Top = 418
+      Width = 117
+      Caption = 'Lightness Decimal Val:'
+    end
+  end
+  object Panel2: TPanel
+    AnchorSideLeft.Control = Panel1
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 140
+    Height = 669
+    Top = 0
+    Width = 978
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 669
+    ClientWidth = 978
+    ParentBackground = False
+    TabOrder = 1
+    object OpenGLControl1: TOpenGLControl
+      Left = 94
+      Height = 75
+      Top = 77
+      Width = 73
+      DepthBits = 32
+    end
+  end
+end
