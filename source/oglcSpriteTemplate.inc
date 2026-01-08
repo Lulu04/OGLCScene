@@ -241,9 +241,9 @@ public
 end;
 
 
-{ TSpriteOnPathToFollow }
+{ TSpriteOnPath }
 // a sprite that moves along a TOGLCPathToFollow instance
-TSpriteOnPathToFollow = class(TSprite)
+TSpriteOnPath = class(TSprite)
 private
   FAutoRotate: boolean;
   FAngleAdjust,
@@ -270,6 +270,7 @@ public
   //   1 -> the sprite is below the path
   property CoeffPositionOnPath: single read FCoeffPositionOnPath write SetCoeffPositionOnLine;
 end;
+TSpriteOnPathToFollow = TSpriteOnPath deprecated 'use TSpriteOnPath instead';
 
 { TOGLCPathDrawing }
 
@@ -922,9 +923,9 @@ begin
   Border.InitFromPath(FPath, Border.Width);
 end;
 
-{ TSpriteOnPathToFollow }
+{ TSpriteOnPath }
 
-constructor TSpriteOnPathToFollow.CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture;
+constructor TSpriteOnPath.CreateAsChildOf(aPathToFollow: TOGLCPathToFollow; ATexture: PTexture;
   Owner: boolean; aZOrder: integer);
 begin
   inherited Create(ATexture, Owner);
@@ -934,23 +935,23 @@ begin
   FCoeffPositionOnPath := 0.5;
 end;
 
-destructor TSpriteOnPathToFollow.Destroy;
+destructor TSpriteOnPath.Destroy;
 begin
   DistanceTraveled.Free;
   DistanceTraveled := NIL;
   inherited Destroy;
 end;
 
-procedure TSpriteOnPathToFollow.SetCoeffPositionOnLine(AValue: single);
+procedure TSpriteOnPath.SetCoeffPositionOnLine(AValue: single);
 begin
   FCoeffPositionOnPath := EnsureRange(AValue, 0.0, 1.0);
 end;
 
-procedure TSpriteOnPathToFollow.Draw(const aLayerPercentOpacity: single);
+procedure TSpriteOnPath.Draw(const aLayerPercentOpacity: single);
 var m: TOGLCMatrix;
   fi: Int64;
-  pos: TPointF;
-  ang, yOffset: single;
+  //pos: TPointF;
+ { ang,} yOffset: single;
 begin
   FComputedOpacity := aLayerPercentOpacity*Opacity.Value*OneDiv255;
   if FComputedOpacity = 0 then exit;
@@ -965,15 +966,18 @@ begin
   end;
 
   if FTexture <> NIL then begin
-    yOffset := FTexture^.FrameHeight - FTexture^.FrameHeight*FCoeffPositionOnPath;
-    TOGLCPathToFollow(FParentSurface).GetPosAndAngle(DistanceTraveled.Value, pos, ang);
+    //TOGLCPathToFollow(FParentSurface).GetPosAndAngle(DistanceTraveled.Value, pos, ang);
     m.CopyFrom(FParentScene.ModelViewMatrix);
-    with m do begin
+    m.AddTransform(X.Value, Y.Value, Scale.x.Value, Scale.y.Value,
+                   Angle.Value, Width*Pivot.x, Height*Pivot.y);
+    yOffset := FTexture^.FrameHeight*0.5 - FTexture^.FrameHeight*FCoeffPositionOnPath;
+    m.Translate(0, yOffset);
+  {  with m do begin
       Translate(pos.x, pos.y);
       Scale(Self.Scale.x.Value, Self.Scale.y.Value);
       if FAutoRotate then Rotate(ang + FAngleAdjust);
       Translate(0, -yOffset);
-    end;
+    end; }
 
     fi := EnsureRange(Trunc(Frame), 0, High(FTexture^.FramesCoord));
     FParentScene.TexturedMVTriangleRenderer.Prepare(ptTriangleStrip, FTexture, 0, FBlendMode);
@@ -990,7 +994,7 @@ begin
   end;
 end;
 
-procedure TSpriteOnPathToFollow.Update(const aElapsedTime: single);
+procedure TSpriteOnPath.Update(const aElapsedTime: single);
 var p: TPointF;
   a: single;
 begin
