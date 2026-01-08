@@ -44,7 +44,7 @@ object FormMain: TFormMain
       Width = 129
       Frequency = 10
       Max = 100
-      Position = 0
+      Position = 50
       ShowSelRange = False
       OnChange = TrackBar1Change
       TabOrder = 0
@@ -64,7 +64,7 @@ object FormMain: TFormMain
       Width = 129
       Frequency = 10
       Max = 100
-      Position = 0
+      Position = 50
       ShowSelRange = False
       OnChange = TrackBar1Change
       TabOrder = 1

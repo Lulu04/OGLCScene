@@ -22,15 +22,15 @@ private
   FtexWarning: PTexture;
 
   FPathToFollow: TOGLCPathToFollow;   // the container for the path
-  FSpriteOnPath: TSpriteOnPathToFollow;    // a sprite specialized to follow a path
-  FTextOnPath: TFreeTextOnPathToFollow;  // a text object specialized to follow a path
+  FSpriteOnPath: TSpriteOnPath;    // a sprite specialized to follow a path
+  FTextOnPath: TFreeTextOnPath;  // a text object specialized to follow a path
 
 public
   procedure CreateObjects; override;
   procedure FreeObjects; override;
 
-  property SpriteOnPath: TSpriteOnPathToFollow read FSpriteOnPath;
-  property TextOnPath: TFreeTextOnPathToFollow read FTextOnPath;
+  property SpriteOnPath: TSpriteOnPath read FSpriteOnPath;
+  property TextOnPath: TFreeTextOnPath read FTextOnPath;
 end;
 
 var ScreenDemo: TScreenDemo = NIL;
@@ -85,18 +85,20 @@ begin
   FPathToFollow.Loop := True;          // the sprite/text jump from the end to the begin
   FPathToFollow.Border.Color := BGRA(50,50,50);
 
+
   // Creation of the sprite warning: the sprite is created as child of the path
-  FSpriteOnPath := TSpriteOnPathToFollow.CreateAsChildOf(FPathToFollow, FtexWarning, False);
+  FSpriteOnPath := TSpriteOnPath.CreateAsChildOf(FPathToFollow, FtexWarning, False);
   FSpriteOnPath.DistanceTraveled.AddConstant(300);  // the sprite moves on the path by 300 pixels/sec
-  FSpriteOnPath.CoeffPositionOnPath := 0;
+  FSpriteOnPath.CoeffPositionOnPath := 0.5;
 
   // Creation of the text
-  FTextOnPath := TFreeTextOnPathToFollow.CreateAsChildOf(FPathToFollow);
+  FTextOnPath := TFreeTextOnPath.CreateAsChildOf(FPathToFollow);
   FTextOnPath.TexturedFont := FtexFont;
   FTextOnPath.Caption := 'Love turns man into an ocean of happiness, an image of peace, a temple of wisdom. '+
                          'Love is every man''s very Self, his true beauty, and the glory of his human existence. Swami Muktananda';
   FTextOnPath.Tint.Value := BGRA(255,255,0);
   FTextOnPath.DistanceTraveled.AddConstant(-50);  // the text moves on the path by 50 pixels/sec
+  FTextOnPath.CoeffPositionOnPath := 0.5;
 end;
 
 procedure TScreenDemo.FreeObjects;
