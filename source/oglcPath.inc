@@ -40,7 +40,10 @@ TOGLCPathHelper = type helper for TOGLCPath
   procedure LoadFromString(const data: string);
 
   function SaveNormalizedToString(aWidth, aHeight: single): string;
-  procedure LoadNormalizedFromStringAndExpand(const data: string; aWidth, aHeight: single);
+  procedure LoadNormalizedFromStringAndExpand(const data: string;
+                                              aWidth, aHeight: single;
+                                              aUseSpline: boolean;
+                                              aSplineStyle: TSplineStyle);
 end;
 
 
@@ -413,14 +416,18 @@ begin
   end;
 end;
 
-procedure TOGLCPathHelper.LoadNormalizedFromStringAndExpand(const data: string; aWidth, aHeight: single);
+procedure TOGLCPathHelper.LoadNormalizedFromStringAndExpand(const data: string; aWidth, aHeight: single;
+  aUseSpline: boolean; aSplineStyle: TSplineStyle);
 var i: integer;
 begin
   LoadFromString(data);
+
   for i:=0 to High(Self) do begin
     Self[i].x := Self[i].x * aWidth;
     Self[i].y := Self[i].y * aHeight;
   end;
+
+  if aUseSpline then ConvertToSpline(aSplineStyle);
 end;
 
 { TPathToFollow }
