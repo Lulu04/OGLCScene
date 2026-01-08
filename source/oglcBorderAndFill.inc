@@ -367,6 +367,7 @@ begin
   FThreshold2 := FThreshold1;
   FVisible := True;
   FBorderPosition := lpInside;
+  FBlendMode := FX_BLEND_NORMAL;
 end;
 
 procedure TOGLCBorder.InitFromPath(const aPath: ArrayOfTPointF; w: single);
