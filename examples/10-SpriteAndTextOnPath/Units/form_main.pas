@@ -111,9 +111,15 @@ begin
   if Sender = TrackBar2 then
     ScreenDemo.TextOnPath.CoeffPositionOnPath := TrackBar2.Position*0.01;
 
-  if Sender = CheckBox1 then ScreenDemo.SpriteOnPath.AutoRotate := CheckBox1.Checked;
+  if Sender = CheckBox1 then begin
+    ScreenDemo.SpriteOnPath.AutoRotate := CheckBox1.Checked;
+    if not CheckBox1.Checked then ScreenDemo.SpriteOnPath.Angle.Value := 0;
+  end;
 
-  if Sender = CheckBox2 then ScreenDemo.TextOnPath.AutoRotate := CheckBox2.Checked;
+  if Sender = CheckBox2 then begin
+    ScreenDemo.TextOnPath.AutoRotate := CheckBox2.Checked;
+    if not CheckBox2.Checked then ScreenDemo.TextOnPath.Angle.Value := 0;
+  end;
 end;
 
 procedure TFormMain.LoadCommonData;
