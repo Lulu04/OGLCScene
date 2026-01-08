@@ -322,10 +322,10 @@ begin
 end;
 
 procedure TFreeTextOnPath.Draw(const aLayerPercentOpacity: single);
-var i, j, yOffset, flipIndex: integer;
+var i, j, flipIndex, yOffset: integer;
   m: TOGLCMatrix;
   pos: TPointF;
-  ang, dist, spacingCoef: single;
+  lineY, ang, dist, spacingCoef: single;
   ch: PTexturedChar;
 begin
   if (FSize.cx = 0) or (FTexturedFont = NIL) then exit;
@@ -346,26 +346,29 @@ begin
 
   flipIndex := FlipToIndex;
   spacingCoef := FTexturedFont.CharSpacingCoeff.Value;
-  dist := DistanceTraveled.Value;
-  yOffset := FTexturedFont.Font.FontPixelMetric.Baseline;
-  yOffset := yOffset - Round(yOffset*FCoeffPositionOnPath);
+
+  yOffset := FTexturedFont.Font.FontPixelMetric.Baseline -
+             Round(FTexturedFont.Font.FontHeight*FCoeffPositionOnPath);
 
   for i:=0 to High(FCharIndexes) do begin
-     for j:=0 to High(FCharIndexes[i]) do begin
+    lineY := FTexturedFont.Font.FontHeight*i;
+    dist := DistanceTraveled.Value;
+    for j:=0 to High(FCharIndexes[i]) do begin
       ch := FTexturedFont.GetCharByIndex(FCharIndexes[i][j]);
       if ch <> NIL then begin
         TOGLCPathToFollow(FParentSurface).GetPosAndAngle(dist, pos, ang);
+        if not AutoRotate then ang := Angle.Value;
         m.CopyFrom(FParentScene.ModelViewMatrix);
         with m do begin
-          Translate(pos.x, pos.y + FTexturedFont.Font.FontHeight*i);
+          Translate(pos.x, pos.y + lineY);
           Scale(Self.Scale.x.Value, Self.Scale.y.Value);
           if FAutoRotate then Rotate(ang + FAngleAdjust);
         end;
+
         FTexturedFont.DrawChar(FCharIndexes[i][j], 0, -yOffset, flipIndex, NIL, @m.Matrix, FComputedOpacity, FComputedTint, FBlendMode);
         dist := dist + ch^.OriginalCharSize.cx * spacingCoef * Scale.x.Value;
       end;
     end;
-    dist := DistanceTraveled.Value;
   end;
 
   // render childs with positive ZOrder
