@@ -667,7 +667,6 @@ begin
 
   ima := TBGRABitmap.Create(1,1);
   SetFontRendererOn(ima);
-  FontPixelMetric := ima.FontPixelMetric;
   ima.Free;
 end;
 
@@ -710,7 +709,6 @@ begin
 
   ima := TBGRABitmap.Create(1,1);
   SetFontRendererOn(ima);
-  FontPixelMetric := ima.FontPixelMetric;
   ima.Free;
 end;
 
@@ -877,6 +875,7 @@ begin
     renderer.OutlineColor := Self.OutLineColor;
     renderer.OuterOutlineOnly := True;
   end;
+  FontPixelMetric := renderer.GetFontPixelMetric;
 {  end else begin
     if UseShadow or UseOutLine then begin
       renderer := TBGRATextEffectFontRenderer.Create;
