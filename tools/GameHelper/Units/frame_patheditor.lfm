@@ -238,10 +238,10 @@ object FramePathEditor: TFramePathEditor
       Left = 7
       Height = 15
       Top = 282
-      Width = 67
+      Width = 62
       BorderSpacing.Left = 7
       BorderSpacing.Top = 15
-      Caption = 'Panel name:'
+      Caption = 'Path name:'
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False

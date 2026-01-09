@@ -103,6 +103,13 @@ begin
   PathBank.Save;
   Modified := False;
 
+  // remove old variable initialization
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableName);
+
+  // create the variable in unit u_common and generate the code to initialize it
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableName, 'TOGLCPath');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeVariable);
+
   FormMain.ShowPagePathBank;
 end;
 

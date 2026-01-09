@@ -58,7 +58,7 @@ type
 
 implementation
 
-uses u_screen_patheditor, u_common, form_main, Graphics;
+uses u_screen_patheditor, u_common, form_main, u_project, Graphics;
 
 {$R *.lfm}
 
@@ -258,13 +258,26 @@ begin
 end;
 
 procedure TFramePathBank.DoRenameSelected;
-var oldName, newName: string;
+var oldName, newName, oldVariableName: string;
+  item: TPathDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPath then exit;
 
   oldName := TV.Selected.Text;
+  item := PathBank.GetByName(oldName);
+  if item = NIL then exit;
+  oldVariableName := item.VariableName;
+
   if not PathBank.DoRenameByName(oldName, newName, True) then exit;
+
+  // remove old variable declaration and initialization
+  Project.Config.TargetLazarusProject.UCommonRemoveVar(oldVariableName);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(oldVariableName);
+
+  // create the variable in unit u_common and generate the code to initialize it
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableName, 'TOGLCPath');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeVariable);
 
   // change name in treeview
   TV.Selected.Text := newName;
@@ -272,9 +285,13 @@ end;
 
 procedure TFramePathBank.DoDuplicateSelected;
 var dstName: string;
+  item: TPathDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPath then exit;
+
+  item := PathBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
 
   if not PathBank.DoDuplicateByName(TV.Selected.Text, dstName, True) then exit;
   // add the new name in the treeview
@@ -283,16 +300,30 @@ begin
     SelectedIndex := 12;
     MakeVisible;
   end;
+
+  // create the variable in unit u_common and generate the code to initialize it
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableName, 'TOGLCPath');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeVariable);
 end;
 
 procedure TFramePathBank.DoDeleteSelected;
+var varName: string;
+  item: TPathDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPath then exit;
 
+  item := PathBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
+  varName := item.VariableName;
+
   if not PathBank.DoDeleteByName(TV.Selected.Text, True) then exit;
   // delete in treeview
   TV.Items.Delete(TV.Selected);
+
+  // remove variable declaration and initialization
+  Project.Config.TargetLazarusProject.UCommonRemoveVar(varName);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(varName);
 
   UpdatePreview;
 end;

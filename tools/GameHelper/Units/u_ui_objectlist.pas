@@ -81,17 +81,19 @@ TFontDescriptorItem = class(TItemWithName)
   // copy only FD, not the name
   procedure DuplicateTo(aItem: Pointer); override;
 
-  // return FTexturedFont_<_Name>
+  // return texturedfont<_Name>
   function VariableNameForTexturedFont: string;
+  // return  charset<_Name>
+  function VariableNameForCharset: string;
   // return fontdescriptor<_Name>
   function VariableNameForFD: string;
   // return gradient<_Name>
   function VariableNameForFontGradient: string;
 
   // declare the fd variable and if needed the gradient variable (without 'var')
-//  function PascalCodeToDeclareVariables: string;
   function PascalCodeToInitializeGradientVariable: string;
   function PascalCodeToInitializeFDVariable: string;
+  function PascalCodeToInitializeCharsetVariable: string;
   function PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean): string;
 end;
 
@@ -149,6 +151,15 @@ TPathDescriptorItem = class(TItemWithName)
   function SaveToString: string; override;
   procedure LoadFromString(const data: string); override;
   procedure DuplicateTo(aItem: Pointer); override;
+
+  // aItemData is the string returned by SaveToString
+  function ItemDataToExpandedPath(const aItemData: string; aWidth, aHeight: integer): TOGLCPath;
+
+  // return oglcpath<_Name>
+  function VariableName: string;
+  // return VariableName := '<PathData>';
+  function PascalCodeToInitializeVariable: string;
+
 end;
 
 { TPathBank }
@@ -187,12 +198,13 @@ var prop: TProperties;
   i: integer;
   s: string;
 begin
+  s := '';
   prop.Init('&');
   prop.Add('Name', _Name);
   prop.Add('Data', FD.SaveToString);
   prop.Add('UseCharset', UseCharsetPreset);
   if Length(CharsetPresets) > 0 then begin
-    s.Join(' ', CharsetPresets);
+    s := s.Join(' ', CharsetPresets);
     prop.Add('Charsets', s);
   end;
   if TextToCharSet <> '' then prop.Add('TextToCharSet', TextToCharSet, True);
@@ -228,6 +240,11 @@ begin
   Result := 'texturedfont'+_Name;
 end;
 
+function TFontDescriptorItem.VariableNameForCharset: string;
+begin
+  Result := 'charset'+_Name;
+end;
+
 function TFontDescriptorItem.VariableNameForFD: string;
 begin
   Result := 'fontdescriptor'+_Name;
@@ -237,13 +254,6 @@ function TFontDescriptorItem.VariableNameForFontGradient: string;
 begin
   Result := 'gradient'+_Name;
 end;
-
-{function TFontDescriptorItem.PascalCodeToDeclareVariables: string;
-begin
-  Result := '  fd'+_Name+': TFontDescriptor;';
-  if FD.UseGradient then
-    Result := Result + #10'  '+VariableNameForFontGradient+': TFontGradient';
-end;  }
 
 function TFontDescriptorItem.PascalCodeToInitializeGradientVariable: string;
 begin
@@ -276,6 +286,21 @@ begin
          FD.ShadowRadius.ToString;
 
   Result := Result + ');';
+end;
+
+function TFontDescriptorItem.PascalCodeToInitializeCharsetVariable: string;
+var i: integer;
+begin
+  Result := '  '+VariableNameForCharset+' := ';
+  if UseCharsetPreset then begin
+    for i:=0 to High(CharsetPresets) do begin
+      Result := Result + 'FScene.Charsets.'+CharsetPresets[i];
+      if i < High(CharsetPresets) then Result := Result + '+';
+    end;
+    Result := Result+';';
+  end else begin
+    Result := Result + 'FScene.Charsets.TextToCharset('''+TextToCharSet+''');';
+  end;
 end;
 
 function TFontDescriptorItem.PascalCodeToAddTexturedFontToAtlas(aGenerateVariableName: boolean): string;
@@ -466,6 +491,30 @@ begin
   TPathDescriptorItem(aItem).UseSpline := UseSpline;
   TPathDescriptorItem(aItem).SplineStyle := SplineStyle;
   TPathDescriptorItem(aItem).PathData := PathData;
+end;
+
+function TPathDescriptorItem.ItemDataToExpandedPath(const aItemData: string;
+  aWidth, aHeight: integer): TOGLCPath;
+begin
+  LoadFromString(aItemData);
+
+  Result := NIL;
+  Result.LoadFromString(PathData);
+  Result.ExpandNormalizedTo(aWidth, aHeight);
+  if UseSpline then
+    Result.ConvertToSpline(SplineStyle);
+end;
+
+function TPathDescriptorItem.VariableName: string;
+begin
+  Result := 'oglcpath'+_Name;
+end;
+
+function TPathDescriptorItem.PascalCodeToInitializeVariable: string;
+var s: string;
+begin
+  WriteStr(s, SplineStyle);
+  Result := '  '+VariableName+'.LoadNormalizedFromStringAndExpand('''+PathData+''', FScene.Width, FScene.Height, '+CodeGen.BooleanToPascal(UseSpline)+', '+s+');';
 end;
 
 { TPathBank }

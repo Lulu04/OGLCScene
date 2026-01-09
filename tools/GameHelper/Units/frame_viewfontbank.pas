@@ -34,7 +34,6 @@ type
     ColorButton4: TColorButton;
     CBGradientType: TComboBox;
     Edit1: TEdit;
-    FD1: TFontDialog;
     FSE1: TFloatSpinEdit;
     GroupBox1: TGroupBox;
     Label1: TLabel;
@@ -204,6 +203,12 @@ begin
   if nam = '' then exit;
   if not IsValidPascalVariableName(nam, True) then exit;
 
+  if (RadioButton1.Checked and (Length(WidgetToCharsetPresets)  = 0)) or
+     (RadioButton2.Checked and (Memo1.Text = '')) then begin
+    ShowMessage('Please, define a charset...');
+    exit;
+  end;
+
   res := mrNone;
   if SelectedIsFont and (TV.Selected.Text = nam) then begin
     res := QuestionDlg('', sOverwriteTheSelectedFont, mtWarning,
@@ -240,6 +245,7 @@ begin
   // remove old variable initialization
   Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableNameForFontGradient);
   Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableNameForFD);
+  Project.Config.TargetLazarusProject.UCommonRemoveVarInitialization(item.VariableNameForCharset);
 
   // create the variables in unit u_common and generate the code to initialize them
   if item.FD.UseGradient then begin
@@ -248,6 +254,10 @@ begin
   end;
   Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForFD, 'TFontDescriptor');
   Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeFDVariable);
+
+  Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForCharset, 'string');
+  Project.Config.TargetLazarusProject.UCommonAddVarInitialization(item.PascalCodeToInitializeCharsetVariable);
+
   Project.Config.TargetLazarusProject.UCommonAddVar(item.VariableNameForTexturedFont, 'TTexturedFont');
 
 end;
@@ -292,6 +302,7 @@ begin
   Memo2.Clear;
   for i:=0 to CheckListBox1.Count-1 do
     if CheckListBox1.Checked[i] then Memo2.Lines.Add(FScene.Charsets.GetByName(CheckListBox1.Items.Strings[i]));
+
 end;
 
 procedure TFrameViewFontBank.PBMouseDown(Sender: TObject; Button: TMouseButton;
@@ -373,7 +384,6 @@ begin
 
   Memo1.Enabled := RadioButton2.Checked;
   if not FInitializing then UpdatePreview;
-
 end;
 
 procedure TFrameViewFontBank.SE1Change(Sender: TObject);
