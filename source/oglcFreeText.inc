@@ -347,8 +347,8 @@ begin
   flipIndex := FlipToIndex;
   spacingCoef := FTexturedFont.CharSpacingCoeff.Value;
 
-  yOffset := FTexturedFont.Font.FontPixelMetric.Baseline -
-             Round(FTexturedFont.Font.FontHeight*FCoeffPositionOnPath);
+  yOffset := FTexturedFont.Font.FontHeight;
+  yOffset := Round(yOffset - yOffset * FCoeffPositionOnPath);
 
   for i:=0 to High(FCharIndexes) do begin
     lineY := FTexturedFont.Font.FontHeight*i;
@@ -357,12 +357,13 @@ begin
       ch := FTexturedFont.GetCharByIndex(FCharIndexes[i][j]);
       if ch <> NIL then begin
         TOGLCPathToFollow(FParentSurface).GetPosAndAngle(dist, pos, ang);
-        if not AutoRotate then ang := Angle.Value;
+        if not AutoRotate then ang := Angle.Value
+          else ang := ang + FAngleAdjust;
         m.CopyFrom(FParentScene.ModelViewMatrix);
         with m do begin
-          Translate(pos.x, pos.y + lineY);
+          Translate(pos.x-ch^.OriginalCharSize.cx*0.5, pos.y + lineY);
           Scale(Self.Scale.x.Value, Self.Scale.y.Value);
-          if FAutoRotate then Rotate(ang + FAngleAdjust);
+          Rotate(ang);
         end;
 
         FTexturedFont.DrawChar(FCharIndexes[i][j], 0, -yOffset, flipIndex, NIL, @m.Matrix, FComputedOpacity, FComputedTint, FBlendMode);
