@@ -181,7 +181,7 @@ var t: TStringList;
   codeop: TSpriteCodeGenerationOptions;
   i, j, c: integer;
   s, sx, sy: string;
-  rootItem, current, _parent: PSurfaceDescriptor;
+  rootItem, current, _parent, surfItem: PSurfaceDescriptor;
   bodyItem: PBodyItem;
   pt: TPostureValues;
   pf: TPointF;
@@ -353,6 +353,15 @@ begin
       'TDeformationGrid': begin
         t.Add('  inherited Create('+rootItem^.textureName + ', False);');
       end;
+      'TOGLCPathToFollow': begin
+        t.Add('  inherited Create(FScene);');
+      end;
+      'TSpriteOnPath': begin
+        raise exception.create('TSpriteOnPath can not be the root surface');
+      end;
+      'TFreeTextOnPath': begin
+        raise exception.create('TFreeTextOnPath can not be the root surface');
+      end;
       'TFreeText': begin
         t.Add('  inherited Create(FScene);');
       end;
@@ -392,17 +401,25 @@ begin
         'TQuad4Color': t.Add('  '+current^.name+' := TQuad4Color.Create(FScene);');
         'TGradientRectangle': t.Add('  '+current^.name+' := TGradientRectangle.Create(FScene);');
         'TDeformationGrid': t.Add('  '+current^.name+' := TDeformationGrid.Create('+current^.textureName+', False);');
+        'TOGLCPathToFollow': t.Add('  '+current^.name+' := TOGLCPathToFollow.Create(FScene);');
+        'TSpriteOnPath': begin
+          surfItem := surfaceList.GetItemByID(current^.parentID);
+          t.Add('  '+current^.name+' := TSpriteOnPath.CreateAsChildOf('+surfItem^.name+', '+current^.textureName+', False, '+current^.zOrder.ToString+');');
+        end;
         'TFreeText': t.Add('  '+current^.name+' := TFreeText.Create(FScene);');
         'TFreeTextClock': t.Add('  '+current^.name+' := TFreeTextClock.Create(FScene, '+CodeGen.BooleanToPascal(current^.ClockStartPaused)+');');
         'TFreeTextAligned': begin
           fontItem := FontBank.GetByName(current^.FontDescriptorName);
           t.Add('  '+current^.name+' := TFreeTextAligned.Create(FScene, '+fontItem.VariableNameForTexturedFont+
-              ', ScaleW('+rootItem^.width.ToString+'), ScaleH('+rootItem^.height.ToString+'));');
+              ', ScaleW('+current^.width.ToString+'), ScaleH('+current^.height.ToString+'));');
+        end;
+        'TFreeTextOnPath': begin
+          surfItem := surfaceList.GetItemByID(current^.parentID);
+          t.Add('  '+current^.name+' := TFreeTextOnPath.CreateAsChildOf('+surfItem^.name+', '+current^.zOrder.ToString+');');
         end
         else raise exception.create('forgot to implement '+current^.classtype.ClassName);
       end;
 
-      t.Add(s);
       // set child dependency and values
       _parent := surfaceList.GetItemByID(current^.parentID);
       if rootItem = NIL then begin
@@ -441,6 +458,7 @@ begin
       if i < surfaceList.Size-1 then t.Add('');
     end;//for
 
+    t.Add('');
     // create collision bodies
     if bodyList.Size > 0 then begin
       t.Add('  // Collision body');

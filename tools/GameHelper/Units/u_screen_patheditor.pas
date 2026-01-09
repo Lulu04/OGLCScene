@@ -361,7 +361,9 @@ begin
     if item = NIL then exit;
 
     Path := NIL;
-    Path.LoadNormalizedFromStringAndExpand(item.PathData, Project.Config.SceneWidth, Project.Config.SceneHeight);
+    Path.LoadNormalizedFromStringAndExpand(item.PathData,
+                                           Project.Config.SceneWidth, Project.Config.SceneHeight,
+                                           False, item.SplineStyle);
     UpdateCurves;
     FramePathEditor.EditPathFromBank(item);
     FormMain.ShowPagePathEditor;

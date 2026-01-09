@@ -327,10 +327,12 @@ end;
 
 procedure TFormMain.FormShow(Sender: TObject);
 begin
-  if not FScene.OpenGLLibLoaded then
+  if not FScene.OpenGLLibLoaded then begin
     ShowMessage('ERROR: OpenGL library could not be loaded...'+LineEnding+
                 'Check if your system is compatible with OpenGL 3.3 core'+LineEnding+
                 'and if the library is well installed on your computer');
+    Close;
+  end;
 end;
 
 procedure TFormMain.OGLMouseDown(Sender: TObject; Button: TMouseButton;

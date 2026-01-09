@@ -46,6 +46,8 @@ type
     BZoomAll: TSpeedButton;
     BZoomOnSelection: TSpeedButton;
     CBAlignReference: TComboBox;
+    CBBorder: TColorButton;
+    CBBorderVisible: TCheckBox;
     CBParent: TComboBox;
     CBChildType: TComboBox;
     CBTextures: TComboBox;
@@ -57,6 +59,8 @@ type
     CheckBox4: TCheckBox;
     CheckBox5: TCheckBox;
     CheckBox6: TCheckBox;
+    CheckBox7: TCheckBox;
+    CheckBox8: TCheckBox;
     ColorButton1: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
@@ -65,21 +69,43 @@ type
     CBBlend: TComboBox;
     ComboBox1: TComboBox;
     ComboBox2: TComboBox;
-    ComboBox3: TComboBox;
     ComboBox4: TComboBox;
     ComboBox5: TComboBox;
+    ComboBox6: TComboBox;
+    ComboBox7: TComboBox;
     Edit2: TEdit;
     Edit3: TEdit;
     Edit4: TEdit;
     Edit5: TEdit;
-    Edit6: TEdit;
+    FSEBorderWidth: TFloatSpinEdit;
+    Label62: TLabel;
+    Label64: TLabel;
+    Label65: TLabel;
     Label70: TLabel;
     Label71: TLabel;
+    Label72: TLabel;
     Label73: TLabel;
+    Label74: TLabel;
+    Label75: TLabel;
+    Label76: TLabel;
+    Label77: TLabel;
+    Label78: TLabel;
+    Label79: TLabel;
+    Label80: TLabel;
     Memo1: TMemo;
+    Memo2: TMemo;
+    PageTSpriteOnPath: TPage;
+    PageControl3: TPageControl;
+    PageTOGLCPathToFollow: TPage;
     PageControl1: TPageControl;
+    PageControl2: TPageControl;
     PageTFreeTextAligned: TPage;
+    Panel2: TPanel;
     Panel21: TPanel;
+    Panel22: TPanel;
+    Panel23: TPanel;
+    Panel24: TPanel;
+    Panel25: TPanel;
     RadioButton3: TRadioButton;
     RadioButton4: TRadioButton;
     RadioGroup2: TRadioGroup;
@@ -144,9 +170,7 @@ type
     Label6: TLabel;
     Label60: TLabel;
     Label61: TLabel;
-    Label62: TLabel;
     Label63: TLabel;
-    Label64: TLabel;
     Label66: TLabel;
     Label67: TLabel;
     Label68: TLabel;
@@ -232,7 +256,13 @@ type
     SE41: TFloatSpinEdit;
     SE43: TSpinEdit;
     SE44: TSpinEdit;
+    SE45: TFloatSpinEdit;
+    SE46: TFloatSpinEdit;
+    SE47: TSpinEdit;
+    SE48: TSpinEdit;
+    SE49: TFloatSpinEdit;
     SE5: TFloatSpinEdit;
+    SE50: TFloatSpinEdit;
     SE6: TFloatSpinEdit;
     SE7: TFloatSpinEdit;
     SE8: TSpinEdit;
@@ -245,6 +275,7 @@ type
     BUpdateposture: TSpeedButton;
     BReverseAngle: TSpeedButton;
     BResetPos: TSpeedButton;
+    SEBorderAlpha: TSpinEdit;
     SEDummy: TSpinEdit;
     SpeedButton1: TSpeedButton;
     SpeedButton10: TSpeedButton;
@@ -266,6 +297,10 @@ type
     SE17: TSpinEdit;
     PageSave: TTabSheet;
     TabSheet1: TTabSheet;
+    PageTFreeTextOnPathParam: TTabSheet;
+    PageTFreeTextOnPathText: TTabSheet;
+    PageBorder: TTabSheet;
+    PagePath: TTabSheet;
     TabSheet3: TTabSheet;
     procedure ArrowUpClick(Sender: TObject);
     procedure BAddPostureToListClick(Sender: TObject);
@@ -302,6 +337,8 @@ type
     function CBToTextureName: string;
     procedure ParentIDToCB(aID: integer);
     function CBToParentID: integer;
+    function WidgetToPathToFollowBorderData: string;
+    procedure PathToFollowBorderDataToWidget(const aBorderData: string);
     function CheckChildWidgets: boolean;
     function DoAddNewChild: boolean;
     procedure DoUpdateChild(aForceRecreateSurface: boolean);
@@ -731,6 +768,8 @@ begin
         'TFreeTextOnPath': Edit5.Text := Surfaces.GetUniqueName('FreeTextOnPath');
         'TFreeTextClock': Edit5.Text := Surfaces.GetUniqueName('FreeTextClock');
         'TFreeTextAligned': Edit5.Text := Surfaces.GetUniqueName('FreeTextAligned');
+        'TOGLCPathToFollow': Edit5.Text := Surfaces.GetUniqueName('OGLCPathToFollow');
+        'TSpriteOnPath': Edit5.Text := Surfaces.GetUniqueName('SpriteOnPath');
       end;
     end;
     if FWorkingChild <> NIL then begin
@@ -749,6 +788,8 @@ begin
       SE27.Value := FWorkingChild^.height;
       SE28.Value := FWorkingChild^.width;
       SE29.Value := FWorkingChild^.height;
+      SE47.Value := FWorkingChild^.width;
+      SE48.Value := FWorkingChild^.height;
       FInitializingWidget := False;
     end;
   end;
@@ -777,6 +818,8 @@ begin
       SE25.Value := texItem^.GetTextureHeight;
       SE26.Value := texItem^.GetTextureWidth;  // TDeformationGrid
       SE27.Value := texItem^.GetTextureHeight;
+      SE47.Value := texItem^.GetTextureWidth;  // TSpriteOnPath
+      SE48.Value := texItem^.GetTextureHeight;
     end;
   end;
 
@@ -836,6 +879,35 @@ begin
     if FWorkingChild^.surface is TGradientRectangle then
       with FWorkingChild^ do
         chang := chang or (width <> SE28.Value) or (height <> SE29.Value);
+
+    if FWorkingChild^.surface is TOGLCPathToFollow then begin
+      with FWorkingChild^ do
+        chang := chang or (WidgetToPathToFollowBorderData <> PathToFollowBorderData) or
+                          (ComboBox7.Text <> PathDescriptorName) or
+                          (CheckBox7.Checked <> PathToFollowLoop);
+        recreateSurface := chang;
+    end;
+
+    if FWorkingChild^.surface is TSpriteOnPath then begin
+      with FWorkingChild^ do
+        chang := chang or (FWorkingChild^.width <> SE47.Value) or (FWorkingChild^.height <> SE48.Value) or
+                          (FWorkingChild^.OnPathAutoRotate <> CheckBox8.Checked) or
+                          (FWorkingChild^.OnPathAngleAdjust <> SE45.Value) or
+                          (FWorkingChild^.OnPathCoeffPosition <> SE46.Value) or
+                          (FWorkingChild^.OnPathDistanceTraveled <> SE50.Value);
+        recreateSurface := chang;
+    end;
+
+    if FWorkingChild^.surface is TFreeTextOnPath then begin
+      with FWorkingChild^ do
+        chang := chang or (FWorkingChild^.FontDescriptorName <> ComboBox2.Text) or
+                          (FWorkingChild^.OnPathAutoRotate <> CheckBox4.Checked) or
+                          (FWorkingChild^.OnPathAngleAdjust <> SE41.Value) or
+                          (FWorkingChild^.OnPathCoeffPosition <> SE42.Value) or
+                          (FWorkingChild^.OnPathDistanceTraveled <> SE49.Value) or
+                          (FWorkingChild^.Caption <> Memo2.Text);
+        recreateSurface := chang;
+    end;
 
     if FWorkingChild^.surface is TFreeText then begin
       with FWorkingChild^ do
@@ -1027,6 +1099,8 @@ begin
     'TGradientRectangle': Result := TGradientRectangle;
     'TQuad4Color': Result := TQuad4Color;
     'TSpriteContainer': Result := TSpriteContainer;
+    'TOGLCPathToFollow': Result := TOGLCPathToFollow;
+    'TSpriteOnPath': Result := TSpriteOnPath;
     'TFreeText': Result := TFreeText;
     'TFreeTextOnPath': Result := TFreeTextOnPath;
     'TFreeTextClock': Result := TFreeTextClock;
@@ -1065,8 +1139,32 @@ begin
     else Result := CBParent.Items.Strings[CBParent.ItemIndex].ToInteger;
 end;
 
+function TFrameToolsSpriteBuilder.WidgetToPathToFollowBorderData: string;
+var border: TOGLCBorder;
+begin
+  border.InitDefault;
+  border.Visible := CBBorderVisible.Checked;
+  border.Color := ColorToBGRA(CBBorder.ButtonColor, SEBorderAlpha.Value);
+  border.Width := FSEBorderWidth.Value;
+  border.LinePosition := TOGLCLinePosition(ComboBox6.ItemIndex);
+  Result := border.SaveToString;
+end;
+
+procedure TFrameToolsSpriteBuilder.PathToFollowBorderDataToWidget(const aBorderData: string);
+var border: TOGLCBorder;
+begin
+  border.InitDefault;
+  border.LoadFromString(aBorderData);
+  CBBorderVisible.Checked := border.Visible;
+  CBBorder.ButtonColor := BGRAToColor(border.Color);
+  SEBorderAlpha.Value := border.Color.alpha;
+  FSEBorderWidth.Value := border.Width;
+  ComboBox6.ItemIndex := Ord(border.LinePosition);
+end;
+
 function TFrameToolsSpriteBuilder.CheckChildWidgets: boolean;
-var definingRoot: boolean;
+var definingRoot, flagError: boolean;
+  item: PSurfaceDescriptor;
 begin
   if CBChildType.ItemIndex = -1 then exit(False);
 
@@ -1077,9 +1175,26 @@ begin
   definingRoot := Surfaces.Size = 0;
   if not definingRoot  and (CBParent.ItemIndex = -1) then exit(False);
 
+  if (CBChildType.Text = 'TSpriteOnPath') or (CBChildType.Text = 'TFreeTextOnPath') then begin
+    flagError := CBToParentID = -1;
+    if not flagError then begin
+      item := Surfaces.GetItemByID(CBToParentID);
+      if item = NIL then flagError := True
+        else flagError := item^.classtype <> TOGLCPathToFollow;
+    end;
+    if flagError then begin
+      ShowMessage('TSpriteOnPath or TFreeTextOnPath can be only child of TOGLCPathToFollow parent');
+      exit(False);
+    end;
+  end;
+
   // check extra properties
   if CBChildType.Text = 'TFreeText' then begin
     if ComboBox1.ItemIndex = -1 then exit(False);
+  end;
+
+  if CBChildType.Text = 'TFreeTextOnPath' then begin
+   if (ComboBox2.ItemIndex = -1) or (Memo2.Text = '') then exit(False);
   end;
 
   Result := True;
@@ -1127,6 +1242,11 @@ begin
                        (FWorkingChild^.surface.Height <> FWorkingChild^.height);
 
   FWorkingChild^.name := Trim(Edit5.Text);
+
+  // TSpriteOnPath and TFreeTextOnPath need a valid parent ID to be created
+  if ((CBToClassType = TSpriteOnPath) or (CBToClassType = TFreeTextOnPath)) and
+     (FWorkingChild^.parentID = -1) then
+    FWorkingChild^.parentID := CBToParentID;
 
   if recreateSurface then begin
     // save the childs of the surface before killing it
@@ -1393,6 +1513,7 @@ end;
 
 procedure TFrameToolsSpriteBuilder.UpdateExtraPropertiesToWorkingTemporary;
 var selectedClass: classOfSimpleSurfaceWithEffect;
+  border: TOGLCBorder;
 begin
   // init extra properties to temporary variable
   if FWorkingChild = NIL then exit;
@@ -1444,6 +1565,32 @@ begin
     FWorkingChild^.BottomRightOffsetY := SE39.Value;
     FWorkingChild^.BottomLeftOffsetX := SE36.Value;
     FWorkingChild^.BottomLeftOffsetY := SE37.Value;
+  end
+  else if selectedClass = TOGLCPathToFollow then begin
+    border.InitDefault;
+    border.Visible := CBBorderVisible.Checked;
+    border.Color := ColorToBGRA(CBBorder.ButtonColor, SEBorderAlpha.Value);
+    border.Width := FSEBorderWidth.Value;
+    border.LinePosition := TOGLCLinePosition(ComboBox6.ItemIndex);
+    FWorkingChild^.PathToFollowBorderData := border.SaveToString;
+    FWorkingChild^.PathDescriptorName := ComboBox7.Text;
+    FWorkingChild^.PathToFollowLoop := CheckBox7.Checked;
+  end
+  else if selectedClass = TSpriteOnPath then begin
+    FWorkingChild^.width := SE47.Value;
+    FWorkingChild^.height := SE48.Value;
+    FWorkingChild^.OnPathAutoRotate := CheckBox8.Checked;
+    FWorkingChild^.OnPathAngleAdjust := SE45.Value;
+    FWorkingChild^.OnPathCoeffPosition := SE46.Value;
+    FWorkingChild^.OnPathDistanceTraveled := SE50.Value;
+  end
+  else if selectedClass = TFreeTextOnPath then begin
+    FWorkingChild^.FontDescriptorName := ComboBox2.Text;
+    FWorkingChild^.Caption := Memo2.Text;
+    FWorkingChild^.OnPathAutoRotate := CheckBox4.Checked;
+    FWorkingChild^.OnPathAngleAdjust := SE41.Value;
+    FWorkingChild^.OnPathCoeffPosition := SE42.Value;
+    FWorkingChild^.OnPathDistanceTraveled := SE49.Value;
   end
   else if selectedClass = TFreeText then begin
     FWorkingChild^.Caption := Edit4.Text;
@@ -1529,6 +1676,8 @@ begin
       'TQuad4Color': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraTQuad4Color);
       'TSpriteContainer': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageExtraEmpty);
       'TDeformationGrid': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTDeformationGrid);
+      'TOGLCPathToFollow': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTOGLCPathToFollow);
+      'TSpriteOnPath': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTSpriteOnPath);
       'TFreeText': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeText);
       'TFreeTextOnPath': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeTextOnPath);
       'TFreeTextClock': NotebookExtra.PageIndex := NotebookExtra.IndexOf(PageTFreeTextClock);
@@ -1575,7 +1724,7 @@ begin
   FontBank.FillComboBoxWithNames(ComboBox4);
   FontBank.FillComboBoxWithNames(ComboBox5);
 
-  PathBank.FillComboBoxWithNames(ComboBox3);
+  PathBank.FillComboBoxWithNames(ComboBox7);
 
   FillListBoxTextureNames;
   Surfaces.FillComboBox(CBParent);
@@ -1598,6 +1747,7 @@ end;
 
 procedure TFrameToolsSpriteBuilder.ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 var tex: PTexture;
+    border: TOGLCBorder;
   procedure ShowFrameIndexWidget(AValue: boolean);
   begin
     Label32.Visible := AValue;
@@ -1714,6 +1864,35 @@ begin
        Memo1.Text := FWorkingChild^.Caption;
        ComboBox5.ItemIndex := ComboBox5.Items.IndexOf(FWorkingChild^.FontDescriptorName);
        RadioGroup2.ItemIndex := Ord(FWorkingChild^.TextAlignment);
+     end;
+
+     if surface is TOGLCPathToFollow then begin
+       border.LoadFromString(FWorkingChild^.PathToFollowBorderData);
+       CBBorderVisible.Checked := border.Visible;
+       CBBorder.ButtonColor := border.Color.ToColor;
+       SEBorderAlpha.Value := border.Color.alpha;
+       FSEBorderWidth.Value := border.Width;
+       ComboBox6.ItemIndex := Ord(border.LinePosition);
+       ComboBox7.ItemIndex := ComboBox7.Items.IndexOf(FWorkingChild^.PathDescriptorName);
+       CheckBox7.Checked := FWorkingChild^.PathToFollowLoop;
+     end;
+
+     if surface is TSpriteOnPath then begin
+       SE47.Value := surface.Width;
+       SE48.Value := surface.Height;
+       CheckBox8.Checked := FWorkingChild^.OnPathAutoRotate;
+       SE45.Value := FWorkingChild^.OnPathAngleAdjust;
+       SE46.Value := FWorkingChild^.OnPathCoeffPosition;
+       SE50.Value := FWorkingChild^.OnPathDistanceTraveled;
+     end;
+
+     if surface is TFreeTextOnPath then begin
+       ComboBox2.ItemIndex := ComboBox2.Items.IndexOf(FWorkingChild^.FontDescriptorName);
+       CheckBox4.Checked := FWorkingChild^.OnPathAutoRotate;
+       SE41.Value := FWorkingChild^.OnPathAngleAdjust;
+       SE42.Value := FWorkingChild^.OnPathCoeffPosition;
+       SE49.Value := FWorkingChild^.OnPathDistanceTraveled;
+       Memo2.Text := FWorkingChild^.Caption;
      end;
     end;
     CBChildType.Enabled := True;

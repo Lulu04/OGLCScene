@@ -62,9 +62,19 @@ public
   GradientData: string;
   // TDeformationGrid
   DeformationGridData: string;
+  // TOGLCPathToFollow
+  PathToFollowBorderData: string;
+  PathToFollowLoop: boolean;
+  PathDescriptorName: string;
   // TFreeTextClock
   TimeValue: single;
   CountDown, ClockShowDecimal, ClockStartPaused: boolean;
+  // TFreeTextOnPath
+  OnPathDistanceTraveled: single;
+  OnPathAutoRotate: boolean;
+  OnPathAngleAdjust: single;
+  OnPathCoeffPosition: single;
+
   // UI objects with bodyshape
   BodyShapeData: string;
   BackGradientData: string;
@@ -286,7 +296,8 @@ end;
 
 implementation
 
-uses u_common, u_screen_spritebuilder, u_utils, u_ui_objectlist, Math;
+uses u_common, u_screen_spritebuilder, u_utils, u_ui_objectlist, u_project,
+  Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -361,12 +372,21 @@ begin
   GradientData := DEFAULT_GRADIENT;
   // TDeformationGrid
   DeformationGridData := '';
+  // TOGLCPathToFollow
+  PathToFollowBorderData := '';
+  PathToFollowLoop := False;
+
   // TFreeTextClock
   TimeValue := 0.0;
   CountDown := False;
   ClockShowDecimal := True;
   ClockStartPaused := False;
-
+  // TFreeTextOnPath  +  TSpriteOnPath
+  PathDescriptorName := '';
+  OnPathAutoRotate := True;
+  OnPathAngleAdjust := 0.0;
+  OnPathCoeffPosition := 0.5;
+  OnPathDistanceTraveled := 0.0;
 
   // UIObject
   BodyShapeData := '';
@@ -438,6 +458,9 @@ end;
 
 procedure TSurfaceDescriptor.CreateSurface(aCreateUIHandle: boolean=True);
 var tex: PTexture;
+  path: TOGLCPath;
+  PathItem: TPathDescriptorItem;
+  surfItem: PSurfaceDescriptor;
 begin
   tex := GetTextureFromTextureName;
 
@@ -510,6 +533,40 @@ begin
   if classType = TSpriteContainer then begin  // TSpriteContainer
     surface := TSpriteContainer.Create(FScene);
     TSpriteContainer(surface).ShowOrigin := True;
+  end else
+  if classType = TOGLCPathToFollow then begin  // TOGLCPathToFollow
+    surface := TOGLCPathToFollow.Create(FScene);
+    path := NIL;
+    PathItem := PathBank.GetByName(PathDescriptorName);
+    if PathItem <> NIL then begin
+      path.LoadFromString(PathItem.PathData);
+      path.ExpandNormalizedTo(Project.Config.SceneWidth, Project.Config.SceneHeight);
+      if PathItem.UseSpline then
+        path.ConvertToSpline(PathItem.SplineStyle);
+    end;
+    TOGLCPathToFollow(surface).InitFromPath(path, False);
+    TOGLCPathToFollow(surface).Border.LoadFromString(PathToFollowBorderData);
+    TOGLCPathToFollow(surface).Loop := PathToFollowLoop;
+  end else
+  if classType = TSpriteOnPath then begin      // TSpriteOnPath
+    surfItem := ParentList.GetItemByID(parentID);
+    surface := TSpriteOnPath.CreateAsChildOf(TOGLCPathToFollow(surfItem^.surface), tex, False, ZOrder);
+    TSpriteOnPath(surface).SetSize(width, height);
+    TSpriteOnPath(surface).DistanceTraveled.Value := OnPathDistanceTraveled;
+    TSpriteOnPath(surface).AutoRotate := OnPathAutoRotate;
+    TSpriteOnPath(surface).AngleAdjust := OnPathAngleAdjust;
+    TSpriteOnPath(surface).CoeffPositionOnPath := OnPathCoeffPosition;
+  end else
+  if classType = TFreeTextOnPath then begin   // TFreeTextOnPath
+    surfItem := ParentList.GetItemByID(parentID);
+    surface := TFreeTextOnPath.CreateAsChildOf(TOGLCPathToFollow(surfItem^.surface), ZOrder);
+    TFreeTextOnPath(surface).DistanceTraveled.Value := OnPathDistanceTraveled;
+    TFreeTextOnPath(surface).AutoRotate := OnPathAutoRotate;
+    TFreeTextOnPath(surface).AngleAdjust := OnPathAngleAdjust;
+    TFreeTextOnPath(surface).CoeffPositionOnPath := OnPathCoeffPosition;
+    FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
+    TFreeTextOnPath(surface).Caption := Caption;
+    TFreeTextOnPath(surface).TexturedFont := TexturedFont;
   end else
   if (classType = TUIPanel) {or (classtype = TUIPanelWithEffects)} then begin      // UIPanel
     surface := TUIPanel.Create(FScene);
@@ -667,6 +724,10 @@ end;
 procedure TSurfaceDescriptor.SetChildDependency;
 var parentItem: PSurfaceDescriptor;
 begin
+  // we do not set the child dependency for TSpriteOnPath and TFreetextOnPath because
+  // they are already child of a TOGLCPathToFollow instance
+  if (classtype = TSpriteOnPath) or (classtype = TFreetextOnPath) then exit;
+
   if parentID = -1 then begin
     if ParentList.ModeForLevelEditor then FScene.Add(surface, layerindex)
       else begin
@@ -1167,6 +1228,17 @@ begin
   aSurface^.GradientData := GradientData;
   // TDeformationGrid
   aSurface^.DeformationGridData := DeformationGridData;
+  // TOGLCPathToFollow
+  aSurface^.PathToFollowBorderData := PathToFollowBorderData;
+  aSurface^.PathDescriptorName := PathDescriptorName;
+  aSurface^.PathToFollowLoop := PathToFollowLoop;
+  // TFreeTextOnPath + TSpriteOnPath
+  aSurface^.OnPathDistanceTraveled := OnPathDistanceTraveled;
+  aSurface^.OnPathAutoRotate := OnPathAutoRotate;
+  aSurface^.OnPathAngleAdjust := OnPathAngleAdjust;
+  aSurface^.OnPathCoeffPosition := OnPathCoeffPosition;
+
+
   // TFreeTextClock
   aSurface^.TimeValue := TimeValue;
   aSurface^.CountDown := CountDown;
@@ -1467,6 +1539,27 @@ begin
   if GetSurfaceType = TDeformationGrid then
     prop.Add('DeformationGridData', DeformationGridData);
 
+  // TOGLCPathToFollow
+  if GetSurfaceType = TOGLCPathToFollow then begin
+    prop.Add('BorderData', PathToFollowBorderData);
+    prop.Add('Loop', PathToFollowLoop);
+    prop.Add('PathDescriptorName', PathDescriptorName);
+  end;
+
+  // TFreeTextOnPath + TSpriteOnPath
+  if (GetSurfaceType = TFreeTextOnPath) or (GetSurfaceType = TSpriteOnPath) then begin
+    prop.Add('DistanceTraveled', OnPathDistanceTraveled);
+    prop.Add('AutoRotate', OnPathAutoRotate);
+    prop.Add('AngleAdjust', OnPathAngleAdjust);
+    prop.Add('CoeffPos', OnPathCoeffPosition);
+  end;
+
+  // TFreeTextOnPath
+  if GetSurfaceType = TFreeTextOnPath then begin
+    prop.Add('FontDescriptorName', FontDescriptorName);
+    prop.Add('Caption', Caption, True);
+  end;
+
   // TFreeText
   if GetSurfaceType = TFreeText then begin
     prop.Add('FontDescriptorName', FontDescriptorName);
@@ -1602,8 +1695,10 @@ begin
     'TSpriteContainer': classtype := TSpriteContainer;
     'TQuad4Color': classtype := TQuad4Color;
     'TGradientRectangle': classtype := TGradientRectangle;
-    'TFreeText': classtype := TFreeText;
+    'TOGLCPathToFollow': classtype := TOGLCPathToFollow;
+    'TSpriteOnPath': classtype := TSpriteOnPath;
     'TFreeTextOnPath': classtype := TFreeTextOnPath;
+    'TFreeText': classtype := TFreeText;
     'TFreeTextClock': classtype := TFreeTextClock;
     'TFreeTextAligned': classtype := TFreeTextAligned;
     'TUIPanel': classtype := TUIPanel;
@@ -1673,6 +1768,17 @@ begin
 
   // TDeformationGrid
   prop.StringValueOf('DeformationGridData', DeformationGridData, '');
+
+  // TOGLCPathToFollow
+  prop.StringValueOf('BorderData', PathToFollowBorderData, '');
+  prop.BooleanValueOf('Loop', PathToFollowLoop, False);
+  prop.StringValueOf('PathDescriptorName', PathDescriptorName, '');
+
+  // TFreeTextOnPath + TSpriteOnPath
+  prop.SingleValueOf('DistanceTraveled', OnPathDistanceTraveled, 0.0);
+  prop.BooleanValueOf('AutoRotate', OnPathAutoRotate, True);
+  prop.SingleValueOf('AngleAdjust', OnPathAngleAdjust, 0.0);
+  prop.SingleValueOf('CoeffPos', OnPathCoeffPosition, 0.5);
 
   // TFreeTextClock
   prop.BooleanValueOf('StartPaused', ClockStartPaused, True);

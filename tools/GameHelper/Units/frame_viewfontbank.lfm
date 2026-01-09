@@ -1089,14 +1089,6 @@ object FrameViewFontBank: TFrameViewFontBank
       end
     end
   end
-  object FD1: TFontDialog
-    MinFontSize = 8
-    MaxFontSize = 150
-    Options = [fdEffects, fdWysiwyg, fdLimitSize]
-    PreviewText = 'The dog is sleeping'
-    Left = 240
-    Top = 128
-  end
   object Timer1: TTimer
     Interval = 200
     OnTimer = Timer1Timer

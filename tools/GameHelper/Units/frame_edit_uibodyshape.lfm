@@ -5,6 +5,7 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
   Width = 282
   ClientHeight = 209
   ClientWidth = 282
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 707
   DesignTop = 174
@@ -94,10 +95,10 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Font.Style = [fsBold]
       Increment = 5
       MaxValue = 255
-      OnChange = CBBorderVisibleChange
       ParentFont = False
       TabOrder = 1
       Value = 255
+      OnChange = CBBorderVisibleChange
     end
     object Label5: TLabel
       AnchorSideTop.Control = Label3
@@ -124,10 +125,10 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Font.Style = [fsBold]
       Increment = 0.5
       MaxValue = 100
-      OnChange = CBBorderVisibleChange
       ParentFont = False
       TabOrder = 2
       Value = 1.5
+      OnChange = CBBorderVisibleChange
     end
     object Label6: TLabel
       AnchorSideLeft.Control = Label5
@@ -286,10 +287,10 @@ object FrameEditUIBodyShape: TFrameEditUIBodyShape
       Font.Style = [fsBold]
       Increment = 5
       MaxValue = 255
-      OnChange = CBFillVisibleChange
       ParentFont = False
       TabOrder = 7
       Value = 255
+      OnChange = CBFillVisibleChange
     end
     object Label9: TLabel
       AnchorSideLeft.Control = Label8

@@ -114,7 +114,9 @@ begin
   item := PathBank.GetByName(aName);
   if item = NIL then exit;
 
-  path.LoadNormalizedFromStringAndExpand(item.PathData, Project.Config.SceneWidth, Project.Config.SceneHeight);
+  path.LoadNormalizedFromStringAndExpand(item.PathData,
+                                         Project.Config.SceneWidth, Project.Config.SceneHeight,
+                                         item.UseSpline, item.SplineStyle);
   FPathToFollow := TOGLCPathToFollow.Create(FScene);
   FScene.Add(FPathToFollow, LAYER_PATH);
   FPathToFollow.InitFromPath(path, False);

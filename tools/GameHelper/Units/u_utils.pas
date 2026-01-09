@@ -67,6 +67,7 @@ TCodeGenerator = record
   function BGRAGradientTypeToPascal(aGradientType: TGradientType): string;
   function FontStyleToPascal(aFontStyle: TFontStyles): string;
   function TextAlignmentToPascal(aAlign: TOGLCAlignment): string;
+  function TextToPascal(const aText: string): string; // insert LineEnding and double quote
 
   procedure CommonPropertiesToPascalCode(t: TStringList;
                                         aSurface: PSurfaceDescriptor;
@@ -162,10 +163,11 @@ function ChildClassTypeIsTextured(const aClassName: string): boolean;
 begin
   case aClassName of
     'TSprite', 'TSpriteWithElasticCorner', 'TTiledSprite', 'TPolarSprite',
-    'TScrollableSprite', 'TDeformationGrid': Result := True;
+    'TScrollableSprite', 'TDeformationGrid', 'TSpriteOnPath': Result := True;
 
      'TShapeOutline', 'TGradientRectangle', 'TQuad4Color', 'TSpriteContainer',
-     'TFreeText', 'TFreeTextOnPath', 'TFreeTextClock', 'TFreeTextAligned': Result := False;
+     'TFreeText', 'TFreeTextOnPath', 'TFreeTextClock', 'TFreeTextAligned',
+     'TOGLCPathToFollow': Result := False;
 
      else raise exception.create('"'+aClassName+'" not implemented');
   end;
@@ -311,6 +313,23 @@ begin
   Result := s;
 end;
 
+function TCodeGenerator.TextToPascal(const aText: string): string;
+const LN = '''+LineEnding+''';
+begin
+  Result := '';
+  if Length(aText) = 0 then exit;
+
+  Result := StringReplace(aText, #39, #39#39, [rfReplaceAll]);
+  Result := StringReplace(Result, #13#10, LN, [rfReplaceAll]);
+  Result := StringReplace(Result, #13, LN, [rfReplaceAll]);
+
+  if Result.StartsWith(LN) then system.Delete(Result, 1, 2)
+    else Result := '''' + Result;
+
+  if Result.EndsWith(LN) then system.Delete(Result, Length(Result)-1, 2)
+    else Result := Result + '''';
+end;
+
 procedure TCodeGenerator.CommonPropertiesToPascalCode(t: TStringList;
   aSurface: PSurfaceDescriptor; const aSpacePrefix: string);
 const BLEND_NAMES: array[0..3] of string=('FX_BLEND_NORMAL', 'FX_BLEND_ADD', 'FX_BLEND_MULT',
@@ -342,6 +361,7 @@ procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
   aItem: PSurfaceDescriptor; const aSpacePrefix: string);
 var
   fontItem: TFontDescriptorItem;
+  PathItem: TPathDescriptorItem;
 begin
   case aItem^.classtype.ClassName of
     'TSprite': begin
@@ -399,8 +419,31 @@ begin
     'TSpriteContainer': begin
     end;
 
+    'TOGLCPathToFollow': begin
+      t.Add(aSpacePrefix+'Border.LoadFromString('''+aItem^.PathToFollowBorderData+''');');
+      PathItem := PathBank.GetByName(aItem^.PathDescriptorName);
+      if PathItem <> NIL then
+        t.Add(aSpacePrefix+'InitFromPath('+PathItem.VariableName+');');
+    end;
+
+    'TSpriteOnPath': begin
+      t.Add(aSpacePrefix+'AutoRotate := '+BooleanToPascal(aItem^.OnPathAutoRotate)+';');
+      t.Add(aSpacePrefix+'AngleAdjust := '+FormatFloatWithDot('0.00', aItem^.OnPathAngleAdjust)+';');
+      t.Add(aSpacePrefix+'CoeffPositionOnPath := '+FormatFloatWithDot('0.00', aItem^.OnPathCoeffPosition)+';');
+    end;
+
+    'TFreeTextOnPath': begin
+      t.Add(aSpacePrefix+'Caption := '+TextToPascal(aItem^.Caption)+';');
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
+      t.Add(aSpacePrefix+'AutoRotate := '+BooleanToPascal(aItem^.OnPathAutoRotate)+';');
+      t.Add(aSpacePrefix+'AngleAdjust := '+FormatFloatWithDot('0.00', aItem^.OnPathAngleAdjust)+';');
+      t.Add(aSpacePrefix+'CoeffPositionOnPath := '+FormatFloatWithDot('0.00', aItem^.OnPathCoeffPosition)+';');
+    end;
+
     'TFreeText': begin
-      t.Add(aSpacePrefix+'Caption := '''+aItem^.Caption+''';');
+      t.Add(aSpacePrefix+'Caption := '+TextToPascal(aItem^.Caption)+';');
       fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
       if fontItem <> NIL then
         t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
@@ -416,7 +459,10 @@ begin
     end;
 
     'TFreeTextAligned': begin
-      t.Add(aSpacePrefix+'Caption := '''+aItem^.Caption+''';');
+      {fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');}
+      t.Add(aSpacePrefix+'Caption := '+TextToPascal(aItem^.Caption)+';');
       t.Add(aSpacePrefix+'Align := '+TextAlignmentToPascal(aItem^.TextAlignment)+';');
     end
 
