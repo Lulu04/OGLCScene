@@ -160,8 +160,8 @@ procedure TFormProjectConfig.WidgetToConfig;
 begin
   // scene
   Project.Config.TargetLazarusProject.UCommonSetDesignValues([SE1.Value, SE2.Value, Self.Monitor.PixelsPerInch]);
-  {Project.Config.SceneWidth := SE1.Value;
-  Project.Config.SceneHeight := SE2.Value;}
+  Project.Config.SceneWidth := SE1.Value;
+  Project.Config.SceneHeight := SE2.Value;
   Project.Config.TargetLazarusProject.ProjectConfig_MaximizeSceneOnMonitor := RBMaximizeSceneSize.Checked;
   Project.Config.TargetLazarusProject.ProjectConfig_WindowedMode := RBWindowed.Checked;
 

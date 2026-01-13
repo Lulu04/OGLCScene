@@ -67,13 +67,16 @@ end;
 procedure TScreenSpriteBank.CreateObjects;
 begin
   ShowLayers([LAYER_UI, LAYER_SPRITEBANK, LAYER_COLLISION_BODY]);
+  ShowSceneBounds;
   // camera
-  CreateCamera([LAYER_SPRITEBANK]);
+  CreateCamera([LAYER_SPRITEBANK, LAYER_SCENEBOUNDS]);
+  ZoomOnScene;
 end;
 
 procedure TScreenSpriteBank.FreeObjects;
 begin
   FreeCamera;
+  HideSceneBounds;
 
   FBodies.Clear;
   FPostures.Clear;
@@ -116,6 +119,7 @@ procedure TScreenSpriteBank.ShowSprite(aIndex: integer);
 begin
   FTextures.LoadFromString(SpriteBank.Mutable[aIndex]^.textures);
   FSurfaces.LoadFromString(SpriteBank.Mutable[aIndex]^.surfaces);
+  FSurfaces.CenterOnScene;
   if FrameToolsSpriteBank.CBShowCollisionBody.Checked then begin
     FBodies.LoadFromString(SpriteBank.Mutable[aIndex]^.collisionbodies);
     FBodies.SetParentSurface(Surfaces.GetRootItem^.surface);

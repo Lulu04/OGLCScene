@@ -5,6 +5,7 @@ object FrameTextureList: TFrameTextureList
   Width = 292
   ClientHeight = 534
   ClientWidth = 292
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 851
   DesignTop = 186
@@ -80,9 +81,9 @@ object FrameTextureList: TFrameTextureList
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 5
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object BTextureUndo: TSpeedButton
         AnchorSideTop.Control = Panel7
@@ -100,9 +101,9 @@ object FrameTextureList: TFrameTextureList
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 9
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object BTextureRedo: TSpeedButton
         AnchorSideTop.Control = Panel7
@@ -121,9 +122,9 @@ object FrameTextureList: TFrameTextureList
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 10
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object BUpdateTextureListbox: TSpeedButton
         AnchorSideLeft.Control = Panel7
@@ -131,17 +132,17 @@ object FrameTextureList: TFrameTextureList
         AnchorSideTop.Side = asrCenter
         Cursor = crHandPoint
         Left = 10
-        Height = 28
-        Top = -1
-        Width = 28
+        Height = 34
+        Top = -4
+        Width = 34
         AutoSize = True
         BorderSpacing.Left = 10
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 6
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object BHelp: TSpeedButton
         AnchorSideTop.Control = Panel7
@@ -160,9 +161,9 @@ object FrameTextureList: TFrameTextureList
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 8
-        OnClick = BHelpClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BHelpClick
       end
     end
     object Panel3: TPanel
@@ -211,9 +212,9 @@ object FrameTextureList: TFrameTextureList
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 15
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object Label2: TLabel
         AnchorSideLeft.Control = Label1
@@ -286,20 +287,20 @@ object FrameTextureList: TFrameTextureList
         AnchorSideTop.Control = BUpdateTexture
         AnchorSideRight.Control = BUpdateTexture
         Cursor = crHandPoint
-        Left = 186
-        Height = 28
+        Left = 174
+        Height = 34
         Hint = 'Add the texture to the list'
         Top = 97
-        Width = 28
+        Width = 34
         Anchors = [akTop, akRight]
         AutoSize = True
         BorderSpacing.Right = 30
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 7
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object BUpdateTexture: TSpeedButton
         AnchorSideLeft.Side = asrBottom
@@ -307,19 +308,19 @@ object FrameTextureList: TFrameTextureList
         AnchorSideRight.Control = Panel3
         AnchorSideRight.Side = asrBottom
         Cursor = crHandPoint
-        Left = 244
-        Height = 28
+        Left = 238
+        Height = 34
         Top = 97
-        Width = 28
+        Width = 34
         Anchors = [akTop, akRight]
         AutoSize = True
         BorderSpacing.Right = 20
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 6
-        OnClick = BChooseImageFileClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BChooseImageFileClick
       end
       object Label6: TLabel
         AnchorSideLeft.Control = Panel3
@@ -380,9 +381,10 @@ object FrameTextureList: TFrameTextureList
         TabOrder = 4
         object Label7: TLabel
           AnchorSideLeft.Control = Panel2
+          AnchorSideTop.Control = Panel2
           Left = 20
           Height = 15
-          Top = 184
+          Top = 9
           Width = 64
           BorderSpacing.Left = 20
           BorderSpacing.Top = 9
@@ -397,13 +399,13 @@ object FrameTextureList: TFrameTextureList
           AnchorSideBottom.Side = asrBottom
           Left = 89
           Height = 23
-          Top = 176
+          Top = 1
           Width = 67
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
           MaxValue = 10000
-          OnChange = SE11Change
           TabOrder = 0
+          OnChange = SE11Change
         end
         object Label3: TLabel
           AnchorSideLeft.Control = SE11
@@ -412,7 +414,7 @@ object FrameTextureList: TFrameTextureList
           AnchorSideTop.Side = asrCenter
           Left = 157
           Height = 15
-          Top = 180
+          Top = 5
           Width = 107
           BorderSpacing.Left = 1
           Caption = '< value don''t match'
@@ -429,7 +431,7 @@ object FrameTextureList: TFrameTextureList
           AnchorSideBottom.Side = asrBottom
           Left = 16
           Height = 15
-          Top = 208
+          Top = 33
           Width = 68
           Anchors = [akRight, akBottom]
           Caption = 'frame height'
@@ -441,12 +443,12 @@ object FrameTextureList: TFrameTextureList
           AnchorSideBottom.Side = asrBottom
           Left = 89
           Height = 23
-          Top = 200
+          Top = 25
           Width = 67
           BorderSpacing.Top = 1
           MaxValue = 10000
-          OnChange = SE11Change
           TabOrder = 1
+          OnChange = SE11Change
         end
         object Label4: TLabel
           AnchorSideLeft.Control = SE12
@@ -455,7 +457,7 @@ object FrameTextureList: TFrameTextureList
           AnchorSideTop.Side = asrCenter
           Left = 157
           Height = 15
-          Top = 204
+          Top = 29
           Width = 107
           BorderSpacing.Left = 1
           Caption = '< value don''t match'
@@ -466,10 +468,13 @@ object FrameTextureList: TFrameTextureList
           Visible = False
         end
         object Label9: TLabel
-          Left = 10
+          AnchorSideTop.Control = Label8
+          AnchorSideTop.Side = asrBottom
+          Left = 16
           Height = 15
-          Top = 264
+          Top = 58
           Width = 123
+          BorderSpacing.Top = 10
           Caption = 'Frame count in texture:'
         end
         object SE13: TSpinEdit
@@ -477,9 +482,9 @@ object FrameTextureList: TFrameTextureList
           AnchorSideLeft.Side = asrBottom
           AnchorSideBottom.Control = Label9
           AnchorSideBottom.Side = asrBottom
-          Left = 138
+          Left = 144
           Height = 23
-          Top = 256
+          Top = 50
           Width = 51
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
@@ -507,6 +512,7 @@ object FrameTextureList: TFrameTextureList
   object OD1: TOpenDialog
     Title = 'Open image file'
     Filter = 'All files|*.*|Image files|*.svg;*.png;*.jpg;*.bmp'
+    Options = [ofAllowMultiSelect, ofEnableSizing, ofViewDetail]
     Left = 240
     Top = 160
   end

@@ -151,6 +151,7 @@ end;
 
 function TTextureItem.PascalCodeToAddTextureToAtlas(aGenerateTexVariableName: boolean): string;
 var texFilename, sw, sh: string;
+  XFrameCount, YFrameCount: integer;
 begin
   // texture filename must be relative to application Data folder
   texFilename := filename;
@@ -167,13 +168,15 @@ begin
     if height = -1 then sh := '-1'
       else sh := 'ScaleH('+height.ToString+')';
 
-    if isMultiFrame then
+    if isMultiFrame then begin
+      XFrameCount := width div frameWidth;
+      YFrameCount := height div frameHeight;
       Result := Result + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
-         ', '+sw+', '+sh+
-         ', '+(width div frameWidth).ToString+
-         ', '+(height div frameHeight).ToString+
-         ', 0);'
-    else
+         ', ScaleW('+frameWidth.ToString+')*'+XFrameCount.ToString+
+         ', ScaleH('+frameHeight.ToString+')*'+YFrameCount.ToString+
+         ', '+XFrameCount.ToString+
+         ', '+YFrameCount.ToString+');'
+    end else
       Result := Result + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
   end else begin
     if isMultiFrame then

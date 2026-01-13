@@ -329,7 +329,7 @@ object FormMain: TFormMain
         Anchors = [akTop, akRight]
         BorderSpacing.Right = 5
         ItemHeight = 15
-        ItemIndex = 1
+        ItemIndex = 0
         Items.Strings = (
           'SPRITE BANK'
           'LEVEL BANK'
@@ -339,7 +339,7 @@ object FormMain: TFormMain
         )
         Style = csDropDownList
         TabOrder = 0
-        Text = 'LEVEL BANK'
+        Text = 'SPRITE BANK'
         OnSelect = CBBankSelect
       end
     end

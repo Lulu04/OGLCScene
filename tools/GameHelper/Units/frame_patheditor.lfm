@@ -1,9 +1,9 @@
 object FramePathEditor: TFramePathEditor
   Left = 0
-  Height = 399
+  Height = 534
   Top = 0
   Width = 296
-  ClientHeight = 399
+  ClientHeight = 534
   ClientWidth = 296
   LCLVersion = '4.5.0.0'
   TabOrder = 0
@@ -68,24 +68,27 @@ object FramePathEditor: TFramePathEditor
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 367
+    Height = 502
     Top = 32
     Width = 296
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 367
+    ClientHeight = 502
     ClientWidth = 296
     Color = 8289918
     ParentBackground = False
     ParentColor = False
     TabOrder = 1
     object CBUseSpline: TCheckBox
+      AnchorSideLeft.Control = Panel1
       AnchorSideTop.Control = Label3
       AnchorSideTop.Side = asrBottom
-      Left = 10
+      Left = 7
       Height = 19
-      Top = 116
+      Top = 176
       Width = 74
+      Anchors = [akLeft]
+      BorderSpacing.Left = 7
       BorderSpacing.Top = 15
       Caption = 'Use spline'
       Checked = True
@@ -100,7 +103,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideTop.Side = asrBottom
       Left = 35
       Height = 23
-      Top = 135
+      Top = 195
       Width = 158
       ItemHeight = 15
       ItemIndex = 3
@@ -124,7 +127,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideTop.Side = asrBottom
       Left = 16
       Height = 15
-      Top = 168
+      Top = 228
       Width = 67
       BorderSpacing.Top = 10
       Caption = 'Global move'
@@ -137,7 +140,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 100
       Height = 20
-      Top = 188
+      Top = 248
       Width = 20
       Anchors = [akTop, akRight]
       ArrowColor = 3881787
@@ -152,7 +155,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 120
       Height = 20
-      Top = 168
+      Top = 228
       Width = 20
       ArrowColor = 3881787
       ArrowType = atUp
@@ -170,7 +173,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 140
       Height = 20
-      Top = 188
+      Top = 248
       Width = 20
       ArrowColor = 3881787
       ArrowType = atRight
@@ -187,7 +190,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 120
       Height = 20
-      Top = 208
+      Top = 268
       Width = 20
       ArrowColor = 3881787
       ArrowType = atDown
@@ -222,7 +225,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideTop.Side = asrBottom
       Left = 16
       Height = 19
-      Top = 248
+      Top = 308
       Width = 82
       BorderSpacing.Top = 20
       Caption = 'Show nodes'
@@ -237,7 +240,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideTop.Side = asrBottom
       Left = 7
       Height = 15
-      Top = 282
+      Top = 342
       Width = 62
       BorderSpacing.Left = 7
       BorderSpacing.Top = 15
@@ -254,7 +257,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideBottom.Side = asrBottom
       Left = 7
       Height = 23
-      Top = 297
+      Top = 357
       Width = 203
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 5
@@ -269,7 +272,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 215
       Height = 30
-      Top = 293
+      Top = 353
       Width = 66
       Anchors = [akTop, akRight]
       BorderSpacing.Right = 15
@@ -286,7 +289,7 @@ object FramePathEditor: TFramePathEditor
       Cursor = crHandPoint
       Left = 143
       Height = 22
-      Top = 245
+      Top = 305
       Width = 113
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Right = 40
@@ -295,34 +298,22 @@ object FramePathEditor: TFramePathEditor
       ImageIndex = 16
       OnClick = BClearAllNodesClick
     end
-    object CBShowLevel: TCheckBox
-      Left = 10
-      Height = 19
-      Top = 32
-      Width = 79
-      Caption = 'Show level'
-      Font.Style = [fsBold]
-      ParentFont = False
-      TabOrder = 4
-      OnChange = CBUseSplineChange
-    end
     object ComboBox2: TComboBox
       AnchorSideLeft.Control = Label2
       AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = CBShowLevel
       AnchorSideTop.Side = asrBottom
       AnchorSideBottom.Control = Label2
       AnchorSideBottom.Side = asrBottom
       Left = 65
       Height = 23
-      Top = 53
+      Top = 116
       Width = 215
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
       Enabled = False
       ItemHeight = 15
       Style = csDropDownList
-      TabOrder = 5
+      TabOrder = 4
       OnSelect = CBUseSplineChange
     end
     object Label2: TLabel
@@ -330,7 +321,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideTop.Side = asrBottom
       Left = 24
       Height = 15
-      Top = 61
+      Top = 124
       Width = 36
       BorderSpacing.Top = 10
       Caption = 'Group:'
@@ -343,7 +334,7 @@ object FramePathEditor: TFramePathEditor
       AnchorSideRight.Side = asrBottom
       Left = 30
       Height = 15
-      Top = 86
+      Top = 149
       Width = 30
       Anchors = [akTop, akRight]
       BorderSpacing.Top = 10
@@ -358,15 +349,56 @@ object FramePathEditor: TFramePathEditor
       AnchorSideBottom.Side = asrBottom
       Left = 65
       Height = 23
-      Top = 78
+      Top = 141
       Width = 215
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 5
       Enabled = False
       ItemHeight = 15
       Style = csDropDownList
+      TabOrder = 5
+      OnSelect = CBUseSplineChange
+    end
+    object ComboBox4: TComboBox
+      AnchorSideTop.Side = asrBottom
+      Left = 15
+      Height = 23
+      Top = 52
+      Width = 241
+      Enabled = False
+      ItemHeight = 15
+      Style = csDropDownList
       TabOrder = 6
       OnSelect = CBUseSplineChange
+    end
+    object CBShowSprite: TCheckBox
+      AnchorSideLeft.Control = Panel1
+      Left = 7
+      Height = 19
+      Top = 24
+      Width = 84
+      BorderSpacing.Left = 7
+      Caption = 'Show sprite'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 7
+      OnChange = CBUseSplineChange
+    end
+    object CBShowLevel: TCheckBox
+      AnchorSideLeft.Control = Panel1
+      AnchorSideTop.Control = ComboBox4
+      AnchorSideTop.Side = asrBottom
+      Left = 7
+      Height = 19
+      Top = 95
+      Width = 79
+      BorderSpacing.Left = 7
+      BorderSpacing.Top = 20
+      Caption = 'Show level'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 8
+      OnChange = CBUseSplineChange
     end
   end
 end

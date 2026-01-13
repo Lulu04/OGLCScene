@@ -424,6 +424,7 @@ begin
       PathItem := PathBank.GetByName(aItem^.PathDescriptorName);
       if PathItem <> NIL then
         t.Add(aSpacePrefix+'InitFromPath('+PathItem.VariableName+');');
+      t.Add(aSpacePrefix+'Loop := '+BooleanToPascal(aItem^.PathToFollowLoop)+';');
     end;
 
     'TSpriteOnPath': begin

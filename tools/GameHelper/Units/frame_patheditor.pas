@@ -21,11 +21,11 @@ type
     BHelp: TSpeedButton;
     BSave: TSpeedButton;
     CBUseSpline: TCheckBox;
-    CBShowLevel: TCheckBox;
     CheckBox4: TCheckBox;
     ComboBox1: TComboBox;
     ComboBox2: TComboBox;
     ComboBox3: TComboBox;
+    ComboBox4: TComboBox;
     Edit1: TEdit;
     Label1: TLabel;
     Label2: TLabel;
@@ -35,6 +35,8 @@ type
     Panel1: TPanel;
     Panel8: TPanel;
     BClearAllNodes: TSpeedButton;
+    CBShowLevel: TCheckBox;
+    CBShowSprite: TCheckBox;
     procedure BCancelClick(Sender: TObject);
     procedure BClearAllNodesClick(Sender: TObject);
     procedure BHelpClick(Sender: TObject);
@@ -55,7 +57,7 @@ type
 implementation
 
 uses form_showhelp, u_screen_patheditor, u_project, u_utils, form_main,
-  u_resourcestring, u_levelbank, Dialogs;
+  u_resourcestring, u_levelbank, u_spritebank, Dialogs;
 
 {$R *.lfm}
 
@@ -120,6 +122,7 @@ begin
   ComboBox2.Enabled := CBShowLevel.Checked;
   Label3.Enabled := CBShowLevel.Checked;
   ComboBox3.Enabled := CBShowLevel.Checked;
+  ComboBox4.Enabled := CBShowSprite.Checked;
 
   if FInitializing then exit;
 
@@ -134,9 +137,18 @@ begin
   if (Sender = ComboBox3) and CBShowLevel.Checked then
     ScreenPathEditor.ShowLevel(ComboBox2.ItemIndex, ComboBox3.ItemIndex);
 
+  if (Sender = ComboBox4) and CBShowSprite.Checked then
+    ScreenPathEditor.ShowSprite(ComboBox4.ItemIndex);
+
   if Sender = CBShowLevel then begin
     if CBShowLevel.Checked then ScreenPathEditor.ShowLevel(ComboBox2.ItemIndex, ComboBox3.ItemIndex)
       else ScreenPathEditor.HideLevel;
+  end;
+
+  if Sender = CBShowSprite then begin
+    if CBShowSprite.Checked and (ComboBox4.ItemIndex <> -1)
+      then ScreenPathEditor.ShowSprite(ComboBox4.ItemIndex)
+      else ScreenPathEditor.HideSprite;
   end;
 
 end;
@@ -144,6 +156,7 @@ end;
 procedure TFramePathEditor.OnShow;
 begin
   LevelBank.FillComboBoxWithGroups(ComboBox2);
+  SpriteBank.FillComboBox(ComboBox4);
 end;
 
 procedure TFramePathEditor.EditPathFromBank(aItem: TPathDescriptorItem);

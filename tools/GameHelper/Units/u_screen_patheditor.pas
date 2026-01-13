@@ -24,8 +24,10 @@ private
   procedure ComputeCurveLineWidth;
   procedure DoLoopMoveNode;
 private
-  FSurfaces: TSurfaceList;
-  FTextures: TTextureList;
+  FLevelSurfaces: TSurfaceList;
+  FLevelTextures: TTextureList;
+  FSpriteSurfaces: TSurfaceList;
+  FSpriteTextures: TTextureList;
 private
   FPathNameToEdit: string;
 public
@@ -43,6 +45,9 @@ public
 
   procedure ShowLevel(aGroupIndex, aLevelIndex: integer);
   procedure HideLevel;
+
+  procedure ShowSprite(aSpriteIndex: integer);
+  procedure HideSprite;
 
 
   procedure ProcessMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -68,7 +73,7 @@ var ScreenPathEditor: TScreenPathEditor;
 
 implementation
 
-uses form_main, u_project, u_levelbank, Math, Controls, Forms;
+uses form_main, u_project, u_levelbank, u_spritebank, Math, Controls, Forms;
 
 { TScreenPathEditor }
 
@@ -243,18 +248,36 @@ begin
   if aLevelIndex = -1 then exit;
 
   group := LevelBank.Items[aGroupIndex];
-  FTextures := group.Textures;
-  FSurfaces.Textures := FTextures;
+  FLevelTextures := group.Textures;
+  FLevelSurfaces.Textures := FLevelTextures;
   level := group.Mutable[aLevelIndex];
 
-  FSurfaces.LoadFromString(level^.surfaces);
+  FLevelSurfaces.LoadFromString(level^.surfaces);
   ZoomViewToFit(Surfaces.GetItemsBounds, 0.8);
 end;
 
 procedure TScreenPathEditor.HideLevel;
 begin
-  FSurfaces.Clear;
-  FTextures := NIL;
+  FLevelSurfaces.Clear;
+  FLevelTextures := NIL;
+end;
+
+procedure TScreenPathEditor.ShowSprite(aSpriteIndex: integer);
+var itemSprite: PSpriteBankItem;
+begin
+  HideSprite;
+  itemSprite := SpriteBank.GetItemByIndex(aSpriteIndex);
+  if itemSprite <> NIL then begin
+    FSpriteTextures.LoadFromString(itemSprite^.textures);
+    FSpriteSurfaces.LoadFromString(itemSprite^.surfaces);
+    FSpriteSurfaces.CenterOnScene;
+  end;
+end;
+
+procedure TScreenPathEditor.HideSprite;
+begin
+  FSpriteSurfaces.Clear;
+  FSpriteTextures.Clear;
 end;
 
 procedure TScreenPathEditor.ProcessMouseUp(Button: TMouseButton;
@@ -346,14 +369,20 @@ end;
 procedure TScreenPathEditor.CreateObjects;
 var item: TPathDescriptorItem;
 begin
-  ShowLayers([LAYER_TOP, LAYER_UI, LAYER_LEVELBANK, LAYER_PATH]);
+  ShowLayers([LAYER_TOP, LAYER_UI, LAYER_LEVELBANK, LAYER_SPRITEBANK, LAYER_PATH]);
   ShowSceneBounds;
-  CreateCamera([LAYER_LEVELBANK, LAYER_PATH, LAYER_SCENEBOUNDS]);
+  CreateCamera([LAYER_LEVELBANK, LAYER_SPRITEBANK, LAYER_PATH, LAYER_SCENEBOUNDS]);
 
   ZoomOnScene;
 
-  FSurfaces := TSurfaceList.Create;
-  FSurfaces.WorkingLayer := LAYER_LEVELBANK;
+  FLevelSurfaces := TSurfaceList.Create;
+  FLevelSurfaces.WorkingLayer := LAYER_LEVELBANK;
+
+  FSpriteTextures := TTextureList.Create;
+  FSpriteSurfaces := TSurfaceList.Create;
+  FSpriteSurfaces.Textures := FSpriteTextures;
+  FSpriteSurfaces.WorkingLayer := LAYER_SPRITEBANK;
+
 
   if FPathNameToEdit <> '' then begin
     // editing an existing path
@@ -383,9 +412,17 @@ end;
 
 procedure TScreenPathEditor.FreeObjects;
 begin
-  FSurfaces.Clear;
-  FSurfaces.Free;
-  FSurfaces := NIL;
+  FLevelSurfaces.Clear;
+  FLevelSurfaces.Free;
+  FLevelSurfaces := NIL;
+  FLevelTextures := NIL;
+
+  FSpriteSurfaces.Clear;
+  FSpriteSurfaces.Free;
+  FSpriteSurfaces := NIL;
+  FSpriteTextures.Free;
+  FSpriteTextures := NIL;
+
   FPathToFollow := NIL;
   FSplinePathToFollow := NIL;
   FNodes := NIL;
@@ -418,12 +455,12 @@ end;
 
 function TScreenPathEditor.Surfaces: TSurfaceList;
 begin
-  Result := FSurfaces;
+  Result := FLevelSurfaces;
 end;
 
 function TScreenPathEditor.Textures: TTextureList;
 begin
-  Result := FTextures;
+  Result := FLevelTextures;
 end;
 
 end.

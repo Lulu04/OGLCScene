@@ -91,6 +91,7 @@ uses Types, u_utils, form_showhelp, u_project, OGLCScene;
 
 procedure TFrameTextureList.BChooseImageFileClick(Sender: TObject);
 var s: TSize;
+  i: Integer;
 begin
   if sender = BUpdateTextureListbox then
     Textures.FillListBox(LBTextureNames);
@@ -98,17 +99,41 @@ begin
   if Sender = BChooseImageFile then begin
     OD1.InitialDir := Project.Config.TargetLazarusProject.GetFolderDataTextures;
     if not OD1.Execute then exit;
-    Label2.Caption := OD1.FileName;
-    Label2.Hint := OD1.FileName;
-    Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
-    if LowerCase(ExtractFileExt(OD1.FileName)) = '.svg' then begin
-      s := GetSVGImageSize(OD1.FileName);
-      SE9.Value := s.cx;
-      SE10.Value := s.cy;
+    if OD1.Files.Count > 1 then begin
+      // multiple files
+      for i:=0 to OD1.Files.Count-1 do begin
+        Label2.Caption := OD1.Files.Strings[i];
+        Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.Files.Strings[i]), '');
+        if LowerCase(ExtractFileExt(OD1.Files.Strings[i])) = '.svg' then begin
+          s := GetSVGImageSize(OD1.Files.Strings[i]);
+          SE9.Value := s.cx;
+          SE10.Value := s.cy;
+        end else begin
+          s := GetImageSize(Label2.Caption);
+          SE9.Value := s.cx;
+          SE10.Value := s.cy;
+        end;
+        DoAddTexture;
+      end;
+      LBTextureNames.ItemIndex := -1;
+      Label2.Caption := '';
+      Edit1.Text := '';
+      SE9.Value := 0;
+      SE10.Value := 0;
     end else begin
-      s := GetImageSize(Label2.Caption);
-      SE9.Value := s.cx;
-      SE10.Value := s.cy;
+      // one file only
+      Label2.Caption := OD1.FileName;
+      Label2.Hint := OD1.FileName;
+      Edit1.Text := 'tex'+ChangeFileExt(ExtractFileName(OD1.FileName), '');
+      if LowerCase(ExtractFileExt(OD1.FileName)) = '.svg' then begin
+        s := GetSVGImageSize(OD1.FileName);
+        SE9.Value := s.cx;
+        SE10.Value := s.cy;
+      end else begin
+        s := GetImageSize(Label2.Caption);
+        SE9.Value := s.cx;
+        SE10.Value := s.cy;
+      end;
     end;
     UpdateTextureWidgetState;
   end;

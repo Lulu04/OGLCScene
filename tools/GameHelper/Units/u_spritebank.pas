@@ -6,7 +6,7 @@ unit u_spritebank;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, SysUtils, StdCtrls,
   OGLCScene, gvector,
   u_undo_redo;
 
@@ -53,6 +53,7 @@ TSpriteBank = class(specialize TVector<TSpriteBankItem>)
   function SpriteNameExists(const aName: string): boolean;
   // search is case insensitive
   function GetItemByName(const aName: string): PSpriteBankItem;
+  function GetItemByIndex(aindex: SizeUInt): PSpriteBankItem;
 
   procedure DeleteByIndex(aIndex: integer);
   procedure DeleteByName(const aName: string);
@@ -61,6 +62,8 @@ TSpriteBank = class(specialize TVector<TSpriteBankItem>)
   procedure LoadFrom(t: TStringList);
   procedure SaveToPath(const aPath: string);
   procedure LoadFromPath(const aPath: string);
+
+  procedure FillComboBox(aCB: TComboBox);
 end;
 
 var
@@ -250,7 +253,7 @@ begin
     end;
 
     // child variables declaration
-    t.Add('private');
+    t.Add('public');
     s := '';
     for i:=0 to surfaceList.Size-1 do begin
       current := surfaceList.Mutable[i];
@@ -267,7 +270,7 @@ begin
     end;
 
     // methods declaration
-    t.Add('public');
+//    t.Add('public');
     if textureList.Size > 0 then
       CodeGen.AddDeclarationOfClassLoadTexture(t);
     CodeGen.AddDeclarationOfSurfaceConstructor(t);
@@ -626,6 +629,11 @@ begin
     end;
 end;
 
+function TSpriteBank.GetItemByIndex(aindex: SizeUInt): PSpriteBankItem;
+begin
+  Result := Mutable[aindex];
+end;
+
 procedure TSpriteBank.DeleteByIndex(aIndex: integer);
 begin
   Erase(aIndex);
@@ -733,6 +741,15 @@ begin
   finally
     t.Free;
   end;
+end;
+
+procedure TSpriteBank.FillComboBox(aCB: TComboBox);
+var i: SizeUInt;
+begin
+  aCB.Clear;
+  if Size = 0 then exit;
+  for i:=0 to Size-1 do
+    aCB.Items.Add(Mutable[i]^.name);
 end;
 
 { TSpriteBankUndoRedoManager }
