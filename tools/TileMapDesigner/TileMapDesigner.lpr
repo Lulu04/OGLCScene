@@ -7,27 +7,30 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, lazopenglcontext, OGLCScene, common, u_main, u_tool_window, screen_map,
-  tileset_manager, uAskTileSize, uabout, uAskGroundType, uinsertlinecolumn,
-  uAskMapSize, uexportgroundtype, uaskeventvalue, usavemap,
-  uexporteventtype, umaps, uasknewlayermapinfo, uaskrenamemap, u_tileset_edit,
+  Forms, lazopenglcontext, OGLCScene, common, 
+form_main, form_tools, screen_map,
+  tileset_manager, 
+form_asktilesize, form_about, form_askgroundtype, form_insertlinecolumn,
+  form_askmapsize, form_exportgroundtype, form_askeventvalue, usavemap,
+  form_exporteventtype, umaps, form_asknewlayermapinfo, 
+form_askrenamemap, u_tileset_edit,
   u_tool_minimap, u_tool_layer;
 
 {$R *.res}
 
 begin
   Application.Initialize;
-  Application.CreateForm(TForm_Main, Form_Main);
-  Application.CreateForm(TForm_Tools, Form_Tools);
-  Application.CreateForm(TForm_AskTileSize, Form_AskTileSize);
-  Application.CreateForm(TForm_About, Form_About);
-  Application.CreateForm(TForm_AskGroundType, Form_AskGroundType);
-  Application.CreateForm(TForm_InsertLineColumn, Form_InsertLineColumn);
-  Application.CreateForm(TForm_AskMapSize, Form_AskMapSize);
-  Application.CreateForm(TForm_ExportGroundType, Form_ExportGroundType);
+  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormTools, FormTools);
+  Application.CreateForm(TFormAskTileSize, FormAskTileSize);
+  Application.CreateForm(TFormAbout, FormAbout);
+  Application.CreateForm(TFormAskGroundType, FormAskGroundType);
+  Application.CreateForm(TFormInsertLineColumn, FormInsertLineColumn);
+  Application.CreateForm(TFormAskMapSize, FormAskMapSize);
+  Application.CreateForm(TFormExportGroundType, FormExportGroundType);
   Application.CreateForm(TForm_AskEvent, Form_AskEvent);
   Application.CreateForm(TForm_ExportEvent, Form_ExportEvent);
-  Application.CreateForm(TForm_AskNewLayerMapInfo, Form_AskNewLayerMapInfo);
+  Application.CreateForm(TFormAskNewLayerMapInfo, FormAskNewLayerMapInfo);
   Application.CreateForm(TForm_RenameMap, Form_RenameMap);
   Application.CreateForm(TForm_Minimap, Form_Minimap);
   Application.CreateForm(TForm_ToolLayer, Form_ToolLayer);

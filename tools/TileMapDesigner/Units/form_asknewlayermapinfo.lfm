@@ -1,0 +1,52 @@
+object FormAskNewLayerMapInfo: TFormAskNewLayerMapInfo
+  Left = 402
+  Height = 240
+  Top = 301
+  Width = 320
+  BorderIcons = [biSystemMenu, biMinimize]
+  BorderStyle = bsSingle
+  Caption = 'New Layer Map'
+  ClientHeight = 240
+  ClientWidth = 320
+  Color = 5804495
+  Position = poMainFormCenter
+  LCLVersion = '4.5.0.0'
+  OnShow = FormShow
+  object BitBtn1: TBitBtn
+    Left = 56
+    Height = 23
+    Top = 208
+    Width = 80
+    Default = True
+    DefaultCaption = True
+    Kind = bkOK
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object BitBtn2: TBitBtn
+    Left = 165
+    Height = 23
+    Top = 208
+    Width = 78
+    Cancel = True
+    DefaultCaption = True
+    Kind = bkCancel
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Label1: TLabel
+    Left = 24
+    Height = 15
+    Top = 32
+    Width = 38
+    Caption = 'Name :'
+    ParentColor = False
+  end
+  object Edit1: TEdit
+    Left = 24
+    Height = 23
+    Top = 48
+    Width = 184
+    TabOrder = 2
+  end
+end

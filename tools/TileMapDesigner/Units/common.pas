@@ -53,8 +53,8 @@ procedure EvalKey(Key: Word);
 procedure OnlyThisLayerVisible(aL: integer);
 
 implementation
-uses u_main, LCLType,
-  u_tool_window,
+uses form_main, LCLType,
+  form_tools,
   u_tileset_edit,
   u_tool_minimap,
   u_tool_layer;
@@ -64,7 +64,7 @@ begin
  if not FProjectIsModified then
  begin
    FProjectIsModified := TRUE;
-   Form_Main.Caption := Form_Main.Caption + ' - modified';
+   FormMain.Caption := FormMain.Caption + ' - modified';
  end;
 end;
 
@@ -73,35 +73,35 @@ var i: integer;
 begin
  case Key of
   VK_PRIOR: begin  // PAGE_UP -> show previous tileset
-    i := Form_Tools.CB1.ItemIndex - 1;
-    if  i>=0 then Form_Tools.CB1.ItemIndex := i;
+    i := FormTools.CB1.ItemIndex - 1;
+    if  i>=0 then FormTools.CB1.ItemIndex := i;
     TileSetEdit.ShowPreviousTileset;
     Key := VK_UNKNOWN;
   end;
   VK_NEXT: begin   // PAGE_DOWN -> show next tileset
-    i := Form_Tools.CB1.ItemIndex + 1;
-    if i<Form_Tools.CB1.Items.Count then Form_Tools.CB1.ItemIndex := i;
+    i := FormTools.CB1.ItemIndex + 1;
+    if i<FormTools.CB1.Items.Count then FormTools.CB1.ItemIndex := i;
     TileSetEdit.ShowNextTileset;
     Key := VK_UNKNOWN;
   end;
 
   VK_F1: begin    // F1 -> Work on previous layer
-   i := Form_Tools.CLBLayer.ItemIndex;
-   if i>0 then Form_Tools.CLBLayer.ItemIndex:=i-1;
+   i := FormTools.CLBLayer.ItemIndex;
+   if i>0 then FormTools.CLBLayer.ItemIndex:=i-1;
   end;
 
   VK_F2: begin    // F2 -> Work on next layer
-   i := Form_Tools.CLBLayer.ItemIndex;
-   if i<Form_Tools.CLBLayer.Count-1 then Form_Tools.CLBLayer.ItemIndex:=i+1;
+   i := FormTools.CLBLayer.ItemIndex;
+   if i<FormTools.CLBLayer.Count-1 then FormTools.CLBLayer.ItemIndex:=i+1;
   end;
 
   VK_F6: begin    // F6 -> show/hide tool window
    if FToolWindowIsVisible then begin
     FToolWindowIsVisible:=FALSE;
-    Form_Tools.Hide;
+    FormTools.Hide;
    end else begin
     FToolWindowIsVisible:=TRUE;
-    Form_Tools.Show;
+    FormTools.Show;
    end;
   end;
 

@@ -62,8 +62,8 @@ end;
 var TileSetManager: TTilesetManager;
 
 implementation
-uses uAskGroundType,
-     uAskEventValue;
+uses form_askgroundtype,
+     form_askeventvalue;
 
 { TTilesetManager }
 
@@ -120,12 +120,12 @@ begin
   end;
 
   // load ground types
-  Form_AskGroundType.LB.Clear;
+  FormAskGroundType.LB.Clear;
   k := temp.IndexOf('GROUND_NAMES');
   if k <> -1 then begin
     txtsplited := temp.Strings[k+1].Split(['|']);
     for i:=0 to Length(txtsplited)-1 do
-     Form_AskGroundType.LB.Items.Add( txtsplited[i] );
+     FormAskGroundType.LB.Items.Add( txtsplited[i] );
   end;
 
   // load Events names

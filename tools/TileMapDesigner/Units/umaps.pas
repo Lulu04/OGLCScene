@@ -75,11 +75,11 @@ end;
 var MapList: TMapList;
 
 implementation
-uses u_tool_window,
-  uasknewlayermapinfo,
-  u_main,
+uses form_tools,
+  form_asknewlayermapinfo,
+  form_main,
   tileset_manager,
-  usavemap, uaskrenamemap,
+  usavemap, form_askrenamemap,
   u_tileset_edit, Math;
 
 { TMapInfo }
@@ -88,7 +88,7 @@ constructor TMapInfo.Create;
 begin
   TileEngine := TTileEngine.Create(FScene);
   //TileEngine.TileMapDesignerModeEnable := TRUE;
-  TileEngine.OnTileEvent := @Form_Main.ProcessTileEngineEvent;
+  TileEngine.OnTileEvent := @FormMain.ProcessTileEngineEvent;
   TileEngine.SetViewSize(FScene.Width, FScene.Height);
 end;
 
@@ -117,16 +117,16 @@ end;
 
 function TMapList.GetSelectedLayerName: string;
 begin
-  if Form_Tools.CLBLayer.ItemIndex=-1
+  if FormTools.CLBLayer.ItemIndex=-1
     then Result := ''
-    else Result := GetMapByIndex(Form_Tools.CLBLayer.ItemIndex).LayerName;
+    else Result := GetMapByIndex(FormTools.CLBLayer.ItemIndex).LayerName;
 end;
 
 function TMapList.GetSelectedMap: TMapInfo;
 begin
-  if Form_Tools.CLBLayer.ItemIndex=-1
+  if FormTools.CLBLayer.ItemIndex=-1
     then Result := NIL
-    else Result := GetMapByIndex(Form_Tools.CLBLayer.ItemIndex);
+    else Result := GetMapByIndex(FormTools.CLBLayer.ItemIndex);
 end;
 
 function TMapList.GetSelectedTileEngine: TTileEngine;
@@ -143,7 +143,7 @@ end;
 
 function TMapList.NoMapSelected: boolean;
 begin
-  Result := Form_Tools.CLBLayer.ItemIndex=-1;
+  Result := FormTools.CLBLayer.ItemIndex=-1;
 end;
 
 procedure TMapList.RemoveTileEngineFromSceneLayer;
@@ -196,8 +196,8 @@ begin
   PutTileEngineToSceneLayer;
   FWorkingTileEngine:=FMainMap.TileEngine;
 
-  Form_Tools.CLBLayer.Items.Add( FMainMap.LayerName );
-  Form_Tools.CLBLayer.Checked[0]:=TRUE;
+  FormTools.CLBLayer.Items.Add( FMainMap.LayerName );
+  FormTools.CLBLayer.Checked[0]:=TRUE;
 // Form_Tools.CLBLayer.ItemIndex:=0;
 
 end;
@@ -214,11 +214,11 @@ var temp: TStringList;
   i: integer;
   map_path: string;
 begin
-  if not Form_Tools.SD2.Execute then exit;
+  if not FormTools.SD2.Execute then exit;
 
   // save all the maps individualy in the file: layer_name.map
-  map_path := ExtractFilePath( Form_Tools.SD2.FileName );
-  Form_Main.SetWindowsTitle(ExtractFileName(Form_Tools.SD2.FileName));
+  map_path := ExtractFilePath( FormTools.SD2.FileName );
+  FormMain.SetWindowsTitle(ExtractFileName(FormTools.SD2.FileName));
 
   for i:=0 to Count-1 do with GetMapByIndex(i) do
     DoSave( TileEngine, map_path+LayerName+'.map');
@@ -233,11 +233,11 @@ begin
   end;
 
   temp.Add('[ACTIVE_MAP]');
-  temp.Add(inttostr(Form_Tools.CLBLayer.ItemIndex));
+  temp.Add(inttostr(FormTools.CLBLayer.ItemIndex));
 
   PatternList.SaveTo( temp );
 
-  temp.SaveToFile( Form_Tools.SD2.FileName );
+  temp.SaveToFile( FormTools.SD2.FileName );
 
   temp.Free;
   FProjectIsModified:=FALSE;
@@ -251,12 +251,12 @@ var temp: TStringList;
   splittedText: TStringArray;
 
 begin
-  if not Form_Tools.OD3.Execute then exit;
-  Form_Tools.SD2.FileName:=Form_Tools.OD3.FileName;
-  Form_Main.SetWindowsTitle(ExtractFileName(Form_Tools.OD3.FileName));
+  if not FormTools.OD3.Execute then exit;
+  FormTools.SD2.FileName:=FormTools.OD3.FileName;
+  FormMain.SetWindowsTitle(ExtractFileName(FormTools.OD3.FileName));
 
   temp:= TStringList.Create;
-  temp.LoadFromFile( Form_Tools.OD3.FileName );
+  temp.LoadFromFile( FormTools.OD3.FileName );
 
   k:=temp.IndexOf('[MAP_SESSION]');
   if k=-1 then begin
@@ -268,7 +268,7 @@ begin
   c:=strtoint(temp.Strings[k]);
 
   ClearList;
-  Form_Tools.CLBLayer.Clear;
+  FormTools.CLBLayer.Clear;
 
   // fill the list without loading any map data, because FMainMap isn't yet initialized
   while c>0 do begin
@@ -283,8 +283,8 @@ begin
 
    FMapList.Add( m );
 
-   i:=Form_Tools.CLBLayer.Items.Add( m.LayerName );
-   Form_Tools.CLBLayer.Checked[i] := splittedText[2]='VISIBLE';
+   i:=FormTools.CLBLayer.Items.Add( m.LayerName );
+   FormTools.CLBLayer.Checked[i] := splittedText[2]='VISIBLE';
 
    dec(c);
   end;
@@ -292,8 +292,8 @@ begin
   k := temp.IndexOf('[ACTIVE_MAP]');
   if k <> -1 then begin
     inc(k);
-    Form_Tools.CLBLayer.ItemIndex:=strtoint(temp.Strings[k]);
-    Form_Main.Label3.Caption:=SelectedLayerName;
+    FormTools.CLBLayer.ItemIndex:=strtoint(temp.Strings[k]);
+    FormMain.Label3.Caption:=SelectedLayerName;
   end;
   PatternList.LoadFrom( temp );
 
@@ -301,7 +301,7 @@ begin
 
 
   // prepare path to map data
-  map_path:= ExtractFilePath(Form_Tools.OD3.FileName);
+  map_path:= ExtractFilePath(FormTools.OD3.FileName);
   // load the main map data
   FMainMap.TileEngine.TexturesOwner:=TRUE;
   FMainMap.TileEngine.LoadMapFile( map_path+FMainMap.LayerName+'.map' );
@@ -313,9 +313,9 @@ begin
   // load tilesset from main map data
   TileSetManager.LoadTileSetFromMapFile( map_path+FMainMap.LayerName+'.map' );
   // update tileset's list
-  Form_Tools.CB1.Clear;
-  for i:=0 to TileSetManager.Count-1 do Form_Tools.CB1.Items.Add( TileSetManager.TileSet[i].Name );
-  if Form_Tools.CB1.Items.Count > 0 then Form_Tools.CB1.ItemIndex := 0;
+  FormTools.CB1.Clear;
+  for i:=0 to TileSetManager.Count-1 do FormTools.CB1.Items.Add( TileSetManager.TileSet[i].Name );
+  if FormTools.CB1.Items.Count > 0 then FormTools.CB1.ItemIndex := 0;
   // load all other maps
   for i:=0 to FMapList.Count-1 do
    if GetMapByIndex(i)<>FMainMap then
@@ -328,22 +328,26 @@ begin
       TileEngine.SetCoordinate(0, 0);
      end;
 
-  Form_Tools.PB1SetSizeAndPos;
-  Form_Tools.UpdateMapParameterOnScreen;
+  FormTools.PB1SetSizeAndPos;
+  FormTools.UpdateMapParameterOnScreen;
 
   PutTileEngineToSceneLayer;
+
+  FormTools.CLBLayer.ItemIndex := 0;
+  SetWorkingTileEngine;;
+
   FProjectIsModified := FALSE;
 end;
 
 procedure TMapList.NewMap;
 var o: TMapInfo;
 begin
-  if Form_AskNewLayerMapInfo.ShowModal = mrOk then
+  if FormAskNewLayerMapInfo.ShowModal = mrOk then
   begin
    RemoveTileEngineFromSceneLayer;
 
    o:= TMapInfo.Create;
-   o.LayerName := Form_AskNewLayerMapInfo.Edit1.Text;
+   o.LayerName := FormAskNewLayerMapInfo.Edit1.Text;
 
    if FMapList.Count = 0 then SetAsMainMap(o)
    else begin
@@ -364,7 +368,7 @@ begin
 
    FMapList.Add(o);
 
-   with Form_Tools.CLBLayer do begin
+   with FormTools.CLBLayer do begin
     ItemIndex:=Items.Add(o.LayerName);
     Checked[ItemIndex]:=TRUE;
    end;
@@ -387,10 +391,10 @@ begin
 
   FMapList.Remove(m);
   m.Free;
-  i:=Form_Tools.CLBLayer.ItemIndex;
-  if i=Form_Tools.CLBLayer.Count-1 then dec(i);
-  Form_Tools.CLBLayer.Items.Delete(Form_Tools.CLBLayer.ItemIndex);
-  Form_Tools.CLBLayer.ItemIndex:=i;
+  i:=FormTools.CLBLayer.ItemIndex;
+  if i=FormTools.CLBLayer.Count-1 then dec(i);
+  FormTools.CLBLayer.Items.Delete(FormTools.CLBLayer.ItemIndex);
+  FormTools.CLBLayer.ItemIndex:=i;
 
   SetProjectModified;
 end;
@@ -407,7 +411,7 @@ begin
 
   if Form_RenameMap.ShowModal=mrOk then begin
     m.LayerName:=Form_RenameMap.Edit1.Text;
-    Form_Tools.CLBLayer.Items.Strings[Form_Tools.CLBLayer.ItemIndex]:=Form_RenameMap.Edit1.Text;
+    FormTools.CLBLayer.Items.Strings[FormTools.CLBLayer.ItemIndex]:=Form_RenameMap.Edit1.Text;
   end;
 end;
 
@@ -460,7 +464,7 @@ begin
     t.InsertRow( aRowIndex, aCount);
     // set tileengine view to see whole map
     t.SetViewSize( t.MapSize.cx, t.MapSize.cy );
-    Form_Tools.UpdateMapParameterOnScreen;
+    FormTools.UpdateMapParameterOnScreen;
   end;
 end;
 
@@ -473,20 +477,20 @@ begin
     t.InsertColumn(aColumnIndex, aCount);
     // set tileengine view to see whole map
     t.SetViewSize(t.MapSize.cx, t.MapSize.cy);
-    Form_Tools.UpdateMapParameterOnScreen;
+    FormTools.UpdateMapParameterOnScreen;
   end;
 end;
 
 procedure TMapList.ShiftMapUp;
 var i: integer;
 begin
-  i:= Form_Tools.CLBLayer.ItemIndex;
+  i:= FormTools.CLBLayer.ItemIndex;
   if i<=0 then exit;
 
   RemoveTileEngineFromSceneLayer;
   FMapList.Exchange( i, i-1 );
-  Form_Tools.CLBLayer.Items.Exchange( i, i-1);
-  Form_Tools.CLBLayer.ItemIndex:=i-1;
+  FormTools.CLBLayer.Items.Exchange( i, i-1);
+  FormTools.CLBLayer.ItemIndex:=i-1;
   PutTileEngineToSceneLayer;
 
   SetProjectModified;
@@ -495,14 +499,14 @@ end;
 procedure TMapList.ShiftMapDown;
 var i: integer;
 begin
-  i := Form_Tools.CLBLayer.ItemIndex;
+  i := FormTools.CLBLayer.ItemIndex;
   if i = -1 then exit;
-  if i = Form_Tools.CLBLayer.Count-1 then exit;
+  if i = FormTools.CLBLayer.Count-1 then exit;
 
   RemoveTileEngineFromSceneLayer;
   FMapList.Exchange(i, i+1);
-  Form_Tools.CLBLayer.Items.Exchange(i, i+1);
-  Form_Tools.CLBLayer.ItemIndex := i+1;
+  FormTools.CLBLayer.Items.Exchange(i, i+1);
+  FormTools.CLBLayer.ItemIndex := i+1;
   PutTileEngineToSceneLayer;
 
   SetProjectModified;
@@ -510,8 +514,8 @@ end;
 
 procedure TMapList.SetWorkingTileEngine;
 begin
-  if Form_Tools.CLBLayer.ItemIndex = -1 then exit;
-  FWorkingTileEngine := TileEngine[Form_Tools.CLBLayer.ItemIndex];
+  if FormTools.CLBLayer.ItemIndex = -1 then exit;
+  FWorkingTileEngine := TileEngine[FormTools.CLBLayer.ItemIndex];
 end;
 
 end.

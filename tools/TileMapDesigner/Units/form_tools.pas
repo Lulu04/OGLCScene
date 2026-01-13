@@ -1,4 +1,4 @@
-unit u_tool_window;
+unit Form_Tools;
 
 {$mode objfpc}{$H+}
 
@@ -23,9 +23,9 @@ const
 
 type
 
-  { TForm_Tools }
+  { TFormTools }
 
-  TForm_Tools = class(TForm)
+  TFormTools = class(TForm)
     Arrow1: TArrow;
     Arrow2: TArrow;
     Button1: TButton;
@@ -154,21 +154,21 @@ type
   end;
 
 var
-  Form_Tools: TForm_Tools;
+  FormTools: TFormTools;
 
 implementation
 {$R *.lfm}
 uses u_tileset_edit, form_main;
 
-{ TForm_Tools }
+{ TFormTools }
 
 
-procedure TForm_Tools.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TFormTools.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   EvalKey( Key );
 end;
 
-procedure TForm_Tools.UpdateMapParameterOnScreen;
+procedure TFormTools.UpdateMapParameterOnScreen;
 var s: string;
 begin
   // map tile count
@@ -206,7 +206,7 @@ begin
 end;
 
 // set Paintbox size and pos
-procedure TForm_Tools.PB1SetSizeAndPos;
+procedure TFormTools.PB1SetSizeAndPos;
 var cellWidth, cellHeight: integer;
   tileAspectRatio: single;
 begin
@@ -220,7 +220,7 @@ begin
 end;
 
 // delete Tileset
-procedure TForm_Tools.Button2Click(Sender: TObject);
+procedure TFormTools.Button2Click(Sender: TObject);
 var i: integer;
 begin
   if CB1.ItemIndex = -1 then exit;
@@ -238,10 +238,10 @@ begin
 end;
 
 // set map size
-procedure TForm_Tools.Button4Click(Sender: TObject);
+procedure TFormTools.Button4Click(Sender: TObject);
 var s: string;
 begin
-  Form_AskMapSize.ShowModal;
+  FormAskMapSize.ShowModal;
 
   // map tile count
   s := 'Column: ' + inttostr(MapList.MainMap.TileEngine.MapTileCount.cx) + ' tile';
@@ -255,7 +255,7 @@ begin
 end;
 
 // stop scroll on main map
-procedure TForm_Tools.Button5Click(Sender: TObject);
+procedure TFormTools.Button5Click(Sender: TObject);
 begin
   SE7.Value := 0;
   SE8.Value := 0;
@@ -264,32 +264,32 @@ begin
 end;
 
 // go to top left on main map
-procedure TForm_Tools.Button6Click(Sender: TObject);
+procedure TFormTools.Button6Click(Sender: TObject);
 begin
   if CLBLayer.ItemIndex = -1 then exit;
   MapList.SelectedTileEngine.PositionOnMap.Value := PointF(0, 0);
 end;
 
 // add map layer
-procedure TForm_Tools.Button7Click(Sender: TObject);
+procedure TFormTools.Button7Click(Sender: TObject);
 begin
   MapList.NewMap;
 end;
 
 // delete map layer
-procedure TForm_Tools.Button8Click(Sender: TObject);
+procedure TFormTools.Button8Click(Sender: TObject);
 begin
   MapList.DeleteMap;
 end;
 
 // tileset choice
-procedure TForm_Tools.CB1Change(Sender: TObject);
+procedure TFormTools.CB1Change(Sender: TObject);
 begin
   PB1SetSizeAndPos;
   PB1.Invalidate;
 end;
 
-procedure TForm_Tools.CB4Change(Sender: TObject);
+procedure TFormTools.CB4Change(Sender: TObject);
 begin
   if CB4.ItemIndex = 1 then
   begin
@@ -306,7 +306,7 @@ begin
 end;
 
 
-procedure TForm_Tools.CB5Change(Sender: TObject);
+procedure TFormTools.CB5Change(Sender: TObject);
 begin
   CB2.Enabled := CB5.Checked;
   Label16.Enabled := CB5.Checked;
@@ -322,12 +322,12 @@ begin
 end;
 
 // show Ground type
-procedure TForm_Tools.CheckBox1Change(Sender: TObject);
+procedure TFormTools.CheckBox1Change(Sender: TObject);
 begin
  PB1.Invalidate;
 end;
 
-procedure TForm_Tools.CLBLayerClickCheck(Sender: TObject);
+procedure TFormTools.CLBLayerClickCheck(Sender: TObject);
 var i: integer;
 begin
   for i:=0 to CLBLayer.Count-1 do
@@ -335,7 +335,7 @@ begin
 end;
 
 // user have selected a map layer
-procedure TForm_Tools.CLBLayerSelectionChange(Sender: TObject;
+procedure TFormTools.CLBLayerSelectionChange(Sender: TObject;
   User: boolean);
 begin
   MapList.SetWorkingTileEngine;
@@ -347,7 +347,7 @@ begin
   CB3.Checked := FWorkingTileEngine.VLoopMode;
 end;
 
-procedure TForm_Tools.FormCreate(Sender: TObject);
+procedure TFormTools.FormCreate(Sender: TObject);
 begin
   MapList := TMapList.Create;
   TileSetEdit := TTilesetEdit.Create;
@@ -356,38 +356,38 @@ end;
 
 
 // add Tileset
-procedure TForm_Tools.Button1Click(Sender: TObject);
+procedure TFormTools.Button1Click(Sender: TObject);
 begin
   if MapList.Count = 0 then exit;
   if not OD1.Execute then exit;
-  Form_AskTileSize.ShowModal;
+  FormAskTileSize.ShowModal;
   if TilesetManager.Count > 0
-    then if (TilesetManager.TileSet[0].TileWidth <> strtoint(Form_AskTileSize.E1.Text)) and
-            (TileSetManager.TileSet[0].TileHeight <> strtoint (Form_AskTileSize.E2.Text))
+    then if (TilesetManager.TileSet[0].TileWidth <> strtoint(FormAskTileSize.E1.Text)) and
+            (TileSetManager.TileSet[0].TileHeight <> strtoint (FormAskTileSize.E2.Text))
            then showmessage('Warning : this tileset does not have the same tile size as the first...');
-  LoadTextureToProject(OD1.FileName, strtoint(Form_AskTileSize.E1.Text), strtoint(Form_AskTileSize.E2.Text));
+  LoadTextureToProject(OD1.FileName, strtoint(FormAskTileSize.E1.Text), strtoint(FormAskTileSize.E2.Text));
   SetProjectModified;
 end;
 
 // layer map shift up in the list
-procedure TForm_Tools.Arrow1Click(Sender: TObject);
+procedure TFormTools.Arrow1Click(Sender: TObject);
 begin
   MapList.ShiftMapUp;
 end;
 // layer map shift down in the list
-procedure TForm_Tools.Arrow2Click(Sender: TObject);
+procedure TFormTools.Arrow2Click(Sender: TObject);
 begin
   MapList.ShiftMapDown;
 end;
 
 // rename a map layer
-procedure TForm_Tools.Button11Click(Sender: TObject);
+procedure TFormTools.Button11Click(Sender: TObject);
 begin
   MapList.RenameMap;
 end;
 
 // load texture
-procedure TForm_Tools.LoadTextureToProject(AFilename: string; AFrameWidth, AFrameHeight: integer);
+procedure TFormTools.LoadTextureToProject(AFilename: string; AFrameWidth, AFrameHeight: integer);
 begin
   MapList.MainMap.TileEngine.AddTexture(AFilename, AFrameWidth, AFrameHeight);
 
@@ -402,25 +402,25 @@ begin
 end;
 
 // menu About
-procedure TForm_Tools.MenuItem9Click(Sender: TObject);
+procedure TFormTools.MenuItem9Click(Sender: TObject);
 begin
-  Form_About.ShowModal;
+  FormAbout.ShowModal;
 end;
 
 // menu Map - ClearAll
-procedure TForm_Tools.Menu_ClearAllMapClick(Sender: TObject);
+procedure TFormTools.Menu_ClearAllMapClick(Sender: TObject);
 begin
   if MessageDlg ('', 'Reset the map ?', mtWarning, [mbYes,mbCancel], 0) = mrYes
     then MapList.ResetMaps;
 end;
 
 // popup menu tile - Export ground type
-procedure TForm_Tools.Menu_ExportGroundTypeClick(Sender: TObject);
+procedure TFormTools.Menu_ExportGroundTypeClick(Sender: TObject);
 begin
-  Form_ExportGroundType.ShowModal;
+  FormExportGroundType.ShowModal;
 end;
 
-procedure TForm_Tools.MILoadSessionClick(Sender: TObject);
+procedure TFormTools.MILoadSessionClick(Sender: TObject);
 var mr: TModalResult;
 begin
   if FProjectIsModified then
@@ -434,29 +434,29 @@ begin
   MapList.LoadSession;
 end;
 
-procedure TForm_Tools.MISaveSessionClick(Sender: TObject);
+procedure TFormTools.MISaveSessionClick(Sender: TObject);
 begin
   MapList.SaveSession;
 end;
 
-procedure TForm_Tools.Panel2Click(Sender: TObject);
+procedure TFormTools.Panel2Click(Sender: TObject);
 begin
 // MapList.MainMap.TileEngine.ResetMap;
 end;
 
-procedure TForm_Tools.PB1MouseDown(Sender: TObject; Button: TMouseButton;
+procedure TFormTools.PB1MouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
-var delta: integer;
+var delta: single;
 begin
   if CB1.ItemIndex = -1 then exit;
 
   with TileSetManager.TileSet[CB1.ItemIndex] do
   begin
-    delta := PB1.Width div XTileCount;
-    FSelectedCell.x :=  X div delta;
+    delta := PB1.Width / XTileCount;
+    FSelectedCell.x :=  Trunc(X / delta);
 
-    delta := PB1.Height div YTileCount;
-    FSelectedCell.y :=  Y div delta;
+    delta := PB1.Height / YTileCount;
+    FSelectedCell.y :=  Trunc(Y / delta);
   end;
 
   PB1.Invalidate;
@@ -465,7 +465,7 @@ end;
 
 
 // PaintBox paint
-procedure TForm_Tools.PB1Paint(Sender: TObject);
+procedure TFormTools.PB1Paint(Sender: TObject);
 var bg, ima: TBGRABitmap;
     i, xxx, yyy, ixfr, iyfr: integer;
   deltaH, deltaV, xx, yy: single;
@@ -533,17 +533,17 @@ begin
 end;
 
 // popup set ground type
-procedure TForm_Tools.MenuItem5Click(Sender: TObject);
+procedure TFormTools.MenuItem5Click(Sender: TObject);
 begin
   if CB1.ItemIndex = -1 then exit;
-  if Form_AskGroundType.ShowModal = mrCancel then exit;
+  if FormAskGroundType.ShowModal = mrCancel then exit;
 
-  MapList.MainMap.TileEngine.SetGroundType(CB1.ItemIndex, FSelectedCell.x, FSelectedCell.y, Form_AskGroundType.LB.ItemIndex);
+  MapList.MainMap.TileEngine.SetGroundType(CB1.ItemIndex, FSelectedCell.x, FSelectedCell.y, FormAskGroundType.LB.ItemIndex);
   PB1.Invalidate;
 end;
 
 // Help button click page 'Setting'
-procedure TForm_Tools.SBHelp1Click(Sender: TObject);
+procedure TFormTools.SBHelp1Click(Sender: TObject);
 begin
  Showmessage('Tile Map Designer offer the possibility to create maps with multiple layers.'+lineending+
              'A session file groups all the informations to organize the layers in your map.'+lineending+
@@ -569,7 +569,7 @@ begin
 end;
 
 // Help button click Tileset
-procedure TForm_Tools.SBHelp2Click(Sender: TObject);
+procedure TFormTools.SBHelp2Click(Sender: TObject);
 begin
  Showmessage('A map use texture or tileset that contains each tile.'+lineending+
              'ADD TILESET -> Load a tileset and add it to your project.'+lineending+
@@ -590,14 +590,14 @@ begin
 end;
 
 // change map view size in game
-procedure TForm_Tools.SE3Change(Sender: TObject);
+procedure TFormTools.SE3Change(Sender: TObject);
 begin
 
  SetProjectModified;
 end;
 
 // scrolling speed (main map)
-procedure TForm_Tools.SE7Change(Sender: TObject);
+procedure TFormTools.SE7Change(Sender: TObject);
 var i: integer;
 begin
   i := CLBLayer.ItemIndex;
@@ -606,7 +606,7 @@ begin
 end;
 
 
-procedure TForm_Tools.GetTextureAndFrameindex(out t, ixfr, iyfr: integer);
+procedure TFormTools.GetTextureAndFrameindex(out t, ixfr, iyfr: integer);
 begin
   t := CB1.ItemIndex;
   if t = -1 then
@@ -619,7 +619,7 @@ begin
   end;
 end;
 
-procedure TForm_Tools.SetRelativeSelectedTile(aDeltaX, aDeltay: integer);
+procedure TFormTools.SetRelativeSelectedTile(aDeltaX, aDeltay: integer);
 begin
   FSelectedCell.x := FSelectedCell.x + aDeltaX;
   FSelectedCell.y := FSelectedCell.y + aDeltay;
