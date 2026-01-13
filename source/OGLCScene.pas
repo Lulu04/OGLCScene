@@ -958,10 +958,9 @@ end;
 
 constructor TOGLCScene.Create(aOGLContext: TOpenGLControl; aAspectRatio: single);
 begin
-  if aAspectRatio <> -1 then begin
+  if aAspectRatio <> -1 then
     aOGLContext.Align := alNone;
-    if aAspectRatio < 1.0 then aAspectRatio := 4/3;
-  end;
+
   inherited Create(aOGLContext, aAspectRatio);
 
   FBackgroundColorF.Init(0,0,0,1);
