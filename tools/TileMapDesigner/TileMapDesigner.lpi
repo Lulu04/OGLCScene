@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MajorVersionNr Value="2"/>
-      <BuildNr Value="1607"/>
+      <BuildNr Value="1615"/>
       <Language Value="040C"/>
       <StringTable CompanyName="Lulu" FileDescription="Tile Map Designer" LegalCopyright="Lulu" LegalTrademarks="LuLu" ProductName="Tile Map Designer" ProductVersion="1.0"/>
     </VersionInfo>
@@ -29,7 +29,7 @@
           <Version Value="11"/>
           <PathDelim Value="\"/>
           <Target>
-            <Filename Value="TileMapDesigner"/>
+            <Filename Value="Binary\TileMapDesigner"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -93,48 +93,52 @@
         <PackageName Value="LCL"/>
       </Item6>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="24">
       <Unit0>
         <Filename Value="TileMapDesigner.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="10"/>
-        <CursorPos X="52" Y="18"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="10"/>
+        <WindowIndex Value="1"/>
+        <TopLine Value="8"/>
+        <CursorPos X="44" Y="20"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="Units\common.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <CursorPos Y="30"/>
+        <TopLine Value="18"/>
+        <CursorPos X="25" Y="27"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="Units\u_main.pas"/>
+        <Filename Value="Units\form_main.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_Main"/>
+        <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="836"/>
-        <CursorPos Y="847"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="1112"/>
+        <CursorPos X="100" Y="1119"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="1">
-          <Item0 Y="1103"/>
+          <Item0 X="3" Y="1192" Left="1" Top="1180"/>
         </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="Units\u_tool_window.pas"/>
+        <Filename Value="Units\form_tools.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_Tools"/>
+        <ComponentName Value="FormTools"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Form_Tools"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="544"/>
-        <CursorPos X="48" Y="546"/>
+        <TopLine Value="309"/>
+        <CursorPos X="26" Y="316"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -143,8 +147,8 @@
         <Filename Value="Units\screen_map.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="42"/>
-        <CursorPos X="48" Y="56"/>
+        <TopLine Value="8"/>
+        <CursorPos X="25" Y="47"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit4>
@@ -152,103 +156,99 @@
         <Filename Value="Units\tileset_manager.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="11"/>
-        <CursorPos X="12" Y="10"/>
+        <TopLine Value="109"/>
+        <CursorPos X="10" Y="128"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
-        <Filename Value="Units\uasktilesize.pas"/>
+        <Filename Value="Units\form_asktilesize.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_AskTileSize"/>
+        <ComponentName Value="FormAskTileSize"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uAskTileSize"/>
         <EditorIndex Value="9"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="5" Y="11"/>
+        <CursorPos X="12"/>
         <UsageCount Value="204"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit6>
       <Unit7>
-        <Filename Value="Units\uabout.pas"/>
+        <Filename Value="Units\form_about.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_About"/>
+        <ComponentName Value="FormAbout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="8"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="10"/>
-        <CursorPos Y="31"/>
+        <CursorPos X="12"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="Units\uaskgroundtype.pas"/>
+        <Filename Value="Units\form_askgroundtype.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_AskGroundType"/>
+        <ComponentName Value="FormAskGroundType"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uAskGroundType"/>
+        <UnitName Value="Form_AskGroundType"/>
         <EditorIndex Value="3"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="27"/>
-        <CursorPos Y="41"/>
+        <TopLine Value="100"/>
+        <CursorPos X="6" Y="113"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit8>
       <Unit9>
-        <Filename Value="Units\uinsertlinecolumn.pas"/>
+        <Filename Value="Units\form_insertlinecolumn.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_InsertLineColumn"/>
+        <ComponentName Value="FormInsertLineColumn"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Form_InsertLineColumn"/>
         <EditorIndex Value="2"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="5"/>
-        <CursorPos X="24" Y="28"/>
+        <CursorPos X="11"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit9>
       <Unit10>
-        <Filename Value="Units\uaskmapsize.pas"/>
+        <Filename Value="Units\form_askmapsize.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_AskMapSize"/>
+        <ComponentName Value="FormAskMapSize"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uAskMapSize"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="1"/>
-        <CursorPos X="12" Y="10"/>
+        <CursorPos X="18"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="Units\uexportgroundtype.pas"/>
+        <Filename Value="Units\form_exportgroundtype.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_ExportGroundType"/>
+        <ComponentName Value="FormExportGroundType"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="7"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="28"/>
-        <CursorPos X="25" Y="39"/>
+        <TopLine Value="37"/>
+        <CursorPos X="34" Y="55"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="Units\uaskeventvalue.pas"/>
+        <Filename Value="Units\form_askeventvalue.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form_AskEvent"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="uAskEventValue"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
         <WindowIndex Value="1"/>
         <CursorPos X="11" Y="9"/>
@@ -257,7 +257,7 @@
         <LoadedDesigner Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="Units\uexporteventtype.pas"/>
+        <Filename Value="Units\form_exporteventtype.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form_ExportEvent"/>
         <HasResources Value="True"/>
@@ -276,36 +276,36 @@
         <ComponentName Value="Form_Save"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="6"/>
-        <CursorPos X="43" Y="82"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="73"/>
+        <CursorPos X="47" Y="87"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit14>
       <Unit15>
         <Filename Value="Units\umaps.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="63"/>
-        <CursorPos Y="77"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="312"/>
+        <CursorPos X="25" Y="327"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit15>
       <Unit16>
-        <Filename Value="Units\uasknewlayermapinfo.pas"/>
+        <Filename Value="Units\form_asknewlayermapinfo.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form_AskNewLayerMapInfo"/>
+        <ComponentName Value="FormAskNewLayerMapInfo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="13"/>
-        <CursorPos X="41" Y="20"/>
+        <CursorPos X="26"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit16>
       <Unit17>
-        <Filename Value="Units\uaskrenamemap.pas"/>
+        <Filename Value="Units\form_askrenamemap.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Form_RenameMap"/>
         <HasResources Value="True"/>
@@ -313,17 +313,17 @@
         <WindowIndex Value="1"/>
         <TopLine Value="3"/>
         <CursorPos X="33" Y="15"/>
-        <UsageCount Value="176"/>
+        <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit17>
       <Unit18>
         <Filename Value="Units\u_tileset_edit.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="393"/>
-        <CursorPos X="25" Y="407"/>
-        <UsageCount Value="161"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="390"/>
+        <CursorPos X="13" Y="405"/>
+        <UsageCount Value="192"/>
         <Loaded Value="True"/>
       </Unit18>
       <Unit19>
@@ -332,10 +332,10 @@
         <ComponentName Value="Form_Minimap"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="87"/>
-        <CursorPos X="3" Y="91"/>
-        <UsageCount Value="110"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="128"/>
+        <CursorPos X="39" Y="147"/>
+        <UsageCount Value="141"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit19>
@@ -345,24 +345,170 @@
         <ComponentName Value="Form_ToolLayer"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="16"/>
         <CursorPos X="11" Y="30"/>
-        <UsageCount Value="99"/>
+        <UsageCount Value="130"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="C:\LazarusFromFpcupDelux\lazarus\components\freetype\easylazfreetype.pas"/>
+        <UnitName Value="EasyLazFreeType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="921"/>
+        <CursorPos Y="935"/>
+        <UsageCount Value="7"/>
+      </Unit21>
+      <Unit22>
+        <Filename Value="..\..\source\oglcTileEngine.inc"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="206"/>
+        <CursorPos X="11" Y="206"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit22>
+      <Unit23>
+        <Filename Value="..\..\source\oglcVelocityCurve.inc"/>
+        <EditorIndex Value="9"/>
+        <TopLine Value="632"/>
+        <CursorPos Y="647"/>
+        <UsageCount Value="17"/>
+        <Loaded Value="True"/>
+      </Unit23>
     </Units>
     <OtherDefines Count="1">
       <Define0 Value="UseCThreads"/>
     </OtherDefines>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="30" HistoryIndex="29">
+      <Position1>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="50" Column="13" TopLine="35"/>
+      </Position1>
+      <Position2>
+        <Filename Value="Units\common.pas"/>
+        <Caret Line="103" Column="40" TopLine="81"/>
+      </Position2>
+      <Position3>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="331" Column="20" TopLine="312"/>
+      </Position3>
+      <Position4>
+        <Filename Value="Units\form_tools.pas"/>
+        <Caret Line="147" Column="15" TopLine="134"/>
+      </Position4>
+      <Position5>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="334" Column="17" TopLine="312"/>
+      </Position5>
+      <Position6>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="41" Column="13" TopLine="26"/>
+      </Position6>
+      <Position7>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="159" Column="3" TopLine="156"/>
+      </Position7>
+      <Position8>
+        <Filename Value="Units\form_tools.pas"/>
+        <Caret Line="213" Column="3" TopLine="207"/>
+      </Position8>
+      <Position9>
+        <Filename Value="Units\form_tools.pas"/>
+        <Caret Line="341" Column="23" TopLine="337"/>
+      </Position9>
+      <Position10>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="65" Column="13" TopLine="51"/>
+      </Position10>
+      <Position11>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="513" Column="3" TopLine="489"/>
+      </Position11>
+      <Position12>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="50" Column="18" TopLine="39"/>
+      </Position12>
+      <Position13>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="335" Column="2" TopLine="309"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\source\oglcVelocityCurve.inc"/>
+        <Caret Line="647" TopLine="632"/>
+      </Position14>
+      <Position15>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="335" TopLine="311"/>
+      </Position15>
+      <Position16>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="513" TopLine="490"/>
+      </Position16>
+      <Position17>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="514" Column="34" TopLine="490"/>
+      </Position17>
+      <Position18>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="1024" Column="23" TopLine="1015"/>
+      </Position18>
+      <Position19>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="156" Column="22" TopLine="136"/>
+      </Position19>
+      <Position20>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="1246" Column="38" TopLine="1225"/>
+      </Position20>
+      <Position21>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="155" Column="15" TopLine="142"/>
+      </Position21>
+      <Position22>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="1174" Column="41" TopLine="1169"/>
+      </Position22>
+      <Position23>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="1190" Column="37" TopLine="1178"/>
+      </Position23>
+      <Position24>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="146" Column="26" TopLine="132"/>
+      </Position24>
+      <Position25>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="326" Column="3" TopLine="312"/>
+      </Position25>
+      <Position26>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="1191" Column="40" TopLine="1177"/>
+      </Position26>
+      <Position27>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="146" Column="14" TopLine="132"/>
+      </Position27>
+      <Position28>
+        <Filename Value="Units\form_tools.pas"/>
+        <Caret Line="341" Column="23" TopLine="337"/>
+      </Position28>
+      <Position29>
+        <Filename Value="Units\form_tools.pas"/>
+        <Caret Line="316" Column="26" TopLine="309"/>
+      </Position29>
+      <Position30>
+        <Filename Value="Units\umaps.pas"/>
+        <Caret Line="327" Column="25" TopLine="312"/>
+      </Position30>
+    </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="TileMapDesigner"/>
+      <Filename Value="Binary\TileMapDesigner"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>

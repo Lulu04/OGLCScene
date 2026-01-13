@@ -1,4 +1,4 @@
-unit u_tool_window;
+unit form_tool_window;
 
 {$mode objfpc}{$H+}
 

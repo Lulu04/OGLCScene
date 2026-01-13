@@ -121,7 +121,7 @@ procedure SetViewOnTileSetEdit;
 procedure SetViewOnPatternList;
 
 implementation
-uses umaps, u_main, Controls, glcorearb; //, gl;
+uses umaps, form_main, Controls, glcorearb; //, gl;
 
 function WorkingPattern: TTiledPattern;
 begin
@@ -401,13 +401,13 @@ var FMousePos: TPoint;
     p1: TPoint;
     p: PTile;
 begin
- FMousePos := Form_Main.OpenGlControl1.ScreenToClient( Mouse.CursorPos );
- if not Form_Main.XYCoorIsInMap( FMousePos.x, FMousePos.y ) then exit;
+ FMousePos := FormMain.OpenGlControl1.ScreenToClient( Mouse.CursorPos );
+ if not FormMain.XYCoorIsInMap( FMousePos.x, FMousePos.y ) then exit;
 
- FMousePos := Form_Main.ClientCoorToTileTopLeftCoor( FMousePos );
+ FMousePos := FormMain.ClientCoorToTileTopLeftCoor( FMousePos );
 
  // take the info of the target tile
- p1 := Form_Main.ClientPosToTileIndex( FMousePos );
+ p1 := FormMain.ClientPosToTileIndex( FMousePos );
  p := FWorkingTileEngine.GetPTile( p1.y, p1.x);
 
  AddOrRemoveTile( p^.TextureIndex, Point(p^.ixFrame,p^.iyFrame), FMousePos );

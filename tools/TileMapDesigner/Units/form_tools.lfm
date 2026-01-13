@@ -1,4 +1,4 @@
-object Form_Tools: TForm_Tools
+object FormTools: TFormTools
   Left = 835
   Height = 641
   Top = 54
@@ -22,9 +22,9 @@ object Form_Tools: TForm_Tools
     Height = 641
     Top = 0
     Width = 339
-    ActivePage = TabSheet1
+    ActivePage = pageLayer
     Align = alClient
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'Tilesets'

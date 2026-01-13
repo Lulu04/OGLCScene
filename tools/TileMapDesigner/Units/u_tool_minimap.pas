@@ -38,7 +38,7 @@ var
   Form_Minimap: TForm_Minimap;
 
 implementation
-uses u_main, Math, OGLCScene;
+uses form_main, Math, OGLCScene;
 
 {$R *.lfm}
 
@@ -139,9 +139,9 @@ end;
 procedure TForm_Minimap.FormShow(Sender: TObject);
 var p: TPoint;
 begin
- p.x := Form_Main.SpeedButton3.Left;
- p.y := Form_Main.SpeedButton3.Top+Form_Main.SpeedButton3.Height;
- p := Form_Main.ClientToScreen(p);
+ p.x := FormMain.SpeedButton3.Left;
+ p.y := FormMain.SpeedButton3.Top+FormMain.SpeedButton3.Height;
+ p := FormMain.ClientToScreen(p);
 
  p := Mouse.CursorPos;
 

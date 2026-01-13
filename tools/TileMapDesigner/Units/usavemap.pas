@@ -15,9 +15,9 @@ procedure DoSave( aTileEngine: TTileEngine; const aFilename: string );
 implementation
 uses tileset_manager,
 
-     u_tool_window,
-     uAskGroundType,
-     uAskEventValue;
+     form_tools,
+     form_askgroundtype,
+     form_askeventvalue;
 
 procedure DoSave( aTileEngine: TTileEngine; const aFilename: string );
 var FMapFile: TStringList;
@@ -37,10 +37,10 @@ begin
 
   // draw size
   FMapFile.Add('DRAW_SIZE');
-  if Form_Tools.CB4.ItemIndex=0
-    then FMapFile.Add( inttostr(Form_Tools.SE3.Value) + '|' + inttostr(Form_Tools.SE4.Value) )
-    else FMapFile.Add( inttostr(Form_Tools.SE3.Value * aTileEngine.TileSize.cx) + '|' +
-                       inttostr(Form_Tools.SE4.Value * aTileEngine.TileSize.cy) );
+  if FormTools.CB4.ItemIndex=0
+    then FMapFile.Add( inttostr(FormTools.SE3.Value) + '|' + inttostr(FormTools.SE4.Value) )
+    else FMapFile.Add( inttostr(FormTools.SE3.Value * aTileEngine.TileSize.cx) + '|' +
+                       inttostr(FormTools.SE4.Value * aTileEngine.TileSize.cy) );
 
   // tile size
   FMapFile.Add('TILE_SIZE');
@@ -66,7 +66,7 @@ begin
 
   // start tile
   FMapFile.Add('START_TILE');
-  FMapFile.Add( Form_Tools.Label10.Caption + '|' + Form_Tools.Label11.Caption );
+  FMapFile.Add( FormTools.Label10.Caption + '|' + FormTools.Label11.Caption );
 
   // Event names
   if Form_AskEvent.LB.Count > 0 then
@@ -79,12 +79,12 @@ begin
   end;
 
   // Ground names
-  if Form_AskGroundType.LB.Count > 0 then
+  if FormAskGroundType.LB.Count > 0 then
   begin
     FMapFile.Add('GROUND_NAMES');
-    for i:=0 to Form_AskGroundType.LB.Count-1 do
-      if i=0 then s := Form_AskGroundType.LB.Items.Strings[i]
-             else s+= '|' + Form_AskGroundType.LB.Items.Strings[i];
+    for i:=0 to FormAskGroundType.LB.Count-1 do
+      if i=0 then s := FormAskGroundType.LB.Items.Strings[i]
+             else s+= '|' + FormAskGroundType.LB.Items.Strings[i];
     FMapFile.Add( s );
   end;
 

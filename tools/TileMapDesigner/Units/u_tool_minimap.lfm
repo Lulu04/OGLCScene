@@ -11,11 +11,11 @@ object Form_Minimap: TForm_Minimap
   Color = clBlack
   FormStyle = fsStayOnTop
   KeyPreview = True
+  LCLVersion = '4.5.0.0'
   OnDeactivate = FormDeactivate
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
-  LCLVersion = '3.8.0.0'
   object PB2: TPaintBox
     Left = 0
     Height = 80
