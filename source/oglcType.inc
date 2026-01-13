@@ -716,7 +716,7 @@ end;
 
 procedure TFontDescriptor.DuplicateTo(aDest: PFontDescriptor);
 begin
-  aDest^.FontName := FontName;
+  aDest^.FontName := Copy(FontName, 1, Length(FontName));
   aDest^.FontHeight := FontHeight;
   aDest^.Style := Style;
   aDest^.OutLineColor := OutLineColor;
