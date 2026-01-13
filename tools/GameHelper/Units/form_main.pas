@@ -106,8 +106,6 @@ type
     procedure ShowPagePathBank;
     procedure ShowPagePathEditor;
 
-    procedure EditSpriteInSpriteBank(const aName: string);
-    procedure EditNewSprite;
     procedure EditLevelInLevelBank(const aName: string);
   end;
 
@@ -632,22 +630,6 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
-end;
-
-procedure TFormMain.EditSpriteInSpriteBank(const aName: string);
-begin
-  FrameToolsSpriteBuilder.EditSpriteInSpriteBank(aName);
-  ShowPageSpriteBuilder;
-  ToolBarMain.Visible := False;
-end;
-
-procedure TFormMain.EditNewSprite;
-begin
-  FScene.RunScreen(ScreenSpriteBuilder);
-  Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBuilder);
-  FrameToolsSpriteBuilder.OnShow;
-  UpdateWidgets;
-  ToolBarMain.Visible := False;
 end;
 
 procedure TFormMain.EditLevelInLevelBank(const aName: string);

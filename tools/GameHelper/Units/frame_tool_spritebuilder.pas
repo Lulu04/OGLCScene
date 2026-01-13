@@ -1264,7 +1264,8 @@ begin
     FWorkingChild^.SetChildDependency;
     FModified := True;
     // restore handle
-    FWorkingChild^.ShowHandle;
+    if ScreenSpriteBuilder.AlreadySelected(FWorkingChild) then
+      FWorkingChild^.ShowHandle;
   end;
 
   UpdateValuesToWorkingSurface;
@@ -1957,9 +1958,13 @@ begin
   Bodies.SetParentSurface(Surfaces.GetRootItem^.surface);
   Postures.LoadFromString(o^.postures);
   FCodeGenerationOptions.LoadFromString(o^.codeoptions);
-  FInitializingWidget := True;
 
+  FInitializingWidget := True;
+  CheckBox1.Checked := FCodeGenerationOptions.useapplysymetrywhenflip;
+  CheckBox2.Checked := FCodeGenerationOptions.overrideProcessMessage;
+  CheckBox3.Checked := FCodeGenerationOptions.overrideUpdate;
   FInitializingWidget := False;
+
   FModified := False;
 
   Edit2.Text := o^.name;

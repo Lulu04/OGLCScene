@@ -333,13 +333,15 @@ begin
   i := LB.ItemIndex;
   if i = -1 then exit;
   LB.ItemIndex := -1;
-  FormMain.EditSpriteInSpriteBank(LB.Items.Strings[i]);
+
+  FrameToolsSpriteBuilder.EditSpriteInSpriteBank(LB.Items.Strings[i]);
+  FormMain.ShowPageSpriteBuilder;
 end;
 
 procedure TFrameToolSpriteBank.DoNewSprite;
 begin
   HideToolPanels;
-  FormMain.EditNewSprite;
+  FormMain.ShowPageSpriteBuilder;
 end;
 
 procedure TFrameToolSpriteBank.DoImportSpriteFromAnotherProject;

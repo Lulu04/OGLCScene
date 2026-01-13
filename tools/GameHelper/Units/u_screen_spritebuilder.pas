@@ -975,7 +975,9 @@ begin
   if not FrameToolsSpriteBuilder.SelectedTabIsCollisionBody then
     FScene.Layer[LAYER_COLLISION_BODY].Visible := False;
   // camera
-  CreateCamera([LAYER_SPRITEBUILDER]);
+  CreateCamera([LAYER_SPRITEBUILDER, LAYER_SCENEBOUNDS]);
+  ShowSceneBounds;
+  ZoomOnScene;
 end;
 
 procedure TScreenSpriteBuilder.FreeObjects;
@@ -986,6 +988,7 @@ begin
   FBodyList.Clear;
   FPostures.Clear;
   FreeCamera;
+  HideSceneBounds;
 end;
 
 procedure TScreenSpriteBuilder.Initialize;

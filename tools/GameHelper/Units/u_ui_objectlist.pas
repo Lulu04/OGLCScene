@@ -229,7 +229,8 @@ end;
 
 procedure TFontDescriptorItem.DuplicateTo(aItem: Pointer);
 begin
-  TFontDescriptorItem(aItem).FD := FD;
+  FD.DuplicateTo(@TFontDescriptorItem(aItem).FD);
+  //TFontDescriptorItem(aItem).FD := Copy(FD, 1, Length(FD));
   TFontDescriptorItem(aItem).UseCharsetPreset := UseCharsetPreset;
   TFontDescriptorItem(aItem).CharsetPresets := Copy(CharsetPresets, 0, Length(CharsetPresets));
   TFontDescriptorItem(aItem).TextToCharSet := Copy(TextToCharSet, 1, Length(TextToCharSet));
@@ -423,8 +424,8 @@ begin
   dst.IsModal := IsModal;
   dst.DarkenBG := DarkenBG;
   dst.DarknessColor := DarknessColor;
-  dst.ScenarioOnShow := ScenarioOnShow;
-  dst.ScenarioOnHide := ScenarioOnHide;
+  dst.ScenarioOnShow := Copy(ScenarioOnShow, 1, Length(ScenarioOnShow));
+  dst.ScenarioOnHide := Copy(ScenarioOnHide, 1, Length(ScenarioOnHide));
   dst.textures := textures;
   dst.surfaces := surfaces;
 end;
@@ -490,7 +491,7 @@ procedure TPathDescriptorItem.DuplicateTo(aItem: Pointer);
 begin
   TPathDescriptorItem(aItem).UseSpline := UseSpline;
   TPathDescriptorItem(aItem).SplineStyle := SplineStyle;
-  TPathDescriptorItem(aItem).PathData := PathData;
+  TPathDescriptorItem(aItem).PathData := Copy(PathData, 1, Length(PathData));
 end;
 
 function TPathDescriptorItem.ItemDataToExpandedPath(const aItemData: string;

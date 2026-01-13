@@ -5,6 +5,7 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
   Width = 300
   ClientHeight = 671
   ClientWidth = 300
+  LCLVersion = '4.5.0.0'
   TabOrder = 0
   DesignLeft = 845
   DesignTop = 95
@@ -59,8 +60,8 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideBottom.Control = Panel3
       AnchorSideBottom.Side = asrBottom
       Left = 3
-      Height = 379
-      Top = 66
+      Height = 373
+      Top = 72
       Width = 294
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Left = 3
@@ -88,9 +89,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       BorderSpacing.Right = 5
       Images = DataModule1.ILIconUI
       ImageIndex = 9
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BRedo: TSpeedButton
       AnchorSideTop.Control = BNewSprite
@@ -106,9 +107,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       BorderSpacing.Top = 3
       Images = DataModule1.ILIconUI
       ImageIndex = 10
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BNewSprite: TSpeedButton
       AnchorSideLeft.Control = LB
@@ -116,38 +117,38 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       AnchorSideTop.Side = asrBottom
       Cursor = crHandPoint
       Left = 8
-      Height = 28
+      Height = 34
       Hint = 'Click to create a new sprite with Sprite Builder'
       Top = 35
-      Width = 56
+      Width = 62
       AutoSize = True
       BorderSpacing.Left = 5
       BorderSpacing.Top = 3
       Caption = 'New'
       Images = DataModule1.ILIconUI
       ImageIndex = 4
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BImportSprite: TSpeedButton
       AnchorSideLeft.Control = BNewSprite
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = BNewSprite
       Cursor = crHandPoint
-      Left = 69
-      Height = 28
+      Left = 75
+      Height = 34
       Hint = 'Import a sprite and its textures from another project'
       Top = 35
-      Width = 68
+      Width = 74
       AutoSize = True
       BorderSpacing.Left = 5
       Caption = 'Import'
       Images = DataModule1.ILIconUI
       ImageIndex = 6
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object Panel8: TPanel
       AnchorSideLeft.Control = Panel3
@@ -195,9 +196,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
         Flat = True
         Images = DataModule1.ILIconUI
         ImageIndex = 8
-        OnClick = BHelpClick
         ShowHint = True
         ParentShowHint = False
+        OnClick = BHelpClick
       end
     end
   end
@@ -244,9 +245,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 4
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BDuplicateSprite: TSpeedButton
       AnchorSideLeft.Control = BRenameSprite
@@ -263,9 +264,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 5
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BDeleteSprite: TSpeedButton
       AnchorSideLeft.Control = BDuplicateSprite
@@ -285,9 +286,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 3
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BEditInSpriteBuilder: TSpeedButton
       AnchorSideLeft.Control = PanelSpriteTool
@@ -302,9 +303,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 7
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BExportPascalUnit: TSpeedButton
       AnchorSideLeft.Control = BDuplicateSprite
@@ -321,9 +322,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 8
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
     object BRemovePascalUnit: TSpeedButton
       AnchorSideLeft.Control = BExportPascalUnit
@@ -340,9 +341,9 @@ object FrameToolSpriteBank: TFrameToolSpriteBank
       Flat = True
       Images = DataModule1.ILLevelTreeView
       ImageIndex = 9
-      OnClick = BNewSpriteClick
       ShowHint = True
       ParentShowHint = False
+      OnClick = BNewSpriteClick
     end
   end
   object SD1: TSaveDialog

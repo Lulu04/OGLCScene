@@ -6,10 +6,10 @@ object FormProjectConfig: TFormProjectConfig
   Caption = 'Project configuration'
   ClientHeight = 381
   ClientWidth = 657
+  LCLVersion = '4.5.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  LCLVersion = '3.8.0.0'
   object Notebook1: TNotebook
     AnchorSideLeft.Control = Panel2
     AnchorSideLeft.Side = asrBottom
@@ -21,7 +21,7 @@ object FormProjectConfig: TFormProjectConfig
     Height = 336
     Top = 0
     Width = 553
-    PageIndex = 1
+    PageIndex = 0
     Anchors = [akTop, akLeft, akRight, akBottom]
     TabOrder = 0
     object PageScene: TPage
@@ -67,9 +67,9 @@ object FormProjectConfig: TFormProjectConfig
           Width = 91
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 10
-          OnChange = SE1Change
           TabOrder = 0
           Value = 1024
+          OnChange = SE1Change
         end
         object Label7: TLabel
           AnchorSideTop.Control = Label6
@@ -95,9 +95,9 @@ object FormProjectConfig: TFormProjectConfig
           Width = 91
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 10
-          OnChange = SE1Change
           TabOrder = 1
           Value = 768
+          OnChange = SE1Change
         end
         object RadioButton1: TRadioButton
           Left = 40
@@ -219,9 +219,9 @@ object FormProjectConfig: TFormProjectConfig
           Caption = 'Add'
           Images = DataModule1.ILIconUI
           ImageIndex = 4
-          OnClick = BAddLayerClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BAddLayerClick
         end
         object BDeleteLayer: TSpeedButton
           AnchorSideLeft.Control = BAddLayer
@@ -237,9 +237,9 @@ object FormProjectConfig: TFormProjectConfig
           Caption = 'Delete'
           Images = DataModule1.ILIconUI
           ImageIndex = 5
-          OnClick = BAddLayerClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BAddLayerClick
         end
         object BRenameLayer: TSpeedButton
           AnchorSideLeft.Control = BAddLayer
@@ -255,9 +255,9 @@ object FormProjectConfig: TFormProjectConfig
           Caption = 'Rename'
           Images = DataModule1.ILIconUI
           ImageIndex = 12
-          OnClick = BAddLayerClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BAddLayerClick
         end
         object UpDown1: TUpDown
           AnchorSideLeft.Control = BAddLayer
@@ -271,11 +271,11 @@ object FormProjectConfig: TFormProjectConfig
           Width = 20
           BorderSpacing.Top = 20
           Min = 0
-          OnClick = UpDown1Click
           ParentShowHint = False
           Position = 0
           ShowHint = True
           TabOrder = 1
+          OnClick = UpDown1Click
         end
       end
     end
@@ -333,9 +333,9 @@ object FormProjectConfig: TFormProjectConfig
           Caption = 'Erase all (groups, levels and textures used by levels)'
           Images = DataModule1.ILIconUI
           ImageIndex = 5
-          OnClick = BEraseLevelBankClick
           ShowHint = True
           ParentShowHint = False
+          OnClick = BEraseLevelBankClick
         end
         object CheckBox1: TCheckBox
           Left = 32

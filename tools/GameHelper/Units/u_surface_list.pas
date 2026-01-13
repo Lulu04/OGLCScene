@@ -216,6 +216,9 @@ private
   FTextures: TTextureList;
   FOnGetTexture: TOnGetTextureEvent;
   function GetTextures: TTextureList;
+private // whole object
+  HandleManager: TUIHandleManager;
+  FRect: TRectF;
 public
   constructor Create;
   destructor Destroy; override;
@@ -266,6 +269,7 @@ public
   procedure SelectNone;
   function GetItemsBounds: TRectF;
 
+
   procedure SetValuesFromTemporaryVariables; // sets x, y, pivot,... on all surfaces
   procedure CopySurfaceValuesToTemporaryVariables;
 
@@ -288,16 +292,23 @@ public
   property UndoRedoManager: TSurfaceUndoRedoManager read FUndoRedoManager;
 
   property ModeForLevelEditor: boolean read FModeForLevelEditor;
+public // whole object handle
+  procedure CenterOnScene;
+  procedure CreateUIHandle;
+  procedure ShowHandle;
+  procedure HideHandle;
+
 
 public // Panel Editor
   function AddMainPanel(const aName: string; aWidth, aHeight: integer): TUIPanelWithEffects;
+
 end;
 
 
 implementation
 
 uses u_common, u_screen_spritebuilder, u_utils, u_ui_objectlist, u_project,
-  Math;
+  u_spritebank, Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -1195,8 +1206,8 @@ end;
 procedure TSurfaceDescriptor.DuplicateTo(aSurface: PSurfaceDescriptor);
 begin
   aSurface^.parentID := parentID;
-  aSurface^.name := name;
-  aSurface^.textureName := textureName;
+  aSurface^.name := Copy(name, 1, Length(name));
+  aSurface^.textureName := Copy(name, 1, Length(textureName));
   aSurface^.classtype := classtype;
   if ParentList.ModeForLevelEditor
     then aSurface^.layerindex := FScene.LayerIndexOf(surface.ParentLayer)
@@ -1225,12 +1236,12 @@ begin
   aSurface^.BottomRightColor := BottomRightColor;
   aSurface^.BottomLeftColor := BottomLeftColor;
   // TGradientRectangle
-  aSurface^.GradientData := GradientData;
+  aSurface^.GradientData := Copy(GradientData, 1, Length(GradientData));
   // TDeformationGrid
-  aSurface^.DeformationGridData := DeformationGridData;
+  aSurface^.DeformationGridData := Copy(DeformationGridData, 1, Length(DeformationGridData));
   // TOGLCPathToFollow
-  aSurface^.PathToFollowBorderData := PathToFollowBorderData;
-  aSurface^.PathDescriptorName := PathDescriptorName;
+  aSurface^.PathToFollowBorderData := Copy(PathToFollowBorderData, 1, Length(PathToFollowBorderData));
+  aSurface^.PathDescriptorName := Copy(PathDescriptorName, 1, Length(PathDescriptorName));
   aSurface^.PathToFollowLoop := PathToFollowLoop;
   // TFreeTextOnPath + TSpriteOnPath
   aSurface^.OnPathDistanceTraveled := OnPathDistanceTraveled;
@@ -1246,20 +1257,20 @@ begin
   aSurface^.ClockStartPaused := ClockStartPaused;
 
   // UI objects
-  aSurface^.BodyShapeData := BodyShapeData;
-  aSurface^.BackGradientData := BackGradientData;
+  aSurface^.BodyShapeData := Copy(BodyShapeData, 1, Length(BodyShapeData));
+  aSurface^.BackGradientData := Copy(BackGradientData, 1, Length(BackGradientData));
   aSurface^.BGDarkenColor := BGDarkenColor;
-  aSurface^.OnShowScenario := OnShowScenario;
-  aSurface^.OnHideScenario := OnHideScenario;
+  aSurface^.OnShowScenario := Copy(OnShowScenario, 1, Length(OnShowScenario));
+  aSurface^.OnHideScenario := Copy(OnHideScenario, 1, Length(OnHideScenario));
   // surfaces with text (textured font)
-  aSurface^.FontDescriptorName := FontDescriptorName;
-  aSurface^.Caption := Caption;
+  aSurface^.FontDescriptorName := Copy(FontDescriptorName, 1, Length(FontDescriptorName));
+  aSurface^.Caption := Copy(Caption, 1, Length(Caption));
   aSurface^.TextAlignment := TextAlignment;
   aSurface^.Checked := Checked;
   aSurface^.CheckShape := CheckShape;
   aSurface^.CheckFill := CheckFill;
   aSurface^.CheckColorChecked :=  CheckColorChecked;
-  aSurface^.textureName2 := textureName2;
+  aSurface^.textureName2 := Copy(textureName2, 1, Length(textureName2));
   aSurface^.CheckAdjustImageToFontHeight := CheckAdjustImageToFontHeight;
   aSurface^.AutoSize := AutoSize;
   aSurface^.uiOrientation := uiOrientation;
@@ -1269,18 +1280,18 @@ begin
   aSurface^.scrollbarPosition := scrollbarPosition;
 //  aSurface^.scrollbarCursorBodyShapeData := scrollbarCursorBodyShapeData;
 //  aSurface^.scrollbarCursorGradientData := scrollbarCursorGradientData;
-  aSurface^.ProgressBarGradientData := ProgressBarGradientData;
+  aSurface^.ProgressBarGradientData := Copy(ProgressBarGradientData, 1, Length(ProgressBarGradientData));
   aSurface^.ProgressBarReversed := ProgressBarReversed;
   aSurface^.ProgressBarPercent := ProgressBarPercent;
   aSurface^.scrollboxUseVScrollbar := scrollboxUseVScrollbar;
   aSurface^.scrollboxUseHScrollbar := scrollboxUseHScrollbar;
   aSurface^.listboxUnselectedTextColor := listboxUnselectedTextColor;
-  aSurface^.listboxUnselectedGradientData := listboxUnselectedGradientData;
+  aSurface^.listboxUnselectedGradientData := Copy(listboxUnselectedGradientData, 1, Length(listboxUnselectedGradientData));
   aSurface^.listboxSelectedTextColor := listboxSelectedTextColor;
-  aSurface^.listboxSelectedGradientData := listboxSelectedGradientData;
+  aSurface^.listboxSelectedGradientData := Copy(listboxSelectedGradientData, 1, Length(listboxSelectedGradientData));
   aSurface^.listboxMultiSelect := listboxMultiSelect;
   aSurface^.listboxItemHeight := listboxItemHeight;
-  aSurface^.TextAreaText := TextAreaText;
+  aSurface^.TextAreaText := Copy(TextAreaText, 1, Length(TextAreaText));
   aSurface^.TextAreaTextTint := TextAreaTextTint;
   aSurface^.OnClick := OnClick;
   aSurface^.OnMouseEnter := OnMouseEnter;
@@ -2124,7 +2135,8 @@ begin
   i := 0;
   repeat
     inc(i);
-  until not NameExists(aBaseName+i.ToString);
+  until not NameExists(aBaseName+i.ToString) {and
+        not SpriteBank.SpriteNameExists(aBaseName+i.ToString)}; // name must be different than another sprite
   Result := aBaseName + i.ToString;
 end;
 
@@ -2295,6 +2307,34 @@ begin
   end;
 
   Result := RectF(PointF(xmin, ymin), PointF(xmax, ymax));
+end;
+
+procedure TSurfaceList.CenterOnScene;
+var root: PSurfaceDescriptor;
+  r: TRectF;
+  offset: TPointF;
+begin
+  root := GetRootItem;
+  if root = NIL then exit;
+
+  r := GetItemsBounds;
+  offset := FScene.center - r.CenterPoint;
+  root^.surface.SetCenterCoordinate(root^.surface.Center + offset);
+end;
+
+procedure TSurfaceList.CreateUIHandle;
+begin
+  //UIHandle.CreateUIHandles(@HandleManager);
+end;
+
+procedure TSurfaceList.ShowHandle;
+begin
+
+end;
+
+procedure TSurfaceList.HideHandle;
+begin
+
 end;
 
 procedure TSurfaceList.SetValuesFromTemporaryVariables;

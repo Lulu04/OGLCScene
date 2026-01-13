@@ -7,7 +7,7 @@
       <Title Value="GameHelper"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
-      <ActiveWindowIndexAtStart Value="2"/>
+      <ActiveWindowIndexAtStart Value="1"/>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
@@ -101,8 +101,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="17"/>
-        <TopLine Value="115"/>
-        <CursorPos X="26" Y="124"/>
+        <TopLine Value="96"/>
+        <CursorPos Y="109"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -111,16 +111,16 @@
         <Filename Value="Units\u_screen_spritebuilder.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="13"/>
-        <TopLine Value="596"/>
-        <CursorPos X="36" Y="606"/>
+        <TopLine Value="380"/>
+        <CursorPos Y="385"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_common.pas"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="39"/>
-        <CursorPos X="51" Y="57"/>
+        <TopLine Value="10"/>
+        <CursorPos X="25" Y="25"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -137,9 +137,9 @@
       <Unit>
         <Filename Value="Units\u_texture_list.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="28"/>
-        <TopLine Value="92"/>
-        <CursorPos Y="108"/>
+        <EditorIndex Value="29"/>
+        <TopLine Value="163"/>
+        <CursorPos X="52" Y="178"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -148,7 +148,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="54"/>
         <CursorPos X="15" Y="66"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_app_pref.pas"/>
@@ -162,9 +162,10 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\source\OGLCScene.pas"/>
+        <IsVisibleTab Value="True"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="404"/>
-        <CursorPos X="28" Y="406"/>
+        <TopLine Value="841"/>
+        <CursorPos Y="856"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit>
@@ -172,8 +173,8 @@
         <Filename Value="Units\u_surface_list.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="15"/>
-        <TopLine Value="532"/>
-        <CursorPos X="41" Y="547"/>
+        <TopLine Value="1302"/>
+        <CursorPos X="35" Y="1303"/>
         <UsageCount Value="207"/>
         <Loaded Value="True"/>
       </Unit>
@@ -190,8 +191,8 @@
         <Filename Value="..\..\source\oglcTexture.inc"/>
         <EditorIndex Value="34"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="485"/>
-        <CursorPos Y="498"/>
+        <TopLine Value="418"/>
+        <CursorPos Y="430"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit>
@@ -199,8 +200,8 @@
         <Filename Value="..\..\source\oglcTextureAtlas.inc"/>
         <EditorIndex Value="33"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="604"/>
-        <CursorPos Y="615"/>
+        <TopLine Value="458"/>
+        <CursorPos X="69" Y="463"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -226,15 +227,15 @@
         <WindowIndex Value="2"/>
         <TopLine Value="202"/>
         <CursorPos X="49" Y="214"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\source\oglcUtils.inc"/>
         <EditorIndex Value="30"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="185"/>
-        <CursorPos X="25" Y="198"/>
+        <TopLine Value="22"/>
+        <CursorPos X="10" Y="17"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
@@ -243,25 +244,25 @@
         <EditorIndex Value="-1"/>
         <WindowIndex Value="2"/>
         <TopLine Value="43"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="25"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_utils.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="22"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="157"/>
-        <CursorPos X="40" Y="167"/>
+        <TopLine Value="70"/>
+        <CursorPos X="13" Y="75"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_screen_template.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="330"/>
-        <CursorPos X="4" Y="348"/>
+        <TopLine Value="939"/>
+        <CursorPos Y="950"/>
         <UsageCount Value="202"/>
         <Loaded Value="True"/>
       </Unit>
@@ -269,8 +270,8 @@
         <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
         <EditorIndex Value="19"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="963"/>
-        <CursorPos X="20" Y="974"/>
+        <TopLine Value="503"/>
+        <CursorPos Y="517"/>
         <UsageCount Value="102"/>
         <Loaded Value="True"/>
       </Unit>
@@ -289,7 +290,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="90"/>
         <CursorPos X="3" Y="111"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="28"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\source\oglcCamera.inc"/>
@@ -331,8 +332,8 @@
         <Filename Value="Units\u_spritebank.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="27"/>
-        <TopLine Value="394"/>
-        <CursorPos X="48" Y="397"/>
+        <TopLine Value="296"/>
+        <CursorPos X="57" Y="308"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -348,9 +349,9 @@
       <Unit>
         <Filename Value="Units\u_ui_handle.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="31"/>
-        <TopLine Value="295"/>
-        <CursorPos X="3" Y="304"/>
+        <EditorIndex Value="32"/>
+        <TopLine Value="156"/>
+        <CursorPos X="49" Y="173"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -358,20 +359,17 @@
         <Filename Value="..\..\source\oglcType.inc"/>
         <EditorIndex Value="26"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="652"/>
-        <CursorPos Y="671"/>
+        <TopLine Value="232"/>
+        <CursorPos X="13" Y="247"/>
         <UsageCount Value="100"/>
-        <Bookmarks Count="1">
-          <Item0 Y="880" Left="1" Top="873"/>
-        </Bookmarks>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_screen_spritebank.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="30"/>
-        <TopLine Value="23"/>
-        <CursorPos X="22" Y="16"/>
+        <EditorIndex Value="31"/>
+        <TopLine Value="66"/>
+        <CursorPos Y="74"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -381,10 +379,9 @@
         <ComponentName Value="FrameToolsSpriteBuilder"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="1875"/>
-        <CursorPos X="44" Y="1887"/>
+        <TopLine Value="1250"/>
+        <CursorPos X="4" Y="1267"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -396,8 +393,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="26"/>
-        <TopLine Value="114"/>
-        <CursorPos X="56" Y="116"/>
+        <TopLine Value="328"/>
+        <CursorPos Y="336"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -426,7 +423,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="145"/>
         <CursorPos X="7" Y="159"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="24"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\source\oglcTileEngine.inc"/>
@@ -448,15 +445,11 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="18"/>
         <WindowIndex Value="2"/>
-        <TopLine Value="349"/>
-        <CursorPos X="54" Y="364"/>
+        <TopLine Value="318"/>
+        <CursorPos X="48" Y="337"/>
         <UsageCount Value="100"/>
-        <Bookmarks Count="1">
-          <Item0 X="2" Y="354" Left="1" Top="342" ID="1"/>
-        </Bookmarks>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -473,7 +466,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="61"/>
         <CursorPos Y="72"/>
-        <UsageCount Value="43"/>
+        <UsageCount Value="35"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_datamodule.pas"/>
@@ -542,7 +535,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="45"/>
         <CursorPos X="3" Y="37"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="16"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_surface_undoredo.inc"/>
@@ -567,8 +560,8 @@
       <Unit>
         <Filename Value="Units\u_screen_levelbank.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="29"/>
-        <TopLine Value="61"/>
+        <EditorIndex Value="30"/>
+        <TopLine Value="49"/>
         <CursorPos X="21" Y="72"/>
         <UsageCount Value="206"/>
         <Loaded Value="True"/>
@@ -587,7 +580,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="13"/>
         <CursorPos X="15" Y="57"/>
-        <UsageCount Value="51"/>
+        <UsageCount Value="43"/>
       </Unit>
       <Unit>
         <Filename Value="Units\frame_texturelist.pas"/>
@@ -595,11 +588,15 @@
         <ComponentName Value="FrameTextureList"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="21"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="157"/>
-        <CursorPos X="28" Y="161"/>
+        <TopLine Value="95"/>
+        <CursorPos X="24" Y="117"/>
         <UsageCount Value="202"/>
+        <Bookmarks Count="1">
+          <Item0 X="9" Y="116" Left="1" Top="102"/>
+        </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -607,8 +604,8 @@
         <Filename Value="Units\u_screen_leveleditor.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="12"/>
-        <TopLine Value="16"/>
-        <CursorPos Y="7"/>
+        <TopLine Value="623"/>
+        <CursorPos X="30" Y="640"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -665,8 +662,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="19"/>
-        <TopLine Value="114"/>
-        <CursorPos X="32" Y="127"/>
+        <TopLine Value="152"/>
+        <CursorPos X="45" Y="163"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -726,7 +723,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1752"/>
         <CursorPos Y="1770"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="3"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\source\oglcEnvironment.inc"/>
@@ -876,8 +873,8 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="4"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="67"/>
-        <CursorPos Y="43"/>
+        <TopLine Value="132"/>
+        <CursorPos Y="156"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit>
@@ -977,8 +974,8 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="13"/>
         <WindowIndex Value="1"/>
-        <TopLine Value="290"/>
-        <CursorPos X="31" Y="300"/>
+        <TopLine Value="218"/>
+        <CursorPos X="52" Y="232"/>
         <UsageCount Value="201"/>
         <Loaded Value="True"/>
       </Unit>
@@ -1099,19 +1096,12 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="C:\lazarus\lcl\include\customform.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1867"/>
-        <CursorPos Y="1879"/>
-        <UsageCount Value="3"/>
-      </Unit>
-      <Unit>
         <Filename Value="Units\u_screen_pathbank.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="104"/>
-        <CursorPos X="61" Y="121"/>
-        <UsageCount Value="159"/>
+        <TopLine Value="60"/>
+        <CursorPos X="3" Y="62"/>
+        <UsageCount Value="214"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -1120,7 +1110,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="364"/>
         <CursorPos X="28" Y="379"/>
-        <UsageCount Value="81"/>
+        <UsageCount Value="109"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -1128,16 +1118,16 @@
         <EditorIndex Value="18"/>
         <TopLine Value="38"/>
         <CursorPos X="15" Y="50"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="72"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Units\u_screen_patheditor.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="353"/>
-        <CursorPos X="49" Y="366"/>
-        <UsageCount Value="155"/>
+        <TopLine Value="260"/>
+        <CursorPos X="38" Y="273"/>
+        <UsageCount Value="210"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -1147,9 +1137,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="76"/>
-        <CursorPos X="34" Y="82"/>
-        <UsageCount Value="153"/>
+        <TopLine Value="128"/>
+        <CursorPos X="33" Y="134"/>
+        <UsageCount Value="208"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -1160,7 +1150,7 @@
         <WindowIndex Value="1"/>
         <TopLine Value="43"/>
         <CursorPos X="33" Y="63"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="106"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -1170,7 +1160,7 @@
         <WindowIndex Value="2"/>
         <TopLine Value="75"/>
         <CursorPos X="32" Y="85"/>
-        <UsageCount Value="19"/>
+        <UsageCount Value="58"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -1179,130 +1169,146 @@
         <WindowIndex Value="2"/>
         <TopLine Value="66"/>
         <CursorPos X="3" Y="69"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="55"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\LazarusFromFpcupDelux\fpcsrc\rtl\objpas\types.pp"/>
+        <UnitName Value="Types"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1470"/>
+        <CursorPos X="3" Y="1473"/>
+        <UsageCount Value="3"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\LazarusFromFpcupDelux\fpcsrc\packages\fcl-stl\src\gvector.pp"/>
+        <EditorIndex Value="28"/>
+        <TopLine Value="180"/>
+        <CursorPos Y="196"/>
+        <UsageCount Value="33"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="261" Column="22" TopLine="245"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="110" Column="15" TopLine="99"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <Caret Line="352" TopLine="345"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="646" Column="3" TopLine="637"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <Caret Line="351" TopLine="342"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="100" Column="36" TopLine="92"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <Caret Line="373" Column="15" TopLine="345"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="561" Column="3" TopLine="558"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="878" Column="16" TopLine="863"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="110" Column="21" TopLine="94"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="231" Column="15" TopLine="218"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="646" Column="11" TopLine="637"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="669" Column="10" TopLine="650"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="100" Column="15" TopLine="88"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="260" Column="13" TopLine="248"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="567" TopLine="558"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="877" Column="9" TopLine="862"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="110" Column="15" TopLine="88"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="231" Column="16" TopLine="223"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="642" Column="5" TopLine="628"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="671" TopLine="650"/>
+        <Filename Value="Units\frame_tool_spritebank.pas"/>
+        <Caret Line="342" Column="33" TopLine="338"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="242" Column="17" TopLine="220"/>
+        <Filename Value="Units\frame_tool_spritebank.pas"/>
+        <Caret Line="57" Column="15" TopLine="46"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="713" Column="46" TopLine="692"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="109" Column="30" TopLine="98"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="231" Column="19" TopLine="231"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="639" Column="22" TopLine="627"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="668" Column="39" TopLine="650"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="100" Column="15" TopLine="88"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="670" Column="25" TopLine="659"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="562" Column="18" TopLine="557"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="713" Column="19" TopLine="702"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="109" Column="31" TopLine="88"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="231" Column="15" TopLine="231"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="634" Column="5" TopLine="620"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="670" TopLine="650"/>
+        <Filename Value="Units\form_main.pas"/>
+        <Caret Line="109" TopLine="96"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="671" TopLine="652"/>
+        <Filename Value="Units\u_screen_spritebuilder.pas"/>
+        <Caret Line="385" TopLine="380"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="670" TopLine="652"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="160" Column="3" TopLine="157"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="671" TopLine="652"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="114" Column="16" TopLine="92"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcType.inc"/>
-        <Caret Line="670" TopLine="652"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="75" Column="15" TopLine="62"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <Caret Line="351" TopLine="345"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="223" Column="3" TopLine="220"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <Caret Line="352" TopLine="345"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="75" Column="15" TopLine="62"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="254" Column="16" TopLine="239"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="115" Column="7" TopLine="101"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="947" Column="7" TopLine="934"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="69" Column="22" TopLine="50"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="254" Column="16" TopLine="239"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="317" Column="18" TopLine="308"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="983" Column="9" TopLine="977"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="69" Column="15" TopLine="56"/>
       </Position>
       <Position>
-        <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
-        <Caret Line="253" Column="15" TopLine="246"/>
+        <Filename Value="Units\frame_texturelist.pas"/>
+        <Caret Line="119" Column="25" TopLine="95"/>
       </Position>
     </JumpHistory>
   </ProjectOptions>
