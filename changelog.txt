@@ -1,9 +1,14 @@
 Version 2.4 - 
-> All examples: added an error message to the user when OpenGL fail to load.
+> All examples: added an error message to the user in case where OpenGL fail to load.
 > Fix: Now a layer update a surface only if it is not in killed state.
 > Fix: TFreeTextAligned Width and Height return the right values.
+> Fix: it was impossible to set an aspect ration lower than 1.
 > Charsets: added method to retrieve the name list of available charset.
-> Game Helper: added Path Editor, bug fix an improve functionalities.
+> Game Helper: added Path Editor, SpriteBuilder now support TOGLCPathToFollow, TFreeTextOnPath and TSpriteOnPath. Bug fix an improve functionalities.
+> Renamed TSpriteOnPathToFollow to TSpriteOnPath. TSpriteOnPathToFollow is deprecated.
+> New directory 'extrademo': PlanetDesigner, CloudDesigner and StarnestDesigner moved to this folder.
+> New demo: Glynn Julia Fractal, originaly written by Boleeman. The demo is located in folder extrademo.
+for more information see: https://forum.lazarus.freepascal.org/index.php/topic,73144.0.html
 
 Version 2.3 - Jan 01 2026
 > Now examples use the Roboto font provided with the library to avoid the problem font name not found.
