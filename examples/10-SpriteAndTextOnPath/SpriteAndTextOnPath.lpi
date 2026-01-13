@@ -104,10 +104,10 @@
       <Unit2>
         <Filename Value="Units\screen_demo.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="30" Y="14"/>
-        <UsageCount Value="80"/>
+        <TopLine Value="85"/>
+        <CursorPos X="21" Y="100"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -117,10 +117,12 @@
       </Unit3>
       <Unit4>
         <Filename Value="..\..\source\oglcFreeText.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="329"/>
-        <CursorPos X="26" Y="352"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="346"/>
+        <CursorPos X="31" Y="363"/>
         <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\source\oglcSpriteTemplate.inc"/>
@@ -144,7 +146,7 @@
         <UsageCount Value="11"/>
       </Unit7>
     </Units>
-    <JumpHistory Count="9" HistoryIndex="8">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="Units\screen_demo.pas"/>
         <Caret Line="63" Column="100" TopLine="50"/>
@@ -181,6 +183,14 @@
         <Filename Value="Units\form_main.pas"/>
         <Caret Line="121" Column="73" TopLine="94"/>
       </Position9>
+      <Position10>
+        <Filename Value="Units\screen_demo.pas"/>
+        <Caret Line="100" Column="21" TopLine="85"/>
+      </Position10>
+      <Position11>
+        <Filename Value="..\..\source\oglcFreeText.inc"/>
+        <Caret Line="39" Column="15" TopLine="28"/>
+      </Position11>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
