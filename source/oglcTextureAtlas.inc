@@ -79,7 +79,12 @@ public
 
   // Construct a bitmap with several frames and add it to the Image Packer.
   // aSVGFilenames is an array that contains the SVG files that represent one frame.
-  function AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture; overload;
+  // aFrameWidth, aFrameHeight: the size of one frame
+  // aXCount, aYCount: the frame count horizontally and vertically
+  // aSpacing: pixel to add between each frame
+  function AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray;
+                                     aFrameWidth, aFrameHeight,
+                                     aXCount, aYCount, aSpacing: integer): PTexture; overload;
 
   // Add a textured font.
   // Image Packer is the owner of the returned TTexturedFont, don't free it in your code !
@@ -440,7 +445,7 @@ begin
   end;
 end;
 
-function TOGLCImagePacker.AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aWidth, aHeight, aXCount, aYCount, aSpacing: integer): PTexture;
+function TOGLCImagePacker.AddMultiFrameImageFromSVG(const aSVGFilenames: TStringArray; aFrameWidth, aFrameHeight, aXCount, aYCount, aSpacing: integer): PTexture;
 var ima, imaWhole: TBGRABitmap;
   i, ix, xx, yy, frameWidth, frameHeight: integer;
 begin
@@ -455,7 +460,7 @@ begin
     yy := 0;
     ix := 0;
     for i:=0 to High(aSVGFilenames) do begin
-      ima := LoadBitmapFromSVG(aSVGFilenames[i], aWidth, aHeight);
+      ima := LoadBitmapFromSVG(aSVGFilenames[i], aFrameWidth, aFrameHeight);
       if i = 0 then begin
         frameWidth := ima.Width + aSpacing;
         frameHeight := ima.Height + aSpacing;
