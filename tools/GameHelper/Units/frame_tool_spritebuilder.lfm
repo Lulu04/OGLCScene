@@ -58,6 +58,7 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
           Width = 167
           Anchors = [akLeft, akBottom]
           BorderSpacing.Left = 5
+          DropDownCount = 16
           ItemHeight = 15
           ItemIndex = 0
           Items.Strings = (
