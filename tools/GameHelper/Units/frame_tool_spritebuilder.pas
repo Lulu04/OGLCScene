@@ -768,8 +768,12 @@ begin
         'TFreeTextOnPath': Edit5.Text := Surfaces.GetUniqueName('FreeTextOnPath');
         'TFreeTextClock': Edit5.Text := Surfaces.GetUniqueName('FreeTextClock');
         'TFreeTextAligned': Edit5.Text := Surfaces.GetUniqueName('FreeTextAligned');
-        'TOGLCPathToFollow': Edit5.Text := Surfaces.GetUniqueName('OGLCPathToFollow');
+        'TOGLCPathToFollow': Edit5.Text := Surfaces.GetUniqueName('PathToFollow');
         'TSpriteOnPath': Edit5.Text := Surfaces.GetUniqueName('SpriteOnPath');
+        'TSpriteContainer': Edit5.Text := Surfaces.GetUniqueName('SpriteContainer');
+        'TQuad4Color': Edit5.Text := Surfaces.GetUniqueName('Quad4Color');
+        'TGradientRectangle': Edit5.Text := Surfaces.GetUniqueName('GradientRectangle');
+        'TShapeOutline': Edit5.Text := Surfaces.GetUniqueName('ShapeOutline');
       end;
     end;
     if FWorkingChild <> NIL then begin

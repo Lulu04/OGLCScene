@@ -27,7 +27,6 @@ TEventOnGetTextureList = function (): TTextureList of object;
     BUpdateTextureListbox: TSpeedButton;
     CheckBox1: TCheckBox;
     Edit1: TEdit;
-    Label1: TLabel;
     Label2: TLabel;
     Label21: TLabel;
     Label3: TLabel;
@@ -100,6 +99,11 @@ begin
     OD1.InitialDir := Project.Config.TargetLazarusProject.GetFolderDataTextures;
     if not OD1.Execute then exit;
     if OD1.Files.Count > 1 then begin
+      if CheckBox1.Checked then
+        if QuestionDlg('', 'The option "Have multiframe" is checked, do you want to keep this option ?',
+                       mtWarning, [mrOk, 'Yes', mrCancel, 'No, uncheck'], 0) = mrCancel
+          then CheckBox1.Checked := False;
+
       // multiple files
       for i:=0 to OD1.Files.Count-1 do begin
         Label2.Caption := OD1.Files.Strings[i];
@@ -247,6 +251,9 @@ begin
   if not FileExists(Label2.Caption) then begin
     BUpdateTexture.Enabled := False;
     BAddTexture.Enabled := False;
+    FInitializingWidget := True;
+    CheckBox1.Checked := False;
+    FInitializingWidget := False;
   end
   else
   if Textures.GetItemByFilename(Label2.Caption) <> NIL then begin
@@ -257,6 +264,9 @@ begin
   begin
     BUpdateTexture.Enabled := False;
     BAddTexture.Enabled := True;
+    FInitializingWidget := True;
+    CheckBox1.Checked := False;
+    FInitializingWidget := False;
   end;
 
   // width and height are read only for non svg file
@@ -323,6 +333,7 @@ begin
 
   FInitializingWidget := True;
   LBTextureNames.ItemIndex := LBTextureNames.Items.Add(texName);
+
   FInitializingWidget := False;
   UpdateTextureWidgetState;
 
