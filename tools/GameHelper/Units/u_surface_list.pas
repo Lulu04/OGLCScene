@@ -80,10 +80,11 @@ public
   BackGradientData: string;
   // UI panels with effects
   BGDarkenColor: TBGRAPixel;
-  OnShowScenario,
-  OnHideScenario: string;
+  OnShowScenarioName,
+  OnHideScenarioName: string;
   // UI objects with text (textured font)
   FontDescriptorName, Caption: string;
+  CaptionColor: TBGRAPixel;
   Atlas: TAtlas;   // to contain localy the textured font
   TexturedFont: TTexturedFont;  // the textured font created from Atlas with FontDescriptorName and Caption
   TextAlignment: TOGLCAlignment;
@@ -308,7 +309,7 @@ end;
 implementation
 
 uses u_common, u_screen_spritebuilder, u_utils, u_ui_objectlist, u_project,
-  u_spritebank, Math;
+  Math;
 
 {$define _IMPLEMENTATION}
 {$I u_surface_undoredo.inc}
@@ -363,7 +364,7 @@ begin
   flipH := False;
   flipV := False;
   zOrder := 0;
-  frameindex := 1.0;
+  frameindex := 0.0; //1.0;
   blendmode := FX_BLEND_NORMAL;
 
   // TPolarSprite
@@ -403,9 +404,10 @@ begin
   BodyShapeData := '';
   BackGradientData := '';
   BGDarkenColor := BGRAPixelTransparent;
-  OnShowScenario := '';
-  OnHideScenario := '';
+  OnShowScenarioName := '';
+  OnHideScenarioName := '';
   Caption := '';
+  CaptionColor := BGRA(0,0,0,0);
   AutoSize := True;
   FontDescriptorName := '';
   Atlas := NIL;
@@ -630,6 +632,11 @@ begin
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
     surface := TUIButton.Create(FScene, Caption, TexturedFont, GetTextureFromTextureName);
     TUIButton(surface).MouseInteractionEnabled := False;
+    TUIButton(surface).BodyShape.LoadFromString(BodyShapeData);
+    TUIButton(surface).BodyShape.ResizeCurrentShape(width, height, True);
+    TUIButton(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
+    TUIButton(surface).BackGradient.ComputeVerticesAndIndices(width, height);
+    TUIButton(surface)._Label.Tint.Value := CaptionColor;
   end else
   if classType = TUICheck then begin // TUICheck
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
@@ -641,6 +648,7 @@ begin
       TUICheck(surface).CustomizeCheckBox(CheckShape, CheckFill);
       TUICheck(surface).ColorChecked := CheckColorChecked;
     end;
+    TUICheck(surface)._Label.Tint.Value := CaptionColor;
     TUICheck(surface).MouseInteractionEnabled := False;
   end else
   if classType = TUIRadio then begin // TUIRadio
@@ -653,6 +661,7 @@ begin
       TUIRadio(surface).CustomizeCheckBox(CheckShape, CheckFill);
       TUIRadio(surface).ColorChecked := CheckColorChecked;
     end;
+    TUIRadio(surface)._Label.Tint.Value := CaptionColor;
     TUIRadio(surface).MouseInteractionEnabled := False;
   end else
   if classType = TUIScrollBar then begin  // TUIScrollBar
@@ -1260,11 +1269,12 @@ begin
   aSurface^.BodyShapeData := Copy(BodyShapeData, 1, Length(BodyShapeData));
   aSurface^.BackGradientData := Copy(BackGradientData, 1, Length(BackGradientData));
   aSurface^.BGDarkenColor := BGDarkenColor;
-  aSurface^.OnShowScenario := Copy(OnShowScenario, 1, Length(OnShowScenario));
-  aSurface^.OnHideScenario := Copy(OnHideScenario, 1, Length(OnHideScenario));
+  aSurface^.OnShowScenarioName := Copy(OnShowScenarioName, 1, Length(OnShowScenarioName));
+  aSurface^.OnHideScenarioName := Copy(OnHideScenarioName, 1, Length(OnHideScenarioName));
   // surfaces with text (textured font)
   aSurface^.FontDescriptorName := Copy(FontDescriptorName, 1, Length(FontDescriptorName));
   aSurface^.Caption := Copy(Caption, 1, Length(Caption));
+  aSurface^.CaptionColor := CaptionColor;
   aSurface^.TextAlignment := TextAlignment;
   aSurface^.Checked := Checked;
   aSurface^.CheckShape := CheckShape;
@@ -1594,7 +1604,7 @@ begin
   end;
 
   _className := GetSurfaceType.ClassName;
-  isUISurface := (_className = 'TUIPanel') or (_className = 'TUIPanelWithEffects') or
+  isUISurface := (_className = 'TUIPanel') or (_className = 'TUIPanelWithEffects') or (_className = 'TUIModalPanel') or
                  (_className = 'TUIImage') or (_className = 'TUILabel') or
                  (_className = 'TUIButton') or (_className = 'TUICheck') or
                  (_className = 'TUIRadio') or (_className = 'TUIScrollBar') or
@@ -1607,12 +1617,13 @@ begin
       if BackGradientData <> '' then prop.Add('BackGradientData', BackGradientData);
     end;
     if BGDarkenColor.alpha <> 0 then prop.Add('BGDarkenColor', BGDarkenColor);
-    if OnShowScenario <> '' then  prop.Add('OnShowScenario', OnShowScenario);
-    if OnHideScenario <> '' then  prop.Add('OnHideScenario', OnHideScenario);
+    if OnShowScenarioName <> '' then  prop.Add('OnShowScenarioName', OnShowScenarioName);
+    if OnHideScenarioName <> '' then  prop.Add('OnHideScenarioName', OnHideScenarioName);
     // UI objects with text (textured font)
     if FontDescriptorName <> '' then begin
       prop.Add('FontDescriptorName', FontDescriptorName);
       if Caption <> '' then prop.Add('Caption', Caption, True);
+      if CaptionColor.alpha <> 0 then prop.Add('CaptionColor', CaptionColor);
       prop.Add('TextAlignment', Ord(TextAlignment));
     end;
     // UI objects with check
@@ -1801,12 +1812,13 @@ begin
   prop.StringValueOf('BodyShapeData', BodyShapeData, '');
   prop.StringValueOf('BackGradientData', BackGradientData, '');
   prop.BGRAPixelValueOf('BGDarkenColor', BGDarkenColor, BGRA(0,0,0,100));
-  prop.StringValueOf('OnShowScenario', OnShowScenario, '');
-  prop.StringValueOf('OnHideScenario', OnHideScenario, '');
+  prop.StringValueOf('OnShowScenarioName', OnShowScenarioName, '');
+  prop.StringValueOf('OnHideScenarioName', OnHideScenarioName, '');
 
   // UI objects with text (textured font) or TFreeTextxxx
   prop.StringValueOf('FontDescriptorName', FontDescriptorName, '');
   prop.StringValueOf('Caption', Caption, '');
+  prop.BGRAPixelValueOf('CaptionColor', CaptionColor, BGRA(0,0,0,0));
   prop.IntegerValueOf('TextAlignment', v, 0);
   TextAlignment := TOGLCAlignment(v);
 

@@ -9,7 +9,7 @@ uses
   Buttons, Spin,
   OGLCScene, BGRABitmap, BGRABitmapTypes,
   frame_texturelist, u_texture_list, u_surface_list, u_ui_objectlist,
-  u_presetmanager, Types;
+  Types;
 
 type
 
@@ -17,6 +17,7 @@ type
 
   TFrameToolUIPanelEditor = class(TFrame)
     BCancel: TSpeedButton;
+    BClearOnHide: TSpeedButton;
     BHelpRootChilds: TSpeedButton;
     BNewChild: TSpeedButton;
     BSave: TSpeedButton;
@@ -50,14 +51,21 @@ type
     CheckBox8: TCheckBox;
     CheckBox9: TCheckBox;
     ColorButton1: TColorButton;
+    ColorButton10: TColorButton;
     ColorButton2: TColorButton;
     ColorButton3: TColorButton;
     ColorButton4: TColorButton;
     ColorButton5: TColorButton;
     ColorButton6: TColorButton;
     ColorButton7: TColorButton;
+    ColorButton8: TColorButton;
+    ColorButton9: TColorButton;
     ComboBox1: TComboBox;
     ComboBox10: TComboBox;
+    CBOnShowScenario: TComboBox;
+    CBOnHideScenario: TComboBox;
+    ComboBox11: TComboBox;
+    ComboBox12: TComboBox;
     ComboBox2: TComboBox;
     ComboBox3: TComboBox;
     ComboBox4: TComboBox;
@@ -85,6 +93,7 @@ type
     Label17: TLabel;
     Label18: TLabel;
     Label19: TLabel;
+    Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
@@ -155,7 +164,14 @@ type
     Label81: TLabel;
     Label82: TLabel;
     Label83: TLabel;
+    Label84: TLabel;
+    Label85: TLabel;
+    Label86: TLabel;
+    Label87: TLabel;
+    Label88: TLabel;
+    Label89: TLabel;
     Label9: TLabel;
+    Label90: TLabel;
     Memo1: TMemo;
     Memo2: TMemo;
     Memo3: TMemo;
@@ -217,6 +233,8 @@ type
     PageChilds: TTabSheet;
     SE100: TSpinEdit;
     SE10: TSpinEdit;
+    SE102: TSpinEdit;
+    SE103: TSpinEdit;
     SE11: TSpinEdit;
     SE14: TSpinEdit;
     SE15: TSpinEdit;
@@ -277,11 +295,16 @@ type
     SE37: TSpinEdit;
     SE38: TSpinEdit;
     SpeedButton8: TSpeedButton;
+    BClearOnShow: TSpeedButton;
+    SE101: TSpinEdit;
     procedure BCancelClick(Sender: TObject);
+    procedure BClearOnShowClick(Sender: TObject);
+    procedure BEditOnShowClick(Sender: TObject);
     procedure BNewChildClick(Sender: TObject);
     procedure BSaveClick(Sender: TObject);
     procedure CBChildClippingChange(Sender: TObject);
     procedure CBChildTypeSelect(Sender: TObject);
+    procedure CBDarkenBGChange(Sender: TObject);
     procedure CBParentDrawItem(Control: TWinControl; Index: Integer;
       ARect: TRect; State: TOwnerDrawState);
     procedure SE1Enter(Sender: TObject);
@@ -319,6 +342,7 @@ type
     FWorkingChild: PSurfaceDescriptor;
     procedure DoClearAll;
     procedure ShowExtraPropertyPanel;
+    procedure FillScenarioComboBox;
   public
     FrameTexturesList: TFrameTextureList;
     constructor Create(aOwner: TComponent); override;
@@ -343,8 +367,9 @@ type
 
 implementation
 
-uses form_main, u_screen_uipaneleditor, u_resourcestring, u_utils, u_project,
-  form_edituibodyshape, u_common, form_editgradient, LCLType, Graphics;
+uses form_main, u_screen_uipaneleditor, u_resourcestring, u_utils,
+  form_edituibodyshape, u_common, form_editgradient, form_editscenario, LCLType,
+  Graphics;
 
 {$R *.lfm}
 
@@ -357,6 +382,70 @@ begin
                    [mrOk, sLeaveWithoutSaving, mrCancel, sCancel], 0) = mrCancel then exit;
   DoClearAll;
   FormMain.ShowPagePanelBank;
+end;
+
+procedure TFrameToolUIPanelEditor.BClearOnShowClick(Sender: TObject);
+var item: TScenarioDescriptorItem;
+begin
+  if FInitializing then exit;
+  if Sender = BClearOnShow then begin
+    CBOnShowScenario.ItemIndex := -1;
+    Memo1.Clear;
+  end;
+
+  if Sender = BClearOnHide then begin
+    CBOnHideScenario.ItemIndex := -1;
+    Memo2.Clear;
+  end;
+
+  if Sender = CBOnShowScenario then begin
+    item := ScenarioBank.GetByName(CBOnShowScenario.Text);
+    if item <> NIL then Memo1.Lines.Text := item.ScenarioData
+      else Memo1.Clear;
+  end;
+
+  if Sender = CBOnHideScenario then begin
+    item := ScenarioBank.GetByName(CBOnHideScenario.Text);
+    if item <> NIL then Memo2.Lines.Text := item.ScenarioData
+      else Memo2.Clear;
+  end;
+end;
+
+procedure TFrameToolUIPanelEditor.BEditOnShowClick(Sender: TObject);
+var
+  item: TScenarioDescriptorItem;
+begin
+  FormEditScenario := TFormEditScenario.Create(NIL);
+
+  if Sender = BEditOnShow then begin
+    if CBOnShowScenario.ItemIndex = -1 then FormEditScenario.EditNew
+      else begin
+        item := ScenarioBank.GetByName(CBOnShowScenario.Text);
+        if item <> NIL then FormEditScenario.EditScenarioFromBank(item)
+          else FormEditScenario.EditNew;
+      end;
+  end;
+
+  if Sender = BEditOnHide then begin
+    if CBOnHideScenario.ItemIndex = -1 then FormEditScenario.EditNew
+      else begin
+        item := ScenarioBank.GetByName(CBOnHideScenario.Text);
+        if item <> NIL then FormEditScenario.EditScenarioFromBank(item)
+          else FormEditScenario.EditNew;
+      end;
+  end;
+
+  try
+    if FormEditScenario.ShowModal = mrOk then begin
+      FillScenarioComboBox;
+      CBOnShowScenario.ItemIndex := CBOnShowScenario.Items.IndexOf(FormEditScenario.GetScenarioName);
+      CBOnHideScenario.ItemIndex := CBOnShowScenario.Items.IndexOf(FormEditScenario.GetScenarioName);
+      if Sender = BEditOnShow then Memo1.Lines.Text := FormEditScenario.GetScenario
+        else Memo2.Lines.Text := FormEditScenario.GetScenario;
+    end;
+  finally
+    FormEditScenario.Free;
+  end;
 end;
 
 procedure TFrameToolUIPanelEditor.BNewChildClick(Sender: TObject);
@@ -381,14 +470,18 @@ begin
   item.ChildClippingEnabled := CBChildClipping.Checked;
   item.IsModal := RBOptionModal.Checked;
   item.DarkenBG := CBDarkenBG.Checked;
-  item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE100.Value);
-  item.ScenarioOnShow := Memo1.Text;
-  item.ScenarioOnHide := Memo2.Text;
+  if CBDarkenBG.Checked then item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE100.Value)
+    else item.DarknessColor := BGRA(0,0,0,0);
+  item.OnShowScenarioName := CBOnShowScenario.Text;
+  item.OnHideScenarioName := CBOnHideScenario.Text;
   item.textures := Textures.SaveToString;
   item.surfaces := Surfaces.SaveToString;
 
   PanelBank.Save;
   Modified := False;
+
+  // export pascal unit
+  item.ExportPanelToPascalUnit;
 
   DoClearAll;
   FormMain.ShowPagePanelBank;
@@ -470,6 +563,11 @@ begin
     recreateSurface := True;
     FModified := True;
   end;
+  if ((Sender = ColorButton8) or (Sender = SE101)) and flag then begin
+    TUIButton(FWorkingChild^.surface)._Label.Tint.Value := ColorToBGRA(ColorButton8.ButtonColor, SE101.Value);
+    recreateSurface := True;
+    FModified := True;
+  end;
   // TUICheck
   if (Sender = Edit4) and flag then begin
     TUICheck(FWorkingChild^.surface).Caption := Edit4.Text;
@@ -503,6 +601,11 @@ begin
     recreateSurface := True;
     FModified := True;
   end;
+  if ((Sender = ColorButton9) or (Sender = SE102)) and flag then begin
+    TUICheck(FWorkingChild^.surface)._Label.Tint.Value := ColorToBGRA(ColorButton9.ButtonColor, SE102.Value);
+    recreateSurface := True;
+    FModified := True;
+  end;
   // TUIRadio
   if (Sender = Edit6) and flag then begin
     TUIRadio(FWorkingChild^.surface).Caption := Edit6.Text;
@@ -533,6 +636,11 @@ begin
       FWorkingChild^.textureName := CBTexturesUIRadioChecked.Text;
       FWorkingChild^.textureName2 := CBTexturesUIRadioUnchecked.Text;
       FWorkingChild^.CheckAdjustImageToFontHeight := CheckBox11.Checked;
+    recreateSurface := True;
+    FModified := True;
+  end;
+  if ((Sender = ColorButton10) or (Sender = SE103)) and flag then begin
+    TUIRadio(FWorkingChild^.surface)._Label.Tint.Value := ColorToBGRA(ColorButton10.ButtonColor, SE103.Value);
     recreateSurface := True;
     FModified := True;
   end;
@@ -646,6 +754,14 @@ begin
   end else begin
     ShowExtraPropertyPanel;
   end;
+end;
+
+procedure TFrameToolUIPanelEditor.CBDarkenBGChange(Sender: TObject);
+begin
+  Label4.Enabled := CBDarkenBG.Checked;
+  ColorButton1.Enabled := CBDarkenBG.Checked;
+  Label5.Enabled := CBDarkenBG.Checked;
+  SE100.Enabled := CBDarkenBG.Checked;
 end;
 
 procedure TFrameToolUIPanelEditor.CBParentDrawItem(Control: TWinControl;
@@ -883,7 +999,7 @@ function TFrameToolUIPanelEditor.CheckChildWidgets: boolean;
 begin
   if CBChildType.ItemIndex = -1 then exit(False);
   if not IsValidPascalVariableName(Trim(Edit5.Text), True) then exit(False);
-//  if CBParent.ItemIndex = -1 then exit(False);
+  if CBParent.ItemIndex = -1 then exit(False);
 
   case CBChildType.Text of
     'TUIPanel', 'TUIPanelWithEffects': Result := True;
@@ -1041,6 +1157,7 @@ begin
       FWorkingChild^.height := SE24.Value;
       FWorkingChild^.AutoSize := CheckBox1.Checked;
       FWorkingChild^.Caption := Edit3.Text;
+      FWorkingChild^.CaptionColor := ColorToBGRA(ColorButton8.ButtonColor, SE101.Value);
       FWorkingChild^.FontDescriptorName := ComboBox2.Text;
       GetSelectedTextureName(texName1, texName2);
       FWorkingChild^.textureName := texName1;
@@ -1050,6 +1167,7 @@ begin
     end;
     'TUICheck': begin
       FWorkingChild^.Caption := Edit4.Text;
+      FWorkingChild^.CaptionColor := ColorToBGRA(ColorButton9.ButtonColor, SE102.Value);
       FWorkingChild^.FontDescriptorName := ComboBox3.Text;
       FWorkingChild^.Checked := CheckBox12.Checked;
       FWorkingChild^.CheckShape := TUICheckShape(ComboBox4.ItemIndex);
@@ -1062,6 +1180,8 @@ begin
     end;
     'TUIRadio': begin
       FWorkingChild^.Caption := Edit6.Text;
+      FWorkingChild^.CaptionColor := ColorToBGRA(ColorButton10.ButtonColor, SE103.Value);
+      FWorkingChild^.CheckColorChecked := ColorToBGRA(ColorButton2.ButtonColor, SE14.Value);
       FWorkingChild^.FontDescriptorName := ComboBox6.Text;
       FWorkingChild^.Checked := CheckBox13.Checked;
       FWorkingChild^.CheckShape := TUICheckShape(ComboBox7.ItemIndex);
@@ -1299,6 +1419,18 @@ begin
     end;
 end;
 
+procedure TFrameToolUIPanelEditor.FillScenarioComboBox;
+var nam: string;
+begin
+  nam := CBOnShowScenario.Text;
+  ScenarioBank.FillComboBoxWithNames(CBOnShowScenario);
+  CBOnShowScenario.Itemindex := CBOnShowScenario.Items.IndexOf(nam);
+
+  nam := CBOnHideScenario.Text;
+  ScenarioBank.FillComboBoxWithNames(CBOnHideScenario);
+  CBOnHideScenario.Itemindex := CBOnHideScenario.Items.IndexOf(nam);
+end;
+
 constructor TFrameToolUIPanelEditor.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
@@ -1396,9 +1528,13 @@ begin
         CBTexturesUIButton.ItemIndex := CBTexturesUIButton.Items.IndexOf(FWorkingChild^.textureName);
         ComboBox2.ItemIndex := ComboBox2.Items.IndexOf(FWorkingChild^.FontDescriptorName);
         Edit3.Text := TUIButton(surface).Caption;
+        ColorButton8.ButtonColor:= BGRAToColor(FWorkingChild^.CaptionColor);
+        SE101.Value := FWorkingChild^.CaptionColor.alpha;
       end;
       if surface is TUICheck then begin
         Edit4.Text := TUICheck(surface).Caption;
+        ColorButton9.ButtonColor := BGRAToColor(FWorkingChild^.CaptionColor);
+        SE102.Value := FWorkingChild^.CaptionColor.alpha;
         ComboBox3.ItemIndex := ComboBox3.Items.IndexOf(FWorkingChild^.FontDescriptorName);
         CheckBox12.Checked := FWorkingChild^.Checked;
         ComboBox4.ItemIndex := Ord(FWorkingChild^.CheckShape);
@@ -1414,6 +1550,8 @@ begin
       end;
       if surface is TUIRadio then begin
         Edit6.Text := TUIRadio(surface).Caption;
+        ColorButton10.ButtonColor := BGRAToColor(FWorkingChild^.CaptionColor);
+        SE103.Value := FWorkingChild^.CaptionColor.alpha;
         ComboBox6.ItemIndex := ComboBox6.Items.IndexOf(FWorkingChild^.FontDescriptorName);
         CheckBox13.Checked := FWorkingChild^.Checked;
         ComboBox7.ItemIndex := Ord(FWorkingChild^.CheckShape);
@@ -1519,10 +1657,12 @@ end;
 
 procedure TFrameToolUIPanelEditor.EditNewPanel;
 begin
+  FillScenarioComboBox; // keep here
   OnShow;
 end;
 
 procedure TFrameToolUIPanelEditor.EditPanelFromBank(aItem: TPanelDescriptorItem);
+var sceItem: TScenarioDescriptorItem;
 begin
   FScene.LogInfo('Start editing panel '+aItem._Name);
 
@@ -1533,7 +1673,13 @@ begin
   ColorButton1.ButtonColor := aItem.DarknessColor.ToColor;
   SE100.Value := aItem.DarknessColor.alpha;
   Edit1.Text := aItem._Name;
-
+  FillScenarioComboBox;
+  CBOnShowScenario.ItemIndex := CBOnShowScenario.Items.IndexOf(aItem.OnShowScenarioName);
+  sceItem := ScenarioBank.GetByName(aItem.OnShowScenarioName);
+  if sceItem <> NIL then Memo1.Lines.Text := sceItem.ScenarioData;
+  CBOnHideScenario.ItemIndex := CBOnHideScenario.Items.IndexOf(aItem.OnHideScenarioName);
+  sceItem := ScenarioBank.GetByName(aItem.OnHideScenarioName);
+  if sceItem <> NIL then Memo2.Lines.Text := sceItem.ScenarioData;
   FInitializing := False;
 
   OnShow;

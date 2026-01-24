@@ -386,6 +386,7 @@ begin
     FontBank.Load;
     PanelBank.Load;
     PathBank.Load;
+    ScenarioBank.Load;
 
     AppPref.LastProjectFilename := aFilename;
   end;
@@ -400,6 +401,7 @@ begin
     FontBank.Clear;
     PanelBank.Clear;
     PathBank.Clear;
+    ScenarioBank.Clear;
     Config.InitDefault;
     WorkingLevelGroup := NIL;
     FScene.LogInfo('done', 1);

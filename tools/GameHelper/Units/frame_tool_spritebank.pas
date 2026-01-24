@@ -261,6 +261,8 @@ begin
 
   // add the new item in the bank and save
   dstItem := SpriteBank.AddEmpty;
+  // retrieve the src item because its adress can change
+  srcItem := SpriteBank.GetItemByName(srcName);
   srcItem^.DuplicateTo(dstItem);
   dstItem^.name := dstName;
   DoSaveSpriteBank;

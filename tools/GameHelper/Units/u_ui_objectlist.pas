@@ -121,14 +121,19 @@ TPanelDescriptorItem = class(TItemWithName)
   IsModal,
   DarkenBG: boolean;
   DarknessColor: TBGRAPixel;
-  ScenarioOnShow,
-  ScenarioOnHide: string; // the content of the scenario
+  OnShowScenarioName,
+  OnHideScenarioName: string; // the content of the scenario
   textures: string;
   surfaces: string;
   procedure InitDefault; override;
   function SaveToString: string; override;
   procedure LoadFromString(const data: string); override;
   procedure DuplicateTo(aItem: Pointer); override;
+
+  // i.e. for a panel named 'Pause' return 'u_panel_pause'
+  function GetUnitName: string;
+  function GetUnitFullFilename: string;
+  procedure ExportPanelToPascalUnit;
 end;
 
 { TPanelBank }
@@ -157,9 +162,8 @@ TPathDescriptorItem = class(TItemWithName)
 
   // return oglcpath<_Name>
   function VariableName: string;
-  // return VariableName := '<PathData>';
+  // return oglcpath<_Name> := '<PathData>';
   function PascalCodeToInitializeVariable: string;
-
 end;
 
 { TPathBank }
@@ -171,17 +175,46 @@ TPathBank = class(specialize TListOfItemWithName<TPathDescriptorItem>)
   function GetSaveFileName: string; override;
 end;
 
+
+{ TScenarioDescriptorItem }
+
+TScenarioDescriptorItem = class(TItemWithName)
+  ScenarioData: string;
+  procedure InitDefault; override;
+  function SaveToString: string; override;
+  procedure LoadFromString(const data: string); override;
+  procedure DuplicateTo(aItem: Pointer); override;
+
+  // return scenario<_Name>
+  function VariableName: string;
+  // return scenario<_Name> := '<ScenarioData>';
+  function PascalCodeToInitializeVariable: string;
+end;
+
+{ TPathBank }
+
+{ TScenarioBank }
+
+TScenarioBank = class(specialize TListOfItemWithName<TScenarioDescriptorItem>)
+  function AddEmpty: TScenarioDescriptorItem; override;
+  function GetItemReadableName: string; override;
+  function GetHeaderFile: string; override;
+  function GetSaveFileName: string; override;
+end;
+
+
 var
   FontBank: TFontBank;
   PanelBank: TPanelBank;
   PathBank: TPathBank;
+  ScenarioBank: TScenarioBank;
 
 //TButtonItem
 
 implementation
 
-uses u_utils, u_common, u_project, u_resourcestring, LazFileUtils, Dialogs,
-  Controls;
+uses u_utils, u_common, u_project, u_resourcestring, u_texture_list,
+  u_surface_list, LazFileUtils, Dialogs, Controls;
 
 { TFontDescriptorItem }
 
@@ -230,7 +263,6 @@ end;
 procedure TFontDescriptorItem.DuplicateTo(aItem: Pointer);
 begin
   FD.DuplicateTo(@TFontDescriptorItem(aItem).FD);
-  //TFontDescriptorItem(aItem).FD := Copy(FD, 1, Length(FD));
   TFontDescriptorItem(aItem).UseCharsetPreset := UseCharsetPreset;
   TFontDescriptorItem(aItem).CharsetPresets := Copy(CharsetPresets, 0, Length(CharsetPresets));
   TFontDescriptorItem(aItem).TextToCharSet := Copy(TextToCharSet, 1, Length(TextToCharSet));
@@ -271,12 +303,13 @@ end;
 
 function TFontDescriptorItem.PascalCodeToInitializeFDVariable: string;
 begin
-  if FD.UseGradient then
-    Result := '  '+VariableNameForFD+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
-         CodeGen.FontStyleToPascal(FD.Style)+', '+VariableNameForFontGradient
-  else
-    Result := '  '+VariableNameForFD+'.Create('''+ FD.FontName+''', '+ FD.FontHeight.ToString+', '+
-          CodeGen.FontStyleToPascal(FD.Style)+', '+CodeGen.BGRAToPascal(FD.FontColor);
+  Result := '  '+VariableNameForFD+'.Create('''+ FD.FontName+''', '+
+                 //FD.FontHeight.ToString+', '+
+                 'Round('+FD.FontHeight.ToString+'/SCREEN_HEIGHT_AT_DESIGN_TIME*FScene.Height), '+
+                 CodeGen.FontStyleToPascal(FD.Style)+', ';
+
+  if FD.UseGradient then Result := Result + VariableNameForFontGradient
+    else Result := Result + CodeGen.BGRAToPascal(FD.FontColor);
 
   if FD.UseOutLine then
     Result := Result + ', '+CodeGen.BGRAToPascal(FD.OutLineColor)+', '+FormatFloatWithDot('0.0', FD.OutLineWidth);
@@ -300,7 +333,8 @@ begin
     end;
     Result := Result+';';
   end else begin
-    Result := Result + 'FScene.Charsets.TextToCharset('''+TextToCharSet+''');';
+    //Result := Result + 'FScene.Charsets.TextToCharset('''+TextToCharSet+''');';
+    Result := Result + CodeGen.TextToPascal(FScene.Charsets.TextToCharset(TextToCharSet), TRUE)+';';
   end;
 end;
 
@@ -353,13 +387,15 @@ procedure TFontBank.GetAtlasWithTexturedFont(const aFontDescriptorName, aCaption
   out aAtlas: TAtlas; out aTexturedFont: TTexturedFont;
   aFillTexture: TBGRABitmap);
 var item: TFontDescriptorItem;
+  s: string;
 begin
   item := GetByName(aFontDescriptorName);
   if item <> NIL then begin
     FScene.MakeCurrent;
     aAtlas := FScene.CreateAtlas;
     aAtlas.Spacing := 2;
-    aTexturedFont := aAtlas.AddTexturedFont(item.FD, TextToCharset(aCaption), aFillTexture);
+    if aCaption = '' then s := ' ' else s := aCaption;
+    aTexturedFont := aAtlas.AddTexturedFont(item.FD, TextToCharset(s), aFillTexture);
     aAtlas.TryToPack;
     aAtlas.Build;
   end else begin
@@ -377,8 +413,8 @@ begin
   IsModal := False;
   DarkenBG := False;
   DarknessColor := BGRA(0,0,0,100);
-  ScenarioOnShow := '';
-  ScenarioOnHide := '';
+  OnShowScenarioName := '';
+  OnHideScenarioName := '';
 
   textures := '';
   surfaces := '';
@@ -393,8 +429,8 @@ begin
   prop.Add('IsModal', IsModal);
   prop.Add('DarkenBG', DarkenBG);
   if DarkenBG then prop.Add('DarknessColor', DarknessColor);
-  if ScenarioOnShow <> '' then prop.Add('ScenarioOnShow', ScenarioOnShow);
-  if ScenarioOnHide <> '' then prop.Add('ScenarioOnHide', ScenarioOnHide);
+  if OnShowScenarioName <> '' then prop.Add('OnShowScenarioName', OnShowScenarioName);
+  if OnHideScenarioName <> '' then prop.Add('OnHideScenarioName', OnHideScenarioName);
   if textures <> '' then prop.Add('Textures', textures);
   if surfaces <> '' then prop.Add('Surfaces', surfaces);
   Result := prop.PackedProperty;
@@ -410,8 +446,8 @@ begin
   prop.BooleanValueOf('IsModal', IsModal, False);
   prop.BooleanValueOf('DarkenBG', DarkenBG, False);
   prop.BGRAPixelValueOf('DarknessColor', DarknessColor, BGRA(0,0,0,100));
-  prop.StringValueOf('ScenarioOnShow', ScenarioOnShow, '');
-  prop.StringValueOf('ScenarioOnHide', ScenarioOnHide, '');
+  prop.StringValueOf('OnShowScenarioName', OnShowScenarioName, '');
+  prop.StringValueOf('OnHideScenarioName', OnHideScenarioName, '');
   prop.StringValueOf('Textures', textures, '');
   prop.StringValueOf('Surfaces', surfaces, '');
 end;
@@ -424,10 +460,302 @@ begin
   dst.IsModal := IsModal;
   dst.DarkenBG := DarkenBG;
   dst.DarknessColor := DarknessColor;
-  dst.ScenarioOnShow := Copy(ScenarioOnShow, 1, Length(ScenarioOnShow));
-  dst.ScenarioOnHide := Copy(ScenarioOnHide, 1, Length(ScenarioOnHide));
-  dst.textures := textures;
-  dst.surfaces := surfaces;
+  dst.OnShowScenarioName := Copy(OnShowScenarioName, 1, Length(OnShowScenarioName));
+  dst.OnHideScenarioName := Copy(OnHideScenarioName, 1, Length(OnHideScenarioName));
+  dst.textures := Copy(textures, 1, Length(textures));
+  dst.surfaces := Copy(surfaces, 1, Length(surfaces));
+end;
+
+function TPanelDescriptorItem.GetUnitName: string;
+begin
+  Result := 'u_panel_' + LowerCase(_Name);
+end;
+
+function TPanelDescriptorItem.GetUnitFullFilename: string;
+begin
+  Result := Project.Config.TargetLazarusProject.GetFolderUnitsSprites + GetUnitName + '.pas';
+end;
+
+procedure TPanelDescriptorItem.ExportPanelToPascalUnit;
+var t: TStringList;
+  textureList: TTextureList;
+  surfaceList: TSurfaceList;
+  i: integer;
+  s, sx, sy: string;
+  rootItem, current, _parent: PSurfaceDescriptor;
+  nameUnit, nameClass, panelClassType: string;
+  fontItem: TFontDescriptorItem;
+begin
+  if (textures = '') or (surfaces = '') then exit;
+  // create each needed instance
+  textureList := TTextureList.Create;
+  surfaceList := TSurfaceList.Create;
+  surfaceList.Textures := textureList;
+  t := TStringList.Create;
+
+  try
+    textureList.LoadFromString(textures);
+    surfaceList.LoadFromString(surfaces, False);
+
+    nameClass := 'TPanel'+_Name;
+    nameUnit := GetUnitName;
+    rootItem := surfaceList.GetRootItem;
+    if IsModal then begin
+      panelClassType := 'TUIModalPanel';
+      rootItem^.classtype := TUIModalPanel;
+    end else begin
+      panelClassType := 'TUIPanelWithEffects';
+      rootItem^.classtype := TUIPanelWithEffects;
+    end;
+
+    if DarkenBG then rootItem^.BGDarkenColor := DarknessColor
+      else rootItem^.BGDarkenColor := BGRA(0,0,0,0);
+
+
+    // header
+    t.Add('{');
+    CodeGen.AddFileGeneratedByGameHelper(t);
+    t.Add('');
+    t.AddText('  DON''T EDIT THIS UNIT because it may be overwritten by the tool -> your code will be lost !'#10+
+              '  Instead, in another unit add "'+nameUnit+'" in the uses clause'#10+
+              '  and add your code in a class inherited from '+nameClass+'.');
+    t.Add('');
+    t.Add('  Usage:');
+    if surfaceList.UseTexture then
+      t.Add('    - add the panel textures to your atlas with class method '+nameClass+'.LoadTexture().');
+    t.AddText('    - create an instance of the panel'#10+
+              '      i.e. F'+_Name+' := TCustom'+_Name+'.Create(aLAYER_INDEX);'#10+
+              '    or if the panel is a child of another surface:'#10+
+              '           F'+_Name+' := TCustom'+_Name+'.Create(-1);'#10+
+              '           F'+_Name+'.SetChildOf(parentSurface, zordervalue);'#10+
+              '    - initialize the panel coordinates'#10+
+              '           F'+_Name+'.Setcoordinates(...);'#10+
+              '}');
+    t.Add('');
+    CodeGen.AddInterface(t, nameUnit);
+
+    // class declaration
+    t.Add(nameClass+' = class('+panelClassType+')');
+
+    // textures declaration
+    if textureList.Size > 0 then begin
+      t.AddText('private');
+      s := '  class var ';
+      for i:=0 to textureList.Size-1 do begin
+        s := s + textureList.Mutable[i]^.name;
+        if i < textureList.Size-1 then s := s +', ';
+        if (i mod 4 = 0) and (i > 0) and (i < textureList.Size-1) then s := s + #10'  ';
+      end;
+      s := s + ': PTexture;'#10+
+           '  class var FAdditionnalScale: single;';
+      t.AddText(s);
+    end;
+
+    // child variables declaration
+    t.Add('public');
+    s := '';
+    for i:=0 to surfaceList.Size-1 do begin
+      current := surfaceList.Mutable[i];
+      if current = rootItem then continue;
+      s := s + '  '+current^.name+': '+current^.classtype.ClassName+';';
+      if i < surfaceList.Size-1 then s := s +#10;
+    end;
+    t.AddText(s);
+
+    // methods declaration
+    if textureList.Size > 0 then
+      CodeGen.AddDeclarationOfClassLoadTexture(t);
+    //CodeGen.AddDeclarationOfSurfaceConstructor(t);
+    t.Add('  constructor Create;');
+
+    t.Add('end;');   // end of class declaration
+    t.Add('');
+    // implementation
+    CodeGen.AddImplementation(t);
+    t.Add('{ '+nameClass+' }');
+    t.Add('');
+
+    // procedure load Texture
+    if textureList.Size > 0 then begin
+      t.AddText('class procedure '+nameClass+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
+                'var texFolder: string;'#10+
+                'begin'#10+
+                '  FAdditionnalScale := AdditionnalScale;'#10+
+                '  texFolder := u_common.TexturesFolder;');
+      for i:=0 to textureList.Size-1 do
+        textureList.Mutable[i]^.PascalCodeToRetrieveOrAddTextureToAtlas(t, '  ', True);
+        //t.Add('  '+textureList.Mutable[i]^.PascalCodeToAddTextureToAtlas(True));
+      t.AddText('end;'#10+#10);
+    end;
+
+    // constructor
+    t.AddText('constructor '+nameClass+'.Create;'#10+
+              'begin'#10);
+    case panelClassType of
+      'TUIPanel', 'TUIPanelWithEffects': begin
+        t.Add('  inherited Create(FScene);');
+      end;
+      'TUIModalPanel': begin
+        if DarkenBG then t.Add('  inherited Create(FScene, '+DarknessColor.alpha.ToString+');')
+          else t.Add('  inherited Create(FScene, 0);');
+      end;
+      'TUILabel': begin
+        t.Add('  inherited Create(FScene);');
+      end;
+      'TUIImage': begin
+        if rootItem^.textureName = '' then s := 'NIL'
+          else s := rootItem^.textureName;
+        t.Add('  inherited Create(FScene, '+s+', '+rootItem^.width.ToString+', '+rootItem^.height.ToString+');');
+      end;
+      'TUIButton': begin
+        t.Add('  inherited Create(FScene);');
+      end;
+      'TUICheck': begin
+        fontItem := FontBank.GetByName(rootItem^.FontDescriptorName);
+        if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+          else s := 'NIL';
+        t.Add('  inherited Create(FScene, '+CodeGen.TextToPascal(rootItem^.Caption)+', '+s+');');
+      end;
+      'TUIRadio': begin
+        fontItem := FontBank.GetByName(rootItem^.FontDescriptorName);
+        if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+          else s := 'NIL';
+        t.Add('  inherited Create(FScene, '+CodeGen.TextToPascal(rootItem^.Caption)+', '+s+');');
+      end;
+      'TUIScrollBar': begin
+        t.Add('  inherited Create(FScene, '+CodeGen.UIOrientationToPascal(rootItem^.uiOrientation)+');');
+      end;
+      'TUIProgressBar': begin
+        t.Add('  inherited Create(FScene, '+CodeGen.UIOrientationToPascal(rootItem^.uiOrientation)+');');
+      end;
+      'TUIScrollBox': begin
+        t.Add('  inherited Create(FScene, '+CodeGen.BooleanToPascal(rootItem^.scrollboxUseVScrollbar)+', '+
+                                            CodeGen.BooleanToPascal(rootItem^.scrollboxUseHScrollbar)+');');
+      end;
+      'TUIListBox': begin
+        fontItem := FontBank.GetByName(rootItem^.FontDescriptorName);
+        if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+          else s := 'NIL';
+        t.Add('  inherited Create(FScene, '+s+');');
+      end;
+      'TUITextArea': begin
+        t.Add('  inherited Create(FScene);');
+      end
+
+      else raise exception.create('forgot to implement '+panelClassType);
+    end;
+    {t.AddText('  if aLayerIndex <> -1 then'#10+
+              '    FScene.Add(Self, aLayerIndex);'#10);}
+    if rootItem <> NIL then begin
+      if (rootItem^.x <> 0.0) or (rootItem^.y <> 0.0) then
+        t.Add('  SetCoordinate(ScaleWF('+FormatFloatWithDot('0.00', rootItem^.x)+'), ScaleHF('+
+                                 FormatFloatWithDot('0.00', rootItem^.y)+'));');
+
+      CodeGen.CommonPropertiesToPascalCode(t, rootItem, '  ');
+      CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
+    end;
+    t.Add('');
+    // creating childs
+    for i:=0 to surfaceList.Size-1 do begin
+      current := surfaceList.Mutable[i];
+      // copy values to variable for easier access
+      //current^.DuplicateValuesToTemporaryVariables;
+
+      if (rootItem <> NIL) and (current = rootItem) then continue;
+
+      case current^.classtype.ClassName of
+        'TUIPanel': t.Add('  '+current^.name+' := TUIPanel.Create(FScene);');
+        'TUILabel': t.Add('  '+current^.name+' := TUILabel.Create(FScene);');
+        'TUIImage': begin
+          if current^.textureName = '' then s := 'NIL'
+            else s := current^.textureName;
+          t.Add('  '+current^.name+' := TUIImage.Create(FScene, '+s+', '+current^.width.ToString+', '+current^.height.ToString+');');
+        end;
+        'TUIButton': begin
+          t.Add('  '+current^.name+' := TUIButton.Create(FScene);');
+        end;
+        'TUICheck': begin
+          fontItem := FontBank.GetByName(current^.FontDescriptorName);
+          if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+            else s := 'NIL';
+          t.Add('  '+current^.name+' := TUICheck.Create(FScene, '+CodeGen.TextToPascal(current^.Caption)+', '+s+');');
+        end;
+        'TUIRadio': begin
+          fontItem := FontBank.GetByName(current^.FontDescriptorName);
+          if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+            else s := 'NIL';
+          t.Add('  '+current^.name+' := TUIRadio.Create(FScene, '+CodeGen.TextToPascal(current^.Caption)+', '+s+');');
+        end;
+        'TUIScrollBar': begin
+          t.Add('  '+current^.name+' := TUIScrollBar.Create(FScene, '+CodeGen.UIOrientationToPascal(current^.uiOrientation)+');');
+        end;
+        'TUIProgressBar': begin
+          t.Add('  '+current^.name+' := TUIProgressBar.Create(FScene, '+CodeGen.UIOrientationToPascal(current^.uiOrientation)+');');
+        end;
+        'TUIScrollBox': begin
+          t.Add('  '+current^.name+' := TUIScrollBox.Create(FScene, '+CodeGen.BooleanToPascal(current^.scrollboxUseVScrollbar)+', '+
+                                              CodeGen.BooleanToPascal(current^.scrollboxUseHScrollbar)+');');
+        end;
+        'TUIListBox': begin
+          fontItem := FontBank.GetByName(current^.FontDescriptorName);
+          if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+            else s := 'NIL';
+          t.Add('  '+current^.name+' := TUIListBox.Create(FScene, '+s+');');
+        end;
+        'TUITextArea': begin
+          t.Add('  '+current^.name+' := TUITextArea.Create(FScene);');
+        end
+        else raise exception.create('forgot to implement '+current^.classtype.ClassName);
+      end;
+
+      // set child dependency and values
+      _parent := surfaceList.GetItemByID(current^.parentID);
+      if rootItem = NIL then begin
+        if current^.parentID = -1 then s := 'Self'
+          else s := _parent^.name;
+      end else begin
+        if current^.parentID = rootItem^.id then s := 'Self'
+          else s := _parent^.name;
+      end;
+      t.AddText('  with '+current^.name+' do begin'#10+
+                '    SetChildOf('+s+', '+current^.zOrder.ToString+');');
+
+      // to keep right proportion, coordinates must be relative to
+      // the width and height of the parent or current
+      if (current^.x <> 0) or (current^.y <> 0) then begin
+        if _parent^.classtype = TSpriteContainer then begin
+          sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
+          sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
+        end else begin
+          if _parent^.IsRoot then begin
+            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, 'Self');
+            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height, 'Self');
+          end else begin
+            sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, _parent^.name);
+            sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/_parent^.height, _parent^.name);
+          end;
+        end;
+        t.Add('    SetCoordinate('+sx+', '+sy+');');
+      end;
+
+      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
+      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
+      t.Add('  end;');
+      if i < surfaceList.Size-1 then t.Add('');
+    end;//for
+
+    t.Add('end;');
+    t.Add('');
+
+    t.Add('end.');
+
+    t.SaveToFile(GetUnitFullFilename);
+  finally
+    textureList.Clear;
+    textureList.Free;
+    surfaceList.Free;
+    t.Free;
+  end;
 end;
 
 { TPanelBank }
@@ -540,6 +868,69 @@ end;
 function TPathBank.GetSaveFileName: string;
 begin
   Result := 'PathBank.oglc';
+end;
+
+{ TScenarioDescriptorItem }
+
+procedure TScenarioDescriptorItem.InitDefault;
+begin
+  ScenarioData := '';
+end;
+
+function TScenarioDescriptorItem.SaveToString: string;
+var prop: TProperties;
+begin
+  prop.Init('!');
+  prop.Add('Name', _Name);
+  prop.Add('Data', ScenarioData, True);
+  Result := prop.PackedProperty;
+end;
+
+procedure TScenarioDescriptorItem.LoadFromString(const data: string);
+var prop: TProperties;
+begin
+  prop.Split(data, '!');
+  prop.StringValueOf('Name', _Name, '???');
+  prop.StringValueOf('Data', ScenarioData, '');
+end;
+
+procedure TScenarioDescriptorItem.DuplicateTo(aItem: Pointer);
+begin
+  TScenarioDescriptorItem(aItem).ScenarioData := Copy(ScenarioData, 1, Length(ScenarioData));
+end;
+
+function TScenarioDescriptorItem.VariableName: string;
+begin
+  Result := 'scenario'+_Name;
+end;
+
+function TScenarioDescriptorItem.PascalCodeToInitializeVariable: string;
+begin
+  Result := '  '+VariableName+' := '+CodeGen.TextToPascal(ScenarioData, True)+';';
+end;
+
+{ TScenarioBank }
+
+function TScenarioBank.AddEmpty: TScenarioDescriptorItem;
+begin
+  Result := TScenarioDescriptorItem.Create;
+  Result.InitDefault;
+  PushBack(Result);
+end;
+
+function TScenarioBank.GetItemReadableName: string;
+begin
+  Result := sScenario;
+end;
+
+function TScenarioBank.GetHeaderFile: string;
+begin
+  Result := '[SCENARIOBANK]';
+end;
+
+function TScenarioBank.GetSaveFileName: string;
+begin
+  Result := 'ScenarioBank.oglc';
 end;
 
 { TListOfItemWithName }
@@ -725,6 +1116,7 @@ end;
 procedure TListOfItemWithName.Save;
 var sl: TStringList;
  filename: string;
+ i: integer;
 begin
   filename := Project.Config.TargetLazarusProject.GetFolderGameHelperFiles + GetSaveFileName;
   FScene.LogInfo('Saving '+GetSaveFileName+' to '+filename, 1);
@@ -732,7 +1124,12 @@ begin
   try
     try
       sl.Add(GetHeaderFile);
-      sl.Add(SaveToString);
+      //sl.Add(SaveToString);
+
+      if Size > 0 then
+        for i:=0 to Size-1 do
+          sl.Add(Mutable[i]^.SaveToString);
+
       sl.SaveToFile(filename);
       FScene.LogInfo('success', 2);
     except
@@ -748,7 +1145,8 @@ end;
 procedure TListOfItemWithName.Load;
 var sl: TStringList;
   filename: string;
-  k: LongInt;
+  i, k: Integer;
+  o: T;
 begin
   Clear;
   filename := Project.Config.TargetLazarusProject.GetFolderGameHelperFiles + GetSaveFileName;
@@ -767,11 +1165,24 @@ begin
         FScene.LogError('Header '+GetHeaderFile+' not found in file !', 2);
         exit;
       end;
-      if k = sl.Count-1 then begin
+
+   {   if k = sl.Count-1 then begin
         FScene.LogError('no data found after the header in file !', 2);
         exit;
       end;
-      LoadFromString(sl.Strings[k+1]);
+      LoadFromString(sl.Strings[k+1]); }
+
+      if k = sl.Count-1 then begin
+        FScene.LogInfo('file is empty', 2);
+        exit;
+      end;
+      repeat
+        inc(k);
+        o := AddEmpty;
+        TItemWithName(o).LoadFromString(sl.Strings[k]);
+      until k = sl.Count-1;
+
+
       FScene.LogInfo('success, '+Size.ToString+' item(s)', 2);
     except
       On E :Exception do begin

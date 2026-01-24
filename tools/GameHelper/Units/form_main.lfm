@@ -196,70 +196,10 @@ object FormMain: TFormMain
       Top = 1
       Width = 303
       Anchors = [akTop, akLeft, akBottom]
-      ClientHeight = 29
-      ClientWidth = 303
       Color = 3226172
       ParentBackground = False
       ParentColor = False
       TabOrder = 1
-      object BSpriteBank: TSpeedButton
-        AnchorSideTop.Control = Panel2
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = Panel2
-        AnchorSideRight.Side = asrBottom
-        Cursor = crHandPoint
-        Left = 207
-        Height = 25
-        Top = 2
-        Width = 85
-        Anchors = [akTop, akRight]
-        AutoSize = True
-        BorderSpacing.Right = 10
-        Caption = 'SPRITE BANK'
-        Enabled = False
-        Font.Color = clBlack
-        Font.Style = [fsBold]
-        ParentFont = False
-        OnClick = BSpriteBankClick
-      end
-      object BLevelBank: TSpeedButton
-        AnchorSideLeft.Control = Panel2
-        AnchorSideLeft.Side = asrCenter
-        AnchorSideTop.Control = Panel2
-        AnchorSideTop.Side = asrCenter
-        Cursor = crHandPoint
-        Left = 112
-        Height = 25
-        Top = 2
-        Width = 78
-        AutoSize = True
-        BorderSpacing.Right = 10
-        Caption = 'LEVEL BANK'
-        Enabled = False
-        Font.Color = clBlack
-        Font.Style = [fsBold]
-        ParentFont = False
-        OnClick = BSpriteBankClick
-      end
-      object BScreenBank: TSpeedButton
-        AnchorSideLeft.Control = Panel2
-        AnchorSideTop.Control = Panel2
-        AnchorSideTop.Side = asrCenter
-        Cursor = crHandPoint
-        Left = 11
-        Height = 25
-        Top = 2
-        Width = 89
-        AutoSize = True
-        BorderSpacing.Left = 10
-        BorderSpacing.Right = 10
-        Caption = 'SCREEN BANK'
-        Enabled = False
-        Font.Color = clBlack
-        Font.Style = [fsBold]
-        ParentFont = False
-        OnClick = BSpriteBankClick
-      end
     end
     object Panel10: TPanel
       AnchorSideLeft.Control = Panel2
@@ -280,43 +220,6 @@ object FormMain: TFormMain
       ParentBackground = False
       ParentColor = False
       TabOrder = 2
-      object BFontBank: TSpeedButton
-        AnchorSideTop.Control = Panel10
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = BToolUIPanel
-        Cursor = crHandPoint
-        Left = 16
-        Height = 25
-        Top = 2
-        Width = 77
-        Anchors = [akTop]
-        AutoSize = True
-        BorderSpacing.Right = 10
-        Caption = 'FONT BANK'
-        Font.Color = clBlack
-        Font.Style = [fsBold]
-        ParentFont = False
-        OnClick = BSpriteBankClick
-      end
-      object BToolUIPanel: TSpeedButton
-        AnchorSideTop.Control = Panel10
-        AnchorSideTop.Side = asrCenter
-        AnchorSideRight.Control = Panel10
-        AnchorSideRight.Side = asrBottom
-        Cursor = crHandPoint
-        Left = 101
-        Height = 25
-        Top = 2
-        Width = 107
-        Anchors = [akTop]
-        AutoSize = True
-        BorderSpacing.Right = 5
-        Caption = 'UI PANEL EDITOR'
-        Font.Color = clBlack
-        Font.Style = [fsBold]
-        ParentFont = False
-        OnClick = BSpriteBankClick
-      end
       object CBBank: TComboBox
         AnchorSideTop.Control = Panel10
         AnchorSideTop.Side = asrCenter
@@ -336,6 +239,7 @@ object FormMain: TFormMain
           'FONT BANK'
           'PANEL BANK'
           'PATH BANK'
+          'SCENARIO BANK'
         )
         Style = csDropDownList
         TabOrder = 0

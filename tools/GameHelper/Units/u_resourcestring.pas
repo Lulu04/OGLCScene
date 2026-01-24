@@ -41,6 +41,7 @@ sDeleteThisxxx='Delete this %s ?';
 sFont='font';
 sPanel='panel';
 sPath='path';
+sScenario='scenario';
 
 sFontDescriptor='Font descriptor';
 sOverwriteTheSelectedFont='Overwrite the selected font ?';

@@ -32,6 +32,9 @@ TTextureItem = record
   procedure LoadFromString(const s: string);
 
   function PascalCodeToAddTextureToAtlas(aGenerateTexVariableName: boolean): string;
+  function PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
+                                                   const aSpacePrefix: string;
+                                                   aGenerateTexVariableName: boolean): string;
 end;
 PTextureItem = ^TTextureItem;
 
@@ -171,20 +174,66 @@ begin
     if isMultiFrame then begin
       XFrameCount := width div frameWidth;
       YFrameCount := height div frameHeight;
-      Result := Result + 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
+      Result := Result+ 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
          ', ScaleW('+frameWidth.ToString+')*'+XFrameCount.ToString+
          ', ScaleH('+frameHeight.ToString+')*'+YFrameCount.ToString+
          ', '+XFrameCount.ToString+
          ', '+YFrameCount.ToString+');'
     end else
-      Result := Result + 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
+      Result := Result+'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
   end else begin
     if isMultiFrame then
-      Result := Result + 'aAtlas.AddMultiFrameImage('+texFilename+
+      Result := Result+'aAtlas.AddMultiFrameImage('+texFilename+
       ', '+(width div frameWidth).ToString+
       ', '+(height div frameHeight).ToString+');'
     else
-      Result := Result + 'aAtlas.Add('+texFilename+');';
+      Result := Result+'aAtlas.Add('+texFilename+');';
+  end;
+end;
+
+function TTextureItem.PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
+   const aSpacePrefix: string; aGenerateTexVariableName: boolean): string;
+var texFilename, sw, sh, s, sAdd: string;
+  XFrameCount, YFrameCount: integer;
+begin
+  // texture filename must be relative to application Data folder
+  texFilename := filename;
+  texFilename := ExtractRelativePath(Project.Config.TargetLazarusProject.GetFolderDataTextures, filename);
+  texFilename := GetCrossPlatformShortFilename(texFilename);
+  texFilename := 'texFolder+'''+texFilename+'''';
+
+  if ExtractFileExt(filename) = '.svg' then begin
+    if width = -1 then sw := '-1'
+      else sw := 'ScaleW('+width.ToString+')';
+    if height = -1 then sh := '-1'
+      else sh := 'ScaleH('+height.ToString+')';
+
+    if isMultiFrame then begin
+      XFrameCount := width div frameWidth;
+      YFrameCount := height div frameHeight;
+      sAdd := 'aAtlas.AddMultiFrameImageFromSVG('+texFilename+
+         ', ScaleW('+frameWidth.ToString+')*'+XFrameCount.ToString+
+         ', ScaleH('+frameHeight.ToString+')*'+YFrameCount.ToString+
+         ', '+XFrameCount.ToString+
+         ', '+YFrameCount.ToString+');'
+    end else
+      sAdd := 'aAtlas.AddFromSVG('+texFilename+', '+sw+', '+sh+');';
+  end else begin
+    if isMultiFrame then
+      sAdd := 'aAtlas.AddMultiFrameImage('+texFilename+
+      ', '+(width div frameWidth).ToString+
+      ', '+(height div frameHeight).ToString+');'
+    else
+      sAdd := 'aAtlas.Add('+texFilename+');';
+  end;
+
+  if aGenerateTexVariableName then begin
+    t.Add(aSpacePrefix+name+' := aAtlas.RetrieveTextureByFileName('''+ExtractFileName(filename)+''');');
+    t.Add(aSpacePrefix+'if '+name+' = NIL then');
+    t.Add('  '+aSpacePrefix+name+' := '+sAdd);
+  end else begin
+    t.Add(aSpacePrefix+'if aAtlas.RetrieveTextureByFileName('''+ExtractFileName(filename)+''') = NIL then');
+    t.Add('  '+aSpacePrefix+sAdd);
   end;
 end;
 
