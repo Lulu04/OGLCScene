@@ -107,7 +107,7 @@ const
      acAngle                = 'Angle'    ; // Angle NewAngleF
      acRotate               = 'Rotate'   ; // Rotate AnglePerSecondF
      acRotateTo             = 'RotateTo' ; // RotateTo AngleF DurationF CurveID
-     acRotationAroundAxis   = 'RotationAroundAxis'    ; // RotationAroundAxis XAxisF YAxisF AnglePerSecondF SelfRotate
+     acRotateAroundPoint    = 'RotateAroundPoint'; // RotateAroundPoint XCenterPtF YCenterPtF AnglePerSecondF SelfRotate
 
      acScale                = 'Scale'          ; // Scale HVValueF      // [1]= normal size, [0..1[->reduced, ]1..inf[->enlarged
      acScaleChange          = 'ScaleChange'    ; // ScaleChange HVNewValueF DurationF CurveID
