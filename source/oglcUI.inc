@@ -384,10 +384,12 @@ public
   procedure Update(const aElapsedtime: single); override;
   procedure DoDraw; override;
 public
+  constructor Create(aParentScene: TOGLCScene);
   constructor Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont; aTexture: PTexture);
   destructor Destroy; override;
   property Image: TUIImage read FImage;
   property _Label: TUILabel read FLabel;
+  procedure InitParameters(const aCaption: string; aFont: TTexturedFont; aTexture: PTexture);
   // Convenient property to allow direct access to property _Label.CaptionDescriptor.Caption
   property Caption: string read GetCaption write SetCaption;
   // the margin in pixel between the image and the caption. Default value is 3 pixels.
@@ -1521,6 +1523,30 @@ begin
   FMouseInteractionEnabled := AValue;
 end;
 
+constructor TUIButton.Create(aParentScene: TOGLCScene);
+begin
+  inherited Create(aParentScene);
+
+  FImage := TUIImage.Create(aParentScene, NIL, 0, 0);
+
+  FLabel := TUILabel.Create(aParentScene);
+  FLabel.CaptionDescriptor.Alignment := taCenterLeft;
+  //AddChild(FLabel);
+  FLabel.MouseInteractionEnabled := False; // disable mouse interaction after AddChild() !!
+  FLabel.CaptionDescriptor.OnSizeChanged := @ProcessCallbackSomethingChangeTheSize;
+
+  FImageMargin := FParentScene.ScaleDesignToScene(DEFAULT_MARGIN_BETWEEN_IMAGE_AND_CAPTION);
+  FNeedToRecomputeSize := True;
+  UpdateWidgetSizeAndLayout;
+
+  // default animation
+  FOnAnimMouseEnter := @DoAnim_OnMouseEnter;
+  FOnAnimMouseLeave := @DoAnim_OnMouseLeave;
+  FOnAnimMouseDown := @DoAnim_OnMouseDown;
+  FOnAnimMouseUp := @DoAnim_OnMouseUp;
+  FOnAnimClick := @DoAnim_OnClick;
+end;
+
 constructor TUIButton.Create(aParentScene: TOGLCScene; const aCaption: string; aFont: TTexturedFont; aTexture: PTexture);
 begin
   inherited Create(aParentScene);
@@ -1556,6 +1582,21 @@ begin
   FreeAndNil(FLabel);
   FreeAndNil(FImage);
   inherited Destroy;
+end;
+
+procedure TUIButton.InitParameters(const aCaption: string;
+  aFont: TTexturedFont; aTexture: PTexture);
+begin
+  Caption := aCaption;
+  _Label.CaptionDescriptor.TexturedFont := aFont;
+
+  if FImage <> NIL then FImage.Free;
+  if aTexture <> NIL then begin
+    FImage := TUIImage.Create(ParentScene, aTexture, aTexture^.FrameWidth, aTexture^.FrameHeight)
+  end else FImage := TUIImage.Create(ParentScene, aTexture, 0, 0);
+  //AddChild(FImage);
+  FImage.OnTextureChanged := @ProcessCallbackSomethingChangeTheSize;
+  FImage.OnSizeChanged := @ProcessCallbackSomethingChangeTheSize;
 end;
 
 procedure TUIButton.DoAnim_OnMouseEnter(Sender: TSimpleSurfaceWithEffect);
