@@ -266,8 +266,10 @@ var prop: TProperties;
 begin
   prop.Init(' ');
   prop.Add('Visible', Visible);
-  prop.Add('Color', Color);
-  prop.Add('BlendMode', BlendMode);
+  if Visible then begin
+    prop.Add('Color', Color);
+    prop.Add('BlendMode', BlendMode);
+  end;
   Result := prop.PackedProperty;
 end;
 
