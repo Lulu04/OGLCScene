@@ -137,11 +137,11 @@ end;
 
 procedure TSpriteBankItem.DuplicateTo(aItem: PSpriteBankItem);
 begin
-  aItem^.textures := textures;
-  aItem^.surfaces := surfaces;
-  aItem^.collisionbodies := collisionbodies;
-  aItem^.postures := postures;
-  aItem^.codeoptions := codeoptions;
+  aItem^.textures := Copy(textures, 1, Length(textures));
+  aItem^.surfaces := Copy(surfaces, 1, Length(surfaces));
+  aItem^.collisionbodies := Copy(collisionbodies, 1, Length(collisionbodies));
+  aItem^.postures := Copy(postures, 1, Length(postures));
+  aItem^.codeoptions := Copy(codeoptions, 1, Length(codeoptions));
 end;
 
 function TSpriteBankItem.SaveToString: string;
@@ -305,7 +305,8 @@ begin
                 '  FAdditionnalScale := AdditionnalScale;'#10+
                 '  texFolder := u_common.TexturesFolder;');
       for i:=0 to textureList.Size-1 do
-        t.Add('  '+textureList.Mutable[i]^.PascalCodeToAddTextureToAtlas(True));
+        textureList.Mutable[i]^.PascalCodeToRetrieveOrAddTextureToAtlas(t, '  ', True);
+        //t.Add('  '+textureList.Mutable[i]^.PascalCodeToAddTextureToAtlas(True));
       t.AddText('end;'#10+#10);
     end;
 
@@ -381,13 +382,12 @@ begin
     t.AddText('  if aLayerIndex <> -1 then'#10+
               '    FScene.Add(Self, aLayerIndex);'#10);
     if rootItem <> NIL then begin
+      CodeGen.CommonPropertiesToPascalCode(t, rootItem, '  ');
+      CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
       if (rootItem^.x <> 0.0) or (rootItem^.y <> 0.0) then
         t.Add('  SetCoordinate(ScaleWF('+FormatFloatWithDot('0.00', rootItem^.x)+'), ScaleHF('+
                                  FormatFloatWithDot('0.00', rootItem^.y)+'));');
-
-      CodeGen.CommonPropertiesToPascalCode(t, rootItem, '  ');
-      CodeGen.ExtraPropertiesToPascalCode(t, rootItem, '  ');
-    end;
+     end;
     t.Add('');
     // creating childs
     for i:=0 to surfaceList.Size-1 do begin
@@ -435,6 +435,9 @@ begin
       t.AddText('  with '+current^.name+' do begin'#10+
                 '    SetChildOf('+s+', '+current^.zOrder.ToString+');');
 
+      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
+      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
+
       // to keep right proportion, coordinates must be relative to
       // the width and height of the parent or current
       if (current^.x <> 0) or (current^.y <> 0) then begin
@@ -453,8 +456,8 @@ begin
         t.Add('    SetCoordinate('+sx+', '+sy+');');
       end;
 
-      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
-      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
+//      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
+//      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
       if codeop.useapplysymetrywhenflip then
         t.Add('    ApplySymmetryWhenFlip := True;');
       t.Add('  end;');

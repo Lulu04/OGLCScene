@@ -31,11 +31,7 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    BLevelBank: TSpeedButton;
-    BFontBank: TSpeedButton;
     BLevelEditor: TSpeedButton;
-    BScreenBank: TSpeedButton;
-    BToolUIPanel: TSpeedButton;
     CBBank: TComboBox;
     Label1: TLabel;
     Notebook1: TNotebook;
@@ -56,7 +52,6 @@ type
     Panel5: TPanel;
     Panel6: TPanel;
     Panel7: TPanel;
-    BSpriteBank: TSpeedButton;
     Panel8: TPanel;
     ToolBarMain: TToolBar;
     BNewProject: TToolButton;
@@ -68,7 +63,6 @@ type
     procedure BNewProjectClick(Sender: TObject);
     procedure BProjectConfigClick(Sender: TObject);
     procedure BSaveProjectClick(Sender: TObject);
-    procedure BSpriteBankClick(Sender: TObject);
     procedure CBBankSelect(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var {%H-}CanClose: boolean);
@@ -243,41 +237,6 @@ begin
   Project.Save;
 end;
 
-procedure TFormMain.BSpriteBankClick(Sender: TObject);
-begin
-  if Sender = BSpriteBank then begin
-    FScene.RunScreen(ScreenSpriteBank);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageSpriteBank);
-    FrameToolsSpriteBank.OnShow;
-    UpdateWidgets;
-    ToolBarMain.Visible := True;
-  end;
-
-  if Sender = BLevelBank then begin
-    FScene.RunScreen(ScreenLevelBank);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageLevelBank);
-    FrameToolLevelBank.OnShow;
-    UpdateWidgets;
-    ToolBarMain.Visible := True;
-  end;
-
-  if Sender = BFontBank then begin
-    FScene.RunScreen(ScreenFontBank);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageFontBank);
-    FrameViewFontBank.Fill;
-    UpdateWidgets;
-    ToolBarMain.Visible := False;
-  end;
-
-  if Sender = BToolUIPanel then begin
-    FScene.RunScreen(ScreenUIPanelEditor);
-    Notebook1.PageIndex := Notebook1.IndexOf(PageUIPanelEditor);
-    FrameToolUIPanelEditor.OnShow;
-    UpdateWidgets;
-    ToolBarMain.Visible := False;
-  end;
-end;
-
 procedure TFormMain.CBBankSelect(Sender: TObject);
 begin
   case CBBank.Text of
@@ -440,6 +399,7 @@ begin
   FontBank:= TFontBank.Create;
   PanelBank := TPanelBank.Create;
   PathBank := TPathBank.Create;
+  ScenarioBank := TScenarioBank.Create;
 
   ScreenLevelEditor := TScreenLevelEditor.Create;
   ScreenLevelEditor.Initialize;
@@ -494,6 +454,9 @@ begin
   PathBank.Free;
   PathBank := NIL;
 
+  ScenarioBank.Free;
+  ScenarioBank := NIL;
+
   ScreenUIPanelBank.Finalize;
   FreeAndNil(ScreenUIPanelBank);
 
@@ -529,9 +492,6 @@ end;
 
 procedure TFormMain.UpdateWidgets;
 begin
-  BSpriteBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageLevelBank);
-  BLevelBank.Enabled := Notebook1.PageIndex = Notebook1.IndexOf(PageSpriteBank);
-
   // project button relative to project disabled if Game Helper is started from the IDE
   BNewProject.Enabled := not IdeConnect.Activated;
   BLoadProject.Enabled := not IdeConnect.Activated;

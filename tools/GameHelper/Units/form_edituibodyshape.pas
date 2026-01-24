@@ -60,7 +60,7 @@ var
 
 implementation
 
-uses form_main, u_app_pref, u_project;
+uses form_main, u_project;
 
 {$R *.lfm}
 

@@ -67,7 +67,11 @@ TCodeGenerator = record
   function BGRAGradientTypeToPascal(aGradientType: TGradientType): string;
   function FontStyleToPascal(aFontStyle: TFontStyles): string;
   function TextAlignmentToPascal(aAlign: TOGLCAlignment): string;
-  function TextToPascal(const aText: string): string; // insert LineEnding and double quote
+  // insert LineEnding and double quote
+  function TextToPascal(const aText: string; aUseSharp10: boolean=False): string;
+  function CheckShapeToPascal(aCheckShape: TUICheckShape): string;
+  function CheckFillToPascal(aCheckFill: TUICheckFill): string;
+  function UIOrientationToPascal(AValue: TUIOrientation): string;
 
   procedure CommonPropertiesToPascalCode(t: TStringList;
                                         aSurface: PSurfaceDescriptor;
@@ -313,7 +317,7 @@ begin
   Result := s;
 end;
 
-function TCodeGenerator.TextToPascal(const aText: string): string;
+function TCodeGenerator.TextToPascal(const aText: string; aUseSharp10: boolean): string;
 const LN = '''+LineEnding+''';
 begin
   Result := '';
@@ -328,6 +332,26 @@ begin
 
   if Result.EndsWith(LN) then system.Delete(Result, Length(Result)-1, 2)
     else Result := Result + '''';
+
+  if aUseSharp10 then begin
+    Result := StringReplace(Result, '+LineEnding+', '#10', [rfReplaceAll]);
+    Result := StringReplace(Result, '+LineEnding', '', [rfReplaceAll]);
+  end;
+end;
+
+function TCodeGenerator.CheckShapeToPascal(aCheckShape: TUICheckShape): string;
+begin
+  system.WriteStr(Result, aCheckShape);
+end;
+
+function TCodeGenerator.CheckFillToPascal(aCheckFill: TUICheckFill): string;
+begin
+  system.WriteStr(Result, aCheckFill);
+end;
+
+function TCodeGenerator.UIOrientationToPascal(AValue: TUIOrientation): string;
+begin
+  system.WriteStr(Result, AValue);
 end;
 
 procedure TCodeGenerator.CommonPropertiesToPascalCode(t: TStringList;
@@ -351,7 +375,7 @@ begin
     t.Add(aSpacePrefix+'Tint.Value := '+BGRAToPascal(aSurface^.tint)+';');
   if aSurface^.tintMode <> tmReplaceColor then
     t.Add(aSpacePrefix+'TintMode := tmMixColor;');
-  if aSurface^.IsTextured and (aSurface^.frameindex <> 1.0) then
+  if aSurface^.IsTextured and (aSurface^.frameindex <> 0.0) then
     t.Add(aSpacePrefix+'Frame := '+FormatFloatWithDot('0.0', aSurface^.frameindex)+';');
   if aSurface^.blendmode <> FX_BLEND_NORMAL then
     t.Add(aSpacePrefix+'BlendMode := '+BLEND_NAMES[aSurface^.blendmode]+';');
@@ -362,6 +386,22 @@ procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
 var
   fontItem: TFontDescriptorItem;
   PathItem: TPathDescriptorItem;
+  s, sx: string;
+  procedure BodyShapeToPascal;
+  begin
+    if aItem^.BodyShapeData <> '' then begin
+      t.Add(aSpacePrefix+'BodyShape.LoadFromString('''+aItem^.BodyShapeData+''');');
+      t.Add(aSpacePrefix+'BodyShape.ResizeCurrentShape(ScaleW('+aItem^.width.ToString+'), ScaleH('+aItem^.height.ToString+'), True);');
+    end;
+  end;
+  procedure BackGradientToPascal;
+  begin
+    if aItem^.BackGradientData <> '' then begin
+      t.Add(aSpacePrefix+'BackGradient.LoadGradientDataFromString('''+aItem^.BackGradientData+''');');
+      t.Add(aSpacePrefix+'BackGradient.ComputeVerticesAndIndices(ScaleW('+aItem^.width.ToString+'), ScaleH('+aItem^.height.ToString+'));');
+    end;
+  end;
+
 begin
   case aItem^.classtype.ClassName of
     'TSprite': begin
@@ -465,6 +505,116 @@ begin
         t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');}
       t.Add(aSpacePrefix+'Caption := '+TextToPascal(aItem^.Caption)+';');
       t.Add(aSpacePrefix+'Align := '+TextAlignmentToPascal(aItem^.TextAlignment)+';');
+    end;
+
+    'TUIPanel': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+    end;
+
+    'TUIModalPanel': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+    end;
+
+    'TUIPanelWithEffects': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+      if aItem^.BGDarkenColor.alpha > 0 then
+        t.Add(aSpacePrefix+'ActivateSceneDarken('+BGRAToPascal(aItem^.BGDarkenColor)+');');
+    end;
+
+    'TUILabel': begin
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
+      t.Add(aSpacePrefix+'Caption := '+TextToPascal(aItem^.Caption)+';');
+    end;
+
+    'TUIImage': begin
+    end;
+
+    'TUIButton': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+      if aItem^.AutoSize = False then
+        t.Add(aSpacePrefix+'AutoSize := False;');
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
+        else s := 'NIL';
+      if aItem^.textureName <> '' then sx := aItem^.textureName
+        else sx := 'NIL';
+      t.Add(aSpacePrefix+'InitParameters('+CodeGen.TextToPascal(aItem^.Caption)+', '+ s+', '+sx+');');
+      if aItem^.CaptionColor.alpha <> 0 then
+        t.Add(aSpacePrefix+'_Label.Tint.Value := '+BGRAToPascal(aItem^.CaptionColor)+';');
+    end;
+
+    'TUICheck': begin
+      if (aItem^.textureName <> '') and (aItem^.textureName2 <> '') then
+        t.Add(aSpacePrefix+'CustomizeCheckBox('+aItem^.textureName+', '+aItem^.textureName2+', '+BooleanToPascal(aItem^.CheckAdjustImageToFontHeight)+');')
+      else t.Add(aSpacePrefix+'CustomizeCheckBox('+CheckShapeToPascal(aItem^.CheckShape)+', '+CheckFillToPascal(aItem^.CheckFill)+');');
+      if aItem^.Checked then
+        t.Add(aSpacePrefix+'Checked := '+BooleanToPascal(aItem^.Checked)+';');
+      t.Add(aSpacePrefix+'ColorChecked := '+BGRAToPascal(aItem^.CheckColorChecked)+';');
+      if aItem^.CaptionColor.alpha <> 0 then
+        t.Add(aSpacePrefix+'_Label.Tint.Value := '+BGRAToPascal(aItem^.CaptionColor)+';');
+    end;
+
+    'TUIRadio': begin
+      if (aItem^.textureName <> '') and (aItem^.textureName2 <> '') then
+        t.Add(aSpacePrefix+'CustomizeCheckBox('+aItem^.textureName+', '+aItem^.textureName2+', '+BooleanToPascal(aItem^.CheckAdjustImageToFontHeight)+');')
+      else t.Add(aSpacePrefix+'CustomizeCheckBox('+CheckShapeToPascal(aItem^.CheckShape)+', '+CheckFillToPascal(aItem^.CheckFill)+');');
+      if aItem^.Checked then
+        t.Add(aSpacePrefix+'Checked := '+BooleanToPascal(aItem^.Checked)+';');
+      t.Add(aSpacePrefix+'ColorChecked := '+BGRAToPascal(aItem^.CheckColorChecked)+';');
+      if aItem^.CaptionColor.alpha <> 0 then
+        t.Add(aSpacePrefix+'_Label.Tint.Value := '+BGRAToPascal(aItem^.CaptionColor)+';');
+    end;
+
+    'TUIScrollBar': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+      t.Add(aSpacePrefix+'SetParams('+aItem^.scrollbarPosition.ToString+', '+
+                                      aItem^.scrollbarMin.ToString+', '+
+                                      aItem^.scrollbarMax.ToString+', '+
+                                      aItem^.scrollbarPageSize.ToString+');');
+    end;
+    'TUIProgressBar': begin
+      BodyShapeToPascal;
+      if aItem^.GradientData <> '' then begin
+        t.Add(aSpacePrefix+'Gradient.LoadGradientDataFromString('''+aItem^.GradientData+''');');
+        t.Add(aSpacePrefix+'Gradient.ComputeVerticesAndIndices(ScaleW('+aItem^.width.ToString+'), ScaleH('+aItem^.height.ToString+'));');
+      end;
+      if aItem^.ProgressBarReversed then
+        t.Add(aSpacePrefix+'Reversed := '+BooleanToPascal(aItem^.ProgressBarReversed)+';');
+      t.Add(aSpacePrefix+'Percent := '+FormatFloatWithDot('0.000', aItem^.ProgressBarPercent)+';');
+    end;
+
+    'TUIScrollBox': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+    end;
+
+    'TUIListBox': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+      t.Add(aSpacePrefix+'ItemHeight := '+aItem^.listboxItemHeight.ToString+';');
+      t.Add(aSpacePrefix+'MultiSelect := '+BooleanToPascal(aItem^.listboxMultiSelect)+';');
+      t.Add(aSpacePrefix+'ItemColor.GradientItem.LoadGradientDataFromString('''+aItem^.listboxUnselectedGradientData+''');');
+      t.Add(aSpacePrefix+'ItemColor.ColorText := '+BGRAToPascal(aItem^.listboxUnselectedTextColor)+';');
+      t.Add(aSpacePrefix+'ItemColor.GradientItemSelected.LoadGradientDataFromString('''+aItem^.listboxSelectedGradientData+''');');
+      t.Add(aSpacePrefix+'ItemColor.ColorSelectedText := '+BGRAToPascal(aItem^.listboxSelectedTextColor)+';');
+    end;
+
+    'TUITextArea': begin
+      BodyShapeToPascal;
+      BackGradientToPascal;
+      fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
+      if fontItem <> NIL then
+        t.Add(aSpacePrefix+'Text.TexturedFont := '+fontItem.VariableNameForTexturedFont+';');
+      t.Add(aSpacePrefix+'Text.Tint.Value := '+BGRAToPascal(aItem^.TextAreaTextTint)+';');
+      t.Add(aSpacePrefix+'Text.Caption := '+TextToPascal(aItem^.TextAreaText)+';');
+      t.Add(aSpacePrefix+'Text.Align := '+TextAlignmentToPascal(aItem^.TextAlignment)+';');
     end
 
     else raise exception.Create('forgot to implement '+aItem^.classtype.ClassName);

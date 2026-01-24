@@ -827,7 +827,8 @@ begin
       else prefixSpace := '      ';
     if group.Size > 0 then begin
       for j:=0 to group.Textures.Size-1 do
-        t.Add(prefixSpace+group.Textures.Mutable[j]^.PascalCodeToAddTextureToAtlas(False))
+        group.Textures.Mutable[j]^.PascalCodeToRetrieveOrAddTextureToAtlas(t, prefixSpace, False);
+        //t.Add(prefixSpace+group.Textures.Mutable[j]^.PascalCodeToAddTextureToAtlas(False));
     end else t.Add(prefixSpace+'// this group is empty');
 
     if not haveSingleGroup then
