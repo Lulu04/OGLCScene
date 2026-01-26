@@ -63,7 +63,8 @@ type
 implementation
 
 uses u_ui_objectlist, u_resourcestring, form_main, u_common,
-  u_screen_uipanelbank, u_screen_uipaneleditor, form_showhelp, Graphics;
+  u_screen_uipanelbank, u_screen_uipaneleditor, form_showhelp, Graphics,
+  LazFileUtils;
 
 {$R *.lfm}
 
@@ -275,20 +276,34 @@ begin
 end;
 
 procedure TFrameToolPanelBank.DoRenameSelected;
-var oldName, newName: string;
+var oldName, newName, oldFilename: string;
+  item: TPanelDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPanel then exit;
 
   oldName := TV.Selected.Text;
+  item := PanelBank.GetByName(oldName);
+  if item = NIL then exit;
+  oldFilename := item.GetUnitFullFilename;
+
   if not PanelBank.DoRenameByName(oldName, newName, True) then exit;
 
   // change name in treeview
   TV.Selected.Text := newName;
+
+  // delete old unit
+  if FileExistsUTF8(oldFilename) then
+      DeleteFileUTF8(oldFilename);
+  // generate new unit
+  item := PanelBank.GetByName(newName);
+  if item = NIL then exit;
+  item.ExportPanelToPascalUnit;
 end;
 
 procedure TFrameToolPanelBank.DoDuplicateSelected;
 var dstName: string;
+  item: TPanelDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPanel then exit;
@@ -300,16 +315,28 @@ begin
     SelectedIndex := 11;
     MakeVisible;
   end;
+  // generate new unit
+  item := PanelBank.GetByName(dstName);
+  if item = NIL then exit;
+  item.ExportPanelToPascalUnit;
 end;
 
 procedure TFrameToolPanelBank.DoDeleteSelected;
+var oldFilename: string;
+  item: TPanelDescriptorItem;
 begin
   HideToolPanels;
   if not SelectedIsPanel then exit;
+  item := PanelBank.GetByName(TV.Selected.Text);
+  if item = NIL then exit;
+  oldFilename := item.GetUnitFullFilename;
 
   if not PanelBank.DoDeleteByName(TV.Selected.Text, True) then exit;
   // delete in treeview
   TV.Items.Delete(TV.Selected);
+  // delete unit
+  if FileExistsUTF8(oldFilename) then
+      DeleteFileUTF8(oldFilename);
 
   UpdatePreview;
 end;

@@ -470,8 +470,7 @@ begin
   item.ChildClippingEnabled := CBChildClipping.Checked;
   item.IsModal := RBOptionModal.Checked;
   item.DarkenBG := CBDarkenBG.Checked;
-  if CBDarkenBG.Checked then item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE100.Value)
-    else item.DarknessColor := BGRA(0,0,0,0);
+  item.DarknessColor := ColorToBGRA(ColorButton1.ButtonColor, SE100.Value);
   item.OnShowScenarioName := CBOnShowScenario.Text;
   item.OnHideScenarioName := CBOnHideScenario.Text;
   item.textures := Textures.SaveToString;
@@ -546,6 +545,7 @@ begin
   end;
   if (Sender = CheckBox1) and flag then begin
     TUIButton(FWorkingChild^.surface).AutoSize := CheckBox1.Checked;
+    recreateSurface := True;
     FModified := True;
   end;
   if (Sender = CBTexturesUIButton) and flag then begin
@@ -793,11 +793,27 @@ end;
 
 procedure TFrameToolUIPanelEditor.SpeedButton1Click(Sender: TObject);
 begin
-  if Sender = SpeedButton1 then CBTexturesUIButton.ItemIndex := -1;
-  if Sender = SpeedButton2 then CBTexturesUICheckChecked.ItemIndex := -1;
-  if Sender = SpeedButton3 then CBTexturesUICheckUnchecked.ItemIndex := -1;
-  if Sender = SpeedButton4 then CBTexturesUIRadioChecked.ItemIndex := -1;
-  if Sender = SpeedButton5 then CBTexturesUIRadioUnchecked.ItemIndex := -1;
+  if Sender = SpeedButton1 then begin
+    CBTexturesUIButton.ItemIndex := -1;
+    CBChildTypeSelect(CBTexturesUIButton);
+  end;
+  if Sender = SpeedButton2 then begin
+    CBTexturesUICheckChecked.ItemIndex := -1;
+    CBChildTypeSelect(CBTexturesUICheckChecked);
+  end;
+  if Sender = SpeedButton3 then begin
+    CBTexturesUICheckUnchecked.ItemIndex := -1;
+    CBChildTypeSelect(CBTexturesUICheckUnchecked);
+  end;
+  if Sender = SpeedButton4 then begin
+    CBTexturesUIRadioChecked.ItemIndex := -1;
+    CBChildTypeSelect(CBTexturesUIRadioChecked);
+  end;
+  if Sender = SpeedButton5 then begin
+    CBTexturesUIRadioUnchecked.ItemIndex := -1;
+    CBChildTypeSelect(CBTexturesUIRadioUnchecked);
+  end;
+
 end;
 
 procedure TFrameToolUIPanelEditor.SpeedButton3Click(Sender: TObject);
