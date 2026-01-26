@@ -752,7 +752,8 @@ begin
 
   FCheckShapeType := aShape;
   FCheckFillType := aFill;
-  w := Max(Round(_Label.CaptionDescriptor.FTexturedFont.Font.FontHeight), FParentScene.ScaleDesignToScene(6));
+  if _Label.CaptionDescriptor.FTexturedFont = NIL then w := FParentScene.ScaleDesignToScene(6)
+    else w := Max(Round(_Label.CaptionDescriptor.FTexturedFont.Font.FontHeight), FParentScene.ScaleDesignToScene(6));
   FCheckShapeSize.cx := w;
   FCheckShapeSize.cy := w;
   lineWidth := Max(2.5, w*0.19);
