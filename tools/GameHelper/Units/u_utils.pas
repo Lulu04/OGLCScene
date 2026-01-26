@@ -320,8 +320,10 @@ end;
 function TCodeGenerator.TextToPascal(const aText: string; aUseSharp10: boolean): string;
 const LN = '''+LineEnding+''';
 begin
-  Result := '';
-  if Length(aText) = 0 then exit;
+  if Length(aText) = 0 then begin
+    Result := '''''';
+    exit;
+  end;
 
   Result := StringReplace(aText, #39, #39#39, [rfReplaceAll]);
   Result := StringReplace(Result, #13#10, LN, [rfReplaceAll]);
@@ -386,7 +388,7 @@ procedure TCodeGenerator.ExtraPropertiesToPascalCode(t: TStringList;
 var
   fontItem: TFontDescriptorItem;
   PathItem: TPathDescriptorItem;
-  s, sx: string;
+  s, sx: String;
   procedure BodyShapeToPascal;
   begin
     if aItem^.BodyShapeData <> '' then begin
@@ -395,10 +397,15 @@ var
     end;
   end;
   procedure BackGradientToPascal;
+  var b: TGradientDescriptor;
   begin
     if aItem^.BackGradientData <> '' then begin
-      t.Add(aSpacePrefix+'BackGradient.LoadGradientDataFromString('''+aItem^.BackGradientData+''');');
-      t.Add(aSpacePrefix+'BackGradient.ComputeVerticesAndIndices(ScaleW('+aItem^.width.ToString+'), ScaleH('+aItem^.height.ToString+'));');
+      b.InitDefault;
+      b.LoadGradientDataFromString(aItem^.BackGradientData);
+      if b.Visible then begin
+        t.Add(aSpacePrefix+'BackGradient.LoadGradientDataFromString('''+aItem^.BackGradientData+''');');
+        t.Add(aSpacePrefix+'BackGradient.ComputeVerticesAndIndices(ScaleW('+aItem^.width.ToString+'), ScaleH('+aItem^.height.ToString+'));');
+      end;
     end;
   end;
 
@@ -535,18 +542,18 @@ begin
     end;
 
     'TUIButton': begin
-      BodyShapeToPascal;
-      BackGradientToPascal;
       if aItem^.AutoSize = False then
         t.Add(aSpacePrefix+'AutoSize := False;');
+      if aItem^.CaptionColor.alpha <> 0 then
+        t.Add(aSpacePrefix+'_Label.Tint.Value := '+BGRAToPascal(aItem^.CaptionColor)+';');
       fontItem := FontBank.GetByName(aItem^.FontDescriptorName);
       if fontItem <> NIL then s := fontItem.VariableNameForTexturedFont
         else s := 'NIL';
       if aItem^.textureName <> '' then sx := aItem^.textureName
         else sx := 'NIL';
       t.Add(aSpacePrefix+'InitParameters('+CodeGen.TextToPascal(aItem^.Caption)+', '+ s+', '+sx+');');
-      if aItem^.CaptionColor.alpha <> 0 then
-        t.Add(aSpacePrefix+'_Label.Tint.Value := '+BGRAToPascal(aItem^.CaptionColor)+';');
+      BodyShapeToPascal;
+      BackGradientToPascal;
     end;
 
     'TUICheck': begin

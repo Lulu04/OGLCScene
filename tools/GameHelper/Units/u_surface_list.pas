@@ -632,6 +632,7 @@ begin
     FontBank.GetAtlasWithTexturedFont(FontDescriptorName, Caption, Atlas, TexturedFont, NIL);
     surface := TUIButton.Create(FScene, Caption, TexturedFont, GetTextureFromTextureName);
     TUIButton(surface).MouseInteractionEnabled := False;
+    TUIButton(surface).AutoSize := AutoSize;
     TUIButton(surface).BodyShape.LoadFromString(BodyShapeData);
     TUIButton(surface).BodyShape.ResizeCurrentShape(width, height, True);
     TUIButton(surface).BackGradient.LoadGradientDataFromString(BackGradientData);
@@ -1616,9 +1617,6 @@ begin
       prop.Add('BodyShapeData', BodyShapeData);
       if BackGradientData <> '' then prop.Add('BackGradientData', BackGradientData);
     end;
-    if BGDarkenColor.alpha <> 0 then prop.Add('BGDarkenColor', BGDarkenColor);
-    if OnShowScenarioName <> '' then  prop.Add('OnShowScenarioName', OnShowScenarioName);
-    if OnHideScenarioName <> '' then  prop.Add('OnHideScenarioName', OnHideScenarioName);
     // UI objects with text (textured font)
     if FontDescriptorName <> '' then begin
       prop.Add('FontDescriptorName', FontDescriptorName);
@@ -1646,6 +1644,12 @@ begin
       prop.Add('scrollbarPosition', scrollbarPosition);
 //      prop.Add('scrollbarCursorBodyShapeData', scrollbarCursorBodyShapeData);
 //      prop.Add('scrollbarCursorGradientData', scrollbarCursorGradientData);
+    end;
+
+    if (_className = 'TUIPanelWithEffects') or (_className = 'TUIModalPanel') then begin
+      if BGDarkenColor.alpha <> 0 then prop.Add('BGDarkenColor', BGDarkenColor);
+      if OnShowScenarioName <> '' then  prop.Add('OnShowScenarioName', OnShowScenarioName);
+      if OnHideScenarioName <> '' then  prop.Add('OnHideScenarioName', OnHideScenarioName);
     end;
 
     if _className = 'TUIProgressBar' then begin
@@ -1811,7 +1815,7 @@ begin
   // UI objects
   prop.StringValueOf('BodyShapeData', BodyShapeData, '');
   prop.StringValueOf('BackGradientData', BackGradientData, '');
-  prop.BGRAPixelValueOf('BGDarkenColor', BGDarkenColor, BGRA(0,0,0,100));
+  prop.BGRAPixelValueOf('BGDarkenColor', BGDarkenColor, BGRA(0,0,0,0));
   prop.StringValueOf('OnShowScenarioName', OnShowScenarioName, '');
   prop.StringValueOf('OnHideScenarioName', OnHideScenarioName, '');
 

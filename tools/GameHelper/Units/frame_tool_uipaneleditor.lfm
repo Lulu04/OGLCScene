@@ -70,9 +70,9 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
     Height = 777
     Top = 40
     Width = 300
-    ActivePage = PageChilds
+    ActivePage = PageMainPanel
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 2
+    TabIndex = 0
     TabOrder = 1
     object PageMainPanel: TTabSheet
       Caption = 'Main panel'
@@ -1083,13 +1083,13 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
           Height = 226
           Top = 294
           Width = 292
-          PageIndex = 4
+          PageIndex = 0
           Anchors = [akTop, akLeft, akRight]
           TabOrder = 4
           object PageExtraEmpty: TPage
             object Panel7: TPanel
               Left = 0
-              Height = 200
+              Height = 226
               Top = 0
               Width = 292
               Align = alClient
@@ -2069,7 +2069,7 @@ object FrameToolUIPanelEditor: TFrameToolUIPanelEditor
                 Height = 81
                 Top = 144
                 Width = 290
-                PageIndex = 1
+                PageIndex = 0
                 Anchors = [akTop, akLeft, akRight, akBottom]
                 TabOrder = 3
                 object PageShapeRadio: TPage
