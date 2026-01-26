@@ -2150,8 +2150,11 @@ var prop: TProperties;
   vi: integer;
   s: string;
   path: TOGLCPath;
+  oldCallback: TOGLCEvent;
 begin
+  oldCallback := FOnShapeChanged;
   InitDefault(FParentScene);
+  FOnShapeChanged := oldCallback;
   prop.Split(data, ',');
   vi := 0;
   s := '';
