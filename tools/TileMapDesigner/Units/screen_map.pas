@@ -100,6 +100,7 @@ begin
 
   FLabelDebug := TFreeText.Create(FScene);
   FLabelDebug.TexturedFont := FEventFont;
+  FLabelDebug.Tint.Value := BGRAWhite;
   FLabelDebug.Caption := 'Debug';
   FLabelDebug.SetCoordinate(0, FScene.Height-FLabelDebug.Height);
   FScene.Add(FLabelDebug, Layer_InfoMap);

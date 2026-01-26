@@ -877,22 +877,22 @@ begin
  // update info on screen
  if XYCoorIsInMap( X, Y ) then begin
 
-  FLabelMapPosition.Caption := 'Map position:  (' + inttostr(Round(X+FWorkingTileEngine.PositionOnMap.x.Value)) +
-                               ',' + inttostr(round(Y+FWorkingTileEngine.PositionOnMap.y.Value)) + ')';
+  FLabelMapPosition.Caption := 'Map position:  (' + Round(X+FWorkingTileEngine.PositionOnMap.x.Value).ToString +
+                               ',' + round(Y+FWorkingTileEngine.PositionOnMap.y.Value).ToString + ')';
 
   it := ClientPosToTileIndex( Point(X,Y) );
-  s := 'Tile Column: ' + inttostr(it.x+1)+'/'+inttostr(FWorkingTileEngine.MapTileCount.cx)+
-       '  Row: '+inttostr(it.y+1)+'/'+inttostr(FWorkingTileEngine.MapTileCount.cy);
+  s := 'Tile: Col index: ' + it.x.ToString+'/'+FWorkingTileEngine.MapTileCount.cx.ToString+
+       '  Row index: '+it.y.ToString+'/'+FWorkingTileEngine.MapTileCount.cy.ToString;
   if TilesetEdit.IsActive
-     then s+='  Tileset: '+inttostr(TilesetEdit.CurrentTilesetIndex)
+     then s+='  Tileset: '+TilesetEdit.CurrentTilesetIndex.ToString
      else s+='  Layer: '+MapList.SelectedLayerName;
   FLabelTileIndexes.Caption := s;
 
   p := FWorkingTileEngine.GetPTile( it.y, it.x);
   i := FWorkingTileEngine.GetGroundType( PointF(X,Y) );
-  FLabelGroundType.Caption := 'Ground: ' + GroundTypeToString( i )+' ('+inttostr(i)+')';
+  FLabelGroundType.Caption := 'Ground: ' + GroundTypeToString( i )+' ('+i.ToString+')';
   FLabelEventName.Caption:='Event: ' + GetStrEvent( FWorkingTileEngine.GetUserEventValue( PointF(X,Y) ))+
-                           ' ('+ inttostr(p^.UserEvent)+')';
+                           ' ('+ p^.UserEvent.ToString+')';
 {
  ti := FTileEngine.GetPTileTexInfo( it.y, it.x );
  FLabelDebug.Caption:='Mouse('+inttostr(X)+','+inttostr(Y)+')  '+
@@ -1236,10 +1236,10 @@ begin
     currentPos := OpenGLControl1.ScreenToClient(Mouse.CursorPos);
     delta := currentPos - FClickedPosOrigin;
     if (delta.x <> 0) or (delta.y <> 0) then begin
-      if delta.x > 0 then delta.x := FWorkingTileEngine.TileSize.cx
+     { if delta.x > 0 then delta.x := FWorkingTileEngine.TileSize.cx
         else delta.x := -FWorkingTileEngine.TileSize.cx;
       if delta.y > 0 then delta.y := FWorkingTileEngine.TileSize.cy
-        else delta.y := -FWorkingTileEngine.TileSize.cy;
+        else delta.y := -FWorkingTileEngine.TileSize.cy; }
       p := FWorkingTileEngine.PositionOnMap.Value + PointF(delta);
       p.x := EnsureRange(p.x, 0, FWorkingTileEngine.MapSize.cx-FScene.Width);
       p.y := EnsureRange(p.y, 0, FWorkingTileEngine.MapSize.cy-FScene.Height);
@@ -1247,7 +1247,7 @@ begin
     end;
     Application.ProcessMessages;
     FScene.DoLoop;
-    Sleep(80);
+    Sleep(10);
   until FState <> sMovingView;
 end;
 
