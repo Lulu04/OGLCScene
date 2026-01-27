@@ -1,7 +1,7 @@
 object FormEditScenario: TFormEditScenario
-  Left = 326
+  Left = 162
   Height = 751
-  Top = 100
+  Top = 50
   Width = 1024
   Caption = 'Edit scenario'
   ClientHeight = 751
@@ -43,6 +43,11 @@ object FormEditScenario: TFormEditScenario
       Width = 501
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Top = 10
+      Color = 1644825
+      Font.Color = 14474460
+      Font.Height = 15
+      Font.Style = [fsBold]
+      ParentFont = False
       ScrollBars = ssAutoVertical
       TabOrder = 0
       OnChange = Memo1Change
@@ -201,7 +206,7 @@ object FormEditScenario: TFormEditScenario
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 231
-      Height = 136
+      Height = 128
       Top = 24
       Width = 282
       Anchors = [akTop, akLeft, akRight]
@@ -216,7 +221,7 @@ object FormEditScenario: TFormEditScenario
       AnchorSideTop.Side = asrBottom
       Left = 231
       Height = 15
-      Top = 165
+      Top = 157
       Width = 45
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
@@ -231,8 +236,8 @@ object FormEditScenario: TFormEditScenario
       AnchorSideRight.Control = Panel2
       AnchorSideRight.Side = asrBottom
       Left = 231
-      Height = 100
-      Top = 180
+      Height = 84
+      Top = 172
       Width = 282
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 5
@@ -246,7 +251,7 @@ object FormEditScenario: TFormEditScenario
       AnchorSideTop.Side = asrBottom
       Left = 231
       Height = 15
-      Top = 285
+      Top = 261
       Width = 47
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
@@ -262,12 +267,58 @@ object FormEditScenario: TFormEditScenario
       AnchorSideRight.Side = asrBottom
       Left = 231
       Height = 204
-      Top = 300
+      Top = 276
       Width = 282
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Right = 5
       ScrollBars = ssAutoVertical
       TabOrder = 3
+    end
+    object Label7: TLabel
+      AnchorSideLeft.Control = LB
+      AnchorSideLeft.Side = asrBottom
+      Left = 231
+      Height = 15
+      Top = 496
+      Width = 130
+      BorderSpacing.Left = 5
+      Caption = 'Velocity curve available'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object LBVelocity: TListBox
+      AnchorSideLeft.Control = Label7
+      AnchorSideTop.Control = Label7
+      AnchorSideTop.Side = asrBottom
+      AnchorSideBottom.Control = Panel2
+      AnchorSideBottom.Side = asrBottom
+      Left = 231
+      Height = 240
+      Hint = 'Double click to add a velocity curve to the scenario'
+      Top = 511
+      Width = 197
+      Anchors = [akTop, akLeft, akBottom]
+      Items.Strings = (
+        'idcLinear'
+        'idcStartFastEndSlow'
+        'idcStartSlowEndFast'
+        'idcSinusoid'
+        'idcSinusoid2'
+        'idcBouncy'
+        'idcSpring'
+        'idcExtend'
+        'idcExtend2'
+        'idc5Steps'
+        'idcDrop'
+        'idcSlowAtMiddle'
+        'idcPauseAtMiddle'
+        'idcSpring2'
+        'idcSingleRebound'
+      )
+      ItemHeight = 15
+      ItemIndex = 0
+      TabOrder = 4
+      OnDblClick = LBVelocityDblClick
     end
   end
   object Splitter1: TSplitter
