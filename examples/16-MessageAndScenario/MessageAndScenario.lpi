@@ -94,7 +94,6 @@
         <ComponentName Value="FormMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="82"/>
         <CursorPos Y="88"/>
@@ -114,9 +113,10 @@
       <Unit3>
         <Filename Value="Units\u_sprite_def.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="139"/>
-        <CursorPos X="15" Y="13"/>
+        <TopLine Value="222"/>
+        <CursorPos X="30" Y="242"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit3>

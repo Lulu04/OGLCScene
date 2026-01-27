@@ -237,9 +237,9 @@ begin
   inherited Create(aTex, False);
   Pivot := PointF(0.5, 0.8);
   // to animate the radar, we write a scenario
-  s := 'RotateTo 80 3.0 idcsinusoid'#10+            // ask a rotation of 80° in 2.0sec with the velocity curve 'sinusoid'
+  s := 'RotateTo 80 3.0 idcSinusoid'#10+            // set angle from its current value to 80° in 2.0sec with the velocity curve 'sinusoid'
        'Wait 3.0'#10+                               // wait until the rotation is done
-       'RotateTo -80 3.0 idcsinusoid'#10+           // ask a rotation to -80° in 2.0sec with the velocity curve 'sinusoid'
+       'RotateTo -80 3.0 idcSinusoid'#10+           // set angle from its current value to -80° in 2.0sec with the velocity curve 'sinusoid'
        'Wait 3.0'#10+                               // wait until the rotation is done
        'Loop';                                      // loop to the beginning
 
