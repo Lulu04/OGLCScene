@@ -5,7 +5,7 @@ function GLErrorToString(aError: GLenum): string;
 function FormatFloatWithDot(const aFmt: string; aValue: single): string;
 // convert the string to single. The string can have '.' or ','
 function StringToSingle(const aStr: string): single;
-
+function TryStringToSingle(const aStr: string; out aValue: single): boolean;
 
 // This function scan the text and return only one occurence of the characters used
 // Usefull to construct small charset with only needed chars.
@@ -157,6 +157,25 @@ begin
         Val(s, Result, err);
       end;
   end;
+end;
+
+function TryStringToSingle(const aStr: string; out aValue: single): boolean;
+var i: integer;
+    err: word;
+    s: string;
+begin
+  Result := False;
+  Val(aStr, aValue, err);
+  if err = 0 then exit(True);
+
+  i := Pos(',', aStr);
+  if i = 0 then exit(False);
+
+  s := aStr;
+  s[i] := '.';
+  Val(s, aValue, err);
+  if err = 0 then Result := False
+    else Result := True;
 end;
 
 function TextToCharset(const aText: string): string;
