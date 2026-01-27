@@ -32,9 +32,9 @@ TTextureItem = record
   procedure LoadFromString(const s: string);
 
   function PascalCodeToAddTextureToAtlas(aGenerateTexVariableName: boolean): string;
-  function PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
-                                                   const aSpacePrefix: string;
-                                                   aGenerateTexVariableName: boolean): string;
+  procedure PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
+                                                    const aSpacePrefix: string;
+                                                    aGenerateTexVariableName: boolean);
 end;
 PTextureItem = ^TTextureItem;
 
@@ -191,9 +191,9 @@ begin
   end;
 end;
 
-function TTextureItem.PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
-   const aSpacePrefix: string; aGenerateTexVariableName: boolean): string;
-var texFilename, sw, sh, s, sAdd: string;
+procedure TTextureItem.PascalCodeToRetrieveOrAddTextureToAtlas(t: TStringList;
+   const aSpacePrefix: string; aGenerateTexVariableName: boolean);
+var texFilename, sw, sh, sAdd: string;
   XFrameCount, YFrameCount: integer;
 begin
   // texture filename must be relative to application Data folder

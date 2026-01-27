@@ -228,7 +228,6 @@ end;
 
 function TFontDescriptorItem.SaveToString: string;
 var prop: TProperties;
-  i: integer;
   s: string;
 begin
   s := '';
@@ -1145,7 +1144,7 @@ end;
 procedure TListOfItemWithName.Load;
 var sl: TStringList;
   filename: string;
-  i, k: Integer;
+  k: Integer;
   o: T;
 begin
   Clear;

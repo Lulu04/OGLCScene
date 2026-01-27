@@ -23,7 +23,9 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
+    Label7: TLabel;
     LB: TListBox;
+    LBVelocity: TListBox;
     Memo1: TMemo;
     Memo2: TMemo;
     Memo3: TMemo;
@@ -38,6 +40,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure LBDblClick(Sender: TObject);
     procedure LBSelectionChange(Sender: TObject; User: boolean);
+    procedure LBVelocityDblClick(Sender: TObject);
     procedure Memo1Change(Sender: TObject);
     procedure SpeedButton1Click(Sender: TObject);
   private
@@ -134,6 +137,9 @@ var i: Integer;
 begin
   i := LB.ItemIndex;
   if i = -1 then exit;
+  if Memo1.Lines.Count > 1 then
+    if Memo1.Lines[Memo1.Lines.Count-1] = '' then
+      Memo1.Lines.Delete(Memo1.Lines.Count-1);
   Memo1.Lines.Add(LB.GetSelectedText);
   FModified := True;
 end;
@@ -223,6 +229,20 @@ begin
     end;
 end;
 
+procedure TFormEditScenario.LBVelocityDblClick(Sender: TObject);
+var i: Integer;
+  p: TPoint;
+  s: string;
+begin
+  i := LBVelocity.ItemIndex;
+  if i = -1 then exit;
+  p := Memo1.CaretPos;
+  s := Memo1.Lines.Strings[p.y];
+  s := s + ' ' + LBVelocity.GetSelectedText;
+  Memo1.Lines.Strings[p.y] := s;
+  FModified := True;
+end;
+
 procedure TFormEditScenario.Memo1Change(Sender: TObject);
 begin
   Sender := Sender;
@@ -269,7 +289,7 @@ begin
   o.ParentScene := FScene;
   scenarioToCheck := o.AddScenario(Memo1.Lines.Text);
   try
-    if scenarioToCheck.ScenarioIsValid then Label6.Caption := 'OK'
+    if not scenarioToCheck.Error then Label6.Caption := 'OK'
     else begin
       Label6.Caption := scenarioToCheck.ErrorMessage;
       Memo1.CaretPos := Point(0, scenarioToCheck.LineError);
@@ -280,10 +300,11 @@ begin
 end;
 
 procedure TFormEditScenario.FormatScenario;
-var i: integer;
+var i, j: integer;
   s: string;
+  A: TStringArray;
 begin
-  // on each line, remove trailing space and first letter uppercase
+  // on each line, remove trailing space and set first letter uppercase
   for i:=0 to Memo1.Lines.Count-1 do begin
     s := Trim(Memo1.Lines.Strings[i]).TrimRight;
     if Length(s) > 0 then
@@ -295,6 +316,19 @@ begin
   for i:=Memo1.Lines.Count-1 downto 0 do
     if Trim(Memo1.Lines.Strings[i]) = '' then
       Memo1.Lines.Delete(i);
+
+  // ensure there is only one space between parameters
+  for i:=0 to Memo1.Lines.Count-1 do begin
+    s := Memo1.Lines.Strings[i];
+    A := s.Split([' ']);
+    for j:= High(A) downto 0 do
+      if A[j] = '' then system.Delete(A, j, 1);
+    s := '';
+    for j:=0 to High(A)-1 do
+      s := s + A[j] + ' ';
+    s := s + A[High(A)];
+    Memo1.Lines.Strings[i] := s;
+  end;
 end;
 
 function TFormEditScenario.GetScenarioName: string;
