@@ -352,6 +352,21 @@ var temp: TStringArray;
         end;
       Result := False;
     end;
+    function TryStringToPositiveSingleNotZero(const s: string; out aValue: single): boolean;
+    begin
+      Result := TryStringToSingle(s, aValue) and
+                (aValue > 0.0);
+    end;
+    function TryStringToByte(const s: string; out aValue: integer): boolean;
+    begin
+      Result := TryStrToInt(s, aValue) and
+                (aValue in [0..255]);
+    end;
+    function TryStringToPositiveInteger(const s: string; out aValue: integer): boolean;
+    begin
+      Result := TryStrToInt(s, aValue) and
+                (aValue >= 0);
+    end;
 
 begin
   temp := Lowercase(FActions.Strings[aLineIndex]).Split([' ']);
@@ -387,9 +402,19 @@ begin
       end;
     end;
 
-    saWait, saAngle, saRotate, saScale, saScaleH, saScaleV: begin
+    saWait: begin
+    Result := CheckParamCount(1) and
+              TryStringToPositiveSingleNotZero(temp[1], FCompiled[aLineIndex].Single1);
+    end;
+
+    saAngle, saRotate: begin
       Result := CheckParamCount(1) and
                 TryStringToSingle(temp[1], FCompiled[aLineIndex].Single1);
+    end;
+
+    saScale, saScaleH, saScaleV: begin
+      Result := CheckParamCount(1) and
+                TryStringToPositiveSingleNotZero(temp[1], FCompiled[aLineIndex].Single1);
     end;
 
     saFreeze, saVisible, saFlipH, saFlipV: begin
@@ -397,55 +422,67 @@ begin
                 TryStringToBoolean(temp[1], FCompiled[aLineIndex].Boolean1);
     end;
 
-    saOpacity, saSetFrame: begin
+    saOpacity: begin
       Result := CheckParamCount(1) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1);
+                TryStringToByte(temp[1], FCompiled[aLineIndex].Integer1);
+    end;
+
+    saSetFrame: begin
+      Result := CheckParamCount(1) and
+                TryStringToPositiveInteger(temp[1], FCompiled[aLineIndex].Integer1);
     end;
 
     saOpacityChange: begin
       Result := CheckParamCount(3) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStringToSingle(temp[2], FCompiled[aLineIndex].Single1) and
+                TryStringToByte(temp[1], FCompiled[aLineIndex].Integer1) and
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single1) and
                 TryStringToCurve(temp[3], FCompiled[aLineIndex].Curve1);
     end;
 
     saAnimate: begin
       Result := CheckParamCount(3) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStrToInt(temp[2], FCompiled[aLineIndex].Integer2) and
-                TryStringToSingle(temp[3], FCompiled[aLineIndex].Single1);
+                TryStringToPositiveInteger(temp[1], FCompiled[aLineIndex].Integer1) and
+                TryStringToPositiveInteger(temp[2], FCompiled[aLineIndex].Integer2) and
+                TryStringToPositiveSingleNotZero(temp[3], FCompiled[aLineIndex].Single1);
     end;
 
     saTint: begin
       Result := CheckParamCount(4) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStrToInt(temp[2], FCompiled[aLineIndex].Integer2) and
-                TryStrToInt(temp[3], FCompiled[aLineIndex].Integer3) and
-                TryStrToInt(temp[4], FCompiled[aLineIndex].Integer4);
+                TryStringToByte(temp[1], FCompiled[aLineIndex].Integer1) and
+                TryStringToByte(temp[2], FCompiled[aLineIndex].Integer2) and
+                TryStringToByte(temp[3], FCompiled[aLineIndex].Integer3) and
+                TryStringToByte(temp[4], FCompiled[aLineIndex].Integer4);
     end;
 
     saTintChange: begin
       Result := CheckParamCount(6) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStrToInt(temp[2], FCompiled[aLineIndex].Integer2) and
-                TryStrToInt(temp[3], FCompiled[aLineIndex].Integer3) and
-                TryStrToInt(temp[4], FCompiled[aLineIndex].Integer4) and
-                TryStringToSingle(temp[5], FCompiled[aLineIndex].Single1) and
+                TryStringToByte(temp[1], FCompiled[aLineIndex].Integer1) and
+                TryStringToByte(temp[2], FCompiled[aLineIndex].Integer2) and
+                TryStringToByte(temp[3], FCompiled[aLineIndex].Integer3) and
+                TryStringToByte(temp[4], FCompiled[aLineIndex].Integer4) and
+                TryStringToPositiveSingleNotZero(temp[5], FCompiled[aLineIndex].Single1) and
                 TryStringToCurve(temp[6], FCompiled[aLineIndex].Curve1);
      end;
 
     saTintRedChange, saTintGreenChange, saTintBlueChange, saTintAlphaChange: begin
       Result := CheckParamCount(3) and
-                TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStringToSingle(temp[2], FCompiled[aLineIndex].Single1) and
+                TryStringToByte(temp[1], FCompiled[aLineIndex].Integer1) and
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single1) and
                 TryStringToCurve(temp[3], FCompiled[aLineIndex].Curve1);
     end;
 
-    saRotateTo, saScaleChange, saScaleHChange, saScaleVChange, saMoveXTo, saMoveYTo,
+    saScaleChange, saScaleHChange, saScaleVChange: begin
+      Result := CheckParamCount(3) and
+                TryStringToPositiveSingleNotZero(temp[1], FCompiled[aLineIndex].Single1) and
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single2) and
+                TryStringToCurve(temp[3], FCompiled[aLineIndex].Curve1);
+    end;
+
+    saRotateTo, saMoveXTo, saMoveYTo,
     saMoveXCenterTo, saMoveYCenterTo, saMoveXRelative, saMoveYRelative: begin
       Result := CheckParamCount(3) and
                 TryStringToSingle(temp[1], FCompiled[aLineIndex].Single1) and
-                TryStringToSingle(temp[2], FCompiled[aLineIndex].Single2) and
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single2) and
                 TryStringToCurve(temp[3], FCompiled[aLineIndex].Curve1);
     end;
 
@@ -453,7 +490,7 @@ begin
       Result := CheckParamCount(4) and
                 TryStringToSingle(temp[1], FCompiled[aLineIndex].Single1) and
                 TryStringToSingle(temp[2], FCompiled[aLineIndex].Single2) and
-                TryStringToSingle(temp[3], FCompiled[aLineIndex].Single3) and
+                TryStringToPositiveSingleNotZero(temp[3], FCompiled[aLineIndex].Single3) and
                 TryStringToCurve(temp[4], FCompiled[aLineIndex].Curve1);
 
     end;
@@ -461,8 +498,8 @@ begin
     saBlink: begin
       Result := CheckParamCount(3) and
                 TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStringToSingle(temp[2], FCompiled[aLineIndex].Single1) and
-                TryStringToSingle(temp[3], FCompiled[aLineIndex].Single2)
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single1) and
+                TryStringToPositiveSingleNotZero(temp[3], FCompiled[aLineIndex].Single2)
     end;
 
     saSetCoor, saSetCenterCoor: begin
@@ -474,7 +511,7 @@ begin
     saPostMessage: begin
       Result := CheckParamCount(2) and
                 TryStrToInt(temp[1], FCompiled[aLineIndex].Integer1) and
-                TryStringToSingle(temp[2], FCompiled[aLineIndex].Single1);
+                TryStringToPositiveSingleNotZero(temp[2], FCompiled[aLineIndex].Single1);
     end;
   end;
 end;
