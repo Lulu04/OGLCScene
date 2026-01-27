@@ -1,6 +1,6 @@
 {$ifdef oglcINTERFACE}
 const
-OGLCSCENE_VERSION = '2.3';
+OGLCSCENE_VERSION = '2.4';
 
 {$endif oglcINTERFACE}
 {$ifdef oglcIMPLEMENTATION}
