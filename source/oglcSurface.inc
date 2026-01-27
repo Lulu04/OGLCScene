@@ -58,42 +58,6 @@ public
  property ParentScene: TOGLCScene read FParentScene write FParentScene;
 end;
 
-TScenarioDecode = procedure(const aActions: TStringArray) of object;
-{ TScenario }
-
-TScenario = class
-private
-  FActions: TStringlist;
-  FCurrentLine: integer;
-  FWaitTime: single;
-  FParentSurface: TSimpleSurfaceWithEffect;
-  FIsPlaying: boolean;
-  FRunError: boolean;
-  FKilled: boolean;
-  FTemp: TStringArray;
-  FScenarioDecodeProc: TScenarioDecode;
-  procedure Execute(const aElapsedTime: single);
-  function GetIsPlaying: boolean;
-  procedure LoadFromFile(const aFilename: string);
-  procedure DecodeAction; virtual;
-public
-  constructor Create;
-  destructor Destroy; override;
-  // aLines is a string that contains the actions to execute,
-  // one action per line and each line separated by #10
-  procedure InitWith(const aLines: string);
-  procedure AddLine(const aLine: string); deprecated 'use procedure InitWith(const aLines: string)';
-  procedure Play(aFromBeginning: boolean);
-  procedure Stop;
-  // Free the scenario
-  procedure Kill;
-  // Return True if the scenario is running
-  property IsPlaying: boolean read GetIsPlaying;
-  // this callback is only called when an action has not been recognized
-  property OnDecode: TScenarioDecode read FScenarioDecodeProc write FScenarioDecodeProc;
-  // True if an error occurs while running the scenario.
-  property RunError: boolean read FRunError;
-end;
 
 { TSimpleSurfaceWithEffect }
 
@@ -153,7 +117,6 @@ protected
   FBindToSprite: TBindToSprite;
 private
   FListScenario: array of TScenario;
-  FScenarioAdditionnalDecode: TScenarioDecode;
   function GetFirstScenarioFreeSlot: integer;
   procedure DoAddScenarioToList(aScenario: TScenario);
 private
@@ -250,8 +213,6 @@ public  // Scenario
   function AddAndPlayScenarioFromFile(const aFilename: string): TScenario;
   function AddAndPlayScenario(const aLines: string): TScenario;
   procedure StopAllScenario;
-  // set a callbak proc to decode custom additionnal actions.
-  procedure SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
 public // Frame animation
   // You can set the range of frame index to use to animate the surface.
   // A texture frame start from 1 because 0 means the whole texture.
@@ -528,8 +489,10 @@ begin
   i := GetFirstScenarioFreeSlot;
   FListScenario[i] := aScenario;
   aScenario.FParentSurface := Self;
-  aScenario.OnDecode := FScenarioAdditionnalDecode;
-  aScenario.FCurrentLine := 0;
+  if aScenario.Error and (FParentScene <> NIL) then begin
+    FParentScene.LogError('Scenario compilation error: '+aScenario.ErrorMessage);
+    FParentScene.LogError('at line '+aScenario.LineError.ToString+' "'+aScenario.LineContentWhereErrorOccur+'"', 1);
+  end;
 end;
 
 procedure TSimpleSurfaceWithEffect.SetFlipV(AValue: boolean);
@@ -779,13 +742,13 @@ begin
   end;
 
   // Frame
-  FFrame += aElapsedTime * FFrameDeltaPerSecond;
-  if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then
-  begin
-    loopLength := FFrameLoopEnd-FFrameLoopStart+1;
-
-    while trunc(FFrame) > FFrameLoopEnd do FFrame -= loopLength;
-    while trunc(FFrame) < FFrameLoopStart do FFrame += loopLength;
+  if FFrameDeltaPerSecond <> 0.0 then begin
+    FFrame += aElapsedTime * FFrameDeltaPerSecond;
+    if (FFrameLoopEnd <> 0) and (FFrameLoopStart <> 0) then begin
+      loopLength := FFrameLoopEnd-FFrameLoopStart+1;
+      while trunc(FFrame) > FFrameLoopEnd do FFrame -= loopLength;
+      while trunc(FFrame) < FFrameLoopStart do FFrame += loopLength;
+    end;
   end;
 
   // Blink
@@ -1463,12 +1426,6 @@ begin
     FListScenario[i].Stop;
 end;
 
-procedure TSimpleSurfaceWithEffect.SetScenarioAdditionnalDecode(aCallbackDecode: TScenarioDecode);
-begin
-  FScenarioAdditionnalDecode := aCallbackDecode;
-end;
-
-
 procedure TSimpleSurfaceWithEffect.BindToSprite(aTargetSurface: TSimpleSurface; aOffsetX, aOffsetY: single);
 begin
   FBindToSprite.InProgress := TRUE;
@@ -1486,191 +1443,6 @@ procedure TSimpleSurfaceWithEffect.UnBind;
 begin
   FBindToSprite.InProgress := FALSE;
 end;
-
-{ TScenario }
-
-constructor TScenario.Create;
-begin
-  FActions := TStringList.Create;
-  FCurrentLine := 0;
-  FWaitTime := 0.0;
-  FParentSurface := NIL;
-  FIsPlaying := FALSE;
-end;
-
-destructor TScenario.Destroy;
-begin
-  FActions.Free;
-  FActions := NIL;
-end;
-
-procedure TScenario.Execute(const aElapsedTime: single);
-var OriginLine: integer;
-begin
-  if FWaitTime > 0
-    then FWaitTime -= aElapsedTime;
-
-  if FIsPlaying and (FWaitTime <= 0.000) then begin
-    OriginLine := FCurrentLine;
-    repeat
-      DecodeAction;
-      inc(FCurrentLine);
-    until (FWaitTime > 0) or (FCurrentLine >= FActions.Count) or
-           not FIsPlaying or (OriginLine = FCurrentLine); // avoid infinite loop in buggy scenario
-    if FCurrentLine >= FActions.Count then FIsPlaying := FALSE;
-  end;
-end;
-
-function TScenario.GetIsPlaying: boolean;
-begin
-  Result := not FRunError and ((FWaitTime > 0.0) or FIsPlaying);
-end;
-
-procedure TScenario.LoadFromFile(const aFilename: string);
-begin
- FActions.Clear;
- try
-   FActions.LoadFromFile(aFilename);
- except
-   FParentSurface.ParentScene.LogError('TScenario.LoadFromFile: error while loading scenario file "'+aFilename+'"');
- end;
-end;
-
-procedure TScenario.DecodeAction;
-var i: integer;
-begin
- if FRunError then exit;
- if Length(FActions.Strings[FCurrentLine]) = 0 then exit;
-
- FTemp := FActions.Strings[FCurrentLine].Split([' ']);
-
- try
- case FTemp[0] of
-  acWait : FWaitTime := StringToSingle(FTemp[1]);
-  acKill : FParentSurface.Kill;
-  acFreeze : FParentSurface.Freeze := CompareText(FTemp[1], acTRUE) = 0;
-  acVisible : FParentSurface.Visible := CompareText(FTemp[1], acTRUE) = 0;
-
-  acOpacity: FParentSurface.Opacity.Value := strtoint(FTemp[1]);
-  acOpacityChange: FParentSurface.Opacity.ChangeTo(strtoint(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID( FTemp[3]));
-
-  acTint: FParentSurface.Tint.Value := BGRA(strtoint( FTemp[1]), strtoint(FTemp[2]), strtoint(FTemp[3]), strtoint(FTemp[4]));
-  acTintChange: FParentSurface.Tint.ChangeTo(BGRA(strtoint(FTemp[1]),
-                                                 strtoint(FTemp[2]),
-                                                 strtoint(FTemp[3]),
-                                                 strtoint(FTemp[4])),
-                                                 StringToSingle(FTemp[5]),
-                                                 StringToCurveID(FTemp[6]));
-  acTintRedChange: FParentSurface.Tint.Red.ChangeTo(strtoint(FTemp[1]), StringToSingle(FTemp[2]),  StringToCurveID(FTemp[3]));
-  acTintGreenChange: FParentSurface.Tint.Green.ChangeTo(strtoint(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  acTintBlueChange: FParentSurface.Tint.Blue.ChangeTo(strtoint(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  acTintAlphaChange: FParentSurface.Tint.Alpha.ChangeTo(strtoint(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-
-  acAngle: FParentSurface.Angle.Value := StringToSingle( FTemp[1]) ;
-  acRotate: FParentSurface.Angle.AddConstant(StringToSingle(FTemp[1]));
-  acRotateTo: FParentSurface.Angle.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  acRotationAroundAxis: FParentSurface.RotationAroundPoint(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToSingle(FTemp[3]), FTemp[4] = acTRUE);
-
-  acScale: FParentSurface.Scale.Value := PointF(StringToSingle(FTemp[1]), StringToSingle(FTemp[1]));
-  acScaleChange: begin
-   FParentSurface.Scale.x.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-   FParentSurface.Scale.y.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  end;
-  acScaleH: FParentSurface.Scale.x.Value := StringToSingle(FTemp[1]);
-  acScaleHChange: FParentSurface.Scale.x.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  acScaleV: FParentSurface.Scale.y.Value := StringToSingle( FTemp[1] );
-  acScaleVChange: FParentSurface.Scale.y.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-
-  acBlink: FParentSurface.Blink(strtoint(FTemp[1]), StringToSingle(FTemp[2]), StringToSingle(FTemp[3]));
-  acStopBlink: FParentSurface.StopBlink;
-
-  acFlipH: FParentSurface.FlipH := CompareText(FTemp[1], acTRUE) = 0;
-  acFlipV: FParentSurface.FlipV := CompareText(FTemp[1], acTRUE) = 0;
-  acToggleFlipH: FParentSurface.FlipH := not FParentSurface.FlipH;
-  acToggleFlipV: FParentSurface.FlipV := not FParentSurface.FlipV;
-
-  acAnimate: begin
-    FParentSurface.SetFrameLoopBounds(strtoint(FTemp[1]), strtoint(FTemp[2]));
-    FParentSurface.FrameAddPerSecond(StringToSingle(FTemp[3]));
-  end;
-  acIncFrame: FParentSurface.Frame := FParentSurface.Frame + 1;
-  acDecFrame: FParentSurface.Frame := FParentSurface.Frame - 1;
-  acSetFrame: FParentSurface.Frame := strtoint(FTemp[1]);
-
-
-  acMoveTo: FParentSurface.MoveTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToSingle(FTemp[3]), StringToCurveID(FTemp[4]));
-  acMoveXTo: FParentSurface.X.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-  acMoveYTo: FParentSurface.Y.ChangeTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID(FTemp[3]));
-
-  acMoveCenterTo: FParentSurface.MoveCenterTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToSingle(FTemp[3]), StringToCurveID(FTemp[4]));
-  acMoveXCenterTo: FParentSurface.MoveXCenterTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID( FTemp[3]));
-  acMoveYCenterTo: FParentSurface.MoveYCenterTo(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID( FTemp[3]));
-
-  acMoveRelative: FParentSurface.MoveRelative(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToSingle(FTemp[3]), StringToCurveID(FTemp[4]));
-  acMoveXRelative: FParentSurface.MoveXRelative(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID( FTemp[3]));
-  acMoveYRelative: FParentSurface.MoveYRelative(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]), StringToCurveID( FTemp[3]));
-
-  acSetCoor: begin
-    FParentSurface.X.Value := StringToSingle(FTemp[1]);
-    FParentSurface.Y.Value := StringToSingle(FTemp[2]);
-  end;
-  acSetCenterCoor: FParentSurface.SetCenterCoordinate(StringToSingle(FTemp[1]), StringToSingle(FTemp[2]));
-
-  acCenterOnScene: FParentSurface.CenterOnScene;
-
-  acPostMessage: FParentSurface.PostMessage(strtoint(FTemp[1]), StringToSingle(FTemp[2]));
-
-  acLoop: FCurrentLine := -1;
-  acLabel:;
-  acGotoLabel: begin
-   i := FActions.IndexOf(acLabel + ' ' + FTemp[1]);
-   if i <> -1 then FCurrentLine := i - 1;
-  end;
-
-  else if FScenarioDecodeProc <> NIL then FScenarioDecodeProc(FTemp);
- end;//case
- except
-   On E :Exception do begin
-      FParentSurface.ParentScene.LogError('TScenario.DecodeAction: an exception occurs: "'+E.Message+'"');
-      FRunError := True;
-      Stop;
-    end;
- end;
-end;
-
-procedure TScenario.InitWith(const aLines: string);
-begin
-  FActions.Clear;
-  FRunError := False;
-  FActions.TextLineBreakStyle := tlbsLF;
-  FActions.Text := aLines;
-end;
-
-procedure TScenario.AddLine(const aLine: string);
-begin
-  FActions.Add(aLine);
-end;
-
-procedure TScenario.Play(aFromBeginning: boolean);
-begin
-  if aFromBeginning then begin
-    FCurrentLine := 0;
-    FWaitTime := 0.0;
-  end;
-
-  FIsPlaying := True;
-end;
-
-procedure TScenario.Stop;
-begin
-  FIsPlaying := False;
-end;
-
-procedure TScenario.Kill;
-begin
-  FKilled := True;
-end;
-
 
 { TSimpleSurface }
 

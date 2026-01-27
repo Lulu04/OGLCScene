@@ -185,6 +185,7 @@ TOGLCCamera = class;
 {$I oglcTimer.inc}
 {$I oglcLayer.inc}
 {$I oglcCollisionBody.inc}
+{$I oglcScenario.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
@@ -920,6 +921,7 @@ end;
 {$I oglcTimer.inc}
 {$I oglcLayer.inc}
 {$I oglcCollisionBody.inc}
+{$I oglcScenario.inc}
 {$I oglcSurface.inc}
 {$I oglcPath.inc}
 {$I oglcCamera.inc}
