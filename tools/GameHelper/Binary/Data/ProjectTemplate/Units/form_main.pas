@@ -39,27 +39,48 @@ uses OGLCScene, u_common, screen_1 {$ifndef WINDOWED_MODE},LCLIntf{$endif};
 { TFormMain }
 
 procedure TFormMain.FormCreate(Sender: TObject);
+{$ifdef Linux}var BoundsRect_client: TRect;{$endif}
 begin
 {$ifdef MAXIMIZE_SCENE_ON_MONITOR}
   FScene := TOGLCScene.Create(OpenGLControl1, SCREEN_WIDTH_AT_DESIGN_TIME/SCREEN_HEIGHT_AT_DESIGN_TIME);
  {$ifdef WINDOWED_MODE}
-  //ShowWindow(Handle, SW_SHOWNORMAL);
-  WindowState := wsMaximized;
-  BorderIcons := [biSystemMenu,biMinimize,biMaximize];
+   // WINDOWED MODE
+   {$if defined(Darwin)}
+     BorderIcons := [biSystemMenu,biMinimize];
+     BoundsRect := Monitor.BoundsRect;
+   {$elseif defined(Unix)}   // linux + bsd
+     BoundsRect_client := Monitor.BoundsRect;
+     BoundsRect_client.Width := Monitor.BoundsRect.width - 100;
+     BoundsRect_client.left:= 50;
+     BoundsRect_client.height := Monitor.BoundsRect.height - 100;
+     BoundsRect_client.top:= 50;
+     BoundsRect := BoundsRect_client;
+     WindowState := wsNormal;
+   {$elseif defined(Windows)}
+     WindowState := wsMaximized;
+     BorderIcons := [biSystemMenu, biMinimize, biMaximize]; // necessary to see the task bar
+   {$endif}
+
  {$else}
-  BorderIcons := [];
-  BorderStyle := bsNone;
-  WindowState := wsFullScreen;
-  ShowWindow(Handle, SW_SHOWFULLSCREEN);
-  BoundsRect := Monitor.BoundsRect;
+   // FULLSCREEN MODE
+   {$if defined(Darwin)}
+     BoundsRect := Monitor.BoundsRect;
+   {$elseif defined(Windows) or defined(Unix)}  // windows + linux + bsd
+     BorderIcons := [];
+     BorderStyle := bsNone;
+     WindowState := wsFullScreen;
+     ShowWindow(Handle, SW_SHOWFULLSCREEN);
+     BoundsRect := Monitor.BoundsRect;
+   {$endif}
  {$endif}
 {$else}
-  ClientWidth := Trunc(SCREEN_WIDTH_AT_DESIGN_TIME);
-  ClientHeight := Trunc(SCREEN_HEIGHT_AT_DESIGN_TIME);
-  FScene := TOGLCScene.Create(OpenGLControl1, -1);
-  BorderIcons := [biSystemMenu];
-  BorderStyle := bsSingle;
-  WindowState := wsNormal;
+     // WINDOWED MODE WITH FIXED SIZE
+     ClientWidth := Trunc(SCREEN_WIDTH_AT_DESIGN_TIME);
+     ClientHeight := Trunc(SCREEN_HEIGHT_AT_DESIGN_TIME);
+     FScene := TOGLCScene.Create(OpenGLControl1, -1);
+     BorderIcons := [biSystemMenu];
+     BorderStyle := bsSingle;
+     WindowState := wsNormal;
 {$endif}
   FScene.DesignPPI := SCREEN_PPI_AT_DESIGN_TIME;
   FScene.LayerCount := LAYER_COUNT;

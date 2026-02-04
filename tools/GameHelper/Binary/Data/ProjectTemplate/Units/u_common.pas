@@ -88,18 +88,18 @@ end;
 function ScaleW(AValue: integer): integer;
 begin
 {$ifdef MAXIMIZE_SCENE_ON_MONITOR}
-  Result := Round(FScene.Width*AValue/SCREEN_WIDTH_AT_DESIGN_TIME*AdditionnalScale);
+  Result := Trunc(FScene.Width*AValue/SCREEN_WIDTH_AT_DESIGN_TIME*AdditionnalScale);
 {$else}
-  Result := Round(AValue*AdditionnalScale);
+  Result := Trunc(AValue*AdditionnalScale);
 {$endif}
 end;
 
 function ScaleH(AValue: integer): integer;
 begin
 {$ifdef MAXIMIZE_SCENE_ON_MONITOR}
-  Result := Round(FScene.Height*AValue/SCREEN_HEIGHT_AT_DESIGN_TIME*AdditionnalScale);
+  Result := Trunc(FScene.Height*AValue/SCREEN_HEIGHT_AT_DESIGN_TIME*AdditionnalScale);
 {$else}
-  Result := Round(AValue*AdditionnalScale);
+  Result := Trunc(AValue*AdditionnalScale);
 {$endif}
 end;
 
