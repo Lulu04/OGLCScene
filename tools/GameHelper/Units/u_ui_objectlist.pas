@@ -545,8 +545,7 @@ begin
         if i < textureList.Size-1 then s := s +', ';
         if (i mod 4 = 0) and (i > 0) and (i < textureList.Size-1) then s := s + #10'  ';
       end;
-      s := s + ': PTexture;'#10+
-           '  class var FAdditionnalScale: single;';
+      s := s + ': PTexture;';
       t.AddText(s);
     end;
 
@@ -579,7 +578,6 @@ begin
       t.AddText('class procedure '+nameClass+'.LoadTexture(aAtlas: TOGLCTextureAtlas);'#10+
                 'var texFolder: string;'#10+
                 'begin'#10+
-                '  FAdditionnalScale := AdditionnalScale;'#10+
                 '  texFolder := u_common.TexturesFolder;');
       for i:=0 to textureList.Size-1 do
         textureList.Mutable[i]^.PascalCodeToRetrieveOrAddTextureToAtlas(t, '  ', True);
@@ -723,8 +721,10 @@ begin
       // the width and height of the parent or current
       if (current^.x <> 0) or (current^.y <> 0) then begin
         if _parent^.classtype = TSpriteContainer then begin
-          sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
-          sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
+          //sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
+          //sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
+          sx := 'ScaleWF('+FormatFloatWithDot('0.000', current^.x)+')';
+          sy := 'ScaleHF('+FormatFloatWithDot('0.000', current^.y)+')';
         end else begin
           if _parent^.IsRoot then begin
             sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, 'Self');

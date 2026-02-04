@@ -442,8 +442,10 @@ begin
       // the width and height of the parent or current
       if (current^.x <> 0) or (current^.y <> 0) then begin
         if _parent^.classtype = TSpriteContainer then begin
-          sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
-          sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
+          //sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/current^.width, current^.name);
+          //sy := CodeGen.FormatYCoorRelativeToParentHeight(current^.y/current^.height, current^.name);
+          sx := 'ScaleWF('+FormatFloatWithDot('0.000', current^.x)+'*FAdditionnalScale)';
+          sy := 'ScaleHF('+FormatFloatWithDot('0.000', current^.y)+'*FAdditionnalScale)';
         end else begin
           if _parent^.IsRoot then begin
             sx := CodeGen.FormatXCoorRelativeToParentWidth(current^.x/_parent^.width, 'Self');
@@ -456,8 +458,6 @@ begin
         t.Add('    SetCoordinate('+sx+', '+sy+');');
       end;
 
-//      CodeGen.CommonPropertiesToPascalCode(t, current, '    ');
-//      CodeGen.ExtraPropertiesToPascalCode(t, current, '    ');
       if codeop.useapplysymetrywhenflip then
         t.Add('    ApplySymmetryWhenFlip := True;');
       t.Add('  end;');
