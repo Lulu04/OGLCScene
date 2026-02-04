@@ -145,12 +145,10 @@ begin
   {$endif}
   bundleName := '/'+AppBundleName;
   i := Pos(bundleName, f);
-  if i > 0 then
-    Result := ConcatPaths([copy(f, 1, i-1), bundleName])
-  else
-    Result := f;
-
-  Result := IncludeTrailingPathDelimiter(Result);
+  if i > 0 then begin
+    Result := IncludeTrailingPathDelimiter(ConcatPaths([copy(f, 1, i-1), bundleName]));
+  end else
+    Result := '';
 end;
 {$endif}
 
@@ -158,16 +156,25 @@ end;
 
 class function TApp.ALSoundLibrariesSubFolder: string;
 begin
- {$if defined(Windows) and defined(cpu386)}
-  Result := 'i386-win32\';
- {$elseif defined(Windows) and defined(cpux86_64)}
-  Result := 'x86_64-win64\';
- {$elseif defined(Linux) and defined(cpu386)}
-  Result := 'i386-linux/';
- {$elseif defined(Linux) and defined(cpux86_64)}
-  Result := 'x86_64-linux/';
- {$elseif defined(Darwin) and defined(cpux86_64)}
-  Result := 'x86_64-macos/';
+ {$if defined(Darwin)}
+   {$if defined(cpux86_64)}
+     Result := 'x86_64-macos/';
+   {$endif}
+
+ {$elseif defined(Windows)}
+   {$if defined(cpu386)}
+     Result := 'i386-win32\';
+   {$elseif defined(cpux86_64)}
+     Result := 'x86_64-win64\';
+   {$endif}
+
+ {$elseif defined(Unix)}     // linux + bsd
+   {$if defined(cpu386)}
+     Result := 'i386-linux/';
+   {$elseif defined(cpux86_64)}
+     Result := 'x86_64-linux/';
+   {$endif}
+
  {$else}
   Result := '';
  {$endif}
@@ -175,11 +182,7 @@ end;
 
 class function TApp.DataFolder: string;
 begin
- {$if defined(Windows)}
-   Result := IncludeTrailingPathDelimiter(Application.Location)+'Data\';
- {$elseif defined(Linux)}
-   Result := IncludeTrailingPathDelimiter(Application.Location)+'Data/';
- {$elseif defined(Darwin)}
+ {$if defined(Darwin)}
    Result := GetAppBundlePath;
    if DirectoryExists(Result) then
      // application use a bundle
@@ -189,6 +192,10 @@ begin
      Result := ConcatPaths([ExtractFilePath(ParamStr(0)), 'Data']);
      Result := IncludeTrailingPathDelimiter(Result);
    end;
+ {$elseif defined(Windows)}
+   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'Data\';
+ {$elseif defined(Unix)}  // linux + bsd
+   Result := IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0)))+'Data/';
  {$else}
    {$error You can not compile this program on this platform, sorry !}
  {$endif}
@@ -197,17 +204,11 @@ end;
 class function TApp.OSName: string;
 begin
   Result := '';
-  {$if defined(Windows) and defined(cpu386)}
-    Result := 'i386-win32';
-  {$elseif defined(Windows) and defined(cpux86_64)}
-    Result := 'x86_64-win64';
-  {$elseif defined(Linux) and defined(cpu386)}
-    Result := 'i386-linux';
-  {$elseif defined(Linux) and defined(cpux86_64)}
-    Result := 'x86_64-linux';
-  {$elseif defined(Darwin) and defined(cpux86_64)}
-    Result := 'x86_64-macos';
-  {$endif}
+  {$if defined(Darwin) and defined(cpux86_64)} Result := 'x86_64-macos'; {$endif}
+  {$if defined(Windows) and defined(cpu386)} Result := 'i386-win32'; {$endif}
+  {$if defined(Windows) and defined(cpux86_64)} Result := 'x86_64-win64'; {$endif}
+  {$if defined(Linux) and defined(cpu386)} Result := 'i386-linux'; {$endif}
+  {$if defined(Linux) and defined(cpux86_64)} Result := 'x86_64-linux'; {$endif}
 end;
 
 
