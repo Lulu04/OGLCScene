@@ -263,8 +263,6 @@ public
 end;
 
 
-
-
 { TOGLCThreeColorTriangleRenderer }
 
 TOGLCThreeColorTriangleRenderer = class(specialize TOGLCGenericPrimitiveRenderer<Txycolor>)
@@ -581,7 +579,7 @@ begin
 
   // insert a primitive restart if needed
   if not aExtraTest and not needFlush and
-    ((aPrimitiveType = ptTriangleStrip) or (aPrimitiveType = ptTriangleFan)) then AddPrimitiveRestart;
+    (aPrimitiveType in [ptTriangleStrip, ptTriangleFan]) then AddPrimitiveRestart;
 
   FBatch^.CurrentRenderer := aNewRenderer;
   FBatch^.CurrentPrimitiveType := aPrimitiveType;
@@ -640,6 +638,7 @@ end;
 procedure TOGLCGenericPrimitiveRenderer.AddPrimitiveRestart;
 var p: PVertexIndex;
 begin
+  if not FUseIndicesBuffer then exit;
   p := QueryIndex(1);
   p^ := PRIMITIVE_INDEX_RESTART_VALUE;
 end;
@@ -647,7 +646,7 @@ end;
 procedure TOGLCGenericPrimitiveRenderer.AddPrimitiveRestartIfNeeded;
 begin
   if (FIndexInIndexArray > 0) and
-     (FBatch^.CurrentPrimitiveType in [ptTriangleStrip, ptTriangleFan]) then AddPrimitiveRestart;
+     (FBatch^.CurrentPrimitiveType in [ptTriangleStrip, ptTriangleFan, ptLineStrip]) then AddPrimitiveRestart;
 end;
 
 procedure TOGLCGenericPrimitiveRenderer.SetCapacity(aCount: ptrint);
@@ -1067,7 +1066,6 @@ begin
 
   InternalPushQuad(quad1, cf);
 end;
-
 
 { TOGLCThreeColorTriangleRenderer }
 
