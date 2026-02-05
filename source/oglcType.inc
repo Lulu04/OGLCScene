@@ -169,6 +169,7 @@ public
   property SystemFontName[index:integer]: string read GetSystemFontName;
 
   procedure ScanProjectFont(const aProjectFontDirectory: string);
+  procedure ClearProjectFonts;
   function ProjectFontCount: integer;
   property ProjectFontName[index:integer]: string read GetProjectFontName;
 
@@ -220,9 +221,6 @@ TFontDescriptor = record
   FontColor: TBGRAPixel;
   Gradient: TFontGradient;
   FontPixelMetric: TFontPixelMetric;
-  // set the default font (arial, white)
-  procedure CreateDefault;
-
   procedure Create(const aFontName: string; aFontHeight: integer; aStyle: TFontStyles; aFontColor: TBGRAPixel); overload;
 
   procedure Create(const aFontName: string; aFontHeight: integer; aStyle: TFontStyles;
@@ -629,11 +627,6 @@ end;
 
 { TFontDescriptor }
 
-procedure TFontDescriptor.CreateDefault;
-begin
-  Create('Arial', 12, [], BGRAWhite);
-end;
-
 procedure TFontDescriptor.Create(const aFontName: string; aFontHeight: integer;
   aStyle: TFontStyles; aFontColor: TBGRAPixel);
 begin
@@ -962,11 +955,10 @@ procedure TFontDescriptor.LoadFromString(const data: string);
 var prop: TProperties;
   s: string;
 begin
-  CreateDefault;
   s := '';
   prop.Split(data, '#');
-  prop.StringValueOf('FontName', FontName, FontName);
-  prop.IntegerValueOf('FontHeight', FontHeight, FontHeight);
+  prop.StringValueOf('FontName', FontName, '');
+  prop.IntegerValueOf('FontHeight', FontHeight, 12);
   prop.StringValueOf('Style', s, '');
   Style := [];
   if s.Contains('B') then Include(Style, fsBold);
@@ -1392,6 +1384,14 @@ begin
   end;
 
   filesFound.Free;
+end;
+
+procedure TOGLCFontManager.ClearProjectFonts;
+begin
+  FProjectFontNames := NIL;
+  FProjectFontFilenames := NIL;
+
+  ScanSystemFonts;
 end;
 
 function TOGLCFontManager.SystemFontCount: integer;
