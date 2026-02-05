@@ -104,6 +104,8 @@ TFontBank = class(specialize TListOfItemWithName<TFontDescriptorItem>)
   function GetItemReadableName: string; override;
   function GetHeaderFile: string; override;
   function GetSaveFileName: string; override;
+  procedure Clear; reintroduce;
+  function GetFirstAvailableFontName: string;
 
   procedure GetAtlasWithTexturedFont(const aFontDescriptorName, aCaption: string;
                                      out aAtlas: TAtlas;
@@ -220,7 +222,8 @@ uses u_utils, u_common, u_project, u_resourcestring, u_texture_list,
 
 procedure TFontDescriptorItem.InitDefault;
 begin
-  FD.CreateDefault;
+  FD.Create(FontBank.GetFirstAvailableFontName, 12, [], BGRA(255,255,255));
+
   UseCharsetPreset := True;
   CharsetPresets := ['NUMBER', 'ASCII_SPACE', 'ASCII_LETTER'];
   TextToCharSet := '';
@@ -380,6 +383,19 @@ end;
 function TFontBank.GetSaveFileName: string;
 begin
   Result := 'FontBank.oglc';
+end;
+
+procedure TFontBank.Clear;
+begin
+  inherited Clear;
+  FScene.FontManager.ClearProjectFonts;
+end;
+
+function TFontBank.GetFirstAvailableFontName: string;
+begin
+  if FScene.FontManager.ProjectFontCount > 0 then Result := FScene.FontManager.ProjectFontName[0]
+    else if FScene.FontManager.SystemFontCount > 0 then Result := FScene.FontManager.SystemFontName[0]
+      else Result := '';
 end;
 
 procedure TFontBank.GetAtlasWithTexturedFont(const aFontDescriptorName, aCaption: string;

@@ -404,6 +404,7 @@ begin
     ScenarioBank.Clear;
     Config.InitDefault;
     WorkingLevelGroup := NIL;
+    FormMain.HideAllPages;
     FScene.LogInfo('done', 1);
   except
     On E :Exception do begin
@@ -431,8 +432,8 @@ begin
     // Sprite Builder: fill the listbox with texture  names
     FrameToolsSpriteBuilder.FillListBoxTextureNames;
 
-    if LevelBank.Size > 0 then FormMain.ShowPageLevelBank
-      else FormMain.ShowPageSpriteBank;
+//    if LevelBank.Size > 0 then FormMain.ShowPageLevelBank
+//      else FormMain.ShowPageSpriteBank;
 
     // retrieve layers from unit u_common.pas
     Layers.InitWith(Config.TargetLazarusProject.UCommonGetLayerNames);
