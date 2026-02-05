@@ -160,6 +160,8 @@ type
     destructor Destroy; override;
     procedure Fill;
 
+    procedure ClearView;
+
     property IsEditable: boolean read FIsEditable write FIsEditable;
     property OnSelectionChange: TNotifyEvent read FOnSelectionChange write FOnSelectionChange;
   end;
@@ -408,8 +410,9 @@ end;
 procedure TFrameViewFontBank.Timer1Timer(Sender: TObject);
 begin
   if FPreviewNeedUpdate then begin
-    ScreenFontBank.UpdatePreview(WidgetToFontDescriptor, GetCharset, GetFillTexture);
     FPreviewNeedUpdate := False;
+    if Label15.Caption <> '' then
+      ScreenFontBank.UpdatePreview(WidgetToFontDescriptor, GetCharset, GetFillTexture);
   end;
 end;
 
@@ -612,7 +615,7 @@ begin
     Radius := 0;
   end;
 
-  if Label15.Caption = '' then Label15.Caption := 'Arial';
+  if Label15.Caption = '' then Label15.Caption := FontBank.GetFirstAvailableFontName;
 
   if RBGradient.Checked then begin
     gradient.Create(fontColor1, fontColor2, CBToGradientType,
@@ -1011,6 +1014,18 @@ begin
 
   FGradOriginPercentCoor := PointF(0.5, 0.0);
   FGradD1PercentCoor := PointF(0.5, 1.0);
+
+  Timer1.Enabled := True;
+end;
+
+procedure TFrameViewFontBank.ClearView;
+begin
+  FPreviewNeedUpdate := False;
+  Timer1.Enabled := False;
+  Label15.Caption := '';
+  TV.Items.Clear;
+  TVAvailableFonts.Items.Clear;
+  ScreenFontBank.ClearView;
 end;
 
 end.

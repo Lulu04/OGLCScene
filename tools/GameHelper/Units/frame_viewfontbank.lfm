@@ -299,9 +299,9 @@ object FrameViewFontBank: TFrameViewFontBank
     Height = 387
     Top = 357
     Width = 325
-    ActivePage = PageCharset
+    ActivePage = PageDesign
     Anchors = [akTop, akLeft, akRight, akBottom]
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 7
     object PageDesign: TTabSheet
       Caption = 'Design'

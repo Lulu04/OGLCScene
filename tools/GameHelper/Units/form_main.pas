@@ -502,6 +502,8 @@ end;
 procedure TFormMain.HideAllPages;
 begin
   Notebook1.PageIndex := -1;
+  CBBank.ItemIndex := -1;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
@@ -512,6 +514,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPageSpriteBuilder;
@@ -522,6 +525,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPageLevelEditor;
@@ -532,6 +536,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPageLevelBank;
@@ -542,6 +547,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPageFontBank;
@@ -562,6 +568,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPagePanelEditor;
@@ -571,6 +578,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPagePathBank;
@@ -581,6 +589,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.ShowPagePathEditor;
@@ -590,6 +599,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
+  FrameViewFontBank.ClearView;
 end;
 
 procedure TFormMain.EditLevelInLevelBank(const aName: string);
