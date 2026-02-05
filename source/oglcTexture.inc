@@ -340,8 +340,13 @@ begin
   with Result do begin
     Left := 0;
     Top := 0;
-    Right := Texture^.FrameWidth;
-    Bottom := Texture^.FrameHeight;
+    if Texture <> NIL then begin
+      Right := Texture^.FrameWidth;
+      Bottom := Texture^.FrameHeight;
+    end else begin
+      Right := 0;
+      Bottom := 0;
+    end;
   end;
 end;
 
