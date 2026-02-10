@@ -518,7 +518,9 @@ end;
 function TOGLCImagePacker.RetrieveTextureByFileName(const aFilename: string): PTexture;
 var item: POGLCImagePackerItem;
 begin
+  Result := NIL;
   item := FirstItem;
+  if item = NIL then exit;
   repeat
     if item^.Texture <> NIL then
       if item^.Texture^.Filename = aFilename then begin
@@ -527,7 +529,6 @@ begin
       end;
     item := item^.Next;
   until item = NIL;
-  Result := NIL;
 end;
 
 function TOGLCImagePacker.TryToPack(aMaxTextureSize: integer): boolean;
