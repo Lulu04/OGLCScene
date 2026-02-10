@@ -96,8 +96,10 @@ private
   procedure CheckIndex(aIndex: integer);
   function CreateItem(const aStr: string): TUIListBoxItem;
   function GetFirstSelectedItem: string;
+  function GetItemIndex: integer;
   procedure SetIndexFirstItemSelected(AValue: integer);
   procedure SetItemHeight(AValue: integer);
+  procedure SetItemIndex(AValue: integer);
   procedure SetSelectedStateOnAllItems(aState: boolean);
   function GetSelected(index: integer): boolean;
   function GetStrItem(index: integer): string;
@@ -144,10 +146,15 @@ public
   // Force an item to be visible in the list.
   procedure MakeItemVisible(aIndex: integer);
 
+  // Return an array of string with the items in the listbox.
+  function ItemsToStringArray: TStringArray;
+
   // The item height .
   property ItemHeight: integer read FItemHeight write SetItemHeight;
   // Number of items currently in the listbox.
   property Count: integer read GetCount;
+  // Get the index of the selected item. -1 if none.
+  property ItemIndex: integer read GetItemIndex write SetItemIndex;
   // Get/Set the index of first selected item.
   property FirstSelectedIndex: integer read FIndexFirstItemSelected write SetIndexFirstItemSelected;
   // Get the string of the item currently selected. '' is returned if there is no selection.
@@ -631,6 +638,11 @@ begin
     else Result := Items[FirstSelectedIndex];
 end;
 
+function TUIListBox.GetItemIndex: integer;
+begin
+  Result := FirstSelectedIndex;
+end;
+
 procedure TUIListBox.SetIndexFirstItemSelected(AValue: integer);
 begin
   if FIndexFirstItemSelected <> -1 then begin
@@ -652,6 +664,11 @@ begin
   if FItemHeight = AValue then Exit;
   FItemHeight := AValue;
   UpdateWidgetSizeAndLayout;
+end;
+
+procedure TUIListBox.SetItemIndex(AValue: integer);
+begin
+  FirstSelectedIndex := -1;
 end;
 
 procedure TUIListBox.SetSelectedStateOnAllItems(aState: boolean);
@@ -880,6 +897,16 @@ begin
   if FVScrollBar = NIL then exit;
   if not FVScrollBar.Visible then exit;
   FVScrollBar.Position := aIndex * FItemHeight;
+end;
+
+function TUIListBox.ItemsToStringArray: TStringArray;
+var i: integer;
+begin
+  Result := NIL;
+  if Count = 0 then exit;
+  SetLength(Result, Count);
+  for i:=0 to Count-1 do
+    Result[i] := Items[i];
 end;
 
 {procedure TUIListBox.Sort;
