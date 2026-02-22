@@ -331,7 +331,7 @@ begin
     FVScrollBar.Visible := False;
     FVScrollBar.OnChange := @ProcessEventScrollBarChange;
     AddChild(FVScrollBar);
-    FHScrollBarMode := sbmAuto;
+    FVScrollBarMode := sbmAuto;
   end;
 
   if aUseHScrollBar then begin
@@ -340,7 +340,7 @@ begin
     FHScrollBar.Visible := False;
     FHScrollBar.OnChange := @ProcessEventScrollBarChange;
     AddChild(FHScrollBar);
-    FVScrollBarMode := sbmAuto;
+    FHScrollBarMode := sbmAuto;
   end;
 end;
 
