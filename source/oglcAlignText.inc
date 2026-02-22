@@ -23,6 +23,7 @@ private
 private
   FCallbackSizeChanged: TOGLCEvent;
   FRect: TRect;
+  function GetLine(index: integer): string;
   procedure InitDefault;
   procedure FreeObjects;
   procedure DistributeTheWordsOnTheSurface;
@@ -54,6 +55,8 @@ public
   property Caption: string read GetCaption write SetCaption;
   property Align: TOGLCAlignment read FAlign write SetAlign;
   property TexturedFont: TTexturedFont read FTexturedFont write SetTexturedFont;
+  property LineCount: integer read FLineCount;
+  property Lines[index:integer]: string read GetLine;
   // fired when caption or Textured font change.
   property OnSizeChanged: TOGLCEvent read FCallbackSizeChanged write FCallbackSizeChanged;
   // True if the caption is <> '' and property TexturedFont is initialized
@@ -71,6 +74,17 @@ begin
   FillChar(Self, SizeOf(TAlignedTextDescriptor), 0);
   Tint := TBGRAParam.Create;
   Tint.Value := BGRA(220,220,220);
+end;
+
+function TAlignedTextDescriptor.GetLine(index: integer): string;
+var i: integer;
+begin
+  Result := '';
+  for i:=0 to High(Words) do begin
+    if Words[i].LineIndex = index then
+      if i = 0 then Result := Words[i].Letters
+        else Result := ' ' + Words[i].Letters;
+  end;
 end;
 
 procedure TAlignedTextDescriptor.FreeObjects;
