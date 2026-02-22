@@ -209,6 +209,7 @@ TOGLCCamera = class;
 {$I oglcTexturedFont.inc}
 {$I oglcAlignText.inc}
 {$I oglcFreeText.inc}
+{$I oglcLetterToSprite.inc}
 {$I oglcUITheme.inc}
 {$I oglcUI.inc}
 {$I oglcUIScrollable.inc}
@@ -951,6 +952,7 @@ end;
 {$I oglcTexturedFont.inc}
 {$I oglcAlignText.inc}
 {$I oglcFreeText.inc}
+{$I oglcLetterToSprite.inc}
 {$I oglcReusableSurfaceContainer.inc}
 {$I oglcEnvironment.inc}
 {$I oglcGpuInfo.inc}
