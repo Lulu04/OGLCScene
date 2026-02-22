@@ -255,7 +255,7 @@ begin
   i := IndexOf( c );
   if i=-1
     then Result := 0
-    else Result := Round(FTexCharArray[i].OriginalCharSize.cx*CharSpacingCoeff.Value);
+    else Result := Trunc(FTexCharArray[i].OriginalCharSize.cx*CharSpacingCoeff.Value);
 end;
 
 function TTexturedFont.GetCharHeight(const c: string): integer;
