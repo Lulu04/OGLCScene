@@ -1,4 +1,8 @@
-Version 2.4 - 
+Version 2.5 - 
+> Added class TLetterSpriteContainer to perform text fx, letter by letter.
+> Game Helper: bug fixes
+
+Version 2.4 - Jan 22 2026
 > Game Helper: added UI Panel Editor, Path Editor and support for TOGLCPathToFollow, TFreeTextOnPath and TSpriteOnPath. Bug fixes an improve functionalities.
 > Renamed TSpriteOnPathToFollow to TSpriteOnPath. TSpriteOnPathToFollow is deprecated.
 > New directory 'extrademo': PlanetDesigner, CloudDesigner and StarnestDesigner moved to this folder.
