@@ -230,7 +230,6 @@ begin
   Result := FAlignedTextDescriptor.Caption;
 end;
 
-
 { TFreeText }
 
 procedure TFreeText.UpdateCharIndexesAndComputeSize;
