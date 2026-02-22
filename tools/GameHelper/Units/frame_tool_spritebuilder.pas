@@ -381,7 +381,7 @@ type
     procedure ShowSelectionData(aSelected: ArrayOfPSurfaceDescriptor);
 
     procedure EditSpriteInSpriteBank(const aName: string);
-    //procedure EditNewSprite;
+    procedure EditNewSprite;
 
     function SelectedTabIsChild: boolean;
     function SelectedTabIsCollisionBody: boolean;
@@ -1976,19 +1976,19 @@ begin
   UpdateExportLabels;
 end;
 
-{procedure TFrameToolsSpriteBuilder.EditNewSprite;
+procedure TFrameToolsSpriteBuilder.EditNewSprite;
 begin
-  Textures.Clear;
+{  Textures.Clear;
   Surfaces.Clear;
   Bodies.Clear;
   //Bodies.SetParentSurface(Surfaces.GetRootItem^.surface);
   Postures.Clear;
-  FCodeGenerationOptions.InitDefault;
+  FCodeGenerationOptions.InitDefault;  }
 
   Edit2.Text := '';
   Edit2.ReadOnly := False;
   UpdateExportLabels;
-end; }
+end;
 
 function TFrameToolsSpriteBuilder.SelectedTabIsChild: boolean;
 begin

@@ -1217,7 +1217,7 @@ procedure TSurfaceDescriptor.DuplicateTo(aSurface: PSurfaceDescriptor);
 begin
   aSurface^.parentID := parentID;
   aSurface^.name := Copy(name, 1, Length(name));
-  aSurface^.textureName := Copy(name, 1, Length(textureName));
+  aSurface^.textureName := Copy(textureName, 1, Length(textureName));
   aSurface^.classtype := classtype;
   if ParentList.ModeForLevelEditor
     then aSurface^.layerindex := FScene.LayerIndexOf(surface.ParentLayer)

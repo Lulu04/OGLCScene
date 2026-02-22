@@ -267,10 +267,10 @@ begin
     if codeop.useapplysymetrywhenflip then begin
       t.Add('protected');
       CodeGen.AddDeclarationOfProtectedFlipHAndFlipVForApplySymmetryWhenFlip(t);
+      t.Add('public');
     end;
 
     // methods declaration
-//    t.Add('public');
     if textureList.Size > 0 then
       CodeGen.AddDeclarationOfClassLoadTexture(t);
     CodeGen.AddDeclarationOfSurfaceConstructor(t);
@@ -478,7 +478,7 @@ begin
             s := '  CollisionBody.AddPoint(';
             s := s + 'PointF('+CodeGen.FormatXCoorRelativeToParentWidth(pf.x/rootItem^.width{surface.Width}, '')+
                      ', '+CodeGen.FormatYCoorRelativeToParentHeight(pf.y/rootItem^.height{surface.Height}, '')+
-                     ')';
+                     '));';
             t.Add(s);
           end;
           _btLine: begin

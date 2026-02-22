@@ -21,11 +21,11 @@ object FrameToolsSpriteBuilder: TFrameToolsSpriteBuilder
     Height = 706
     Top = 32
     Width = 300
-    ActivePage = PageChilds
+    ActivePage = PageSave
     Anchors = [akTop, akLeft, akRight, akBottom]
     MultiLine = True
     Options = [nboMultiLine]
-    TabIndex = 1
+    TabIndex = 4
     TabOrder = 0
     OnChange = PC1Change
     object PageTextures: TTabSheet
