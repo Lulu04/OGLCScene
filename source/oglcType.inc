@@ -258,6 +258,7 @@ TFontDescriptor = record
   procedure SetFontRendererOn(aBitmap: TBGRABitmap);
   function UseShadow: boolean;
   function UseOutLine: boolean;
+  function TextSize(const aStr: string): TSize;
   // gives the additionnal size computed from outline width and shadow parameters.
   function DecorationSize: TSize;
 public  // utils for Game Helper
@@ -787,23 +788,11 @@ end;
 procedure TFontDescriptor.ResizeAndDrawStringOn(aBitmap: TBGRABitmap; const aStr: string; aFillTexture: TBGRABitmap);
 var xx,yy:single;
     ts: TSize;
- {   _ShadowOffsetX, _ShadowOffsetY, _ShadowRadius: integer;
-    _OutLineWidth: single; }
    grad: TBGRAGradientScanner;
-   familyItem: TCustomFamilyCollectionItem;
-   font: TFreeTypeFont;
 begin
-  familyItem := FontCollection.Family[FontName];
-  if familyItem <> NIL then begin
-    font := familyItem.Font[0].Createfont;
-    try
-      font.SizeInPixels := FontHeight;
-      ts.cx := Round(font.TextWidth(aStr));
-      ts.cy := Round(font.TextHeight(aStr));
-    finally
-      font.Free;
-    end;
-  end else ts := aBitmap.TextSize(aStr);
+  ts := TextSize(aStr);
+  if ts.cx = 0 then
+    ts := aBitmap.TextSize(aStr);
 
   // size of the rendered font. try to take into account shadow and outline.
   ts := ts + DecorationSize;
@@ -813,26 +802,6 @@ begin
   if ts.cy = 0 then ts.cy := 1;
 
   aBitmap.SetSize(ts.cx, ts.cy);
-
-{  // force shadow param. to 0 if there is no shadow
-  if UseShadow then begin
-    _ShadowOffsetX := ShadowOffsetX;
-    _ShadowOffsetY := ShadowOffsetY;
-    _ShadowRadius := ShadowRadius;
-  end else begin
-     _ShadowOffsetX := 0;
-     _ShadowOffsetY := 0;
-     _ShadowRadius := 0;
-  end;
-  // force outline param. to 0 if there is no outline
-  if UseOutLine
-    then _OutLineWidth := OutLineWidth
-    else _OutLineWidth := 0;
-
-  xx := _OutlineWidth*0.5+_ShadowRadius;
-  yy := xx;
-  if _ShadowOffsetX < 0 then xx += Abs(_ShadowOffsetX);
-  if _ShadowOffsetY < 0 then yy += Abs(_ShadowOffsetY);  }
 
   xx := 0;
   yy := 0;
@@ -900,6 +869,23 @@ end;
 function TFontDescriptor.UseOutLine: boolean;
 begin
   Result := (OutLineColor.alpha <> 0) and (OutLineWidth > 0);
+end;
+
+function TFontDescriptor.TextSize(const aStr: string): TSize;
+var familyItem: TCustomFamilyCollectionItem;
+  font: TFreeTypeFont;
+begin
+  familyItem := FontCollection.Family[FontName];
+  if familyItem <> NIL then begin
+    font := familyItem.Font[0].Createfont;
+    try
+      font.SizeInPixels := FontHeight;
+      Result.cx := Round(font.TextWidth(aStr));
+      Result.cy := Round(font.TextHeight(aStr));
+    finally
+      font.Free;
+    end;
+  end else Result := Size(0, 0);
 end;
 
 function TFontDescriptor.DecorationSize: TSize;
