@@ -343,6 +343,7 @@ end;
 procedure TFrameToolSpriteBank.DoNewSprite;
 begin
   HideToolPanels;
+  FrameToolsSpriteBuilder.EditNewSprite;
   FormMain.ShowPageSpriteBuilder;
 end;
 

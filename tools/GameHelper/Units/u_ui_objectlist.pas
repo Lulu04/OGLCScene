@@ -607,10 +607,14 @@ begin
     case panelClassType of
       'TUIPanel', 'TUIPanelWithEffects': begin
         t.Add('  inherited Create(FScene);');
+        if not ChildClippingEnabled then
+          t.Add('  ChildClippingEnabled := False;');
       end;
       'TUIModalPanel': begin
         if DarkenBG then t.Add('  inherited Create(FScene, '+DarknessColor.alpha.ToString+');')
           else t.Add('  inherited Create(FScene, 0);');
+        if not ChildClippingEnabled then
+          t.Add('  ChildClippingEnabled := False;');
       end;
       'TUILabel': begin
         t.Add('  inherited Create(FScene);');

@@ -82,6 +82,7 @@ type
     procedure CreateAppTextureAtlas;
     procedure FreeAppTextureAtlas;
   private
+    FPreviousPageSelected: TPage;
     procedure LoadCommonData;
     procedure FreeCommonData;
     procedure ProcessApplicationIdle(Sender: TObject; var Done: Boolean);
@@ -239,6 +240,7 @@ end;
 
 procedure TFormMain.CBBankSelect(Sender: TObject);
 begin
+  if FPreviousPageSelected = PageFontBank then FrameViewFontBank.ClearView;
   case CBBank.Text of
     'SPRITE BANK': ShowPageSpriteBank;
     'LEVEL BANK': ShowPageLevelBank;
@@ -504,6 +506,7 @@ begin
   Notebook1.PageIndex := -1;
   CBBank.ItemIndex := -1;
   FrameViewFontBank.ClearView;
+  FPreviousPageSelected := NIL;
 end;
 
 procedure TFormMain.ShowPageSpriteBank;
@@ -514,7 +517,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PageSpriteBank;
 end;
 
 procedure TFormMain.ShowPageSpriteBuilder;
@@ -525,7 +528,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PageSpriteBuilder;
 end;
 
 procedure TFormMain.ShowPageLevelEditor;
@@ -536,7 +539,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PageLevelEditor;
 end;
 
 procedure TFormMain.ShowPageLevelBank;
@@ -547,7 +550,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PageLevelBank;
 end;
 
 procedure TFormMain.ShowPageFontBank;
@@ -558,6 +561,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
+  FPreviousPageSelected := PageFontBank;
 end;
 
 procedure TFormMain.ShowPagePanelBank;
@@ -568,7 +572,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PagePanelBank;
 end;
 
 procedure TFormMain.ShowPagePanelEditor;
@@ -578,7 +582,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PageUIPanelEditor;
 end;
 
 procedure TFormMain.ShowPagePathBank;
@@ -589,7 +593,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := True;
   CBBank.Enabled := True;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PagePathBank;
 end;
 
 procedure TFormMain.ShowPagePathEditor;
@@ -599,7 +603,7 @@ begin
   UpdateWidgets;
   ToolBarMain.Visible := False;
   CBBank.Enabled := False;
-  FrameViewFontBank.ClearView;
+  FPreviousPageSelected := PagePathEditor;
 end;
 
 procedure TFormMain.EditLevelInLevelBank(const aName: string);
